@@ -235,6 +235,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               .map(transfer -> new NearbyStop(
                   transfer.to,
                   transfer.getDistanceMeters(),
+                  0,
                   transfer.getEdges(),
                   GeometryUtils.concatenateLineStrings(transfer
                         .getEdges()

@@ -85,7 +85,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                 if (sd.stop == stop) { continue; }
                 graph.transfersByStop.put(
                     stop,
-                    new SimpleTransfer(stop, sd.stop, sd.distance, sd.edges)
+                    new SimpleTransfer(stop, sd.stop, sd.distance, sd.distanceIndependentTime, sd.edges)
                 );
                 n += 1;
             }
@@ -97,7 +97,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                     if (sd.stop == ts0.getStop()) { continue; }
                     if (sd.stop instanceof Stop) { continue; }
                     graph.transfersByStop.put(sd.stop,
-                        new SimpleTransfer(sd.stop, ts0.getStop(), sd.distance, sd.edges)
+                        new SimpleTransfer(sd.stop, ts0.getStop(), sd.distance, sd.distanceIndependentTime, sd.edges)
                     );
                     n += 1;
                 }

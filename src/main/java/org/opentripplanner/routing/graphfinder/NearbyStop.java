@@ -8,8 +8,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -27,16 +25,18 @@ public class NearbyStop implements Comparable<NearbyStop> {
 
   public final StopLocation stop;
   public final double distance;
+  public final int distanceIndependentTime;
 
   public final List<Edge> edges;
   public final LineString geometry;
   public final State state;
 
   public NearbyStop(
-      StopLocation stop, double distance, List<Edge> edges, LineString geometry, State state
+      StopLocation stop, double distance, int distanceIndependentTime, List<Edge> edges, LineString geometry, State state
   ) {
     this.stop = stop;
     this.distance = distance;
+    this.distanceIndependentTime = distanceIndependentTime;
     this.edges = edges;
     this.geometry = geometry;
     this.state = state;
@@ -46,7 +46,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
       TransitStopVertex stopVertex, double distance, List<Edge> edges, LineString geometry,
       State state
   ) {
-    this(stopVertex.getStop(), distance, edges, geometry, state);
+    this(stopVertex.getStop(), distance, 0, edges, geometry, state);
   }
 
   @Override
@@ -64,25 +64,22 @@ public class NearbyStop implements Comparable<NearbyStop> {
    */
   public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
     double effectiveWalkDistance = 0.0;
+    int distanceIndependentTime = 0;
     GraphPath graphPath = new GraphPath(state, false);
     CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
     List<Edge> edges = new ArrayList<>();
     for (Edge edge : graphPath.edges) {
-      if (edge instanceof StreetEdge) {
-        LineString geometry = edge.getGeometry();
-        if (geometry != null) {
-          if (coordinates.size() == 0) {
-            coordinates.extend(geometry.getCoordinates());
-          }
-          else {
-            coordinates.extend(geometry.getCoordinates(), 1);
-          }
+      LineString geometry = edge.getGeometry();
+      if (geometry != null) {
+        if (coordinates.size() == 0) {
+          coordinates.extend(geometry.getCoordinates());
         }
-        effectiveWalkDistance += edge.getEffectiveWalkDistance();
+        else {
+          coordinates.extend(geometry.getCoordinates(), 1);
+        }
       }
-      else if (edge instanceof PathwayEdge) {
-        effectiveWalkDistance += edge.getDistanceMeters();
-      }
+      effectiveWalkDistance += edge.getEffectiveWalkDistance();
+      distanceIndependentTime += edge.getDistanceIndependentTime();
       edges.add(edge);
     }
     if (coordinates.size() < 2) {   // Otherwise the walk step generator breaks.
@@ -95,6 +92,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
     return new NearbyStop(
         stop,
         effectiveWalkDistance,
+        distanceIndependentTime,
         edges,
         geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())),
         state
