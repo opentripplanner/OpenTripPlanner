@@ -37,6 +37,14 @@ public interface PathLeg<T extends RaptorTripSchedule> {
         return toTime() - fromTime();
     }
 
+
+    /**
+     * The computed generalized-cost for this path leg.
+     * <p>
+     * {@code -1} is returned if no cost is computed by raptor.
+     */
+    int generalizedCost();
+
     /**
      * @return {@code true} if transit leg, if not {@code false}.
      */
