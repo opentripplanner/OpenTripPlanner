@@ -107,9 +107,6 @@ public class GraphBuilder implements Runnable {
 
         GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
 
-        boolean hasStreetData = hasOsm || graphBuilder.graph.hasStreets;
-
-
         if ( hasOsm ) {
             List<BinaryOpenStreetMapProvider> osmProviders = Lists.newArrayList();
             for (DataSource osmFile : dataSources.get(OSM)) {
@@ -166,7 +163,7 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(netexModule(config, dataSources.get(NETEX)));
         }
 
-        if(hasTransitData && hasStreetData) {
+        if(hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
             if (config.matchBusRoutesToStreets) {
                 graphBuilder.addModule(new BusRouteStreetMatcher());
             }
