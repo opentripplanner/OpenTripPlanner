@@ -21,15 +21,15 @@ class GroupOfStationsMapper {
 
     private final FeedScopedIdFactory idFactory;
 
-    private final EntityById<FeedScopedId, MultiModalStation> multiModalStations;
+    private final EntityById<MultiModalStation> multiModalStations;
 
-    private final EntityById<FeedScopedId, Station> stations;
+    private final EntityById<Station> stations;
 
 
     GroupOfStationsMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<FeedScopedId, MultiModalStation> multiModalStations,
-            EntityById<FeedScopedId, Station> stations
+            EntityById<MultiModalStation> multiModalStations,
+            EntityById<Station> stations
     ) {
         this.idFactory = idFactory;
         this.multiModalStations = multiModalStations;
@@ -37,9 +37,9 @@ class GroupOfStationsMapper {
     }
 
     GroupOfStations map(GroupOfStopPlaces groupOfStopPlaces) {
-        GroupOfStations groupOfStations = new GroupOfStations();
-        groupOfStations.setId(
-                idFactory.createId(groupOfStopPlaces.getId()));
+        GroupOfStations groupOfStations = new GroupOfStations(
+            idFactory.createId(groupOfStopPlaces.getId())
+        );
         groupOfStations.setName(groupOfStopPlaces.getName().getValue());
         WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(groupOfStopPlaces.getCentroid());
 

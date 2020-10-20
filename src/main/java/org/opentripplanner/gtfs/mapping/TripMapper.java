@@ -27,9 +27,8 @@ class TripMapper {
     }
 
     private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
-        Trip lhs = new Trip();
+        Trip lhs = new Trip(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
-        lhs.setId(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
         lhs.setRoute(routeMapper.map(rhs.getRoute()));
         lhs.setServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
         lhs.setTripShortName(rhs.getTripShortName());

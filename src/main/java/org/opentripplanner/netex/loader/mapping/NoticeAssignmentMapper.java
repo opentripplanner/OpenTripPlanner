@@ -33,9 +33,9 @@ class NoticeAssignmentMapper {
 
     private final ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById;
 
-    private final EntityById<FeedScopedId, Route> routesById;
+    private final EntityById<Route> routesById;
 
-    private final EntityById<FeedScopedId, Trip> tripsById;
+    private final EntityById<Trip> tripsById;
 
     private final Map<String, StopTime> stopTimesByNetexId;
 
@@ -48,8 +48,8 @@ class NoticeAssignmentMapper {
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId,
             ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
-            EntityById<FeedScopedId, Route> routesById,
-            EntityById<FeedScopedId, Trip> tripsById,
+            EntityById<Route> routesById,
+            EntityById<Trip> tripsById,
             Map<String, StopTime> stopTimesByNetexId
     ) {
         this.idFactory = idFactory;
@@ -61,11 +61,11 @@ class NoticeAssignmentMapper {
         this.stopTimesByNetexId = stopTimesByNetexId;
     }
 
-    Multimap<TransitEntity<?>, Notice> map(NoticeAssignment noticeAssignment) {
+    Multimap<TransitEntity, Notice> map(NoticeAssignment noticeAssignment) {
         // TODO OTP2 - Idealy this should en up as one key,value pair.
         //             The `StopPointInJourneyPattern` witch result in more than one key/valye pair,
         //             can be replaced with a new compound key type.
-        Multimap<TransitEntity<?>, Notice> noticiesByEntity = ArrayListMultimap.create();
+        Multimap<TransitEntity, Notice> noticiesByEntity = ArrayListMultimap.create();
 
         String noticedObjectId = noticeAssignment.getNoticedObjectRef().getRef();
         Notice otpNotice = getOrMapNotice(noticeAssignment);

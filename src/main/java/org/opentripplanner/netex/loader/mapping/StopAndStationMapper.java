@@ -3,10 +3,9 @@ package org.opentripplanner.netex.loader.mapping;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
@@ -45,7 +44,7 @@ class StopAndStationMapper {
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
     private final StationMapper stationMapper;
     private final StopMapper stopMapper;
-    private final EntityById<FeedScopedId, FareZone> tariffZonesById;
+    private final EntityById<FareZone> tariffZonesById;
     private final FeedScopedIdFactory idFactory;
 
     /**
@@ -61,7 +60,7 @@ class StopAndStationMapper {
     StopAndStationMapper(
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
-            EntityById<FeedScopedId, FareZone> tariffZonesById,
+            EntityById<FareZone> tariffZonesById,
             DataImportIssueStore issueStore
     ) {
         this.stationMapper = new StationMapper(idFactory);

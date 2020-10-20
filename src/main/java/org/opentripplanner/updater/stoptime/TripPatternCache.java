@@ -44,10 +44,10 @@ public class TripPatternCache {
         
         // Create TripPattern if it doesn't exist yet
         if (tripPattern == null) {
-            tripPattern = new TripPattern(route, stopPattern);
-            
             // Generate unique code for trip pattern
-            tripPattern.setId(new FeedScopedId(tripPattern.getFeedId(), generateUniqueTripPatternCode(tripPattern)));
+            var id = new FeedScopedId(tripPattern.getFeedId(), generateUniqueTripPatternCode(tripPattern));
+
+            tripPattern = new TripPattern(id, route, stopPattern);
             
             // Create an empty bitset for service codes (because the new pattern does not contain any trips)
             tripPattern.setServiceCodes(graph.getServiceCodes());
