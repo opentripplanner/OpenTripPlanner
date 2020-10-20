@@ -5,8 +5,17 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * This class generate a new id for new TripPatterns created real-time by the
+ * SIRI updaters. It is important to creat only on instance of this class, and inject it
+ * where it is needed.
+ * <p>
+ * The id generation is thread-safe, even if that is probably not needed.
+ */
 class SiriTripPatternIdGenerator {
-  private int counter = 0;
+  private final AtomicInteger counter = new AtomicInteger(0);
 
   /**
    * Generate unique trip pattern code for real-time added trip pattern. This function roughly
@@ -21,7 +30,7 @@ class SiriTripPatternIdGenerator {
     if( directionId == null) { directionId = ""; }
 
     // OBA library uses underscore as separator, we're moving toward colon.
-    String id = String.format("%s:%s:%03d:RT", routeId.getId(), directionId, ++counter);
+    String id = String.format("%s:%s:%03d:RT", routeId.getId(), directionId, counter.incrementAndGet());
 
     return new FeedScopedId(routeId.getFeedId(), id);
   }
