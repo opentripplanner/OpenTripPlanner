@@ -51,6 +51,11 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
+  public DataFetcher<Integer> generalizedCost() {
+    return environment -> getSource(environment).generalizedCost;
+  }
+
+  @Override
   public DataFetcher<EncodedPolylineBean> legGeometry() {
     return environment -> getSource(environment).legGeometry;
   }
