@@ -55,6 +55,7 @@ public class RoutingWorker {
      * can be boarded today. If there are trips that last multiple days, this will need to be
      * increased.
      */
+    // TODO This is used in the FlexRouter. Investigate if it is needed.
     private static final int ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY = 1;
 
     /**
@@ -63,6 +64,7 @@ public class RoutingWorker {
      * and would also need to board trips starting tomorrow. If a search window that lasts more than
      * a day is used, this will need to be increased.
      */
+    // TODO This could be calculated per request.
     private static final int ADDITIONAL_SEARCH_DAYS_AFTER_TODAY = 1;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
