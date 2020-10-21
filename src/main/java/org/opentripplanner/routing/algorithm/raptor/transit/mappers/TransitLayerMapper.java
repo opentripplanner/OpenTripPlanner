@@ -70,8 +70,7 @@ public class TransitLayerMapper {
             tripPatternsByStopByDate,
             transferByStopIndex,
             stopIndex,
-            graph.getTimeZone().toZoneId(),
-            graph.getMaxNumberOfMidnightCrossingsOfTrip()
+            graph.getTimeZone().toZoneId()
         );
     }
 
@@ -115,13 +114,13 @@ public class TransitLayerMapper {
                 // This nested loop could be quite inefficient.
                 // Maybe determine in advance which patterns are running on each service and day.
                 for (org.opentripplanner.model.TripPattern oldTripPattern : allTripPatterns) {
-                    TripPatternForDate tripPatternForDate =
+                    List<TripPatternForDate> tripPatternForDate =
                         tripPatternForDateMapper.map(
                             oldTripPattern.scheduledTimetable,
                             serviceDate
                     );
                     if (tripPatternForDate != null) {
-                        values.add(tripPatternForDate);
+                        values.addAll(tripPatternForDate);
                     }
                 }
                 if (!values.isEmpty()) {

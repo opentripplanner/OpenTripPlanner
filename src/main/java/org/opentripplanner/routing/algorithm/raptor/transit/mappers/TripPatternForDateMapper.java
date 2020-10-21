@@ -11,6 +11,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +59,7 @@ public class TripPatternForDateMapper {
      * @param serviceDate The date to map the TripPatternForDate for - READ ONLY
      * @return TripPatternForDate for this timetable and serviceDate
      */
-    public TripPatternForDate map(Timetable timetable, ServiceDate serviceDate) {
+    public List<TripPatternForDate> map(Timetable timetable, ServiceDate serviceDate) {
 
         TIntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
 
@@ -99,9 +100,18 @@ public class TripPatternForDateMapper {
             return null;
         }
 
-        return new TripPatternForDate(newTripPatternForOld.get(oldTripPattern),
+        // An extra TripPatternForDate object will be created for each time the TripPattern crosses
+        // midnight.
+        List<TripPatternForDate> result = new ArrayList<>();
+        for (int i = 0; i < oldTripPattern.getMaxNumberOfMidnightCrossingsOfTrip(); i++) {
+            LocalDate localDate = ServiceCalendarMapper.localDateFromServiceDate(serviceDate);
+
+            // TODO For future dates the times will need to be offset here
+            result.add(new TripPatternForDate(newTripPatternForOld.get(oldTripPattern),
                 times.toArray(TripTimes[]::new),
-                ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
-        );
+                localDate.plusDays(i)));
+        }
+
+        return result;
     }
 }

@@ -98,12 +98,14 @@ public class TransitLayerUpdater {
           .collect(Collectors.toMap(t -> t.getTripPattern().getPattern(), t -> t)));
 
       for (Timetable timetable : timetablesForDate) {
-        TripPatternForDate tripPatternForDate = tripPatternForDateMapper.map(
+        List<TripPatternForDate> tripPatternForDates = tripPatternForDateMapper.map(
             timetable,
             timetable.serviceDate
         );
-        if (tripPatternForDate != null) {
-          patternsForDateMap.put(timetable.pattern, tripPatternForDate);
+        if (tripPatternForDates != null) {
+          for (TripPatternForDate tripPatternForDate : tripPatternForDates) {
+            patternsForDateMap.put(timetable.pattern, tripPatternForDate);
+          }
         } else {
           // This has been completely cancelled, or otherwise doesn't map cleanly
           patternsForDateMap.remove(timetable.pattern);
