@@ -211,11 +211,9 @@ public class OSMDatabase {
     public void addNode(OSMNode node) {
         if (node.isBikeRental()) {
             bikeRentalNodes.put(node.getId(), node);
-            return;
         }
         if (node.isBikeParking()) {
             bikeParkingNodes.put(node.getId(), node);
-            return;
         }
         if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
                 .isStop()))
