@@ -18,7 +18,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
