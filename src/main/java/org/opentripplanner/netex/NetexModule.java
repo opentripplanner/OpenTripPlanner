@@ -88,13 +88,11 @@ public class NetexModule implements GraphBuilderModule {
 
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
-                // NB! The calls below have side effects - the builder state is updated!
                 if (OTPFeature.FlexRouting.isOn()) {
-                    FlexTripsMapper.createFlexTrips(transitBuilder);
+                    transitBuilder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(transitBuilder));
                 }
 
                 OtpTransitService otpService = transitBuilder.build();
-
 
 
                 // TODO OTP2 - Move this into the AddTransitModelEntitiesToGraph

@@ -136,9 +136,8 @@ public class GtfsModule implements GraphBuilderModule {
 
                 calendarServiceData.add(builder.buildCalendarServiceData());
 
-                // NB! The calls below have side effects - the builder state is updated!
                 if (OTPFeature.FlexRouting.isOn()) {
-                    FlexTripsMapper.createFlexTrips(builder);
+                    builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder));
                 }
 
                 repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip());
