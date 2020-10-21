@@ -232,8 +232,6 @@ public class Graph implements Serializable {
      */
     public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
 
-    public int numberOfDaysOfLongestTrip = 0;
-
     /** Interlining relationships between trips. */
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
 
@@ -978,9 +976,5 @@ public class Graph implements Serializable {
 
     public Collection<SimpleTransfer> getTransfersByStop(StopLocation stop) {
         return transfersByStop.get(stop);
-    }
-
-    public int getNumberOfDaysOfLongestTrip() {
-        return numberOfDaysOfLongestTrip;
     }
 }

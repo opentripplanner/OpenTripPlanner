@@ -32,6 +32,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
 
+    private static final int SECONDS_OF_DAY = 86_400;
+
     /**
      * This constant is used for indicating passed stops, fully canceled trips and trips that are
      * otherwise unavailable during routing. It should only be used in a contiguous block at the
@@ -560,12 +562,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     }
 
     /**
-     * Calculates the duration of the trip in number of days
+     * Calculates the number of times this trip crosses midnight.
      */
-    public int calculateDurationInDays() {
-        return (int) TimeUnit.SECONDS.toDays(
-            scheduledArrivalTimes[scheduledDepartureTimes.length - 1]
-                - scheduledDepartureTimes[0]);
+    public int calculateNumberOfMidnightCrossings() {
+        return scheduledArrivalTimes[scheduledArrivalTimes.length - 1] / SECONDS_OF_DAY;
     }
 
     /**

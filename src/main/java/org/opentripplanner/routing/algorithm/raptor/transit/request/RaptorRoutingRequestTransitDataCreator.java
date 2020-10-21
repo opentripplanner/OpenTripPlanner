@@ -158,7 +158,7 @@ class RaptorRoutingRequestTransitDataCreator {
     return transitLayer
         .getTripPatternsForDate(date)
         .stream()
-        .filter(p -> p.getTripPattern().getPattern().getNumberOfDaysOfLongestTrip()
+        .filter(p -> p.getTripPattern().getPattern().getMaxNumberOfMidnightCrossingsOfTrip()
             >= filterByLengthOfTripInDays)
         .filter(p -> transitModes.contains(p.getTripPattern().getTransitMode()))
         .filter(p -> !bannedRoutes.contains(p.getTripPattern().getPattern().route.getId()))

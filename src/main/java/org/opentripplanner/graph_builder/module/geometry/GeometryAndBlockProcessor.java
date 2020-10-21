@@ -164,10 +164,6 @@ public class GeometryAndBlockProcessor {
 
             // Store the tripPattern in the Graph so it will be serialized and usable in routing.
             graph.tripPatternForId.put(tripPattern.getId(), tripPattern);
-            graph.numberOfDaysOfLongestTrip = Math.max(
-                graph.numberOfDaysOfLongestTrip,
-                tripPattern.getNumberOfDaysOfLongestTrip()
-            );
         }
 
         /* Identify interlined trips and create the necessary edges. */

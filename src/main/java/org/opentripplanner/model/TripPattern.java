@@ -105,11 +105,10 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     private byte[][] hopGeometries = null;
 
     /**
-     * The number of 24 hour periods (rounded up) of the longest lasting Trip contained in this
-     * Route. This is needed so that the routing algorithm can account for boarding trips that
-     * started several days in the past.
+     * The max number of midnight crossings of a trip in this pattern. This is needed so that the
+     * routing will correctly filter departures by date.
      */
-    private int numberOfDaysOfLongestTrip;
+    private int maxNumberOfMidnightCrossingsOfTrip;
 
     /**
      * The original TripPattern this replaces at least for one modified trip.
@@ -322,9 +321,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
             LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(), this.route);
         }
         // Record the longest duration trip added so far
-        numberOfDaysOfLongestTrip = Math.max(
-            tt.calculateDurationInDays(),
-            numberOfDaysOfLongestTrip
+        maxNumberOfMidnightCrossingsOfTrip = Math.max(
+            tt.calculateNumberOfMidnightCrossings(), maxNumberOfMidnightCrossingsOfTrip
         );
     }
 
@@ -635,8 +633,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         return freqs.get(0);
     }
 
-    public int getNumberOfDaysOfLongestTrip() {
-        return numberOfDaysOfLongestTrip;
+    public int getMaxNumberOfMidnightCrossingsOfTrip() {
+        return maxNumberOfMidnightCrossingsOfTrip;
     }
 
     public TripPattern clone () {

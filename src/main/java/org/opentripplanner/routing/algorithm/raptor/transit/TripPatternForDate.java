@@ -8,6 +8,11 @@ import java.util.Objects;
 /**
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid
  * having to do any filtering by date during the search itself.
+ *
+ * IMPORTANT: The localDate field indicates a date when this trip is running, not just the date of
+ * departure from the first stop. This means that every departure of a trip that crosses midnight
+ * will be a part of a number of TripPatternForDate objects equal to the number of times the trip
+ * crosses midnight.
  */
 public class TripPatternForDate {
 

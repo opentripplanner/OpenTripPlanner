@@ -71,7 +71,7 @@ public class TransitLayerMapper {
             transferByStopIndex,
             stopIndex,
             graph.getTimeZone().toZoneId(),
-            graph.getNumberOfDaysOfLongestTrip()
+            graph.getMaxNumberOfMidnightCrossingsOfTrip()
         );
     }
 
