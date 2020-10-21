@@ -5,9 +5,7 @@ import org.opentripplanner.model.*;
 import java.util.Collection;
 import java.util.TimeZone;
 
-public class MonoOrMultiModalStation extends TransitEntity<FeedScopedId> {
-
-  private final FeedScopedId id;
+public class MonoOrMultiModalStation extends TransitEntity {
 
   private final String name;
 
@@ -37,7 +35,8 @@ public class MonoOrMultiModalStation extends TransitEntity<FeedScopedId> {
   private final MonoOrMultiModalStation parentStation;
 
   public MonoOrMultiModalStation(Station station, MultiModalStation parentStation) {
-      this.id = station.getId();
+      super(station.getId());
+
       this.name = station.getName();
       this.lat = station.getLat();
       this.lon = station.getLon();
@@ -53,7 +52,7 @@ public class MonoOrMultiModalStation extends TransitEntity<FeedScopedId> {
   }
 
   public MonoOrMultiModalStation(MultiModalStation multiModalStation) {
-    this.id = multiModalStation.getId();
+    super(multiModalStation.getId());
     this.name = multiModalStation.getName();
     this.lat = multiModalStation.getLat();
     this.lon = multiModalStation.getLon();
@@ -63,10 +62,6 @@ public class MonoOrMultiModalStation extends TransitEntity<FeedScopedId> {
     this.timezone = null;
     this.childStops = multiModalStation.getChildStops();
     this.parentStation = null;
-  }
-
-  @Override public FeedScopedId getId() {
-    return id;
   }
 
   public String getName() {
@@ -107,6 +102,6 @@ public class MonoOrMultiModalStation extends TransitEntity<FeedScopedId> {
 
   @Override
   public String toString() {
-    return "<MonoOrMultiModalStation " + this.id + ">";
+    return "<MonoOrMultiModalStation " + getId() + ">";
   }
 }

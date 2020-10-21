@@ -7,7 +7,6 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
@@ -21,7 +20,7 @@ public class QuayAtDistanceType {
                     .type(new GraphQLNonNull(Scalars.GraphQLID))
                     .dataFetcher(environment -> relay.toGlobalId("QAD",
                         ((NearbyStop) environment.getSource()).distance + ";" +
-                            TransitIdMapper.mapEntityIDToApi((TransitEntity<FeedScopedId>) ((NearbyStop) environment.getSource()).stop)
+                            TransitIdMapper.mapEntityIDToApi((TransitEntity) ((NearbyStop) environment.getSource()).stop)
                     ))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()

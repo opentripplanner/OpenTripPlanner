@@ -199,16 +199,14 @@ public class TestItineraryBuilder {
 
   /** Create a dummy trip */
   private  static Trip trip(int id, Route route) {
-    Trip trip = new Trip();
-    trip.setId(new FeedScopedId(FEED, Integer.toString(id)));
+    Trip trip = new Trip(new FeedScopedId(FEED, Integer.toString(id)));
     trip.setRoute(route);
     return trip;
   }
 
   /** Create a dummy route */
   private  static Route route(TransitMode mode) {
-    Route route = new Route();
-    route.setId(new FeedScopedId(FEED, mode.name()));
+    Route route = new Route(new FeedScopedId(FEED, mode.name()));
     route.setMode(mode);
     route.setLongName(mode.name());
     return route;

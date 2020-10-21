@@ -27,16 +27,14 @@ class FeedInfoMapper {
     }
 
     private FeedInfo doMap(org.onebusaway.gtfs.model.FeedInfo rhs) {
-        FeedInfo lhs = new FeedInfo();
-
-        lhs.setId(feedId);
-        lhs.setPublisherName(rhs.getPublisherName());
-        lhs.setPublisherUrl(rhs.getPublisherUrl());
-        lhs.setLang(rhs.getLang());
-        lhs.setStartDate(mapServiceDate(rhs.getStartDate()));
-        lhs.setEndDate(mapServiceDate(rhs.getEndDate()));
-        lhs.setVersion(rhs.getVersion());
-
-        return lhs;
+        return new FeedInfo(
+            feedId,
+            rhs.getPublisherName(),
+            rhs.getPublisherUrl(),
+            rhs.getLang(),
+            mapServiceDate(rhs.getStartDate()),
+            mapServiceDate(rhs.getEndDate()),
+            rhs.getVersion()
+        );
     }
 }

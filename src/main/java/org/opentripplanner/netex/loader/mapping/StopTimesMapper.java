@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
@@ -41,7 +40,7 @@ class StopTimesMapper {
 
     private final ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById;
 
-    private final EntityById<FeedScopedId, Stop> stopsById;
+    private final EntityById<Stop> stopsById;
 
     private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
@@ -50,7 +49,7 @@ class StopTimesMapper {
 
     StopTimesMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<FeedScopedId, Stop> stopsById,
+            EntityById<Stop> stopsById,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef
     ) {
@@ -165,7 +164,7 @@ class StopTimesMapper {
     private Stop lookupStop(
             StopPointInJourneyPattern stopPointInJourneyPattern,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-            EntityById<FeedScopedId, Stop> stopsById
+            EntityById<Stop> stopsById
     ) {
         if (stopPointInJourneyPattern == null) return null;
 

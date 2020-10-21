@@ -9,17 +9,13 @@ public class TestRouteMatcher extends TestCase {
 
     public void testRouteMatcher() {
 
-        Route r1 = new Route();
-        r1.setId(new FeedScopedId("A1", "42"));
+        Route r1 = new Route(new FeedScopedId("A1", "42"));
         r1.setShortName("R1");
-        Route r2 = new Route();
-        r2.setId(new FeedScopedId("A1", "43"));
+        Route r2 = new Route(new FeedScopedId("A1", "43"));
         r2.setShortName("R2");
-        Route r1b = new Route();
-        r1b.setId(new FeedScopedId("A2", "42"));
+        Route r1b = new Route(new FeedScopedId("A2", "42"));
         r1b.setShortName("R1");
-        Route r3 = new Route();
-        r3.setId(new FeedScopedId("A1", "44"));
+        Route r3 = new Route(new FeedScopedId("A1", "44"));
         r3.setShortName("R3_b");
 
         RouteMatcher emptyMatcher = RouteMatcher.emptyMatcher();
@@ -75,8 +71,7 @@ public class TestRouteMatcher extends TestCase {
         }
         assertTrue(thrown);
         
-        Route r1c = new Route();
-        r1c.setId(new FeedScopedId("A_1", "R_42"));
+        Route r1c = new Route(new FeedScopedId("A_1", "R_42"));
         r1c.setShortName("R_42");
 
         RouteMatcher matcherR1c = RouteMatcher.parse("A\\_1_R 42");

@@ -43,10 +43,9 @@ public class NoticeAssignmentMapperTest {
         noticeAssignment.setNoticedObjectRef(new VersionOfObjectRefStructure().withRef(ROUTE_ID));
         noticeAssignment.setNotice(NOTICE);
 
-        Route route = new Route();
-        route.setId(MappingSupport.ID_FACTORY.createId(ROUTE_ID));
+        Route route = new Route(MappingSupport.ID_FACTORY.createId(ROUTE_ID));
 
-        EntityById<FeedScopedId, Route> routesById = new EntityById<>();
+        EntityById<Route> routesById = new EntityById<>();
         routesById.add(route);
 
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
@@ -58,7 +57,7 @@ public class NoticeAssignmentMapperTest {
                 new HashMap<>()
         );
 
-        Multimap<TransitEntity<?>, org.opentripplanner.model.Notice> noticesByElement =
+        Multimap<TransitEntity, org.opentripplanner.model.Notice> noticesByElement =
                 noticeAssignmentMapper.map(noticeAssignment);
 
         org.opentripplanner.model.Notice notice2 = noticesByElement.get(route).iterator().next();
@@ -82,8 +81,7 @@ public class NoticeAssignmentMapperTest {
                 new TimetabledPassingTime().withId(TIMETABLED_PASSING_TIME2)
         );
 
-        Trip trip = new Trip();
-        trip.setId(new FeedScopedId("T", "1"));
+        Trip trip = new Trip(new FeedScopedId("T", "1"));
         StopTime stopTime1 = createStopTime(1, trip);
         StopTime stopTime2 = createStopTime(2, trip);
 
@@ -106,7 +104,7 @@ public class NoticeAssignmentMapperTest {
                 stopTimesById
         );
 
-        Multimap<TransitEntity<?>, org.opentripplanner.model.Notice> noticesByElement
+        Multimap<TransitEntity, org.opentripplanner.model.Notice> noticesByElement
                 = noticeAssignmentMapper.map(noticeAssignment);
 
         org.opentripplanner.model.Notice notice2a = noticesByElement.get(stopTime1.getId())

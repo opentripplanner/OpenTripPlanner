@@ -18,16 +18,14 @@ import java.util.Map;
  * Links child stops with parent stations by adding bidirectional object references.
  */
 class StopToParentStationLinker {
-    private final EntityById<FeedScopedId, Station> otpStations = new EntityById<>();
-    private final EntityById<FeedScopedId, StationElement> otpStationElements = new EntityById<>();
-    private final EntityById<FeedScopedId, BoardingArea> boardingAreas = new EntityById<>();
+    private final EntityById<Station> otpStations = new EntityById<>();
+    private final EntityById<StationElement> otpStationElements = new EntityById<>();
+    private final EntityById<BoardingArea> boardingAreas = new EntityById<>();
 
     private final Map<StationElement, FeedScopedId> stationElementsToStations = new HashMap<>();
     private final Map<BoardingArea, FeedScopedId> boardingAreasToStops = new HashMap<>();
 
     private final DataImportIssueStore issueStore;
-
-    private static Logger LOG = LoggerFactory.getLogger(StopToParentStationLinker.class);
 
     StopToParentStationLinker(DataImportIssueStore issueStore) {
         this.issueStore = issueStore;

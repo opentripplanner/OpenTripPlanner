@@ -1,11 +1,9 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Trip extends TransitEntity<FeedScopedId> {
+public final class Trip extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
-
-    private FeedScopedId id;
 
     private Route route;
 
@@ -39,11 +37,12 @@ public final class Trip extends TransitEntity<FeedScopedId> {
     /** Custom extension for KCM to specify a fare per-trip */
     private String fareId;
 
-    public Trip() {
+    public Trip(FeedScopedId id) {
+        super(id);
     }
 
     public Trip(Trip obj) {
-        this.id = obj.id;
+        this(obj.getId());
         this.route = obj.route;
         this.operator = obj.operator;
         this.serviceId = obj.serviceId;
@@ -57,14 +56,6 @@ public final class Trip extends TransitEntity<FeedScopedId> {
         this.tripBikesAllowed = obj.tripBikesAllowed;
         this.bikesAllowed = obj.bikesAllowed;
         this.fareId = obj.fareId;
-    }
-
-    public FeedScopedId getId() {
-        return id;
-    }
-
-    public void setId(FeedScopedId id) {
-        this.id = id;
     }
 
     /**

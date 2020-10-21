@@ -65,13 +65,13 @@ public class NetexMapper {
 
     public NetexMapper(
             OtpTransitServiceBuilder transitBuilder,
-            String agencyId,
+            String feedId,
             Deduplicator deduplicator,
             DataImportIssueStore issueStore
     ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
-        this.idFactory = new FeedScopedIdFactory(agencyId);
+        this.idFactory = new FeedScopedIdFactory(feedId);
         this.issueStore = issueStore;
     }
 
@@ -240,7 +240,7 @@ public class NetexMapper {
                 stopTimesByNetexId
         );
         for (NoticeAssignment noticeAssignment : netexIndex.getNoticeAssignmentById().localValues()) {
-            Multimap<TransitEntity<?>, Notice> noticesByElementId;
+            Multimap<TransitEntity, Notice> noticesByElementId;
             noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
             transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
         }

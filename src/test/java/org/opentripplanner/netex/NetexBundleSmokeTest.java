@@ -159,7 +159,7 @@ public class NetexBundleSmokeTest {
         assertEquals(4, trips.size());
     }
 
-    private void assertNoticeAssignments(Multimap<TransitEntity<?>, Notice> map) {
+    private void assertNoticeAssignments(Multimap<TransitEntity, Notice> map) {
         assertNote(map, fId("RUT:ServiceJourney:4-101468-583"),"045", "Notice on ServiceJourney");
         assertNote(map, stId("RUT:ServiceJourney:4-101468-583", 0).getId(), "035", "Notice on TimetabledPassingTime");
         assertNote(map, fId("RUT:Line:4"), "075", "Notice on Line");
@@ -167,8 +167,8 @@ public class NetexBundleSmokeTest {
         assertEquals(4, map.size());
     }
 
-    private void assertNote(Multimap<TransitEntity<?>, Notice> map, Serializable entityKey, String code, String text) {
-        TransitEntity<?> key = map.keySet().stream()
+    private void assertNote(Multimap<TransitEntity, Notice> map, Serializable entityKey, String code, String text) {
+        TransitEntity key = map.keySet().stream()
                 .filter(it -> entityKey.equals(it.getId()))
                 .findFirst()
                 .orElseThrow(IllegalStateException::new);
