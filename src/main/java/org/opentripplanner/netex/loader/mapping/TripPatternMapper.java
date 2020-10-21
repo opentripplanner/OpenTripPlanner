@@ -41,7 +41,7 @@ class TripPatternMapper {
 
     private final FeedScopedIdFactory idFactory;
 
-    private final EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
+    private final EntityById<org.opentripplanner.model.Route> otpRouteById;
 
     private final ReadOnlyHierarchicalMap<String, Route> routeById;
 
@@ -57,9 +57,9 @@ class TripPatternMapper {
 
     TripPatternMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<FeedScopedId, Stop> stopsById,
-            EntityById<FeedScopedId, FlexStopLocation> flexStopLocationsById,
-            EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
+            EntityById<Stop> stopsById,
+            EntityById<FlexStopLocation> flexStopLocationsById,
+            EntityById<org.opentripplanner.model.Route> otpRouteById,
             Set<FeedScopedId> shapePointsIds,
             ReadOnlyHierarchicalMap<String, Route> routeById,
             ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
@@ -136,8 +136,12 @@ class TripPatternMapper {
         // Create StopPattern from any trip (since they are part of the same JourneyPattern)
         StopPattern stopPattern = new StopPattern(result.tripStopTimes.get(trips.get(0)));
 
-        TripPattern tripPattern = new TripPattern(lookupRoute(journeyPattern), stopPattern);
-        tripPattern.setId(idFactory.createId(journeyPattern.getId()));
+        TripPattern tripPattern = new TripPattern(
+            idFactory.createId(journeyPattern.getId()),
+            lookupRoute(journeyPattern),
+            stopPattern
+        );
+
         tripPattern.name = journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue();
 
         createTripTimes(trips, tripPattern);

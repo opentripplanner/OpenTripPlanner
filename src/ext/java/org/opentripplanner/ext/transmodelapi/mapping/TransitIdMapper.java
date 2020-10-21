@@ -16,7 +16,7 @@ public class TransitIdMapper {
 
   private static String fixedFeedId = null;
 
-  public static String mapEntityIDToApi(TransitEntity<FeedScopedId> entity) {
+  public static String mapEntityIDToApi(TransitEntity entity) {
     return mapIDToApi(entity.getId());
   }
 
@@ -64,7 +64,7 @@ public class TransitIdMapper {
    *                 of wrongly set feedIds to block the entire API from working.
    * @return the fixedFeedId - used to unit test this method.
    */
-  public static String setupFixedFeedId(Collection<? extends TransitEntity<FeedScopedId>> entities) {
+  public static String setupFixedFeedId(Collection<? extends TransitEntity> entities) {
     fixedFeedId = "UNKNOWN_FEED";
 
     // Count each feedId

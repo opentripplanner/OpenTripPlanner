@@ -5,24 +5,17 @@ package org.opentripplanner.model;
  * describing circumstances which cannot be modelled as structured data." Any NeTEx element can have a notice attached,
  * although not all are supported in OTP.
  */
-public class Notice extends TransitEntity<FeedScopedId> {
+public class Notice extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
-
-    private FeedScopedId id;
 
     private String text;
 
     private String publicCode;
 
-    @Override
-    public FeedScopedId getId() {
-        return id;
-    }
 
-    @Override
-    public void setId(FeedScopedId id) {
-        this.id = id;
+    public Notice(FeedScopedId id) {
+        super(id);
     }
 
     public String getText() {
@@ -42,5 +35,5 @@ public class Notice extends TransitEntity<FeedScopedId> {
     }
 
     @Override
-    public String toString() { return "<Notice " + id + ">"; }
+    public String toString() { return "<Notice " + getId() + ">"; }
 }

@@ -13,7 +13,6 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -102,7 +101,7 @@ public class GtfsGraphBuilderModuleTest {
         return list;
     }
 
-    private static <S extends Serializable, T extends TransitEntity<S>> T withId(Iterable<T> beans, S id) {
+    private static <T extends TransitEntity> T withId(Iterable<T> beans, FeedScopedId id) {
         for (T bean : beans) {
             if (bean.getId().equals(id)) {
                 return bean;

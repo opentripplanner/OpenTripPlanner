@@ -76,8 +76,7 @@ public class ToStringBuilderTest {
 
   @Test
   public void addTransitEntity() {
-    Trip trip = new Trip();
-    trip.setId(new FeedScopedId("F", "1"));
+    Trip trip = new Trip(new FeedScopedId("F", "1"));
     assertEquals(
         "ToStringBuilderTest{tripId: F:1}",
         subject().addEntityId("tripId", trip).toString()

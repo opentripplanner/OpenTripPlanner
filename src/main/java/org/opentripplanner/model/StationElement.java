@@ -5,9 +5,7 @@ package org.opentripplanner.model;
  * of the fileds are shared between the types, and eg. in pathways the namespace any of them can be
  * used as from and to.
  */
-public abstract class StationElement extends TransitEntity<FeedScopedId> {
-
-  protected final FeedScopedId id;
+public abstract class StationElement extends TransitEntity {
 
   private final String name;
 
@@ -32,24 +30,13 @@ public abstract class StationElement extends TransitEntity<FeedScopedId> {
       WheelChairBoarding wheelchairBoarding,
       StopLevel level
   ) {
-    this.id = id;
+    super(id);
     this.name = name;
     this.code = code;
     this.description = description;
     this.coordinate = coordinate;
     this.wheelchairBoarding = wheelchairBoarding;
     this.level = level;
-  }
-
-  @Override
-  public FeedScopedId getId() {
-    return id;
-  }
-
-  /** @throws UnsupportedOperationException */
-  @Override
-  public final void setId(FeedScopedId id) {
-    super.setId(id);
   }
 
   /**

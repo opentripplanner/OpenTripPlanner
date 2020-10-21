@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.opentripplanner.util.AssertUtils.assertHasValue;
+
 public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
     /**
@@ -23,7 +25,8 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     private final String id;
 
     public FeedScopedId(@NotNull String feedId, @NotNull String id) {
-        if(feedId == null || id == null) { throw new IllegalArgumentException(); }
+        assertHasValue(feedId);
+        assertHasValue(id);
 
         this.feedId = feedId;
         this.id = id;

@@ -23,25 +23,25 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TripTimesTest {
-    private static final FeedScopedId tripId = new FeedScopedId("agency", "testtrip");
+    private static final FeedScopedId TRIP_ID = new FeedScopedId("agency", "testTripId");
+    private static final FeedScopedId ROUTE_ID = new FeedScopedId("agency", "testRrouteId");
 
-    private static final FeedScopedId stop_a = new FeedScopedId("agency", "A"); // 0
-    private static final FeedScopedId stop_b = new FeedScopedId("agency", "B"); // 1
-    private static final FeedScopedId stop_c = new FeedScopedId("agency", "C"); // 2
-    private static final FeedScopedId stop_d = new FeedScopedId("agency", "D"); // 3
-    private static final FeedScopedId stop_e = new FeedScopedId("agency", "E"); // 4
-    private static final FeedScopedId stop_f = new FeedScopedId("agency", "F"); // 5
-    private static final FeedScopedId stop_g = new FeedScopedId("agency", "G"); // 6
-    private static final FeedScopedId stop_h = new FeedScopedId("agency", "H"); // 7
+    private static final FeedScopedId STOP_A = new FeedScopedId("agency", "A"); // 0
+    private static final FeedScopedId STOP_B = new FeedScopedId("agency", "B"); // 1
+    private static final FeedScopedId STOP_C = new FeedScopedId("agency", "C"); // 2
+    private static final FeedScopedId STOP_D = new FeedScopedId("agency", "D"); // 3
+    private static final FeedScopedId STOP_E = new FeedScopedId("agency", "E"); // 4
+    private static final FeedScopedId STOP_F = new FeedScopedId("agency", "F"); // 5
+    private static final FeedScopedId STOP_G = new FeedScopedId("agency", "G"); // 6
+    private static final FeedScopedId STOP_H = new FeedScopedId("agency", "H"); // 7
 
     private static final FeedScopedId[] stops =
-        {stop_a, stop_b, stop_c, stop_d, stop_e, stop_f, stop_g, stop_h};
+        {STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H};
 
     private static final TripTimes originalTripTimes;
 
     static {
-        Trip trip = new Trip();
-        trip.setId(tripId);
+        Trip trip = new Trip(TRIP_ID);
 
         List<StopTime> stopTimes = new LinkedList<StopTime>();
 
@@ -62,8 +62,8 @@ public class TripTimesTest {
     @Test
     public void testBikesAllowed() {
         Graph graph = new Graph();
-        Trip trip = new Trip();
-        Route route = new Route();
+        Trip trip = new Trip(TRIP_ID);
+        Route route = new Route(ROUTE_ID);
         trip.setRoute(route);
         List<StopTime> stopTimes = Arrays.asList(new StopTime(), new StopTime());
         TripTimes s = new TripTimes(trip, stopTimes, new Deduplicator());
@@ -130,7 +130,7 @@ public class TripTimesTest {
         updatedTripTimesA.updateDepartureDelay(0, 10);
         updatedTripTimesA.updateArrivalDelay(6, 13);
 
-        assertEquals(0 * 60 + 10, updatedTripTimesA.getDepartureTime(0));
+        assertEquals(10, updatedTripTimesA.getDepartureTime(0));
         assertEquals(6 * 60 + 13, updatedTripTimesA.getArrivalTime(6));
     }
 
@@ -151,10 +151,9 @@ public class TripTimesTest {
 
     @Test
     public void testApply() {
-        Trip trip = new Trip();
-        trip.setId(tripId);
+        Trip trip = new Trip(TRIP_ID);
 
-        List<StopTime> stopTimes = new LinkedList<StopTime>();
+        List<StopTime> stopTimes = new LinkedList<>();
 
         StopTime stopTime0 = new StopTime();
         StopTime stopTime1 = new StopTime();

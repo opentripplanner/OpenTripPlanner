@@ -2,7 +2,6 @@ package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
@@ -26,15 +25,15 @@ class RouteMapper {
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
     private final FeedScopedIdFactory idFactory;
-    private final EntityById<FeedScopedId, Agency> agenciesById;
-    private final EntityById<FeedScopedId, Operator> operatorsById;
+    private final EntityById<Agency> agenciesById;
+    private final EntityById<Operator> operatorsById;
     private final NetexImportDataIndexReadOnlyView netexIndex;
     private final AuthorityToAgencyMapper authorityMapper;
 
     RouteMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<FeedScopedId, Agency> agenciesById,
-            EntityById<FeedScopedId, Operator> operatorsById,
+            EntityById<Agency> agenciesById,
+            EntityById<Operator> operatorsById,
             NetexImportDataIndexReadOnlyView netexIndex,
             String timeZone
     ) {
@@ -46,9 +45,9 @@ class RouteMapper {
     }
 
     org.opentripplanner.model.Route mapRoute(Line_VersionStructure line){
-        org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
-
-        otpRoute.setId(idFactory.createId(line.getId()));
+        org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route(
+            idFactory.createId(line.getId())
+        );
         otpRoute.setAgency(findOrCreateAuthority(line));
         otpRoute.setOperator(findOperator(line));
         otpRoute.setLongName(line.getName().getValue());

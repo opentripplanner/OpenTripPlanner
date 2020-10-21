@@ -50,14 +50,11 @@ public class TestBanning {
     }
 
     private Collection<Route> getTestRoutes() {
-        Route route1 = new Route();
-        route1.setId(new FeedScopedId("RB", "RUT:Route:1"));
+        Route route1 = new Route(new FeedScopedId("RB", "RUT:Route:1"));
         route1.setLongName("");
-        Route route2 = new Route();
-        route2.setId(new FeedScopedId("RB", "RUT:Route:2"));
+        Route route2 = new Route(new FeedScopedId("RB", "RUT:Route:2"));
         route2.setLongName("");
-        Route route3 = new Route();
-        route3.setId(new FeedScopedId("RB", "RUT:Route:3"));
+        Route route3 = new Route(new FeedScopedId("RB", "RUT:Route:3"));
         route3.setLongName("");
 
         Agency agency1 = new Agency(

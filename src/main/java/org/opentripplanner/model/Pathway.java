@@ -1,11 +1,9 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Pathway extends TransitEntity<FeedScopedId> {
+public final class Pathway extends TransitEntity {
 
     private static final long serialVersionUID = -2404871423254094109L;
-
-    private FeedScopedId id;
 
     private int pathwayMode;
 
@@ -27,14 +25,8 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
 
     private boolean isBidirectional;
 
-    @Override
-    public FeedScopedId getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(FeedScopedId id) {
-        this.id = id;
+    public Pathway(FeedScopedId id) {
+        super(id);
     }
 
     public void setPathwayMode(int pathwayMode) {
@@ -119,7 +111,7 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
 
     @Override
     public String toString() {
-        return "<Pathway " + this.id + ">";
+        return "<Pathway " + getId() + ">";
     }
 
     public boolean isPathwayModeWheelchairAccessible() {

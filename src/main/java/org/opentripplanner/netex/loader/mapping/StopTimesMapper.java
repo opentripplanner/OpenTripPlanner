@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
@@ -44,9 +43,9 @@ class StopTimesMapper {
 
     private final ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById;
 
-    private final EntityById<FeedScopedId, Stop> stopsById;
+    private final EntityById<Stop> stopsById;
 
-    private final EntityById<FeedScopedId, FlexStopLocation> flexibleStopLocationsById;
+    private final EntityById<FlexStopLocation> flexibleStopLocationsById;
 
     private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
@@ -57,8 +56,8 @@ class StopTimesMapper {
 
     StopTimesMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<FeedScopedId, Stop> stopsById,
-            EntityById<FeedScopedId, FlexStopLocation> flexStopLocationsById,
+            EntityById<Stop> stopsById,
+            EntityById<FlexStopLocation> flexStopLocationsById,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef
@@ -198,8 +197,8 @@ class StopTimesMapper {
             StopPointInJourneyPattern stopPointInJourneyPattern,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
-            EntityById<FeedScopedId, Stop> stopsById,
-            EntityById<FeedScopedId, FlexStopLocation> flexStopLocationsById
+            EntityById<Stop> stopsById,
+            EntityById<FlexStopLocation> flexStopLocationsById
     ) {
         if (stopPointInJourneyPattern == null) return null;
 

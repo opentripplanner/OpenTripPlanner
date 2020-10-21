@@ -30,8 +30,7 @@ public class FlexStopLocationMapper {
    * FlexLocationGroup, as an equivalent is not defined in the NeTEx Nordic profile.
    */
   public FlexStopLocation map(FlexibleStopPlace flexibleStopPlace) {
-    FlexStopLocation result = new FlexStopLocation();
-    result.setId(idFactory.createId(flexibleStopPlace.getId()));
+    FlexStopLocation result = new FlexStopLocation(idFactory.createId(flexibleStopPlace.getId()));
     result.setName(flexibleStopPlace.getName().getValue());
 
     Object flexibleAreaOrFlexibleAreaRefOrHailAndRideArea = flexibleStopPlace
