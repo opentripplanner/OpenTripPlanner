@@ -124,6 +124,7 @@ public class TransitLayerMapper {
                     }
                 }
                 if (!values.isEmpty()) {
+                    // TODO This would need to be indexed by the actual date in the values
                     result.put(localDate, values);
                 }
             });
