@@ -3,6 +3,7 @@ package org.opentripplanner.netex.loader.parser;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
 import org.rutebanken.netex.model.FlexibleLine;
@@ -160,21 +161,26 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
                 }
             }
             else if (stopAssignment.getValue() instanceof FlexibleStopAssignment) {
-                FlexibleStopAssignment assignment = (FlexibleStopAssignment) stopAssignment
-                    .getValue();
-                String flexibleStopPlaceRef = assignment.getFlexibleStopPlaceRef().getRef();
+                if(OTPFeature.FlexRouting.isOn()) {
+                    FlexibleStopAssignment assignment = (FlexibleStopAssignment) stopAssignment.getValue();
+                    String flexibleStopPlaceRef = assignment.getFlexibleStopPlaceRef().getRef();
 
-                // TODO OTP2 - This check belongs to the mapping or as a separate validation
-                //           - step. The problem is that we do not want to relay on the
-                //           - the order in witch elements are loaded.
-                FlexibleStopPlace flexibleStopPlace =
-                    flexibleStopPlaceById.lookup(flexibleStopPlaceRef);
+                    // TODO OTP2 - This check belongs to the mapping or as a separate validation
+                    //           - step. The problem is that we do not want to relay on the
+                    //           - the order in witch elements are loaded.
+                    FlexibleStopPlace flexibleStopPlace = flexibleStopPlaceById.lookup(
+                        flexibleStopPlaceRef);
 
-                if (flexibleStopPlace != null) {
-                    String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
-                    flexibleStopPlaceByStopPointRef.put(stopPointRef, flexibleStopPlace.getId());
-                } else {
-                    LOG.warn("FlexibleStopPlace {} not found in stop place file.", flexibleStopPlaceRef);
+                    if (flexibleStopPlace != null) {
+                        String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
+                        flexibleStopPlaceByStopPointRef.put(stopPointRef, flexibleStopPlace.getId());
+                    }
+                    else {
+                        LOG.warn(
+                            "FlexibleStopPlace {} not found in stop place file.",
+                            flexibleStopPlaceRef
+                        );
+                    }
                 }
             }
             else {
@@ -228,7 +234,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
             if (element.getValue() instanceof Line) {
                 this.lines.add((Line) element.getValue());
             } else if (element.getValue() instanceof FlexibleLine) {
-                this.flexibleLines.add((FlexibleLine) element.getValue());
+                if(OTPFeature.FlexRouting.isOn()) {
+                    this.flexibleLines.add((FlexibleLine) element.getValue());
+                }
             }
             else {
                 warnOnMissingMapping(LOG, element.getValue());

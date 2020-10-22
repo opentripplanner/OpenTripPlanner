@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
@@ -181,7 +182,10 @@ public class NetexMapper {
         FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(idFactory);
 
         for (FlexibleStopPlace flexibleStopPlace : netexIndex.getFlexibleStopPlacesById().localValues()) {
-            transitBuilder.getLocations().add(flexStopLocationMapper.map(flexibleStopPlace));
+            FlexStopLocation stopLocation = flexStopLocationMapper.map(flexibleStopPlace);
+            if (stopLocation != null) {
+                transitBuilder.getLocations().add(stopLocation);
+            }
         }
     }
 
