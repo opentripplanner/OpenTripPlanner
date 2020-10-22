@@ -440,7 +440,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 //        String groupOfLines = estimatedVehicleJourney.getGroupOfLinesRef().getValue();
 
 //        Preconditions.checkNotNull(estimatedVehicleJourney.getExternalLineRef(), "ExternalLineRef is required");
-        String externalLineRef = estimatedVehicleJourney.getExternalLineRef().getValue();
+        String externalLineRef;
+        if (estimatedVehicleJourney.getExternalLineRef() != null) {
+            externalLineRef = estimatedVehicleJourney.getExternalLineRef().getValue();
+        } else {
+            externalLineRef = lineRef;
+        }
 
         // TODO - SIRI: Where is the Operator?
 //        Operator operator = graphIndex.operatorForId.get(new FeedScopedId(feedId, operatorRef));
