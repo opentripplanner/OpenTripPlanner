@@ -17,6 +17,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
+import org.opentripplanner.netex.loader.mapping.calendar.CalendarMapper;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.Authority;
@@ -239,7 +240,7 @@ public class NetexMapper {
 
     private void mapCalendarDayTypes(NetexImportDataIndexReadOnlyView netexIndex) {
         CalendarMapper calMapper = new CalendarMapper(
-                idFactory,
+                idFactory::createId,
                 netexIndex.getDayTypeAssignmentByDayTypeId(),
                 netexIndex.getOperatingPeriodById(),
                 netexIndex.getDayTypeById(), issueStore

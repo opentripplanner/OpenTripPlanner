@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.mapping;
+package org.opentripplanner.netex.loader.mapping.calendar;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
+import org.opentripplanner.netex.loader.mapping.MappingSupport;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
@@ -27,7 +28,7 @@ public class CalendarMapperTest {
     @Before
     public void setup() {
         subject = new CalendarMapper(
-                MappingSupport.ID_FACTORY,
+                MappingSupport.ID_FACTORY::createId,
                 new HierarchicalMultimap<>(),
                 new HierarchicalMapById<>(),
                 new HierarchicalMapById<>(),

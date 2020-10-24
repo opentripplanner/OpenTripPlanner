@@ -10,7 +10,7 @@ import org.opentripplanner.model.FeedScopedId;
  * <p>
  * This class should only be used by the Netex import/mapping process.
  */
-class FeedScopedIdFactory {
+public class FeedScopedIdFactory {
 
     private final String feedId;
 
@@ -21,4 +21,5 @@ class FeedScopedIdFactory {
     public FeedScopedId createId(String netexId) {
         return new FeedScopedId(feedId, netexId);
     }
+
 }

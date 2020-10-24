@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.mapping;
+package org.opentripplanner.netex.loader.mapping.calendar;
 
 import org.junit.Test;
 import org.rutebanken.netex.model.DayOfWeekEnumeration;
@@ -9,7 +9,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.netex.loader.mapping.DayOfWeekMapper.mapDayOfWeek;
+import static org.opentripplanner.netex.loader.mapping.calendar.DayOfWeekMapper.mapDayOfWeek;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.FRIDAY;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.MONDAY;

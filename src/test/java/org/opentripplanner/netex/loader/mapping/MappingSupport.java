@@ -9,9 +9,9 @@ import javax.xml.namespace.QName;
 /**
  * Test mapping support utility functions - shared between tests.
  */
-class MappingSupport {
+public class MappingSupport {
 
-    static final FeedScopedIdFactory ID_FACTORY = new FeedScopedIdFactory("TEST");
+    public static final FeedScopedIdFactory ID_FACTORY = new FeedScopedIdFactory("TEST");
 
 
     /** private constructor to prevent instansiation of utility class */

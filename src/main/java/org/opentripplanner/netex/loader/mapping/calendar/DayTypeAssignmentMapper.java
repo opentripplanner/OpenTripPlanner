@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.mapping;
+package org.opentripplanner.netex.loader.mapping.calendar;
 
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
 import org.rutebanken.netex.model.DayType;
