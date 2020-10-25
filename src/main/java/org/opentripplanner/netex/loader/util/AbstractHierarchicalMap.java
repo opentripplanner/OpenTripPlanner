@@ -37,12 +37,19 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
         return localContainsKey(key) || parentContainsKey(key);
     }
 
+    /** The size of the collection including any parent nodes. Returns the number of key-value pairs for a Map. */
+    public int size() {
+        return localSize() + (isRoot() ? 0 : parent.localSize());
+    }
+
     /** Get value from 'local' map, parent is not queried. */
     abstract V localGet(K key);
 
     /** Check if key exist in 'local' map, parent is not queried. */
     abstract boolean localContainsKey(K key);
 
+    /** Return the size of the collection. Returns the number of key-value pairs for a Map. */
+    protected abstract int localSize();
 
     /* private methods */
 
@@ -57,6 +64,12 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
      */
     private boolean parentContainsKey(K key) {
         return parent != null && parent.containsKey(key);
+    }
+
+    @Override
+    public String toString() {
+        // It helps in debugging to se the size before expanding the element
+        return "size = " + size();
     }
 }
 

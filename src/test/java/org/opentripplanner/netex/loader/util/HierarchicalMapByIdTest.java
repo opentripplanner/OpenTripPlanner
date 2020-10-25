@@ -72,4 +72,16 @@ public class HierarchicalMapByIdTest {
         root.add(SCHWARZENEGGER);
         assertEquals(SCHWARZENEGGER, child.lookup(SCHWARZENEGGER.getId()));
     }
+
+    @Test
+    public void testToStringAndSize() {
+        assertEquals("size = 0", root.toString());
+        assertEquals("size = 0", child.toString());
+        root.add(SCHWARZENEGGER);
+        assertEquals("size = 1", root.toString());
+        assertEquals("size = 1", child.toString());
+        child.add(EASTWOOD);
+        assertEquals("size = 1", root.toString());
+        assertEquals("size = 2", child.toString());
+    }
 }

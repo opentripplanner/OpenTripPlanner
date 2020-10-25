@@ -4,7 +4,6 @@ import com.google.common.collect.Multimap;
 import org.rutebanken.netex.model.EntityInVersionStructure;
 
 import java.util.Collection;
-import java.util.Set;
 
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionedElementIn;

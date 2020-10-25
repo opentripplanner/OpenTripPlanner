@@ -62,4 +62,9 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
     boolean localContainsKey(K key) {
         return map.containsKey(key);
     }
+
+    @Override
+    protected int localSize() {
+        return map.size();
+    }
 }

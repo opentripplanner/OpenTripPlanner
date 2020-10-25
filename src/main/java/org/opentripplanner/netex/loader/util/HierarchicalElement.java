@@ -36,7 +36,7 @@ public class HierarchicalElement<E> {
     public E get() {
         if(element != null) { return element; }
         if(parent == null) { return null; }
-        else return parent.get();
+        else { return parent.get(); }
     }
 
     /**
@@ -44,5 +44,11 @@ public class HierarchicalElement<E> {
      */
     public void set(E element) {
         this.element = element;
+    }
+
+    @Override
+    public String toString() {
+        E value = get();
+        return value == null ? "<empty>" : value.toString();
     }
 }

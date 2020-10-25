@@ -87,4 +87,11 @@ public class HierarchicalMultimapTest {
       assertEquals(Set.of(PRESIDENT, ACTOR), country.localKeys());
       assertEquals(Set.of(GOVERNOR, ACTOR), state.localKeys());
     }
+
+    @Test
+    public void testToStringAndSize() {
+        assertEquals("size = 2", country.toString());
+        assertEquals("size = 4", state.toString());
+    }
+
 }

@@ -56,4 +56,9 @@ public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collec
     boolean localContainsKey(K key) {
         return map.containsKey(key);
     }
+
+    @Override
+    protected int localSize() {
+        return map.size();
+    }
 }

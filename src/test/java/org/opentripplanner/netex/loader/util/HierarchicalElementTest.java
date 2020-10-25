@@ -59,4 +59,13 @@ public class HierarchicalElementTest {
         // Both child and parent is now returning the parent value
         assertEquals(parent.get(), child.get());
     }
+
+    @Test public void toStringTest() {
+        assertEquals("<empty>", child.toString());
+        assertEquals("<empty>", parent.toString());
+        parent.set(HELLO_MY_KING);
+        assertEquals("Hello my king", child.toString());
+        child.set(HELLO_MY_FRIEND);
+        assertEquals("Hello my friend", child.toString());
+    }
 }
