@@ -5,10 +5,10 @@ import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
 
 import javax.annotation.Nullable;
 
-public class TransferPriorityMapper {
+class TransferPriorityMapper {
 
     @Nullable
-    public static TransferPriority mapToDomain(InterchangeWeightingEnumeration value) {
+    static TransferPriority mapToDomain(InterchangeWeightingEnumeration value) {
         if(value == null) { return null; }
 
         switch (value) {

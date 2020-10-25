@@ -43,18 +43,18 @@ import java.util.List;
  * the GeometryAndBlockProcessor in order to keep the existing validation of the geometries.
  * (2020-02-14 #2952)
  */
-public class ServiceLinkMapper {
+class ServiceLinkMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopMapper.class);
     private final FeedScopedIdFactory idFactory;
   private final DataImportIssueStore issueStore;
 
-  public ServiceLinkMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
+  ServiceLinkMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
   }
 
-  public Collection<ShapePoint> getShapePointsByJourneyPattern(
+  Collection<ShapePoint> getShapePointsByJourneyPattern(
       JourneyPattern journeyPattern,
       ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById,
       ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
