@@ -9,6 +9,6 @@ public class FeedScopedIdFactoryTest {
     @Test
     public void setFeedScope() {
         FeedScopedId feedScopedId1 = MappingSupport.ID_FACTORY.createId("NSR:StopPlace:1");
-        assertEquals("TEST:NSR:StopPlace:1", feedScopedId1.toString());
+        assertEquals("F:NSR:StopPlace:1", feedScopedId1.toString());
     }
 }

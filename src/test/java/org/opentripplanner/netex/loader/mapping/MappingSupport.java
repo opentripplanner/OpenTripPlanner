@@ -11,7 +11,7 @@ import javax.xml.namespace.QName;
  */
 public class MappingSupport {
 
-    public static final FeedScopedIdFactory ID_FACTORY = new FeedScopedIdFactory("TEST");
+    public static final FeedScopedIdFactory ID_FACTORY = new FeedScopedIdFactory("F");
 
 
     /** private constructor to prevent instansiation of utility class */
