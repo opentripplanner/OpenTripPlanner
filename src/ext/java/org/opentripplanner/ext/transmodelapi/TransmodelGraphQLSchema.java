@@ -1287,6 +1287,13 @@ public class TransmodelGraphQLSchema {
                 .description("Set of ids of authorities to fetch lines for.")
                 .type(new GraphQLList(Scalars.GraphQLString))
                 .build())
+            .argument(GraphQLArgument
+                .newArgument()
+                .name("flexibleOnly")
+                .description("Filter by lines containing flexible / on demand serviceJourneys only.")
+                .type(Scalars.GraphQLBoolean)
+                .defaultValue(false)
+                .build())
             .dataFetcher(environment -> {
               if ((environment.getArgument("ids") instanceof List)) {
                 if (environment
@@ -1306,6 +1313,12 @@ public class TransmodelGraphQLSchema {
                     .collect(Collectors.toList());
               }
               Stream<Route> stream = GqlUtil.getRoutingService(environment).getAllRoutes().stream();
+
+              if ((boolean) environment.getArgument("flexibleOnly")) {
+                stream = stream.filter(t -> GqlUtil
+                    .getRoutingService(environment)
+                    .getFlexIndex().routeById.containsKey(t.getId()));
+              }
               if (environment.getArgument("name") != null) {
                 stream = stream
                     .filter(route -> route.getLongName() != null)
