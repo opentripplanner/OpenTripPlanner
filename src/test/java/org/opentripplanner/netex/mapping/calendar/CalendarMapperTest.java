@@ -7,8 +7,8 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.netex.mapping.MappingSupport;
-import org.opentripplanner.netex.index.util.HierarchicalMapById;
-import org.opentripplanner.netex.index.util.HierarchicalMultimap;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.index.util;
+package org.opentripplanner.netex.index.hierarchy;
 
 /**
  * Read only interface for a hierarchical map. This interface proved a interface to a hierarchy of

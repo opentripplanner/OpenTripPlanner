@@ -6,6 +6,7 @@ import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
 import org.junit.Test;
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.netex.mapping.MappingSupport;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -15,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.opentripplanner.netex.mapping.MappingSupport.*;
 
 public class FlexStopLocationMapperTest {
 
@@ -76,7 +78,7 @@ public class FlexStopLocationMapperTest {
   @Test
   public void mapFlexStopLocation() {
 
-    FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(MappingSupport.ID_FACTORY);
+    FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(ID_FACTORY);
 
     FlexibleStopPlace flexibleStopPlace = new FlexibleStopPlace()
         .withId(FLEXIBLE_STOP_PLACE_ID)

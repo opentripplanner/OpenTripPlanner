@@ -2,9 +2,9 @@ package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.index.util.HierarchicalMap;
-import org.opentripplanner.netex.index.util.HierarchicalMapById;
-import org.opentripplanner.netex.index.util.HierarchicalMultimap;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeRefStructure;

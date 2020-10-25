@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.index.util;
+package org.opentripplanner.netex.index.hierarchy;
 
 import com.google.common.collect.Multimap;
 import org.rutebanken.netex.model.EntityInVersionStructure;

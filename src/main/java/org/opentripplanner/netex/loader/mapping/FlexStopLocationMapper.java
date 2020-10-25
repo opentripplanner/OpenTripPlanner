@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.netex.mapping.FeedScopedIdFactory;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.slf4j.Logger;

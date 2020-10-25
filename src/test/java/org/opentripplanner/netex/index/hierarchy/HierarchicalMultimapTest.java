@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.index.util;
+package org.opentripplanner.netex.index.hierarchy;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -11,10 +11,10 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.netex.index.util.E.EASTWOOD;
-import static org.opentripplanner.netex.index.util.E.REAGAN;
-import static org.opentripplanner.netex.index.util.E.SCHWARZENEGGER;
-import static org.opentripplanner.netex.index.util.SetSupport.sort;
+import static org.opentripplanner.netex.index.hierarchy.E.EASTWOOD;
+import static org.opentripplanner.netex.index.hierarchy.E.REAGAN;
+import static org.opentripplanner.netex.index.hierarchy.E.SCHWARZENEGGER;
+import static org.opentripplanner.netex.index.hierarchy.SetSupport.sort;
 
 /**
  * We uses a simplified version of the data structure used in the {@link HierarchicalMapTest}:

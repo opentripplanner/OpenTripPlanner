@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.netex.index.util.HierarchicalVersionMapById;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;

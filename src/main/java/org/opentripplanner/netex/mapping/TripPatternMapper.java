@@ -8,7 +8,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMap;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.rutebanken.netex.model.DestinationDisplay;

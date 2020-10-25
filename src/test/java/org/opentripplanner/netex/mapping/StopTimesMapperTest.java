@@ -5,7 +5,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.loader.util.HierarchicalMap;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 
 import java.math.BigInteger;
 import java.time.LocalTime;

@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.loader;
 
-import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMap;
-import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
