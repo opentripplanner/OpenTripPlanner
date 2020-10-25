@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.GroupEntries;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
-import org.opentripplanner.netex.index.NetexEntityDataIndex;
+import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
@@ -38,7 +38,7 @@ public class NetexBundle implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
     /** stack of NeTEx elements needed to link the input to existing data */
-    private final Deque<NetexEntityDataIndex> netexIndex = new LinkedList<>();
+    private final Deque<NetexEntityIndex> netexIndex = new LinkedList<>();
 
     private final CompositeDataSource source;
 
@@ -96,7 +96,7 @@ public class NetexBundle implements Closeable {
     private void loadFileEntries() {
 
         // Add a global(this zip file) shared NeTEX DAO
-        netexIndex.addFirst(new NetexEntityDataIndex());
+        netexIndex.addFirst(new NetexEntityIndex());
 
         // Load global shared files
         loadFilesThenMapToOtpTransitModel("shared file", hierarchy.sharedEntries());
@@ -126,7 +126,7 @@ public class NetexBundle implements Closeable {
      * at the end pop of the index.
      */
     private void scopeInputData(Runnable task) {
-        netexIndex.addFirst(new NetexEntityDataIndex(index()));
+        netexIndex.addFirst(new NetexEntityIndex(index()));
         task.run();
         netexIndex.removeFirst();
     }
@@ -146,7 +146,7 @@ public class NetexBundle implements Closeable {
         otpMapper.mapNetexToOtp(index().readOnlyView());
     }
 
-    private NetexEntityDataIndex index() {
+    private NetexEntityIndex index() {
         return netexIndex.peekFirst();
     }
 

@@ -25,7 +25,7 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 
 import java.util.Collection;
 
-public interface NetexImportDataIndexReadOnlyView {
+public interface NetexEntityIndexReadOnlyView {
     Network lookupNetworkForLine(String groupOfLineOrNetworkId);
     ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById();
     ReadOnlyHierarchicalMapById<DayType> getDayTypeById();

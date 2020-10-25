@@ -2,7 +2,7 @@ package org.opentripplanner.netex.loader;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.netex.index.NetexEntityDataIndex;
+import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.OperatingPeriod;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (01.12.2017)
  */
-public class NetexEntityDataIndexTest {
+public class NetexEntityIndexTest {
 
     private static final String ID = "ID:A";
     private static final String ID_2 = "ID:B";
@@ -29,13 +29,13 @@ public class NetexEntityDataIndexTest {
     private static final String TIMEZONE_NO = "Oslo/Norway";
     private static final String TIMEZONE_PST = "PST";
 
-    private NetexEntityDataIndex root;
-    private NetexEntityDataIndex child;
+    private NetexEntityIndex root;
+    private NetexEntityIndex child;
 
     @Before
     public void setup() {
-        root = new NetexEntityDataIndex();
-        child = new NetexEntityDataIndex(root);
+        root = new NetexEntityIndex();
+        child = new NetexEntityIndex(root);
     }
 
     @Test

@@ -15,7 +15,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.index.api.NetexImportDataIndexReadOnlyView;
+import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarMapper;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -81,7 +81,7 @@ public class NetexMapper {
     /**
      * <p>
      * This method mapes the last Netex file imported using the *local* entities in the
-     * hierarchical {@link NetexImportDataIndexReadOnlyView}.
+     * hierarchical {@link NetexEntityIndexReadOnlyView}.
      * </p>
      * <p>
      * Note that the order in which the elements are mapped is important. For example, if a file
@@ -91,7 +91,7 @@ public class NetexMapper {
      *
      * @param netexIndex The parsed Netex entities to be mapped
      */
-    public void mapNetexToOtp(NetexImportDataIndexReadOnlyView netexIndex) {
+    public void mapNetexToOtp(NetexEntityIndexReadOnlyView netexIndex) {
         // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency must be mapped
         // before Route - if both entities are defined in the same file.
         mapAuthorities(netexIndex);
@@ -108,14 +108,14 @@ public class NetexMapper {
         mapNoticeAssignments(netexIndex);
     }
 
-    private void mapOperators(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapOperators(NetexEntityIndexReadOnlyView netexIndex) {
         OperatorToAgencyMapper mapper = new OperatorToAgencyMapper(idFactory);
         for (org.rutebanken.netex.model.Operator operator : netexIndex.getOperatorsById().localValues()) {
             transitBuilder.getOperatorsById().add(mapper.mapOperator(operator));
         }
     }
 
-    private void mapAuthorities(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapAuthorities(NetexEntityIndexReadOnlyView netexIndex) {
         AuthorityToAgencyMapper agencyMapper = new AuthorityToAgencyMapper(idFactory, netexIndex.getTimeZone());
         for (Authority authority : netexIndex.getAuthoritiesById().localValues()) {
             Agency agency = agencyMapper.mapAuthorityToAgency(authority);
@@ -123,7 +123,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapShapePoints(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapShapePoints(NetexEntityIndexReadOnlyView netexIndex) {
         ServiceLinkMapper serviceLinkMapper = new ServiceLinkMapper(idFactory, issueStore);
         for (JourneyPattern journeyPattern : netexIndex.getJourneyPatternsById().localValues()) {
 
@@ -139,7 +139,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapStopPlaceAndQuays(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapStopPlaceAndQuays(NetexEntityIndexReadOnlyView netexIndex) {
         for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
             StopAndStationMapper stopMapper = new StopAndStationMapper(
@@ -155,7 +155,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapMultiModalStopPlaces(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapMultiModalStopPlaces(NetexEntityIndexReadOnlyView netexIndex) {
         MultiModalStationMapper mapper = new MultiModalStationMapper(idFactory);
         for (StopPlace multiModalStopPlace : netexIndex.getMultiModalStopPlaceById().localValues()) {
             transitBuilder.getMultiModalStationsById().add(
@@ -167,7 +167,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapGroupsOfStopPlaces(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapGroupsOfStopPlaces(NetexEntityIndexReadOnlyView netexIndex) {
         GroupOfStationsMapper groupOfStationsMapper = new GroupOfStationsMapper(
                 idFactory,
                 transitBuilder.getMultiModalStationsById(),
@@ -178,7 +178,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapFlexibleStopPlaces(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapFlexibleStopPlaces(NetexEntityIndexReadOnlyView netexIndex) {
         FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(idFactory);
 
         for (FlexibleStopPlace flexibleStopPlace : netexIndex.getFlexibleStopPlacesById().localValues()) {
@@ -189,7 +189,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapRoute(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapRoute(NetexEntityIndexReadOnlyView netexIndex) {
         RouteMapper routeMapper = new RouteMapper(
                 idFactory,
                 transitBuilder.getAgenciesById(),
@@ -207,7 +207,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapTripPatterns(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapTripPatterns(NetexEntityIndexReadOnlyView netexIndex) {
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
                 idFactory,
                 transitBuilder.getStops(),
@@ -237,7 +237,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapCalendarDayTypes(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapCalendarDayTypes(NetexEntityIndexReadOnlyView netexIndex) {
         CalendarMapper calMapper = new CalendarMapper(
                 idFactory::createId,
                 netexIndex.getDayTypeAssignmentByDayTypeId(),
@@ -251,7 +251,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapNoticeAssignments(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapNoticeAssignments(NetexEntityIndexReadOnlyView netexIndex) {
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
                 idFactory,
                 netexIndex.getPassingTimeByStopPointId(),
@@ -267,7 +267,7 @@ public class NetexMapper {
         }
     }
 
-    private void mapTariffZones(NetexImportDataIndexReadOnlyView netexIndex) {
+    private void mapTariffZones(NetexEntityIndexReadOnlyView netexIndex) {
         TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(idFactory);
         for (TariffZone tariffZone : netexIndex.getTariffZonesById().localValues()) {
             transitBuilder.getFareZonesById().add(tariffZoneMapper.mapTariffZone(tariffZone));

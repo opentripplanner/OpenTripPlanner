@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.index.NetexEntityDataIndex;
+import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.util.OTPFeature;
@@ -122,7 +122,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     }
 
     @Override
-    void setResultOnIndex(NetexEntityDataIndex index) {
+    void setResultOnIndex(NetexEntityIndex index) {
         // update entities
         index.destinationDisplayById.addAll(destinationDisplays);
         index.groupOfLinesById.addAll(groupOfLines);

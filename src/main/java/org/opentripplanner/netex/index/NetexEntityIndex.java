@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.index;
 
-import org.opentripplanner.netex.index.api.NetexImportDataIndexReadOnlyView;
+import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalElement;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
@@ -40,7 +40,7 @@ import java.util.Set;
 
 /**
  * This class holds indexes of Netex objects for lookup during the NeTEx import using the
- * {@link NetexImportDataIndexReadOnlyView}.
+ * {@link NetexEntityIndexReadOnlyView}.
  * <p>
  * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared data</em>,
  * and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to avoid keeping everything
@@ -62,10 +62,10 @@ import java.util.Set;
  * {@link HierarchicalElement} classes.
  * <p/>
  * The mapping code should not insert entities, so an instance of this class implements the
- * {@link NetexImportDataIndexReadOnlyView} witch is passed to the mapping code for translation into
+ * {@link NetexEntityIndexReadOnlyView} witch is passed to the mapping code for translation into
  * OTP domain model objects.
  */
-public class NetexEntityDataIndex {
+public class NetexEntityIndex {
 
     // Indexes to entities
     public final HierarchicalMapById<Authority> authoritiesById;
@@ -112,7 +112,7 @@ public class NetexEntityDataIndex {
     /**
      * Create a root node.
      */
-    public NetexEntityDataIndex() {
+    public NetexEntityIndex() {
         this.authoritiesById = new HierarchicalMapById<>();
         this.dayTypeById = new HierarchicalMapById<>();
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
@@ -147,7 +147,7 @@ public class NetexEntityDataIndex {
      * Create a child node.
      * @param parent can not be <code>null</code>.
      */
-    public NetexEntityDataIndex(NetexEntityDataIndex parent) {
+    public NetexEntityIndex(NetexEntityIndex parent) {
         this.authoritiesById = new HierarchicalMapById<>(parent.authoritiesById);
         this.dayTypeById = new HierarchicalMapById<>(parent.dayTypeById);
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);
@@ -178,8 +178,8 @@ public class NetexEntityDataIndex {
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
 
-    public NetexImportDataIndexReadOnlyView readOnlyView() {
-        return new NetexImportDataIndexReadOnlyView() {
+    public NetexEntityIndexReadOnlyView readOnlyView() {
+        return new NetexEntityIndexReadOnlyView() {
 
             /**
              * Lookup a Network given a GroupOfLine id or an Network id. If the given
