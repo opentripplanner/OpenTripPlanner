@@ -35,7 +35,7 @@ class SetSupport {
     /**
      * Create a new sorted list of the given values.
      */
-    static <E extends Comparable> List<E> sort(Collection<E> values) {
+    static <E extends Comparable<E>> List<E> sort(Collection<E> values) {
         return values.stream().sorted().collect(Collectors.toList());
     }
 }
