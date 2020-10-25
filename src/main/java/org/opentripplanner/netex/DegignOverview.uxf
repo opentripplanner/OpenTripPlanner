@@ -71,7 +71,7 @@ m1=1..n</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>Shared file
-/_stops.xml/</panel_attributes>
+/_stops.xml, ../</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -83,7 +83,7 @@ m1=1..n</panel_attributes>
       <h>40</h>
     </coordinates>
     <panel_attributes>Shared Group file
-/_RUT.xml/
+/_RUT.xml, ../
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -93,10 +93,12 @@ m1=1..n</panel_attributes>
       <x>600</x>
       <y>280</y>
       <w>140</w>
-      <h>40</h>
+      <h>70</h>
     </coordinates>
     <panel_attributes>XML Group file
 /RUT-Line-21.xml/
+/RUT-Line-32.xml/
+/RUT-Line-60.xml/
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -106,7 +108,7 @@ m1=1..n</panel_attributes>
       <x>470</x>
       <y>110</y>
       <w>290</w>
-      <h>230</h>
+      <h>260</h>
     </coordinates>
     <panel_attributes>/XML input files/
 </panel_attributes>

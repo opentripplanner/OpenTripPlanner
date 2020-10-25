@@ -15,6 +15,7 @@ OTP assume the data is valid and as a main rule the data is not washed or improv
 data quality should be fixed BEFORE loading the data into OTP. OTP will try to _ignores_ invalid 
 data, allowing the rest to be imported. 
 
+
 ## Design
 
 The 2 main classes are the [`NetexModule`](NetexModule.java) and the [`NetexBundle`](NetexBundle.java).
@@ -26,9 +27,10 @@ start OTP with as many bundles as you like, and you may mix GTFS and NeTEx bundl
 
 
 ### Netex File Bundle
+
 As seen above the _netex-file-bundle_ is organized in a hierarchy. This is done to support 
 loading large data set, and to avoid keeping everything in memory. OTP load entities into the a
-hierarchical [NetexImportDataIndex](index/NetexImportDataIndex.java) before each entity is mapped.
+hierarchical [`NetexEntityDataIndex`](index/NetexEntityDataIndex.java) before each entity is mapped.
 This make sure all entities are available during mapping, and that the order of the entities in the 
 files does not matter. 
 
@@ -45,25 +47,36 @@ Within each group there is also _shared-group-data_ and _group-files_ (leaf-file
    _group-files_.
 - Entities in global _shared-files_ can reference other entities in the same file and entities in 
   other global _shared-files_.
+ 
+✅ Note! You can configure how your data files are grouped into the 3 levels above using regular 
+expressions in the _build-config.json_.
 
 
 ### Load entities and map to OTP model
 
 The load and mapping process is:
 
-1. Load _shared-data-files_
+1. Load _shared-data-files_ into _index_.
 1. Map _shared-data-entries_
 1. For each group:
-    1. Load _group-shared-files_
+    1. Load _group-shared-files_ into index
     1. Map _group-shared-entries_
     1. For each leaf group-file file:
-        1. Load _group-file_
+        1. Load _group-file_ into index
         1. Map _group-entries_
         1. Clear leaf data from index
     1. Clear group data from index
 
 The [`NetexBundele`](NetexBundle.java) repeat the exact same steps at each level multiple times. 
-The hirarchical structure of the [NetexEntityDataIndex](index/NetexEntityDataIndex.java) is
-supported using a _stack_ of [hierarchical collections](index/hierarchy/AbstractHierarchicalMap.java) which is
-pushed and popped for each level. 
+The hierarchical structure of the [`NetexEntityDataIndex`](index/NetexEntityDataIndex.java) is
+supported using a _stack_ of [hierarchical collections](index/hierarchy/AbstractHierarchicalMap.java)
+which is pushed and popped for each level. 
 
+
+
+
+<style>
+.info{
+    background-color: #9ad5ea;
+}
+</style>
