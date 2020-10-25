@@ -70,9 +70,8 @@ public class NetexImportDataIndex {
     public final HierarchicalMapById<Authority> authoritiesById;
     public final HierarchicalMapById<DayType> dayTypeById;
     public final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId;
-    /**
-     * DayTypeRefs is only needed in the local scope, no need to lookup values in the parent.
-     * */
+
+    /** DayTypeRefs is only needed in the local scope, no need to lookup values in the parent. */
     public final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs;
     public final HierarchicalMapById<DestinationDisplay> destinationDisplayById;
     public final HierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;

@@ -76,9 +76,12 @@ class TripMapper {
 
     @Nullable
     private FeedScopedId getShapeId(ServiceJourney serviceJourney) {
-        JourneyPattern journeyPattern = journeyPatternsById.lookup(serviceJourney.getJourneyPatternRef().getValue().getRef());
-    FeedScopedId serviceLinkId = journeyPattern != null ? idFactory.createId(journeyPattern
-        .getId().replace("JourneyPattern", "ServiceLink")) : null;
+        JourneyPattern journeyPattern = journeyPatternsById.lookup(
+            serviceJourney.getJourneyPatternRef().getValue().getRef()
+        );
+        FeedScopedId serviceLinkId = journeyPattern != null
+            ? idFactory.createId(journeyPattern.getId().replace("JourneyPattern", "ServiceLink"))
+            : null;
 
     return shapePointIds.contains(serviceLinkId) ? serviceLinkId : null;
     }
@@ -104,10 +107,9 @@ class TripMapper {
             lineRef = lineRefStruct.getValue().getRef();
         } else if(serviceJourney.getJourneyPatternRef() != null){
             // Connect to Line referenced through JourneyPattern->Route
-      JourneyPattern journeyPattern = journeyPatternsById.lookup(serviceJourney
-          .getJourneyPatternRef()
-          .getValue()
-          .getRef());
+            JourneyPattern journeyPattern = journeyPatternsById.lookup(
+                serviceJourney.getJourneyPatternRef().getValue().getRef()
+            );
             String routeRef = journeyPattern.getRouteRef().getRef();
             lineRef = routeById.lookup(routeRef).getLineRef().getValue().getRef();
         }
