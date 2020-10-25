@@ -8,7 +8,7 @@ import org.opentripplanner.netex.loader.GroupEntries;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.netex.loader.NetexEntityDataIndex;
 import org.opentripplanner.netex.loader.NetexXmlParser;
-import org.opentripplanner.netex.loader.mapping.NetexMapper;
+import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.NetexConfig;
