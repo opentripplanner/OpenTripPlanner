@@ -23,36 +23,52 @@ import java.util.Comparator;
 public class ValidityComparator implements Comparator<Collection<ValidBetween>> {
 
     @Override
-    public int compare(Collection<ValidBetween> v1collection, Collection<ValidBetween> v2collection) {
-        if (v1collection.size() > 1 || v2collection.size() > 1) {
+    public int compare(Collection<ValidBetween> v1List, Collection<ValidBetween> v2List) {
+        if (v1List.size() > 1 || v2List.size() > 1) {
             throw new NotSupportedException("More than one validity period not supported");
         }
 
-        ValidBetween v1 = v1collection.stream().findFirst().orElse(null);
-        ValidBetween v2 = v2collection.stream().findFirst().orElse(null);
+        ValidBetween v1 = v1List.stream().findFirst().orElse(null);
+        ValidBetween v2 = v2List.stream().findFirst().orElse(null);
 
-        Boolean validNow1 = ValidityHelper.isValidNow(v1);
-        Boolean validNow2 = ValidityHelper.isValidNow(v2);
-        if (validNow1 && !validNow2) return -1;
-        if (validNow2 && !validNow1) return 1;
-        if (validNow1 && validNow2) return 0;
+        // Check NOW
+        {
+            boolean validNow1 = ValidityHelper.isValidNow(v1);
+            boolean validNow2 = ValidityHelper.isValidNow(v2);
 
-        Boolean validFuture1 = ValidityHelper.isValidFuture(v1);
-        Boolean validFuture2 = ValidityHelper.isValidFuture(v2);
-        if (validFuture1 && !validFuture2) return -1;
-        if (validFuture2 && !validFuture1) return 1;
-        if (validFuture1 && validFuture2) {
-            return v1.getFromDate().compareTo(v2.getFromDate());
+            if (validNow1 || validNow2) {
+                if (validNow1 && validNow2) { return 0; }
+                return validNow1 ? -1 : 1;
+            }
         }
 
-        Boolean validPast1 = ValidityHelper.isValidPast(v1);
-        Boolean validPast2 = ValidityHelper.isValidPast(v2);
-        if (validPast1 && !validPast2) return -1;
-        if (validPast2 && !validPast1) return 1;
-        if (validPast1 && validPast2) {
-            return v2.getToDate().compareTo(v1.getToDate());
+        // Check FUTURE
+        {
+            boolean validFuture1 = ValidityHelper.isValidFuture(v1);
+            boolean validFuture2 = ValidityHelper.isValidFuture(v2);
+
+            if (validFuture1 || validFuture2) {
+                if (validFuture1 && validFuture2) {
+                    //noinspection ConstantConditions
+                    return v1.getFromDate().compareTo(v2.getFromDate());
+                }
+                return validFuture1 ? -1 : 1;
+            }
         }
 
+        // Check PAST
+        {
+            boolean validPast1 = ValidityHelper.isValidPast(v1);
+            boolean validPast2 = ValidityHelper.isValidPast(v2);
+
+            if (validPast1 || validPast2) {
+                if (validPast1 && validPast2) {
+                    //noinspection ConstantConditions
+                    return v2.getToDate().compareTo(v1.getToDate());
+                }
+                return validPast1 ? -1 : 1;
+            }
+        }
         return 0;
     }
 }
