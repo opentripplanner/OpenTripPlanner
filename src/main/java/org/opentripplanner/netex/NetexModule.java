@@ -32,8 +32,6 @@ import java.util.List;
 public class NetexModule implements GraphBuilderModule {
     private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;
 
-    private final boolean linkStopsToParentStations;
-    private final boolean parentStationTransfers;
     private final int subwayAccessTime;
     private final int maxInterlineDistance;
     private final String netexFeedId;
@@ -50,16 +48,12 @@ public class NetexModule implements GraphBuilderModule {
 
     public NetexModule(
             String netexFeedId,
-            boolean linkStopsToParentStations,
-            boolean parentStationTransfers,
             int subwayAccessTime,
             int maxInterlineDistance,
             ServiceDateInterval transitPeriodLimit,
             List<NetexBundle> netexBundles
     ) {
         this.netexFeedId = netexFeedId;
-        this.linkStopsToParentStations = linkStopsToParentStations;
-        this.parentStationTransfers = parentStationTransfers;
         this.subwayAccessTime = subwayAccessTime;
         this.maxInterlineDistance = maxInterlineDistance;
         this.transitPeriodLimit = transitPeriodLimit;
