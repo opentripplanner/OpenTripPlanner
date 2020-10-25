@@ -12,9 +12,9 @@ import java.util.List;
  * entries.
  */
 class GroupEntries {
-    private String name;
-    private List<DataSource> sharedEntries = new ArrayList<>();
-    private List<DataSource> entries = new ArrayList<>();
+    private final String name;
+    private final List<DataSource> sharedEntries = new ArrayList<>();
+    private final List<DataSource> entries = new ArrayList<>();
 
     GroupEntries(String name) {
         this.name = name;

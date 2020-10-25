@@ -191,7 +191,7 @@ class StopTimesMapper {
 
     @Nullable
     private StopLocation lookUpStopLocation(StopPointInJourneyPattern stopPointInJourneyPattern) {
-        if (stopPointInJourneyPattern == null) return null;
+        if (stopPointInJourneyPattern == null) { return null; }
 
         String stopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
 

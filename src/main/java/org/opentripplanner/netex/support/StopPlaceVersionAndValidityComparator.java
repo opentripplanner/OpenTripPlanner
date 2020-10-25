@@ -9,7 +9,7 @@ import java.util.Comparator;
  */
 
 public class StopPlaceVersionAndValidityComparator implements Comparator<StopPlace> {
-    private ValidityComparator validityComparator = new ValidityComparator();
+    private final ValidityComparator validityComparator = new ValidityComparator();
 
     @Override
     public int compare(StopPlace s1, StopPlace s2) {

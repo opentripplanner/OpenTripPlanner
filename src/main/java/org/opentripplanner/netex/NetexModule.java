@@ -44,9 +44,9 @@ public class NetexModule implements GraphBuilderModule {
      */
     private final ServiceDateInterval transitPeriodLimit;
 
-    private List<NetexBundle> netexBundles;
+    private final List<NetexBundle> netexBundles;
 
-    private FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
+    private final FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
 
     public NetexModule(
             String netexFeedId,

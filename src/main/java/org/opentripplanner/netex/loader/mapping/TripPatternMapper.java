@@ -103,7 +103,7 @@ class TripPatternMapper {
             Trip trip = tripMapper.mapServiceJourney(serviceJourney);
 
             // Unable to map ServiceJourney, problem logged by the mapper above
-            if(trip == null) continue;
+            if(trip == null) { continue; }
 
             StopTimesMapper.MappedStopTimes stopTimes = stopTimesMapper.mapToStopTimes(
                     journeyPattern,
@@ -112,7 +112,7 @@ class TripPatternMapper {
             );
 
             // Unable to map StopTimes, problem logged by the mapper above
-            if (stopTimes == null) continue;
+            if (stopTimes == null) { continue; }
 
             result.tripStopTimes.put(trip, stopTimes.stopTimes);
             result.stopTimeByNetexId.putAll(stopTimes.stopTimeByNetexId);
@@ -122,7 +122,7 @@ class TripPatternMapper {
         }
 
         // No trips successfully mapped
-        if(trips.isEmpty()) return result;
+        if(trips.isEmpty()) { return result; }
 
         // TODO OTP2 Trips containing FlexStopLocations are not added to StopPatterns until support
         //           for this is added.

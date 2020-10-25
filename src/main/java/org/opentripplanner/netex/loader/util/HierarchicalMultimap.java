@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * <p>
@@ -20,7 +19,7 @@ import java.util.Set;
  * @param <V> the base value type
  */
 public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collection<V>> {
-    private Multimap<K,V> map  = ArrayListMultimap.create();
+    private final Multimap<K,V> map  = ArrayListMultimap.create();
 
     /** Create a root for the hierarchy */
     public HierarchicalMultimap() {

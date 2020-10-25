@@ -12,7 +12,7 @@ import java.util.Set;
  * @param <V> the value type
  */
 public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
-    private Map<K,V> map  = new HashMap<>();
+    private final Map<K,V> map  = new HashMap<>();
 
     /** Create a new hierarchical map root. */
     public HierarchicalMap() {

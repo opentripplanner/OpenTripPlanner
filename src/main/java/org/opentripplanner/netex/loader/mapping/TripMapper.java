@@ -25,9 +25,9 @@ class TripMapper {
     private static final Logger LOG = LoggerFactory.getLogger(TripMapper.class);
 
     private final FeedScopedIdFactory idFactory;
-    private EntityById<org.opentripplanner.model.Route> otpRouteById;
-    private ReadOnlyHierarchicalMap<String, Route> routeById;
-    private ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
+    private final EntityById<org.opentripplanner.model.Route> otpRouteById;
+    private final ReadOnlyHierarchicalMap<String, Route> routeById;
+    private final ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
   private final Set<FeedScopedId> shapePointIds;
 
     TripMapper(

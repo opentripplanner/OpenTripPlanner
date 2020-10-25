@@ -36,7 +36,7 @@ public class NetexBundle implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
     /** stack of NeTEx elements needed to link the input to existing data */
-    private Deque<NetexImportDataIndex> netexIndex = new LinkedList<>();
+    private final Deque<NetexImportDataIndex> netexIndex = new LinkedList<>();
 
     private final CompositeDataSource source;
 
