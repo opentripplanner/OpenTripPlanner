@@ -1,13 +1,13 @@
 package org.opentripplanner.netex.loader;
 
-import org.opentripplanner.netex.loader.util.HierarchicalElement;
-import org.opentripplanner.netex.loader.util.HierarchicalMap;
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
-import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
-import org.opentripplanner.netex.loader.util.HierarchicalVersionMapById;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.index.util.HierarchicalElement;
+import org.opentripplanner.netex.index.util.HierarchicalMap;
+import org.opentripplanner.netex.index.util.HierarchicalMapById;
+import org.opentripplanner.netex.index.util.HierarchicalMultimap;
+import org.opentripplanner.netex.index.util.HierarchicalVersionMapById;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
@@ -57,7 +57,7 @@ import java.util.Set;
  * and save memory during the load operation, because data not needed any more can be thrown away.
  * <p>
  * The hierarchy implementation is delegated to the
- * {@link org.opentripplanner.netex.loader.util.AbstractHierarchicalMap} and the
+ * {@link org.opentripplanner.netex.index.util.AbstractHierarchicalMap} and the
  * {@link HierarchicalElement} classes.
  * <p/>
  * The mapping code should not insert entities, so an instance of this class implements the

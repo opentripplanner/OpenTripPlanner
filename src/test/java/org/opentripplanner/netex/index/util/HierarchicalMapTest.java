@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.util;
+package org.opentripplanner.netex.index.util;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,10 +13,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
-import static org.opentripplanner.netex.loader.util.E.REAGAN;
-import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
-import static org.opentripplanner.netex.loader.util.SetSupport.sort;
+import static org.opentripplanner.netex.index.util.E.EASTWOOD;
+import static org.opentripplanner.netex.index.util.E.REAGAN;
+import static org.opentripplanner.netex.index.util.E.SCHWARZENEGGER;
+import static org.opentripplanner.netex.index.util.SetSupport.sort;
 
 /**
  * To test the hierarchical map we construct a hierarchy of:

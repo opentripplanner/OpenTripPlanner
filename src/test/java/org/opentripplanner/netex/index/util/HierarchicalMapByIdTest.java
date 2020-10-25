@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.util;
+package org.opentripplanner.netex.index.util;
 
 import org.junit.Test;
 
@@ -10,9 +10,9 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
-import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
-import static org.opentripplanner.netex.loader.util.SetSupport.sort;
+import static org.opentripplanner.netex.index.util.E.EASTWOOD;
+import static org.opentripplanner.netex.index.util.E.SCHWARZENEGGER;
+import static org.opentripplanner.netex.index.util.SetSupport.sort;
 
 /**
  * This test extends the tests performed in {@link HierarchicalMapTest} with respect to

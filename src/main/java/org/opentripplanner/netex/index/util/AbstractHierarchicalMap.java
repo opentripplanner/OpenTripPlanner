@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.util;
+package org.opentripplanner.netex.index.util;
 
 /**
  * Base class for a hierarchical map. This class proved a way to create a hierarchy of maps with

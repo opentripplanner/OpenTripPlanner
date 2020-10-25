@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.util;
+package org.opentripplanner.netex.index.util;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

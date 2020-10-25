@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.util;
+package org.opentripplanner.netex.index.util;
 
 import org.rutebanken.netex.model.EntityInVersionStructure;
 import org.rutebanken.netex.model.EntityStructure;

@@ -3,7 +3,7 @@ package org.opentripplanner.netex.loader.parser;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.netex.loader.NetexEntityDataIndex;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Journey_VersionStructure;

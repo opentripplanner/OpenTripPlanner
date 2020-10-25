@@ -5,8 +5,8 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.loader.util.HierarchicalMap;
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
+import org.opentripplanner.netex.index.util.HierarchicalMap;
+import org.opentripplanner.netex.index.util.HierarchicalMapById;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 

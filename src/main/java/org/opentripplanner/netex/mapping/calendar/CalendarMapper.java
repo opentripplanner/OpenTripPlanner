@@ -6,8 +6,8 @@ import org.opentripplanner.graph_builder.issues.ServiceCodeDoesNotContainService
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;

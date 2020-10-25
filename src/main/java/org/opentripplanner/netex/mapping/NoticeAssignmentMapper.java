@@ -10,7 +10,7 @@ import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMap;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;

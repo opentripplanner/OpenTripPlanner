@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.util;
+package org.opentripplanner.netex.index.util;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -13,12 +13,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
-import static org.opentripplanner.netex.loader.util.E.REAGAN;
-import static org.opentripplanner.netex.loader.util.E.REAGAN_2;
-import static org.opentripplanner.netex.loader.util.E.REAGAN_3;
-import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
-import static org.opentripplanner.netex.loader.util.SetSupport.sort;
+import static org.opentripplanner.netex.index.util.E.EASTWOOD;
+import static org.opentripplanner.netex.index.util.E.REAGAN;
+import static org.opentripplanner.netex.index.util.E.REAGAN_2;
+import static org.opentripplanner.netex.index.util.E.REAGAN_3;
+import static org.opentripplanner.netex.index.util.E.SCHWARZENEGGER;
+import static org.opentripplanner.netex.index.util.SetSupport.sort;
 
 public class HierarchicalVersionMapByIdTest {
     private final HierarchicalVersionMapById<E> root = new HierarchicalVersionMapById<>();

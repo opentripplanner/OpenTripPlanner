@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.loader.parser;
 
 import org.opentripplanner.netex.loader.NetexEntityDataIndex;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.index.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
