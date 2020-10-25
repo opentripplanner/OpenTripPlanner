@@ -87,7 +87,7 @@ public class CalendarMapper {
     ) {
         return new ServiceCalendarDate(
                 idFactory.apply(serviceId),
-                new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()),
+                new ServiceDate(date.toLocalDate()),
                 exceptionType
         );
     }
