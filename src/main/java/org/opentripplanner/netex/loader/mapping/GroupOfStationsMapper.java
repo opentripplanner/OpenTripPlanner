@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopCollection;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.impl.EntityById;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.StopPlaceRefStructure;
@@ -13,6 +13,7 @@ import org.rutebanken.netex.model.StopPlaceRefs_RelStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 class GroupOfStationsMapper {
@@ -78,6 +79,7 @@ class GroupOfStationsMapper {
         }
     }
 
+    @Nullable
     private StopCollection lookupStation(FeedScopedId stationId) {
         if (stations.containsKey(stationId)) {
             return stations.get(stationId);

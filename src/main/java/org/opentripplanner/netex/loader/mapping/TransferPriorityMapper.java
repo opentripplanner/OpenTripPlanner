@@ -3,8 +3,11 @@ package org.opentripplanner.netex.loader.mapping;
 import org.opentripplanner.model.TransferPriority;
 import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
 
+import javax.annotation.Nullable;
+
 public class TransferPriorityMapper {
 
+    @Nullable
     public static TransferPriority mapToDomain(InterchangeWeightingEnumeration value) {
         if(value == null) { return null; }
 

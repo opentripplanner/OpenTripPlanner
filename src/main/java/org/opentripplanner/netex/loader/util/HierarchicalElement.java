@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.loader.util;
 
+import javax.annotation.Nullable;
+
 /**
  * This is a hierarchical wrapper around a singe element witch provide the
  * ability to create <em>parent</em> and <em>child</em> relationship with
@@ -30,9 +32,10 @@ public class HierarchicalElement<E> {
      * Get element, if not found delegate up to the parent.
      * @return an {@code null} if no element is found.
      */
+    @Nullable
     public E get() {
-        if(element != null) return element;
-        if(parent == null) return null;
+        if(element != null) { return element; }
+        if(parent == null) { return null; }
         else return parent.get();
     }
 

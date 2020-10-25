@@ -4,6 +4,8 @@ import org.opentripplanner.model.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
+import javax.annotation.Nullable;
+
 class WgsCoordinateMapper {
 
     /**
@@ -13,6 +15,7 @@ class WgsCoordinateMapper {
      * @return true if the handler is successfully invoked with a location, {@code false} if
      *         any of the required data elements are {@code null}.
      */
+    @Nullable
     static WgsCoordinate mapToDomain(SimplePoint_VersionStructure point) {
         if(point == null || point.getLocation() == null) { return null; }
         LocationStructure loc = point.getLocation();

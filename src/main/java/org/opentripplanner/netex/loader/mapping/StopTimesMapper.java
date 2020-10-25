@@ -16,6 +16,7 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ class StopTimesMapper {
     /**
      * @return a map of stop-times indexed by the TimetabledPassingTime id.
      */
+    @Nullable
     MappedStopTimes mapToStopTimes(
             JourneyPattern journeyPattern,
             Trip trip,
@@ -187,9 +189,8 @@ class StopTimesMapper {
         return stopTime;
     }
 
-    private StopLocation lookUpStopLocation(
-            StopPointInJourneyPattern stopPointInJourneyPattern
-    ) {
+    @Nullable
+    private StopLocation lookUpStopLocation(StopPointInJourneyPattern stopPointInJourneyPattern) {
         if (stopPointInJourneyPattern == null) return null;
 
         String stopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
@@ -216,6 +217,7 @@ class StopTimesMapper {
         return stopLocation;
     }
 
+    @Nullable
     private static StopPointInJourneyPattern findStopPoint(String pointInJourneyPatterRef,
                                                     JourneyPattern journeyPattern) {
         List<PointInLinkSequence_VersionedChildStructure> points = journeyPattern

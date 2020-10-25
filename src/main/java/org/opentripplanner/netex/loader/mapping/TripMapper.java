@@ -12,6 +12,7 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
 import java.util.Set;
 
@@ -49,6 +50,7 @@ class TripMapper {
    *
      * @return valid trip or {@code null} if unable to map to a valid trip.
      */
+    @Nullable
     Trip mapServiceJourney(ServiceJourney serviceJourney){
         org.opentripplanner.model.Route route = resolveRoute(serviceJourney);
         String serviceId = resolveServiceId(serviceJourney);
@@ -62,14 +64,17 @@ class TripMapper {
         trip.setRoute(route);
         trip.setServiceId(idFactory.createId(serviceId));
         trip.setShapeId(getShapeId(serviceJourney));
+
         if (serviceJourney.getPrivateCode() != null) {
           trip.setInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
         }
+
         trip.setTripShortName(serviceJourney.getPublicCode());
 
         return trip;
     }
 
+    @Nullable
     private FeedScopedId getShapeId(ServiceJourney serviceJourney) {
         JourneyPattern journeyPattern = journeyPatternsById.lookup(serviceJourney.getJourneyPatternRef().getValue().getRef());
     FeedScopedId serviceLinkId = journeyPattern != null ? idFactory.createId(journeyPattern
