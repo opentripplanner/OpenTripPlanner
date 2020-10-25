@@ -12,14 +12,15 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
 
@@ -49,14 +50,12 @@ class RaptorRoutingRequestTransitDataCreator {
   }
 
   List<List<TripPatternForDates>> createTripPatternsPerStop(
-      int additionalPastSearchDays,
       int additionalFutureSearchDays,
       Set<TransitMode> transitModes,
       Set<FeedScopedId> bannedRoutes
   ) {
 
-    List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
-        additionalPastSearchDays,
+    List<TripPatternForDate> tripPatternForDates = getTripPatternsForDateRange(
         additionalFutureSearchDays,
         transitModes,
         bannedRoutes
@@ -67,20 +66,20 @@ class RaptorRoutingRequestTransitDataCreator {
     return createTripPatternsPerStop(tripPatternForDateList, transitLayer.getStopCount());
   }
 
-  private List<Map<FeedScopedId, TripPatternForDate>> getTripPatternsForDateRange(
-      int additionalPastSearchDays,
+  private List<TripPatternForDate> getTripPatternsForDateRange(
       int additionalFutureSearchDays,
       Set<TransitMode> transitModes,
       Set<FeedScopedId> bannedRoutes
   ) {
-    List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDates = new ArrayList<>();
+    List<TripPatternForDate> tripPatternForDates = new ArrayList<>();
 
     // This filters trips by the search date as well as additional dates before and after
-    for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
-      tripPatternForDates.add(
+    for (int d = 0; d <= additionalFutureSearchDays; ++d) {
+      tripPatternForDates.addAll(
         filterActiveTripPatterns(
           transitLayer,
           departureDate.plusDays(d),
+          d == 0,
           transitModes,
           bannedRoutes
         )
@@ -97,32 +96,36 @@ class RaptorRoutingRequestTransitDataCreator {
    * performance for searching, as each TripPattern is searched only once per round.
    */
   static List<TripPatternForDates> merge(
-      ZonedDateTime searchStartTime, List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDateList
+      ZonedDateTime searchStartTime, List<TripPatternForDate> patternForDateList
   ) {
+
+    // Group TripPatternForDate objects by TripPattern
+    Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = patternForDateList
+        .stream()
+        .collect(groupingBy(TripPatternForDate::getTripPattern));
+
     List<TripPatternForDates> combinedList = new ArrayList<>();
 
-    // Extract all distinct TripPatterns across the search days
-    Map<FeedScopedId, TripPatternWithRaptorStopIndexes> allTripPatternsById = tripPatternForDateList
-        .stream()
-        .flatMap(t -> t.values().stream())
-        .map(TripPatternForDate::getTripPattern)
-        .distinct()
-        .collect(Collectors.toMap(TripPatternWithRaptorStopIndexes::getId, t -> t));
+    // For each TripPattern, time expand each TripPatternForDate and merge into a single
+    // TripPatternForDates
+    for (Map.Entry<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternEntry : patternForDateByPattern
+        .entrySet()) {
 
-    // For each TripPattern, time expand each TripPatternForDate and merge into a single TripPatternForDates
-    for (Map.Entry<FeedScopedId, TripPatternWithRaptorStopIndexes> patternEntry : allTripPatternsById.entrySet()) {
-      List<TripPatternForDate> tripPatterns = new ArrayList<>();
+      // Sort by date
+      List<TripPatternForDate> patternsSorted = patternEntry
+          .getValue()
+          .stream()
+          .sorted(Comparator.comparing(TripPatternForDate::getLocalDate))
+          .collect(Collectors.toUnmodifiableList());
+
+      // Calculate offsets per date
       List<Integer> offsets = new ArrayList<>();
-
-      for (Map<FeedScopedId, TripPatternForDate> tripPatternById : tripPatternForDateList) {
-        TripPatternForDate tripPatternForDate = tripPatternById.get(patternEntry.getKey());
-        if (tripPatternForDate != null) {
-          tripPatterns.add(tripPatternForDate);
-          offsets.add(secondsSinceStartOfTime(searchStartTime, tripPatternForDate.getLocalDate()));
-        }
+      for (TripPatternForDate tripPatternForDate : patternsSorted) {
+        offsets.add(secondsSinceStartOfTime(searchStartTime, tripPatternForDate.getLocalDate()));
       }
 
-      combinedList.add(new TripPatternForDates(patternEntry.getValue(), tripPatterns, offsets));
+      // Combine TripPatternForDate objects
+      combinedList.add(new TripPatternForDates(patternEntry.getKey(), patternsSorted, offsets));
     }
 
     return combinedList;
@@ -144,12 +147,17 @@ class RaptorRoutingRequestTransitDataCreator {
     return result;
   }
 
-  private static Map<FeedScopedId, TripPatternForDate> filterActiveTripPatterns(
+  private static List<TripPatternForDate> filterActiveTripPatterns(
       TransitLayer transitLayer,
       LocalDate date,
+      boolean firstDay,
       Set<TransitMode> transitModes,
       Set<FeedScopedId> bannedRoutes
   ) {
+
+    // On the first search day we want to add both TripPatternsForDate objects that start that day
+    // and any previous day, while on subsequent search days we only want to add the
+    // TripPatternForDate objects that start on that particular day. This is to prevent duplicates.
 
     return transitLayer
         .getTripPatternsForDate(date)
@@ -157,7 +165,8 @@ class RaptorRoutingRequestTransitDataCreator {
         .filter(p -> transitModes.contains(p.getTripPattern().getTransitMode()))
         .filter(p -> !bannedRoutes.contains(p.getTripPattern()
             .getPattern().route.getId()))
-        .collect(toMap(p -> p.getTripPattern().getId(), p -> p));
+        .filter(p -> firstDay || p.getStartOfRunningPeriod().toLocalDate().equals(date))
+        .collect(Collectors.toList());
   }
 
   List<List<RaptorTransfer>> calculateTransferDuration(double walkSpeed) {

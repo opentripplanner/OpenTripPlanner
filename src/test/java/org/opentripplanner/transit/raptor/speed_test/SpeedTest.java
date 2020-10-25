@@ -363,7 +363,6 @@ public class SpeedTest {
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),
                 1,
-                1,
                 request.getTransitModes(),
                 Collections.emptySet(),
                 request.getWalkSpeedMeterPrSecond()

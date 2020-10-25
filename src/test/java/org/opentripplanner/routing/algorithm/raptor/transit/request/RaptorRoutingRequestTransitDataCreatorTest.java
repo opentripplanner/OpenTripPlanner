@@ -11,9 +11,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,30 +36,25 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
         TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(TP_ID_2,null, null);
         TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(TP_ID_3,null, null);
 
-        List<Map<FeedScopedId, TripPatternForDate>> tripPatternsForDates = new ArrayList<>();
+        List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 
         // TripPatterns valid for 1st day in search range
-        Map<FeedScopedId, TripPatternForDate> tripPatternForDatesById = new HashMap<>();
-        tripPatternForDatesById.put(tripPattern1.getId(), new TripPatternForDate(tripPattern1, times, first));
-        tripPatternForDatesById.put(tripPattern2.getId(), new TripPatternForDate(tripPattern2, times, first));
-        tripPatternForDatesById.put(tripPattern3.getId(), new TripPatternForDate(tripPattern1, times, first));
-        tripPatternsForDates.add(tripPatternForDatesById);
+        tripPatternsForDates.add(new TripPatternForDate(tripPattern1, first));
+        tripPatternsForDates.add(new TripPatternForDate(tripPattern2, first));
+        tripPatternsForDates.add(new TripPatternForDate(tripPattern3, first));
 
         // TripPatterns valid for 2nd day in search range
-        Map<FeedScopedId, TripPatternForDate> tripPatternForDatesById2 = new HashMap<>();
-        tripPatternForDatesById2.put(tripPattern2.getId(), new TripPatternForDate(tripPattern2, times, second));
-        tripPatternForDatesById2.put(tripPattern3.getId(), new TripPatternForDate(tripPattern3, times, second));
-        tripPatternsForDates.add(tripPatternForDatesById2);
+        tripPatternsForDates.add(new TripPatternForDate(tripPattern2, second));
+        tripPatternsForDates.add(new TripPatternForDate(tripPattern3, second));
 
         // TripPatterns valid for 3rd day in search range
-        Map<FeedScopedId, TripPatternForDate> tripPatternForDatesById3 = new HashMap<>();
-        tripPatternForDatesById3.put(tripPattern1.getId(), new TripPatternForDate(tripPattern1, times, third));
-        tripPatternForDatesById3.put(tripPattern3.getId(), new TripPatternForDate(tripPattern3, times, third));
-        tripPatternsForDates.add(tripPatternForDatesById3);
+        tripPatternsForDates.add(new TripPatternForDate(tripPattern1, third));
+        tripPatternsForDates.add(new TripPatternForDate(tripPattern3, third));
+
 
         // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset in time when requested.
         List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
-            startOfTime, tripPatternsForDates
+           startOfTime, tripPatternsForDates
         );
 
         // Get the results

@@ -63,7 +63,7 @@ public class RoutingWorker {
      * and would also need to board trips starting tomorrow. If a search window that lasts more than
      * a day is used, this will need to be increased.
      */
-    private static final int ADDITIONAL_SEARCH_DAYS_AFTER_TODAY = 1;
+    private static final int ADDITIONAL_SEARCH_DAYS_AFTER_TODAY = 2;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
@@ -139,7 +139,6 @@ public class RoutingWorker {
         requestTransitDataProvider = new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDateTime().toInstant(),
-                ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
                 ADDITIONAL_SEARCH_DAYS_AFTER_TODAY,
                 request.modes.transitModes,
                 request.rctx.bannedRoutes,
