@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.NetexEntityDataIndex;
+import org.opentripplanner.netex.index.NetexEntityDataIndex;
 import org.rutebanken.netex.model.VersionFrame_VersionStructure;
 import org.slf4j.Logger;
 

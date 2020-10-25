@@ -2,7 +2,7 @@ package org.opentripplanner.netex.loader.parser;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.netex.loader.NetexEntityDataIndex;
+import org.opentripplanner.netex.index.NetexEntityDataIndex;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeAssignmentsInFrame_RelStructure;

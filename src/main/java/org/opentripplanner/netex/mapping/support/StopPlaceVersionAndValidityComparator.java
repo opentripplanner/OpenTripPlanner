@@ -1,5 +1,6 @@
-package org.opentripplanner.netex.support;
+package org.opentripplanner.netex.mapping.support;
 
+import org.opentripplanner.netex.support.NetexVersionHelper;
 import org.rutebanken.netex.model.StopPlace;
 
 import java.util.Comparator;

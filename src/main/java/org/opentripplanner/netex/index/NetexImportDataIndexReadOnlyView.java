@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader;
+package org.opentripplanner.netex.index;
 
 import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMapById;

@@ -1,8 +1,7 @@
-package org.opentripplanner.netex.mapping;
+package org.opentripplanner.netex.mapping.support;
 
 import org.junit.Test;
 import org.locationtech.jts.util.Assert;
-import org.opentripplanner.netex.support.ValidityComparator;
 import org.rutebanken.netex.model.ValidBetween;
 
 import java.time.LocalDateTime;

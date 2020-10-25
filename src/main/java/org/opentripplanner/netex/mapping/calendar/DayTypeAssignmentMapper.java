@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.opentripplanner.netex.support.NetexObjectDecorator.logUnmappedEntityRef;
+import static org.opentripplanner.netex.mapping.support.NetexObjectDecorator.logUnmappedEntityRef;
 
 /**
  * Map {@link DayTypeAssignment}s to set of {@link LocalDateTime}.

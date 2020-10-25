@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.GroupEntries;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
-import org.opentripplanner.netex.loader.NetexEntityDataIndex;
+import org.opentripplanner.netex.index.NetexEntityDataIndex;
 import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;

@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.support;
+package org.opentripplanner.netex.mapping.support;
 
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader;
+package org.opentripplanner.netex.index;
 
 import org.opentripplanner.netex.index.hierarchy.HierarchicalElement;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;

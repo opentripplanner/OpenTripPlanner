@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.support;
+package org.opentripplanner.netex.mapping.support;
 
 import org.junit.Test;
 

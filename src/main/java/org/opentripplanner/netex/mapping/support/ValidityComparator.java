@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.support;
+package org.opentripplanner.netex.mapping.support;
 
 import org.rutebanken.netex.model.ValidBetween;
 
@@ -20,7 +20,7 @@ import java.util.Comparator;
  * 2. Future valid period with earliest start date
  * 3. Past valid period with latest end date
  */
-public class ValidityComparator implements Comparator<Collection<ValidBetween>> {
+class ValidityComparator implements Comparator<Collection<ValidBetween>> {
 
     @Override
     public int compare(Collection<ValidBetween> v1List, Collection<ValidBetween> v2List) {

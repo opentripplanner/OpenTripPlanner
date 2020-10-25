@@ -2,6 +2,7 @@ package org.opentripplanner.netex.loader;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.netex.index.NetexEntityDataIndex;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.OperatingPeriod;

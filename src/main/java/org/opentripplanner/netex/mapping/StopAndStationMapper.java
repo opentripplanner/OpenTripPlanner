@@ -8,7 +8,7 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalVersionMapById;
-import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
+import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;

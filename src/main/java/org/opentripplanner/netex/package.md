@@ -28,7 +28,7 @@ start OTP with as many bundles as you like, and you may mix GTFS and NeTEx bundl
 ### Netex File Bundle
 As seen above the _netex-file-bundle_ is organized in a hierarchy. This is done to support 
 loading large data set, and to avoid keeping everything in memory. OTP load entities into the a
-hierarchical [NetexImportDataIndex](loader/NetexImportDataIndex.java) before each entity is mapped.
+hierarchical [NetexImportDataIndex](index/NetexImportDataIndex.java) before each entity is mapped.
 This make sure all entities are available during mapping, and that the order of the entities in the 
 files does not matter. 
 
@@ -63,7 +63,7 @@ The load and mapping process is:
     1. Clear group data from index
 
 The [`NetexBundele`](NetexBundle.java) repeat the exact same steps at each level multiple times. 
-The hirarchical structure of the [NetexEntityDataIndex](loader/NetexEntityDataIndex.java) is
-supported using a _stack_ of [hierarchical collections](loader/util/AbstractHierarchicalMap.java) which is
+The hirarchical structure of the [NetexEntityDataIndex](index/NetexEntityDataIndex.java) is
+supported using a _stack_ of [hierarchical collections](index/hierarchy/AbstractHierarchicalMap.java) which is
 pushed and popped for each level. 
 

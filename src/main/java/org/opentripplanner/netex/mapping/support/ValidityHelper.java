@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.support;
+package org.opentripplanner.netex.mapping.support;
 
 import org.rutebanken.netex.model.ValidBetween;
 
@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
  * This helper class provides methods for checking if a period is valid now, in the past, or in the future according
  * to the current date.
  */
-public class ValidityHelper {
+class ValidityHelper {
     private ValidityHelper() {}
 
     // No validity information treated as valid now
-    public static boolean isValidNow(ValidBetween validBetween) {
+    static boolean isValidNow(ValidBetween validBetween) {
         LocalDateTime now = LocalDateTime.now();
         if (validBetween != null) {
             if (validBetween.getFromDate() == null && validBetween.getToDate() == null) {
@@ -32,7 +32,7 @@ public class ValidityHelper {
         return true;
     }
 
-    public static boolean isValidPast(ValidBetween validBetween) {
+    static boolean isValidPast(ValidBetween validBetween) {
         LocalDateTime now = LocalDateTime.now();
         if (validBetween != null) {
             if (validBetween.getToDate() == null) {
@@ -48,7 +48,7 @@ public class ValidityHelper {
         return false;
     }
 
-    public static boolean isValidFuture(ValidBetween validBetween) {
+    static boolean isValidFuture(ValidBetween validBetween) {
         LocalDateTime now = LocalDateTime.now();
         if (validBetween != null) {
             if (validBetween.getFromDate() == null) {
