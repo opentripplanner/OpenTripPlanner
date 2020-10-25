@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.NetexEntityDataIndex;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Organisation_VersionStructure;
@@ -44,7 +44,7 @@ class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructur
         verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
     }
 
-    @Override void setResultOnIndex(NetexImportDataIndex netexIndex) {
+    @Override void setResultOnIndex(NetexEntityDataIndex netexIndex) {
         netexIndex.authoritiesById.addAll(authorities);
         netexIndex.operatorsById.addAll(operators);
     }

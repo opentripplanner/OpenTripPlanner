@@ -5,7 +5,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.NetexEntityDataIndex;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.GroupOfLinesRefStructure;
@@ -30,14 +30,14 @@ public class RouteMapperTest {
 
     @Test
     public void mapRouteWithDefaultAgency() {
-        NetexImportDataIndex netexImportDataIndex = new NetexImportDataIndex();
+        NetexEntityDataIndex netexEntityDataIndex = new NetexEntityDataIndex();
         Line line = createExampleLine();
 
         RouteMapper routeMapper = new RouteMapper(
                 MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 new EntityById<>(),
-                netexImportDataIndex.readOnlyView(),
+                netexEntityDataIndex.readOnlyView(),
                 TimeZone.getDefault().toString()
         );
 
@@ -50,7 +50,7 @@ public class RouteMapperTest {
 
     @Test
     public void mapRouteWithAgencySpecified() {
-        NetexImportDataIndex netexIndex = new NetexImportDataIndex();
+        NetexEntityDataIndex netexIndex = new NetexEntityDataIndex();
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
 
         Network network = new Network()
@@ -81,7 +81,7 @@ public class RouteMapperTest {
 
     @Test
     public void mapRouteWithColor() {
-        NetexImportDataIndex netexImportDataIndex = new NetexImportDataIndex();
+        NetexEntityDataIndex netexEntityDataIndex = new NetexEntityDataIndex();
         Line line = createExampleLine();
         byte[] color = new byte[] {127, 0, 0};
         byte[] textColor = new byte[] {0, 127, 0};
@@ -94,7 +94,7 @@ public class RouteMapperTest {
                 MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 new EntityById<>(),
-                netexImportDataIndex.readOnlyView(),
+                netexEntityDataIndex.readOnlyView(),
                 TimeZone.getDefault().toString()
         );
 

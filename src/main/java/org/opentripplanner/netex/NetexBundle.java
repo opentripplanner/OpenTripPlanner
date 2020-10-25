@@ -1,10 +1,13 @@
-package org.opentripplanner.netex.loader;
+package org.opentripplanner.netex;
 
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.NetexModule;
+import org.opentripplanner.netex.loader.GroupEntries;
+import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
+import org.opentripplanner.netex.loader.NetexEntityDataIndex;
+import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.mapping.NetexMapper;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -18,8 +21,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.LinkedList;
-
-import static java.util.Collections.singletonList;
+import java.util.List;
 
 /**
  * Loads/reads a NeTEx bundle of a data source(zip file/directory/cloud storage) and maps it into
@@ -36,7 +38,7 @@ public class NetexBundle implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
     /** stack of NeTEx elements needed to link the input to existing data */
-    private final Deque<NetexImportDataIndex> netexIndex = new LinkedList<>();
+    private final Deque<NetexEntityDataIndex> netexIndex = new LinkedList<>();
 
     private final CompositeDataSource source;
 
@@ -76,7 +78,7 @@ public class NetexBundle implements Closeable {
         otpMapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore);
 
         // Load data
-        loadZipFileEntries();
+        loadFileEntries();
 
         return transitBuilder;
     }
@@ -91,10 +93,10 @@ public class NetexBundle implements Closeable {
     /* private methods */
 
     /** Load all files entries in the bundle */
-    private void loadZipFileEntries() {
+    private void loadFileEntries() {
 
         // Add a global(this zip file) shared NeTEX DAO
-        netexIndex.addFirst(new NetexImportDataIndex());
+        netexIndex.addFirst(new NetexEntityDataIndex());
 
         // Load global shared files
         loadFilesThenMapToOtpTransitModel("shared file", hierarchy.sharedEntries());
@@ -102,7 +104,7 @@ public class NetexBundle implements Closeable {
         for (GroupEntries group : hierarchy.groups()) {
             LOG.info("reading group {}", group.name());
 
-            newNetexImportDataScope(() -> {
+            scopeInputData(() -> {
                 // Load shared group files
                 loadFilesThenMapToOtpTransitModel(
                         "shared group file",
@@ -110,9 +112,9 @@ public class NetexBundle implements Closeable {
                 );
 
                 for (DataSource entry : group.independentEntries()) {
-                    newNetexImportDataScope(() -> {
+                    scopeInputData(() -> {
                         // Load each independent file in group
-                        loadFilesThenMapToOtpTransitModel("group file", singletonList(entry));
+                        loadFilesThenMapToOtpTransitModel("group file", List.of(entry));
                     });
                 }
             });
@@ -123,8 +125,8 @@ public class NetexBundle implements Closeable {
      * make a new index and pushes it on the index stack, before executing the task and
      * at the end pop of the index.
      */
-    private void newNetexImportDataScope(Runnable task) {
-        netexIndex.addFirst(new NetexImportDataIndex(index()));
+    private void scopeInputData(Runnable task) {
+        netexIndex.addFirst(new NetexEntityDataIndex(index()));
         task.run();
         netexIndex.removeFirst();
     }
@@ -144,7 +146,7 @@ public class NetexBundle implements Closeable {
         otpMapper.mapNetexToOtp(index().readOnlyView());
     }
 
-    private NetexImportDataIndex index() {
+    private NetexEntityDataIndex index() {
         return netexIndex.peekFirst();
     }
 

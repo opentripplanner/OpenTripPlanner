@@ -15,7 +15,7 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.NetexEntityDataIndex;
 import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
 import org.opentripplanner.netex.loader.mapping.calendar.CalendarMapper;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
@@ -82,7 +82,7 @@ public class NetexMapper {
     /**
      * <p>
      * This method mappes the last Netex file imported using the *local* entities in the
-     * hierarchical {@link NetexImportDataIndex}.
+     * hierarchical {@link NetexEntityDataIndex}.
      * </p>
      * <p>
      * Note that the order in which the elements are mapped is important. For example, if a file

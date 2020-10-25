@@ -64,7 +64,7 @@ import java.util.Set;
  * {@link NetexImportDataIndexReadOnlyView} witch is passed to the mapping code for translation into
  * OTP domain model objects.
  */
-public class NetexImportDataIndex {
+public class NetexEntityDataIndex {
 
     // Indexes to entities
     public final HierarchicalMapById<Authority> authoritiesById;
@@ -111,7 +111,7 @@ public class NetexImportDataIndex {
     /**
      * Create a root node.
      */
-    public NetexImportDataIndex() {
+    public NetexEntityDataIndex() {
         this.authoritiesById = new HierarchicalMapById<>();
         this.dayTypeById = new HierarchicalMapById<>();
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
@@ -146,7 +146,7 @@ public class NetexImportDataIndex {
      * Create a child node.
      * @param parent can not be <code>null</code>.
      */
-    NetexImportDataIndex(NetexImportDataIndex parent) {
+    public NetexEntityDataIndex(NetexEntityDataIndex parent) {
         this.authoritiesById = new HierarchicalMapById<>(parent.authoritiesById);
         this.dayTypeById = new HierarchicalMapById<>(parent.dayTypeById);
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);

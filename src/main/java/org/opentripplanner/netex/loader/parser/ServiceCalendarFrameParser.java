@@ -2,7 +2,7 @@ package org.opentripplanner.netex.loader.parser;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.NetexEntityDataIndex;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeAssignmentsInFrame_RelStructure;
@@ -50,7 +50,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     }
 
     @Override
-    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+    void setResultOnIndex(NetexEntityDataIndex netexIndex) {
         netexIndex.dayTypeById.addAll(dayTypes);
         netexIndex.operatingPeriodById.addAll(operatingPeriods);
         netexIndex.dayTypeAssignmentByDayTypeId.addAll(dayTypeAssignmentByDayTypeId);

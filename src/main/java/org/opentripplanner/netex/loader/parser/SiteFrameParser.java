@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.NetexEntityDataIndex;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
@@ -69,7 +69,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     }
 
     @Override
-    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+    void setResultOnIndex(NetexEntityDataIndex netexIndex) {
         netexIndex.flexibleStopPlaceById.addAll(flexibleStopPlaces);
         netexIndex.groupOfStopPlacesById.addAll(groupsOfStopPlaces);
         netexIndex.multiModalStopPlaceById.addAll(multiModalStopPlaces);

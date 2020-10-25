@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (01.12.2017)
  */
-public class NetexImportDataIndexTest {
+public class NetexEntityDataIndexTest {
 
     private static final String ID = "ID:A";
     private static final String ID_2 = "ID:B";
@@ -28,13 +28,13 @@ public class NetexImportDataIndexTest {
     private static final String TIMEZONE_NO = "Oslo/Norway";
     private static final String TIMEZONE_PST = "PST";
 
-    private NetexImportDataIndex root;
-    private NetexImportDataIndex child;
+    private NetexEntityDataIndex root;
+    private NetexEntityDataIndex child;
 
     @Before
     public void setup() {
-        root = new NetexImportDataIndex();
-        child = new NetexImportDataIndex(root);
+        root = new NetexEntityDataIndex();
+        child = new NetexEntityDataIndex(root);
     }
 
     @Test
