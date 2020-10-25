@@ -5,7 +5,9 @@ import org.junit.Test;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,8 +16,6 @@ import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
 import static org.opentripplanner.netex.loader.util.E.REAGAN;
 import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
-import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
-import static org.opentripplanner.netex.loader.util.SetSupport.setOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 
 /**
@@ -92,17 +92,17 @@ public class HierarchicalMapTest {
         hmap.addAll(map);
 
         // Then
-        assertEquals(setOf("A", "B"),  hmap.localKeys());
+        assertEquals(Set.of("A", "B"),  hmap.localKeys());
         assertEquals(EASTWOOD,  hmap.localGet("A"));
-        assertEquals(sort(listOf(EASTWOOD, SCHWARZENEGGER)),  sort(hmap.localValues()));
+        assertEquals(sort(List.of(EASTWOOD, SCHWARZENEGGER)),  sort(hmap.localValues()));
         assertTrue(hmap.localContainsKey("B"));
     }
 
     @Test public void localValues() {
         // Given added elements in the setup method
-        assertEqElements(listOf(EASTWOOD, REAGAN),  country.localValues());
-        assertEqElements(listOf(SCHWARZENEGGER, SCHWARZENEGGER), state.localValues());
-        assertEqElements(listOf(EASTWOOD, REAGAN), city.localValues());
+        assertEqElements(List.of(EASTWOOD, REAGAN),  country.localValues());
+        assertEqElements(List.of(SCHWARZENEGGER, SCHWARZENEGGER), state.localValues());
+        assertEqElements(List.of(EASTWOOD, REAGAN), city.localValues());
     }
 
     @Test public void localGet() {

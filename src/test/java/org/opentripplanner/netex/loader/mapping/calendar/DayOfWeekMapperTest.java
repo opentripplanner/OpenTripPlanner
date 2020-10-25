@@ -1,11 +1,9 @@
 package org.opentripplanner.netex.loader.mapping.calendar;
 
 import org.junit.Test;
-import org.rutebanken.netex.model.DayOfWeekEnumeration;
 
 import java.time.DayOfWeek;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -24,18 +22,18 @@ import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKEND;
 
 public class DayOfWeekMapperTest {
 
-    private static final Set<DayOfWeek> WEEKDAYS_EXPECTED = EnumSet.of(
+    private static final Set<DayOfWeek> WEEKDAYS_EXPECTED = Set.of(
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY,
             DayOfWeek.THURSDAY,
             DayOfWeek.FRIDAY
     );
-    private static final Set<DayOfWeek> WEEKEND_EXPECTED = EnumSet.of(
+    private static final Set<DayOfWeek> WEEKEND_EXPECTED = Set.of(
             DayOfWeek.SATURDAY,
             DayOfWeek.SUNDAY
     );
-    private static final Set<DayOfWeek> EVERYDAY_EXPECTED = EnumSet.of(
+    private static final Set<DayOfWeek> EVERYDAY_EXPECTED = Set.of(
             DayOfWeek.MONDAY,
             DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY,
@@ -46,54 +44,47 @@ public class DayOfWeekMapperTest {
     );
 
     @Test public void mapDayOfWeekSingleValue() {
-        assertEquals(EnumSet.of(DayOfWeek.MONDAY), mapDayOfWeek(MONDAY));
-        assertEquals(EnumSet.of(DayOfWeek.TUESDAY), mapDayOfWeek(TUESDAY));
-        assertEquals(EnumSet.of(DayOfWeek.WEDNESDAY), mapDayOfWeek(WEDNESDAY));
-        assertEquals(EnumSet.of(DayOfWeek.THURSDAY), mapDayOfWeek(THURSDAY));
-        assertEquals(EnumSet.of(DayOfWeek.FRIDAY), mapDayOfWeek(FRIDAY));
-        assertEquals(EnumSet.of(DayOfWeek.SATURDAY), mapDayOfWeek(SATURDAY));
-        assertEquals(EnumSet.of(DayOfWeek.SUNDAY), mapDayOfWeek(SUNDAY));
+        assertEquals(Set.of(DayOfWeek.MONDAY), mapDayOfWeek(MONDAY));
+        assertEquals(Set.of(DayOfWeek.TUESDAY), mapDayOfWeek(TUESDAY));
+        assertEquals(Set.of(DayOfWeek.WEDNESDAY), mapDayOfWeek(WEDNESDAY));
+        assertEquals(Set.of(DayOfWeek.THURSDAY), mapDayOfWeek(THURSDAY));
+        assertEquals(Set.of(DayOfWeek.FRIDAY), mapDayOfWeek(FRIDAY));
+        assertEquals(Set.of(DayOfWeek.SATURDAY), mapDayOfWeek(SATURDAY));
+        assertEquals(Set.of(DayOfWeek.SUNDAY), mapDayOfWeek(SUNDAY));
 
         assertEquals(WEEKDAYS_EXPECTED, mapDayOfWeek(WEEKDAYS));
         assertEquals(WEEKEND_EXPECTED, mapDayOfWeek(WEEKEND));
         assertEquals(EVERYDAY_EXPECTED, mapDayOfWeek(EVERYDAY));
-        assertEquals(EnumSet.noneOf(DayOfWeek.class), mapDayOfWeek(NONE));
+        assertEquals(Set.of(), mapDayOfWeek(NONE));
     }
 
 
     @Test public void mapDayOfWeekSet() {
         // Nothing is mapped to nothing
-        assertEquals(
-                EnumSet.noneOf(DayOfWeek.class),
-                mapDayOfWeek(EnumSet.noneOf(DayOfWeekEnumeration.class))
-        );
+        assertEquals(Set.of(), mapDayOfWeek(Set.of()));
+
         // The union of one set with one element is just that one element
-        assertEquals(EnumSet.of(DayOfWeek.MONDAY), mapDayOfWeek(EnumSet.of(MONDAY)));
+        assertEquals(Set.of(DayOfWeek.MONDAY), mapDayOfWeek(Set.of(MONDAY)));
 
         // The union of two sets with one element is a set with two elements
         assertEquals(
-                EnumSet.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY),
-                mapDayOfWeek(EnumSet.of(MONDAY, WEDNESDAY))
+                Set.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY),
+                mapDayOfWeek(Set.of(MONDAY, WEDNESDAY))
         );
         // The union of two sets with the same element is a set with one elements
         assertEquals(
-                EnumSet.of(DayOfWeek.MONDAY),
+                Set.of(DayOfWeek.MONDAY),
                 mapDayOfWeek(Arrays.asList(MONDAY, MONDAY))
         );
         // The union of two none overlapping set contains all elements of both sets
         assertEquals(
-                EnumSet.of(DayOfWeek.MONDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY),
-                mapDayOfWeek(EnumSet.of(MONDAY, WEEKEND))
+                Set.of(DayOfWeek.MONDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY),
+                mapDayOfWeek(Set.of(MONDAY, WEEKEND))
         );
         // Union of a set with NONE is a empty set
-        assertEquals(
-                EnumSet.noneOf(DayOfWeek.class),
-                mapDayOfWeek(EnumSet.of(NONE))
-        );
+        assertEquals(Set.of(),  mapDayOfWeek(Set.of(NONE)));
+
         // Union of sets with duplicate result in all duplicates removed
-        assertEquals(
-                EVERYDAY_EXPECTED,
-                mapDayOfWeek(EnumSet.of(MONDAY, WEDNESDAY, WEEKEND, EVERYDAY))
-        );
+        assertEquals(EVERYDAY_EXPECTED, mapDayOfWeek(Set.of(MONDAY, WEEKEND, EVERYDAY)));
     }
 }

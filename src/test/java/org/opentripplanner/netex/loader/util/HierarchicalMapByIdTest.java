@@ -3,15 +3,15 @@ package org.opentripplanner.netex.loader.util;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
 import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
-import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
-import static org.opentripplanner.netex.loader.util.SetSupport.setOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 
 /**
@@ -30,12 +30,12 @@ public class HierarchicalMapByIdTest {
         String sId = SCHWARZENEGGER.getId();
 
         // When
-        subject.addAll(listOf(EASTWOOD, SCHWARZENEGGER));
+        subject.addAll(List.of(EASTWOOD, SCHWARZENEGGER));
 
         // Then
-        assertEquals(setOf(eId, sId),  subject.localKeys());
+        assertEquals(Set.of(eId, sId),  subject.localKeys());
         assertEquals(EASTWOOD,  subject.localGet(eId));
-        assertEquals(sort(listOf(EASTWOOD, SCHWARZENEGGER)),  sort(subject.localValues()));
+        assertEquals(sort(List.of(EASTWOOD, SCHWARZENEGGER)),  sort(subject.localValues()));
         assertTrue(subject.localContainsKey(eId));
     }
 

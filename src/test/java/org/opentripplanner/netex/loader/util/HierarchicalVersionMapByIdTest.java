@@ -5,6 +5,8 @@ import com.google.common.collect.Multimap;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -16,8 +18,6 @@ import static org.opentripplanner.netex.loader.util.E.REAGAN;
 import static org.opentripplanner.netex.loader.util.E.REAGAN_2;
 import static org.opentripplanner.netex.loader.util.E.REAGAN_3;
 import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
-import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
-import static org.opentripplanner.netex.loader.util.SetSupport.setOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 
 public class HierarchicalVersionMapByIdTest {
@@ -33,12 +33,12 @@ public class HierarchicalVersionMapByIdTest {
         String rId = REAGAN.getId();
 
         // When
-        subject.addAll(listOf(REAGAN, REAGAN_2, REAGAN_3, EASTWOOD, SCHWARZENEGGER));
+        subject.addAll(List.of(REAGAN, REAGAN_2, REAGAN_3, EASTWOOD, SCHWARZENEGGER));
 
         // Then
-        assertEquals(setOf(eId, sId, rId),  subject.localKeys());
-        assertEquals(listOf(EASTWOOD), subject.localGet(eId));
-        assertEquals(sort(listOf(REAGAN, REAGAN_2, REAGAN_3)),  sort(subject.localGet(rId)));
+      assertEquals(Set.of(eId, sId, rId),  subject.localKeys());
+        assertEquals(List.of(EASTWOOD), subject.localGet(eId));
+        assertEquals(sort(List.of(REAGAN, REAGAN_2, REAGAN_3)),  sort(subject.localGet(rId)));
         assertTrue(subject.localContainsKey(eId));
     }
 
@@ -77,7 +77,7 @@ public class HierarchicalVersionMapByIdTest {
     @Test
     public void addToRootAndRetrieveFromChild() {
         root.add(SCHWARZENEGGER);
-        assertEquals(listOf(SCHWARZENEGGER), child.lookup(SCHWARZENEGGER.getId()));
+        assertEquals(List.of(SCHWARZENEGGER), child.lookup(SCHWARZENEGGER.getId()));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class HierarchicalVersionMapByIdTest {
 
         // Also verify all Reagans are present in the collection
         assertEquals(
-                sort(listOf(REAGAN, REAGAN_2)),
+                sort(List.of(REAGAN, REAGAN_2)),
                 sort(child.lookup(REAGAN.getId()))
         );
     }

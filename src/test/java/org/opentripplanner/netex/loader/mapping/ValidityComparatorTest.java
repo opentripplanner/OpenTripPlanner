@@ -6,10 +6,14 @@ import org.opentripplanner.netex.support.ValidityComparator;
 import org.rutebanken.netex.model.ValidBetween;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.List;
 
 public class ValidityComparatorTest {
-    private ValidityComparator validityComparator = new ValidityComparator();
+    private static final int EXP_EQ = 0;
+    private static final int EXP_LT = -1;
+    private static final int EXP_GT = 1;
+
+    private final ValidityComparator comparator = new ValidityComparator();
 
     @Test
     public void testValidityComparator() {
@@ -39,31 +43,18 @@ public class ValidityComparatorTest {
         validFuture2.setFromDate(LocalDateTime.now().plusDays(6));
         validFuture2.setToDate(LocalDateTime.now().plusDays(8));
 
-        Assert.equals(0, validityComparator.compare(
-                Collections.singletonList(validNull), Collections.singletonList(validNull)));
-        Assert.equals(0, validityComparator.compare(
-                Collections.singletonList(validNull), Collections.singletonList(validNow1)));
-        Assert.equals(0, validityComparator.compare(
-                Collections.singletonList(validNow1), Collections.singletonList(validNow2)));
-        Assert.equals(-1, validityComparator.compare(
-                Collections.singletonList(validNow1), Collections.singletonList(validPast2)));
-        Assert.equals(-1, validityComparator.compare(
-                Collections.singletonList(validNow1), Collections.singletonList(validFuture2)));
-        Assert.equals(0, validityComparator.compare(
-                Collections.singletonList(validPast1), Collections.singletonList(validPast1)));
-        Assert.equals(1, validityComparator.compare(
-                Collections.singletonList(validPast1), Collections.singletonList(validNow2)));
-        Assert.equals(-1, validityComparator.compare(
-                Collections.singletonList(validPast1), Collections.singletonList(validPast2)));
-        Assert.equals(1, validityComparator.compare(
-                Collections.singletonList(validPast1), Collections.singletonList(validFuture2)));
-        Assert.equals(0, validityComparator.compare(
-                Collections.singletonList(validFuture1), Collections.singletonList(validFuture1)));
-        Assert.equals(1, validityComparator.compare(
-                Collections.singletonList(validFuture1), Collections.singletonList(validNow2)));
-        Assert.equals(-1, validityComparator.compare(
-                Collections.singletonList(validFuture1), Collections.singletonList(validPast2)));
-        Assert.equals(-1, validityComparator.compare(
-                Collections.singletonList(validFuture1), Collections.singletonList(validFuture2)));
+        Assert.equals(EXP_EQ, comparator.compare(List.of(validNull), List.of(validNull)));
+        Assert.equals(EXP_EQ, comparator.compare(List.of(validNull), List.of(validNow1)));
+        Assert.equals(EXP_EQ, comparator.compare(List.of(validNow1), List.of(validNow2)));
+        Assert.equals(EXP_LT, comparator.compare(List.of(validNow1), List.of(validPast2)));
+        Assert.equals(EXP_LT, comparator.compare(List.of(validNow1), List.of(validFuture2)));
+        Assert.equals(EXP_EQ, comparator.compare(List.of(validPast1), List.of(validPast1)));
+        Assert.equals(EXP_GT, comparator.compare(List.of(validPast1), List.of(validNow2)));
+        Assert.equals(EXP_LT, comparator.compare(List.of(validPast1), List.of(validPast2)));
+        Assert.equals(EXP_GT, comparator.compare(List.of(validPast1), List.of(validFuture2)));
+        Assert.equals(EXP_EQ, comparator.compare(List.of(validFuture1), List.of(validFuture1)));
+        Assert.equals(EXP_GT, comparator.compare(List.of(validFuture1), List.of(validNow2)));
+        Assert.equals(EXP_LT, comparator.compare(List.of(validFuture1), List.of(validPast2)));
+        Assert.equals(EXP_LT, comparator.compare(List.of(validFuture1), List.of(validFuture2)));
     }
 }

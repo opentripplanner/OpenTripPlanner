@@ -7,15 +7,13 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.netex.loader.util.E.EASTWOOD;
 import static org.opentripplanner.netex.loader.util.E.REAGAN;
 import static org.opentripplanner.netex.loader.util.E.SCHWARZENEGGER;
-import static org.opentripplanner.netex.loader.util.SetSupport.listOf;
-import static org.opentripplanner.netex.loader.util.SetSupport.setOf;
 import static org.opentripplanner.netex.loader.util.SetSupport.sort;
 
 /**
@@ -64,9 +62,9 @@ public class HierarchicalMultimapTest {
         subject.addAll(input);
 
         // Then
-        assertEquals(setOf("A", "B"),  subject.localKeys());
-        assertEquals(sort(listOf(EASTWOOD, SCHWARZENEGGER)), sort(subject.localGet("A")));
-        assertEquals(sort(singleton(REAGAN)),  sort(subject.localGet("B")));
+      assertEquals(Set.of("A", "B"),  subject.localKeys());
+        assertEquals(sort(List.of(EASTWOOD, SCHWARZENEGGER)), sort(subject.localGet("A")));
+        assertEquals(sort(List.of(REAGAN)),  sort(subject.localGet("B")));
         assertTrue(subject.localContainsKey("A"));
     }
 
@@ -86,7 +84,7 @@ public class HierarchicalMultimapTest {
     }
 
     @Test public void localKeys() {
-        assertEquals(setOf(PRESIDENT, ACTOR), country.localKeys());
-        assertEquals(setOf(GOVERNOR, ACTOR), state.localKeys());
+      assertEquals(Set.of(PRESIDENT, ACTOR), country.localKeys());
+      assertEquals(Set.of(GOVERNOR, ACTOR), state.localKeys());
     }
 }
