@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.index.hierarchy;
 
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+
 /**
  * Base class for a hierarchical map. This class proved a way to create a hierarchy of maps with
  * a parent - child relationship. Elements must be added to the right level (map instance), but

@@ -2,6 +2,7 @@ package org.opentripplanner.netex.index.hierarchy;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 
 import java.util.Collection;
 import java.util.Map;

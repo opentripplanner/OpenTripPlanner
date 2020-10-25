@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.loader.mapping;
+package org.opentripplanner.netex.mapping;
 
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.LinearRingType;

@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.index.hierarchy;
 
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.rutebanken.netex.model.EntityStructure;
 
 import java.util.Collection;

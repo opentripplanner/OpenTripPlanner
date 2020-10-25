@@ -4,7 +4,7 @@ import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.index.NetexImportDataIndexReadOnlyView;
+import org.opentripplanner.netex.index.api.NetexImportDataIndexReadOnlyView;
 import org.rutebanken.netex.model.Line_VersionStructure;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OperatorRefStructure;

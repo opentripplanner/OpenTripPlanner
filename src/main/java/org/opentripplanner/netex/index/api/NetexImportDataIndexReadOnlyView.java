@@ -1,8 +1,5 @@
-package org.opentripplanner.netex.index;
+package org.opentripplanner.netex.index.api;
 
-import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMap;
-import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;

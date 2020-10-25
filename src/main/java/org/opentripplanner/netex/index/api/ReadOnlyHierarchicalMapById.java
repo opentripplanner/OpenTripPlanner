@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.index.hierarchy;
+package org.opentripplanner.netex.index.api;
 
 import org.rutebanken.netex.model.EntityStructure;
 

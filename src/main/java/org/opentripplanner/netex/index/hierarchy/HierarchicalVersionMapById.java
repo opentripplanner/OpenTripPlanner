@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.index.hierarchy;
 
 import com.google.common.collect.Multimap;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.rutebanken.netex.model.EntityInVersionStructure;
 
 import java.util.Collection;

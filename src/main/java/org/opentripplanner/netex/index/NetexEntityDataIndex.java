@@ -1,13 +1,14 @@
 package org.opentripplanner.netex.index;
 
+import org.opentripplanner.netex.index.api.NetexImportDataIndexReadOnlyView;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalElement;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
-import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMap;
-import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.index.hierarchy.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
