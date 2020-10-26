@@ -1,9 +1,14 @@
 package org.opentripplanner.netex.loader.parser;
 
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
+import org.rutebanken.netex.model.FlexibleLine;
+import org.rutebanken.netex.model.FlexibleStopAssignment;
+import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupsOfLinesInFrame_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -35,11 +40,15 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayById;
 
+    private final ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;
+
     private final Collection<Network> networks = new ArrayList<>();
 
     private final Collection<GroupOfLines> groupOfLines = new ArrayList<>();
 
     private final Collection<Route> routes = new ArrayList<>();
+
+    private final Collection<FlexibleLine> flexibleLines = new ArrayList<>();
 
     private final Collection<Line> lines = new ArrayList<>();
 
@@ -51,12 +60,18 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     private final Map<String, String> quayIdByStopPointRef = new HashMap<>();
 
+    private final Map<String, String> flexibleStopPlaceByStopPointRef = new HashMap<>();
+
     private final Collection<ServiceLink> serviceLinks = new ArrayList<>();
 
     private final NoticeParser noticeParser = new NoticeParser();
 
-    ServiceFrameParser(ReadOnlyHierarchicalVersionMapById<Quay> quayById) {
+    ServiceFrameParser(
+        ReadOnlyHierarchicalVersionMapById<Quay> quayById,
+        ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById
+    ) {
         this.quayById = quayById;
+        this.flexibleStopPlaceById = flexibleStopPlaceById;
     }
 
     @Override
@@ -112,10 +127,12 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         index.destinationDisplayById.addAll(destinationDisplays);
         index.groupOfLinesById.addAll(groupOfLines);
         index.journeyPatternsById.addAll(journeyPatterns);
+        index.flexibleLineByid.addAll(flexibleLines);
         index.lineById.addAll(lines);
         index.networkById.addAll(networks);
         noticeParser.setResultOnIndex(index);
         index.quayIdByStopPointRef.addAll((quayIdByStopPointRef));
+        index.flexibleStopPlaceByStopPointRef.addAll(flexibleStopPlaceByStopPointRef);
         index.routeById.addAll(routes);
         index.serviceLinkById.addAll(serviceLinks);
 
@@ -141,6 +158,29 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
                     quayIdByStopPointRef.put(stopPointRef, quay.getId());
                 } else {
                     LOG.warn("Quay {} not found in stop place file.", quayRef);
+                }
+            }
+            else if (stopAssignment.getValue() instanceof FlexibleStopAssignment) {
+                if(OTPFeature.FlexRouting.isOn()) {
+                    FlexibleStopAssignment assignment = (FlexibleStopAssignment) stopAssignment.getValue();
+                    String flexibleStopPlaceRef = assignment.getFlexibleStopPlaceRef().getRef();
+
+                    // TODO OTP2 - This check belongs to the mapping or as a separate validation
+                    //           - step. The problem is that we do not want to relay on the
+                    //           - the order in witch elements are loaded.
+                    FlexibleStopPlace flexibleStopPlace = flexibleStopPlaceById.lookup(
+                        flexibleStopPlaceRef);
+
+                    if (flexibleStopPlace != null) {
+                        String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
+                        flexibleStopPlaceByStopPointRef.put(stopPointRef, flexibleStopPlace.getId());
+                    }
+                    else {
+                        LOG.warn(
+                            "FlexibleStopPlace {} not found in stop place file.",
+                            flexibleStopPlaceRef
+                        );
+                    }
                 }
             }
             else {
@@ -193,6 +233,10 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         for (JAXBElement element : lines.getLine_()) {
             if (element.getValue() instanceof Line) {
                 this.lines.add((Line) element.getValue());
+            } else if (element.getValue() instanceof FlexibleLine) {
+                if(OTPFeature.FlexRouting.isOn()) {
+                    this.flexibleLines.add((FlexibleLine) element.getValue());
+                }
             }
             else {
                 warnOnMissingMapping(LOG, element.getValue());
