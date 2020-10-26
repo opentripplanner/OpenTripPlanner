@@ -102,8 +102,8 @@ public class NetexEntityIndexTest {
     @Test
     public void lookupServiceJourneysById() {
         ServiceJourney value = new ServiceJourney().withId(ID_2);
-        root.serviceJourneyByPatternId.add(ID, value);
-        assertEquals(singletonList(value), child.serviceJourneyByPatternId.lookup(ID));
+        root.serviceJourneyById.add(value);
+        assertEquals(value, child.serviceJourneyById.lookup(ID_2));
     }
 
     @Test

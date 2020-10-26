@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
@@ -45,7 +47,7 @@ class TripPatternMapper {
 
     private final ReadOnlyHierarchicalMap<String, Route> routeById;
 
-    private final ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> serviceJourneyByPatternId;
+    private final Multimap<String, ServiceJourney> serviceJourniesByPatternId = ArrayListMultimap.create();
 
     private final TripMapper tripMapper;
 
@@ -66,12 +68,11 @@ class TripPatternMapper {
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
-            ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> serviceJourneyByPatternId,
+            ReadOnlyHierarchicalMap<String, ServiceJourney> serviceJourneyById,
             Deduplicator deduplicator
     ) {
         this.idFactory = idFactory;
         this.routeById = routeById;
-        this.serviceJourneyByPatternId = serviceJourneyByPatternId;
         this.otpRouteById = otpRouteById;
         this.tripMapper = new TripMapper(idFactory, otpRouteById, routeById, journeyPatternById, shapePointsIds);
         this.stopTimesMapper = new StopTimesMapper(
@@ -83,13 +84,17 @@ class TripPatternMapper {
             flexibleStopPlaceIdByStopPointRef
         );
         this.deduplicator = deduplicator;
+
+        // Index service journey by pattern id
+        for (ServiceJourney sj : serviceJourneyById.localValues()) {
+            this.serviceJourniesByPatternId.put(sj.getJourneyPatternRef().getValue().getRef(), sj);
+        }
     }
 
     Result mapTripPattern(JourneyPattern journeyPattern) {
         // Make sure the result is clean, by creating a new object.
         result = new Result();
-        Collection<ServiceJourney> serviceJourneys = serviceJourneyByPatternId
-                .lookup(journeyPattern.getId());
+        Collection<ServiceJourney> serviceJourneys = serviceJourniesByPatternId.get(journeyPattern.getId());
 
         if (serviceJourneys == null || serviceJourneys.isEmpty()) {
             LOG.warn("ServiceJourneyPattern " + journeyPattern.getId()

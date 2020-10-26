@@ -12,6 +12,7 @@ import org.rutebanken.netex.model.PresentationStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 /**
@@ -104,6 +105,7 @@ class RouteMapper {
         return agency;
     }
 
+    @Nullable
     private Operator findOperator(Line_VersionStructure line) {
         OperatorRefStructure opeRef = line.getOperatorRef();
 

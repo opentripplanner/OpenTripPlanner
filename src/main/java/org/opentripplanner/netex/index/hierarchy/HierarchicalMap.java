@@ -3,7 +3,6 @@ package org.opentripplanner.netex.index.hierarchy;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A concrete implementation of {@link AbstractHierarchicalMap}.
@@ -41,7 +40,7 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
     }
 
     /** @return return all keys in the local map */
-    Set<K> localKeys() {
+    public Collection<K> localKeys() {
         return map.keySet();
     }
 
@@ -49,7 +48,7 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
      * @return a collection of all values hold in the local map, all values added to one of the
      * parents are excluded from the collection.
      */
-    Collection<V> localValues() {
+    public Collection<V> localValues() {
         return map.values();
     }
 
@@ -66,5 +65,10 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
     @Override
     protected int localSize() {
         return map.size();
+    }
+
+    @Override
+    void localRemove(K key) {
+        map.remove(key);
     }
 }

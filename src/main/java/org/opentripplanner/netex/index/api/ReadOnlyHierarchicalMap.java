@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.index.api;
 
+import java.util.Collection;
+
 /**
  * Read only interface for a hierarchical map. This interface proved a interface to a hierarchy of
  * maps with a parent - child relationship. Elements are retrieved using ({@link #lookup(Object)}).
@@ -23,4 +25,17 @@ public interface ReadOnlyHierarchicalMap<K,V> {
      * The key exist in this Collection or one of the parents (parent, parent´s parent and so on)
      */
     boolean containsKey(K key);
+
+    /**
+     * @return a collection of all values hold in the local map, all values added to one of the
+     * parents are excluded from the collection.
+     */
+    Collection<K> localKeys();
+
+
+    /**
+     * @return a collection of all values hold in the local map, all values added to one of the
+     * parents are excluded from the collection.
+     */
+    Collection<V> localValues();
 }

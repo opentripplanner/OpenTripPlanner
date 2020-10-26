@@ -2,6 +2,7 @@ package org.opentripplanner.netex.index.hierarchy;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.netex.index.api.HMapValidationRule;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import static org.opentripplanner.netex.index.hierarchy.SetSupport.sort;
  * {@link AbstractHierarchicalMap} class.
  */
 public class HierarchicalMapTest {
+
     private static final String PRESIDENT = "president";
     private static final String GOVERNOR = "governor";
     private static final String MAYOR = "mayor";
@@ -158,8 +160,69 @@ public class HierarchicalMapTest {
         assertFalse(city.localContainsKey(GOVERNOR));
     }
 
+    /** Test localSize(), size() and toString(): "size = N" */
+    @Test public void sizeAndToString() {
+        // Given added elements in the setup method
+        assertEquals(2, country.localSize());
+        assertEquals(2, country.size());
+        assertEquals("size = 2", country.toString());
+
+        assertEquals(2, state.localSize());
+        assertEquals(4, state.size());
+        assertEquals("size = 4", state.toString());
+
+        assertEquals(2, city.localSize());
+        assertEquals(4, city.size());
+        assertEquals("size = 4", city.toString());
+    }
+
+    @Test public void localRemove() {
+        int originalCitySize = city.size();
+
+        country.localRemove(GOVERNOR);
+        city.localRemove(GOVERNOR);
+        // GOVERNOR belongs to state, not city or country - no change expected
+        assertEquals(originalCitySize , city.size());
+
+        // Remove GOVERNOR -> expect size to decrement by one
+        state.localRemove(GOVERNOR);
+        assertEquals(originalCitySize-1, city.size());
+        assertNull("GOVERNOR is removed from office", state.localGet(GOVERNOR));
+    }
+
+    @Test public void validate() {
+        // Given a filter to remove REAGAN
+        HMapValidationRule<String, E> reagenFilter = new HMapValidationRule<>() {
+            @Override public Status validate(String key, E element) {
+                return REAGAN.equals(element) ? Status.DISCARD : Status.OK;
+            }
+            @Override public String logMessage(String key, E value) {
+                return String.format("%s %s is removed", key, value.name());
+            }
+        };
+
+        // And a warning consumer
+        final StringBuilder warningConsumer = new StringBuilder();
+
+        // Then remove from CITY - actor removed
+        city.validate(reagenFilter, warningConsumer::append);
+        assertEquals("actor Reagan is removed", warningConsumer.toString());
+        assertEquals("[E(Eastwood, 1)]" , city.localValues().toString());
+
+        // Then remove from STATE - nothing to remove
+        warningConsumer.setLength(0);
+        state.validate(reagenFilter, warningConsumer::append);
+        assertEquals("", warningConsumer.toString());
+        assertEquals(2 , state.localSize());
+
+        // Then remove from COUNTRY - president removed
+        warningConsumer.setLength(0);
+        country.validate(reagenFilter, warningConsumer::append);
+        assertEquals("president Reagan is removed", warningConsumer.toString());
+        assertEquals("[E(Eastwood, 1)]" , country.localValues().toString());
+    }
+
     private void assertEqElements(Collection<E> expected, Collection<E> actual) {
         assertEquals(sort(expected), sort(actual));
     }
-
 }

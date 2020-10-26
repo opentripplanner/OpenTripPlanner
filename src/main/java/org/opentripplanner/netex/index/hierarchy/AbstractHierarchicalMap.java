@@ -1,6 +1,11 @@
 package org.opentripplanner.netex.index.hierarchy;
 
+import org.opentripplanner.netex.index.api.HMapValidationRule;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Base class for a hierarchical map. This class proved a way to create a hierarchy of maps with
@@ -44,6 +49,23 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
         return localSize() + (isRoot() ? 0 : parent.localSize());
     }
 
+    public void validate(HMapValidationRule<K, V> rule, Consumer<String> warnMsgConsumer) {
+        List<K> discardKeys = new ArrayList<>();
+        for (K key : localKeys()) {
+            V value = localGet(key);
+
+            HMapValidationRule.Status status = rule.validate(key, value);
+
+            if(status == HMapValidationRule.Status.DISCARD) {
+                discardKeys.add(key);
+            }
+            if(status != HMapValidationRule.Status.OK) {
+                warnMsgConsumer.accept(rule.logMessage(key, value));
+            }
+        }
+        discardKeys.forEach(this::localRemove);
+    }
+
     /** Get value from 'local' map, parent is not queried. */
     abstract V localGet(K key);
 
@@ -52,6 +74,9 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
 
     /** Return the size of the collection. Returns the number of key-value pairs for a Map. */
     protected abstract int localSize();
+
+    /** Remove local value from collection. */
+    abstract void localRemove(K key);
 
     /* private methods */
 

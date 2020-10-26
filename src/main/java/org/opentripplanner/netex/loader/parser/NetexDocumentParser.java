@@ -59,7 +59,7 @@ public class NetexDocumentParser {
         } else if(value instanceof ServiceCalendarFrame) {
             parse((ServiceCalendarFrame) value, new ServiceCalendarFrameParser());
         } else if(value instanceof TimetableFrame) {
-            parse((TimetableFrame) value, new TimeTableFrameParser(netexIndex.journeyPatternsById));
+            parse((TimetableFrame) value, new TimeTableFrameParser());
         } else if(value instanceof ServiceFrame) {
             parse((ServiceFrame) value, new ServiceFrameParser(
                 netexIndex.quayById,
