@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
@@ -57,11 +58,13 @@ class TripPatternMapper {
     TripPatternMapper(
             FeedScopedIdFactory idFactory,
             EntityById<Stop> stopsById,
+            EntityById<FlexStopLocation> flexStopLocationsById,
             EntityById<org.opentripplanner.model.Route> otpRouteById,
             Set<FeedScopedId> shapePointsIds,
             ReadOnlyHierarchicalMap<String, Route> routeById,
             ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
+            ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> serviceJourneyByPatternId,
             Deduplicator deduplicator
@@ -71,7 +74,14 @@ class TripPatternMapper {
         this.serviceJourneyByPatternId = serviceJourneyByPatternId;
         this.otpRouteById = otpRouteById;
         this.tripMapper = new TripMapper(idFactory, otpRouteById, routeById, journeyPatternById, shapePointsIds);
-        this.stopTimesMapper = new StopTimesMapper(idFactory, stopsById, destinationDisplayById, quayIdByStopPointRef);
+        this.stopTimesMapper = new StopTimesMapper(
+            idFactory,
+            stopsById,
+            flexStopLocationsById,
+            destinationDisplayById,
+            quayIdByStopPointRef,
+            flexibleStopPlaceIdByStopPointRef
+        );
         this.deduplicator = deduplicator;
     }
 
@@ -113,6 +123,15 @@ class TripPatternMapper {
 
         // No trips successfully mapped
         if(trips.isEmpty()) return result;
+
+        // TODO OTP2 Trips containing FlexStopLocations are not added to StopPatterns until support
+        //           for this is added.
+        if (result.tripStopTimes
+            .get(trips.get(0))
+            .stream()
+            .anyMatch(t -> t.getStop() instanceof FlexStopLocation)) {
+            return result;
+        }
 
         // Create StopPattern from any trip (since they are part of the same JourneyPattern)
         StopPattern stopPattern = new StopPattern(result.tripStopTimes.get(trips.get(0)));
