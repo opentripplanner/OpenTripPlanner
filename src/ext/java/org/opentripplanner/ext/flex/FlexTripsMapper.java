@@ -43,7 +43,8 @@ public class FlexTripsMapper {
       }
 
       //Keep lambda! A method-ref would causes incorrect class and line number to be logged
-      progress.step(LOG::info);
+      //noinspection Convert2MethodRef
+      progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
     LOG.info("Done creating flex trips. Created a total of {} trips.", result.size());
