@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.netex.loader.mapping;
 
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.LinearRingType;
@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
 
 import java.util.ArrayList;
 import java.util.List;
