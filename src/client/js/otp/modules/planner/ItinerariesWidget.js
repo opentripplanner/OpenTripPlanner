@@ -484,7 +484,8 @@ otp.widgets.ItinerariesWidget =
         //TRANSLATORS: Travel: hour date on which this trip is made
         .append('<div class="otp-itinTripSummaryLabel">' + _tr("Travel") + '</div><div class="otp-itinTripSummaryText">'+itin.getStartTimeStr()+'</div>')
         //TRANSLATORS: Time: minutes How long is this trip
-        .append('<div class="otp-itinTripSummaryLabel">' + _tr("Time") + '</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>');
+        .append('<div class="otp-itinTripSummaryLabel">' + _tr("Time") + '</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>')
+        .append('<div class="otp-itinTripSummaryLabel">' + _tr("GenCost") + '</div><div class="otp-itinTripSummaryText">'+itin.getGeneralizedCost()+'</div>');
 
         var walkDistance = itin.getModeDistance("WALK");
         if(walkDistance > 0) {

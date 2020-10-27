@@ -31,6 +31,11 @@ public class LegacyGraphQLItineraryImpl
   }
 
   @Override
+  public DataFetcher<Integer> generalizedCost() {
+    return environment -> getSource(environment).generalizedCost;
+  }
+
+  @Override
   public DataFetcher<Long> waitingTime() {
     return environment -> (long) getSource(environment).waitingTimeSeconds;
   }

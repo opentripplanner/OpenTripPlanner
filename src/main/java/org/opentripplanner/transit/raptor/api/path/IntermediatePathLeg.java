@@ -14,12 +14,14 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
     private final int fromTime;
     private final int toStop;
     private final int toTime;
+    private final int cost;
 
-    IntermediatePathLeg(int fromStop, int fromTime, int toStop, int toTime) {
+    IntermediatePathLeg(int fromStop, int fromTime, int toStop, int toTime, int cost) {
         this.fromStop = fromStop;
         this.fromTime = fromTime;
         this.toStop = toStop;
         this.toTime = toTime;
+        this.cost = cost;
     }
 
     /**
@@ -44,6 +46,11 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
     @Override
     public final int toTime(){
         return toTime;
+    }
+
+    @Override
+    public int generalizedCost() {
+        return cost;
     }
 
     @Override

@@ -131,23 +131,24 @@ public class StopArrivalsTestData {
      * here returned as a path.
      */
     public static Path<TestRaptorTripSchedule> basicTripAsPath() {
-        PathLeg<TestRaptorTripSchedule> leg6 = new EgressPathLeg<>(null, STOP_5, E_START, E_END);
+        PathLeg<TestRaptorTripSchedule> leg6 = new EgressPathLeg<>(
+            null, STOP_5, E_START, E_END, 1_000
+        );
         TransitPathLeg<TestRaptorTripSchedule> leg5 = new TransitPathLeg<>(
-                STOP_4, T3_START, STOP_5, T3_END, TRIP_3, leg6
+                STOP_4, T3_START, STOP_5, T3_END, 1_000, TRIP_3, leg6
         );
         TransitPathLeg<TestRaptorTripSchedule> leg4 = new TransitPathLeg<>(
-                STOP_3, T2_START, STOP_4, T2_END, TRIP_2, leg5
+                STOP_3, T2_START, STOP_4, T2_END, 1_000, TRIP_2, leg5
         );
         PathLeg<TestRaptorTripSchedule> leg3 = new TransferPathLeg<>(
-                STOP_2, W1_START, STOP_3, W1_END, leg4.asTransitLeg()
+                STOP_2, W1_START, STOP_3, W1_END, 1_000, leg4.asTransitLeg()
         );
         TransitPathLeg<TestRaptorTripSchedule> leg2 = new TransitPathLeg<>(
-                STOP_1, T1_START, STOP_2, T1_END, TRIP_1, leg3
+                STOP_1, T1_START, STOP_2, T1_END, 1_000, TRIP_1, leg3
         );
         AccessPathLeg<TestRaptorTripSchedule> leg1 = new AccessPathLeg<>(
-                null, STOP_1, A_START, A_END, leg2.asTransitLeg()
+                null, STOP_1, A_START, A_END, 1_000, leg2.asTransitLeg()
         );
-
         return new Path<>(1, leg1, RaptorCostConverter.toOtpDomainCost(6_000));
     }
 
