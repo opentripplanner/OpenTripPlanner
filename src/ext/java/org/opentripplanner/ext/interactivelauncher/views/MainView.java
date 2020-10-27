@@ -1,6 +1,6 @@
-package org.opentripplanner.ext.interactivlancher.views;
+package org.opentripplanner.ext.interactivelauncher.views;
 
-import org.opentripplanner.ext.interactivlancher.SetupResult;
+import org.opentripplanner.ext.interactivelauncher.SetupResult;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,8 +12,8 @@ import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.GridBagConstraints.CENTER;
 import static java.awt.GridBagConstraints.NONE;
 import static java.awt.GridBagConstraints.NORTH;
-import static org.opentripplanner.ext.interactivlancher.views.ViewUtils.BACKGROUND;
-import static org.opentripplanner.ext.interactivlancher.views.ViewUtils.debugLayout;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.BACKGROUND;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.debugLayout;
 
 public class MainView extends JFrame {
 

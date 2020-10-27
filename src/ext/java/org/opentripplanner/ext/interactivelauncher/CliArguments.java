@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.interactivlancher;
+package org.opentripplanner.ext.interactivelauncher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.interactivlancher.views;
+package org.opentripplanner.ext.interactivelauncher.views;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -6,9 +6,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.opentripplanner.ext.interactivlancher.views.ViewUtils.addComp;
-import static org.opentripplanner.ext.interactivlancher.views.ViewUtils.addSectionDoubleSpace;
-import static org.opentripplanner.ext.interactivlancher.views.ViewUtils.addSectionSpace;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
 
 class ConfigDirsView {
   private final Box panel = Box.createVerticalBox();

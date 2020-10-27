@@ -1,12 +1,12 @@
-package org.opentripplanner.ext.interactivlancher.views;
+package org.opentripplanner.ext.interactivelauncher.views;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static org.opentripplanner.ext.interactivlancher.views.ViewUtils.addComp;
-import static org.opentripplanner.ext.interactivlancher.views.ViewUtils.addSectionDoubleSpace;
-import static org.opentripplanner.ext.interactivlancher.views.ViewUtils.addSectionSpace;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
 
 class OptionsView {
   private final Box panel = Box.createVerticalBox();

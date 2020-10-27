@@ -1,6 +1,6 @@
-package org.opentripplanner.ext.interactivlancher;
+package org.opentripplanner.ext.interactivelauncher;
 
-import org.opentripplanner.ext.interactivlancher.views.MainView;
+import org.opentripplanner.ext.interactivelauncher.views.MainView;
 import org.opentripplanner.standalone.OTPMain;
 
 

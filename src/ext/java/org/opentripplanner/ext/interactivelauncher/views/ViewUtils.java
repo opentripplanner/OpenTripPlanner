@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.interactivlancher.views;
+package org.opentripplanner.ext.interactivelauncher.views;
 
 import javax.swing.*;
 import java.awt.*;
