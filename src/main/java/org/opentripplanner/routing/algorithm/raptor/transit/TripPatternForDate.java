@@ -39,30 +39,46 @@ public class TripPatternForDate {
      */
     private final LocalDateTime endOfRunningPeriod;
 
-    // TODO Added for testing. Fix this and expand the test so that new functionality is tested
-    public TripPatternForDate(TripPatternWithRaptorStopIndexes tripPattern, LocalDate localDate) {
-        this.tripPattern = tripPattern;
-        this.tripTimes = new TripTimes[] { null };
-        this.localDate = localDate;
-
-        // These depend on the tripTimes array being sorted
-        this.startOfRunningPeriod = localDate.atStartOfDay()
-            .plusSeconds(7200);
-        this.endOfRunningPeriod = localDate.atStartOfDay()
-            .plusSeconds(10800);
+    public static TripPatternForDate getTripPatternForDateForTest(
+        TripPatternWithRaptorStopIndexes tripPattern,
+        int startSecondsOfDay,
+        int endSecondsOfDay,
+        LocalDate localDate
+    ) {
+        return new TripPatternForDate(tripPattern, startSecondsOfDay, endSecondsOfDay, localDate);
     }
 
-    public TripPatternForDate(TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate) {
+    public TripPatternForDate(
+        TripPatternWithRaptorStopIndexes tripPattern,
+        TripTimes[] tripTimes,
+        LocalDate localDate
+    ) {
         this.tripPattern = tripPattern;
         this.tripTimes = tripTimes;
         this.localDate = localDate;
 
         // These depend on the tripTimes array being sorted
-        this.startOfRunningPeriod = localDate.atStartOfDay()
+        this.startOfRunningPeriod = localDate
+            .atStartOfDay()
             .plusSeconds(tripTimes[0].getDepartureTime(0));
-        this.endOfRunningPeriod = localDate.atStartOfDay()
-            .plusSeconds(tripTimes[tripTimes.length - 1]
-                .getArrivalTime(tripTimes[tripTimes.length - 1].getNumStops() - 1));
+        this.endOfRunningPeriod = localDate
+            .atStartOfDay()
+            .plusSeconds(tripTimes[tripTimes.length - 1].getArrivalTime(
+                tripTimes[tripTimes.length - 1].getNumStops() - 1));
+    }
+
+    // For testing
+    private TripPatternForDate(
+        TripPatternWithRaptorStopIndexes tripPattern,
+        int startSecondsOfDay,
+        int endSecondsOfDay,
+        LocalDate localDate
+    ) {
+        this.tripPattern = tripPattern;
+        this.tripTimes = new TripTimes[] {null};
+        this.localDate = localDate;
+        this.startOfRunningPeriod = localDate.atStartOfDay().plusSeconds(startSecondsOfDay);
+        this.endOfRunningPeriod = localDate.atStartOfDay().plusSeconds(endSecondsOfDay);
     }
 
     public TripTimes[] tripTimes() {

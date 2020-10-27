@@ -5,7 +5,6 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
-import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -23,8 +22,6 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
     @Test
     public void testMergeTripPatterns() {
-        TripTimes[] times = new TripTimes[] { null };
-
         LocalDate first = LocalDate.of(2019, 3, 30);
         LocalDate second = LocalDate.of(2019, 3, 31);
         LocalDate third = LocalDate.of(2019, 4, 1);
@@ -39,17 +36,24 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
         List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 
         // TripPatterns valid for 1st day in search range
-        tripPatternsForDates.add(new TripPatternForDate(tripPattern1, first));
-        tripPatternsForDates.add(new TripPatternForDate(tripPattern2, first));
-        tripPatternsForDates.add(new TripPatternForDate(tripPattern3, first));
+        tripPatternsForDates.add(TripPatternForDate.getTripPatternForDateForTest(
+            tripPattern1, 0, 7200, first));
+        tripPatternsForDates.add(TripPatternForDate.getTripPatternForDateForTest(
+            tripPattern2, 0, 7200, first));
+        tripPatternsForDates.add(TripPatternForDate.getTripPatternForDateForTest(
+            tripPattern3, 0, 7200, first));
 
         // TripPatterns valid for 2nd day in search range
-        tripPatternsForDates.add(new TripPatternForDate(tripPattern2, second));
-        tripPatternsForDates.add(new TripPatternForDate(tripPattern3, second));
+        tripPatternsForDates.add(TripPatternForDate.getTripPatternForDateForTest(
+            tripPattern2, 0, 7200, second));
+        tripPatternsForDates.add(TripPatternForDate.getTripPatternForDateForTest(
+            tripPattern3, 0, 7200, second));
 
         // TripPatterns valid for 3rd day in search range
-        tripPatternsForDates.add(new TripPatternForDate(tripPattern1, third));
-        tripPatternsForDates.add(new TripPatternForDate(tripPattern3, third));
+        tripPatternsForDates.add(TripPatternForDate.getTripPatternForDateForTest(
+            tripPattern1, 0, 7200, third));
+        tripPatternsForDates.add(TripPatternForDate.getTripPatternForDateForTest(
+            tripPattern3, 0, 7200, third));
 
 
         // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset in time when requested.
