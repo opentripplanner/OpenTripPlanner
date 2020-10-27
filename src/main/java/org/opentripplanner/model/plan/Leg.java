@@ -154,6 +154,16 @@ public class Leg {
 
    public Boolean rentedBike;
 
+  /**
+   * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
+   * computed by the algorithm for the section this leg account for. This is relevant for anyone
+   * who want to debug an search and tuning the system. The unit should be equivalent to the cost
+   * of "one second of transit".
+   * <p>
+   * -1 indicate that the cost is not set/computed.
+   */
+  public int generalizedCost = -1;
+
   public Leg(TraverseMode mode) {
     if(mode.isTransit()) {
       throw new IllegalArgumentException("To create a transit leg use the other constructor.");
@@ -261,9 +271,10 @@ public class Leg {
                 .addBool("realTime", realTime)
                 .addBool("isNonExactFrequency", isNonExactFrequency)
                 .addNum("headway", headway)
-                .addNum("distance", distanceMeters, "m")
-                .addBool("pathway", pathway)
                 .addEnum("mode", mode)
+                .addNum("distance", distanceMeters, "m")
+                .addNum("cost", generalizedCost)
+                .addBool("pathway", pathway)
                 .addNum("agencyTimeZoneOffset", agencyTimeZoneOffset, 0)
                 .addNum("routeType", routeType)
                 .addEntityId("agencyId", getAgency())
