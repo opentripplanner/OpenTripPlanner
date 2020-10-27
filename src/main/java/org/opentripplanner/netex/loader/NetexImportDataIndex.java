@@ -13,6 +13,8 @@ import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.FlexibleLine;
+import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -73,9 +75,11 @@ public class NetexImportDataIndex {
      * */
     public final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs;
     public final HierarchicalMapById<DestinationDisplay> destinationDisplayById;
+    public final HierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;
     public final HierarchicalMapById<GroupOfLines> groupOfLinesById;
     public final HierarchicalMapById<GroupOfStopPlaces> groupOfStopPlacesById;
     public final HierarchicalMapById<JourneyPattern> journeyPatternsById;
+    public final HierarchicalMapById<FlexibleLine> flexibleLineByid;
     public final HierarchicalMapById<Line> lineById;
     public final HierarchicalMapById<StopPlace> multiModalStopPlaceById;
     public final HierarchicalMapById<Network> networkById;
@@ -85,6 +89,7 @@ public class NetexImportDataIndex {
     public final HierarchicalMapById<Operator> operatorsById;
     public final HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId;
     public final HierarchicalVersionMapById<Quay> quayById;
+    public final HierarchicalMap<String, String> flexibleStopPlaceByStopPointRef;
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
     public final HierarchicalMapById<Route> routeById;
     public final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId;
@@ -113,9 +118,11 @@ public class NetexImportDataIndex {
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
         this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>();
+        this.flexibleStopPlaceById = new HierarchicalMapById<>();
         this.groupOfLinesById = new HierarchicalMapById<>();
         this.groupOfStopPlacesById = new HierarchicalMapById<>();
         this.journeyPatternsById = new HierarchicalMapById<>();
+        this.flexibleLineByid = new HierarchicalMapById<>();
         this.lineById = new HierarchicalMapById<>();
         this.multiModalStopPlaceById = new HierarchicalMapById<>();
         this.networkById = new HierarchicalMapById<>();
@@ -126,6 +133,7 @@ public class NetexImportDataIndex {
         this.operatorsById = new HierarchicalMapById<>();
         this.passingTimeByStopPointId = new HierarchicalMultimap<>();
         this.quayById = new HierarchicalVersionMapById<>();
+        this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>();
         this.quayIdByStopPointRef = new HierarchicalMap<>();
         this.routeById = new HierarchicalMapById<>();
         this.serviceJourneyByPatternId = new HierarchicalMultimap<>();
@@ -145,9 +153,11 @@ public class NetexImportDataIndex {
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);
         this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>(parent.destinationDisplayById);
+        this.flexibleStopPlaceById = new HierarchicalMapById<>(parent.flexibleStopPlaceById);
         this.groupOfLinesById = new HierarchicalMapById<>(parent.groupOfLinesById);
         this.groupOfStopPlacesById = new HierarchicalMapById<>(parent.groupOfStopPlacesById);
         this.journeyPatternsById = new HierarchicalMapById<>(parent.journeyPatternsById);
+        this.flexibleLineByid = new HierarchicalMapById<>(parent.flexibleLineByid);
         this.lineById = new HierarchicalMapById<>(parent.lineById);
         this.multiModalStopPlaceById = new HierarchicalMapById<>(parent.multiModalStopPlaceById);
         this.networkById = new HierarchicalMapById<>(parent.networkById);
@@ -158,6 +168,7 @@ public class NetexImportDataIndex {
         this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
         this.passingTimeByStopPointId = new HierarchicalMultimap<>(parent.passingTimeByStopPointId);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
+        this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>(parent.flexibleStopPlaceByStopPointRef);
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
         this.routeById = new HierarchicalMapById<>(parent.routeById);
         this.serviceJourneyByPatternId = new HierarchicalMultimap<>(parent.serviceJourneyByPatternId);
@@ -208,12 +219,20 @@ public class NetexImportDataIndex {
                 return destinationDisplayById;
             }
 
+            public ReadOnlyHierarchicalMapById<FlexibleStopPlace> getFlexibleStopPlacesById() {
+                return flexibleStopPlaceById;
+            }
+
             public ReadOnlyHierarchicalMapById<GroupOfStopPlaces> getGroupOfStopPlacesById() {
                 return groupOfStopPlacesById;
             }
 
             public ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById() {
                 return journeyPatternsById;
+            }
+
+            public ReadOnlyHierarchicalMapById<FlexibleLine> getFlexibleLineById() {
+                return flexibleLineByid;
             }
 
             public ReadOnlyHierarchicalMapById<Line> getLineById() {
@@ -246,6 +265,10 @@ public class NetexImportDataIndex {
 
             public ReadOnlyHierarchicalVersionMapById<Quay> getQuayById() {
                 return quayById;
+            }
+
+            public ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef() {
+                return flexibleStopPlaceByStopPointRef;
             }
 
             public ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef() {

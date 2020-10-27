@@ -1,10 +1,13 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
@@ -42,7 +45,11 @@ class StopTimesMapper {
 
     private final EntityById<Stop> stopsById;
 
+    private final EntityById<FlexStopLocation> flexibleStopLocationsById;
+
     private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
+
+    private final ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef;
 
     private String currentHeadSign;
 
@@ -50,13 +57,17 @@ class StopTimesMapper {
     StopTimesMapper(
             FeedScopedIdFactory idFactory,
             EntityById<Stop> stopsById,
+            EntityById<FlexStopLocation> flexStopLocationsById,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
-            ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef
+            ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
+            ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef
     ) {
         this.idFactory = idFactory;
         this.destinationDisplayById = destinationDisplayById;
         this.stopsById = stopsById;
+        this.flexibleStopLocationsById = flexStopLocationsById;
         this.quayIdByStopPointRef = quayIdByStopPointRef;
+        this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
     }
 
     /**
@@ -76,7 +87,7 @@ class StopTimesMapper {
             String pointInJourneyPattern = currentPassingTime.getPointInJourneyPatternRef().getValue().getRef();
 
             StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
-            Stop stop = lookupStop(stopPoint, quayIdByStopPointRef, stopsById);
+            StopLocation stop = lookUpStopLocation(stopPoint);
             if (stop == null) {
                 LOG.warn("Stop with id {} not found for StopPoint {} in JourneyPattern {}. "
                         + "Trip {} will not be mapped.",
@@ -90,9 +101,19 @@ class StopTimesMapper {
             }
 
             StopTime stopTime = mapToStopTime(trip, stopPoint, stop, currentPassingTime, i);
+            if (stopTime == null) {
+                return null;
+            }
 
             result.add(currentPassingTime.getId(), stopTime);
         }
+
+        if (OTPFeature.FlexRouting.isOn()) {
+            // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
+            //      this should be harmonized between GTFS and NeTEx
+            modifyDataForUnscheduledFlexTrip(result);
+        }
+
         return result;
     }
 
@@ -109,7 +130,7 @@ class StopTimesMapper {
     private StopTime mapToStopTime(
             Trip trip,
             StopPointInJourneyPattern stopPoint,
-            Stop stop,
+            StopLocation stop,
             TimetabledPassingTime passingTime,
             int stopSequence
     ) {
@@ -117,6 +138,11 @@ class StopTimesMapper {
         stopTime.setTrip(trip);
         stopTime.setStopSequence(stopSequence);
         stopTime.setStop(stop);
+        // TODO PassingTimes containing EarliestArrivalTime or LatestDepartureTime only not yet
+        //      supported
+        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
+            return null;
+        }
         stopTime.setArrivalTime(
                 calculateOtpTime(passingTime.getArrivalTime(), passingTime.getArrivalDayOffset(),
                         passingTime.getDepartureTime(), passingTime.getDepartureDayOffset()));
@@ -161,26 +187,33 @@ class StopTimesMapper {
         return stopTime;
     }
 
-    private Stop lookupStop(
-            StopPointInJourneyPattern stopPointInJourneyPattern,
-            ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-            EntityById<Stop> stopsById
+    private StopLocation lookUpStopLocation(
+            StopPointInJourneyPattern stopPointInJourneyPattern
     ) {
         if (stopPointInJourneyPattern == null) return null;
 
         String stopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
 
         String stopId = quayIdByStopPointRef.lookup(stopPointRef);
-        if (stopId == null) {
+        String flexibleStopPlaceId = flexibleStopPlaceIdByStopPointRef.lookup(stopPointRef);
+
+        if (stopId == null && flexibleStopPlaceId == null) {
             LOG.warn("No passengerStopAssignment found for " + stopPointRef);
             return null;
         }
 
-        Stop stop = stopsById.get(idFactory.createId(stopId));
-        if (stop == null) {
-            LOG.warn("Quay not found for " + stopPointRef);
+        StopLocation stopLocation;
+        if (stopId != null) {
+            stopLocation = stopsById.get(idFactory.createId(stopId));
+        } else {
+            stopLocation = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
         }
-        return stop;
+
+        if (stopLocation == null) {
+            LOG.warn("No Quay or FlexibleStopPlace found for " + stopPointRef);
+        }
+
+        return stopLocation;
     }
 
     private static StopPointInJourneyPattern findStopPoint(String pointInJourneyPatterRef,
@@ -216,5 +249,25 @@ class StopTimesMapper {
 
     private static boolean isFalse(Boolean value) {
         return value != null && !value;
+    }
+
+    // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
+    //      this should be harmonized between GTFS and NeTEx
+    private static void modifyDataForUnscheduledFlexTrip(MappedStopTimes result) {
+        List<StopTime> stopTimes = result.stopTimes;
+        if (stopTimes.size() == 2 && stopTimes
+            .stream()
+            .allMatch(s -> s.getStop() instanceof FlexStopLocation)) {
+
+            int departureTime = stopTimes.get(0).getDepartureTime();
+            int arrivalTime = stopTimes.get(1).getArrivalTime();
+
+            for (StopTime stopTime : stopTimes) {
+                stopTime.clearArrivalTime();
+                stopTime.clearDepartureTime();
+                stopTime.setFlexWindowStart(departureTime);
+                stopTime.setFlexWindowEnd(arrivalTime);
+            }
+        }
     }
 }
