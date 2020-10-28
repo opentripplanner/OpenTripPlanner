@@ -32,6 +32,11 @@ Short introduction to the REST API.
 Used to import GTFS transit data files.
 
 
+### [NeTEx import module](src/main/java/org/opentripplanner/netex/package.md)
+
+Used to import NeTEx transit data files.
+
+
 ### [Raptor transit routing](src/main/java/org/opentripplanner/transit/raptor/package.md)
 
 This is the OTP2 new transit routing engine implemented using the Raptor algorithm. It explains how

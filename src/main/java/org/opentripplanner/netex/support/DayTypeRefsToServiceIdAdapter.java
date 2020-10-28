@@ -2,9 +2,8 @@ package org.opentripplanner.netex.support;
 
 import org.rutebanken.netex.model.DayTypeRefStructure;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +24,6 @@ import static org.opentripplanner.netex.support.DayTypeRefToServiceIdMapper.gene
  * NeTEx implementation note: The DayTypeRefStructure version info is ignored.
  */
 public final class DayTypeRefsToServiceIdAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(DayTypeRefsToServiceIdAdapter.class);
 
     private final Set<String> dayTypeRefs;
     private final String serviceId;
@@ -35,6 +33,7 @@ public final class DayTypeRefsToServiceIdAdapter {
      *
      * @return the new adapter or {@code null} if the input set is empty.
      */
+    @Nullable
     public static DayTypeRefsToServiceIdAdapter create(DayTypeRefs_RelStructure refs) {
         Set<String> dayTypeRefs = collectDayTypeRefs(refs);
         return dayTypeRefs.isEmpty() ?  null : new DayTypeRefsToServiceIdAdapter(dayTypeRefs);
@@ -45,6 +44,7 @@ public final class DayTypeRefsToServiceIdAdapter {
      *
      * @return the new ServiceId or {@code null} if the input set is empty.
      */
+    @Nullable
     public static String createServiceId(DayTypeRefs_RelStructure refs) {
         Set<String> dayTypeRefs = collectDayTypeRefs(refs);
         return dayTypeRefs.isEmpty() ? null : generateServiceId(dayTypeRefs);

@@ -56,15 +56,15 @@ public class NetexDataSourceHierarchy {
         return this;
     }
 
-    String description() {
+    public String description() {
         return source.path();
     }
 
-    Iterable<DataSource> sharedEntries() {
+    public Iterable<DataSource> sharedEntries() {
         return sharedEntries;
     }
 
-    Iterable<GroupEntries> groups() {
+    public Iterable<GroupEntries> groups() {
         return groupEntries.values();
     }
 

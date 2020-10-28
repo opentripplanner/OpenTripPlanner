@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.index.NetexEntityDataIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
 import org.rutebanken.netex.model.GeneralFrame;
@@ -28,9 +28,9 @@ import java.util.List;
 public class NetexDocumentParser {
     private static final Logger LOG = LoggerFactory.getLogger(NetexDocumentParser.class);
 
-    private final NetexImportDataIndex netexIndex;
+    private final NetexEntityDataIndex netexIndex;
 
-    private NetexDocumentParser(NetexImportDataIndex netexIndex) {
+    private NetexDocumentParser(NetexEntityDataIndex netexIndex) {
         this.netexIndex = netexIndex;
     }
 
@@ -38,7 +38,7 @@ public class NetexDocumentParser {
      * This static method create a new parser and parse the document. The result is added
      * to given index for further processing.
      */
-    public static void parseAndPopulateIndex(NetexImportDataIndex index, PublicationDeliveryStructure doc) {
+    public static void parseAndPopulateIndex(NetexEntityDataIndex index, PublicationDeliveryStructure doc) {
         new NetexDocumentParser(index).parse(doc);
     }
 
