@@ -52,7 +52,8 @@ expressions in the _build-config.json_.
 
 ### Load entities and map to OTP model
 
-The load, validate and mapping process is:
+The [load](loader/NetexDataSourceHierarchy.java), [validate](validation/Validator.java) and 
+[mapping](mapping/NetexMapper.java) process is:
 
 1. Load _shared-data-files_ into _index_.
 1. Validate loaded entities 
@@ -75,4 +76,4 @@ The hierarchical structure of the file input is matched by the
 and `pop()` methods to prepare/edject for each file set at a given level. 
 
 ## Dependencies
-
+> TODO OTP2 - DSJ-3 Add this section when adding support for DSJ
