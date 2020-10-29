@@ -2,7 +2,7 @@ package org.opentripplanner.netex.loader.parser;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.index.NetexEntityDataIndex;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeAssignmentsInFrame_RelStructure;
@@ -50,7 +50,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     }
 
     @Override
-    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+    void setResultOnIndex(NetexEntityDataIndex netexIndex) {
         netexIndex.dayTypeById.addAll(dayTypes);
         netexIndex.operatingPeriodById.addAll(operatingPeriods);
         netexIndex.dayTypeAssignmentByDayTypeId.addAll(dayTypeAssignmentByDayTypeId);
@@ -67,18 +67,18 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     //List<JAXBElement<? extends DataManagedObjectStructure>>
     private void parseDayTypes(DayTypesInFrame_RelStructure element) {
         if(element == null) return;
-        for (JAXBElement dt : element.getDayType_()) {
+        for (JAXBElement<?> dt : element.getDayType_()) {
             parseDayType(dt);
         }
     }
 
     private void parseDayTypes(DayTypes_RelStructure dayTypes) {
-        for (JAXBElement dt : dayTypes.getDayTypeRefOrDayType_()) {
+        for (JAXBElement<?> dt : dayTypes.getDayTypeRefOrDayType_()) {
             parseDayType(dt);
         }
     }
 
-    private void parseDayType(JAXBElement dt) {
+    private void parseDayType(JAXBElement<?> dt) {
         if (dt.getValue() instanceof DayType) {
             dayTypes.add((DayType) dt.getValue());
         }

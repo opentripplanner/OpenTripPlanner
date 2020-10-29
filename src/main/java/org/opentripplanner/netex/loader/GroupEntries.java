@@ -11,10 +11,10 @@ import java.util.List;
  * with a set of shared group entries and a set of _individual_
  * entries.
  */
-class GroupEntries {
-    private String name;
-    private List<DataSource> sharedEntries = new ArrayList<>();
-    private List<DataSource> entries = new ArrayList<>();
+public class GroupEntries {
+    private final String name;
+    private final List<DataSource> sharedEntries = new ArrayList<>();
+    private final List<DataSource> entries = new ArrayList<>();
 
     GroupEntries(String name) {
         this.name = name;
@@ -28,7 +28,7 @@ class GroupEntries {
         sharedEntries.add(entry);
     }
 
-    Collection<DataSource> sharedEntries() {
+    public Collection<DataSource> sharedEntries() {
         return sharedEntries;
     }
 
@@ -36,7 +36,7 @@ class GroupEntries {
         entries.add(entry);
     }
 
-    Collection<DataSource> independentEntries() {
+    public Collection<DataSource> independentEntries() {
         return entries;
     }
 }

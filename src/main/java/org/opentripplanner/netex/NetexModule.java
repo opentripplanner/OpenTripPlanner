@@ -10,7 +10,6 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -32,8 +31,6 @@ import java.util.List;
 public class NetexModule implements GraphBuilderModule {
     private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;
 
-    private final boolean linkStopsToParentStations;
-    private final boolean parentStationTransfers;
     private final int subwayAccessTime;
     private final int maxInterlineDistance;
     private final String netexFeedId;
@@ -44,22 +41,18 @@ public class NetexModule implements GraphBuilderModule {
      */
     private final ServiceDateInterval transitPeriodLimit;
 
-    private List<NetexBundle> netexBundles;
+    private final List<NetexBundle> netexBundles;
 
-    private FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
+    private final FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
 
     public NetexModule(
             String netexFeedId,
-            boolean linkStopsToParentStations,
-            boolean parentStationTransfers,
             int subwayAccessTime,
             int maxInterlineDistance,
             ServiceDateInterval transitPeriodLimit,
             List<NetexBundle> netexBundles
     ) {
         this.netexFeedId = netexFeedId;
-        this.linkStopsToParentStations = linkStopsToParentStations;
-        this.parentStationTransfers = parentStationTransfers;
         this.subwayAccessTime = subwayAccessTime;
         this.maxInterlineDistance = maxInterlineDistance;
         this.transitPeriodLimit = transitPeriodLimit;

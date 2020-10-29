@@ -66,7 +66,7 @@ public final class Stop extends StationElement implements StopLocation {
    */
   public static Stop stopForTest(String idAndName, double lat, double lon) {
     return new Stop(
-        new FeedScopedId("TEST", idAndName),
+        new FeedScopedId("F", idAndName),
         idAndName,
         idAndName,
         null,

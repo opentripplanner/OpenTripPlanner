@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.index.NetexEntityDataIndex;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
@@ -122,7 +122,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     }
 
     @Override
-    void setResultOnIndex(NetexImportDataIndex index) {
+    void setResultOnIndex(NetexEntityDataIndex index) {
         // update entities
         index.destinationDisplayById.addAll(destinationDisplays);
         index.groupOfLinesById.addAll(groupOfLines);
@@ -143,7 +143,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     private void parseStopAssignments(StopAssignmentsInFrame_RelStructure stopAssignments) {
         if (stopAssignments == null) return;
 
-        for (JAXBElement stopAssignment : stopAssignments.getStopAssignment()) {
+        for (JAXBElement<?> stopAssignment : stopAssignments.getStopAssignment()) {
             if (stopAssignment.getValue() instanceof PassengerStopAssignment) {
                 PassengerStopAssignment assignment = (PassengerStopAssignment) stopAssignment
                         .getValue();
@@ -192,7 +192,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     private void parseRoutes(RoutesInFrame_RelStructure routes) {
         if (routes == null) return;
 
-        for (JAXBElement element : routes.getRoute_()) {
+        for (JAXBElement<?> element : routes.getRoute_()) {
             if (element.getValue() instanceof Route) {
                 Route route = (Route) element.getValue();
                 this.routes.add(route);
@@ -230,7 +230,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     private void parseLines(LinesInFrame_RelStructure lines) {
         if (lines == null) return;
 
-        for (JAXBElement element : lines.getLine_()) {
+        for (JAXBElement<?> element : lines.getLine_()) {
             if (element.getValue() instanceof Line) {
                 this.lines.add((Line) element.getValue());
             } else if (element.getValue() instanceof FlexibleLine) {
@@ -247,7 +247,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     private void parseJourneyPatterns(JourneyPatternsInFrame_RelStructure journeyPatterns) {
         if (journeyPatterns == null) return;
 
-        for (JAXBElement pattern : journeyPatterns.getJourneyPattern_OrJourneyPatternView()) {
+        for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern_OrJourneyPatternView()) {
             if (pattern.getValue() instanceof JourneyPattern) {
                 this.journeyPatterns.add((JourneyPattern) pattern.getValue());
             }

@@ -54,7 +54,7 @@ public class ServiceCalendarMapperTest {
         CALENDAR.setEndDate(END_DATE);
     }
 
-    private ServiceCalendarMapper subject = new ServiceCalendarMapper();
+    private final ServiceCalendarMapper subject = new ServiceCalendarMapper();
 
     @Test
     public void testMapCollection() {
