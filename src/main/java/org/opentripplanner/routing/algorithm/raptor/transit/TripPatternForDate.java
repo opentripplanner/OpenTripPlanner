@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.time.LocalDate;
@@ -49,22 +50,22 @@ public class TripPatternForDate {
     }
 
     public TripPatternForDate(
-        TripPatternWithRaptorStopIndexes tripPattern,
-        TripTimes[] tripTimes,
-        LocalDate localDate
+        TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate
     ) {
         this.tripPattern = tripPattern;
         this.tripTimes = tripTimes;
         this.localDate = localDate;
 
         // These depend on the tripTimes array being sorted
-        this.startOfRunningPeriod = localDate
-            .atStartOfDay()
-            .plusSeconds(tripTimes[0].getDepartureTime(0));
-        this.endOfRunningPeriod = localDate
-            .atStartOfDay()
-            .plusSeconds(tripTimes[tripTimes.length - 1].getArrivalTime(
-                tripTimes[tripTimes.length - 1].getNumStops() - 1));
+        this.startOfRunningPeriod = DateMapper.asDateTime(
+            localDate,
+            tripTimes[0].getDepartureTime(0)
+        );
+        this.endOfRunningPeriod = DateMapper.asDateTime(
+            localDate,
+            tripTimes[tripTimes.length - 1].getArrivalTime(
+                tripTimes[tripTimes.length - 1].getNumStops() - 1)
+        );
     }
 
     // For testing
