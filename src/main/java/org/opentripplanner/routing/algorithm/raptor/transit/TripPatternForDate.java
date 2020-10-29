@@ -40,15 +40,6 @@ public class TripPatternForDate {
      */
     private final LocalDateTime endOfRunningPeriod;
 
-    public static TripPatternForDate getTripPatternForDateForTest(
-        TripPatternWithRaptorStopIndexes tripPattern,
-        int startSecondsOfDay,
-        int endSecondsOfDay,
-        LocalDate localDate
-    ) {
-        return new TripPatternForDate(tripPattern, startSecondsOfDay, endSecondsOfDay, localDate);
-    }
-
     public TripPatternForDate(
         TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate
     ) {
@@ -66,20 +57,6 @@ public class TripPatternForDate {
             tripTimes[tripTimes.length - 1].getArrivalTime(
                 tripTimes[tripTimes.length - 1].getNumStops() - 1)
         );
-    }
-
-    // For testing
-    private TripPatternForDate(
-        TripPatternWithRaptorStopIndexes tripPattern,
-        int startSecondsOfDay,
-        int endSecondsOfDay,
-        LocalDate localDate
-    ) {
-        this.tripPattern = tripPattern;
-        this.tripTimes = new TripTimes[] {null};
-        this.localDate = localDate;
-        this.startOfRunningPeriod = localDate.atStartOfDay().plusSeconds(startSecondsOfDay);
-        this.endOfRunningPeriod = localDate.atStartOfDay().plusSeconds(endSecondsOfDay);
     }
 
     public TripTimes[] tripTimes() {
