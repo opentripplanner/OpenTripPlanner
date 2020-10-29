@@ -3,6 +3,7 @@ package org.opentripplanner.datastore;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -37,6 +38,12 @@ public interface OtpDataStoreConfig {
      * The pattern is NOT Case sensitive.
      */
     String DEFAULT_DEM_PATTERN = "(?i)\\.tiff?$";
+
+    /**
+     * Match all filenames that ends with suffix {@code .nc}.
+     * The pattern is NOT Case sensitive.
+     */
+    String DEFAULT_AIR_QUALITY_PATTERN = "(?i)\\.nc$";
 
     /**
      * The base directory on the local file-system. Used to lookup config files and all input
@@ -94,6 +101,14 @@ public interface OtpDataStoreConfig {
     @NotNull List<URI> netexFiles();
 
     /**
+     * Array of URIs to Air quality data files.
+     * <p>
+     * This parameter is optional. If {@code null} Air quality files are loaded from
+     * {@link #baseDirectory()}.
+     */
+    List<URI> airQualityFiles();
+
+    /**
      * The URI to the graph object file to load and/or save.
      */
     URI graph();
@@ -134,4 +149,6 @@ public interface OtpDataStoreConfig {
      * @see #DEFAULT_DEM_PATTERN for default value.
      */
     Pattern demLocalFilePattern();
+
+    Pattern airQualityLocalFilePattern();
 }

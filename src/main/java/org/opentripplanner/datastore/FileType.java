@@ -17,11 +17,11 @@ public enum FileType {
   GRAPH("🦠", "OTP Graph file"),
   REPORT("📈", "Issue report"),
   OTP_STATUS("⏳", "OTP build status"),
-  UNKNOWN("❓", "Unknown file");
+  UNKNOWN("❓", "Unknown file"),
+  AIR_QUALITY("⛅", "Air quality data");
 
   private final String icon;
   private final String text;
-
   FileType(String icon, String text) {
     this.icon = icon;
     this.text = text;
@@ -45,7 +45,7 @@ public enum FileType {
    * At least one input data file must be present to build a graph.
    */
   public boolean isInputDataSource() {
-    return EnumSet.of(GTFS, NETEX, OSM, DEM).contains(this);
+    return EnumSet.of(GTFS, NETEX, OSM, DEM, AIR_QUALITY).contains(this);
   }
 
   /**

@@ -16,10 +16,7 @@ import java.io.File;
 import java.util.EnumSet;
 import java.util.Set;
 
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
+import static org.opentripplanner.datastore.FileType.*;
 
 
 /**
@@ -59,6 +56,7 @@ public class GraphBuilderDataSources {
         include(cli.doBuildStreet() && bc.streets, DEM);
         include(cli.doBuildTransit() && bc.transit, GTFS);
         include(cli.doBuildTransit() && bc.transit, NETEX);
+        include(true, AIR_QUALITY);
 
         selectFilesToImport();
 
@@ -122,7 +120,6 @@ public class GraphBuilderDataSources {
 
     private void logSkippedAndSelectedFiles() {
         LOG.info("Loading files from: {}", String.join(", ", store.getRepositoryDescriptions()));
-
         // Sort data input files by type
         for (FileType type : FileType.values()) {
             for (DataSource source : inputData.get(type)) {

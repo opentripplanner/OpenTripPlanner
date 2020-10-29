@@ -44,6 +44,15 @@ import java.util.Locale;
  * 
  */
 public class StreetEdge extends Edge implements Cloneable {
+    /** Air quality */
+    private long aqiTime;
+    private float[] carbonMonoxide;
+    private float[] nitrogenMonoxide;
+    private float[] nitrogenDioxide;
+    private float[] ozone;
+    private float[] sulfurDioxide;
+    private float[] particles2_5;
+    private float[] particles10;
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
@@ -115,6 +124,71 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
+
+
+    public void setCarbonMonoxide(float[] carbonMonoxide) {
+        this.carbonMonoxide = carbonMonoxide;
+    }
+
+    public void setNitrogenMonoxide(float[] nitrogenMonoxide) {
+        this.nitrogenMonoxide = nitrogenMonoxide;
+    }
+
+    public void setNitrogenDioxide(float[] nitrogenDioxide) {
+        this.nitrogenDioxide = nitrogenDioxide;
+    }
+
+    public void setOzone(float[] ozone) {
+        this.ozone = ozone;
+    }
+
+    public void setSulfurDioxide(float[] sulfurDioxide) {
+        this.sulfurDioxide = sulfurDioxide;
+    }
+
+    public void setParticles2_5(float[] particles2_5) {
+        this.particles2_5 = particles2_5;
+    }
+
+    public void setParticles10(float[] particles10) {
+        this.particles10 = particles10;
+    }
+
+    public float[] getCarbonMonoxide() {
+        return this.carbonMonoxide;
+    }
+
+    public float[] getNitrogenMonoxide() {
+        return this.nitrogenMonoxide;
+    }
+
+    public float[] getNitrogenDioxide() {
+        return this.nitrogenDioxide;
+    }
+
+    public float[] getOzone() {
+        return this.ozone;
+    }
+
+    public float[] getSulfurDioxide() {
+        return this.sulfurDioxide;
+    }
+
+    public float[] getParticles2_5() {
+        return this.particles2_5;
+    }
+
+    public float[] getParticles10() {
+        return this.particles10;
+    }
+
+    public void setAqiTime (long aqiTime) {
+        this.aqiTime = aqiTime;
+    }
+
+    public long getAqiTime () {
+        return this.aqiTime;
+    }
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -513,6 +587,12 @@ public class StreetEdge extends Edge implements Cloneable {
         s1.incrementTimeInSeconds(roundedTime);
         
         s1.incrementWeight(weight);
+
+        boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
+
+        if (walkingOrBiking && options.pollutionPenalty != null) {
+            
+        }
 
         return s1;
     }

@@ -15,15 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.opentripplanner.datastore.FileType.CONFIG;
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GRAPH;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.datastore.FileType.OTP_STATUS;
-import static org.opentripplanner.datastore.FileType.REPORT;
-import static org.opentripplanner.datastore.FileType.UNKNOWN;
+import static org.opentripplanner.datastore.FileType.*;
 import static org.opentripplanner.datastore.OtpDataStore.BUILD_REPORT_DIR;
 import static org.opentripplanner.datastore.base.LocalDataSourceRepository.isCurrentDir;
 import static org.opentripplanner.standalone.config.ConfigLoader.isConfigFile;
@@ -40,20 +32,22 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     private final Pattern netexLocalFilePattern;
     private final Pattern osmLocalFilePattern;
     private final Pattern demLocalFilePattern;
-
+    private final Pattern airQualityLocalFilePattern;
 
     public FileDataSourceRepository(
         File baseDir,
         Pattern gtfsLocalFilePattern,
         Pattern netexLocalFilePattern,
         Pattern osmLocalFilePattern,
-        Pattern demLocalFilePattern
+        Pattern demLocalFilePattern,
+        Pattern airQualityLocalFilePattern
     ) {
         this.baseDir = baseDir;
         this.gtfsLocalFilePattern = gtfsLocalFilePattern;
         this.netexLocalFilePattern = netexLocalFilePattern;
         this.osmLocalFilePattern = osmLocalFilePattern;
         this.demLocalFilePattern = demLocalFilePattern;
+        this.airQualityLocalFilePattern = airQualityLocalFilePattern;
     }
 
     /**
@@ -153,6 +147,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
         if (isTransitFile(file, gtfsLocalFilePattern)) { return GTFS; }
         if (isTransitFile(file, netexLocalFilePattern)) { return NETEX; }
         if (osmLocalFilePattern.matcher(name).find()) { return OSM; }
+        if (airQualityLocalFilePattern.matcher(name).find()) { return AIR_QUALITY; }
         // Digital elevation model (elevation raster)
         if (demLocalFilePattern.matcher(name).find()) { return DEM; }
         if (name.matches("(streetG|g)raph.obj")) { return GRAPH; }

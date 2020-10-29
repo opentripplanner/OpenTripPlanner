@@ -18,14 +18,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.datastore.FileType.CONFIG;
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GRAPH;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.datastore.FileType.REPORT;
-import static org.opentripplanner.datastore.FileType.UNKNOWN;
+import static org.opentripplanner.datastore.FileType.*;
 
 /**
  * The responsibility of this class is to provide access to all data sources OTP uses like the
@@ -82,6 +75,7 @@ public class OtpDataStore {
         addAll(findMultipleSources(config.demFiles(),  DEM));
         addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
         addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
+        addAll(findMultipleSources(config.airQualityFiles(), AIR_QUALITY));
 
         streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
         graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);

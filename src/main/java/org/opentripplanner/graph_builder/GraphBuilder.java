@@ -1,16 +1,13 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
+import fi.metatavu.airquality.AirQualityDataFile;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.*;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
-import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
-import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -33,10 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
+import static org.opentripplanner.datastore.FileType.*;
 import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
 
 /**
@@ -70,7 +64,11 @@ public class GraphBuilder implements Runnable {
         // Check all graph builder inputs, and fail fast to avoid waiting until the build process
         // advances.
         for (GraphBuilderModule builder : graphBuilderModules) {
-            builder.checkInputs();
+            try {
+                builder.checkInputs();
+            } catch (Exception exception) {
+                LOG.error("A builder module failed: " + exception.getMessage(), exception);
+            }
         }
 
         DataImportIssueStore issueStore = new DataImportIssueStore(true);
@@ -103,8 +101,8 @@ public class GraphBuilder implements Runnable {
         boolean hasDem  = dataSources.has(DEM) || config.fetchElevationUS;
         boolean hasGtfs = dataSources.has(GTFS);
         boolean hasNetex = dataSources.has(NETEX);
+        boolean hasAirQuality = dataSources.has(AIR_QUALITY);
         boolean hasTransitData = hasGtfs || hasNetex;
-
         GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
 
         if ( hasOsm ) {
@@ -240,6 +238,15 @@ public class GraphBuilder implements Runnable {
                     )
             );
         }
+
+        if (hasAirQuality) {
+            for (DataSource airQualitySource : dataSources.get(AIR_QUALITY)) {
+                AirQualityDataFile airQualityDataFile = new AirQualityDataFile(new File(airQualitySource.path()));
+                AirQualityModule airQualityModule = new AirQualityModule(airQualityDataFile);
+                graphBuilder.addModule(airQualityModule);
+            }
+        }
+
         return graphBuilder;
     }
 }

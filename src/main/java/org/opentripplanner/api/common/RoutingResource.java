@@ -582,6 +582,30 @@ public abstract class RoutingResource {
     @QueryParam("pathComparator")
     private String pathComparator;
 
+    @QueryParam("pollutionPenalty")
+    private Double pollutionPenalty;
+
+    @QueryParam("carbonMonoxideTreshold")
+    private Double carbonMonoxideTreshold;
+
+    @QueryParam("nitrogenMonoxideTreshold")
+    private Double nitrogenMonoxideTreshold;
+
+    @QueryParam("nitrogenDioxideTreshold")
+    private Double nitrogenDioxideTreshold;
+
+    @QueryParam("ozoneTreshold")
+    private Double ozoneTreshold;
+
+    @QueryParam("sulfurDioxideTreshold")
+    private Double sulfurDioxideTreshold;
+
+    @QueryParam("pm2_5Treshold")
+    private Double pm2_5Treshold;
+
+    @QueryParam("pm10Treshold")
+    private Double pm10Treshold;
+
     /**
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -632,6 +656,41 @@ public abstract class RoutingResource {
             } else {
                 request.setDateTime(date, time, tz);
             }
+        }
+
+        if (pollutionPenalty != null && carbonMonoxideTreshold != null) {
+            request.pollutionPenalty = pollutionPenalty;
+            request.carbonMonoxideTreshold = carbonMonoxideTreshold;
+        }
+
+        if (pollutionPenalty != null && nitrogenMonoxideTreshold != null) {
+            request.pollutionPenalty = pollutionPenalty;
+            request.nitrogenMonoxideTreshold = nitrogenMonoxideTreshold;
+        }
+
+        if (pollutionPenalty != null && nitrogenDioxideTreshold != null) {
+            request.pollutionPenalty = pollutionPenalty;
+            request.nitrogenDioxideTreshold = nitrogenDioxideTreshold;
+        }
+
+        if (pollutionPenalty != null && ozoneTreshold != null) {
+            request.pollutionPenalty = pollutionPenalty;
+            request.ozoneTreshold = ozoneTreshold;
+        }
+
+        if (pollutionPenalty != null && sulfurDioxideTreshold != null) {
+            request.pollutionPenalty = pollutionPenalty;
+            request.ozoneTreshold = sulfurDioxideTreshold;
+        }
+
+        if (pollutionPenalty != null && pm2_5Treshold != null) {
+            request.pollutionPenalty = pollutionPenalty;
+            request.particles2_5Treshold = pm2_5Treshold;
+        }
+
+        if (pollutionPenalty != null && pm10Treshold != null) {
+            request.pollutionPenalty = pollutionPenalty;
+            request.particles10Treshold = pm10Treshold;
         }
 
         if(searchWindow != null) {

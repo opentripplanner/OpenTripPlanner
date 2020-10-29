@@ -6,10 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_DEM_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_GTFS_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_NETEX_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_OSM_PATTERN;
+import static org.opentripplanner.datastore.OtpDataStoreConfig.*;
 
 /**
  * Configure paths to each individual file resource. Use URIs to specify paths. If a parameter is
@@ -119,6 +116,14 @@ public class StorageConfig {
     public final List<URI> netex = new ArrayList<>();
 
     /**
+     * Array of URIs to Air quality data files.
+     * <p>
+     * This parameter is optional. If {@code null} Air quality files are loaded from
+     * {@link #baseDirectory()}.
+     */
+    public final List<URI> airQuality = new ArrayList<>();
+
+    /**
      * URI to the directory where the graph build report should be written to. The html report is
      * written into this directory. If the directory exist, any existing files are deleted.
      * If it does not exist, it is created.
@@ -145,6 +150,7 @@ public class StorageConfig {
        this.dem.addAll(config.asUris("dem"));
        this.gtfs.addAll(config.asUris("gtfs"));
        this.netex.addAll(config.asUris("netex"));
+       this.airQuality.addAll(config.asUris("airQuality"));
        this.buildReportDir = config.asUri("buildReportDir", null);
        this.localFileNamePatterns = new LocalFilenamePatterns(config.path("localFileNamePatterns"));
     }
@@ -200,11 +206,18 @@ public class StorageConfig {
          */
         public final Pattern dem;
 
+        /**
+         * Match all filenames that ends with suffix {@code .nc}.
+         * The pattern is NOT Case sensitive.
+         */
+        public final Pattern airQuality;
+
         public LocalFilenamePatterns(NodeAdapter c) {
             this.gtfs = c.asPattern("gtfs", DEFAULT_GTFS_PATTERN);
             this.netex = c.asPattern("netex", DEFAULT_NETEX_PATTERN);
             this.osm = c.asPattern("osm", DEFAULT_OSM_PATTERN);
             this.dem = c.asPattern("dem", DEFAULT_DEM_PATTERN);
+            this.airQuality = c.asPattern("airQuality", DEFAULT_AIR_QUALITY_PATTERN);
         }
     }
 }
