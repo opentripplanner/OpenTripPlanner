@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.index.NetexEntityDataIndex;
+import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.util.OTPFeature;
@@ -122,7 +122,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     }
 
     @Override
-    void setResultOnIndex(NetexEntityDataIndex index) {
+    void setResultOnIndex(NetexEntityIndex index) {
         // update entities
         index.destinationDisplayById.addAll(destinationDisplays);
         index.groupOfLinesById.addAll(groupOfLines);
@@ -131,7 +131,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         index.lineById.addAll(lines);
         index.networkById.addAll(networks);
         noticeParser.setResultOnIndex(index);
-        index.quayIdByStopPointRef.addAll((quayIdByStopPointRef));
+        index.quayIdByStopPointRef.addAll(quayIdByStopPointRef);
         index.flexibleStopPlaceByStopPointRef.addAll(flexibleStopPlaceByStopPointRef);
         index.routeById.addAll(routes);
         index.serviceLinkById.addAll(serviceLinks);
@@ -145,20 +145,10 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
         for (JAXBElement<?> stopAssignment : stopAssignments.getStopAssignment()) {
             if (stopAssignment.getValue() instanceof PassengerStopAssignment) {
-                PassengerStopAssignment assignment = (PassengerStopAssignment) stopAssignment
-                        .getValue();
+                var assignment = (PassengerStopAssignment) stopAssignment.getValue();
                 String quayRef = assignment.getQuayRef().getRef();
-
-                // TODO OTP2 - This check belongs to the mapping or as a separate validation
-                //           - step. The problem is that we do not want to relay on the
-                //           - the order in witch elements are loaded.
-                Quay quay = quayById.lookupLastVersionById(quayRef);
-                if (quay != null) {
-                    String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
-                    quayIdByStopPointRef.put(stopPointRef, quay.getId());
-                } else {
-                    LOG.warn("Quay {} not found in stop place file.", quayRef);
-                }
+                String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
+                quayIdByStopPointRef.put(stopPointRef, quayRef);
             }
             else if (stopAssignment.getValue() instanceof FlexibleStopAssignment) {
                 if(OTPFeature.FlexRouting.isOn()) {

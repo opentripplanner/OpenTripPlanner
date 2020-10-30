@@ -4,7 +4,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeRefStructure;
@@ -48,7 +47,7 @@ class NetexTestDataSample {
     private final EntityById<Stop> stopsById = new EntityById<>();
     private final HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
     private final List<TimetabledPassingTime> timetabledPassingTimes = new ArrayList<>();
-    private final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId = new HierarchicalMultimap<>();
+    private final HierarchicalMapById<ServiceJourney> serviceJourneyById = new HierarchicalMapById<>();
     private final HierarchicalMapById<Route> routesById = new HierarchicalMapById<>();
 
     private final EntityById<org.opentripplanner.model.Route> otpRouteByid = new EntityById<>();
@@ -131,7 +130,7 @@ class NetexTestDataSample {
                     .withPassingTimes(
                             new TimetabledPassingTimes_RelStructure().withTimetabledPassingTime(timetabledPassingTimes)
                     );
-            serviceJourneyByPatternId.add(journeyPattern.getId(), serviceJourney);
+            serviceJourneyById.add(serviceJourney);
         }
 
         // Setup stops
@@ -166,8 +165,8 @@ class NetexTestDataSample {
         return timetabledPassingTimes;
     }
 
-    HierarchicalMultimap<String, ServiceJourney> getServiceJourneyByPatternId() {
-        return serviceJourneyByPatternId;
+    HierarchicalMapById<ServiceJourney> getServiceJourneyById() {
+        return serviceJourneyById;
     }
 
     HierarchicalMapById<Route> getRouteById() {

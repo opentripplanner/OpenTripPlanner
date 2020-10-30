@@ -5,12 +5,14 @@ import com.google.common.collect.Multimap;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.opentripplanner.netex.index.hierarchy.E.EASTWOOD;
 import static org.opentripplanner.netex.index.hierarchy.E.REAGAN;
 import static org.opentripplanner.netex.index.hierarchy.E.SCHWARZENEGGER;
@@ -83,6 +85,28 @@ public class HierarchicalMultimapTest {
         assertTrue(country.lookup(GOVERNOR).isEmpty());
     }
 
+    @Test public void addAll() {
+        ArrayListMultimap<String, E> map = ArrayListMultimap.create();
+        map.put(ACTOR, SCHWARZENEGGER);
+        map.put(ACTOR, EASTWOOD);
+        country.addAll(map);
+
+        for (Collection<E> value : country.localValues()) {
+            // 3 Actors
+            if(value.size() == 3) {
+                // Expect Eastwood twice, since the value is a list, not a set.
+                assertEquals("[E(Eastwood, 1), E(Schwarzenegger, 1), E(Eastwood, 1)]", value.toString());
+            }
+            // 1 precident
+            else if(value.size() == 1) {
+                assertEquals("[E(Reagan, 1)]", value.toString());
+            }
+            else {
+                fail("Unexpected: " + value);
+            }
+        }
+    }
+
     @Test public void localKeys() {
       assertEquals(Set.of(PRESIDENT, ACTOR), country.localKeys());
       assertEquals(Set.of(GOVERNOR, ACTOR), state.localKeys());
@@ -94,4 +118,8 @@ public class HierarchicalMultimapTest {
         assertEquals("size = 4", state.toString());
     }
 
+    @Test public void localRemove() {
+        country.localRemove(PRESIDENT);
+        assertEquals(1, country.localSize());
+    }
 }

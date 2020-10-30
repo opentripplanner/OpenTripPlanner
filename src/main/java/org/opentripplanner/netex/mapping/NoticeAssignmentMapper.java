@@ -12,10 +12,12 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.rutebanken.netex.model.NoticeAssignment;
+import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -29,7 +31,7 @@ class NoticeAssignmentMapper {
 
     private final FeedScopedIdFactory idFactory;
 
-    private final ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId;
+    private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId = ArrayListMultimap.create();
 
     private final ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById;
 
@@ -46,7 +48,7 @@ class NoticeAssignmentMapper {
 
     NoticeAssignmentMapper(
             FeedScopedIdFactory idFactory,
-            ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId,
+            Collection<ServiceJourney> serviceJourneys,
             ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
             EntityById<Route> routesById,
             EntityById<Trip> tripsById,
@@ -54,11 +56,17 @@ class NoticeAssignmentMapper {
     ) {
         this.idFactory = idFactory;
         this.noticeMapper = new NoticeMapper(idFactory);
-        this.passingTimeByStopPointId = passingTimeByStopPointId;
         this.noticesById = noticesById;
         this.routesById = routesById;
         this.tripsById = tripsById;
         this.stopTimesByNetexId = stopTimesByNetexId;
+
+        // Index passing time by stopPoint id
+        for (ServiceJourney sj : serviceJourneys) {
+            for (TimetabledPassingTime it : sj.getPassingTimes().getTimetabledPassingTime()) {
+                passingTimeByStopPointId.put(it.getPointInJourneyPatternRef().getValue().getRef(), it);
+            }
+        }
     }
 
     Multimap<TransitEntity, Notice> map(NoticeAssignment noticeAssignment) {
@@ -75,10 +83,10 @@ class NoticeAssignmentMapper {
             return noticiesByEntity;
         }
 
-        // Special case for StopPointInJourneyPattern. The OTP model do not have this element, so we
-        // attach the notice to all StopTimes for the pattern at the given stop.
-        Collection<TimetabledPassingTime> times =  passingTimeByStopPointId.lookup(noticedObjectId);
-        if (!times.isEmpty()) {
+        // Special case for StopPointInJourneyPattern. The OTP model do not have this element, so
+        // we attach the notice to all StopTimes for the pattern at the given stop.
+        Collection<TimetabledPassingTime> times =  passingTimeByStopPointId.get(noticedObjectId);
+        if (times != null && !times.isEmpty()) {
             for (TimetabledPassingTime time : times) {
                 noticiesByEntity.put(lookupStopTimeKey(time.getId()), otpNotice);
             }
@@ -104,6 +112,7 @@ class NoticeAssignmentMapper {
         return stopTimesByNetexId.get(timeTablePassingTimeId).getId();
     }
 
+    @Nullable
     private Notice getOrMapNotice(NoticeAssignment assignment) {
         org.rutebanken.netex.model.Notice notice = assignment.getNotice() != null
                 ? assignment.getNotice()

@@ -4,7 +4,7 @@ import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.index.api.NetexImportDataIndexReadOnlyView;
+import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.rutebanken.netex.model.Line_VersionStructure;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OperatorRefStructure;
@@ -12,6 +12,7 @@ import org.rutebanken.netex.model.PresentationStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 /**
@@ -27,14 +28,14 @@ class RouteMapper {
     private final FeedScopedIdFactory idFactory;
     private final EntityById<Agency> agenciesById;
     private final EntityById<Operator> operatorsById;
-    private final NetexImportDataIndexReadOnlyView netexIndex;
+    private final NetexEntityIndexReadOnlyView netexIndex;
     private final AuthorityToAgencyMapper authorityMapper;
 
     RouteMapper(
             FeedScopedIdFactory idFactory,
             EntityById<Agency> agenciesById,
             EntityById<Operator> operatorsById,
-            NetexImportDataIndexReadOnlyView netexIndex,
+            NetexEntityIndexReadOnlyView netexIndex,
             String timeZone
     ) {
         this.idFactory = idFactory;
@@ -104,6 +105,7 @@ class RouteMapper {
         return agency;
     }
 
+    @Nullable
     private Operator findOperator(Line_VersionStructure line) {
         OperatorRefStructure opeRef = line.getOperatorRef();
 

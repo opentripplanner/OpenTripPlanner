@@ -1,4 +1,3 @@
-
 # NeTEx
 
 NeTEx is a European standard for exchanging Transit data. OTP can import NeTEx into its 
@@ -47,36 +46,34 @@ Within each group there is also _shared-group-data_ and _group-files_ (leaf-file
    _group-files_.
 - Entities in global _shared-files_ can reference other entities in the same file and entities in 
   other global _shared-files_.
- 
+
 ✅ Note! You can configure how your data files are grouped into the 3 levels above using regular 
 expressions in the _build-config.json_.
 
-
 ### Load entities and map to OTP model
 
-The load and mapping process is:
+The [load](loader/NetexDataSourceHierarchy.java), [validate](validation/Validator.java) and 
+[mapping](mapping/NetexMapper.java) process is:
 
 1. Load _shared-data-files_ into _index_.
+1. Validate loaded entities 
 1. Map _shared-data-entries_
 1. For each group:
     1. Load _group-shared-files_ into index
+    1. Validate loaded entities 
     1. Map _group-shared-entries_
     1. For each leaf group-file file:
         1. Load _group-file_ into index
+        1. Validate loaded entities 
         1. Map _group-entries_
         1. Clear leaf data from index
     1. Clear group data from index
 
 The [`NetexBundele`](NetexBundle.java) repeat the exact same steps at each level multiple times. 
-The hierarchical structure of the [`NetexEntityDataIndex`](index/NetexEntityDataIndex.java) is
-supported using a _stack_ of [hierarchical collections](index/hierarchy/AbstractHierarchicalMap.java)
-which is pushed and popped for each level. 
+The hierarchical structure of the file input is matched by the 
+[`NetexEntityDataIndex`](index/NetexEntityDataIndex.java) and the 
+[NetexMapper](mapping/NetexMapper.java). These two classes work like a "Stack" and provide `push()` 
+and `pop()` methods to prepare/edject for each file set at a given level. 
 
-
-
-
-<style>
-.info{
-    background-color: #9ad5ea;
-}
-</style>
+## Dependencies
+> TODO OTP2 - DSJ-3 Add this section when adding support for DSJ

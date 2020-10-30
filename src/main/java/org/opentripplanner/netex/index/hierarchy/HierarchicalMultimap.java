@@ -18,7 +18,12 @@ import java.util.Map;
  *</p>
  * @param <K> the key type
  * @param <V> the base value type
+ * @deprecated The use of this in the NetexIndex indicate that we are processing the entities in
+ *             the load phase, and not just store it in an index and passing it to the
+ *             validation/mapping phase. There might be a valid use-case for this class in the
+ *             future in the mappers, so this should be checked before removing it.
  */
+@Deprecated
 public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collection<V>> {
     private final Multimap<K,V> map  = ArrayListMultimap.create();
 
@@ -44,8 +49,14 @@ public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collec
         }
     }
 
-    Collection<K> localKeys() {
+    @Override
+    public Collection<K> localKeys() {
         return map.keySet();
+    }
+
+    @Override
+    public Collection<Collection<V>> localValues() {
+        return map.asMap().values();
     }
 
     @Override
@@ -61,5 +72,10 @@ public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collec
     @Override
     protected int localSize() {
         return map.size();
+    }
+
+    @Override
+    void localRemove(K key) {
+        map.removeAll(key);
     }
 }
