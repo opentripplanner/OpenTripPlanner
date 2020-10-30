@@ -4,8 +4,6 @@ import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInputObjectField;
-import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
@@ -24,38 +22,6 @@ public class TripQuery {
       GraphQLOutputType tripType,
       GqlUtil gqlUtil
   ) {
-    GraphQLInputObjectType preferredInputType = GraphQLInputObjectType.newInputObject()
-        .name("InputPreferred")
-        .description("Preferences for trip search.")
-        .field(GqlUtil.newIdListInputField(
-            "lines",
-            "Set of ids of lines preferred by user."
-        ))
-        .field(GqlUtil.newIdListInputField(
-            "authorities",
-            "Set of ids of authorities preferred by user."
-        ))
-        .field(GraphQLInputObjectField.newInputObjectField()
-            .name("otherThanPreferredLinesPenalty")
-            .description("Penalty added for using a line that is not preferred if user has set any line as preferred. In number of seconds that user is willing to wait for preferred line.")
-            .type(Scalars.GraphQLInt)
-            .defaultValue(routing.request.otherThanPreferredRoutesPenalty)
-            .build())
-        .build();
-
-    GraphQLInputObjectType unpreferredInputType = GraphQLInputObjectType.newInputObject()
-        .name("InputUnpreferred")
-        .description("Negative preferences for trip search. Unpreferred elements may still be used in suggested trips if alternatives are not desirable, see InputBanned for hard limitations.")
-        .field(GqlUtil.newIdListInputField(
-            "lines",
-            "Set of ids of lines user prefers not to use."
-        ))
-        .field(GqlUtil.newIdListInputField(
-            "authorities",
-            "Set of ids of authorities user prefers not to use."
-        ))
-        .build();
-
     return GraphQLFieldDefinition.newFieldDefinition()
         .name("trip")
         .description("Input type for executing a travel search for a trip between two locations. Returns trip patterns describing suggested alternatives for the trip.")
@@ -132,16 +98,6 @@ public class TripQuery {
             .description("Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.")
             .type(Scalars.GraphQLBoolean)
             .defaultValue(routing.request.arriveBy)
-            .build())
-        .argument(GraphQLArgument.newArgument()
-            .name("preferred")
-            .description("Parameters for indicating authorities or lines that preferably should be used in trip patters. A cost is applied to boarding nonpreferred authorities or lines (otherThanPreferredRoutesPenalty).")
-            .type(preferredInputType)
-            .build())
-        .argument(GraphQLArgument.newArgument()
-            .name("unpreferred")
-            .description("Parameters for indicating authorities or lines that preferably should not be used in trip patters. A cost is applied to boarding nonpreferred authorities or lines (otherThanPreferredRoutesPenalty).")
-            .type(unpreferredInputType)
             .build())
         .argument(GraphQLArgument.newArgument()
             .name("banned")
