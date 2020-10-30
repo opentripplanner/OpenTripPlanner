@@ -3,6 +3,9 @@ package fi.metatavu.airquality;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
 
+/**
+ * This class represents pollution. It contains a field for each supported pollutant.
+ */
 public class NetcdfPollution {
 
   private final ArrayFloat.D4 carbonMonoxide;

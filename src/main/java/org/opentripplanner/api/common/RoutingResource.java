@@ -582,29 +582,47 @@ public abstract class RoutingResource {
     @QueryParam("pathComparator")
     private String pathComparator;
 
-    @QueryParam("pollutionPenalty")
-    private Double pollutionPenalty;
+    @QueryParam("carbonMonoxideThreshold")
+    private Double carbonMonoxideThreshold;
 
-    @QueryParam("carbonMonoxideTreshold")
-    private Double carbonMonoxideTreshold;
+    @QueryParam("nitrogenMonoxideThreshold")
+    private Double nitrogenMonoxideThreshold;
 
-    @QueryParam("nitrogenMonoxideTreshold")
-    private Double nitrogenMonoxideTreshold;
+    @QueryParam("nitrogenDioxideThreshold")
+    private Double nitrogenDioxideThreshold;
 
-    @QueryParam("nitrogenDioxideTreshold")
-    private Double nitrogenDioxideTreshold;
+    @QueryParam("ozoneThreshold")
+    private Double ozoneThreshold;
 
-    @QueryParam("ozoneTreshold")
-    private Double ozoneTreshold;
+    @QueryParam("sulfurDioxideThreshold")
+    private Double sulfurDioxideThreshold;
 
-    @QueryParam("sulfurDioxideTreshold")
-    private Double sulfurDioxideTreshold;
+    @QueryParam("pm2_5Threshold")
+    private Double pm2_5Threshold;
 
-    @QueryParam("pm2_5Treshold")
-    private Double pm2_5Treshold;
+    @QueryParam("pm10Threshold")
+    private Double pm10Threshold;
 
-    @QueryParam("pm10Treshold")
-    private Double pm10Treshold;
+    @QueryParam("carbonMonoxidePenalty")
+    private Double carbonMonoxidePenalty;
+
+    @QueryParam("nitrogenMonoxidePenalty")
+    private Double nitrogenMonoxidePenalty;
+
+    @QueryParam("nitrogenDioxidePenalty")
+    private Double nitrogenDioxidePenalty;
+
+    @QueryParam("ozonePenalty")
+    private Double ozonePenalty;
+
+    @QueryParam("sulfurDioxidePenalty")
+    private Double sulfurDioxidePenalty;
+
+    @QueryParam("pm2_5Penalty")
+    private Double pm2_5Penalty;
+
+    @QueryParam("pm10Penalty")
+    private Double pm10Penalty;
 
     /**
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
@@ -658,39 +676,39 @@ public abstract class RoutingResource {
             }
         }
 
-        if (pollutionPenalty != null && carbonMonoxideTreshold != null) {
-            request.pollutionPenalty = pollutionPenalty;
-            request.carbonMonoxideTreshold = carbonMonoxideTreshold;
+        if (carbonMonoxidePenalty != null && carbonMonoxideThreshold != null) {
+            request.carbonMonoxidePenalty = carbonMonoxidePenalty;
+            request.carbonMonoxideThreshold = carbonMonoxideThreshold;
         }
 
-        if (pollutionPenalty != null && nitrogenMonoxideTreshold != null) {
-            request.pollutionPenalty = pollutionPenalty;
-            request.nitrogenMonoxideTreshold = nitrogenMonoxideTreshold;
+        if (nitrogenMonoxidePenalty != null && nitrogenMonoxideThreshold != null) {
+            request.nitrogenMonoxidePenalty = nitrogenMonoxidePenalty;
+            request.nitrogenMonoxideThreshold = nitrogenMonoxideThreshold;
         }
 
-        if (pollutionPenalty != null && nitrogenDioxideTreshold != null) {
-            request.pollutionPenalty = pollutionPenalty;
-            request.nitrogenDioxideTreshold = nitrogenDioxideTreshold;
+        if (nitrogenDioxidePenalty != null && nitrogenDioxideThreshold != null) {
+            request.nitrogenDioxidePenalty = nitrogenDioxidePenalty;
+            request.nitrogenDioxideThreshold = nitrogenDioxideThreshold;
         }
 
-        if (pollutionPenalty != null && ozoneTreshold != null) {
-            request.pollutionPenalty = pollutionPenalty;
-            request.ozoneTreshold = ozoneTreshold;
+        if (ozonePenalty != null && ozoneThreshold != null) {
+            request.ozonePenalty = ozonePenalty;
+            request.ozoneThreshold = ozoneThreshold;
         }
 
-        if (pollutionPenalty != null && sulfurDioxideTreshold != null) {
-            request.pollutionPenalty = pollutionPenalty;
-            request.ozoneTreshold = sulfurDioxideTreshold;
+        if (sulfurDioxidePenalty != null && sulfurDioxideThreshold != null) {
+            request.sulfurDioxidePenalty = sulfurDioxidePenalty;
+            request.sulfurDioxideThreshold = sulfurDioxideThreshold;
         }
 
-        if (pollutionPenalty != null && pm2_5Treshold != null) {
-            request.pollutionPenalty = pollutionPenalty;
-            request.particles2_5Treshold = pm2_5Treshold;
+        if (pm2_5Penalty != null && pm2_5Threshold != null) {
+            request.particles2_5Penalty = pm2_5Penalty;
+            request.particles2_5Threshold = pm2_5Threshold;
         }
 
-        if (pollutionPenalty != null && pm10Treshold != null) {
-            request.pollutionPenalty = pollutionPenalty;
-            request.particles10Treshold = pm10Treshold;
+        if (pm10Penalty != null && pm10Threshold != null) {
+            request.particles10Penalty = pm10Penalty;
+            request.particles10Threshold = pm10Threshold;
         }
 
         if(searchWindow != null) {

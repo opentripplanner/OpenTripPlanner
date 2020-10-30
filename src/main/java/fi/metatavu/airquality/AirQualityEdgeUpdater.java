@@ -18,7 +18,6 @@ import ucar.ma2.Array;
 /**
  * Class that updates air quality data from single air quality data file into all street edges.
  *
- *
  */
 public class AirQualityEdgeUpdater {
 
@@ -28,7 +27,7 @@ public class AirQualityEdgeUpdater {
   private final AirQualityDataFile airQualityDataFile;
   private final Collection<StreetEdge> streetEdges;
   private int edgesUpdated;
-  private long aqiTime = 0;
+  private final long dataStartTime;
   private final NetcdfPollution netcdfPollution;
 
   /**
@@ -42,9 +41,10 @@ public class AirQualityEdgeUpdater {
     this.airQualityDataFile = airQualityDataFile;
     this.streetEdges = streetEdges;
     this.edgesUpdated = 0;
-    this.aqiTime = this.airQualityDataFile.getOriginDate().toInstant().toEpochMilli();
+    double startTimeHours = this.airQualityDataFile.getTimeArray().getDouble(0);
+    this.dataStartTime = this.airQualityDataFile.getOriginDate().toInstant().plusSeconds((long) (startTimeHours * 3600)).toEpochMilli();
     netcdfPollution = airQualityDataFile.getPollution();
-    LOG.info(String.format("Street edges update statring from time stamp %d", this.aqiTime));
+    LOG.info(String.format("Street edges update starting from time stamp %d", this.dataStartTime));
   }
 
   /**
@@ -65,13 +65,13 @@ public class AirQualityEdgeUpdater {
     Coordinate fromCoordinate = fromVertex.getCoordinate();
     Coordinate toCoordinate = toVertex.getCoordinate();
 
-    float[] carbonMonoxide = getAverageAq(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.CARBON_MONOXIDE);
-    float[] nitrogenMonoxide = getAverageAq(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.NITROGEN_MONOXIDE);
-    float[] nitrogenDioxide = getAverageAq(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.NITROGEN_DIOXIDE);
-    float[] ozone = getAverageAq(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.OZONE);
-    float[] sulfurDioxide = getAverageAq(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.SULFUR_DIOXIDE);
-    float[] particles2_5 = getAverageAq(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.PARTICLES_PM2_5);
-    float[] particles10 = getAverageAq(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.PARTICLES_PM10);
+    float[] carbonMonoxide = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.CARBON_MONOXIDE);
+    float[] nitrogenMonoxide = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.NITROGEN_MONOXIDE);
+    float[] nitrogenDioxide = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.NITROGEN_DIOXIDE);
+    float[] ozone = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.OZONE);
+    float[] sulfurDioxide = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.SULFUR_DIOXIDE);
+    float[] particles2_5 = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.PARTICLES_PM2_5);
+    float[] particles10 = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.PARTICLES_PM10);
 
     streetEdge.setCarbonMonoxide(carbonMonoxide);
     streetEdge.setNitrogenMonoxide(nitrogenMonoxide);
@@ -80,7 +80,7 @@ public class AirQualityEdgeUpdater {
     streetEdge.setSulfurDioxide(sulfurDioxide);
     streetEdge.setParticles2_5(particles2_5);
     streetEdge.setParticles10(particles10);
-    streetEdge.setAqiTime(aqiTime);
+    streetEdge.setAirQualityDataStartTime(dataStartTime);
 
     edgesUpdated++;
 
@@ -90,7 +90,7 @@ public class AirQualityEdgeUpdater {
   }
 
   /**
-   * Returns average air quality sample datas near given line.
+   * Returns average air quality sample data near given line.
    *
    * Each cell of returned array represent an average of air quality index in time
    *
@@ -100,20 +100,18 @@ public class AirQualityEdgeUpdater {
    * @param toLatitude to latitude
    * @param pollutant pollutant
    *
-   * @return array of air quality index samples in time
+   * @return array of pollutant values samples in time
    */
-  private float[] getAverageAq(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, Pollutant pollutant) {
+  private float[] getAveragePollution(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, Pollutant pollutant) {
     EdgeAirQuality edgeAirQuality = new EdgeAirQuality();
 
-    getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, pollutant).stream().forEach(sample -> {
+    getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, pollutant).forEach(sample -> {
       for (int time = 0; time < sample.length; time++) {
-        edgeAirQuality.addAirQualitySample(time, sample[time]);
+        edgeAirQuality.addPollutantValueSample(time, sample[time]);
       }
     });
 
-    float[] result = edgeAirQuality.getAirQualities((int) airQualityDataFile.getTimeArray().getSize());
-
-    return result;
+    return edgeAirQuality.getPollutantValues((int) airQualityDataFile.getTimeArray().getSize());
   }
 
   /**
@@ -137,23 +135,23 @@ public class AirQualityEdgeUpdater {
 
     for (int i = 0; i < distance / spacing; i++) {
       Point2D samplePoint = moveTo(fromLongitude, fromLatitude, azimuth, i * spacing);
-      result.add(getClosestAqi(samplePoint, pollutant));
+      result.add(getClosestPollutionValue(samplePoint, pollutant));
     }
 
     return result;
   }
 
   /**
-   * Returns closest air quality for given point.
+   * Returns closest a pollution value for given point.
    *
    * Returned array represent an air quality index in time
    *
    * @param samplePoint point
    * @param pollutant pollutant
    *
-   * @return closest air quality index for given point
+   * @return closest pollution for given point
    */
-  private float[] getClosestAqi(Point2D samplePoint, Pollutant pollutant) {
+  private float[] getClosestPollutionValue(Point2D samplePoint, Pollutant pollutant) {
     double lon = samplePoint.getX();
     double lat = samplePoint.getY();
 
@@ -166,31 +164,31 @@ public class AirQualityEdgeUpdater {
 
     for (int timeIndex = 0; timeIndex < timeSize; timeIndex++) {
       if (pollutant == Pollutant.CARBON_MONOXIDE) {
-        result[timeIndex] = (float) netcdfPollution.getCarbonMonoxide().get(timeIndex, height, latIndex, lonIndex);
+        result[timeIndex] = netcdfPollution.getCarbonMonoxide().get(timeIndex, height, latIndex, lonIndex);
       }
 
       if (pollutant == Pollutant.NITROGEN_MONOXIDE) {
-        result[timeIndex] = (float) netcdfPollution.getNitrogenMonoxide().get(timeIndex, height, latIndex, lonIndex);
+        result[timeIndex] = netcdfPollution.getNitrogenMonoxide().get(timeIndex, height, latIndex, lonIndex);
       }
 
       if (pollutant == Pollutant.NITROGEN_DIOXIDE) {
-        result[timeIndex] = (float) netcdfPollution.getNitrogenDioxide().get(timeIndex, height, latIndex, lonIndex);
+        result[timeIndex] = netcdfPollution.getNitrogenDioxide().get(timeIndex, height, latIndex, lonIndex);
       }
 
       if (pollutant == Pollutant.OZONE) {
-        result[timeIndex] = (float) netcdfPollution.getOzone().get(timeIndex, height, latIndex, lonIndex);
+        result[timeIndex] = netcdfPollution.getOzone().get(timeIndex, height, latIndex, lonIndex);
       }
 
       if (pollutant == Pollutant.SULFUR_DIOXIDE) {
-        result[timeIndex] = (float) netcdfPollution.getSulfurDioxide().get(timeIndex, height, latIndex, lonIndex);
+        result[timeIndex] = netcdfPollution.getSulfurDioxide().get(timeIndex, height, latIndex, lonIndex);
       }
 
       if (pollutant == Pollutant.PARTICLES_PM2_5) {
-        result[timeIndex] = (float) netcdfPollution.getParticles2_5().get(timeIndex, height, latIndex, lonIndex);
+        result[timeIndex] = netcdfPollution.getParticles2_5().get(timeIndex, height, latIndex, lonIndex);
       }
 
       if (pollutant == Pollutant.PARTICLES_PM10) {
-        result[timeIndex] = (float) netcdfPollution.getParticles10().get(timeIndex, height, latIndex, lonIndex);
+        result[timeIndex] = netcdfPollution.getParticles10().get(timeIndex, height, latIndex, lonIndex);
       }
     }
 

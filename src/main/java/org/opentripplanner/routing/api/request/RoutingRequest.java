@@ -245,14 +245,21 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Deprecated
     public boolean wheelchairAccessible = false;
 
-    public Double pollutionPenalty = null;
-    public Double carbonMonoxideTreshold = null;
-    public Double nitrogenMonoxideTreshold = null;
-    public Double nitrogenDioxideTreshold = null;
-    public Double ozoneTreshold = null;
-    public Double sulfurDioxideTreshold = null;
-    public Double particles2_5Treshold = null;
-    public Double particles10Treshold = null;
+    public Double carbonMonoxideThreshold = null;
+    public Double nitrogenMonoxideThreshold = null;
+    public Double nitrogenDioxideThreshold = null;
+    public Double ozoneThreshold = null;
+    public Double sulfurDioxideThreshold = null;
+    public Double particles2_5Threshold = null;
+    public Double particles10Threshold = null;
+
+    public Double carbonMonoxidePenalty = null;
+    public Double nitrogenMonoxidePenalty = null;
+    public Double nitrogenDioxidePenalty = null;
+    public Double ozonePenalty = null;
+    public Double sulfurDioxidePenalty = null;
+    public Double particles2_5Penalty = null;
+    public Double particles10Penalty = null;
 
     /**
      * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,

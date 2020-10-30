@@ -16,9 +16,6 @@ import ucar.nc2.units.DateUnit;
 /**
  * Class for representing single air quality data file
  *
- * @author Antti Leppä <antti.leppa@metatavu.fi>
- * @author Heikki Kurhinen <heikki.kurhinen@metatavu.fi>
- *
  */
 public class AirQualityDataFile {
 

@@ -2,56 +2,60 @@ package fi.metatavu.airquality;
 
 import java.util.HashMap;
 import java.util.Map;
+
+/**
+ * A helper class for air quality edge updater
+ */
 public class EdgeAirQuality {
 
-  private Map<Integer, float[]> airQualities;
+  private final Map<Integer, float[]> pollutantValues;
 
   /**
    * Constructor
    */
   public EdgeAirQuality() {
-    airQualities = new HashMap<>();
+    pollutantValues = new HashMap<>();
   }
 
   /**
-   * Adds air quality index for given time
+   * Adds a pollutant value for given time
    *
    * @param time time
-   * @param airQuality air quality index
+   * @param pollutantValue pollutantValue
    */
-  public void addAirQualitySample(int time, float airQuality) {
-    float[] existing = airQualities.get(time);
+  public void addPollutantValueSample(int time, float pollutantValue) {
+    float[] existing = pollutantValues.get(time);
     if (existing == null) {
-      airQualities.put(time, new float[] { airQuality });
+      pollutantValues.put(time, new float[] { pollutantValue });
     } else {
       float[] updated = new float[existing.length + 1];
       System.arraycopy(existing, 0, updated, 0, existing.length);
-      updated[existing.length] = airQuality;
-      airQualities.put(time, updated);
+      updated[existing.length] = pollutantValue;
+      pollutantValues.put(time, updated);
     }
   }
 
   /**
-   * Returns air quality average for given time
+   * Returns pollutant value average for given time
    *
    * @param time time
-   * @return air quality index
+   * @return pollutant value
    */
-  public float getAirQuality(int time) {
-    return getAverage(getAirQualitiesInTime(time));
+  public float getPollutantValue(int time) {
+    return getAverage(getPollutantValuesInTime(time));
   }
 
   /**
-   * Returns air quality averages given times
+   * Returns pollutant value averages given times
    *
    * @param times times
-   * @return air quality indexes
+   * @return pollutantValues
    */
-  public float[] getAirQualities(int times) {
+  public float[] getPollutantValues(int times) {
     float[] result = new float[times];
 
     for (int time = 0; time < times; time++) {
-      result[time] = getAirQuality(time);
+      result[time] = getPollutantValue(time);
     }
 
     return result;
@@ -81,10 +85,10 @@ public class EdgeAirQuality {
    * Returns array of air quality indices in time
    *
    * @param time time
-   * @return array of air quality indices
+   * @return array of pollutant value
    */
-  private float[] getAirQualitiesInTime(int time) {
-    return airQualities.get(time);
+  private float[] getPollutantValuesInTime(int time) {
+    return pollutantValues.get(time);
   }
 
 }

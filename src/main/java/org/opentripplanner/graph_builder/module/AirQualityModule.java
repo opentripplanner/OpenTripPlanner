@@ -4,13 +4,13 @@ import fi.metatavu.airquality.AirQualityDataFile;
 import fi.metatavu.airquality.AirQualityEdgeUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * A module to update graph with air quality data
+ */
 public class AirQualityModule implements GraphBuilderModule {
   private final AirQualityDataFile dataFile;
 

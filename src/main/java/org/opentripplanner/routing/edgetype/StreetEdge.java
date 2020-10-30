@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -45,7 +47,7 @@ import java.util.Locale;
  */
 public class StreetEdge extends Edge implements Cloneable {
     /** Air quality */
-    private long aqiTime;
+    private long airQualityDataStartTime;
     private float[] carbonMonoxide;
     private float[] nitrogenMonoxide;
     private float[] nitrogenDioxide;
@@ -182,12 +184,12 @@ public class StreetEdge extends Edge implements Cloneable {
         return this.particles10;
     }
 
-    public void setAqiTime (long aqiTime) {
-        this.aqiTime = aqiTime;
+    public void setAirQualityDataStartTime(long airQualityDataStartTime) {
+        this.airQualityDataStartTime = airQualityDataStartTime;
     }
 
-    public long getAqiTime () {
-        return this.aqiTime;
+    public long getAirQualityDataStartTime() {
+        return this.airQualityDataStartTime;
     }
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
@@ -588,13 +590,75 @@ public class StreetEdge extends Edge implements Cloneable {
         
         s1.incrementWeight(weight);
 
+        /*
+         * If traverse mode is WALK or BICYCLE then the weight is updated based on air quality.
+         * Weight is increased for each pollutant defined in the request.
+         */
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
-        if (walkingOrBiking && options.pollutionPenalty != null) {
-            
+        if (walkingOrBiking) {
+            Instant aqiTimeInstant = Instant.ofEpochMilli(getAirQualityDataStartTime());
+            Instant requestInstant = options.getDateTime().toInstant();
+            int airQualityHour = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
+            if (airQualityHour >= 0) {
+               double totalPenalty = 0d;
+
+               if (carbonMonoxide != null && options.carbonMonoxideThreshold != null) {
+                   totalPenalty += calculatePollutionPenalty(airQualityHour, carbonMonoxide, options.carbonMonoxideThreshold, options.carbonMonoxidePenalty);
+               }
+
+                if (nitrogenMonoxide != null && options.nitrogenMonoxideThreshold != null) {
+                    totalPenalty += calculatePollutionPenalty(airQualityHour, nitrogenMonoxide, options.nitrogenMonoxideThreshold, options.nitrogenMonoxidePenalty);
+                }
+
+                if (nitrogenDioxide != null && options.nitrogenDioxideThreshold != null) {
+                    totalPenalty += calculatePollutionPenalty(airQualityHour, nitrogenDioxide, options.nitrogenDioxideThreshold, options.nitrogenDioxidePenalty);
+                }
+
+                if (ozone != null && options.ozoneThreshold != null) {
+                    totalPenalty += calculatePollutionPenalty(airQualityHour, ozone, options.ozoneThreshold, options.ozonePenalty);
+                }
+
+                if (sulfurDioxide != null && options.sulfurDioxideThreshold != null) {
+                    totalPenalty += calculatePollutionPenalty(airQualityHour, sulfurDioxide, options.sulfurDioxideThreshold, options.sulfurDioxidePenalty);
+                }
+
+                if (particles2_5 != null && options.particles2_5Threshold != null) {
+                    totalPenalty += calculatePollutionPenalty(airQualityHour, particles2_5, options.particles2_5Threshold, options.particles2_5Penalty);
+                }
+
+                if (particles10 != null && options.particles10Threshold != null) {
+                    totalPenalty += calculatePollutionPenalty(airQualityHour, particles10, options.particles10Threshold, options.particles10Penalty);
+                }
+
+                s1.incrementWeight(totalPenalty);
+            }
         }
 
         return s1;
+    }
+
+    /**
+     * Calculates penalty for a single pollutant at a given time
+     *
+     * @param airQualityHour time for which the penalty is calculated
+     * @param pollutionValues array of pollutant values to fetch the current value from
+     * @param penaltyThreshold threshold for pollution above which the penalty will be enforced
+     * @param penaltyMultiplier penalty multiplier for pollution that will be used to calculate penalty
+     *
+     * @return penalty
+     */
+    private double calculatePollutionPenalty (int airQualityHour, float[] pollutionValues, double penaltyThreshold, double penaltyMultiplier) {
+        double penalty = 0d;
+
+        if (airQualityHour < pollutionValues.length) {
+            float value = pollutionValues[airQualityHour];
+            if (value > penaltyThreshold) {
+                penalty = (value + 1 - penaltyThreshold) * penaltyMultiplier;
+            }
+        }
+
+        return penalty;
     }
 
     private double calculateOverageWeight(double firstValue, double secondValue, double maxValue,
