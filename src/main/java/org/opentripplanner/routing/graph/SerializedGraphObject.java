@@ -8,6 +8,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
+import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
@@ -192,7 +193,7 @@ public class SerializedGraphObject implements Serializable {
         // The default strategy requires every class you serialize, even in your dependencies, to have a zero-arg
         // constructor (which can be private). The setInstantiatorStrategy method completely replaces that default
         // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
-        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
+        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
     }
 
