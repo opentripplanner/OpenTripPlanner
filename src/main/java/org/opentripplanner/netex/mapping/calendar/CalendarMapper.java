@@ -36,7 +36,7 @@ public class CalendarMapper {
 
 
     public CalendarMapper(
-        Function<String, FeedScopedId> idFactory,
+            Function<String, FeedScopedId> idFactory,
             ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
             ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
             ReadOnlyHierarchicalMapById<DayType> dayTypeById,
