@@ -37,7 +37,7 @@ public class TripPatternMapperTest {
                 sample.getQuayIdByStopPointRef(),
                 new HierarchicalMap<>(),
                 new HierarchicalMapById<>(),
-                sample.getServiceJourneyByPatternId(),
+                sample.getServiceJourneyById(),
                 new Deduplicator()
         );
 

@@ -1,14 +1,14 @@
 package org.opentripplanner.netex.index;
 
-import org.opentripplanner.netex.index.api.NetexImportDataIndexReadOnlyView;
+import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalElement;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
@@ -31,7 +31,6 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone;
-import org.rutebanken.netex.model.TimetabledPassingTime;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -40,7 +39,7 @@ import java.util.Set;
 
 /**
  * This class holds indexes of Netex objects for lookup during the NeTEx import using the
- * {@link NetexImportDataIndexReadOnlyView}.
+ * {@link NetexEntityIndexReadOnlyView}.
  * <p>
  * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared data</em>,
  * and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to avoid keeping everything
@@ -62,10 +61,11 @@ import java.util.Set;
  * {@link HierarchicalElement} classes.
  * <p/>
  * The mapping code should not insert entities, so an instance of this class implements the
- * {@link NetexImportDataIndexReadOnlyView} witch is passed to the mapping code for translation into
+ * {@link NetexEntityIndexReadOnlyView} witch is passed to the mapping code for translation into
  * OTP domain model objects.
  */
-public class NetexEntityDataIndex {
+public class NetexEntityIndex {
+    private final NetexEntityIndex parent;
 
     // Indexes to entities
     public final HierarchicalMapById<Authority> authoritiesById;
@@ -87,12 +87,11 @@ public class NetexEntityDataIndex {
     public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
     public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
     public final HierarchicalMapById<Operator> operatorsById;
-    public final HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId;
     public final HierarchicalVersionMapById<Quay> quayById;
     public final HierarchicalMap<String, String> flexibleStopPlaceByStopPointRef;
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
     public final HierarchicalMapById<Route> routeById;
-    public final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId;
+    public final HierarchicalMapById<ServiceJourney> serviceJourneyById;
     public final HierarchicalMapById<ServiceLink> serviceLinkById;
     public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
     public final HierarchicalMapById<TariffZone> tariffZonesById;
@@ -112,7 +111,8 @@ public class NetexEntityDataIndex {
     /**
      * Create a root node.
      */
-    public NetexEntityDataIndex() {
+    public NetexEntityIndex() {
+        this.parent = null;
         this.authoritiesById = new HierarchicalMapById<>();
         this.dayTypeById = new HierarchicalMapById<>();
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
@@ -131,12 +131,11 @@ public class NetexEntityDataIndex {
         this.noticeAssignmentById = new HierarchicalMapById<>();
         this.operatingPeriodById = new HierarchicalMapById<>();
         this.operatorsById = new HierarchicalMapById<>();
-        this.passingTimeByStopPointId = new HierarchicalMultimap<>();
         this.quayById = new HierarchicalVersionMapById<>();
         this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>();
         this.quayIdByStopPointRef = new HierarchicalMap<>();
         this.routeById = new HierarchicalMapById<>();
-        this.serviceJourneyByPatternId = new HierarchicalMultimap<>();
+        this.serviceJourneyById = new HierarchicalMapById<>();
         this.serviceLinkById = new HierarchicalMapById<>();
         this.stopPlaceById = new HierarchicalVersionMapById<>();
         this.tariffZonesById = new HierarchicalMapById<>();
@@ -147,7 +146,8 @@ public class NetexEntityDataIndex {
      * Create a child node.
      * @param parent can not be <code>null</code>.
      */
-    public NetexEntityDataIndex(NetexEntityDataIndex parent) {
+    public NetexEntityIndex(NetexEntityIndex parent) {
+        this.parent = parent;
         this.authoritiesById = new HierarchicalMapById<>(parent.authoritiesById);
         this.dayTypeById = new HierarchicalMapById<>(parent.dayTypeById);
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);
@@ -166,20 +166,37 @@ public class NetexEntityDataIndex {
         this.noticeAssignmentById = new HierarchicalMapById<>(parent.noticeAssignmentById);
         this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
         this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
-        this.passingTimeByStopPointId = new HierarchicalMultimap<>(parent.passingTimeByStopPointId);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
         this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>(parent.flexibleStopPlaceByStopPointRef);
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
         this.routeById = new HierarchicalMapById<>(parent.routeById);
-        this.serviceJourneyByPatternId = new HierarchicalMultimap<>(parent.serviceJourneyByPatternId);
+        this.serviceJourneyById = new HierarchicalMapById<>(parent.serviceJourneyById);
         this.serviceLinkById = new HierarchicalMapById<>(parent.serviceLinkById);
         this.stopPlaceById = new HierarchicalVersionMapById<>(parent.stopPlaceById);
         this.tariffZonesById = new HierarchicalMapById<>(parent.tariffZonesById);
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
 
-    public NetexImportDataIndexReadOnlyView readOnlyView() {
-        return new NetexImportDataIndexReadOnlyView() {
+
+    /**
+     * Prepare to for indexing of a new sub-level of entities(shared-files, shared-group-files and
+     * group-files). This is a life-cycle method used to notify this class that a new dataset is
+     * about to be processed. Any existing intermediate state must be saved(pushed down the stack).
+     */
+    public NetexEntityIndex push() {
+        return new NetexEntityIndex(this);
+    }
+
+    /**
+     * It is now safe to discard any intermediate state added since last call to the {@link #push()}
+     * method.
+     */
+    public NetexEntityIndex pop() {
+        return this.parent;
+    }
+
+    public NetexEntityIndexReadOnlyView readOnlyView() {
+        return new NetexEntityIndexReadOnlyView() {
 
             /**
              * Lookup a Network given a GroupOfLine id or an Network id. If the given
@@ -207,6 +224,11 @@ public class NetexEntityDataIndex {
                 return dayTypeById;
             }
 
+            /**
+             * @deprecated This should be replaced with a collection of DayTypeAssignment. The
+             *             mapper is responsible for indexing its data, except for entities by id.
+             */
+            @Deprecated
             public ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId() {
                 return dayTypeAssignmentByDayTypeId;
             }
@@ -259,10 +281,6 @@ public class NetexEntityDataIndex {
                 return operatorsById;
             }
 
-            public ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> getPassingTimeByStopPointId() {
-                return passingTimeByStopPointId;
-            }
-
             public ReadOnlyHierarchicalVersionMapById<Quay> getQuayById() {
                 return quayById;
             }
@@ -279,8 +297,8 @@ public class NetexEntityDataIndex {
                 return routeById;
             }
 
-            public ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> getServiceJourneyByPatternId() {
-                return serviceJourneyByPatternId;
+            public ReadOnlyHierarchicalMapById<ServiceJourney> getServiceJourneyById() {
+                return serviceJourneyById;
             }
 
             public ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById() {

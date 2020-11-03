@@ -30,6 +30,8 @@ class E extends EntityInVersionStructure implements Comparable<E> {
         setVersion(Integer.toString(version));
     }
 
+    public String name() { return name; }
+
     @Override public String toString() {
         return String.format("E(%s, %s)", name, getVersion());
     }

@@ -9,15 +9,19 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.NoticeRefStructure;
+import org.rutebanken.netex.model.PointInJourneyPatternRefStructure;
+import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -50,7 +54,7 @@ public class NoticeAssignmentMapperTest {
 
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
                 MappingSupport.ID_FACTORY,
-                new HierarchicalMultimap<>(),
+                List.of(),
                 new HierarchicalMapById<>(),
                 routesById,
                 new EntityById<>(),
@@ -67,18 +71,15 @@ public class NoticeAssignmentMapperTest {
 
     @Test
     public void mapNoticeAssignmentOnStopPoint() {
-        HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId =
-                new HierarchicalMultimap<>();
         HierarchicalMapById<Notice> noticesById = new HierarchicalMapById<>();
 
-
-        passingTimeByStopPointId.add(
-                STOP_POINT_ID,
-                new TimetabledPassingTime().withId(TIMETABLED_PASSING_TIME1)
-        );
-        passingTimeByStopPointId.add(
-                STOP_POINT_ID,
-                new TimetabledPassingTime().withId(TIMETABLED_PASSING_TIME2)
+        Collection<ServiceJourney> serviceJourneys = List.of(
+            new ServiceJourney().withPassingTimes(
+                new TimetabledPassingTimes_RelStructure().withTimetabledPassingTime(
+                    createTimetabledPassingTime(TIMETABLED_PASSING_TIME1, STOP_POINT_ID),
+                    createTimetabledPassingTime(TIMETABLED_PASSING_TIME2, STOP_POINT_ID)
+                )
+            )
         );
 
         Trip trip = new Trip(new FeedScopedId("T", "1"));
@@ -97,7 +98,7 @@ public class NoticeAssignmentMapperTest {
 
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
                 MappingSupport.ID_FACTORY,
-                passingTimeByStopPointId,
+                serviceJourneys,
                 noticesById,
                 new EntityById<>(),
                 new EntityById<>(),
@@ -122,5 +123,15 @@ public class NoticeAssignmentMapperTest {
         stopTime1.setStopSequence(stopSequence);
         stopTime1.setTrip(trip);
         return stopTime1;
+    }
+
+    private static TimetabledPassingTime createTimetabledPassingTime(String id, String stopPointId) {
+        return new TimetabledPassingTime()
+            .withId(id)
+            .withPointInJourneyPatternRef(
+                MappingSupport.createJaxbElement(
+                    new PointInJourneyPatternRefStructure().withRef(stopPointId)
+                )
+            );
     }
 }

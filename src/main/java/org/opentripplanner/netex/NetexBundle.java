@@ -4,12 +4,13 @@ import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.loader.GroupEntries;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
-import org.opentripplanner.netex.index.NetexEntityDataIndex;
 import org.opentripplanner.netex.loader.NetexXmlParser;
-import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
+import org.opentripplanner.netex.mapping.NetexMapper;
+import org.opentripplanner.netex.validation.Validator;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.NetexConfig;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
@@ -19,8 +20,6 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.JAXBException;
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -37,15 +36,15 @@ import java.util.List;
 public class NetexBundle implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
-    /** stack of NeTEx elements needed to link the input to existing data */
-    private final Deque<NetexEntityDataIndex> netexIndex = new LinkedList<>();
+    /** The NeTEx entities loaded from the input files and passed on to the mapper. */
+    private NetexEntityIndex index = new NetexEntityIndex();
 
     private final CompositeDataSource source;
 
     private final NetexDataSourceHierarchy hierarchy;
 
     /** maps the NeTEx XML document to OTP transit model. */
-    private NetexMapper otpMapper;
+    private NetexMapper mapper;
 
     private NetexXmlParser xmlParser;
 
@@ -75,7 +74,7 @@ public class NetexBundle implements Closeable {
 
         // init parser and mapper
         xmlParser = new NetexXmlParser();
-        otpMapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore);
+        mapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore);
 
         // Load data
         loadFileEntries();
@@ -94,10 +93,6 @@ public class NetexBundle implements Closeable {
 
     /** Load all files entries in the bundle */
     private void loadFileEntries() {
-
-        // Add a global(this zip file) shared NeTEX DAO
-        netexIndex.addFirst(new NetexEntityDataIndex());
-
         // Load global shared files
         loadFilesThenMapToOtpTransitModel("shared file", hierarchy.sharedEntries());
 
@@ -126,9 +121,11 @@ public class NetexBundle implements Closeable {
      * at the end pop of the index.
      */
     private void scopeInputData(Runnable task) {
-        netexIndex.addFirst(new NetexEntityDataIndex(index()));
+        index = index.push();
+        mapper = mapper.push();
         task.run();
-        netexIndex.removeFirst();
+        mapper = mapper.pop();
+        index = index.pop();
     }
 
     /**
@@ -142,12 +139,12 @@ public class NetexBundle implements Closeable {
             // Load entry and store it in the index
             loadSingeFileEntry(fileDescription, entry);
         }
-        // map current NeTEx objects into the OTP Transit Model
-        otpMapper.mapNetexToOtp(index().readOnlyView());
-    }
 
-    private NetexEntityDataIndex index() {
-        return netexIndex.peekFirst();
+        // Validate input data, and remove invalid data
+        Validator.validate(index);
+
+        // map current NeTEx objects into the OTP Transit Model
+        mapper.mapNetexToOtp(index.readOnlyView());
     }
 
     /** Load a single entry and store it in the index for later */
@@ -156,7 +153,7 @@ public class NetexBundle implements Closeable {
             LOG.info("reading entity {}: {}", fileDescription, entry.name());
 
             PublicationDeliveryStructure doc = xmlParser.parseXmlDoc(entry.asInputStream());
-            NetexDocumentParser.parseAndPopulateIndex(index(), doc);
+            NetexDocumentParser.parseAndPopulateIndex(index, doc);
 
         } catch (JAXBException e) {
             throw new RuntimeException(e.getMessage(), e);
