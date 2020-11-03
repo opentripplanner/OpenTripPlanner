@@ -109,16 +109,15 @@ public class RouteMatcher implements Cloneable, Serializable {
     }
 
     public boolean matches(Route route) {
-        if (this == EMPTY_MATCHER)
-            return false;
-        if (agencyAndRouteIds.contains(route.getId()))
-            return true;
-        String routeName = route.getName().replace("_", " ");
-        if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getFeedId(),
-                routeName)))
-            return true;
-        if (routeNames.contains(routeName))
-            return true;
+        if (this == EMPTY_MATCHER) { return false; }
+        if (agencyAndRouteIds.contains(route.getId())) { return true; }
+        if (route.getName() != null) {
+            String routeName = route.getName().replace("_", " ");
+            if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getFeedId(),
+                routeName
+            ))) { return true; }
+            if (routeNames.contains(routeName)) { return true; }
+        }
         return false;
     }
 
