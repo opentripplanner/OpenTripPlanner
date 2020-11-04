@@ -152,7 +152,7 @@ class DayTypeAssignmentMapper {
             List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
 
             for (PropertyOfDay p : propertyOfDays) {
-                result.addAll(DayOfWeekMapper.mapDayOfWeek(p.getDaysOfWeek()));
+                result.addAll(DayOfWeekMapper.mapDayOfWeeks(p.getDaysOfWeek()));
             }
         }
         return result;
