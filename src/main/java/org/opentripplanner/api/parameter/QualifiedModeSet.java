@@ -70,9 +70,6 @@ public class QualifiedModeSet implements Serializable {
                  case FUNICULAR:
                      transitModes.add(TransitMode.FUNICULAR);
                      break;
-                 case FLEXIBLE:
-                     transitModes.add(TransitMode.FLEXIBLE);
-                     break;
              }
         }
 
@@ -132,6 +129,21 @@ public class QualifiedModeSet implements Serializable {
                         egressMode = StreetMode.WALK;
                         directMode = StreetMode.CAR;
                     }
+                    break;
+            }
+        }
+
+        // These modes are set last in order to take precedence over other modes
+        for (QualifiedMode qMode : qModes) {
+            switch (qMode.mode) {
+                case FLEXACCESS:
+                    accessMode = StreetMode.FLEXIBLE;
+                    break;
+                case FLEXEGRESS:
+                    egressMode = StreetMode.FLEXIBLE;
+                    break;
+                case FLEXDIRECT:
+                    directMode = StreetMode.FLEXIBLE;
                     break;
             }
         }

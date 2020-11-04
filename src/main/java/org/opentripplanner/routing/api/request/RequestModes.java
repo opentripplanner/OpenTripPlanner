@@ -21,4 +21,11 @@ public class RequestModes {
     this.directMode = directMode;
     this.transitModes = transitModes;
   }
+
+  public boolean contains(StreetMode streetMode) {
+    return
+        streetMode.equals(accessMode)
+            || streetMode.equals(egressMode)
+            || streetMode.equals(directMode);
+  }
 }

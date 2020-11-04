@@ -108,6 +108,8 @@ public class EnumTypes {
         .value("car_pickup", StreetMode.CAR_PICKUP, "Walk to a pickup point along "
             + "the road, drive to a drop-off point along the road, and walk the rest of the way. "
             + "This can include various taxi-services or kiss & ride.")
+        .value("flexible", StreetMode.FLEXIBLE, "Any form of flexible or on-demand "
+            + "service.")
         .build();
 
     public static GraphQLEnumType MODE = GraphQLEnumType.newEnum()
