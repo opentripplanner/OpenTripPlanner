@@ -8,6 +8,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,8 @@ public class TripTimeShortHelper {
     /**
      * Find trip time short for the from place in transit leg, or null.
      */
-    public TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
+    @Nullable
+    public static TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
 
         ServiceDate serviceDate = leg.serviceDate;
@@ -41,7 +43,8 @@ public class TripTimeShortHelper {
     /**
      * Find trip time short for the to place in transit leg, or null.
      */
-    public TripTimeShort getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
+    @Nullable
+    public static TripTimeShort getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
 
         ServiceDate serviceDate = leg.serviceDate;
@@ -67,7 +70,7 @@ public class TripTimeShortHelper {
     /**
      * Find trip time shorts for all stops for the full trip of a leg.
      */
-    public List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
+    public static List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
 
         ServiceDate serviceDate = leg.serviceDate;
@@ -77,7 +80,7 @@ public class TripTimeShortHelper {
     /**
      * Find trip time shorts for all intermediate stops for a leg.
      */
-    public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
+    public static List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
 
         ServiceDate serviceDate = leg.serviceDate;
@@ -109,7 +112,10 @@ public class TripTimeShortHelper {
         return filteredTripTimes;
     }
 
-    private boolean matchesQuayOrSiblingQuay(FeedScopedId quayId, FeedScopedId candidate, RoutingService routingService) {
+
+    /* private methods */
+
+    private static boolean matchesQuayOrSiblingQuay(FeedScopedId quayId, FeedScopedId candidate, RoutingService routingService) {
         boolean foundMatch = quayId.equals(candidate);
         if (!foundMatch) {
             //Check parentStops
