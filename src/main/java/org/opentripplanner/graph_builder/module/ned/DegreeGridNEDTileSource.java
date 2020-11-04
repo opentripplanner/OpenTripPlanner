@@ -8,6 +8,7 @@ import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,18 +43,16 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
     public String awsBucketName;
 
-    @Override
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }
-
-    @Override
-    public void setCacheDirectory(File cacheDirectory) {
-        this.cacheDirectory = cacheDirectory;
-    }
+    private List<File> nedTiles;
 
     @Override
     public List<File> getNEDTiles() {
+        return nedTiles;
+    }
+
+    @Override public void fetchData(Graph graph, File cacheDirectory) {
+        this.graph = graph;
+        this.cacheDirectory = cacheDirectory;
 
         HashSet<P2<Integer>> tiles = new HashSet<P2<Integer>>();
 
@@ -67,9 +65,15 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         for (P2<Integer> tile : tiles) {
             int x = tile.first - 1;
             int y = tile.second + 1;
-            paths.add(getPathToTile(x, y));
+            File tilePath = getPathToTile(x, y);
+            if (tilePath != null) {
+                paths.add(tilePath);
+            }
         }
-        return paths;
+        if (paths.size() == 0) {
+            throw new RuntimeException("No elevation tiles were able to be downloaded!");
+        }
+        nedTiles = paths;
     }
 
     private String formatLatLon(int x, int y) {
@@ -97,14 +101,15 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
             path.getParentFile().mkdirs();
 
             if (awsAccessKey == null || awsSecretKey == null) {
-                throw new RuntimeException("Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set");
+                throw new RuntimeException(
+                    "Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set");
             }
             log.info("Downloading NED degree tile " + path);
             // download the file from S3.
             AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
+            String key = formatLatLon(x, y) + ".tiff";
             try {
                 S3Service s3Service = new RestS3Service(awsCredentials);
-                String key = formatLatLon(x, y) + ".tiff";
                 S3Object object = s3Service.getObject(awsBucketName, key);
 
                 InputStream istream = object.getDataInputStream();
@@ -121,15 +126,27 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
                 ostream.close();
                 istream.close();
             } catch (S3ServiceException e) {
+                // Check if the error code is a NoSuchKey code which indicates that the file was not found in the S3
+                // bucket. If this is the cause, allow execution to continue, but add an annotation about the missing
+                // file.
+                //
+                // Note: The IAM policy for the provided credentials must allow both s3:GetObject and s3:ListBucket for
+                // the target bucket. If just GetObject is provided, the S3ServiceException will instead indicate a
+                // forbidden access error.
+                if (e.getS3ErrorCode().equals("NoSuchKey")) {
+                    log.error(
+                        graph.addBuilderAnnotation(
+                            new Graphwide(
+                                String.format("Elevation tile %s missing from s3bucket. Proceeding without tile!", key)
+                            )
+                        )
+                    );
+                    return null;
+                }
+                // Some other error occurred.
                 path.deleteOnExit();
                 throw new RuntimeException(e);
-            } catch (ServiceException e) {
-                path.deleteOnExit();
-                throw new RuntimeException(e);
-            } catch (FileNotFoundException e) {
-                path.deleteOnExit();
-                throw new RuntimeException(e);
-            } catch (IOException e) {
+            } catch (ServiceException | IOException e) {
                 path.deleteOnExit();
                 throw new RuntimeException(e);
             }
