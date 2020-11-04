@@ -7,13 +7,13 @@ import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FlexStopLocationMapper {
+class FlexStopLocationMapper {
 
   private final FeedScopedIdFactory idFactory;
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexStopLocationMapper.class);
 
-  public FlexStopLocationMapper(FeedScopedIdFactory idFactory) {
+  FlexStopLocationMapper(FeedScopedIdFactory idFactory) {
     this.idFactory = idFactory;
   }
 
@@ -21,7 +21,7 @@ public class FlexStopLocationMapper {
    * Maps NeTEx FlexibleStopPlace to FlexStopLocation. This currently does not support
    * FlexLocationGroup, as an equivalent is not defined in the NeTEx Nordic profile.
    */
-  public FlexStopLocation map(FlexibleStopPlace flexibleStopPlace) {
+  FlexStopLocation map(FlexibleStopPlace flexibleStopPlace) {
     FlexStopLocation result = new FlexStopLocation(idFactory.createId(flexibleStopPlace.getId()));
     result.setName(flexibleStopPlace.getName().getValue());
 
