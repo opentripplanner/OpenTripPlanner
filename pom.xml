@@ -5,7 +5,6 @@
     <name>OpenTripPlanner</name>
     <description>The OpenTripPlanner multimodal journey planning system</description>
     <url>http://opentripplanner.org</url>
-
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
     <version>2.1.0-SNAPSHOT</version>
@@ -461,6 +460,19 @@
         </repository>
     </repositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- This make sure all google libraries are using compatible versions. -->
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>14.4.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
@@ -473,11 +485,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-storage</artifactId>
-            <version>1.113.2</version>
         </dependency>
 
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
@@ -579,13 +586,6 @@
             <version>0.5</version>
         </dependency>
 
-        <!-- Google Cloud Pubsub for SIRI-updater-->
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-pubsub</artifactId>
-            <version>1.100.0</version>
-        </dependency>
-
         <!--
             The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
             The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and
@@ -655,6 +655,29 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!--
+          Google library imports
+          The version is imported using google libraries-bom, see dep.management
+        -->
+
+        <!-- Google Cloud Storage - as OTP DataSource -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+        </dependency>
+
+        <!-- Google Cloud Pubsub for SIRI-updater-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+        </dependency>
+
+        <!-- Google Protocol Buffers compact binary serialization format -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+
         <!-- Asynchronous Websocket-capable client, for message-driven incremental GTFS-RT -->
         <!-- AsyncHttpClient Websockets need a newer version of Grizzly than Jersey does. -->
         <dependency>
@@ -691,14 +714,6 @@
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
             <version>1.0.7</version>
-        </dependency>
-        <!-- Google Protocol Buffers compact binary serialization format -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>3.11.4</version>
-            <type>jar</type>
-            <scope>compile</scope>
         </dependency>
         <!-- Joda Time is a widely used replacement for flaky Java time classes. -->
         <dependency>
