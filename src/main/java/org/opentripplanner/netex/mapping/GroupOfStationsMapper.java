@@ -7,6 +7,7 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.impl.EntityById;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.StopPlaceRefStructure;
 import org.rutebanken.netex.model.StopPlaceRefs_RelStructure;

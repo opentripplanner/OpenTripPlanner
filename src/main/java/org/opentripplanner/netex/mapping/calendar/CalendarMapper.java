@@ -3,11 +3,11 @@ package org.opentripplanner.netex.mapping.calendar;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ServiceCodeDoesNotContainServiceDates;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_ADD;
@@ -29,14 +28,14 @@ import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_T
 public class CalendarMapper {
     private final DataImportIssueStore issueStore;
 
-    private final Function<String, FeedScopedId> idFactory;
+    private final FeedScopedIdFactory idFactory;
     private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
     private final ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById;
     private final ReadOnlyHierarchicalMapById<DayType> dayTypeById;
 
 
     public CalendarMapper(
-            Function<String, FeedScopedId> idFactory,
+            FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
             ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
             ReadOnlyHierarchicalMapById<DayType> dayTypeById,
@@ -86,7 +85,7 @@ public class CalendarMapper {
             LocalDateTime date, String serviceId, Integer exceptionType
     ) {
         return new ServiceCalendarDate(
-                idFactory.apply(serviceId),
+                idFactory.createId(serviceId),
                 new ServiceDate(date.toLocalDate()),
                 exceptionType
         );

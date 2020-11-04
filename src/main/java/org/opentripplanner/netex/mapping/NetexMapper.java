@@ -17,6 +17,7 @@ import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarMapper;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.Authority;
@@ -54,10 +55,8 @@ public class NetexMapper {
     private final OtpTransitServiceBuilder transitBuilder;
     private final FeedScopedIdFactory idFactory;
     private final Deduplicator deduplicator;
-    private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
-
-
     private final DataImportIssueStore issueStore;
+    private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
 
     /**
      * This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService,
@@ -257,10 +256,11 @@ public class NetexMapper {
 
     private void mapCalendarDayTypes(NetexEntityIndexReadOnlyView netexIndex) {
         CalendarMapper calMapper = new CalendarMapper(
-                idFactory::createId,
+                idFactory,
                 netexIndex.getDayTypeAssignmentByDayTypeId(),
                 netexIndex.getOperatingPeriodById(),
-                netexIndex.getDayTypeById(), issueStore
+                netexIndex.getDayTypeById(),
+                issueStore
         );
 
         for (DayTypeRefsToServiceIdAdapter dayTypeRefs : netexIndex.getDayTypeRefs()) {

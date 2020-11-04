@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareZone;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 
 class TariffZoneMapper {
 

@@ -4,6 +4,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LineRefStructure;
