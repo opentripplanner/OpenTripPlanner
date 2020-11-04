@@ -12,7 +12,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
-import org.opentripplanner.ext.transmodelapi.model.route.JourneyWhiteListed;
+import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;

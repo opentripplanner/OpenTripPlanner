@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.transmodelapi.model.route;
+package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectType;
