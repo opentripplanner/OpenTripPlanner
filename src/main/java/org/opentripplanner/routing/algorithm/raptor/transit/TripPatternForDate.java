@@ -1,9 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid
@@ -26,10 +30,33 @@ public class TripPatternForDate {
     /** The date for which the filtering was performed. */
     private final LocalDate localDate;
 
-    public TripPatternForDate(TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate) {
+    /**
+     * The first departure time of the first trip.
+     */
+    private final LocalDateTime startOfRunningPeriod;
+
+    /**
+     * The last arrival time of the last trip.
+     */
+    private final LocalDateTime endOfRunningPeriod;
+
+    public TripPatternForDate(
+        TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate
+    ) {
         this.tripPattern = tripPattern;
         this.tripTimes = tripTimes;
         this.localDate = localDate;
+
+        // These depend on the tripTimes array being sorted
+        this.startOfRunningPeriod = DateMapper.asDateTime(
+            localDate,
+            tripTimes[0].getDepartureTime(0)
+        );
+        this.endOfRunningPeriod = DateMapper.asDateTime(
+            localDate,
+            tripTimes[tripTimes.length - 1].getArrivalTime(
+                tripTimes[tripTimes.length - 1].getNumStops() - 1)
+        );
     }
 
     public TripTimes[] tripTimes() {
@@ -54,6 +81,21 @@ public class TripPatternForDate {
 
     public int numberOfTripSchedules() {
         return tripTimes.length;
+    }
+
+    public LocalDateTime getStartOfRunningPeriod() {
+        return startOfRunningPeriod;
+    }
+
+    public LocalDateTime getEndOfRunningPeriod() {
+        return endOfRunningPeriod;
+    }
+
+    public List<LocalDate> getRunningPeriodDates() {
+        // Add one day to ensure last day is included
+        return startOfRunningPeriod.toLocalDate()
+            .datesUntil(endOfRunningPeriod.toLocalDate().plusDays(1))
+            .collect(Collectors.toList());
     }
 
     public int hashCode() {

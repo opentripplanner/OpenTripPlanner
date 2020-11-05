@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -27,5 +28,9 @@ public class DateMapper {
 
     public static int secondsSinceStartOfTime(ZonedDateTime startOfTime, Instant instant) {
         return (int) Duration.between(startOfTime.toInstant(), instant).getSeconds();
+    }
+
+    public static LocalDateTime asDateTime(LocalDate localDate, int secondsSinceStartOfDay) {
+        return localDate.atStartOfDay().plusSeconds(secondsSinceStartOfDay);
     }
 }
