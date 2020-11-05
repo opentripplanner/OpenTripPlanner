@@ -19,11 +19,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -95,21 +96,32 @@ public class FlexRouter {
 
     Set<StopLocation> egressStops = streetEgressByStop.keySet();
 
-    Collection<Itinerary> itineraries = new ArrayList<>();
+    Map<FlexTrip, Itinerary> itinerariesByTrip = new HashMap<>();
 
     for (FlexAccessTemplate template : this.flexAccessTemplates) {
       StopLocation transferStop = template.getTransferStop();
+      FlexTrip trip = template.getFlexTrip();
       if (egressStops.contains(transferStop)) {
-        for(NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
-          if (itinerary != null) {
-            itineraries.add(itinerary);
+        for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
+          Itinerary itinerary = template.createDirectItinerary(
+              egress,
+              arriveBy,
+              departureTime,
+              startOfTime
+          );
+          // Only add one the earliest itinerary per trip
+          if (itinerary != null && (
+              !itinerariesByTrip.containsKey(trip)
+                  || itinerary.startTime()
+                  .before(itinerariesByTrip.get(trip).startTime())
+          )) {
+            itinerariesByTrip.put(template.getFlexTrip(), itinerary);
           }
         }
       }
     }
 
-    return itineraries;
+    return itinerariesByTrip.values();
   }
 
   public Collection<FlexAccessEgress> createFlexAccesses() {
