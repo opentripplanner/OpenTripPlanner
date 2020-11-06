@@ -33,4 +33,15 @@ public class DateMapper {
     public static LocalDateTime asDateTime(LocalDate localDate, int secondsSinceStartOfDay) {
         return localDate.atStartOfDay().plusSeconds(secondsSinceStartOfDay);
     }
+
+    public static int secondsSinceStartOfService(
+        ZonedDateTime departureDate, ZonedDateTime dateTime, ZoneId zoneId
+    ) {
+        ZonedDateTime startOfService = asStartOfService(departureDate, zoneId);
+        return (int) Duration.between(startOfService, dateTime).toSeconds();
+    }
+
+    private static ZonedDateTime asStartOfService(ZonedDateTime dateTime, ZoneId zoneId) {
+        return asStartOfService(dateTime.withZoneSameInstant(zoneId));
+    }
 }
