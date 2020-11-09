@@ -70,12 +70,20 @@ class TripPatternMapper {
             ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, ServiceJourney> serviceJourneyById,
+            Map<String, FeedScopedId> serviceIds,
             Deduplicator deduplicator
     ) {
         this.idFactory = idFactory;
         this.routeById = routeById;
         this.otpRouteById = otpRouteById;
-        this.tripMapper = new TripMapper(idFactory, otpRouteById, routeById, journeyPatternById, shapePointsIds);
+        this.tripMapper = new TripMapper(
+            idFactory,
+            otpRouteById,
+            routeById,
+            journeyPatternById,
+            serviceIds,
+            shapePointsIds
+        );
         this.stopTimesMapper = new StopTimesMapper(
             idFactory,
             stopsById,

@@ -1,9 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
 import org.junit.Test;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
@@ -14,6 +16,7 @@ import org.rutebanken.netex.model.ServiceJourney;
 import javax.xml.bind.JAXBElement;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
@@ -22,8 +25,9 @@ import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 public class TripMapperTest {
 
     private static final String ROUTE_ID = "RUT:Route:1";
-    private static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
+    private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
     private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
+    private static final FeedScopedId SERVICE_ID = new FeedScopedId("F", "S001");
 
     private static final JAXBElement<LineRefStructure> LINE_REF = MappingSupport.createWrappedRef(
             ROUTE_ID, LineRefStructure.class
@@ -35,9 +39,13 @@ public class TripMapperTest {
         Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
         transitBuilder.getRoutes().add(route);
 
-        TripMapper tripMapper = new TripMapper(ID_FACTORY, transitBuilder.getRoutes(),
-                new HierarchicalMapById<>(),
-                new HierarchicalMapById<>(), Collections.emptySet()
+        TripMapper tripMapper = new TripMapper(
+            ID_FACTORY,
+            transitBuilder.getRoutes(),
+            new HierarchicalMapById<>(),
+            new HierarchicalMap<>(),
+            Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
+            Collections.emptySet()
         );
 
         ServiceJourney serviceJourney = createExampleServiceJourney();
@@ -77,6 +85,7 @@ public class TripMapperTest {
                 transitBuilder.getRoutes(),
                 routeById,
                 journeyPatternById,
+                Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
                 Collections.emptySet()
         );
 

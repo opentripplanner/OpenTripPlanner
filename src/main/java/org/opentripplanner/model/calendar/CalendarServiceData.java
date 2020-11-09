@@ -18,11 +18,11 @@ public class CalendarServiceData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<FeedScopedId, TimeZone> timeZonesByAgencyId = new HashMap<>();
+    private final Map<FeedScopedId, TimeZone> timeZonesByAgencyId = new HashMap<>();
 
-    private Map<FeedScopedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
+    private final Map<FeedScopedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
 
-    private Map<ServiceDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
+    private final Map<ServiceDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
 
     /**
      * @return the time zone for the specified agencyId, or null if the agency was

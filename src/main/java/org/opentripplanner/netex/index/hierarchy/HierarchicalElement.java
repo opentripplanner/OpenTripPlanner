@@ -18,6 +18,7 @@ public class HierarchicalElement<E> {
 
     private E element = null;
 
+
     /** Create a root for the hierarchy */
     public HierarchicalElement() {
         this(null);
@@ -26,6 +27,12 @@ public class HierarchicalElement<E> {
     /** Create a child of the given {@code parent}. */
     public HierarchicalElement(HierarchicalElement<E> parent) {
         this.parent = parent;
+    }
+
+
+    /** Return a reference to the parent. */
+    public HierarchicalElement<E> parent() {
+        return parent;
     }
 
     /**

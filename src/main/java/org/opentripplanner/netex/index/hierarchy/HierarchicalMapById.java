@@ -25,6 +25,12 @@ public class HierarchicalMapById<V extends EntityStructure>
         super(parent);
     }
 
+    /** Return a reference to the parent. */
+    @Override
+    public HierarchicalMapById<V> parent() {
+        return (HierarchicalMapById<V>) super.parent();
+    }
+
     /**
      * Add an entity and use its {@code id} as key to index it.
      */
