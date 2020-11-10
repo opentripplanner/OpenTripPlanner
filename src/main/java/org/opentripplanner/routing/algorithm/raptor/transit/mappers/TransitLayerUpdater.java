@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,6 +42,9 @@ public class TransitLayerUpdater {
    */
   private final Map<LocalDate, Map<TripPattern, TripPatternForDate>>
       tripPatternsStartingOnDateMapCache = new HashMap<>();
+
+  private final Map<LocalDate, Set<TripPatternForDate>>
+      tripPatternsRunningOnDateMapCache = new HashMap<>();
 
   public TransitLayerUpdater(
       Graph graph, Map<ServiceDate, TIntSet> serviceCodesRunningForDate
@@ -107,8 +110,12 @@ public class TransitLayerUpdater {
     // Now loop through all running period dates of old and new TripPatternsForDate and update
     // the tripPatternsByRunningPeriodDate accordingly
     for (LocalDate date : datesToBeUpdated) {
-      List<TripPatternForDate> patternsForDate =
-          realtimeTransitLayer.getTripPatternsRunningOnDateCopy(date);
+
+      tripPatternsRunningOnDateMapCache.computeIfAbsent(date,
+          p -> new HashSet<>(realtimeTransitLayer.getTripPatternsStartingOnDateCopy(date))
+      );
+
+      Set<TripPatternForDate> patternsForDate = tripPatternsRunningOnDateMapCache.get(date);
 
       for (Map.Entry<TripPattern, TripPatternForDate> entry : newTripPatternsForDate.entrySet()) {
         TripPattern tripPattern = entry.getKey();
@@ -130,7 +137,7 @@ public class TransitLayerUpdater {
         }
       }
 
-      realtimeTransitLayer.replaceTripPatternsForDate(date, patternsForDate);
+      realtimeTransitLayer.replaceTripPatternsForDate(date, new ArrayList<>(patternsForDate));
     }
 
     // Switch out the reference with the updated realtimeTransitLayer. This is synchronized to
