@@ -1,30 +1,10 @@
 package org.opentripplanner.ext.bikerentalservicedirectory;
 
-import org.opentripplanner.updater.bike_rental.GbfsBikeRentalDataSource;
+import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRentalDataSourceParameters;
 
-public class GbfsDataSourceParameters implements GbfsBikeRentalDataSource.Parameters {
+public class GbfsDataSourceParameters extends GbfsBikeRentalDataSourceParameters {
 
-  private final String url;
-
-  private final String name;
-
-  public GbfsDataSourceParameters(String url, String name) {
-    this.url = url;
-    this.name = name;
-  }
-
-  @Override
-  public boolean routeAsCar() {
-    return false;
-  }
-
-  @Override
-  public String getUrl() {
-    return url;
-  }
-
-  @Override
-  public String getName() {
-    return name;
+  public GbfsDataSourceParameters(String url, String network) {
+    super(url, network, false);
   }
 }

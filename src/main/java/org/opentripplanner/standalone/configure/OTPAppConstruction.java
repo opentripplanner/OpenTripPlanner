@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.configure;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
@@ -16,6 +15,7 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
 
 /**

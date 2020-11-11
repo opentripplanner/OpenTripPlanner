@@ -41,7 +41,7 @@ import java.util.List;
  *
  */
 public class MqttGtfsRealtimeUpdater implements GraphUpdater {
-    private static Logger LOG = LoggerFactory.getLogger(MqttGtfsRealtimeUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MqttGtfsRealtimeUpdater.class);
 
     private GraphUpdaterManager updaterManager;
 
@@ -57,16 +57,19 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     private final String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
 
+    private final String configRef;
+
     MemoryPersistence persistence = new MemoryPersistence();
 
     private MqttClient client;
 
-    public MqttGtfsRealtimeUpdater(Parameters parameters) {
-        url = parameters.getUrl();
-        topic = parameters.getTopic();
-        feedId = parameters.getFeedId();
-        qos = parameters.getQos();
-        fuzzyTripMatching = parameters.getFuzzyTripMatching();
+    public MqttGtfsRealtimeUpdater(MqttGtfsRealtimeUpdaterParameters parameters) {
+        this.configRef = parameters.getConfigRef();
+        this.url = parameters.getUrl();
+        this.topic = parameters.getTopic();
+        this.feedId = parameters.getFeedId();
+        this.qos = parameters.getQos();
+        this.fuzzyTripMatching = parameters.getFuzzyTripMatching();
     }
 
     @Override
@@ -75,7 +78,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) throws Exception {
+    public void setup(Graph graph) {
         // Only create a realtime data snapshot source if none exists already
         TimetableSnapshotSource snapshotSource =
             graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
@@ -114,8 +117,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public String getName() {
-        return "MqttGtfsRealtimeUpdater";
+    public String getConfigRef() {
+        return configRef;
     }
 
     private class Callback implements MqttCallbackExtended {
@@ -135,7 +138,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         }
 
         @Override
-        public void messageArrived(String topic, MqttMessage message) throws Exception {
+        public void messageArrived(String topic, MqttMessage message) {
             List<GtfsRealtime.TripUpdate> updates = null;
             boolean fullDataset = true;
             try {
@@ -174,13 +177,5 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {}
-    }
-
-    public interface Parameters {
-        String getUrl();
-        String getTopic();
-        String getFeedId();
-        int getQos();
-        boolean getFuzzyTripMatching();
     }
 }

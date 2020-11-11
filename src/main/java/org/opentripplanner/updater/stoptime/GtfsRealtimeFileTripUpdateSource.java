@@ -1,18 +1,17 @@
 package org.opentripplanner.updater.stoptime;
 
+import com.google.transit.realtime.GtfsRealtime;
+import com.google.transit.realtime.GtfsRealtime.FeedEntity;
+import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.transit.realtime.GtfsRealtime;
-import com.google.transit.realtime.GtfsRealtime.FeedEntity;
-import com.google.transit.realtime.GtfsRealtime.FeedMessage;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 /** Reads the GTFS-RT from a local file. */
 public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
@@ -32,7 +31,7 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
      */
     private final String feedId;
 
-    public GtfsRealtimeFileTripUpdateSource(GtfsRealtimeFileTripUpdateSourceParameters config) {
+    public GtfsRealtimeFileTripUpdateSource(Parameters config) {
         this.feedId = getFeedId();
         this.file = new File(config.getFile());
     }
@@ -45,23 +44,24 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
         fullDataset = true;
         try {
             InputStream is = new FileInputStream(file);
-            if (is != null) {
-                // Decode message
-                feedMessage = FeedMessage.PARSER.parseFrom(is);
-                feedEntityList = feedMessage.getEntityList();
-                
-                // Change fullDataset value if this is an incremental update
-                if (feedMessage.hasHeader()
-                        && feedMessage.getHeader().hasIncrementality()
-                        && feedMessage.getHeader().getIncrementality()
-                                .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)) {
-                    fullDataset = false;
-                }
-                
-                // Create List of TripUpdates
-                updates = new ArrayList<TripUpdate>(feedEntityList.size());
-                for (FeedEntity feedEntity : feedEntityList) {
-                    if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
+
+            // Decode message
+            feedMessage = FeedMessage.PARSER.parseFrom(is);
+            feedEntityList = feedMessage.getEntityList();
+
+            // Change fullDataset value if this is an incremental update
+            if (feedMessage.hasHeader()
+                    && feedMessage.getHeader().hasIncrementality()
+                    && feedMessage.getHeader().getIncrementality()
+                            .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)) {
+                fullDataset = false;
+            }
+
+            // Create List of TripUpdates
+            updates = new ArrayList<TripUpdate>(feedEntityList.size());
+            for (FeedEntity feedEntity : feedEntityList) {
+                if (feedEntity.hasTripUpdate()) {
+                    updates.add(feedEntity.getTripUpdate());
                 }
             }
         } catch (Exception e) {
@@ -84,8 +84,8 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
         return this.feedId;
     }
 
-    public interface GtfsRealtimeFileTripUpdateSourceParameters
-        extends PollingStoptimeUpdater.Parameters {
+    public interface Parameters {
+        String getFeedId();
         String getFile();
     }
 }

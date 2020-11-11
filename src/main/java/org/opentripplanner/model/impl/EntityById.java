@@ -1,10 +1,9 @@
 package org.opentripplanner.model.impl;
 
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitEntity;
 
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -14,12 +13,11 @@ import java.util.stream.Collectors;
  * The purpose of this class is to provide a map from id to the corresponding entity.
  * It is simply an index of entities.
  *
- * @param <I> the entity id type
  * @param <E> the entity type
  */
-public class EntityById<I extends Serializable, E extends TransitEntity<I>> {
+public class EntityById<E extends TransitEntity> {
 
-    private final Map<I, E> map = new HashMap<>();
+    private final Map<FeedScopedId, E> map = new HashMap<>();
 
     public void add(E entity) {
         map.put(entity.getId(), entity);
@@ -39,7 +37,7 @@ public class EntityById<I extends Serializable, E extends TransitEntity<I>> {
      * @return the value to which the specified key is mapped, or
      *         {@code null} if this map contains no mapping for the key
      */
-    public E get(I id) {
+    public E get(FeedScopedId id) {
         return map.get(id);
     }
 
@@ -50,7 +48,7 @@ public class EntityById<I extends Serializable, E extends TransitEntity<I>> {
         return map.size();
     }
 
-    public boolean containsKey(I id) {
+    public boolean containsKey(FeedScopedId id) {
         return map.containsKey(id);
     }
 
@@ -81,8 +79,8 @@ public class EntityById<I extends Serializable, E extends TransitEntity<I>> {
      * <p>
      * The returned map is immutable.
      */
-    Map<I, E> asImmutableMap() {
-        return Collections.unmodifiableMap(new HashMap<>(map));
+    Map<FeedScopedId, E> asImmutableMap() {
+        return Map.copyOf(map);
     }
 
 }

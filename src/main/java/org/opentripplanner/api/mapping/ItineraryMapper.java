@@ -31,6 +31,7 @@ public class ItineraryMapper {
         api.transitTime = domain.transitTimeSeconds;
         api.waitingTime = domain.waitingTimeSeconds;
         api.walkDistance = domain.nonTransitDistanceMeters;
+        api.generalizedCost = domain.generalizedCost;
         api.walkLimitExceeded = domain.nonTransitLimitExceeded;
         api.elevationLost = domain.elevationLost;
         api.elevationGained = domain.elevationGained;

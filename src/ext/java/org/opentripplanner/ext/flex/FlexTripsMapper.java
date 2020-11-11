@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import org.opentripplanner.ext.flex.trip.ContinuousPickupDropOffTrip;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
@@ -17,7 +18,8 @@ public class FlexTripsMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripsMapper.class);
 
-  static public void createFlexTrips(OtpTransitServiceBuilder builder) {
+  static public List<FlexTrip<?>> createFlexTrips(OtpTransitServiceBuilder builder) {
+    List<FlexTrip<?>> result = new ArrayList<>();
     TripStopTimes stopTimesByTrip = builder.getStopTimesSortedByTrip();
 
     final int tripSize = stopTimesByTrip.size();
@@ -32,18 +34,20 @@ public class FlexTripsMapper {
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
-        builder.getFlexTripsById().add(new UnscheduledTrip(trip, stopTimes));
+        result.add(new UnscheduledTrip(trip, stopTimes));
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
-        builder.getFlexTripsById().add(new ScheduledDeviatedTrip(trip, stopTimes));
+        result.add(new ScheduledDeviatedTrip(trip, stopTimes));
       } else if (ContinuousPickupDropOffTrip.hasContinuousStops(stopTimes)) {
-        builder.getFlexTripsById().add(new ContinuousPickupDropOffTrip(trip, stopTimes));
+        result.add(new ContinuousPickupDropOffTrip(trip, stopTimes));
       }
 
       //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+      //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
-    LOG.info("Done creating flex trips. Created a total of {} trips.", builder.getFlexTripsById().size());
+    LOG.info("Done creating flex trips. Created a total of {} trips.", result.size());
+    return result;
   }
 
 }

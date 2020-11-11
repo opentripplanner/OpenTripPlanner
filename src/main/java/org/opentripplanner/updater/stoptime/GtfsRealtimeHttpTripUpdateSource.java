@@ -30,8 +30,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
 
     private final String url;
 
-    public GtfsRealtimeHttpTripUpdateSource(
-        PollingStoptimeUpdater.Parameters config) {
+    public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
         this.feedId = config.getFeedId();
         this.url = config.getUrl();
     }
@@ -84,5 +83,11 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     @Override
     public String getFeedId() {
         return this.feedId;
+    }
+
+
+    interface Parameters {
+        String getFeedId();
+        String getUrl();
     }
 }

@@ -2,11 +2,11 @@ package org.opentripplanner.datastore;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.net.URI;
@@ -215,7 +215,8 @@ public class OtpDataStore {
         }
         return result;
     }
-   
+
+    @Nullable
     private <T> T findSourceUsingAllRepos(Function<DataSourceRepository, T> repoFindSource) {
         for (DataSourceRepository it : allRepositories) {
             T res = repoFindSource.apply(it);

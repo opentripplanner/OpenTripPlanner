@@ -29,9 +29,8 @@ public class LocationMapper {
   }
 
   private FlexStopLocation doMap(org.onebusaway.gtfs.model.Location gtfsLocation) {
-    FlexStopLocation otpLocation = new FlexStopLocation();
+    FlexStopLocation otpLocation = new FlexStopLocation(mapAgencyAndId(gtfsLocation.getId()));
 
-    otpLocation.setId(mapAgencyAndId(gtfsLocation.getId()));
     otpLocation.setName(gtfsLocation.getName());
     try {
       otpLocation.setGeometry(GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry()));

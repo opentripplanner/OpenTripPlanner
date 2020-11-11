@@ -26,9 +26,44 @@ OTP is configured via three configuration JSON files which are read from the dir
 
 Options and parameters that are taken into account during the graph building process will be "baked into" the graph, and cannot be changed later in a running server. These are specified in `build-config.json`. Other details of OTP operation can be modified without rebuilding the graph. These run-time configuration options are found in `router-config.json`. Finally, `otp-config.json` contains simple switches that enable or disable system-wide features. 
 
+## Configuration types
+
+The OTP configuration files use the JSON file format. OTP allows comments and unquoted field names 
+in the JSON configuration files to be more human-friendly. OTP supports all the basic JSON types: 
+nested objects `{...}`, arrays `[]`, numbers `789.0` and boolean `true` | `false`. In addition to 
+these basic types some configuration parameters are parsed with some restrictions. In the 
+documentation below we will refer to the following types:
+
+Type | Description | Examples
+-----|-------------|---------
+boolean | This is the Boolean JSON type. | `true` or `false`
+number | This is the Number JSON type. | `1`, `5`, `3.14` 
+string | A quoted string. This is the String JSON type. | `"This is a string!"`
+_Type_[] | Array of of given Type. This is the Array JSON type. | `[ 1, 2, 3 ]` 
+double | A decimal floating point _number_. 64 bit.| `3.14`
+integer | A decimal integer _number_. 32 bit. | `1`, `-7`, `2100200300`
+long | A decimal integer _number_. 64 bit. | `-1234567890123456789`
+enum | A fixed set of string literals. | BicycleOptimize: `"QUICK"`, `"SAFE"` ...
+enum-map | List of key/value pairs, where the key is a enum and the value can be any given type. | `{ RAIL: 1.2, BUS: 2.3 }` 
+enum-set | List of enum string values | `[ "RAIL", "TRAM" ]`
+locale | _`Language[\_country[\_variant]]`_. A Locale object represents a specific geographical, political, or cultural region. For more information see the [Java 11 Locale](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html). | `en_US`, `nn_NO`
+date | Local date. The format is _YYYY-MM-DD_ (ISO-8601). | `2020-09-21`
+date or period | A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number. | `P1Y` is one year from now, `-P3M2D` means 3 months and 2 days ago, and `P1D` means tomorrow.
+regexp pattern | A regular expression pattern used to match a sting. | `"$^"` matches an empty string. `"gtfs"` matches `"A-*gtfs*-file.zip"`. `"$\w{3})-.*\.xml^"` matches a filename with 3 alpha-numeric characters in the beginning of the filename and _.xml_ as file extension.   
+uri | An URI path to a resource like a file or a URL. | `"gs://bucket/path/a.obj"` `"http://foo.bar/"` `"file:///Users/x/local/file"
+linear function | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x` | `"600 + 2.0 x"`
+
+
 # System-wide Configuration
 
-Using the file `otp-config.json` you can enable or disable different APIs and experimental [Sandbox Extensions](SandboxExtension.md). By default, all supported APIs are enabled and all sandbox features are disabled, so for most OTP2 use cases it is not necessary to create this file. Features that can be toggled in this file are generally only affect the routing phase of OTP2 usage, but for consistency all such "feature flags", even those that would affect graph building, are managed in this one file. See the OTPFeature Java class for an enumeration of all available features and their default settings. Here is an example:
+Using the file `otp-config.json` you can enable or disable different APIs and experimental
+[Sandbox Extensions](SandboxExtension.md). By default, all supported APIs are enabled and all 
+sandbox features are disabled. So for most OTP2 use cases it is not necessary to create this file.
+Features that can be toggled in this file are generally only affect the routing phase of OTP2
+usage, but for consistency all such "feature flags", even those that would affect graph building,
+are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/util/OTPFeature.java) 
+Java class for an enumeration of all available features and their default settings. Here is an 
+example:
 
 ```JSON
 // otp-config.json
@@ -78,12 +113,12 @@ config key | description | value type | value default | notes
 `storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
 `subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
 `transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
-`transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | Date or Period (ISO 8601) | `-P1Y` | `2020-01-01`, `-P1M3D`, `-P3W`
-`transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | Date or Period (ISO 8601) | `P3Y` | `2022-12-31`, `P1Y6M10D`, `P12W`
+`transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | date or period | &minus;P1Y | _2020&#8209;01&#8209;01, &minus;P1M3D, &minus;P3W_
+`transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
 `useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 
-This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
+This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
 
 
 ## Storage
@@ -94,19 +129,19 @@ based storage as well as using local disk. If you run OTP in the cloud you might
 and build times if you use the cloud storage instead of copying the files, it also simplefy the 
 deplyment. Nested `storage` build-config. 
 
-See (StorageConfig.java)[https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java] 
+See (StorageConfig.java)[https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java] 
 for up-to-date detailed description of each config parameter. Here is an overview:
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
 `gsCredentials` | Use an environment variable to point to the Google Cloud credentials: `"${MY_GOC_SERVICE}"`. | string | `null`
-`graph` | Absolute path to the graph file. | URI | `null`
-`streetGraph` | Absolute path to the street-graph file. | URI | `null`
-`osm` | List of absolute paths of Open Street Map files to build. | URI array | `null`
-`dem` | List of absolute paths of Elevation DEM files to build. | URI array | `null`
-`gtfs` | List of GTFS transit data files to build. | URI array | `null`
-`netex` | List of NeTEx transit data files to build. | URI array | `null`
-`buildReportDir` | Path to directory for the build issue report generated by OTP. | URI | `null`
+`graph` | Absolute path to the graph file. | uri | `null`
+`streetGraph` | Absolute path to the street-graph file. | uri | `null`
+`osm` | List of absolute paths of Open Street Map files to build. | uri [] | `null`
+`dem` | List of absolute paths of Elevation DEM files to build. | uri [] | `null`
+`gtfs` | List of GTFS transit data files to build. | uri [] | `null`
+`netex` | List of NeTEx transit data files to build. | uri [] | `null`
+`buildReportDir` | Path to directory for the build issue report generated by OTP. | uri | `null`
 `localFileNamePatterns` | Patterns to use for auto resolving local filenames to input data types. | object | `null`
 
 ### Local Filename Patterns
@@ -114,10 +149,10 @@ Nested inside `storage : { localFileNamePatterns : { ... } }` in `build-config.j
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
-`osm` | Pattern used to match Open Street Map files on local disk | Regexp Pattern | `(?i)(\.pbf)`|\.osm|\.osm\.xml)$` 
-`dem` | Pattern used to match Elevation DEM files on local disk | Regexp Pattern | `(?i)\.tiff?$` 
-`gtfs` | Pattern used to match GTFS files on local disk | Regexp Pattern | `(?i)gtfs` 
-`netex` | Pattern used to match NeTEx files on local disk | Regexp Pattern | `(?i)netex` 
+`osm` | Pattern used to match Open Street Map files on local disk | regexp pattern | `(?i)(\.pbf)`|\.osm|\.osm\.xml)$` 
+`dem` | Pattern used to match Elevation DEM files on local disk | regexp pattern | `(?i)\.tiff?$` 
+`gtfs` | Pattern used to match GTFS files on local disk | regexp pattern | `(?i)gtfs` 
+`netex` | Pattern used to match NeTEx files on local disk | regexp pattern | `(?i)netex` 
 
 ### Storage example:
 ```
@@ -236,7 +271,12 @@ You can configure it as follows in `build-config.json`:
 
 With some elevation data, the elevation values are specified as relative to the a geoid (irregular estimate of mean sea level). See [issue #2301](https://github.com/opentripplanner/OpenTripPlanner/issues/2301) for detailed discussion of this. In these cases, it is necessary to also add this geoid value onto the elevation value to get the correct result. OTP can automatically calculate these values in one of two ways. 
 
-The first way is to use the geoid difference value that is calculated once at the center of the graph. This value is returned in each trip plan response in the [ElevationMetadata](http://dev.opentripplanner.org/apidoc/1.4.0/json_ElevationMetadata.html) field. Using a single value can be sufficient for smaller OTP deployments, but might result in incorrect values at the edges of larger OTP deployments. If your OTP instance uses this, it is recommended to set a default request value in the `router-config.json` file as follows:
+The first way is to use the geoid difference value that is calculated once at the center of the 
+graph. This value is returned in each trip plan response in the 
+[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field. 
+Using a single value can be sufficient for smaller OTP deployments, but might result in incorrect 
+values at the edges of larger OTP deployments. If your OTP instance uses this, it is recommended 
+to set a default request value in the `router-config.json` file as follows:
 
 ```JSON
 // router-config.json
@@ -459,8 +499,7 @@ There are many trip planning options used in the OTP web API, and more exist
 internally that are not exposed via the API. You may want to change the default value for some of these parameters,
 i.e. the value which will be applied unless it is overridden in a web API request.
 
-A full list of them can be found in the RoutingRequest class
-[in the Javadoc](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/routing/core/RoutingRequest.html).
+A full list of them can be found in the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java).
 Any public field or setter method in this class can be given a default value using the routingDefaults section of
 `router-config.json` as follows:
 
@@ -484,7 +523,7 @@ config key | description | value type | value default
 `debugItineraryFilter` | Enable this to attach a system notice to itineraries instead of removing them. Some filters are not configurable, byt will show up in the system-notice if debugging is enabled. | boolean | `false`
 `groupBySimilarityKeepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
 `groupBySimilarityKeepNumOfItineraries` | Reduce the number of itineraries to the requested number by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
-`transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be 1 hour plus 2 times the best cost use: `3600 + 2.0 x`. To set an absolute value(3000) use: `3000 + 0x`  | `DoubleFunction` | `null`
+`transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be 1 hour plus 2 times the best cost use: `3600 + 2.0 x`. To set an absolute value(3000) use: `3000 + 0x`  | linear function | `null`
 
 
 ### Group-by-filters
@@ -507,81 +546,6 @@ trip. The `groupBySimilarityKeepOne` filter will keep ONE itinerary in each grou
 to 2, returning between 4 and 6 elements depending on the distribution. The _max-limit_ can never 
 be less than 1.
 
-
-## Routing modes
-
-TODO OTP2 - This need to be updated. Why is this even here, does it make sence to configure this and is it possible?
-          - Is this API documentation? Move to proper place.
-
-The routing request parameter `mode` determines which transport modalities should be considered when calculating the list
-of routes.
-
-Some modes (mostly bicycle and car) also have optional qualifiers `RENT` and `PARK` to specify if vehicles are to be parked at a station or rented. In theory
-this can also apply to other modes but makes sense only in select cases which are listed below.
-
-Whether a transport mode is available highly depends on the input feeds (GTFS, OSM, bike sharing feeds) and the graph building options supplied to OTP.
-
-The complete list of modes are:
-
-- `WALK`: Walking some or all of the route.
-
-- `TRANSIT`: General catch-all for all public transport modes.
-
-- `BICYCLE`: Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
-
-- `BICYCLE_RENT`: Taking a rented, shared-mobility bike for part or the entirety of the route.  
-
-    _Prerequisite:_ Vehicle positions need to be added to OTP either as static stations or dynamic data feeds. 
-
-    For dynamic bike positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
-
-    For static stations check the graph building documentation for the property `staticBikeRental`.
-
-- `BICYCLE_PARK`: Leaving the bicycle at the departure station and walking from the arrival station to the destination.
-
-    This mode needs to be combined with at least one transit mode (or `TRANSIT`) otherwise it behaves like an ordinary bicycle journey.
-
-    _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
-
-- `CAR`: Driving your own car the entirety of the route. 
-
-    If this is combined with `TRANSIT` it will return routes with a 
-    [Kiss & Ride](https://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride_/_kiss_and_fly) component. This means that the car is not parked in a permanent
-    parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off
-    location.
-
-- `CAR_PARK`: Driving a car to the park-and-ride facilities near a station and taking public transport.
-
-    This mode needs to be combined with at least one transit mode (or `TRANSIT`) otherwise it behaves like an ordinary car journey.
-
-    _Prerequisite:_ Park-and-ride areas near the station need to be present in the OSM input file.
-
-
-The following modes are 1-to-1 mappings from the [GTFS `route_type`](https://developers.google.com/transit/gtfs/reference/#routestxt):
-
-- `TRAM`: Tram, streetcar, or light rail. Used for any light rail or street-level system within a metropolitan area.
-
-- `SUBWAY`: Subway or metro. Used for any underground rail system within a metropolitan area.
-
-- `RAIL`: Used for intercity or long-distance travel.
-
-- `BUS`: Used for short- and long-distance bus routes.
-
-- `FERRY`: Ferry. Used for short- and long-distance boat service.
-
-- `CABLE_CAR`: Cable car. Used for street-level cable cars where the cable runs beneath the car.
-
-- `GONDOLA`: Gondola or suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.
-
-- `FUNICULAR`: Funicular. Used for any rail system that moves on steep inclines with a cable traction system.
-
-Lastly, this mode is part of the [Extended GTFS route types](https://developers.google.com/transit/gtfs/reference/extended-route-types):
-
-- `AIRPLANE`: Taking an airplane.
-
-Note that there are conceptual overlaps between `TRAM`, `SUBWAY` and `RAIL` and some transport providers categorize their routes differently to others.
-In other words, what is considered a `SUBWAY` in one city might be of type `RAIL` in another. Study your input GTFS feed carefully to 
-find out the appropriate mapping in your region.
 
 ### Drive-to-transit routing defaults
 
@@ -671,7 +635,7 @@ config key | description | value type | value default
 `iterationDepartureStepInSeconds` | Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds. | int | `60`
 `searchThreadPoolSize` | Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread. | int | `0`
 `dynamicSearchWindow` | The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics. | object | `null`
-`stopTransferCost` | Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | object | `null`
+`stopTransferCost` | Use this to set a stop transfer cost for the given [TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/model/TransferPriority.java). The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | enum map | `null`
 
 ### Tuning transit routing - Dynamic search window
 Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.json`.
@@ -904,4 +868,4 @@ To configure and url for the [BikeRentalServiceDirectory](sandbox/BikeRentalServ
 
 # Configure using command-line arguments
 
-Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/standalone/CommandLineParameters.html).
+Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java).

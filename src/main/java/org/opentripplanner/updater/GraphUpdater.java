@@ -49,5 +49,9 @@ public interface GraphUpdater {
         return true;
     }
 
-    String getName();
+    /**
+     * This is the updater "type" used in the configuration file. It should ONLY be used
+     * to provide human friendly messages while logging and debugging.
+     */
+    String getConfigRef();
 }

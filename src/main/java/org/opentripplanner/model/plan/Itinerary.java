@@ -68,8 +68,10 @@ public class Itinerary {
      * If a generalized cost is used in the routing algorithm, this should be the total
      * cost computed by the algorithm. This is relevant for anyone who want to debug an search
      * and tuning the system. The unit should be equivalent to the cost of "one second of transit".
+     * <p>
+     * -1 indicate that the cost is not set/computed.
      */
-    public int generalizedCost = 0;
+    public int generalizedCost = -1;
 
     /**
      * This itinerary has a greater slope than the user requested (but there are no possible

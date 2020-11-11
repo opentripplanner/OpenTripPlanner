@@ -4,7 +4,6 @@ import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
@@ -18,11 +17,12 @@ import java.util.stream.Stream;
  * subclasses encapsulates the different business logic, which the different types of services
  * adhere to.
  */
-public abstract class FlexTrip<T> extends TransitEntity<FeedScopedId> {
+public abstract class FlexTrip<T> extends TransitEntity {
 
   protected final Trip trip;
 
   public FlexTrip(Trip trip) {
+    super(trip.getId());
     this.trip = trip;
   }
 
@@ -39,11 +39,6 @@ public abstract class FlexTrip<T> extends TransitEntity<FeedScopedId> {
   public abstract int latestArrivalTime(int arrivalTime, T fromStopIndex, T toStopIndex, int flexTime);
 
   public abstract Collection<StopLocation> getStops();
-
-  @Override
-  public FeedScopedId getId() {
-    return trip.getId();
-  }
 
   public Trip getTrip() {
     return trip;

@@ -47,4 +47,5 @@ pages:
     - SIRI Updater: 'sandbox/SiriUpdator.md'
     - Bike Rental Service Directory API support: 'sandbox/BikeRentalServiceDirectory.md'
     - Mapbox Vector Tiles API: 'sandbox/MapboxVectorTilesApi.md'
+    - Mapbox Vector Tiles API: 'sandbox/InteractiveOtpMain.md'
     - Sandbox Extension Example: 'sandbox/Examples.md'

@@ -35,7 +35,7 @@ public interface OtpTransitService {
      * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
      * any type (Serializable).
      */
-    Multimap<TransitEntity<?>, Notice> getNoticeAssignments();
+    Multimap<TransitEntity, Notice> getNoticeAssignments();
 
     Collection<Pathway> getAllPathways();
 

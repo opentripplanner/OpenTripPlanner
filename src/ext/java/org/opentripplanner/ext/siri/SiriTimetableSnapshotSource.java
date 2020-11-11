@@ -86,10 +86,18 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      */
     private final ReentrantLock bufferLock = new ReentrantLock(true);
 
+
+    /**
+     * Use a id generator to generate TripPattern ids for new TripPatterns created by RealTime
+     * updates.
+     */
+    private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
+
     /**
      * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
      */
-    private final SiriTripPatternCache tripPatternCache = new SiriTripPatternCache();
+    private final SiriTripPatternCache tripPatternCache = new SiriTripPatternCache(tripPatternIdGenerator);
+
 
     /** Should expired realtime data be purged from the graph. */
     public boolean purgeExpiredData = true;
@@ -432,7 +440,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 //        String groupOfLines = estimatedVehicleJourney.getGroupOfLinesRef().getValue();
 
 //        Preconditions.checkNotNull(estimatedVehicleJourney.getExternalLineRef(), "ExternalLineRef is required");
-        String externalLineRef = estimatedVehicleJourney.getExternalLineRef().getValue();
+        String externalLineRef;
+        if (estimatedVehicleJourney.getExternalLineRef() != null) {
+            externalLineRef = estimatedVehicleJourney.getExternalLineRef().getValue();
+        } else {
+            externalLineRef = lineRef;
+        }
 
         // TODO - SIRI: Where is the Operator?
 //        Operator operator = graphIndex.operatorForId.get(new FeedScopedId(feedId, operatorRef));
@@ -450,8 +463,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         Route route = graph.index.getRouteForId(routeId);
 
         if (route == null) { // Route is unknown - create new
-            route = new Route();
-            route.setId(routeId);
+            route = new Route(routeId);
             route.setType(getRouteType(estimatedVehicleJourney.getVehicleModes()));
 //            route.setOperator(operator);
 
@@ -471,8 +483,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             graph.index.addRoutes(route);
         }
 
-        Trip trip = new Trip();
-        trip.setId(tripId);
+        Trip trip = new Trip(tripId);
         trip.setRoute(route);
 
         // TODO - SIRI: Set transport-submode based on replaced- and replacement-route
@@ -560,7 +571,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
         StopPattern stopPattern = new StopPattern(aimedStopTimes);
-        TripPattern pattern = new TripPattern(trip.getRoute(), stopPattern);
+
+        var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
+
+        TripPattern pattern = new TripPattern(id, trip.getRoute(), stopPattern);
 
         TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, graph.deduplicator);
 

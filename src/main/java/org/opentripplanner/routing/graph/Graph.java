@@ -113,21 +113,21 @@ public class Graph implements Serializable {
      * retrieved by the API when navigating from that object. The map key is entity id:
      * {@link TransitEntity#getId()}. The notice is part of the static transit data.
      */
-    private final Multimap<TransitEntity<?>, Notice> noticesByElement = HashMultimap.create();
+    private final Multimap<TransitEntity, Notice> noticesByElement = HashMultimap.create();
 
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
 
     private long transitServiceEnds = 0;
 
-    private Map<Class<?>, Serializable> services = new HashMap<>();
+    private final Map<Class<?>, Serializable> services = new HashMap<>();
 
-    private TransferTable transferTable = new TransferTable();
+    private final TransferTable transferTable = new TransferTable();
 
     private GraphBundle bundle;
 
     /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
-    private Map<String, Vertex> vertices = new ConcurrentHashMap<>();
+    private final Map<String, Vertex> vertices = new ConcurrentHashMap<>();
 
     private transient CalendarService calendarService;
 
@@ -145,13 +145,13 @@ public class Graph implements Serializable {
 
     private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
 
-    private Collection<Agency> agencies = new ArrayList<>();
+    private final Collection<Agency> agencies = new ArrayList<>();
 
-    private Collection<Operator> operators = new ArrayList<>();
+    private final Collection<Operator> operators = new ArrayList<>();
 
-    private Collection<String> feedIds = new HashSet<>();
+    private final Collection<String> feedIds = new HashSet<>();
 
-    private Map<String, FeedInfo> feedInfoForId = new HashMap<>();
+    private final Map<String, FeedInfo> feedInfoForId = new HashMap<>();
 
     private transient TimeZone timeZone = null;
 
@@ -168,7 +168,7 @@ public class Graph implements Serializable {
     public Preferences preferences = null;
 
     /** List of transit modes that are availible in GTFS data used in this graph**/
-    private HashSet<TransitMode> transitModes = new HashSet<>();
+    private final HashSet<TransitMode> transitModes = new HashSet<>();
 
     public boolean hasBikeSharing = false;
 
@@ -257,7 +257,7 @@ public class Graph implements Serializable {
     private transient TransitLayer transitLayer;
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
-    private transient ConcurrentPublished<TransitLayer> realtimeTransitLayer =
+    private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer =
         new ConcurrentPublished<>();
 
     public transient TransitLayerUpdater transitLayerUpdater;
@@ -366,7 +366,6 @@ public class Graph implements Serializable {
 
     /**
      * Get all the vertices in the graph.
-     * @return
      */
     public Collection<Vertex> getVertices() {
         return this.vertices.values();
@@ -386,8 +385,6 @@ public class Graph implements Serializable {
     /**
      * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
      * {@link Edge}. This method is not thread-safe.
-     * @param edge
-     * @param turnRestriction
      */
     public void addTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
         if (edge == null || turnRestriction == null) return;
@@ -402,8 +399,6 @@ public class Graph implements Serializable {
     /**
      * Remove a {@link TurnRestriction} from the {@link TurnRestriction} {@link List} belonging to
      * an {@link Edge}. This method is not thread-safe.
-     * @param edge
-     * @param turnRestriction
      */
     public void removeTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
         if (edge == null || turnRestriction == null) return;
@@ -421,7 +416,6 @@ public class Graph implements Serializable {
      * Get the {@link TurnRestriction} {@link List} that belongs to an {@link Edge} and return an
      * immutable copy. This method is thread-safe when used by itself, but not if addTurnRestriction
      * or removeTurnRestriction is called concurrently.
-     * @param edge
      * @return The {@link TurnRestriction} {@link List} that belongs to the {@link Edge}
      */
     public List<TurnRestriction> getTurnRestrictions(Edge edge) {
@@ -436,7 +430,6 @@ public class Graph implements Serializable {
 
     /**
      * Return only the StreetEdges in the graph.
-     * @return
      */
     public Collection<StreetEdge> getStreetEdges() {
         Collection<Edge> allEdges = this.getEdges();
@@ -542,8 +535,8 @@ public class Graph implements Serializable {
     ) {
         long now = new Date().getTime() / 1000;
         final long SEC_IN_DAY = 24 * 60 * 60;
-        HashSet<String> agenciesWithFutureDates = new HashSet<String>();
-        HashSet<String> agencies = new HashSet<String>();
+        HashSet<String> agenciesWithFutureDates = new HashSet<>();
+        HashSet<String> agencies = new HashSet<>();
         for (FeedScopedId sid : data.getServiceIds()) {
             agencies.add(sid.getFeedId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
@@ -603,7 +596,6 @@ public class Graph implements Serializable {
 
     /**
      * Adds mode of transport to transit modes in graph
-     * @param mode
      */
     public void addTransitMode(TransitMode mode) {
         transitModes.add(mode);
@@ -678,7 +670,7 @@ public class Graph implements Serializable {
 
     public int removeEdgelessVertices() {
         int removed = 0;
-        List<Vertex> toRemove = new LinkedList<Vertex>();
+        List<Vertex> toRemove = new LinkedList<>();
         for (Vertex v : this.getVertices())
             if (v.getDegreeOut() + v.getDegreeIn() == 0)
                 toRemove.add(v);
@@ -709,18 +701,20 @@ public class Graph implements Serializable {
     }
 
     public void addFeedInfo(FeedInfo info) {
-        this.feedInfoForId.put(info.getId().toString(), info);
+        this.feedInfoForId.put(info.getId(), info);
     }
 
     /**
-     * Returns the time zone for the first agency in this graph. This is used to interpret times in API requests. The JVM default time zone cannot be
-     * used because we support multiple graphs on one server via the routerId. Ideally we would want to interpret times in the time zone of the
-     * geographic location where the origin/destination vertex or board/alight event is located. This may become necessary when we start making graphs
-     * with long distance train, boat, or air services.
+     * Returns the time zone for the first agency in this graph. This is used to interpret times in
+     * API requests. The JVM default time zone cannot be used because we support multiple graphs on
+     * one server via the routerId. Ideally we would want to interpret times in the time zone of
+     * the geographic location where the origin/destination vertex or board/alight event is
+     * located. This may become necessary when we start making graphs with long distance train,
+     * boat, or air services.
      */
     public TimeZone getTimeZone() {
         if (timeZone == null) {
-            if (agencies == null || agencies.size() == 0) {
+            if (agencies.size() == 0) {
                 timeZone = TimeZone.getTimeZone("GMT");
                 LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
             } else {
@@ -846,11 +840,11 @@ public class Graph implements Serializable {
         return transitServiceEnds;
     }
 
-    public Multimap<TransitEntity<?>, Notice> getNoticesByElement() {
+    public Multimap<TransitEntity, Notice> getNoticesByElement() {
         return noticesByElement;
     }
 
-    public void addNoticeAssignments(Multimap<TransitEntity<?>, Notice> noticesByElement) {
+    public void addNoticeAssignments(Multimap<TransitEntity, Notice> noticesByElement) {
         this.noticesByElement.putAll(noticesByElement);
     }
 
@@ -928,7 +922,7 @@ public class Graph implements Serializable {
         return getService(BikeRentalStationService.class);
     }
 
-    public Collection<Notice> getNoticesByEntity(TransitEntity<?> entity) {
+    public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
         Collection<Notice> res = getNoticesByElement().get(entity);
         return res == null ? Collections.emptyList() : res;
     }

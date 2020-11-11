@@ -78,7 +78,7 @@ public class RaptorPathToItineraryMapper {
         List<Leg> legs = new ArrayList<>();
 
         // Map access leg
-        mapAccessLeg(legs, path.accessLeg());
+        legs.addAll(mapAccessLeg(path.accessLeg()));
 
         // TODO: Add back this code when PathLeg interface contains object references
 
@@ -93,10 +93,9 @@ public class RaptorPathToItineraryMapper {
                 firstLeg = false;
                 legs.add(transitLeg);
             }
-
             // Map transfer leg
-            if (pathLeg.isTransferLeg()) {
-                mapTransferLeg(legs, pathLeg.asTransferLeg());
+            else if (pathLeg.isTransferLeg()) {
+                legs.addAll(mapTransferLeg(pathLeg.asTransferLeg()));
             }
 
             pathLeg = pathLeg.nextLeg();
@@ -104,7 +103,7 @@ public class RaptorPathToItineraryMapper {
 
         // Map egress leg
         EgressPathLeg<TripSchedule> egressPathLeg = pathLeg.asEgressLeg();
-        mapEgressLeg(legs, egressPathLeg);
+        legs.addAll(mapEgressLeg(egressPathLeg));
         propagateStopPlaceNamesToWalkingLegs(legs);
 
         Itinerary itinerary = new Itinerary(legs);
@@ -116,24 +115,23 @@ public class RaptorPathToItineraryMapper {
         return itinerary;
     }
 
-    private void mapAccessLeg(
-            List<Leg> legs,
-            AccessPathLeg<TripSchedule> accessPathLeg
-    ) {
+    private List<Leg> mapAccessLeg(AccessPathLeg<TripSchedule> accessPathLeg) {
         AccessEgress accessPath = (AccessEgress) accessPathLeg.access();
 
-        if (accessPath.durationInSeconds() == 0) { return; }
+        if (accessPath.durationInSeconds() == 0) { return List.of(); }
 
         GraphPath graphPath = new GraphPath(accessPath.getLastState(), false);
 
         Itinerary subItinerary = GraphPathToItineraryMapper
             .generateItinerary(graphPath, request.locale);
 
-        if (subItinerary.legs.isEmpty()) { return; }
+        if (subItinerary.legs.isEmpty()) { return List.of(); }
 
         subItinerary.timeShiftToStartAt(createCalendar(accessPathLeg.fromTime()));
 
-        legs.addAll(subItinerary.legs);
+        applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, accessPathLeg);
+
+        return subItinerary.legs;
     }
 
     private Leg mapTransitLeg(
@@ -177,6 +175,7 @@ public class RaptorPathToItineraryMapper {
 
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
+        leg.generalizedCost = pathLeg.generalizedCost();
 
         // TODO OTP2 - alightRule and boardRule needs mapping
         //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary
@@ -202,39 +201,39 @@ public class RaptorPathToItineraryMapper {
         return leg;
     }
 
-    private void mapTransferLeg(List<Leg> legs, TransferPathLeg<TripSchedule> pathLeg) {
+    private List<Leg> mapTransferLeg(TransferPathLeg<TripSchedule> pathLeg) {
         Stop transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
         Stop transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = transitLayer.getTransferByStopIndex().get(pathLeg.fromStop()).stream().filter(t -> t.getToStop() == pathLeg.toStop()).findFirst().get();
 
         Place from = mapStopToPlace(transferFromStop, null);
         Place to = mapStopToPlace(transferToStop, null);
-        mapNonTransitLeg(legs, pathLeg, transfer, from, to, false);
+        return mapNonTransitLeg(pathLeg, transfer, from, to, false);
     }
 
-    private void mapEgressLeg(
-            List<Leg> legs,
-            EgressPathLeg<TripSchedule> egressPathLeg
-    ) {
+    private List<Leg> mapEgressLeg(EgressPathLeg<TripSchedule> egressPathLeg) {
         AccessEgress egressPath = (AccessEgress) egressPathLeg.egress();
 
-        if (egressPath.durationInSeconds() == 0) { return; }
+        if (egressPath.durationInSeconds() == 0) { return List.of(); }
 
         GraphPath graphPath = new GraphPath(egressPath.getLastState(), false);
 
         Itinerary subItinerary = GraphPathToItineraryMapper
             .generateItinerary(graphPath, request.locale);
 
-        if (subItinerary.legs.isEmpty()) { return; }
+        if (subItinerary.legs.isEmpty()) { return List.of(); }
 
         subItinerary.timeShiftToStartAt(createCalendar(egressPathLeg.fromTime()));
 
-        legs.addAll(subItinerary.legs);
+        applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, egressPathLeg);
+
+        return subItinerary.legs;
     }
 
-    private void mapNonTransitLeg(List<Leg> legs, PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {
+    private List<Leg> mapNonTransitLeg(PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {
+        //List<Leg> legs = new ArrayList<>();
         List<Edge> edges = transfer.getEdges();
-        if (edges.isEmpty()) {
+        if (edges == null || edges.isEmpty()) {
             Leg leg = new Leg(TraverseMode.WALK);
             leg.from = from;
             leg.to = to;
@@ -243,9 +242,10 @@ public class RaptorPathToItineraryMapper {
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
             leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();
+            leg.generalizedCost = pathLeg.generalizedCost();
 
             if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
-                legs.add(leg);
+                return List.of(leg);
             }
         } else {
             RoutingRequest traverseRequest = request.clone();
@@ -268,12 +268,12 @@ public class RaptorPathToItineraryMapper {
                     .generateItinerary(graphPath, request.locale);
 
             if (subItinerary.legs.isEmpty()) {
-                return;
+                return List.of();
             }
 
-            // TODO OTP2 We use the duration initially calculated for use during routing
-            //      because they do not always match up and we risk getting negative wait times
-            //      (#2955)
+            // TODO OTP2 - We use the duration initially calculated for use during routing because
+            //           - they do not always match up and we risk getting negative wait times
+            //           - Issue https://github.com/opentripplanner/OpenTripPlanner/issues/2955
             if (subItinerary.legs.size() != 1) {
                 throw new IllegalArgumentException("Sub itineraries should only contain one leg.");
             }
@@ -281,9 +281,11 @@ public class RaptorPathToItineraryMapper {
             subItinerary.legs.get(0).endTime = createCalendar(pathLeg.toTime());
 
             if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
-                legs.addAll(subItinerary.legs);
+                applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, pathLeg);
+                return subItinerary.legs;
             }
         }
+        return List.of();
     }
 
     /**
@@ -396,5 +398,24 @@ public class RaptorPathToItineraryMapper {
             distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
         }
         return distance;
+    }
+
+    /**
+     * Add the cost to the first leg, and set all others to 0(zero) - we compute the cost for the
+     * entire street section as a hole, so there is no way to break it down to each individual
+     * sub-section. There might be more than on sub-section in the future. An access/egress/transfer
+     * raptor path is converted into a list of legs with zero to N elements. Cost is generated for
+     * the entire collection of sub-sections.
+     * <p>
+     * TODO OTP2 - Break cost down on sub-section legs.
+     *           - Issue https://github.com/opentripplanner/OpenTripPlanner/issues/3215
+     *
+     * @param legs the legs representing one raptor access/transfer/egress
+     * @param raptorLeg the cost taken from the RaptorPathLeg.
+     */
+    private static void applyCostFromRaptorPathToAccessEgressTransfer(List<Leg> legs, PathLeg<?> raptorLeg) {
+        if(legs.isEmpty()) { return; }
+        legs.forEach(l -> l.generalizedCost = 0);
+        legs.get(0).generalizedCost = raptorLeg.generalizedCost();
     }
 }

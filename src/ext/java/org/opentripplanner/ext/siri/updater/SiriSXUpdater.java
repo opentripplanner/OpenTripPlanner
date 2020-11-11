@@ -50,30 +50,24 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     private int retryCount = 0;
     private final String originalRequestorRef;
 
-    public SiriSXUpdater(Parameters config) {
+    public SiriSXUpdater(SiriSXUpdaterParameters config) {
         super(config);
         // TODO: add options to choose different patch services
-        String url = config.getUrl();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-
+        this.url = config.getUrl();
         this.requestorRef = config.getRequestorRef();
+        this.earlyStart = config.getEarlyStartSec();
+        this.feedId = config.getFeedId();
+
         if (requestorRef == null || requestorRef.isEmpty()) {
-            requestorRef = "otp-"+UUID.randomUUID().toString();
+            requestorRef = "otp-" + UUID.randomUUID().toString();
         }
 
         //Keeping original requestorRef use as base for updated requestorRef to be used in retries
         this.originalRequestorRef = requestorRef;
 
-        this.url = url;// + uniquenessParameter;
-        this.earlyStart = config.getEarlyStartSec();
-        this.feedId = config.getFeedId();
-
-
         int timeoutSec = config.getTimeoutSec();
         if (timeoutSec > 0) {
-            this.timeout = 1000*timeoutSec;
+            this.timeout = 1000 * timeoutSec;
         }
 
         blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
@@ -200,12 +194,4 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         return "SiriSXUpdater (" + url + ")";
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getUrl();
-        String getRequestorRef();
-        int getEarlyStartSec();
-        String getFeedId();
-        int getTimeoutSec();
-        boolean blockReadinessUntilInitialized();
-    }
 }

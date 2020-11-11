@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.updater.UpdaterParameters;
+import org.opentripplanner.updater.UpdatersParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class RouterConfig implements Serializable {
     private final double streetRoutingTimeoutSeconds;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
-    private final UpdaterParameters updaterParameters;
+    private final UpdatersParameters updatersParameters;
     private final VectorTileConfig vectorTileLayers;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
@@ -47,7 +47,7 @@ public class RouterConfig implements Serializable {
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-        this.updaterParameters = new UpdaterConfig(adapter);
+        this.updatersParameters = new UpdatersConfig(adapter);
         this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
 
         if(logUnusedParams) {
@@ -83,7 +83,7 @@ public class RouterConfig implements Serializable {
         return transitConfig;
     }
 
-    public UpdaterParameters updaterConfig() { return updaterParameters; }
+    public UpdatersParameters updaterConfig() { return updatersParameters; }
 
     public VectorTileConfig vectorTileLayers() { return vectorTileLayers; }
 
