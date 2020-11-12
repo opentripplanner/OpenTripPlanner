@@ -4,7 +4,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
-import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.Route;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -28,41 +29,50 @@ class TripMapper {
     private final EntityById<org.opentripplanner.model.Route> otpRouteById;
     private final ReadOnlyHierarchicalMap<String, Route> routeById;
     private final ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
-  private final Set<FeedScopedId> shapePointIds;
+    private final Map<String, FeedScopedId> serviceIds;
+    private final Set<FeedScopedId> shapePointIds;
 
     TripMapper(
             FeedScopedIdFactory idFactory,
             EntityById<org.opentripplanner.model.Route> otpRouteById,
             ReadOnlyHierarchicalMap<String, Route> routeById,
-      ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById,
-      Set<FeedScopedId> shapePointIds
+            ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById,
+            Map<String, FeedScopedId> serviceIds,
+            Set<FeedScopedId> shapePointIds
     ) {
         this.idFactory = idFactory;
         this.otpRouteById = otpRouteById;
         this.routeById = routeById;
         this.journeyPatternsById = journeyPatternsById;
-    this.shapePointIds = shapePointIds;
+        this.serviceIds = serviceIds;
+        this.shapePointIds = shapePointIds;
     }
 
     /**
      * Map a service journey to a trip.
      * <p>
-   *
      * @return valid trip or {@code null} if unable to map to a valid trip.
      */
     @Nullable
     Trip mapServiceJourney(ServiceJourney serviceJourney){
-        org.opentripplanner.model.Route route = resolveRoute(serviceJourney);
-        String serviceId = resolveServiceId(serviceJourney);
+        FeedScopedId serviceId = serviceIds.get(serviceJourney.getId());
 
-        if(serviceId == null || route == null) {
+        if(serviceId == null) {
+            LOG.warn("Unable to map ServiceJourney, missing Route. SJ id: {}", serviceJourney.getId());
+            return null;
+        }
+
+        org.opentripplanner.model.Route route = resolveRoute(serviceJourney);
+
+        if(route == null) {
+            LOG.warn("Unable to map ServiceJourney, missing serviceId. SJ id: {}", serviceJourney.getId());
             return null;
         }
 
         Trip trip = new Trip(idFactory.createId(serviceJourney.getId()));
 
         trip.setRoute(route);
-        trip.setServiceId(idFactory.createId(serviceId));
+        trip.setServiceId(serviceId);
         trip.setShapeId(getShapeId(serviceJourney));
 
         if (serviceJourney.getPrivateCode() != null) {
@@ -84,17 +94,6 @@ class TripMapper {
             : null;
 
     return shapePointIds.contains(serviceLinkId) ? serviceLinkId : null;
-    }
-
-    private String resolveServiceId(ServiceJourney serviceJourney) {
-        String serviceId =  DayTypeRefsToServiceIdAdapter.createServiceId(serviceJourney.getDayTypes());
-        if(serviceId == null) {
-            LOG.warn(
-                    "Not able to generate serviceId for ServiceJourney, dayTypes is empty. ServiceJourney id: {}",
-                    serviceJourney.getId()
-            );
-        }
-        return serviceId;
     }
 
     private org.opentripplanner.model.Route resolveRoute(ServiceJourney serviceJourney) {

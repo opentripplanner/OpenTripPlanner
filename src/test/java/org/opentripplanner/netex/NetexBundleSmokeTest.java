@@ -26,9 +26,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -68,7 +70,7 @@ public class NetexBundleSmokeTest {
         assertStations(otpModel.getAllStations());
         assertTripPatterns(otpModel.getTripPatterns());
         assertTrips(otpModel.getAllTrips());
-        assertServiceIds(otpModel.getAllServiceIds());
+        assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
         assertNoticeAssignments(otpModel.getNoticeAssignments());
 
         // And then - smoke test service calendar
@@ -150,7 +152,7 @@ public class NetexBundleSmokeTest {
 
         assertEquals("Jernbanetorget", t.getTripHeadsign());
         assertNull(t.getTripShortName());
-        assertEquals("RUT:DayType:6-101468", t.getServiceId().getId());
+        assertNotNull(t.getServiceId());
         assertEquals("Ruter", t.getOperator().getName());
         assertNull(t.getTripOperator());
         assertEquals(0, t.getBikesAllowed());
@@ -181,29 +183,39 @@ public class NetexBundleSmokeTest {
         assertEquals(1, list.size());
     }
 
-    private void assertServiceIds(Collection<FeedScopedId> serviceIds) {
-        List<String> sIds = serviceIds.stream().map(FeedScopedId::getId).sorted().collect(Collectors.toList());
-        assertEquals(
-                "[RUT:DayType:0-105025+RUT:DayType:0-105026+RUT:DayType:6-101468, RUT:DayType:6-101468]",
-                sIds.toString()
-        );
+    private void assertServiceIds(Collection<Trip> trips, Collection<FeedScopedId> serviceIds) {
+        Set<FeedScopedId> tripServiceIds = trips.stream().map(Trip::getServiceId).collect(Collectors.toSet());
+        assertEquals(tripServiceIds, Set.copyOf(serviceIds));
     }
 
     private void assetServiceCalendar(CalendarServiceData cal) {
         assertEquals("[RB:RUT:Authority:RUT]", cal.getAgencyIds().toString());
         assertEquals("Europe/Oslo", cal.getTimeZoneForAgencyId(new FeedScopedId("RB", "RUT:Authority:RUT")).toZoneId().toString());
+
+        ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
+        assertEquals(2, sIds.size());
+        FeedScopedId serviceId1 = sIds.get(0);
+        FeedScopedId serviceId2 = sIds.get(1);
+
+        List<ServiceDate> dates1 = cal.getServiceDatesForServiceId(serviceId1);
+        List<ServiceDate> dates2 = cal.getServiceDatesForServiceId(serviceId2);
+
+        if(dates1.size() > dates2.size()) {
+            var datesTemp = dates1;
+            dates1 = dates2;
+            dates2 = datesTemp;
+        }
+
         assertEquals(
-                "[RUT:DayType:0-105025+RUT:DayType:0-105026+RUT:DayType:6-101468, RUT:DayType:6-101468]",
-                cal.getServiceIds().stream().map(FeedScopedId::getId).sorted().collect(Collectors.toList()).toString()
+            "[2017-12-21, 2017-12-22, 2017-12-25, 2017-12-26, 2017-12-27, 2017-12-28, "
+                + "2017-12-29, 2018-01-02, 2018-01-03, 2018-01-04]",
+            dates1.toString()
         );
         assertEquals(
-                "[2017-12-21, 2017-12-22, 2017-12-25, 2017-12-26, 2017-12-27, 2017-12-28, 2017-12-29, 2018-01-02, 2018-01-03, 2018-01-04]",
-                cal.getServiceDatesForServiceId(fId("RUT:DayType:6-101468")).toString()
-        );
-        ServiceDate DEC_29 = new ServiceDate(2017, 12, 29);
-        assertEquals(
-                "RUT:DayType:0-105025+RUT:DayType:0-105026+RUT:DayType:6-101468, RUT:DayType:6-101468",
-                cal.getServiceIdsForDate(DEC_29).stream().map(FeedScopedId::getId).sorted().collect(Collectors.joining(", "))
+            "[2017-12-21, 2017-12-22, 2017-12-23, 2017-12-24, 2017-12-25, 2017-12-26, "
+                + "2017-12-27, 2017-12-28, 2017-12-29, 2017-12-30, 2017-12-31, 2018-01-02, "
+                + "2018-01-03, 2018-01-04]",
+            dates2.toString()
         );
         assertEquals(2, cal.getServiceIds().size());
         assertEquals(1, cal.getAgencyIds().size());

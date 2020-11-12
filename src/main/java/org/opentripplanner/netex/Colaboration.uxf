@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>360</x>
+      <y>30</y>
+      <w>210</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>NetexDataSourceHierarchy
+&lt;&lt;loader&gt;&gt;
+bg=#b0e0ff
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>360</x>
+      <y>380</y>
+      <w>210</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>Validator
+&lt;&lt;validation&gt;&gt;
+bg=#b0e0ff
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>360</x>
+      <y>250</y>
+      <w>210</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>NetexEntityDataIndex
+&lt;&lt;index&gt;&gt;
+bg=#b0e0ff
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>360</x>
+      <y>490</y>
+      <w>210</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>NetexMapper
+&lt;&lt;mapping&gt;&gt;
+bg=#b0e0ff
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>680</x>
+      <y>250</y>
+      <w>240</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>NetexXMLEntity
+&lt;&lt;org.rutebanken.netex.model&gt;&gt;
+bg=#ffc0cb
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>260</y>
+      <w>140</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-&gt;
+m2=*</panel_attributes>
+    <additional_attributes>10.0;10.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>370</x>
+      <y>130</y>
+      <w>190</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>NetexXMLParser
+&lt;&lt;loader&gt;&gt;
+bg=#b0e0ff
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>40</y>
+      <w>220</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+1: list xml-files
+</panel_attributes>
+    <additional_attributes>200.0;20.0;50.0;20.0;10.0;230.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>140</y>
+      <w>230</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+2. pares xml files 
+ &lt; Xml POJOs
+</panel_attributes>
+    <additional_attributes>210.0;20.0;60.0;20.0;10.0;130.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>250</y>
+      <w>220</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+3. insert XmlPOJOs
+</panel_attributes>
+    <additional_attributes>200.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>140</y>
+      <w>260</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+create</panel_attributes>
+    <additional_attributes>10.0;20.0;240.0;20.0;240.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>260</y>
+      <w>220</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+3. validate entities</panel_attributes>
+    <additional_attributes>200.0;150.0;50.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>430</x>
+      <y>290</y>
+      <w>190</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+- validate relations
+- discard invalid entities</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>260</y>
+      <w>220</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+4. map to OPT domain</panel_attributes>
+    <additional_attributes>200.0;260.0;50.0;260.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>290</y>
+      <w>400</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+- list entities (local scope)
+- lookup referenced objects (global scope)   </panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;40.0;90.0;190.0;10.0;220.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>50</x>
+      <y>250</y>
+      <w>120</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>NetexBundle
+bg=#b0e0ff
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

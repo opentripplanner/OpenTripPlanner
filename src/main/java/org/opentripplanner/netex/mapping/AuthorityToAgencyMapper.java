@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.Authority;
 
 import static org.opentripplanner.netex.mapping.support.NetexObjectDecorator.withOptional;

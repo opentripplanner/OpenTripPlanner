@@ -23,7 +23,7 @@ class DayOfWeekMapper {
      * <p>
      * [MONDAY, SATURDAY, WEEKEND] => [MONDAY, SATURDAY, SUNDAY]
      */
-    static Set<DayOfWeek> mapDayOfWeek(Collection<DayOfWeekEnumeration> values) {
+    static Set<DayOfWeek> mapDayOfWeeks(Collection<DayOfWeekEnumeration> values) {
         EnumSet<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
         for (DayOfWeekEnumeration it : values) {
             result.addAll(mapDayOfWeek(it));

@@ -17,9 +17,9 @@ import java.util.List;
 /**
  * This maps from the OpenGIS PolygonType to LocationTech geometry.
  */
-public class OpenGisMapper {
+class OpenGisMapper {
 
-  public static Geometry mapGeometry(PolygonType polygonType) {
+  static Geometry mapGeometry(PolygonType polygonType) {
     return new Polygon(
         new LinearRing(mapCoordinateSequence(polygonType.getExterior()),
             GeometryUtils.getGeometryFactory()
