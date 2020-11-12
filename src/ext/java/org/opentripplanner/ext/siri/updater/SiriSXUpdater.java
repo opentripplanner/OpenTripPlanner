@@ -87,7 +87,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         this.transitAlertService = new TransitAlertServiceImpl(graph);
         SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         if (updateHandler == null) {
-            updateHandler = new SiriAlertsUpdateHandler(feedId);
+            updateHandler = new SiriAlertsUpdateHandler(feedId, graph);
         }
         updateHandler.setEarlyStart(earlyStart);
         updateHandler.setTransitAlertService(transitAlertService);
