@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.index.api;
 
-import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -13,6 +13,7 @@ import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
+import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
@@ -29,7 +30,7 @@ public interface NetexEntityIndexReadOnlyView {
     ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById();
     ReadOnlyHierarchicalMapById<DayType> getDayTypeById();
     ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId();
-    Iterable<DayTypeRefsToServiceIdAdapter> getDayTypeRefs();
+    ReadOnlyHierarchicalMapById<DatedServiceJourney> getDatedServiceJourneys();
     ReadOnlyHierarchicalMapById<DestinationDisplay> getDestinationDisplayById();
     ReadOnlyHierarchicalMapById<FlexibleStopPlace> getFlexibleStopPlacesById();
     ReadOnlyHierarchicalMapById<GroupOfStopPlaces> getGroupOfStopPlacesById();
@@ -39,6 +40,7 @@ public interface NetexEntityIndexReadOnlyView {
     ReadOnlyHierarchicalMapById<StopPlace> getMultiModalStopPlaceById();
     ReadOnlyHierarchicalMapById<Notice> getNoticeById();
     ReadOnlyHierarchicalMapById<NoticeAssignment> getNoticeAssignmentById();
+    ReadOnlyHierarchicalMapById<OperatingDay> getOperatingDayById();
     ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById();
     ReadOnlyHierarchicalMapById<Operator> getOperatorsById();
     ReadOnlyHierarchicalVersionMapById<Quay> getQuayById();

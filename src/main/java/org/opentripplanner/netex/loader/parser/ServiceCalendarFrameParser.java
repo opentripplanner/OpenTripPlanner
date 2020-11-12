@@ -9,6 +9,8 @@ import org.rutebanken.netex.model.DayTypeAssignmentsInFrame_RelStructure;
 import org.rutebanken.netex.model.DayTypeAssignments_RelStructure;
 import org.rutebanken.netex.model.DayTypesInFrame_RelStructure;
 import org.rutebanken.netex.model.DayTypes_RelStructure;
+import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.OperatingDaysInFrame_RelStructure;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.OperatingPeriodsInFrame_RelStructure;
@@ -26,11 +28,9 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     private static final Logger LOG = LoggerFactory.getLogger(ServiceCalendarFrameParser.class);
 
     private final Collection<DayType> dayTypes = new ArrayList<>();
-
     private final Collection<OperatingPeriod> operatingPeriods = new ArrayList<>();
-
-    private final Multimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId =
-            ArrayListMultimap.create();
+    private final Collection<OperatingDay> operatingDays = new ArrayList<>();
+    private final Multimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId = ArrayListMultimap.create();
 
 
     @Override
@@ -38,6 +38,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
         parseServiceCalendar(frame.getServiceCalendar());
         parseDayTypes(frame.getDayTypes());
         parseOperatingPeriods(frame.getOperatingPeriods());
+        parseOperatingDays(frame.getOperatingDays());
         parseDayTypeAssignments(frame.getDayTypeAssignments());
 
         // Keep list sorted alphabetically
@@ -53,6 +54,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     void setResultOnIndex(NetexEntityIndex netexIndex) {
         netexIndex.dayTypeById.addAll(dayTypes);
         netexIndex.operatingPeriodById.addAll(operatingPeriods);
+        netexIndex.operatingDayById.addAll(operatingDays);
         netexIndex.dayTypeAssignmentByDayTypeId.addAll(dayTypeAssignmentByDayTypeId);
     }
 
@@ -85,11 +87,16 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     }
 
     private void parseOperatingPeriods(OperatingPeriodsInFrame_RelStructure element) {
-        if(element == null) return;
+        if(element == null) { return; }
 
         for (OperatingPeriod_VersionStructure p : element.getOperatingPeriodOrUicOperatingPeriod()) {
             operatingPeriods.add((OperatingPeriod) p);
         }
+    }
+
+    private void parseOperatingDays(OperatingDaysInFrame_RelStructure element) {
+        if(element == null) { return; }
+        operatingDays.addAll(element.getOperatingDay());
     }
 
     private void parseDayTypeAssignments(DayTypeAssignments_RelStructure element) {

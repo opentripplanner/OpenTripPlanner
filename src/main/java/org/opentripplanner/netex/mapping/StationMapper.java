@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.Station;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

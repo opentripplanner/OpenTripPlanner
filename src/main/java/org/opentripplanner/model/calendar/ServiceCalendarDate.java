@@ -42,6 +42,14 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
         this.exceptionType =  exceptionType;
     }
 
+    /**
+     * Create a service calendar date on the given date with the given id. The 'exceptionType'
+     * is set to 'EXCEPTION_TYPE_ADD'.
+     */
+    public static ServiceCalendarDate create(FeedScopedId serviceId, ServiceDate date) {
+        return new ServiceCalendarDate(serviceId, date, EXCEPTION_TYPE_ADD);
+    }
+
     public FeedScopedId getServiceId() {
         return serviceId;
     }
