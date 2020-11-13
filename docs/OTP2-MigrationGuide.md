@@ -40,17 +40,25 @@ These properties changed names from:
  
 These parameters are no longer supported:
 
- - `stopClusterMode` OTP2 link stops and stations based on the GTFS/NeTEx input. There is no
-         automatic linking any more. If this is needed, feel free to port the OTP1 logic into 
-         a Sandbox feature. The OTP1 options are: `proximity`, `parentStation`.
- - `parentStopLinking` OTP2 link stops and stations based on the GTFS/NeTEx input, but there is no 
-         such thing in the street graph, only stops exist in the street graph. When OTP2 generate
-         transfers based on the street graph generated from OSM data. If no OSM data is provided,
-         then we would like to use "line-of-sight" transfers. See issue 
-         [#3204](https://github.com/opentripplanner/OpenTripPlanner/issues/3204).  
- - `stationTransfers` This functionality is not ported to OTP2. If needed it should be a sandbox
-         feature. 
-
+ - `stopClusterMode` 
+ - `parentStopLinking`
+ - `stationTransfers`
+ 
+ OTP2 keep the stops and stations relationship(called "parentStation") in the transit model. OTP 
+ import the relation from the GTFS and/or NeTEx input. There is no way to automatically generate
+ this relation based on geographically `proximity` in OTP2. This enables OTP to search from any
+ stop part of a station _without_ walking/waiting when the request from/to input field is a 
+ station id.
+ 
+ Transfers in OTP2 are generated based on the stop location and the OSM data or GTFS Pathways. In 
+ future versions of OTP2 we also want to support generating simple transfers based on 
+ "line-of-sight" if no pathways or OSM data exist. See issue
+ [#3204](https://github.com/opentripplanner/OpenTripPlanner/issues/3204).
+ 
+ Improving/patching input data is NOT a core feature of OTP, but anyone is welcome to implement 
+ a sandbox plugin to patch data. So, if any of the features above are needed they can be ported
+ from OTP1 into a OTP2 sandbox feature.
+ 
  
 ## Router config
 Se the [Router Configuration](Configuration.md#router-configuration) for a description of the 
