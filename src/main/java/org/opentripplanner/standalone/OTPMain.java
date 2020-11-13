@@ -16,6 +16,7 @@ import org.opentripplanner.util.ThrowableUtils;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up
@@ -27,6 +28,17 @@ import org.slf4j.LoggerFactory;
 public class OTPMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
+
+    static {
+
+        // Disable HSQLDB reconfiguration of Java Unified Logging (j.u.l)
+        System.setProperty("hsqldb.reconfig_logging", "false");
+
+        // Remove existing handlers attached to the j.u.l root logger
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        // Bridge j.u.l (used by Jersey) to the SLF4J root logger, so all logging goes through the same API
+        SLF4JBridgeHandler.install();
+    }
 
     /**
      * ENTRY POINT: This is the main method that is called when running otp.jar from the command line.
