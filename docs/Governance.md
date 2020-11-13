@@ -14,7 +14,7 @@ The current members of this committee are (in alphabetical order):
 | David Emory       | [MARTA](https://www.itsmarta.com/) (Atlanta, Georgia) |
 | Thomas Gran       | [Ruter](https://ruter.no/en/) & [Entur](https://entur.no/) (Norway) |
 | Tuukka Hastrup    | [Maanteeamet](https://www.mnt.ee/et) (Estonia) |
-| Frank Purcell     | [TriMet](https:/trimet.org) (Portland, Oregon)   |
+| Frank Purcell     | [TriMet](https:/trimet.org/) (Portland, Oregon)   |
 | Evan Siroky       | [IBI Group](https://www.ibigroup.com/) |
 | David Turner      | ex-[OpenPlans](https://www.openplans.org/) |
 
