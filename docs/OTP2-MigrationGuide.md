@@ -25,6 +25,12 @@ you want into a single instance of OTP2.
 
 ## Build config
 
+New parameters:
+
+ - `transitServiceStart` Limit the import of transit services to the given *start* date. Default: `-P1Y`
+ - `transitServiceEnd` Limit the import of transit services to the given *end* date. *Inclusive*. Default: `P3Y`
+
+
 These properties changed names from:
 
  - `htmlAnnotations` to `dataImportReport`
@@ -32,15 +38,37 @@ These properties changed names from:
  - `boardTimes` to `routingDefaults.boardSlackByMode`
  - `alightTimes` to `routingDefaults.alightSlackByMode`
  
-These parameters is no longer supported:
+These parameters are no longer supported:
 
- - `stopClusterMode` - TODO OTP2 Why? Old options: `proximity`, `parentStation`
+ - `stopClusterMode` OTP2 link stops and stations based on the GTFS/NeTEx input. There is no
+         automatic linking any more. If this is needed, feel free to port the OTP1 logic into 
+         a Sandbox feature. The OTP1 options are: `proximity`, `parentStation`.
+ - `parentStopLinking` OTP2 link stops and stations based on the GTFS/NeTEx input, but there is no 
+         such thing in the street graph, only stops exist in the street graph. When OTP2 generate
+         transfers based on the street graph generated from OSM data. If no OSM data is provided,
+         then we would like to use "line-of-sight" transfers. See issue 
+         [#3204](https://github.com/opentripplanner/OpenTripPlanner/issues/3204).  
+ - `stationTransfers` This functionality is not ported to OTP2. If needed it should be a sandbox
+         feature. 
 
  
 ## Router config
+Se the [Router Configuration](Configuration.md#router-configuration) for a description of the 
+new and continued routing parameters.
 
- - All updaters that require data sources now require you to specify a `sourceType`, even if that
-   particular updater only has one possible data source.
+New parameters:
+
+ - `streetRoutingTimeout` Maximum time limit for street route queries. Replace the old `timeout`.
+ - `transit` Transit tuning parameters, configure the raptor router. A set of parameters to tune 
+             the Raptor transit router. 
+ 
+These parameters are no longer supported:
+
+ - `timeout` Replaced by `streetRoutingTimeout`
+ - `timeouts` OTP1 searches the graph many times, while OTP2 do one search finding multiple results
+              in one search. So, there is no need for this parameter.
+ - `boardTimes` is replaced by `request` parameter `boardSlack` and `boardSlackForMode`.
+ - `alightTimes` is replaced by `request` parameter `alightSlack` and `alightSlackForMode`.
  
    
 ## REST API
