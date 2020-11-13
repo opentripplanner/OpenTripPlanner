@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -188,7 +189,7 @@ public class TransmodelGraphQLPlanner {
             ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
-            ElementWrapper<ArrayList<TransitMode>> transitModes = new ElementWrapper<>();
+            ElementWrapper<Set<TransitMode>> transitModes = new ElementWrapper<>();
             callWith.argument("modes.accessMode", accessMode::set);
             callWith.argument("modes.egressMode", egressMode::set);
             callWith.argument("modes.directMode", directMode::set);
@@ -196,7 +197,7 @@ public class TransmodelGraphQLPlanner {
 
             if (transitModes.get() == null) {
                 // Default to all transport modes if transport modes not specified
-                transitModes.set(new ArrayList<>(Arrays.asList(TransitMode.values())));
+                transitModes.set(RequestModes.defaultRequestModes.transitModes);
             }
 
             request.modes = new RequestModes(

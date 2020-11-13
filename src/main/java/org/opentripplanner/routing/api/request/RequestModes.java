@@ -2,13 +2,23 @@ package org.opentripplanner.routing.api.request;
 
 import org.opentripplanner.model.TransitMode;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class RequestModes {
+
   public StreetMode accessMode;
   public StreetMode egressMode;
   public StreetMode directMode;
   public Set<TransitMode> transitModes;
+
+  public static RequestModes defaultRequestModes = new RequestModes(
+      null,
+      null,
+      null,
+      new HashSet<>(Arrays.asList(TransitMode.values()))
+  );
 
   public RequestModes(
       StreetMode accessMode,
