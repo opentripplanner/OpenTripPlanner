@@ -508,6 +508,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             trip.setRouteShortName("" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue());
         }
 
+        // Use destinationName as default headsign - if provided
+        if (estimatedVehicleJourney.getDestinationNames() != null && !estimatedVehicleJourney.getDestinationNames().isEmpty()) {
+            trip.setTripHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
+        }
+
 //        trip.setTripOperator(operator);
 
         // TODO - SIRI: Populate these?
@@ -566,6 +571,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             if (estimatedCall.getDestinationDisplaies() != null && !estimatedCall.getDestinationDisplaies().isEmpty()) {
                 NaturalLanguageStringStructure destinationDisplay = estimatedCall.getDestinationDisplaies().get(0);
                 stopTime.setStopHeadsign(destinationDisplay.getValue());
+            } else if (trip.getTripHeadsign() == null) {
+                // Fallback to empty string
+                stopTime.setStopHeadsign("");
             }
 
             if (i == 0) {
