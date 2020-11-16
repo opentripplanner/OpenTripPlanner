@@ -14,9 +14,9 @@ public class RequestModes {
   public Set<TransitMode> transitModes;
 
   public static RequestModes defaultRequestModes = new RequestModes(
-      null,
-      null,
-      null,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      StreetMode.WALK,
       new HashSet<>(Arrays.asList(TransitMode.values()))
   );
 
