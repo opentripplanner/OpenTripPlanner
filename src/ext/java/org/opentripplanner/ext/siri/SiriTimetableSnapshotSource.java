@@ -651,7 +651,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 graph.getCalendarService().getServiceDatesForServiceId(serviceId).isEmpty()) {
             LOG.info("Adding serviceId {} to CalendarService", serviceId);
             // TODO - SIRI: Need to add the ExtraJourney as a Trip - alerts may be attached to it
-//           graph.getCalendarService().addServiceIdAndServiceDates(serviceId, Arrays.asList(serviceDate));
+           graph.getCalendarService().addServiceIdAndServiceDates(serviceId, Arrays.asList(serviceDate));
         }
 
 
