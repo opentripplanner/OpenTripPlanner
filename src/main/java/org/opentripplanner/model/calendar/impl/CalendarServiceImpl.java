@@ -42,6 +42,11 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
+    public void addServiceIdAndServiceDates(FeedScopedId serviceId, List<ServiceDate> serviceDates) {
+        data.putServiceDatesForServiceId(serviceId, serviceDates);
+    }
+
+    @Override
     public Set<FeedScopedId> getServiceIdsOnDate(ServiceDate date) {
         return data.getServiceIdsForDate(date);
     }
