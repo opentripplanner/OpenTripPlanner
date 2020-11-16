@@ -321,7 +321,7 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEXEGRESS,WALK,TRANSIT" : _tr('Transit with flex egress'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "FLEXACCESS,FLEX_EGRESS,TRANSIT" : _tr('Transit with flex access and egress'),
+    "FLEXACCESS,FLEXEGRESS,TRANSIT" : _tr('Transit with flex access and egress'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEXDIRECT" : _tr('Direct flex search'),
     //uncomment only if bike rental exists in a map
