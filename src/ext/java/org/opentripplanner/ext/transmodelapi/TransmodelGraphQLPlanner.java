@@ -25,9 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -189,15 +188,15 @@ public class TransmodelGraphQLPlanner {
             ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
-            ElementWrapper<Set<TransitMode>> transitModes = new ElementWrapper<>();
+            ElementWrapper<List<TransitMode>> transitModes = new ElementWrapper<>();
             callWith.argument("modes.accessMode", accessMode::set);
             callWith.argument("modes.egressMode", egressMode::set);
             callWith.argument("modes.directMode", directMode::set);
             callWith.argument("modes.transportMode", transitModes::set);
 
             if (transitModes.get() == null) {
-                // Default to all transport modes if transport modes not specified
-                transitModes.set(RequestModes.defaultRequestModes.transitModes);
+                // Default to no transport modes if transport modes not specified
+                transitModes.set(Collections.emptyList());
             }
 
             request.modes = new RequestModes(
