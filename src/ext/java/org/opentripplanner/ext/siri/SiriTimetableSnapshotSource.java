@@ -36,6 +36,7 @@ import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.HashSet;
@@ -515,11 +516,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 //        trip.setTripPublicCode(null);
         trip.setBlockId(null);
         trip.setTripShortName(null);
-        trip.setTripHeadsign(null);
 //        trip.setKeyValues(null);
 
         List<Stop> addedStops = new ArrayList<>();
         List<StopTime> aimedStopTimes = new ArrayList<>();
+
+        // TODO - SIRI: Handle RecordedCalls. Finding departureTime++ from first stop will fail when
+        //              trip passes midnight, and the first stops are RecordedCalls.
+
+        ZonedDateTime departureTime = null;
 
         List<EstimatedCall> estimatedCalls = estimatedVehicleJourney.getEstimatedCalls().getEstimatedCalls();
         for (int i = 0; i < estimatedCalls.size(); i++) {
@@ -535,11 +540,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             ZonedDateTime aimedArrivalTime = estimatedCall.getAimedArrivalTime();
             ZonedDateTime aimedDepartureTime = estimatedCall.getAimedDepartureTime();
 
+            if (departureTime == null) {
+                departureTime = aimedDepartureTime;
+            }
+
             if (aimedArrivalTime != null) {
-                stopTime.setArrivalTime(calculateSecondsSinceMidnight(aimedArrivalTime));
+                stopTime.setArrivalTime(calculateSecondsSinceMidnight(departureTime, aimedArrivalTime));
             }
             if (aimedDepartureTime != null) {
-                stopTime.setDepartureTime(calculateSecondsSinceMidnight(aimedDepartureTime));
+                stopTime.setDepartureTime(calculateSecondsSinceMidnight(departureTime, aimedDepartureTime));
             }
 
             if (estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.ALIGHTING) {
@@ -591,11 +600,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             int aimedDepartureTime = aimedStopTimes.get(i).getDepartureTime();
 
             if (expectedArrival != null) {
-                int expectedArrivalTime = calculateSecondsSinceMidnight(expectedArrival);
+                int expectedArrivalTime = calculateSecondsSinceMidnight(departureTime, expectedArrival);
                 tripTimes.updateArrivalDelay(i, expectedArrivalTime - aimedArrivalTime);
             }
             if (expectedDeparture != null) {
-                int expectedDepartureTime = calculateSecondsSinceMidnight(expectedDeparture);
+                int expectedDepartureTime = calculateSecondsSinceMidnight(departureTime, expectedDeparture);
                 tripTimes.updateDepartureDelay(i, expectedDepartureTime - aimedDepartureTime);
             }
 
@@ -825,6 +834,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
         return DateMapper.secondsSinceStartOfService(dateTime, dateTime, routingService.getTimeZone().toZoneId());
+    }
+
+    private int calculateSecondsSinceMidnight(ZonedDateTime startOfService, ZonedDateTime dateTime) {
+        return DateMapper.secondsSinceStartOfService(startOfService, dateTime, routingService.getTimeZone().toZoneId());
     }
 
 
