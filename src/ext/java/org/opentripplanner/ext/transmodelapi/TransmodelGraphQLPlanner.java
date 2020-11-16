@@ -243,22 +243,6 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
         //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 
-        /*
-        if (!request.modes.isTransit() && request.modes.getCar()) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.kissAndRide) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.rideAndKiss) {
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.parkAndRide) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.useFlexService) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        }
-         */
-
         return request;
     }
 
@@ -269,22 +253,6 @@ public class TransmodelGraphQLPlanner {
             .collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
         return new HashMap<>(bannedTrips);
     }
-
-    /*
-    private String getLocationOfFirstQuay(String vertexId, GraphIndex graphIndex) {
-        // TODO THIS DOES NOT WORK !!
-        Vertex vertex = graphIndex.stopVertexForStop.get(vertexId);
-        if (vertex instanceof TransitStopVertex) {
-            TransitStopVertex stopVertex = (TransitStopVertex) vertex;
-
-            FeedScopedId stopId = stopVertex.getStop().getId();
-
-            return stopId.getFeedId().concat(":").concat(stopId.getId());
-        } else {
-            return vertexId;
-        }
-    }
-    */
 
     /**
      * Simple wrapper in order to pass a consumer into the CallerWithEnvironment.argument method.
