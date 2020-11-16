@@ -7,6 +7,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -159,11 +160,15 @@ public class SiriFuzzyTripMatcher {
 
     private Set<Trip> getMatchingTripsOnStopOrSiblings(String lastStopPoint, ZonedDateTime arrivalTime) {
 
-        Set<Trip> trips = start_stop_tripCache.get(createStartStopKey(lastStopPoint, arrivalTime.toLocalTime().toSecondOfDay()));
+        int secondsSinceMidnight = DateMapper.secondsSinceStartOfService(arrivalTime, arrivalTime, routingService.getTimeZone().toZoneId());
+        int secondsSinceMidnightYesterday = DateMapper.secondsSinceStartOfService(arrivalTime.minusDays(1), arrivalTime, routingService.getTimeZone().toZoneId());
+
+        Set<Trip> trips = start_stop_tripCache.get(createStartStopKey(lastStopPoint, secondsSinceMidnight));
         if (trips == null) {
             //Attempt to fetch trips that started yesterday - i.e. add 24 hours to arrival-time
-            int lastStopArrivalTime = arrivalTime.toLocalTime().toSecondOfDay() + (24 * 60 * 60);
-            trips = start_stop_tripCache.get(createStartStopKey(lastStopPoint, lastStopArrivalTime));
+            trips = start_stop_tripCache.get(createStartStopKey(lastStopPoint,
+                secondsSinceMidnightYesterday
+            ));
         }
 
         if (trips == null || trips.isEmpty()) {
@@ -174,7 +179,7 @@ public class SiriFuzzyTripMatcher {
                 // TODO OTP2 resolve stop-station split
                 Collection<Stop> allQuays = stop.getParentStation().getChildStops();
                 for (Stop quay : allQuays) {
-                    Set<Trip> tripSet = start_stop_tripCache.get(createStartStopKey(quay.getId().getId(), arrivalTime.toLocalTime().toSecondOfDay()));
+                    Set<Trip> tripSet = start_stop_tripCache.get(createStartStopKey(quay.getId().getId(), secondsSinceMidnight));
                     if (tripSet != null) {
                         if (trips == null) {
                             trips = tripSet;

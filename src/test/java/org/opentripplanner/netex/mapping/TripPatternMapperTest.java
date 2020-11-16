@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import org.junit.Test;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -12,6 +13,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,7 +21,7 @@ import static org.junit.Assert.assertEquals;
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (29.11.2017)
  */
 public class TripPatternMapperTest {
-
+    private static final FeedScopedId SERVICE_ID = new FeedScopedId("F", "S01");
 
     @Test
     public void testMapTripPattern() {
@@ -38,6 +40,7 @@ public class TripPatternMapperTest {
                 new HierarchicalMap<>(),
                 new HierarchicalMapById<>(),
                 sample.getServiceJourneyById(),
+                Map.of(NetexTestDataSample.SERVICE_JOURNEY_ID, SERVICE_ID),
                 new Deduplicator()
         );
 

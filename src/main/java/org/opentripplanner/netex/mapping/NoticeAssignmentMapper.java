@@ -11,6 +11,7 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TimetabledPassingTime;

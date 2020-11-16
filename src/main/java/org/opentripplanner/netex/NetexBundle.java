@@ -36,20 +36,22 @@ import java.util.List;
 public class NetexBundle implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
-    /** The NeTEx entities loaded from the input files and passed on to the mapper. */
-    private NetexEntityIndex index = new NetexEntityIndex();
-
     private final CompositeDataSource source;
 
     private final NetexDataSourceHierarchy hierarchy;
+
+    private final String netexFeedId;
+
+    /** The NeTEx entities loaded from the input files and passed on to the mapper. */
+    private NetexEntityIndex index = new NetexEntityIndex();
+
+    /** Report errors to issue store */
+    private DataImportIssueStore issueStore;
 
     /** maps the NeTEx XML document to OTP transit model. */
     private NetexMapper mapper;
 
     private NetexXmlParser xmlParser;
-
-    private final String netexFeedId;
-
 
     public NetexBundle(
             String netexFeedId,
@@ -68,6 +70,8 @@ public class NetexBundle implements Closeable {
             DataImportIssueStore issueStore
     ) {
         LOG.info("Reading {}", hierarchy.description());
+
+        this.issueStore = issueStore;
 
         // Store result in a mutable OTP Transit Model
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
@@ -114,6 +118,7 @@ public class NetexBundle implements Closeable {
                 }
             });
         }
+        mapper.finnishUp();
     }
 
     /**
@@ -141,7 +146,7 @@ public class NetexBundle implements Closeable {
         }
 
         // Validate input data, and remove invalid data
-        Validator.validate(index);
+        Validator.validate(index, issueStore);
 
         // map current NeTEx objects into the OTP Transit Model
         mapper.mapNetexToOtp(index.readOnlyView());

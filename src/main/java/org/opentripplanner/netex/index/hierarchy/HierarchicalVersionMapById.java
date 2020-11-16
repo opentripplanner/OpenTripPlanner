@@ -29,6 +29,12 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
         super(parent);
     }
 
+    /** Return a reference to the parent. */
+    @Override
+    public HierarchicalVersionMapById<V> parent() {
+        return (HierarchicalVersionMapById<V>) super.parent();
+    }
+
     /**
      * Add an entity and use its Id as key to index it.
      */

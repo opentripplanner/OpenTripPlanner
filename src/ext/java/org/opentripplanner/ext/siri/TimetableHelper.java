@@ -6,6 +6,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -24,8 +25,8 @@ import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
 
 import javax.xml.datatype.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -105,6 +106,8 @@ public class TimetableHelper {
         //Populate missing data from existing TripTimes
         newTimes.serviceCode = oldTimes.serviceCode;
 
+        ZoneId zoneId = graph.getTimeZone().toZoneId();
+
         int callCounter = 0;
         ZonedDateTime departureDate = null;
         Set<Object> alreadyVisited = new HashSet<>();
@@ -162,11 +165,11 @@ public class TimetableHelper {
                     int arrivalTime = newTimes.getArrivalTime(callCounter);
                     int realtimeArrivalTime = arrivalTime;
                     if (recordedCall.getActualArrivalTime() != null) {
-                        realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getActualArrivalTime());
+                        realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getActualArrivalTime(), zoneId);
                     } else if (recordedCall.getExpectedArrivalTime() != null) {
-                        realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getExpectedArrivalTime());
+                        realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getExpectedArrivalTime(), zoneId);
                     } else if (recordedCall.getAimedArrivalTime() != null) {
-                        realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getAimedArrivalTime());
+                        realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getAimedArrivalTime(), zoneId);
                     }
                     int arrivalDelay = realtimeArrivalTime - arrivalTime;
                     newTimes.updateArrivalDelay(callCounter, arrivalDelay);
@@ -175,11 +178,11 @@ public class TimetableHelper {
                     int departureTime = newTimes.getDepartureTime(callCounter);
                     int realtimeDepartureTime = departureTime;
                     if (recordedCall.getActualDepartureTime() != null) {
-                        realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getActualDepartureTime());
+                        realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getActualDepartureTime(), zoneId);
                     } else if (recordedCall.getExpectedDepartureTime() != null) {
-                        realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getExpectedDepartureTime());
+                        realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getExpectedDepartureTime(), zoneId);
                     } else if (recordedCall.getAimedDepartureTime() != null) {
-                        realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getAimedDepartureTime());
+                        realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getAimedDepartureTime(), zoneId);
                     }
                     if (realtimeDepartureTime < realtimeArrivalTime) {
                         realtimeDepartureTime = realtimeArrivalTime;
@@ -244,17 +247,17 @@ public class TimetableHelper {
                         int arrivalTime = newTimes.getArrivalTime(callCounter);
                         int realtimeArrivalTime = -1;
                         if (estimatedCall.getExpectedArrivalTime() != null) {
-                            realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, estimatedCall.getExpectedArrivalTime());
+                            realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, estimatedCall.getExpectedArrivalTime(), zoneId);
                         } else if (estimatedCall.getAimedArrivalTime() != null) {
-                            realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, estimatedCall.getAimedArrivalTime());
+                            realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, estimatedCall.getAimedArrivalTime(), zoneId);
                         }
 
                         int departureTime = newTimes.getDepartureTime(callCounter);
                         int realtimeDepartureTime = departureTime;
                         if (estimatedCall.getExpectedDepartureTime() != null) {
-                            realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, estimatedCall.getExpectedDepartureTime());
+                            realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, estimatedCall.getExpectedDepartureTime(), zoneId);
                         } else if (estimatedCall.getAimedDepartureTime() != null) {
-                            realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, estimatedCall.getAimedDepartureTime());
+                            realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, estimatedCall.getAimedDepartureTime(), zoneId);
                         }
 
                         if (realtimeArrivalTime == -1) {
@@ -552,20 +555,6 @@ public class TimetableHelper {
         }
 
         return modifiedStops;
-    }
-
-    private static int calculateSecondsSinceMidnight(ZonedDateTime departureDate, ZonedDateTime dateTime) {
-
-        int daysBetween = 0;
-        if (departureDate.getDayOfMonth() != dateTime.getDayOfMonth()) {
-            ZonedDateTime midnightOnDepartureDate = departureDate.withHour(0).withMinute(0).withSecond(0);
-            ZonedDateTime midnightOnCurrentStop = dateTime.withHour(0).withMinute(0).withSecond(0);
-            daysBetween = (int) ChronoUnit.DAYS.between(midnightOnDepartureDate, midnightOnCurrentStop);
-        }
-        // If first departure was 'yesterday' - add 24h
-        int daysSinceDeparture = daysBetween * (24 * 60 * 60);
-
-        return dateTime.toLocalTime().toSecondOfDay() + daysSinceDeparture;
     }
 
     /**

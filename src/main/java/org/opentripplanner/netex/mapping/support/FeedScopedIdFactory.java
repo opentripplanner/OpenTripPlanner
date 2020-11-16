@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.mapping;
+package org.opentripplanner.netex.mapping.support;
 
 import org.opentripplanner.model.FeedScopedId;
 
@@ -10,15 +10,15 @@ import org.opentripplanner.model.FeedScopedId;
  * <p>
  * This class should only be used by the Netex import/mapping process.
  */
-class FeedScopedIdFactory {
+public class FeedScopedIdFactory {
 
     private final String feedId;
 
-    FeedScopedIdFactory(String feedId) {
+    public FeedScopedIdFactory(String feedId) {
         this.feedId = feedId;
     }
 
-    FeedScopedId createId(String netexId) {
+    public FeedScopedId createId(String netexId) {
         return new FeedScopedId(feedId, netexId);
     }
 

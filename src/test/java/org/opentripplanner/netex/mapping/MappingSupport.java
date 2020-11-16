@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 import javax.validation.constraints.NotNull;
