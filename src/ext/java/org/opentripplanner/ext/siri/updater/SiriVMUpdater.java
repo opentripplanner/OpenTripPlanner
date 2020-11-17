@@ -7,7 +7,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
@@ -19,7 +18,7 @@ import java.util.List;
 /**
  * Update OTP stop time tables from some (realtime) source
  *
- * Usage example ('rt' name is an example) in file 'Graph.properties':
+ * Usage example:
  *
  * <pre>
  * rt.type = stop-time-updater
