@@ -3,7 +3,8 @@
 ## Command line
 The command line parameters are changed. Use the `--help` option to get the current documentation,
 and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#starting-otp) for examples. The 
-possibility to build the graph in 2 steps (streets then transit) is new in OTP2. OTP2 does not support multiple routers.
+possibility to build the graph in 2 steps (streets then transit) is new in OTP2. OTP2 does not support
+multiple routers.
 
 
 ## File loading
@@ -25,6 +26,12 @@ you want into a single instance of OTP2.
 
 ## Build config
 
+New parameters:
+
+ - `transitServiceStart` Limit the import of transit services to the given *start* date. Default: `-P1Y`
+ - `transitServiceEnd` Limit the import of transit services to the given *end* date. *Inclusive*. Default: `P3Y`
+
+
 These properties changed names from:
 
  - `htmlAnnotations` to `dataImportReport`
@@ -32,15 +39,44 @@ These properties changed names from:
  - `boardTimes` to `routingDefaults.boardSlackByMode`
  - `alightTimes` to `routingDefaults.alightSlackByMode`
  
-These parameters is no longer supported:
+These parameters are no longer supported:
 
- - `stopClusterMode` - TODO OTP2 Why? Old options: `proximity`, `parentStation`
-
+ - `stopClusterMode` 
+ - `parentStopLinking`
+ - `stationTransfers`
+ 
+ OTP2 keeps the stops and stations relationship(called "parentStation") in the transit model. OTP 
+ imports the relation from the GTFS and/or NeTEx input. There is no way to automatically generate
+ this relation based on geographic proximity in OTP2. This enables OTP to search from any stop 
+ part of a station _without_ walking/waiting when the request from/to input field is a station id.
+ 
+ Transfers in OTP2 are generated based on the stop location and the OSM data or GTFS Pathways. In 
+ future versions of OTP2 we also want to support generating simple transfers based on 
+ "line-of-sight" if no pathways or OSM data exist. See issue
+ [#3204](https://github.com/opentripplanner/OpenTripPlanner/issues/3204).
+ 
+ Improving/patching input data is NOT a core feature of OTP, but anyone is welcome to implement 
+ a sandbox plugin to patch data. So, if any of the features above are needed they can be ported
+ from OTP1 into a OTP2 sandbox feature.
+ 
  
 ## Router config
+Se the [Router Configuration](Configuration.md#router-configuration) for a description of the 
+new and continued routing parameters.
 
- - All updaters that require data sources now require you to specify a `sourceType`, even if that
-   particular updater only has one possible data source.
+New parameters:
+
+ - `streetRoutingTimeout` Maximum time limit for street route queries. Replace the old `timeout`.
+ - `transit` Transit tuning parameters, configure the raptor router. A set of parameters to tune 
+             the Raptor transit router. 
+ 
+These parameters are no longer supported:
+
+ - `timeout` Replaced by `streetRoutingTimeout`
+ - `timeouts` OTP1 searches the graph many times, while OTP2 do one search finding multiple results
+              in one search. So, there is no need for this parameter.
+ - `boardTimes` is replaced by `request` parameter `boardSlack` and `boardSlackForMode`.
+ - `alightTimes` is replaced by `request` parameter `alightSlack` and `alightSlackForMode`.
  
    
 ## REST API
