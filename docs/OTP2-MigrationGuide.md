@@ -3,7 +3,8 @@
 ## Command line
 The command line parameters are changed. Use the `--help` option to get the current documentation,
 and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#starting-otp) for examples. The 
-possibility to build the graph in 2 steps (streets then transit) is new in OTP2. OTP2 does not support multiple routers.
+possibility to build the graph in 2 steps (streets then transit) is new in OTP2. OTP2 does not support
+multiple routers.
 
 
 ## File loading
@@ -44,11 +45,10 @@ These parameters are no longer supported:
  - `parentStopLinking`
  - `stationTransfers`
  
- OTP2 keep the stops and stations relationship(called "parentStation") in the transit model. OTP 
- import the relation from the GTFS and/or NeTEx input. There is no way to automatically generate
- this relation based on geographically `proximity` in OTP2. This enables OTP to search from any
- stop part of a station _without_ walking/waiting when the request from/to input field is a 
- station id.
+ OTP2 keeps the stops and stations relationship(called "parentStation") in the transit model. OTP 
+ imports the relation from the GTFS and/or NeTEx input. There is no way to automatically generate
+ this relation based on geographic proximity in OTP2. This enables OTP to search from any stop 
+ part of a station _without_ walking/waiting when the request from/to input field is a station id.
  
  Transfers in OTP2 are generated based on the stop location and the OSM data or GTFS Pathways. In 
  future versions of OTP2 we also want to support generating simple transfers based on 
