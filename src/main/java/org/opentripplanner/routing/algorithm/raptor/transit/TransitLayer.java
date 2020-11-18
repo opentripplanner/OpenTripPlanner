@@ -2,11 +2,11 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.model.Stop;
 
+import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
 public class TransitLayer {
 
   /**
-   * Transit data required for routing, indexed by each date it runs through.
+   * Transit data required for routing, indexed by each local date(Graph TimeZone) it runs through.
+   * A Trip "runs through" a date if any of its arrivals or depatures is happening on that date.
    */
   private final HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByRunningPeriodDate;
 
@@ -62,6 +63,7 @@ public class TransitLayer {
     return stopIndex.indexByStop.get(stop);
   }
 
+  @Nullable
   public Stop getStopByIndex(int stop) {
     return stop != -1 ? this.stopIndex.stopsByIndex.get(stop) : null;
   }
@@ -71,7 +73,7 @@ public class TransitLayer {
   }
 
   public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
-    return tripPatternsByRunningPeriodDate.getOrDefault(date, Collections.emptyList());
+    return tripPatternsByRunningPeriodDate.getOrDefault(date, List.of());
   }
 
   /**
@@ -91,7 +93,7 @@ public class TransitLayer {
 
   public List<TripPatternForDate> getTripPatternsRunningOnDateCopy(LocalDate runningPeriodDate) {
     List<TripPatternForDate> tripPatternForDate = tripPatternsByRunningPeriodDate.get(runningPeriodDate);
-    return tripPatternForDate != null ? new ArrayList<>(tripPatternsByRunningPeriodDate.get(runningPeriodDate)) : null;
+    return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : null;
   }
 
   public List<TripPatternForDate> getTripPatternsStartingOnDateCopy(LocalDate date) {

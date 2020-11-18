@@ -87,10 +87,6 @@ public class TripPatternForDate {
         return startOfRunningPeriod;
     }
 
-    public LocalDateTime getEndOfRunningPeriod() {
-        return endOfRunningPeriod;
-    }
-
     public List<LocalDate> getRunningPeriodDates() {
         // Add one day to ensure last day is included
         return startOfRunningPeriod.toLocalDate()
