@@ -2,6 +2,7 @@ package org.opentripplanner.netex.index.hierarchy;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.netex.index.api.HMapValidationRule;
 
 import java.util.Collection;
@@ -196,8 +197,8 @@ public class HierarchicalMapTest {
             @Override public Status validate(String key, E element) {
                 return REAGAN.equals(element) ? Status.DISCARD : Status.OK;
             }
-            @Override public String logMessage(String key, E value) {
-                return String.format("%s %s is removed", key, value.name());
+            @Override public DataImportIssue logMessage(String key, E value) {
+                return () -> String.format("%s %s is removed", key, value.name());
             }
         };
 
@@ -205,19 +206,19 @@ public class HierarchicalMapTest {
         final StringBuilder warningConsumer = new StringBuilder();
 
         // Then remove from CITY - actor removed
-        city.validate(reagenFilter, warningConsumer::append);
+        city.validate(reagenFilter, i -> warningConsumer.append(i.getMessage()));
         assertEquals("actor Reagan is removed", warningConsumer.toString());
         assertEquals("[E(Eastwood, 1)]" , city.localValues().toString());
 
         // Then remove from STATE - nothing to remove
         warningConsumer.setLength(0);
-        state.validate(reagenFilter, warningConsumer::append);
+        state.validate(reagenFilter, i -> warningConsumer.append(i.getMessage()));
         assertEquals("", warningConsumer.toString());
         assertEquals(2 , state.localSize());
 
         // Then remove from COUNTRY - president removed
         warningConsumer.setLength(0);
-        country.validate(reagenFilter, warningConsumer::append);
+        country.validate(reagenFilter, i -> warningConsumer.append(i.getMessage()));
         assertEquals("president Reagan is removed", warningConsumer.toString());
         assertEquals("[E(Eastwood, 1)]" , country.localValues().toString());
     }

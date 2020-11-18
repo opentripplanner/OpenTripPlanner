@@ -9,8 +9,8 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
-import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -23,6 +23,7 @@ import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
+import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
@@ -33,9 +34,6 @@ import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This class holds indexes of Netex objects for lookup during the NeTEx import using the
@@ -69,11 +67,9 @@ public class NetexEntityIndex {
 
     // Indexes to entities
     public final HierarchicalMapById<Authority> authoritiesById;
+    public final HierarchicalMapById<DatedServiceJourney> datedServiceJourneys;
     public final HierarchicalMapById<DayType> dayTypeById;
     public final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId;
-
-    /** DayTypeRefs is only needed in the local scope, no need to lookup values in the parent. */
-    public final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs;
     public final HierarchicalMapById<DestinationDisplay> destinationDisplayById;
     public final HierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;
     public final HierarchicalMapById<GroupOfLines> groupOfLinesById;
@@ -85,6 +81,7 @@ public class NetexEntityIndex {
     public final HierarchicalMapById<Network> networkById;
     public final HierarchicalMapById<Notice> noticeById;
     public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
+    public final HierarchicalMapById<OperatingDay> operatingDayById;
     public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
     public final HierarchicalMapById<Operator> operatorsById;
     public final HierarchicalVersionMapById<Quay> quayById;
@@ -116,7 +113,7 @@ public class NetexEntityIndex {
         this.authoritiesById = new HierarchicalMapById<>();
         this.dayTypeById = new HierarchicalMapById<>();
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
-        this.dayTypeRefs = new HashSet<>();
+        this.datedServiceJourneys = new HierarchicalMapById<>();
         this.destinationDisplayById = new HierarchicalMapById<>();
         this.flexibleStopPlaceById = new HierarchicalMapById<>();
         this.groupOfLinesById = new HierarchicalMapById<>();
@@ -129,6 +126,7 @@ public class NetexEntityIndex {
         this.networkIdByGroupOfLineId = new HierarchicalMap<>();
         this.noticeById = new HierarchicalMapById<>();
         this.noticeAssignmentById = new HierarchicalMapById<>();
+        this.operatingDayById = new HierarchicalMapById<>();
         this.operatingPeriodById = new HierarchicalMapById<>();
         this.operatorsById = new HierarchicalMapById<>();
         this.quayById = new HierarchicalVersionMapById<>();
@@ -151,7 +149,7 @@ public class NetexEntityIndex {
         this.authoritiesById = new HierarchicalMapById<>(parent.authoritiesById);
         this.dayTypeById = new HierarchicalMapById<>(parent.dayTypeById);
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);
-        this.dayTypeRefs = new HashSet<>();
+        this.datedServiceJourneys = new HierarchicalMapById<>(parent.datedServiceJourneys);
         this.destinationDisplayById = new HierarchicalMapById<>(parent.destinationDisplayById);
         this.flexibleStopPlaceById = new HierarchicalMapById<>(parent.flexibleStopPlaceById);
         this.groupOfLinesById = new HierarchicalMapById<>(parent.groupOfLinesById);
@@ -164,6 +162,7 @@ public class NetexEntityIndex {
         this.networkIdByGroupOfLineId = new HierarchicalMap<>(parent.networkIdByGroupOfLineId);
         this.noticeById = new HierarchicalMapById<>(parent.noticeById);
         this.noticeAssignmentById = new HierarchicalMapById<>(parent.noticeAssignmentById);
+        this.operatingDayById = new HierarchicalMapById<>(parent.operatingDayById);
         this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
         this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
@@ -206,6 +205,7 @@ public class NetexEntityIndex {
              * <p/>
              * If no Network is found {@code null} is returned.
              */
+            @Override
             public Network lookupNetworkForLine(String groupOfLineOrNetworkId) {
                 GroupOfLines groupOfLines = groupOfLinesById.lookup(groupOfLineOrNetworkId);
 
@@ -216,10 +216,12 @@ public class NetexEntityIndex {
                 return networkById.lookup(networkId);
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById() {
                 return authoritiesById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<DayType> getDayTypeById() {
                 return dayTypeById;
             }
@@ -233,86 +235,111 @@ public class NetexEntityIndex {
                 return dayTypeAssignmentByDayTypeId;
             }
 
-            public Iterable<DayTypeRefsToServiceIdAdapter> getDayTypeRefs() {
-                return Collections.unmodifiableSet(dayTypeRefs);
+            @Override
+            public ReadOnlyHierarchicalMapById<DatedServiceJourney> getDatedServiceJourneys() {
+                return datedServiceJourneys;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<DestinationDisplay> getDestinationDisplayById() {
                 return destinationDisplayById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<FlexibleStopPlace> getFlexibleStopPlacesById() {
                 return flexibleStopPlaceById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<GroupOfStopPlaces> getGroupOfStopPlacesById() {
                 return groupOfStopPlacesById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById() {
                 return journeyPatternsById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<FlexibleLine> getFlexibleLineById() {
                 return flexibleLineByid;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<Line> getLineById() {
                 return lineById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<StopPlace> getMultiModalStopPlaceById() {
                 return multiModalStopPlaceById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<Notice> getNoticeById() {
                 return noticeById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<NoticeAssignment> getNoticeAssignmentById() {
                 return noticeAssignmentById;
             }
+            @Override
+            public ReadOnlyHierarchicalMapById<OperatingDay> getOperatingDayById() {
+                return operatingDayById;
+            }
 
+            @Override
             public ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
                 return operatingPeriodById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<Operator> getOperatorsById() {
                 return operatorsById;
             }
 
+            @Override
             public ReadOnlyHierarchicalVersionMapById<Quay> getQuayById() {
                 return quayById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef() {
                 return flexibleStopPlaceByStopPointRef;
             }
 
+            @Override
             public ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef() {
                 return quayIdByStopPointRef;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<Route> getRouteById() {
                 return routeById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<ServiceJourney> getServiceJourneyById() {
                 return serviceJourneyById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById() {
                 return serviceLinkById;
             }
 
+            @Override
             public ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById() {
                 return stopPlaceById;
             }
 
+            @Override
             public ReadOnlyHierarchicalMapById<TariffZone> getTariffZonesById() {
                 return tariffZonesById;
             }
 
+            @Override
             public String getTimeZone() {
                 return timeZone.get();
             }

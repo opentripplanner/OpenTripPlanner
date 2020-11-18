@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.validation;
 
+import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.netex.issues.ObjecctNotFound;
 import org.rutebanken.netex.model.ServiceJourney;
 
 class JourneyPatternNotFoundInSJ extends AbstractHMapValidationRule<String, ServiceJourney> {
@@ -12,10 +14,8 @@ class JourneyPatternNotFoundInSJ extends AbstractHMapValidationRule<String, Serv
   }
 
   @Override
-  public String logMessage(String key, ServiceJourney sj) {
-    return "JourneyPattern not found for ServiceJourney."
-        + " ServiceJourney=" + sj.getId()
-        + ", JourneyPattern id= " +getPatternId(sj);
+  public DataImportIssue logMessage(String key, ServiceJourney sj) {
+    return new ObjecctNotFound("ServiceJourney", sj.getId(), "JourneyPattern", getPatternId(sj));
   }
 
   private String getPatternId(ServiceJourney sj) {

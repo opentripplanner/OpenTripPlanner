@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.index.hierarchy;
 
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.netex.index.api.HMapValidationRule;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 
@@ -49,7 +50,7 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
         return localSize() + (isRoot() ? 0 : parent.localSize());
     }
 
-    public void validate(HMapValidationRule<K, V> rule, Consumer<String> warnMsgConsumer) {
+    public void validate(HMapValidationRule<K, V> rule, Consumer<DataImportIssue> warnMsgConsumer) {
         List<K> discardKeys = new ArrayList<>();
         for (K key : localKeys()) {
             V value = localGet(key);
@@ -64,6 +65,11 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
             }
         }
         discardKeys.forEach(this::localRemove);
+    }
+
+    /** Return a reference to the parent. */
+    public AbstractHierarchicalMap<K,V> parent() {
+        return parent;
     }
 
     /** Get value from 'local' map, parent is not queried. */

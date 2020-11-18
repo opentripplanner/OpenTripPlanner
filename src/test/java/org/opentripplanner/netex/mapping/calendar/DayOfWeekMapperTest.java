@@ -61,30 +61,30 @@ public class DayOfWeekMapperTest {
 
     @Test public void mapDayOfWeekSet() {
         // Nothing is mapped to nothing
-        assertEquals(Set.of(), mapDayOfWeek(Set.of()));
+        assertEquals(Set.of(), DayOfWeekMapper.mapDayOfWeeks(Set.of()));
 
         // The union of one set with one element is just that one element
-        assertEquals(Set.of(DayOfWeek.MONDAY), mapDayOfWeek(Set.of(MONDAY)));
+        assertEquals(Set.of(DayOfWeek.MONDAY), DayOfWeekMapper.mapDayOfWeeks(Set.of(MONDAY)));
 
         // The union of two sets with one element is a set with two elements
         assertEquals(
                 Set.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY),
-                mapDayOfWeek(Set.of(MONDAY, WEDNESDAY))
+                DayOfWeekMapper.mapDayOfWeeks(Set.of(MONDAY, WEDNESDAY))
         );
         // The union of two sets with the same element is a set with one elements
         assertEquals(
                 Set.of(DayOfWeek.MONDAY),
-                mapDayOfWeek(Arrays.asList(MONDAY, MONDAY))
+                DayOfWeekMapper.mapDayOfWeeks(Arrays.asList(MONDAY, MONDAY))
         );
         // The union of two none overlapping set contains all elements of both sets
         assertEquals(
                 Set.of(DayOfWeek.MONDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY),
-                mapDayOfWeek(Set.of(MONDAY, WEEKEND))
+                DayOfWeekMapper.mapDayOfWeeks(Set.of(MONDAY, WEEKEND))
         );
         // Union of a set with NONE is a empty set
-        assertEquals(Set.of(),  mapDayOfWeek(Set.of(NONE)));
+        assertEquals(Set.of(),  DayOfWeekMapper.mapDayOfWeeks(Set.of(NONE)));
 
         // Union of sets with duplicate result in all duplicates removed
-        assertEquals(EVERYDAY_EXPECTED, mapDayOfWeek(Set.of(MONDAY, WEEKEND, EVERYDAY)));
+        assertEquals(EVERYDAY_EXPECTED, DayOfWeekMapper.mapDayOfWeeks(Set.of(MONDAY, WEEKEND, EVERYDAY)));
     }
 }

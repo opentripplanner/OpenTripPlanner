@@ -31,6 +31,16 @@ public class DateMapper {
     }
 
     public static LocalDateTime asDateTime(LocalDate localDate, int secondsSinceStartOfDay) {
+        // In OTP LocalDate is sometimes used to represent ServiceDate. This calculation is
+        // "safe" because calculations on LocalDate ignore TimeZone adjustments, just like the
+        // ServiceDate. So, in this case it is not necessary to: 'NOON - 12 hours + secondsSinceStartOfDay'
         return localDate.atStartOfDay().plusSeconds(secondsSinceStartOfDay);
+    }
+
+    public static int secondsSinceStartOfService(
+        ZonedDateTime departureDate, ZonedDateTime dateTime, ZoneId zoneId
+    ) {
+        ZonedDateTime startOfService = asStartOfService(departureDate.toLocalDate(), zoneId);
+        return (int) Duration.between(startOfService, dateTime).toSeconds();
     }
 }

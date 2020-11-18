@@ -14,6 +14,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -823,7 +824,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
-        return dateTime.toLocalTime().toSecondOfDay();
+        return DateMapper.secondsSinceStartOfService(dateTime, dateTime, routingService.getTimeZone().toZoneId());
     }
 
 

@@ -9,6 +9,7 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LinkSequenceProjection;
 import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;

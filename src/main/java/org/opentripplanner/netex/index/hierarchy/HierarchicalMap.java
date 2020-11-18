@@ -23,6 +23,11 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
         super(parent);
     }
 
+    /** Return a reference to the parent. */
+    public HierarchicalMap<K,V> parent() {
+        return (HierarchicalMap<K, V>) super.parent();
+    }
+
     /**
      * Add a new pair of {@code key & value} to the local map instance.
      */

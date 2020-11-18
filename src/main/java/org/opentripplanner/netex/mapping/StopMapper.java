@@ -6,6 +6,7 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.Quay;
 
 import javax.annotation.Nullable;

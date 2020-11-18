@@ -37,6 +37,7 @@ import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
 class NetexTestDataSample {
+    public static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
     private static final DayType EVERYDAY = new DayType()
             .withId("EVERYDAY")
             .withName(new MultilingualString().withValue("everyday"));
@@ -123,7 +124,7 @@ class NetexTestDataSample {
         // Create a new Service Journey with line, dayType, journeyPattern and timetable from above
         {
             ServiceJourney serviceJourney = new ServiceJourney()
-                    .withId("RUT:ServiceJourney:1")
+                    .withId(SERVICE_JOURNEY_ID)
                     .withLineRef(lineRef)
                     .withDayTypes(createEveryDayRefs())
                     .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
