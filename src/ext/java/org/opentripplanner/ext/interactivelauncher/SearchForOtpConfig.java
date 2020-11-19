@@ -38,13 +38,20 @@ class SearchForOtpConfig {
     }
 
     final int newDepthLimit = depthLimit - 1;
-    return Arrays.stream(dir.listFiles())
+    File[] files = dir.listFiles();
+
+    if(files == null) { return Stream.empty(); }
+
+    return Arrays.stream(files)
         .flatMap(f -> recursiveSearch(f, newDepthLimit));
   }
 
   @SuppressWarnings("ConstantConditions")
   static private boolean isOtpConfigDataDir(File dir) {
-    for (File f : dir.listFiles()) {
+    File[] files = dir.listFiles();
+    if(files == null) { return false; }
+
+    for (File f : files) {
       if(isConfigFile(f.getName())) {
         return true;
       }

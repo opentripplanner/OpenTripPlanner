@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
+import org.opentripplanner.ext.interactivelauncher.Model;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +17,7 @@ class OptionsView {
   private final JCheckBox saveGraphChk = new JCheckBox("Save graph", true);
   private final JCheckBox startOptServerChk = new JCheckBox("Serve graph", true);
 
-  OptionsView() {
+  OptionsView(Model model) {
     addComp(new JLabel("Build graph"), panel);
     addSectionSpace(panel);
     addComp(buildStreetGraphChk, panel);
@@ -31,6 +33,8 @@ class OptionsView {
     addComp(saveGraphChk, panel);
     addComp(startOptServerChk, panel);
     addSectionDoubleSpace(panel);
+
+    initValues(model);
   }
 
   Box panel() {
@@ -44,23 +48,37 @@ class OptionsView {
     startOptServerChk.addActionListener(l);
   }
 
+  private void initValues(Model model) {
+    buildStreetGraphChk.setSelected(model.isBuildStreet());
+    buildTransitGraphChk.setSelected(model.isBuildTransit());
+    saveGraphChk.setSelected(model.isSaveGraph());
+    startOptServerChk.setSelected(model.isServeGraph());
+  }
+
+  public void updateModel(Model model) {
+    model.setBuildStreet(buildStreet());
+    model.setBuildTransit(buildTransit());
+    model.setServeGraph(saveGraph());
+    model.setServeGraph(startOptServer());
+  }
+
   void initState() {
     onBuildGraphChkChanged(null);
   }
 
-  boolean buildStreet() {
+  private boolean buildStreet() {
     return buildStreetGraphChk.isSelected();
   }
 
-  boolean buildTransit() {
+  private boolean buildTransit() {
     return buildTransitGraphChk.isSelected();
   }
 
-  boolean saveGraph() {
+  private boolean saveGraph() {
     return saveGraphChk.isSelected();
   }
 
-  boolean startOptServer() {
+  private boolean startOptServer() {
     return startOptServerChk.isSelected();
   }
 
