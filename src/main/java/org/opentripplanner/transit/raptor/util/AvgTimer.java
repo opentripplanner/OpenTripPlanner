@@ -1,16 +1,23 @@
 package org.opentripplanner.transit.raptor.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 
 /**
- * This class is used to collect data and print a summary after some period of time.
+ * This class is used to collect performance data and print a summary after some period of time.
+ * Measuring performance with this class is NOT meant for production use, only for test use. It
+ * would be a nice enhancement to make it THREAD-SAFE and enable it for production use as well.
+ * To make it THREAD-SAFE the AvgTimer must be created pr thread as well as pr method and the
+ * result must be merged before printing the results. This would also require some cleanup to
+ * prevent a memory leak. For example it would be easy to drop the unused timers every time a
+ * report is printed. In a "long" running test/production the report printing can not be done
+ * at the end, but need to be scheduled(e.g. once every hour).
  *
  * <pre>
  *       METHOD CALLS DURATION |              SUCCESS               |         FAILURE
@@ -19,9 +26,21 @@ import java.util.stream.Stream;
  *       AvgTimer:main t2      |   45   699  388 ms     55   21,4 s |    0 ms      0    0,0 s
  *       AvgTimer:main t3      |    4   692  375 ms    110   41,3 s |    0 ms      0    0,0 s
  * </pre>
+ *
+ * <p>
+ * <b>THREAD SAFETY</b>
+ * <p>
+ * The provider/factory methods are all THREAD-SAFE, but the {@link AvgTimer} instances are NOT.
+ * By default the static factory/provider return a no-op THREAD-SAFE timer. Turning the timers ON
+ * should only be done when testing performance, never in a production environment.
+ * <p>
+ * <b>ENABLE TIMERS</b>
+ * <p>
+ * The AvgTimer need to be enabled ({@link #enableTimers(boolean)}) in code BEFORE any timers are
+ * created. The default is to create no-op timers.
  */
 public abstract class AvgTimer {
-    public static boolean NOOP = true;
+    private static boolean noop = true;
     private static final String RESULT_TABLE_TITLE = "METHOD CALLS DURATION";
 
     /**
@@ -29,7 +48,7 @@ public abstract class AvgTimer {
      * order for printing at the end of the program. This more or less will resemble the call stack.
      */
     private static final List<String> methods = new ArrayList<>();
-    private static final Map<String, AvgTimer> allTimers = new HashMap<>();
+    private static final Map<String, AvgTimer> allTimers = new ConcurrentHashMap<>();
 
     protected final String method;
     private long startTime = 0;
@@ -50,7 +69,6 @@ public abstract class AvgTimer {
      * @param method Use: <SimpleClassName>:<methodName>
      */
     public static AvgTimer timerMilliSec(final String method) {
-        if(NOOP) { return NoopAvgTimer.INSTANCE; }
         return timer(method, AvgTimerMilliSec::new);
     }
 
@@ -58,7 +76,6 @@ public abstract class AvgTimer {
      * @param method Use: <SimpleClassName>:<methodName>
      */
     public static AvgTimer timerMicroSec(final String method) {
-        if(NOOP) { return NoopAvgTimer.INSTANCE; }
         return timer(method, AvgTimerMicroSec::new);
     }
 
@@ -73,11 +90,15 @@ public abstract class AvgTimer {
      * with no overhead to the performance.
      */
     public static void enableTimers(boolean enable) {
-        NOOP = !enable;
+        noop = !enable;
+    }
+
+    public static boolean timersEnabled() {
+        return !noop;
     }
 
     public static List<String> listResults() {
-        if(NOOP) { return List.of(); }
+        if(noop) { return List.of(); }
 
         final int width = Math.max(
                 RESULT_TABLE_TITLE.length(),
@@ -100,7 +121,7 @@ public abstract class AvgTimer {
      * you may call this method after the warm up is done.
      */
     public static void resetAll() {
-        if(NOOP) { return; }
+        if(noop) { return; }
         allTimers().forEach(AvgTimer::reset);
     }
 
@@ -173,6 +194,8 @@ public abstract class AvgTimer {
     /* private methods */
 
     private static AvgTimer timer(final String method, final Function<String, ? extends AvgTimer> factory) {
+        if(noop) { return NoopAvgTimer.INSTANCE; }
+
         return allTimers.computeIfAbsent(method, m -> {
             methods.add(m);
             return factory.apply(m);
