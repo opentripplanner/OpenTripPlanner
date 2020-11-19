@@ -5,7 +5,7 @@ import java.awt.*;
 
 final class ViewUtils {
   private static final boolean DEBUG_LAYOUT = false;
-  private static final int SECTION_SPACE = 10;
+  static final int SECTION_SPACE = 10;
   static final Color BACKGROUND = new Color(0xe0, 0xf0, 0xff);
   static final Color BG_STATUS_BAR = new Color(0xd0, 0xe0, 0xf0);
   static final Color FG_STATUS_BAR = new Color(0, 0, 0x80);
