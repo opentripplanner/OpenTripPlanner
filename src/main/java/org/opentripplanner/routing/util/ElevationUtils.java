@@ -71,7 +71,7 @@ public class ElevationUtils {
         double trueLength = lengths[0];
         double flatLength = lengths[1];
         if (flatLength < 1e-3) {
-            log.error("Too small edge, returning neutral slope costs.");
+            // Too small edge, returning neutral slope costs.
             return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false, 1.0);
         }
         double lengthMultiplier = trueLength / flatLength;
