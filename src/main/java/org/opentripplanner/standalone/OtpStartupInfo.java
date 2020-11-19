@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone;
 
-import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.ProjectInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +24,15 @@ public class OtpStartupInfo {
     static {
         INFO = ""
                 + HEADER.stream().map(OtpStartupInfo::line).collect(Collectors.joining())
-                + line("Version:  " + MavenVersion.VERSION.version)
-                + line("Commit:   " + MavenVersion.VERSION.commit)
-                + line("Branch:   " + MavenVersion.VERSION.branch)
-                + line("Build:    " + MavenVersion.VERSION.buildTime)
+                + line("Version:  " + ProjectInfo.INSTANCE.version)
+                + line("Commit:   " + ProjectInfo.INSTANCE.commit)
+                + line("Branch:   " + ProjectInfo.INSTANCE.branch)
+                + line("Build:    " + ProjectInfo.INSTANCE.buildTime)
                 + dirtyLineIfDirty();
     }
 
     private static String dirtyLineIfDirty() {
-        return MavenVersion.VERSION.dirty
+        return ProjectInfo.INSTANCE.dirty
         ? line("Dirty:    Local modification exist!")
         : "";
     }

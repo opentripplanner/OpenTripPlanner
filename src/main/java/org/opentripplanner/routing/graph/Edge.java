@@ -2,7 +2,6 @@ package org.opentripplanner.routing.graph;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 
@@ -18,7 +17,7 @@ import java.util.Locale;
  */
 public abstract class Edge implements Serializable {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     protected Vertex fromv;
 

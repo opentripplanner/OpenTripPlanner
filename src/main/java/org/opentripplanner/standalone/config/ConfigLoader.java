@@ -16,7 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static org.opentripplanner.util.EnvironmentVariableReplacer.insertEnvironmentVariables;
+import static org.opentripplanner.standalone.config.EnvironmentVariableReplacer.insertEnvironmentVariables;
 
 /**
  * Generic config file loader. This is used to load all configuration files.

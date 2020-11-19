@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.graph;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -26,7 +25,7 @@ import java.util.Locale;
  */
 public abstract class Vertex implements Serializable, Cloneable {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
 

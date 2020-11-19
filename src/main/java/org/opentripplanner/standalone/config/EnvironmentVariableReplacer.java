@@ -1,4 +1,7 @@
-package org.opentripplanner.util;
+package org.opentripplanner.standalone.config;
+
+import org.opentripplanner.common.ProjectInfo;
+import org.opentripplanner.util.OtpAppException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,14 +11,41 @@ import java.util.regex.Pattern;
 /**
  * Replaces environment variable placeholders specified on the format ${variable} in a text
  * with the current system environment variable values.
+ * <p>
+ * The following OTP Project info is also available in addition to system environment
+ * variables:
+ *
+ * <ul>
+ *   <li>{@code maven.version} - Full Maven version string, including the SNAPSHOT qualifier if present.</li>
+ *   <li>{@code maven.version.short} - Maven version without the SNAPSHOT qualifier</li>
+ *   <li>{@code maven.version.major} - Major version number</li>
+ *   <li>{@code maven.version.minor} - Minor version number</li>
+ *   <li>{@code maven.version.patch} - Patch version number</li>
+ *   <li>{@code maven.version.qualifier} - Maven SNAPSHOT qualifier.</li>
+ *   <li>{@code git.branch} - Git branch</li>
+ *   <li>{@code git.commit} - Git commit hash</li>
+ *   <li>{@code git.commit.timestamp} - Timestamp for the Git commit.</li>
+ * </ul>
  */
-public class EnvironmentVariableReplacer {
+class EnvironmentVariableReplacer {
     /**
      * A pattern matching a placeholder like '${VAR_NAME}'. The placeholder must start with
      * '${' and end with '}'. The environment variable name must consist of only alphanumerical
-     * characters(a-z, A-Z, 0-9) and underscore '_'.
+     * characters(a-z, A-Z, 0-9), dot `.` and underscore '_'.
      */
-    private static Pattern PATTERN = Pattern.compile("\\$\\{(\\w+)}");
+    private final static Pattern PATTERN = Pattern.compile("\\$\\{([.\\w]+)}");
+
+    private static final Map<String, String> PROJECT_INFO = Map.of(
+        "maven.version" , ProjectInfo.INSTANCE.version,
+        "maven.version.short" , ProjectInfo.INSTANCE.unqualifiedVersion(),
+        "maven.version.major" , Integer.toString(ProjectInfo.INSTANCE.major),
+        "maven.version.minor" , Integer.toString(ProjectInfo.INSTANCE.minor),
+        "maven.version.patch" , Integer.toString(ProjectInfo.INSTANCE.patch),
+        "maven.version.qualifier" , ProjectInfo.INSTANCE.qualifier,
+        "git.branch" , ProjectInfo.INSTANCE.branch,
+        "git.commit" , ProjectInfo.INSTANCE.commit,
+        "git.commit.timestamp" , ProjectInfo.INSTANCE.commitTime
+    );
 
 
     /**
@@ -38,6 +68,9 @@ public class EnvironmentVariableReplacer {
                 String value = System.getenv(nameOnly);
                 if (value != null) {
                     environmentVariables.put(envVar, value);
+                }
+                else if(PROJECT_INFO.containsKey(nameOnly)) {
+                    environmentVariables.put(envVar, PROJECT_INFO.get(nameOnly));
                 }
                 else {
                     throw new OtpAppException(

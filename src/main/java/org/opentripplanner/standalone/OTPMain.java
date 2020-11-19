@@ -2,7 +2,7 @@ package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.ProjectInfo;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -71,18 +71,18 @@ public class OTPMain {
             // parsed commands, since there will be three separate objects.
             JCommander jc = JCommander.newBuilder().addObject(params).args(args).build();
             if (params.version) {
-                System.out.println(MavenVersion.VERSION.getLongVersionString());
+                System.out.println(ProjectInfo.INSTANCE.getLongVersionString());
                 System.exit(0);
             }
             if (params.help) {
-                System.out.println(MavenVersion.VERSION.getShortVersionString());
+                System.out.println(ProjectInfo.INSTANCE.getShortVersionString());
                 jc.setProgramName("java -Xmx4G -jar otp.jar");
                 jc.usage();
                 System.exit(0);
             }
             params.inferAndValidate();
         } catch (ParameterException pex) {
-            System.out.println(MavenVersion.VERSION.getShortVersionString());
+            System.out.println(ProjectInfo.INSTANCE.getShortVersionString());
             LOG.error("Parameter error: {}", pex.getMessage());
             System.exit(1);
         }
