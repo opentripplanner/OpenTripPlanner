@@ -21,16 +21,15 @@ import java.util.stream.Stream;
  * </pre>
  */
 public abstract class AvgTimer {
-    private static boolean NOOP = true;
+    public static boolean NOOP = true;
     private static final String RESULT_TABLE_TITLE = "METHOD CALLS DURATION";
 
     /**
      * Keep a list of methods in the order they are added, so that we can list all timers in the same
      * order for printing at the end of the program. This more or less will resemble the call stack.
      */
-    private static List<String> methods = new ArrayList<>();
-    private static Map<String, AvgTimer> allTimers = new HashMap<>();
-
+    private static final List<String> methods = new ArrayList<>();
+    private static final Map<String, AvgTimer> allTimers = new HashMap<>();
 
     protected final String method;
     private long startTime = 0;
@@ -51,6 +50,7 @@ public abstract class AvgTimer {
      * @param method Use: <SimpleClassName>:<methodName>
      */
     public static AvgTimer timerMilliSec(final String method) {
+        if(NOOP) { return NoopAvgTimer.INSTANCE; }
         return timer(method, AvgTimerMilliSec::new);
     }
 
@@ -58,6 +58,7 @@ public abstract class AvgTimer {
      * @param method Use: <SimpleClassName>:<methodName>
      */
     public static AvgTimer timerMicroSec(final String method) {
+        if(NOOP) { return NoopAvgTimer.INSTANCE; }
         return timer(method, AvgTimerMicroSec::new);
     }
 
@@ -75,14 +76,9 @@ public abstract class AvgTimer {
         NOOP = !enable;
     }
 
-    private static AvgTimer timer(final String method, final Function<String, ? extends AvgTimer> factory) {
-        return allTimers.computeIfAbsent(method, methid -> {
-            methods.add(methid);
-            return NOOP ? new NoopAvgTimer(method) : factory.apply(methid);
-        });
-    }
-
     public static List<String> listResults() {
+        if(NOOP) { return List.of(); }
+
         final int width = Math.max(
                 RESULT_TABLE_TITLE.length(),
                 allTimers().mapToInt(it -> it.method.length()).max().orElse(0)
@@ -104,18 +100,8 @@ public abstract class AvgTimer {
      * you may call this method after the warm up is done.
      */
     public static void resetAll() {
+        if(NOOP) { return; }
         allTimers().forEach(AvgTimer::reset);
-    }
-
-    private void reset() {
-        startTime = 0;
-        lapTime = 0;
-        minTime = Long.MAX_VALUE;
-        maxTime = -1;
-        totalTimeSuccess = 0;
-        totalTimeFailed = 0;
-        counterSuccess = 0;
-        counterFailed = 0;
     }
 
     public void start() {
@@ -186,17 +172,11 @@ public abstract class AvgTimer {
 
     /* private methods */
 
-    private boolean used() {
-        return counterSuccess != 0 || counterFailed != 0;
-    }
-
-    private String toString(int width) {
-        return formatLine(
-                method,
-                width,
-                formatResultAvg(totalTimeSuccess, counterSuccess),
-                formatResult(totalTimeFailed, counterFailed)
-        );
+    private static AvgTimer timer(final String method, final Function<String, ? extends AvgTimer> factory) {
+        return allTimers.computeIfAbsent(method, m -> {
+            methods.add(m);
+            return factory.apply(m);
+        });
     }
 
     private static Stream<AvgTimer> allTimers() {
@@ -220,6 +200,30 @@ public abstract class AvgTimer {
         );
     }
 
+    private void reset() {
+        startTime = 0;
+        lapTime = 0;
+        minTime = Long.MAX_VALUE;
+        maxTime = -1;
+        totalTimeSuccess = 0;
+        totalTimeFailed = 0;
+        counterSuccess = 0;
+        counterFailed = 0;
+    }
+
+    private boolean used() {
+        return counterSuccess != 0 || counterFailed != 0;
+    }
+
+    private String toString(int width) {
+        return formatLine(
+            method,
+            width,
+            formatResultAvg(totalTimeSuccess, counterSuccess),
+            formatResult(totalTimeFailed, counterFailed)
+        );
+    }
+
     private String formatResultAvg(long time, int count) {
         return String.format(
                 "%4s %5s %4s %s %6s %6s s",
@@ -236,13 +240,12 @@ public abstract class AvgTimer {
         return value < 10_000 ? Long.toString(value) : (value/1000) + "'";
     }
 
+    private String formatResult(long time, int count) {
+        return String.format("%4d %s %6d %6s s", average(time, count), unit(), count, toSec(time));
+    }
 
     private static String columnHeaderAvg() {
         return " Min   Max  Avg     Count   Total";
-    }
-
-    private String formatResult(long time, int count) {
-        return String.format("%4d %s %6d %6s s", average(time, count), unit(), count, toSec(time));
     }
 
     private static String columnFailureHeader() {
@@ -310,6 +313,7 @@ public abstract class AvgTimer {
     }
 
     private static final class NoopAvgTimer extends AvgTimer {
+        private static final NoopAvgTimer INSTANCE = new NoopAvgTimer("noop");
         private NoopAvgTimer(String name) { super(name); }
         @Override public void start() { }
         @Override public void stop() { }
