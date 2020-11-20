@@ -1,14 +1,21 @@
 package org.opentripplanner.ext.siri;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +24,6 @@ import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
-
-import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class is used for matching TripDescriptors without trip_ids to scheduled GTFS data and to
@@ -211,29 +210,30 @@ public class SiriFuzzyTripMatcher {
 
                 TripPattern tripPattern = index.getPatternForTrip().get(trip);
 
-                    String currentTripId = getUnpaddedTripId(trip.getId().getId());
+                String currentTripId = getUnpaddedTripId(trip.getId().getId());
 
-                    if (mappedTripsCache.containsKey(currentTripId)) {
-                        mappedTripsCache.get(currentTripId).add(trip);
-                    } else {
-                        Set<Trip> initialSet = new HashSet<>();
-                        initialSet.add(trip);
-                        mappedTripsCache.put(currentTripId, initialSet);
-                    }
+                if (mappedTripsCache.containsKey(currentTripId)) {
+                    mappedTripsCache.get(currentTripId).add(trip);
+                } else {
+                    Set<Trip> initialSet = new HashSet<>();
+                    initialSet.add(trip);
+                    mappedTripsCache.put(currentTripId, initialSet);
+                }
 
-                if (tripPattern != null &&
-                        (tripPattern.getMode().equals(TraverseMode.RAIL) /*||
-                                                    (trip.getTransportSubmode() != null &&
-                                                            trip.getTransportSubmode().equals(TransmodelTransportSubmode.RAIL_REPLACEMENT_BUS))*/)) {
-                    // TODO - SIRI: Add support for submode
-                    if (trip.getTripShortName() != null) {
-                        String tripShortName = trip.getTripShortName();
-                        if (mappedVehicleRefCache.containsKey(tripShortName)) {
-                            mappedVehicleRefCache.get(tripShortName).add(trip);
+                if (tripPattern != null && (
+                    tripPattern.getMode().equals(TransitMode.RAIL) || (
+                        tripPattern.getNetexSubmode() != null &&
+                        tripPattern.getNetexSubmode().equals("railReplacementBus")
+                ))) {
+
+                    if (trip.getInternalPlanningCode() != null) {
+                        String internalPlanningCode = trip.getInternalPlanningCode();
+                        if (mappedVehicleRefCache.containsKey(internalPlanningCode)) {
+                            mappedVehicleRefCache.get(internalPlanningCode).add(trip);
                         } else {
                             Set<Trip> initialSet = new HashSet<>();
                             initialSet.add(trip);
-                            mappedVehicleRefCache.put(tripShortName, initialSet);
+                            mappedVehicleRefCache.put(internalPlanningCode, initialSet);
                         }
                     }
                 }
@@ -382,5 +382,44 @@ public class SiriFuzzyTripMatcher {
             }
         }
         return -1;
+    }
+
+    /**
+     * Returns a match of tripIds that match the provided values.
+     *
+     * @param internalPlanningCode
+     * @param serviceDate
+     * @param mode
+     * @param transportSubmode
+     * @return
+     */
+    public List<FeedScopedId> getTripIdForInternalPlanningCodeServiceDateAndMode(String internalPlanningCode, ServiceDate serviceDate, TransitMode mode, String transportSubmode) {
+
+        Set<Trip> cachedTripsBySiriId = getCachedTripsBySiriId(internalPlanningCode);
+
+        if (cachedTripsBySiriId.isEmpty()) {
+            cachedTripsBySiriId = getCachedTripsByVehicleRef(internalPlanningCode);
+        }
+
+        List<FeedScopedId> matches = new ArrayList<>();
+        for (Trip trip : cachedTripsBySiriId) {
+            final TripPattern tripPattern = routingService.getPatternForTrip().get(trip);
+            if (tripPattern.getMode().equals(mode) || (
+                tripPattern.getNetexSubmode() != null &&
+                tripPattern.getNetexSubmode().equals(transportSubmode)
+            )) {
+
+                Set<ServiceDate> serviceDates = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
+
+                if (serviceDates.contains(serviceDate) &&
+                    trip.getInternalPlanningCode() != null &&
+                    trip.getInternalPlanningCode().equals(internalPlanningCode)) {
+                    matches.add(trip.getId());
+                }
+            }
+        }
+
+
+        return matches;
     }
 }
