@@ -16,9 +16,9 @@ public class TransitLayer {
 
   /**
    * Transit data required for routing, indexed by each local date(Graph TimeZone) it runs through.
-   * A Trip "runs through" a date if any of its arrivals or depatures is happening on that date.
+   * A Trip "runs through" a date if any of its arrivals or departures is happening on that date.
    */
-  private final HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByRunningPeriodDate;
+  private final HashMap<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate;
 
   /**
    * Index of outer list is from stop index, inner list index has no specific meaning. To stop index
@@ -40,7 +40,7 @@ public class TransitLayer {
    */
   public TransitLayer(TransitLayer transitLayer) {
     this(
-        transitLayer.tripPatternsByRunningPeriodDate,
+        transitLayer.tripPatternsRunningOnDate,
         transitLayer.transferByStopIndex,
         transitLayer.stopIndex,
         transitLayer.transitDataZoneId
@@ -48,12 +48,12 @@ public class TransitLayer {
   }
 
   public TransitLayer(
-      Map<LocalDate, List<TripPatternForDate>> tripPatternsByRunningPeriodDate,
+      Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
       List<List<Transfer>> transferByStopIndex,
       StopIndexForRaptor stopIndex,
       ZoneId transitDataZoneId
   ) {
-    this.tripPatternsByRunningPeriodDate = new HashMap<>(tripPatternsByRunningPeriodDate);
+    this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transferByStopIndex = transferByStopIndex;
     this.stopIndex = stopIndex;
     this.transitDataZoneId = transitDataZoneId;
@@ -73,7 +73,7 @@ public class TransitLayer {
   }
 
   public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
-    return tripPatternsByRunningPeriodDate.getOrDefault(date, List.of());
+    return tripPatternsRunningOnDate.getOrDefault(date, List.of());
   }
 
   /**
@@ -92,7 +92,7 @@ public class TransitLayer {
   }
 
   public List<TripPatternForDate> getTripPatternsRunningOnDateCopy(LocalDate runningPeriodDate) {
-    List<TripPatternForDate> tripPatternForDate = tripPatternsByRunningPeriodDate.get(runningPeriodDate);
+    List<TripPatternForDate> tripPatternForDate = tripPatternsRunningOnDate.get(runningPeriodDate);
     return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : null;
   }
 
@@ -116,6 +116,6 @@ public class TransitLayer {
       LocalDate date,
       List<TripPatternForDate> tripPatternForDates
   ) {
-    this.tripPatternsByRunningPeriodDate.replace(date, tripPatternForDates);
+    this.tripPatternsRunningOnDate.replace(date, tripPatternForDates);
   }
 }
