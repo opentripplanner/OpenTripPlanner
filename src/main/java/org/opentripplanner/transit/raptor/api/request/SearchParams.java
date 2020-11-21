@@ -1,12 +1,11 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
 
@@ -233,15 +232,15 @@ public class SearchParams {
 
     @Override
     public String toString() {
-        return "SearchParams{" +
-                "earliestDepartureTime=" + TimeUtils.timeToStrCompact(earliestDepartureTime, TIME_NOT_SET) +
-                ", latestArrivalTime=" + TimeUtils.timeToStrCompact(latestArrivalTime, TIME_NOT_SET) +
-                ", searchWindowInSeconds=" + TimeUtils.timeToStrCompact(searchWindowInSeconds, NOT_SET) +
-                ", boardSlackInSeconds=" + boardSlackInSeconds +
-                ", numberOfAdditionalTransfers=" + numberOfAdditionalTransfers +
-                ", accessLegs(max 5)=" + accessLegs.stream().limit(5).collect(Collectors.toList()) +
-                ", egressLegs(max 5)=" + egressLegs.stream().limit(5).collect(Collectors.toList()) +
-                '}';
+        return ToStringBuilder.of(SearchParams.class)
+            .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
+            .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
+            .addDurationSec("searchWindow", searchWindowInSeconds)
+            .addDurationSec("boardSlack", boardSlackInSeconds)
+            .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+            .addColLimited("accessLegs", accessLegs, 5)
+            .addColLimited("egressLegs", egressLegs, 5)
+            .toString();
     }
 
     @Override
