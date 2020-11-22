@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.I18NString;
@@ -15,7 +14,7 @@ import org.opentripplanner.util.I18NString;
  */
 public class ParkAndRideVertex extends Vertex {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     private String id;
 

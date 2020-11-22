@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.ProjectInfo;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -123,7 +123,7 @@ public class SpeedTest {
         printProfileStatistics();
 
         service.shutdown();
-        System.err.println("\nSpeedTest done! " + MavenVersion.VERSION.getShortVersionString());
+        System.err.println("\nSpeedTest done! " + ProjectInfo.INSTANCE.getShortVersionString());
     }
 
     private void runSingleTest(int sample, int nSamples) throws Exception {
