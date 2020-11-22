@@ -54,6 +54,39 @@ uri | An URI path to a resource like a file or a URL. | `"gs://bucket/path/a.obj
 linear function | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x` | `"600 + 2.0 x"`
 
 
+## System environment and project information substitution
+
+OTP support injecting system environment variables and project information parameters into the 
+configuration. A pattern like `${VAR_NAME}` in a configuration file is substituted with an
+environment variable with name `VAR_NAME`. The substitution is done BEFORE the JSON is parsed, so
+both json keys and values is subject to substitution. This is useful if you want OTPs version 
+number to be part of the _graph-file-name_, or you want to inject credentials in a cloud based 
+deployment.
+
+```JSON
+{
+  storage : {
+    gsCredentials: "${GCS_SERVICE_CREDENTIALS}",
+    graph: "file:///var/otp/graph-${maven.version.short}.obj",
+  }
+}
+```     
+In the example above the environment variable `GCS_SERVICE_CREDENTIALS` on the local machine where
+OTP is deployed is injected into the config. Also, the Maven version number `x.y.z` is injected.
+
+The project information variables available are:
+
+  - `maven.version`
+  - `maven.version.short`
+  - `maven.version.major`
+  - `maven.version.minor`
+  - `maven.version.patch`
+  - `maven.version.qualifier`
+  - `git.branch`
+  - `git.commit`
+  - `git.commit.timestamp`
+
+
 # System-wide Configuration
 
 Using the file `otp-config.json` you can enable or disable different APIs and experimental

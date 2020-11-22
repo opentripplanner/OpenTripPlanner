@@ -86,9 +86,9 @@ public class TransitLayerMapper {
     ) {
         Collection<TripPattern> allTripPatterns = graph.tripPatternForId.values();
 
-        final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld =
-            mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
+        final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
 
+        newTripPatternForOld = mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
 
         TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
             graph.index.getServiceCodesRunningForDate(),
