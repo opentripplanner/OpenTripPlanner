@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
@@ -35,5 +36,15 @@ public class AccessEgress implements RaptorTransfer {
 
   public State getLastState() {
     return lastState;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+        .of(AccessEgress.class)
+        .addNum("stop", toFromStop)
+        .addDurationSec("duration", durationInSeconds)
+        .addObj("state", lastState)
+        .toString();
   }
 }

@@ -155,7 +155,7 @@ public class ToStringBuilder {
      * seconds) is only added if they are not zero {@code 0}. This is the same format as the
      * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
      */
-    public ToStringBuilder addDuration(String name, Integer durationSeconds) {
+    public ToStringBuilder addDurationSec(String name, Integer durationSeconds) {
         return addIfNotIgnored(name, durationSeconds, null, TimeUtils::durationToStr);
     }
 

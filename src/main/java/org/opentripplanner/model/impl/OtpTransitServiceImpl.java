@@ -11,9 +11,9 @@ import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
@@ -51,7 +51,7 @@ import java.util.Map;
  */
 class OtpTransitServiceImpl implements OtpTransitService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OtpTransitService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceImpl.class);
 
     private final Collection<Agency> agencies;
 
@@ -126,6 +126,13 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
         this.trips = immutableList(builder.getTripsById().values());
         this.flexTrips = immutableList(builder.getFlexTripsById().values());
+
+        if(!builder.getFrequencies().isEmpty()) {
+            LOG.error(
+                "OTP2 do not support GTFS Trip Frequencies. "
+                + "See https://github.com/opentripplanner/OpenTripPlanner/issues/3243."
+            );
+        }
     }
 
     @Override

@@ -162,7 +162,7 @@ accounting for market-neutrality requirements and showing relevant trips and ope
     deprecated ~~cluster~~.
 - `Agency`
   - The `id` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
-- 'Alert'
+- Alert`
   - `effectiveEndDate` is added to show the end time of the alert validity.
 
 ### AlertPatcher
