@@ -190,7 +190,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <!-- OTP include face javadoc. See docs/javadoc/README.md -->
+                        <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
                         <id>package-javadoc</id>
                         <phase>package</phase>
                         <goals><goal>jar</goal></goals>
@@ -231,7 +231,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <!-- OTP include face javadoc. See docs/javadoc/README.md -->
+                <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
