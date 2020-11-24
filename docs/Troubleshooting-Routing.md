@@ -78,7 +78,7 @@ Finally, bicycles are *not*allowed on *highway=footway* when any of the followin
 
 Other access tags (such as `access=no` and `access=private` affect routing as well, and can be overridden similarly. While `access=no` prohibits all traffic, `access=private` disallows through traffic.
 
-See [osmWayPropertySet config attribute](Configuration#Way-property-sets)
+See [osmWayPropertySet config attribute](Configuration.md#Way-property-sets)
 
 ### Railway Platforms
 

@@ -120,8 +120,8 @@ public class ProjectInfo implements Serializable {
     }
 
     public String getLongVersionString() {
-        String format = "version: %s\nmajor: %s\nminor: %s\npatch: %s\nqualifier: %s\ncommit: %s\n";
-        return String.format(format, version, major, minor, patch, qualifier, commit);
+        String format = "version: %s, commit: %s, branch: %s";
+        return String.format(format, version, commit, branch);
     }
 
     /** @return "major.minor.patch". The SNAPSHOT `qualifier` is removed. */

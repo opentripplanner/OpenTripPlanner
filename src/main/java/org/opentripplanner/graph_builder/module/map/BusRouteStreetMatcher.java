@@ -10,11 +10,13 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
     private static final Logger log = LoggerFactory.getLogger(BusRouteStreetMatcher.class);
 
     public List<String> provides() {
-        return Arrays.asList("edge matching");
+        return List.of("edge matching");
     }
 
     public List<String> getPrerequisites() {
@@ -48,7 +50,13 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
         StreetMatcher matcher = new StreetMatcher(graph);
         log.info("Finding corresponding street edges for trip patterns...");
         // Why do we need to iterate over the routes? Why not just patterns?
-        for (Route route : graph.index.getAllRoutes()) {
+        Collection<Route> allRoutes = graph.index.getAllRoutes();
+
+        // Track progress
+        ProgressTracker progress = ProgressTracker.track("Match route to street edges", 10, allRoutes.size());
+        log.info(progress.startMessage());
+
+        for (Route route : allRoutes) {
             for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
                 if (pattern.getMode() == TransitMode.BUS) {
                     /* we can only match geometry to streets on bus routes */
@@ -79,7 +87,9 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
                     }
                 }
             }
+            progress.step(log::info);
         }
+        log.info(progress.completeMessage());
     }
 
     @Override

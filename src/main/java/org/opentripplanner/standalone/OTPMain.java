@@ -32,6 +32,7 @@ public class OTPMain {
     static {
 
         // Disable HSQLDB reconfiguration of Java Unified Logging (j.u.l)
+        //noinspection AccessOfSystemProperties
         System.setProperty("hsqldb.reconfig_logging", "false");
 
         // Remove existing handlers attached to the j.u.l root logger
@@ -45,6 +46,7 @@ public class OTPMain {
      */
     public static void main(String[] args) {
         try {
+            LOG.info("OTP STARTED (" + ProjectInfo.INSTANCE.getLongVersionString() + ")");
             OtpStartupInfo.logInfo();
             CommandLineParameters params = parseAndValidateCmdLine(args);
             startOTPServer(params);
@@ -56,6 +58,9 @@ public class OTPMain {
         catch (Exception e) {
             LOG.error("An uncaught error occurred inside OTP: {}", e.getLocalizedMessage(), e);
             System.exit(-1);
+        }
+        finally {
+            LOG.info("OTP SHUTDOWN (" + ProjectInfo.INSTANCE.getLongVersionString() + ")");
         }
     }
 

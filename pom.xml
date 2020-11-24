@@ -177,7 +177,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -187,6 +187,18 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
+                        <id>package-javadoc</id>
+                        <phase>package</phase>
+                        <goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classesDirectory>${basedir}/docs/javadoc</classesDirectory>
+                            <classifier>javadoc</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
@@ -218,27 +230,11 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
-                <configuration>
-                    <skip>true</skip>
-                    <!-- Turn off strict Javadoc checking -->
-                    <doclint>none</doclint>
-                    <!-- We get tons of errors about classes not existing, maybe due to multiple source roots.
-                         For now we're excluding almost everything just to create dummy Javadoc JARs. -->
-                    <excludePackageNames>org.opentripplanner.*</excludePackageNames>
-                </configuration>
-                <executions>
-                    <!-- Compress Javadoc into JAR and include that JAR when deploying.
-                         Required for deployments to Maven Central. -->
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <configuration><skip>true</skip></configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
