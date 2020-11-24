@@ -11,7 +11,7 @@ As a Java program, OTP must be run within a Java virtual machine (JVM), which is
 
 OpenTripPlanner is written in Java and distributed as a single runnable JAR file. This is a "shaded" JAR containing all other libraries needed for OTP to work. The OTP2 release candidate is available from the Maven Central repository. You will be able to go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the [directory for the release candidate](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.0.0-rc1/), and download the [file whose name ends with `shaded.jar`](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.0.0-rc1/otp-2.0.0-rc1-shaded.jar).
 
-You may also want to get your own copy of the OTP source code and [build a bleeding edge development JAR from scratch](Getting-OTP), especially if you plan to do some development yourself. Currently the OTP2 release candidate is in feature freeze, meaning we are not adding any new features, only stabilizing the existing ones for release. So if you want to test and fix existing functionality for the release, check out the branch `2.0-rc`; if you want to work on new features that will be contributed after the 2.0 releaes, be sure to check out the `dev-2.x` branch before running the build.
+You may also want to get your own copy of the OTP source code and [build a bleeding edge development JAR from scratch](Getting-OTP.md), especially if you plan to do some development yourself. Currently the OTP2 release candidate is in feature freeze, meaning we are not adding any new features, only stabilizing the existing ones for release. So if you want to test and fix existing functionality for the release, check out the branch `2.0-rc`; if you want to work on new features that will be contributed after the 2.0 releaes, be sure to check out the `dev-2.x` branch before running the build.
 
 ## Get some data
 
@@ -38,7 +38,7 @@ Download OSM PBF data for the same geographic region as your GTFS feed, and plac
 
 We find [this tool](https://boundingbox.klokantech.com/) useful for determining the geographic coordinates of bounding boxes. The CSV option in that tool produces exactly the format expected by the `osmconvert -b` switch. The `--complete-ways` switch is important to handle roads that cross outside your bounding box.
 
-If you have extracted a smaller PBF file from a larger region, be sure to put only your extract (not the original larger file) in the directory with your GTFS data. Otherwise OTP will try to load both the original file and the extract in a later step. See the [page on preparing OSM data](Preparing-OSM) for additional information and example commands for cropping and filtering OSM data.
+If you have extracted a smaller PBF file from a larger region, be sure to put only your extract (not the original larger file) in the directory with your GTFS data. Otherwise OTP will try to load both the original file and the extract in a later step. See the [page on preparing OSM data](Preparing-OSM.md) for additional information and example commands for cropping and filtering OSM data.
 
 ## Starting OTP
 

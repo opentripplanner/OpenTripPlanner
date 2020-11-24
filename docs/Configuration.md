@@ -135,13 +135,11 @@ config key | description | value type | value default | notes
 `multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
 `osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`
-`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
 `platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
 `readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
 `staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
 `staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
-`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
 `streets` | Include street input files (OSM/PBF) | boolean | true | 
 `storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
 `subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes

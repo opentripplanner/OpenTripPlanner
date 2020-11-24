@@ -158,10 +158,10 @@ public class ToStringBuilderTest {
 
   @Test
   public void addDuration() {
-    assertEquals("ToStringBuilderTest{d: 35s}", subject().addDuration("d", 35).toString());
+    assertEquals("ToStringBuilderTest{d: 35s}", subject().addDurationSec("d", 35).toString());
     assertEquals(
         "ToStringBuilderTest{d: 1d2h50m45s}",
-        subject().addDuration("d", (26 * 60 + 50) * 60 + 45).toString()
+        subject().addDurationSec("d", (26 * 60 + 50) * 60 + 45).toString()
     );
     assertEquals(
         "ToStringBuilderTest{d: 2m5s}",
