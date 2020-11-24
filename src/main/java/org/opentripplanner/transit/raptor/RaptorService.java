@@ -3,11 +3,13 @@ package org.opentripplanner.transit.raptor;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.transit.raptor.service.RangRaptorDynamicSearch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -18,6 +20,8 @@ import java.util.Collection;
  */
 public class RaptorService<T extends RaptorTripSchedule> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RaptorService.class);
+
     private final RaptorConfig<T> config;
 
     public RaptorService(RaptorConfig<T> config) {
@@ -25,6 +29,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
     }
 
     public RaptorResponse<T> route(RaptorRequest<T> request, RaptorTransitDataProvider<T> transitData) {
+        LOG.debug("Raptor request: {}", request);
+
         if(request.isDynamicSearch()) {
             return new RangRaptorDynamicSearch<>(config, transitData, request).route();
         }
