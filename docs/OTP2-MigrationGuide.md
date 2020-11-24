@@ -109,10 +109,13 @@ The following parameters are missing in OTP2 but will be added:
  Some features in OTP1 will not be present upon launch in OTP2, and they are proposed to be removed
  permanently from OTP2, but may require some development to support valid important cases:
  
-  - `maxWalkDistance`, `maxTransferWalkDistance`, & `maxWait` - `walkReluctance` and `waitReluctance`
-    should be utilized. If implemented, they should be filters on top of Raptor search rather than
-    embedded in search. But this shouldn't be necessary: if the trip is just beyond max
-    distance/wait, rider should still see it if it is the only option.
+  - `maxWalkDistance`, `maxTransferWalkDistance`, & `maxWait` - these parameters impose hard limits
+    and are no longer the preferred way to reduce the amount of walking or waiting in returned 
+    itineraries. In OTP2 the goal is to control this with `walkReluctance` and `waitReluctance`. 
+    Internally some limits on walking and waiting do still exist, but they are set quite high so 
+    trips with long walking or waiting times are still considered. Note that unlike in OTP1, if you
+    do set your own max walk or wait time on an API request, it will apply to both transit searches
+    and non-transit searches.
   - `maxHours` & `useRequestedDateTimeInMaxHours` - This is replaced by `searchWindow`, which
     limits the arrival or departure window of the trip
   - `worstTime` - This factor returns the “worst” trip in a depart after/arrive by search, i.e.
