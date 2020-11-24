@@ -39,7 +39,7 @@
   <logger name="org.opentripplanner.routing.edgetype.PlainStreetEdge" level="info" />
 
   <!-- Raptor request debug logging - Turn on/off: debug/info -->
-  <logger name="org.opentripplanner.transit.raptor.RaptorService" level="debug" />
+  <logger name="org.opentripplanner.transit.raptor.RaptorService" level="info" />
 
   <!-- Avoid printing info messages about calendars when building graph -->
   <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />
