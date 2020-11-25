@@ -38,6 +38,10 @@ public class OtpStartupInfo {
     }
 
     public static void logInfo() {
+        LOG.info("OTP STARTED (" + ProjectInfo.INSTANCE.getLongVersionString() + ")");
+        Runtime.getRuntime().addShutdownHook(new Thread(() ->
+            LOG.info("OTP SHUTDOWN (" + ProjectInfo.INSTANCE.getLongVersionString() + ")"))
+        );
         LOG.info(NEW_LINE + INFO);
     }
 

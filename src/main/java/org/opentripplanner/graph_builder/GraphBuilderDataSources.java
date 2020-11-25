@@ -123,10 +123,12 @@ public class GraphBuilderDataSources {
     }
 
     private void logSkippedAndSelectedFiles() {
-        LOG.info("Process data sources: {}", String.join(", ", store.getRepositoryDescriptions()));
+        LOG.info("Data source location(s): {}",
+            String.join(", ", store.getRepositoryDescriptions())
+        );
 
         // Sort data input files by type
-        LOG.info("Load files:");
+        LOG.info("Data source:");
         for (FileType type : FileType.values()) {
             for (DataSource source : inputData.get(type)) {
                 if (type == FileType.CONFIG) {
@@ -138,10 +140,12 @@ public class GraphBuilderDataSources {
             }
         }
 
-        LOG.info("Skip files:");
-        for (FileType type : FileType.values()) {
-            for (DataSource source : skipData.get(type)) {
-                LOG.info(BULLET_POINT + source.detailedInfo());
+        if (!skipData.values().isEmpty()) {
+            LOG.info("Unknown/skipped files:");
+            for (FileType type : FileType.values()) {
+                for (DataSource source : skipData.get(type)) {
+                    LOG.info(BULLET_POINT + source.detailedInfo());
+                }
             }
         }
     }
