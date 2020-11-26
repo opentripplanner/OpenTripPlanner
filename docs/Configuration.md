@@ -36,7 +36,7 @@ Options and parameters that are taken into account during the graph building pro
 
 The OTP configuration files use the JSON file format. OTP allows comments and unquoted field names 
 in the JSON configuration files to be more human-friendly. OTP supports all the basic JSON types: 
-nested objects `{...}`, arrays `[]`, numbers `789.0` and boolean `true` | `false`. In addition to 
+nested objects `{...}`, arrays `[]`, numbers `789.0` and boolean `true` or `false`. In addition to 
 these basic types some configuration parameters are parsed with some restrictions. In the 
 documentation below we will refer to the following types:
 
@@ -74,12 +74,13 @@ example:
 ```JSON
 // otp-config.json
 {
-    otpFeatures : {
-        APIBikeRental : false,
-        SandboxExampleAPIGraphStatistics : true
+    "otpFeatures" : {
+        "APIBikeRental" : false,
+        "SandboxExampleAPIGraphStatistics" : true
     }
 }
 ```
+
 
 # Graph Build Configuration
 
@@ -87,7 +88,6 @@ This table lists all the JSON properties that can be defined in a `build-config.
 
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
-`` |  TODO | boolean | false |
 `areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
 `banDiscouragedWalking` | should walking should be allowed on OSM ways tagged with `foot=discouraged"` | boolean | false | 
 `banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
@@ -288,11 +288,12 @@ another module that will then automatically fetch data in this format from an Am
 You can configure it as follows in `build-config.json`:
 
 ```JSON
+// router-config.json
 {
-    "elevationBucket" : {
-        "accessKey" : "your-aws-access-key",
-        "secretKey" : "corresponding-aws-secret-key",
-        "bucketName" : "ned13"
+    "elevationBucket": {
+        "accessKey": "your-aws-access-key",
+        "secretKey": "corresponding-aws-secret-key",
+        "bucketName": "ned13"
     }
 }
 ```
@@ -312,7 +313,7 @@ to set a default request value in the `router-config.json` file as follows:
 // router-config.json
 {
     "routingDefaults": {
-        "geoidElevation ": true   
+        "geoidElevation": true   
     }
 }
 ```
@@ -487,7 +488,7 @@ To add your own custom property set have a look at `org.opentripplanner.graph_bu
 ```JSON
 // build-config.json
 {
-  osmWayPropertySet: "norway"
+  "osmWayPropertySet": "norway"
 }
 ```
 
@@ -533,6 +534,7 @@ Any public field or setter method in this class can be given a default value usi
 `router-config.json` as follows:
 
 ```JSON
+// router-config.json
 {
     "routingDefaults": {
         "walkSpeed": 2.0,
@@ -592,6 +594,7 @@ from the stop (offboard) vertex to the onboard vertex, and the alight time is ad
 seconds needed for the ride and alighting processes in `router-config.json` as follows:
 
 ```JSON
+// router-config.json
 {
   "boardTimes": {
     "AIRPLANE": 2700
@@ -696,26 +699,26 @@ config key | description | value type
 Use values in a range from `0` to `100 000`. **All key/value pairs are required if the `stopTransferCost` is listed.** 
 
 
-### Transit example section from router-config.json
-```
+### Transit example
+```JSON
+// router-config.json
 {
-    transit: {
-        maxNumberOfTransfers: 12,
-        scheduledTripBinarySearchThreshold: 50,
-        iterationDepartureStepInSeconds: 60,
-        searchThreadPoolSize: 0,
-        dynamicSearchWindow: {
-            minTripTimeCoefficient: 0.4,
-            minTripTimeCoefficient: 0.3,
-            minTimeMinutes: 30,
-            maxLengthMinutes : 360,
-            stepMinutes: 10
+    "transit": {
+        "maxNumberOfTransfers": 12,
+        "scheduledTripBinarySearchThreshold": 50,
+        "iterationDepartureStepInSeconds": 60,
+        "searchThreadPoolSize": 0,
+        "dynamicSearchWindow": {
+            "minTripTimeCoefficient": 0.4,
+            "minTimeMinutes": 30,
+            "maxLengthMinutes" : 360,
+            "stepMinutes": 10
         },
-        stopTransferCost: {
-            DISCOURAGED: 72000,
-            ALLOWED:       150,
-            RECOMMENDED:    60,
-            PREFERRED:       0
+        "stopTransferCost": {
+            "DISCOURAGED": 72000,
+            "ALLOWED":       150,
+            "RECOMMENDED":    60,
+            "PREFERRED":       0
         }
     }
 }
@@ -827,7 +830,6 @@ connect to a network resource is the `url` field.
           "url": "http://coast.socialbicycles.com/opendata/"
         },
 
-
         // Polling bike rental updater for DC bikeshare (a Bixi system)
         // Negative update frequency means to run once and then stop updating (essentially static data)
         {
@@ -835,7 +837,7 @@ connect to a network resource is the `url` field.
             "sourceType": "bixi",
             "url": "https://www.capitalbikeshare.com/data/stations/bikeStations.xml",
             "frequencySec": -1
-		},
+        },
 
         // Bike parking availability
         {
@@ -866,6 +868,7 @@ Steps to add a GBFS feed to a router:
 - Add one entry in the `updater` field of `router-config.json` in the format
 
 ```JSON
+// router-config.json
 {
      "type": "bike-rental",
      "frequencySec": 60,
