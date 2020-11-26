@@ -98,7 +98,6 @@ config key | description | value type | value default | notes
 `embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
-`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
 `islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
 `islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
 `matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
@@ -264,28 +263,7 @@ routing for bicyclists. It even helps avoid hills for walking itineraries. DEMs 
 ### U.S. National Elevation Dataset
 
 In the United States, a high resolution [National Elevation Dataset](http://ned.usgs.gov/) is available for the entire
-territory. The US Geological Survey (USGS) delivers this dataset in tiles via a somewhat awkward heavyweight web-based GIS
-which generates and emails you download links. OpenTripPlanner contains a module which will automatically contact this
-service and download the proper tiles to completely cover your transit and street network area. This process is rather
-slow (download is around 1.5 hours, then setting elevation for streets takes about 5 minutes for the Portland, Oregon region),
-but once the tiles are downloaded OTP will keep them in local cache for the next graph build operation.
-
-To auto-download NED tiles when building your graph, add the following line to `build-config.json` in your router
-directory:
-
-```JSON
-// build-config.json
-{
-  "fetchElevationUS": true
-}
-```
-
-You may also want to add the `--cache <directory>` command line parameter to specify a custom NED tile cache location.
-
-NED downloads take quite a long time and slow down the graph building process. The USGS will also deliver the
-whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA). OpenTripPlanner contains
-another module that will then automatically fetch data in this format from an Amazon S3 copy of your bulk data.
-You can configure it as follows in `build-config.json`:
+territory. It used to be possible to download NED tiles on the fly from a rather complex USGS SOAP service. This was somewhat unreliable and would greatly slow down the graph building process. The USGS would also deliver the whole dataset in bulk if you [sent them a hard drive](https://web.archive.org/web/20150811051917/http://ned.usgs.gov:80/faq.html#DATA). We did this many years back and uploaded the entire data set to Amazon AWS S3. OpenTripPlanner contains another module that will then automatically fetch data in this format from any Amazon S3 copy of the bulk data. You can configure it as follows in `build-config.json`:
 
 ```JSON
 // router-config.json
@@ -297,6 +275,11 @@ You can configure it as follows in `build-config.json`:
     }
 }
 ```
+
+This `ned13` bucket is still available on S3 under a "requester pays" policy. As long as you specify valid AWS account credentials you should be able to download tiles with any bandwidth costs billed to your AWS account.
+
+Once the tiles are downloaded for a particular geographic area, OTP will keep them in local cache for the next graph build operation. You may also want to add the `--cache <directory>` command line parameter to specify a custom NED tile cache location.
+
 
 ### Geoid Difference
 
