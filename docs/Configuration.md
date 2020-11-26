@@ -1,5 +1,9 @@
 # Configuring OpenTripPlanner
 
+_Note: if you are familiar with OTP1 configuration and are migrating to OTP2, please read the 
+[OTP2 Migration Guide](OTP2-MigrationGuide.md) to learn what has changed._
+
+
 ## Base Directory
 
 On the OTP2 command line you must always specify a single directory after all the switches. This tells OTP2 where to look for any configuration files, as well as the input files to build a graph (GTFS, OSM, elevation, and base street graphs) or the `graph.obj` file to load when starting a server. 
