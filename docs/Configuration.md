@@ -83,7 +83,7 @@ example:
 
 # Graph Build Configuration
 
-This table lists the possible settings that can be defined in a `build-config.json` file. These will be stored in the graph itself, and affect any server that subsequently loads that graph. Sections follow that describe particular settings in more depth.
+This table lists all the JSON properties that can be defined in a `build-config.json` file. These will be stored in the graph itself, and affect any server that subsequently loads that graph. Sections follow that describe particular settings in more depth.
 
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
@@ -178,6 +178,8 @@ config key | description | value type | value default
 `dem` | Pattern used to match Elevation DEM files on local disk | regexp pattern | `(?i)\.tiff?$` 
 `gtfs` | Pattern used to match GTFS files on local disk | regexp pattern | `(?i)gtfs` 
 `netex` | Pattern used to match NeTEx files on local disk | regexp pattern | `(?i)netex` 
+
+OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow seeking within files to guess what they are. Therefore, like all other file types GTFS is now detected from a filename pattern. It is not sufficient to look for the `.zip` extension because Netex data is also often supplied in a ZIP file. 
 
 ### Storage example
 
