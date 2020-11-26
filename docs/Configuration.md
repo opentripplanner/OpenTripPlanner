@@ -168,7 +168,7 @@ for an up-to-date detailed description of each config parameter.
 
 ### Local Filename Patterns
 
-Nested inside `storage : { localFileNamePatterns : { ... } }` in `build-config.json`.
+When scanning the base directory for inputs, each file's name is checked against patterns to detect what kind of file it is. These patterns can be overridden in the config, by nesting a `localFileNamePatterns` property inside the `storage` property (see example below). Here are the keys you can place inside `localFileNamePatterns`:
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
@@ -177,20 +177,23 @@ config key | description | value type | value default
 `gtfs` | Pattern used to match GTFS files on local disk | regexp pattern | `(?i)gtfs` 
 `netex` | Pattern used to match NeTEx files on local disk | regexp pattern | `(?i)netex` 
 
-### Storage example:
-```
-storage : {
-  // Use the GCS_SERVICE_CREDENTIALS environment variable to locate GCS credentials
-  gsCredentials: "${GCS_SERVICE_CREDENTIALS}",
-  streetGraph: "file:///Users/kelvin/otp/streetGraph.obj",
-  osm: ["gs://bucket-name/shared-osm-file.pbf"]
-  localFileNamePatterns: {
-    // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
-    gtfs : "^g-.*\.zip$", 
+### Storage example
+
+```JSON
+// build-config.json 
+{
+  "storage": {
+    // Use the GCS_SERVICE_CREDENTIALS environment variable to locate GCS credentials
+    "gsCredentials": "${GCS_SERVICE_CREDENTIALS}",
+    "streetGraph": "file:///Users/kelvin/otp/streetGraph.obj",
+    "osm": ["gs://bucket-name/shared-osm-file.pbf"],
+    "localFileNamePatterns": {
+      // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
+      "gtfs" : "^g-.*\\.zip$"
+    }
   }
 }
 ```
-
 
 ## Limit the transit service period
 
