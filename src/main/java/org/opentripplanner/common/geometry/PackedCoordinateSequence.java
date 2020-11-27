@@ -200,6 +200,11 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         double[] coords;
 
         /**
+         * For use with Kryo library only. Kryo needs an no-arg constructor in order to deserialize data.
+         */
+        public Double() {}
+
+        /**
          * Builds a new packed coordinate sequence
          * 
          * @param coords

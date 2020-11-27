@@ -71,8 +71,15 @@ public class StreetTransitLink extends Edge {
 
     public State traverse(State s0) {
 
-        // Forbid taking shortcuts composed of two street-transit links in a row. Also avoids spurious leg transitions.
-        if (s0.backEdge instanceof StreetTransitLink) {
+        // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
+        // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
+        // it is possible that two stops can have the same GPS coordinate thus creating a possibility for a
+        // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
+        // if they are for the same stop.
+        if (
+            s0.backEdge instanceof StreetTransitLink &&
+                ((StreetTransitLink) s0.backEdge).transitStop == this.transitStop
+        ) {
             return null;
         }
 

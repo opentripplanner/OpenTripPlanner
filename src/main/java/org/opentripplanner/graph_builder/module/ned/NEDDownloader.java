@@ -45,15 +45,7 @@ public class NEDDownloader implements NEDTileSource {
 
     private double _lonXStep = 0.16;
 
-    @Override
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }
-
-    @Override
-    public void setCacheDirectory(File cacheDirectory) {
-        this.cacheDirectory = cacheDirectory;
-    }
+    private List<File> nedTiles;
 
     private File getPathToNEDArchive(String key) {
         if (!cacheDirectory.exists()) {
@@ -294,7 +286,15 @@ public class NEDDownloader implements NEDTileSource {
 
     @Override
     public List<File> getNEDTiles() {
+        return nedTiles;
+    }
+
+    @Override public void fetchData(Graph graph, File cacheDirectory) {
+        this.graph = graph;
+        this.cacheDirectory = cacheDirectory;
+
         log.info("Downloading NED elevation data (or fetching it from local cache).");
+        
         List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();
         int tileCount = 0;
@@ -336,7 +336,7 @@ public class NEDDownloader implements NEDTileSource {
             }
             log.error("Unable to download a NED tile after 5 requests.");
         }
-        return files;
+        nedTiles = files;
     }
 
     private List<URL> getDownloadURLsCached() {

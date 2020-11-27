@@ -80,4 +80,4 @@ There are a number of different resources available through the HTTP API. Beside
 
 - Return all unique sequences of stops on the TriMet Green rail line: [http://localhost:8080/otp/routers/default/index/routes/TriMet:4/patterns](http://localhost:8080/otp/routers/default/index/routes/TriMet:4/patterns)
 
-We refer to this as the Index API. It is also documented [in the OTP HTTP API docs](http://dev.opentripplanner.org/apidoc/1.0.0/resource_IndexAPI.html).
+We refer to this as the Index API. It is also documented [in the OTP HTTP API docs](http://dev.opentripplanner.org/apidoc/1.4.0/resource_IndexAPI.html).

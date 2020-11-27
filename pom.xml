@@ -262,6 +262,7 @@
                 <version>2.21.0</version>
                 <configuration>
                     <argLine>-Xmx2G</argLine>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
                 </configuration>
@@ -419,7 +420,7 @@
         <repository>
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
-            <url>https://download.osgeo.org/webdav/geotools/</url>
+            <url>https://repo.osgeo.org/repository/release/</url>
         </repository>
         <repository>
             <id>axis</id>
@@ -439,7 +440,7 @@
         <repository>
             <id>onebusaway-releases</id>
             <name>Onebusaway Releases Repo</name>
-            <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
+            <url>https://repo.camsys-apps.com/releases/</url>
         </repository>
     </repositories>
 

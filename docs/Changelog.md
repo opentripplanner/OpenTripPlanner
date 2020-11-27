@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0 (2020-11-27)
+
+- Add application/x-protobuf to accepted protobuf content-types (#2839)
+- Add Way Property Set for the UK (#2818)
+- Fixes surefire test failure during build (#2816)
+- Improve documentation for `mode` routing parameter (#2809)
+- Disable linking from already linked stops (#2372)
+- Optimize elevation calculations
+
 ## 1.4 (2019-07-30)
 
 - Remove Open Traffic prototype code (#2698)
