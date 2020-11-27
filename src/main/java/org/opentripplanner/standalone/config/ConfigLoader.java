@@ -35,7 +35,7 @@ public class ConfigLoader {
     private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
 
     /** When echoing config files to logs, values for these keys will be hidden. */
-    private static final Set<String> REDACT_KEYS = ImmutableSet.of("secretKey", "accessKey");
+    private static final Set<String> REDACT_KEYS = ImmutableSet.of("secretKey", "accessKey", "gsCredentials");
 
     private final ObjectMapper mapper = new ObjectMapper();
     @Nullable
