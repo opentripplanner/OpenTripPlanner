@@ -10,11 +10,10 @@ You are currently reading the documentation for **OpenTripPlanner 2**, the secon
 
 Several versions of this documentation are built and published automatically for different branches of OTP. Each of these has a different stable URL, and you may switch between these versions using the selector in the lower right of the published documentation.
 
- - [Latest](http://docs.opentripplanner.org/en/latest) - Latest stable release from master branch
- - [v2.0.0](http://docs.opentripplanner.org/en/v2.0.0) - Most recent release 2.0
+ - [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.0 (the git master branch)
  - [v1.5.0](http://docs.opentripplanner.org/en/v1.5.0) - Stable 1.x release
- - [dev-1.x](http://docs.opentripplanner.org/en/dev-1.x) - OTP 1 active development 
  - [dev-2.x](http://docs.opentripplanner.org/en/dev-2.x) - OTP 2 active development
+ - [dev-1.x](http://docs.opentripplanner.org/en/dev-1.x) - OTP 1 active development 
 
 # Audience
 
