@@ -262,8 +262,14 @@ routing for bicyclists. It even helps avoid hills for walking itineraries. DEMs 
 
 ### U.S. National Elevation Dataset
 
-In the United States, a high resolution [National Elevation Dataset](http://ned.usgs.gov/) is available for the entire
-territory. It used to be possible to download NED tiles on the fly from a rather complex USGS SOAP service. This was somewhat unreliable and would greatly slow down the graph building process. The USGS would also deliver the whole dataset in bulk if you [sent them a hard drive](https://web.archive.org/web/20150811051917/http://ned.usgs.gov:80/faq.html#DATA). We did this many years back and uploaded the entire data set to Amazon AWS S3. OpenTripPlanner contains another module that will then automatically fetch data in this format from any Amazon S3 copy of the bulk data. You can configure it as follows in `build-config.json`:
+In the United States, a high resolution [National Elevation Dataset](http://ned.usgs.gov/) is 
+available for the entire territory. It used to be possible for OTP to download NED tiles on the fly 
+from a rather complex USGS SOAP service. This process was somewhat unreliable and would greatly slow
+ down the graph building process. In any case the service has since been replaced. But the USGS 
+ would also deliver the whole dataset in bulk if you [sent them a hard drive](https://web.archive.org/web/20150811051917/http://ned.usgs.gov:80/faq.html#DATA). We did this many years back and uploaded 
+ the entire data set to Amazon AWS S3. OpenTripPlanner contains another module that can automatically 
+ fetch data in this format from any Amazon S3 copy of the bulk data. You can configure it as follows
+  in `build-config.json`:
 
 ```JSON
 // router-config.json
@@ -276,17 +282,30 @@ territory. It used to be possible to download NED tiles on the fly from a rather
 }
 ```
 
-This `ned13` bucket is still available on S3 under a "requester pays" policy. As long as you specify valid AWS account credentials you should be able to download tiles with any bandwidth costs billed to your AWS account.
+This `ned13` bucket is still available on S3 under a "requester pays" policy. As long as you specify 
+valid AWS account credentials you should be able to download tiles, and any bandwidth costs will be 
+billed to your AWS account.
 
-Once the tiles are downloaded for a particular geographic area, OTP will keep them in local cache for the next graph build operation. You may also want to add the `--cache <directory>` command line parameter to specify a custom NED tile cache location.
+Once the tiles are downloaded for a particular geographic area, OTP will keep them in local cache 
+for the next graph build operation. You should add the `--cache <directory>` command line parameter 
+to specify your NED tile cache location.
 
 
 ### Geoid Difference
 
-With some elevation data, the elevation values are specified as relative to the a geoid (irregular estimate of mean sea level). See [issue #2301](https://github.com/opentripplanner/OpenTripPlanner/issues/2301) for detailed discussion of this. In these cases, it is necessary to also add this geoid value onto the elevation value to get the correct result. OTP can automatically calculate these values in one of two ways. 
+Some elevation data sets are relative to mean sea level. At a global scale sea level is represented 
+as a surface called the geoid, which is irregular in shape due to local gravitational anomalies. 
+ On the other hand, GPS elevations are reported relative to the  WGS84 spheroid, a perfectly smooth 
+ mathematical surface approximating the geoid. 
+In cases where the two elevation definitions are mixed, it may be necessary to adjust elevation 
+values to avoid confusing users with things like negative elevation values in places clearly above 
+sea level. See [issue #2301](https://github.com/opentripplanner/OpenTripPlanner/issues/2301) 
+for detailed discussion of this. 
 
-The first way is to use the geoid difference value that is calculated once at the center of the 
-graph. This value is returned in each trip plan response in the 
+OTP allows you to adjust the elevation values reported in API responses in two ways.
+The first way is to store ellipsoid (GPS) elevation values internally, but apply a single geoid 
+difference value in the OTP client where appropriate to display elevations above sea level.
+This ellipsoid to geoid difference is returned in each trip plan response in the 
 [ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field. 
 Using a single value can be sufficient for smaller OTP deployments, but might result in incorrect 
 values at the edges of larger OTP deployments. If your OTP instance uses this, it is recommended 
@@ -301,7 +320,13 @@ to set a default request value in the `router-config.json` file as follows:
 }
 ```
 
-The second way is to precompute these geoid difference values at a more granular level and include them when calculating elevations for each sampled point along each street edge. In order to speed up calculations, the geoid difference values are calculated and cached using only 2 significant digits of GPS coordinates. This is more than enough detail for most regions of the world and should result in less than one meter of difference in areas that have large changes in geoid difference values. To enable this, include the following in the `build-config.json` file: 
+The second way is to precompute these geoid difference values at a more granular level and store 
+all elevations internally relative to the geoid (sea level). Elevations returned in the API 
+responses will then not need to be adjusted to match end users' intuitive understanding of elevation.
+In order to speed up calculations, these geoid difference values are calculated and cached using only 
+2 significant digits of GPS coordinates. This is more than enough detail for most regions of the 
+world and should result in less than one meter of vertical error even in areas that have the largest
+ geoid irregularities. To enable this, include the following in the `build-config.json` file: 
 
 ```JSON
 // build-config.json
