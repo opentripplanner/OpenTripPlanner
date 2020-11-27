@@ -67,7 +67,7 @@ Using the file `otp-config.json` you can enable or disable different APIs and ex
 sandbox features are disabled. So for most OTP2 use cases it is not necessary to create this file.
 Features that can be toggled in this file are generally only affect the routing phase of OTP2
 usage, but for consistency all such "feature flags", even those that would affect graph building,
-are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/util/OTPFeature.java) 
+are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/util/OTPFeature.java) 
 Java class for an enumeration of all available features and their default settings. Here is an 
 example:
 
@@ -121,7 +121,7 @@ config key | description | value type | value default | notes
 `useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 
-This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
+This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
 
 
 ## Storage
@@ -164,7 +164,7 @@ Note that when files are specified with URIs in this configuration, the file typ
 
 The default behavior of scanning the base directory for inputs is overridden independently for each file type. So in the above configuration, GTFS and OSM will be loaded from Google Cloud Storage, but OTP2 will still scan the base directory for all other types such as DEM files. Supplying an empty array for a particular file type will ensure that no inputs of that type are loaded, including by local directory scanning.
 
-See the comments in the source code of class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java) 
+See the comments in the source code of class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java) 
 for an up-to-date detailed description of each config parameter.
 
 ### Local Filename Patterns
@@ -306,7 +306,7 @@ OTP allows you to adjust the elevation values reported in API responses in two w
 The first way is to store ellipsoid (GPS) elevation values internally, but apply a single geoid 
 difference value in the OTP client where appropriate to display elevations above sea level.
 This ellipsoid to geoid difference is returned in each trip plan response in the 
-[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field. 
+[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field. 
 Using a single value can be sufficient for smaller OTP deployments, but might result in incorrect 
 values at the edges of larger OTP deployments. If your OTP instance uses this, it is recommended 
 to set a default request value in the `router-config.json` file as follows:
@@ -537,7 +537,7 @@ There are many trip planning options used in the OTP web API, and more exist
 internally that are not exposed via the API. You may want to change the default value for some of these parameters,
 i.e. the value which will be applied unless it is overridden in a web API request.
 
-A full list of them can be found in the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java).
+A full list of them can be found in the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java).
 Any public field or setter method in this class can be given a default value using the routingDefaults section of
 `router-config.json` as follows:
 
@@ -675,7 +675,7 @@ config key | description | value type | value default
 `iterationDepartureStepInSeconds` | Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds. | int | `60`
 `searchThreadPoolSize` | Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread. | int | `0`
 `dynamicSearchWindow` | The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics. | object | `null`
-`stopTransferCost` | Use this to set a stop transfer cost for the given [TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/model/TransferPriority.java). The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | enum map | `null`
+`stopTransferCost` | Use this to set a stop transfer cost for the given [TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/model/TransferPriority.java). The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | enum map | `null`
 
 ### Tuning transit routing - Dynamic search window
 Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.json`.
@@ -908,4 +908,4 @@ To configure and url for the [BikeRentalServiceDirectory](sandbox/BikeRentalServ
 
 # Configure using command-line arguments
 
-Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java).
+Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java).

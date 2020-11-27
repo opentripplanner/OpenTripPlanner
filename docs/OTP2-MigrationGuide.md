@@ -90,8 +90,8 @@ Support for XML as a request/response format is removed. The only supported form
 
 #### Query parameter changes
 
-A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java) 
- and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java) 
+ and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
  class for the documentation on what is now supported in 2.0. A few features did not make it into 
  the 2.0, but is sheduled for the 2.1 release.
  See [GitHub issues 2.1](https://github.com/opentripplanner/OpenTripPlanner/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.1).  
