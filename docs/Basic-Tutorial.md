@@ -1,7 +1,6 @@
 # OpenTripPlanner 2 Basic Tutorial
 
 This page should allow you to set up and test your own OTP2 server. If all goes well it should only take a few minutes!
-**Note that this covers the OTP2 release candidate undergoing final testing, not the existing OTP 1.x release versions. If you do not wish to try out the 2.0 release candidate, please use the documentation selector in the lower right to choose the 1.x version.**
 
 ## Get Java
 
@@ -9,16 +8,16 @@ As a Java program, OTP must be run within a Java virtual machine (JVM), which is
 
 ## Get OTP
 
-OpenTripPlanner is written in Java and distributed as a single runnable JAR file. This is a "shaded" JAR containing all other libraries needed for OTP to work. The OTP2 release candidate is available from the Maven Central repository. You will be able to go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the [directory for the release candidate](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.0.0-rc1/), and download the [file whose name ends with `shaded.jar`](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.0.0-rc1/otp-2.0.0-rc1-shaded.jar).
+OpenTripPlanner is written in Java and distributed as a single runnable JAR file. This is a "shaded" JAR containing all other libraries needed for OTP to work, and is available from the Maven Central repository. You will be able to go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the [directory for the 2.0 release](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.0.0/), and download the [file whose name ends with `shaded.jar`](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.0.0/otp-2.0.0-shaded.jar).
 
-You may also want to get your own copy of the OTP source code and [build a bleeding edge development JAR from scratch](Getting-OTP.md), especially if you plan to do some development yourself. Currently the OTP2 release candidate is in feature freeze, meaning we are not adding any new features, only stabilizing the existing ones for release. So if you want to test and fix existing functionality for the release, check out the branch `dev-2.x`.
+You may also want to get your own copy of the OTP source code and [build a bleeding edge development JAR from scratch](Getting-OTP.md), especially if you plan to do some development yourself. In that case, check out the branch `dev-2.x`.
 
 ## Get some data
 
 ### GTFS for Transit Schedules and Stops
 
 First you'll need GTFS data to build a transit network. There's an excellent description of the GTFS format [here](http://gtfs.org/). Transport agencies throughout the world provide GTFS schedules to the public. Transitland has a
-[registry of feeds](https://transit.land/feed-registry) and [TransitFeeds](http://transitfeeds.com/) also provides an extensive catalog. The best option is often to simply fetch the data directly from a transit operator or agency. If you know of a feed you want to work with, download it and put it in an empty directory you have created for your OTP instance such as `/home/username/otp` on Linux, `/Users/username/otp` on OSX, or `C:\Users\username\otp` on Windows. The GTFS file's name must end in `.zip` for OTP to detect it. We often use the convention of ending GTFS file names with `.gtfs.zip` since technically a GTFS feed is just a ZIP file containing a specific set of files. If you don't have a particular feed in mind, the one for Portland, Oregon's TriMet agency is a good option. It is available at [this URL](http://developer.trimet.org/schedule/gtfs.zip). This is a moderate-sized input of good quality (TriMet initiated OTP development and helped develop the GTFS format). On Linux, this could be done on the command line as follows:
+[registry of feeds](https://transit.land/feed-registry) and [TransitFeeds](http://transitfeeds.com/) also provides an extensive catalog. The best option is often to simply fetch the data directly from a transit operator or agency. If you know of a feed you want to work with, download it and put it in an empty directory you have created for your OTP instance such as `/home/username/otp` on Linux, `/Users/username/otp` on MacOS, or `C:\Users\username\otp` on Windows. For OTP2 to detect a GTFS file, **its name must end in `.zip` and must contain the letters 'gtfs'**. We often use the convention of saving GTFS files with names ending in `.gtfs.zip` which meets both these criteria, reflecting the fact that a GTFS feed is just a ZIP file containing a specific set of files. If you don't have a particular feed in mind, the one for Portland, Oregon's TriMet agency is a good option. It is available at [this URL](http://developer.trimet.org/schedule/gtfs.zip). This is a moderate-sized input of good quality (TriMet initiated OTP development and helped develop the GTFS format). On Linux, this could be done on the command line as follows:
 
     $ cd /home/username
     $ mkdir otp
@@ -42,7 +41,7 @@ If you have extracted a smaller PBF file from a larger region, be sure to put on
 
 ## Starting OTP
 
-A typical command to start OTP looks like `java -Xmx1G -jar otp.shaded.jar <options>`. The 
+A typical command to start OTP looks like `java -Xmx2G -jar otp.shaded.jar <options>`. The 
  `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when working with the Portland TriMet data set, and several gigabytes for larger inputs. If you have
  sufficient memory in your computer, set this to a couple of gigabytes (e.g. `-Xmx2G`). Java uses a [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)) approach to memory management, which requires some "breathing room" to efficiently operate. Without sufficient free memory OTP can grind to a halt. [VisualVM](https://visualvm.github.io) is a good way to inspect Java memory usage, especially with the [VisualGC plugin](https://visualvm.github.io/plugins.html).
  
