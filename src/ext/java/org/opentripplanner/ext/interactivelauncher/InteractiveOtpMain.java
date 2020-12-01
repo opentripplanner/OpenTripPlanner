@@ -25,7 +25,7 @@ public class InteractiveOtpMain {
   private void run() {
     this.model = Model.load();
     MainView frame = new MainView(this::startOtp, model);
-    frame.start();;
+    frame.start();
   }
 
   private void startOtp() {
