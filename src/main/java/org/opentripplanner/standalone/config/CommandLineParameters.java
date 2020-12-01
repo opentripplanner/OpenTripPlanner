@@ -78,8 +78,7 @@ public class CommandLineParameters implements Cloneable {
     public boolean save = false;
 
     @Parameter(names = {"--cache"}, validateWith = ReadWriteDirectory.class,
-            description = "The directory under which to cache OSM and NED tiles. Default is "
-                    + "BASE_PATH/cache.")
+            description = "The directory under which to cache OSM and NED tiles.")
     public File cacheDirectory = new File(DEFAULT_CACHE_PATH);
 
     /* Options for the server sub-task. */

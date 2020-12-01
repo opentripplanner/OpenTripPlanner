@@ -106,11 +106,6 @@ public class BuildConfig {
      */
     public final boolean matchBusRoutesToStreets;
 
-    /**
-     * Download US NED elevation data and apply it to the graph.
-     */
-    public final boolean fetchElevationUS;
-
     /** If specified, download NED elevation tiles from the given AWS S3 bucket. */
     public final S3BucketConfig elevationBucket;
 
@@ -312,7 +307,6 @@ public class BuildConfig {
         elevationUnitMultiplier = c.asDouble("elevationUnitMultiplier", 1);
         embedRouterConfig = c.asBoolean("embedRouterConfig", true);
         extraEdgesStopPlatformLink = c.asBoolean("extraEdgesStopPlatformLink", false);
-        fetchElevationUS = c.asBoolean("fetchElevationUS", false);
         includeEllipsoidToGeoidDifference = c.asBoolean("includeEllipsoidToGeoidDifference", false);
         pruningThresholdIslandWithStops = c.asInt("islandWithStopsMaxSize", 5);
         pruningThresholdIslandWithoutStops = c.asInt("islandWithoutStopsMaxSize", 40);

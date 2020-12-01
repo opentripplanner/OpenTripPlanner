@@ -205,6 +205,7 @@ performed off the master branch, and are tagged with git annotated tags.
     * You can also use the `package` goal instead of the `install` goal to avoid signing if you don't have the GPG certificate installed.
     * All tests should pass
     * This build will also create Enunciate API docs and Javadoc with the correct non-snapshot version number
+    * The 'site' goal may cause a failing Javadoc build. In that case you can manually build only the Enunciate docs with `mvn enunciate:docs`
 * Deploy the documentation to AWS S3
     * You have to do this right after the test release build to ensure the right version number in the docs
     * You will need AWSCLI tools (`sudo pip install -U awscli`)

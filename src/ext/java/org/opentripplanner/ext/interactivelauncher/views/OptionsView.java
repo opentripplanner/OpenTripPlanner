@@ -58,7 +58,7 @@ class OptionsView {
   public void updateModel(Model model) {
     model.setBuildStreet(buildStreet());
     model.setBuildTransit(buildTransit());
-    model.setServeGraph(saveGraph());
+    model.setSaveGraph(saveGraph());
     model.setServeGraph(startOptServer());
   }
 
