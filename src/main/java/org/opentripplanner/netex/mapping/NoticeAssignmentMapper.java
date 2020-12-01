@@ -89,10 +89,10 @@ class NoticeAssignmentMapper {
         Collection<TimetabledPassingTime> times =  passingTimeByStopPointId.get(noticedObjectId);
         if (times != null && !times.isEmpty()) {
             for (TimetabledPassingTime time : times) {
-                addNoticeStopTime(noticiesByEntity, time.getId(), otpNotice);
+                addStopTimeNotice(noticiesByEntity, time.getId(), otpNotice);
             }
         } else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
-            addNoticeStopTime(noticiesByEntity, noticedObjectId, otpNotice);
+            addStopTimeNotice(noticiesByEntity, noticedObjectId, otpNotice);
         } else {
             FeedScopedId otpId = idFactory.createId(noticedObjectId);
 
@@ -122,7 +122,7 @@ class NoticeAssignmentMapper {
         return notice == null ? null : noticeMapper.map(notice);
     }
 
-    private void addNoticeStopTime(Multimap<TransitEntity, Notice> map, String stopTimeId, Notice notice) {
+    private void addStopTimeNotice(Multimap<TransitEntity, Notice> map, String stopTimeId, Notice notice) {
         StopTime stopTime = stopTimesByNetexId.get(stopTimeId);
         if(stopTime == null) {
             LOG.warn("NoticeAssigment mapping failed, StopTime not found. StopTime id: {}", stopTimeId);
