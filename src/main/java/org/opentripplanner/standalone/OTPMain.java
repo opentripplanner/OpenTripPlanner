@@ -46,7 +46,6 @@ public class OTPMain {
      */
     public static void main(String[] args) {
         try {
-            LOG.info("OTP STARTED (" + ProjectInfo.INSTANCE.getLongVersionString() + ")");
             OtpStartupInfo.logInfo();
             CommandLineParameters params = parseAndValidateCmdLine(args);
             startOTPServer(params);
@@ -58,9 +57,6 @@ public class OTPMain {
         catch (Exception e) {
             LOG.error("An uncaught error occurred inside OTP: {}", e.getLocalizedMessage(), e);
             System.exit(-1);
-        }
-        finally {
-            LOG.info("OTP SHUTDOWN (" + ProjectInfo.INSTANCE.getLongVersionString() + ")");
         }
     }
 
