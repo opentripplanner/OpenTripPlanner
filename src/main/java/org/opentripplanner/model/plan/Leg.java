@@ -58,6 +58,11 @@ public class Leg {
     */
    public Boolean realTime = false;
 
+  /**
+   * Whether this Leg describes a flexible trip
+   */
+  public Boolean flexible = false;
+
    /**
     * Is this a frequency-based trip with non-strict departure times?
     */
@@ -191,6 +196,10 @@ public class Leg {
 
     public boolean isOnStreetNonTransit() {
         return mode.isOnStreetNonTransit();
+    }
+
+    public boolean isFlexible() {
+     return flexible;
     }
 
     /**
