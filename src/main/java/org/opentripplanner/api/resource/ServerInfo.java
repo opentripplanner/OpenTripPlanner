@@ -1,6 +1,6 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.ProjectInfo;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,7 +25,7 @@ public class ServerInfo {
     
     // Fields must be public or have a public getter to be auto-serialized to JSON
 
-    public MavenVersion serverVersion = MavenVersion.VERSION;
+    public ProjectInfo serverInfo = ProjectInfo.INSTANCE;
     public String cpuName = "unknown";
     public int nCores = 0;
 

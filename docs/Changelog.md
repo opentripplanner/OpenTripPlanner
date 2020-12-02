@@ -1,6 +1,9 @@
 # Changelog
 
-## 2.0 (in progress)
+## 2.1.0 (in progress)
+
+
+## 2.0.0 (2020-11-27)
 
 See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
 
@@ -47,18 +50,18 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Fix issue with colliding TripPattern ids after modifications form real-time updaters [#3202](https://github.com/opentripplanner/OpenTripPlanner/issues/3202)
 - Fix: The updater config type is unknown: gtfs-http [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
 - Fix: Problem building and loading the GTFS file in San Fransisco Bay Area [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
+- Fix: The `BusRouteStreetMatcher` and `TransitToTaggedStopsModule` graph builder modules are not run if the graph is build in two steps, and add progress tracker to BusRouteStreetMatcher. [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
+- Improvement: Insert project information like Maven version number into configuration files. [#3254](https://github.com/opentripplanner/OpenTripPlanner/pull/3254)   
 
 
-## Ported over from the 1.x
+
+## Ported over from 1.4 and 1.5
 
 - Add application/x-protobuf to accepted protobuf content-types [#2839](https://github.com/opentripplanner/OpenTripPlanner/issues/2839)
 - Make OTP run on Java 11 [#2812](https://github.com/opentripplanner/OpenTripPlanner/issues/2812)
 - Fixes surefire test failure during build [#2816](https://github.com/opentripplanner/OpenTripPlanner/issues/2816)
 - Disable linking from already linked stops [#2372](https://github.com/opentripplanner/OpenTripPlanner/issues/2372)
 - Add Way Property Set for the UK [#2818](https://github.com/opentripplanner/OpenTripPlanner/issues/2818)
-
-## 1.4 (2019-07-30)
-
 - Remove Open Traffic prototype code [#2698](https://github.com/opentripplanner/OpenTripPlanner/issues/2698)
 - Docs: improve configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project [#2636](https://github.com/opentripplanner/OpenTripPlanner/issues/2636)
@@ -68,11 +71,20 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - increase GTFS-realtime feeds size limit from 64MB to 2G [#2738](https://github.com/opentripplanner/OpenTripPlanner/issues/2738)
 - Fix XML response serialization [#2685](https://github.com/opentripplanner/OpenTripPlanner/issues/2685)
 - Refactor InterleavedBidirectionalHeuristic [#2671](https://github.com/opentripplanner/OpenTripPlanner/issues/2671)
-- Fix minor test failure against BANO geocoder [#2798](https://github.com/opentripplanner/OpenTripPlanner/issues/2798)
 - Add "Accept" headers to GTFS-RT HTTP requests [#2796](https://github.com/opentripplanner/OpenTripPlanner/issues/2796)
-- Fixes surefire test failure during build [#2816](https://github.com/opentripplanner/OpenTripPlanner/issues/2816)
+- Fix minor test failure against BANO geocoder [#2798](https://github.com/opentripplanner/OpenTripPlanner/issues/2798)
+- Fix frequency bounds checking [#2540](https://github.com/opentripplanner/OpenTripPlanner/issues/2540)
+- Remove dependency on Conveyal jackson2-geojson
+- Changed calculation of slope costs [#2579](https://github.com/opentripplanner/OpenTripPlanner/issues/2579)
+- Replace Java built in serialization with faster Kryo [#2681](https://github.com/opentripplanner/OpenTripPlanner/issues/2681)
+- Support OSM highway=razed tag [#2660](https://github.com/opentripplanner/OpenTripPlanner/issues/2660)
+- Add bicimad bike rental updater [#2503](https://github.com/opentripplanner/OpenTripPlanner/issues/2503)
+- Add Smoove citybikes updater [#2515](https://github.com/opentripplanner/OpenTripPlanner/issues/2515)
+- Allow big GTFS-realtime feeds by increasing protobuf size limit to 2G [#2739](https://github.com/opentripplanner/OpenTripPlanner/issues/2739)
 - Cannot transfer between stops at exactly the same location [#2371](https://github.com/opentripplanner/OpenTripPlanner/issues/2371)
 - Improve documentation for `mode` routing parameter [#2809](https://github.com/opentripplanner/OpenTripPlanner/issues/2809)
+- Switched to single license file, removing all OTP and OBA file license headers
+
 
 ## 1.3 (2018-08-03)
 

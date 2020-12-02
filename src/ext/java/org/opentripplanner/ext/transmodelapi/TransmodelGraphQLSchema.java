@@ -18,7 +18,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
 import org.apache.commons.collections.CollectionUtils;
-import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.ProjectInfo;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
@@ -1077,7 +1077,7 @@ public class TransmodelGraphQLSchema {
             .name("serverInfo")
             .description("Get OTP server information")
             .type(new GraphQLNonNull(serverInfoType))
-            .dataFetcher(e -> MavenVersion.VERSION)
+            .dataFetcher(e -> ProjectInfo.INSTANCE)
             .build())
         .build();
 

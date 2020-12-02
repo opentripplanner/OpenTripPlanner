@@ -32,7 +32,7 @@ When in doubt, new users are advised to try out OTP2 and switch to OTP1 if they 
 | Feature | OTP1 | OTP2 |
 |---------|------|------|
 | OSM street data | yes | yes |
-| GTFS transit data | yes | yes |
+| GTFS transit data | yes | yes ([_frequency.txt_ not jet supported](https://github.com/opentripplanner/OpenTripPlanner/issues/3243)) |
 | Netex transit data | no | yes<br>(Nordic profile) |
 | GTFS-Realtime | yes<br>(streaming, polling, incremental) | yes<br>(streaming, polling, incremental) |
 | SIRI Realtime | no | yes |

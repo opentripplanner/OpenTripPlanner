@@ -1,16 +1,23 @@
 package org.opentripplanner.transit.raptor.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 
 /**
- * This class is used to collect data and print a summary after some period of time.
+ * This class is used to collect performance data and print a summary after some period of time.
+ * Measuring performance with this class is NOT meant for production use, only for test use. It
+ * would be a nice enhancement to make it THREAD-SAFE and enable it for production use as well.
+ * To make it THREAD-SAFE the AvgTimer must be created pr thread as well as pr method and the
+ * result must be merged before printing the results. This would also require some cleanup to
+ * prevent a memory leak. For example it would be easy to drop the unused timers every time a
+ * report is printed. In a "long" running test/production the report printing can not be done
+ * at the end, but need to be scheduled(e.g. once every hour).
  *
  * <pre>
  *       METHOD CALLS DURATION |              SUCCESS               |         FAILURE
@@ -19,18 +26,29 @@ import java.util.stream.Stream;
  *       AvgTimer:main t2      |   45   699  388 ms     55   21,4 s |    0 ms      0    0,0 s
  *       AvgTimer:main t3      |    4   692  375 ms    110   41,3 s |    0 ms      0    0,0 s
  * </pre>
+ *
+ * <p>
+ * <b>THREAD SAFETY</b>
+ * <p>
+ * The provider/factory methods are all THREAD-SAFE, but the {@link AvgTimer} instances are NOT.
+ * By default the static factory/provider return a no-op THREAD-SAFE timer. Turning the timers ON
+ * should only be done when testing performance, never in a production environment.
+ * <p>
+ * <b>ENABLE TIMERS</b>
+ * <p>
+ * The AvgTimer need to be enabled ({@link #enableTimers(boolean)}) in code BEFORE any timers are
+ * created. The default is to create no-op timers.
  */
 public abstract class AvgTimer {
-    private static boolean NOOP = true;
+    private static boolean noop = true;
     private static final String RESULT_TABLE_TITLE = "METHOD CALLS DURATION";
 
     /**
      * Keep a list of methods in the order they are added, so that we can list all timers in the same
      * order for printing at the end of the program. This more or less will resemble the call stack.
      */
-    private static List<String> methods = new ArrayList<>();
-    private static Map<String, AvgTimer> allTimers = new HashMap<>();
-
+    private static final List<String> methods = new ArrayList<>();
+    private static final Map<String, AvgTimer> allTimers = new ConcurrentHashMap<>();
 
     protected final String method;
     private long startTime = 0;
@@ -72,17 +90,16 @@ public abstract class AvgTimer {
      * with no overhead to the performance.
      */
     public static void enableTimers(boolean enable) {
-        NOOP = !enable;
+        noop = !enable;
     }
 
-    private static AvgTimer timer(final String method, final Function<String, ? extends AvgTimer> factory) {
-        return allTimers.computeIfAbsent(method, methid -> {
-            methods.add(methid);
-            return NOOP ? new NoopAvgTimer(method) : factory.apply(methid);
-        });
+    public static boolean timersEnabled() {
+        return !noop;
     }
 
     public static List<String> listResults() {
+        if(noop) { return List.of(); }
+
         final int width = Math.max(
                 RESULT_TABLE_TITLE.length(),
                 allTimers().mapToInt(it -> it.method.length()).max().orElse(0)
@@ -104,18 +121,8 @@ public abstract class AvgTimer {
      * you may call this method after the warm up is done.
      */
     public static void resetAll() {
+        if(noop) { return; }
         allTimers().forEach(AvgTimer::reset);
-    }
-
-    private void reset() {
-        startTime = 0;
-        lapTime = 0;
-        minTime = Long.MAX_VALUE;
-        maxTime = -1;
-        totalTimeSuccess = 0;
-        totalTimeFailed = 0;
-        counterSuccess = 0;
-        counterFailed = 0;
     }
 
     public void start() {
@@ -186,17 +193,13 @@ public abstract class AvgTimer {
 
     /* private methods */
 
-    private boolean used() {
-        return counterSuccess != 0 || counterFailed != 0;
-    }
+    private static AvgTimer timer(final String method, final Function<String, ? extends AvgTimer> factory) {
+        if(noop) { return NoopAvgTimer.INSTANCE; }
 
-    private String toString(int width) {
-        return formatLine(
-                method,
-                width,
-                formatResultAvg(totalTimeSuccess, counterSuccess),
-                formatResult(totalTimeFailed, counterFailed)
-        );
+        return allTimers.computeIfAbsent(method, m -> {
+            methods.add(m);
+            return factory.apply(m);
+        });
     }
 
     private static Stream<AvgTimer> allTimers() {
@@ -220,6 +223,30 @@ public abstract class AvgTimer {
         );
     }
 
+    private void reset() {
+        startTime = 0;
+        lapTime = 0;
+        minTime = Long.MAX_VALUE;
+        maxTime = -1;
+        totalTimeSuccess = 0;
+        totalTimeFailed = 0;
+        counterSuccess = 0;
+        counterFailed = 0;
+    }
+
+    private boolean used() {
+        return counterSuccess != 0 || counterFailed != 0;
+    }
+
+    private String toString(int width) {
+        return formatLine(
+            method,
+            width,
+            formatResultAvg(totalTimeSuccess, counterSuccess),
+            formatResult(totalTimeFailed, counterFailed)
+        );
+    }
+
     private String formatResultAvg(long time, int count) {
         return String.format(
                 "%4s %5s %4s %s %6s %6s s",
@@ -236,13 +263,12 @@ public abstract class AvgTimer {
         return value < 10_000 ? Long.toString(value) : (value/1000) + "'";
     }
 
+    private String formatResult(long time, int count) {
+        return String.format("%4d %s %6d %6s s", average(time, count), unit(), count, toSec(time));
+    }
 
     private static String columnHeaderAvg() {
         return " Min   Max  Avg     Count   Total";
-    }
-
-    private String formatResult(long time, int count) {
-        return String.format("%4d %s %6d %6s s", average(time, count), unit(), count, toSec(time));
     }
 
     private static String columnFailureHeader() {
@@ -310,6 +336,7 @@ public abstract class AvgTimer {
     }
 
     private static final class NoopAvgTimer extends AvgTimer {
+        private static final NoopAvgTimer INSTANCE = new NoopAvgTimer("noop");
         private NoopAvgTimer(String name) { super(name); }
         @Override public void start() { }
         @Override public void stop() { }

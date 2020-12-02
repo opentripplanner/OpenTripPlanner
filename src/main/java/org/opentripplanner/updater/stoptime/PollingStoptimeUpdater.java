@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Update OTP stop time tables from some (realtime) source
  *
- * Usage example ('rt' name is an example) in file 'Graph.properties':
+ * Usage example:
  *
  * <pre>
  * rt.type = stop-time-updater

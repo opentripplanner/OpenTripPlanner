@@ -4,7 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.ProjectInfo;
 
 public class ServerInfoType {
   public static GraphQLOutputType create() {
@@ -16,35 +16,35 @@ public class ServerInfoType {
             .name("version")
             .description("Maven version")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> MavenVersion.VERSION.version)
+            .dataFetcher(e -> ProjectInfo.INSTANCE.version)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("buildTime")
             .description("OTP Build timestamp")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> MavenVersion.VERSION.buildTime)
+            .dataFetcher(e -> ProjectInfo.INSTANCE.buildTime)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("gitBranch")
             .description("")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> MavenVersion.VERSION.branch)
+            .dataFetcher(e -> ProjectInfo.INSTANCE.branch)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("gitCommit")
             .description("")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> MavenVersion.VERSION.commit)
+            .dataFetcher(e -> ProjectInfo.INSTANCE.commit)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("gitCommitTime")
             .description("")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> MavenVersion.VERSION.commitTime)
+            .dataFetcher(e -> ProjectInfo.INSTANCE.commitTime)
             .build())
         .build();
   }

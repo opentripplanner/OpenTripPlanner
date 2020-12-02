@@ -7,18 +7,18 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Properties;
 
-public class MavenVersion implements Serializable {
+public class ProjectInfo implements Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MavenVersion.class);
-    public static final MavenVersion VERSION = fromProperties();
-    private static final long serialVersionUID = VERSION.getUID();
+    private static final Logger LOG = LoggerFactory.getLogger(ProjectInfo.class);
+    public static final ProjectInfo INSTANCE = fromProperties();
+    private static final long serialVersionUID = INSTANCE.getUID();
     private static final String UNKNOWN = "UNKNOWN";
 
     /* Info derived from version string */
     public final String version; 
     public final int major;
     public final int minor;
-    public final int incremental;
+    public final int patch;
     public final String qualifier;
     
     /* Other info from git-commit-id-plugin via maven-version.properties */
@@ -29,13 +29,13 @@ public class MavenVersion implements Serializable {
     public final String buildTime;
     public final boolean dirty;
 
-    private static MavenVersion fromProperties() {
+    private static ProjectInfo fromProperties() {
         final String FILE = "maven-version.properties";
         try {
             Properties props = new java.util.Properties();
-            InputStream in = MavenVersion.class.getClassLoader().getResourceAsStream(FILE);
+            InputStream in = ProjectInfo.class.getClassLoader().getResourceAsStream(FILE);
             props.load(in);
-            MavenVersion version = new MavenVersion(
+            ProjectInfo version = new ProjectInfo(
                     props.getProperty("project.version"),
                     props.getProperty("git.commit.id"),
                     props.getProperty("git.commit.id.describe"),
@@ -48,11 +48,11 @@ public class MavenVersion implements Serializable {
             return version;
         } catch (Exception e) {
             LOG.error("Error reading version from properties file: {}", e.getMessage());
-            return new MavenVersion();
+            return new ProjectInfo();
         }
     }
     
-    private MavenVersion () {
+    private ProjectInfo() {
         // JAXB Marshalling requires classes to have a 0-arg constructor and mutable fields.
         // otherwise it throws a com.sun.xml.bind.v2.runtime.IllegalAnnotationsException.
         // It is protecting you against yourself, since you might someday want to
@@ -66,7 +66,7 @@ public class MavenVersion implements Serializable {
         this("0.0.0-ParseFailure", UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
     }
     
-    public MavenVersion (
+    public ProjectInfo(
             String version,
             String commit,
             String describe,
@@ -91,9 +91,9 @@ public class MavenVersion implements Serializable {
         else
             minor = 0;
         if (fields.length > 2)
-            incremental = Integer.parseInt(fields[2]);
+            patch = Integer.parseInt(fields[2]);
         else
-            incremental = 0;
+            patch = 0;
         this.commit = normalize(commit);
         this.describe = normalize(describe);
         this.commitTime = normalize(commitTime);
@@ -103,12 +103,12 @@ public class MavenVersion implements Serializable {
     }
 
     public long getUID() {
-        return (long) hashCode();
+        return hashCode();
     }
 
     public String toString() {
         return String.format("MavenVersion(%d, %d, %d, %s, %s)", 
-               major, minor, incremental, qualifier, commit);
+               major, minor, patch, qualifier, commit);
     }
 
     public String toStringVerbose() {
@@ -120,22 +120,27 @@ public class MavenVersion implements Serializable {
     }
 
     public String getLongVersionString() {
-        String format = "version: %s\nmajor: %s\nminor: %s\npatch: %s\nqualifier: %s\ncommit: %s\n";
-        return String.format(format, version, major, minor, incremental, qualifier, commit);
+        String format = "version: %s, commit: %s, branch: %s";
+        return String.format(format, version, commit, branch);
+    }
+
+    /** @return "major.minor.patch". The SNAPSHOT `qualifier` is removed. */
+    public String unqualifiedVersion() {
+        return String.format("%d.%d.%d", major, minor, patch);
     }
 
     public int hashCode () {
         return (qualifier.equals("SNAPSHOT") ? -1 : +1) *
-                (1000000 * major + 1000 * minor + incremental);
+                (1000000 * major + 1000 * minor + patch);
     }
 
     public boolean equals (Object other) {
-        if ( ! (other instanceof MavenVersion))
+        if ( ! (other instanceof ProjectInfo))
             return false;
-        MavenVersion that = (MavenVersion) other;
+        ProjectInfo that = (ProjectInfo) other;
         return this.major == that.major &&
                this.minor == that.minor &&
-               this.incremental == that.incremental &&
+               this.patch == that.patch &&
                this.qualifier.equals(that.qualifier);
     }
 

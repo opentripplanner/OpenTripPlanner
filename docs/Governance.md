@@ -11,10 +11,11 @@ The current members of this committee are (in alphabetical order):
 | Andrew Byrd       | [Conveyal](http://conveyal.com) |
 | Thomas Craig      | [Trillium Transit](https://trilliumtransit.com/) |
 | Drew Dara-Abrams  | [Interline](http://www.interline.io) |
-| David Emory       | [MARTA](https://www.itsmarta.com/) (Atlanta, Georgia) |
+| David Emory       | [MARTA](https://www.itsmarta.com/) (Atlanta, Georgia USA) |
 | Thomas Gran       | [Ruter](https://ruter.no/en/) & [Entur](https://entur.no/) (Norway) |
 | Tuukka Hastrup    | [Maanteeamet](https://www.mnt.ee/et) (Estonia) |
-| Frank Purcell     | [TriMet](https:/trimet.org) (Portland, Oregon)   |
+| Joel Lappalainan  | [Digitransit](https://digitransit.fi/) (Finland) |
+| Frank Purcell     | [TriMet](https:/trimet.org/) (Portland, Oregon) |
 | Evan Siroky       | [IBI Group](https://www.ibigroup.com/) |
 | David Turner      | ex-[OpenPlans](https://www.openplans.org/) |
 

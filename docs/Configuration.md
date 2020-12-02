@@ -1,8 +1,12 @@
 # Configuring OpenTripPlanner
 
+_Note: if you are familiar with OTP1 configuration and are migrating to OTP2, please read the 
+[OTP2 Migration Guide](OTP2-MigrationGuide.md) to learn what has changed._
+
+
 ## Base Directory
 
-On the OTP2 command line you must always specify a single directory after all the switches. This tells OTP2 where to look for any configuration files, as well as the input files to build a graph (GTFS, OSM, elevation, and base street graphs) or the `graph.obj` file to load when starting a server. 
+On the OTP2 command line you must always specify a single directory after all the switches. This tells OTP2 where to look for any configuration files. By default OTP will also scan this directory for input files to build a graph (GTFS, OSM, elevation, and base street graphs) or the `graph.obj` file to load when starting a server.
 
 A typical OTP2 directory for a New York City graph might include the following:
 
@@ -18,7 +22,9 @@ port-authority-of-new-york-new-jersey.gtfs.zip
 graph.obj
 ```
 
-You could have more than one of these directories if you are building separate graphs for separate regions. Each one should contain one or more GTFS feeds (which are just zip files full of comma-separated text tables), a PBF OpenStreetMap file, some JSON configuration files, and any output files such as `graph.obj`. For convenience, especially if you work with only one graph at a time, you may want to place your OTP2 JAR file in this same directory.
+You could have more than one of these directories if you are building separate graphs for separate regions. Each one should contain one or more GTFS feeds, a PBF OpenStreetMap file, some JSON configuration files, and any output files such as `graph.obj`. For convenience, especially if you work with only one graph at a time, you may want to place your OTP2 JAR file in this same directory. Note that file types are detected through a case-insensitive combination of file extension and words within the file name. GTFS file names must end in `.zip` and contain the letters `gtfs`, and OSM files must end in `.pbf`.
+
+It is also possible to provide a list of input files in the configuration, which will override this default behavior of scanning the base directory for input files. Scanning is overridden independently for each file type, and can point to remote cloud storage with arbitrary URIs. See [the storage section](Configuration.md#Storage) for further details. 
 
 ## Three Scopes of Configuration
 
@@ -30,7 +36,7 @@ Options and parameters that are taken into account during the graph building pro
 
 The OTP configuration files use the JSON file format. OTP allows comments and unquoted field names 
 in the JSON configuration files to be more human-friendly. OTP supports all the basic JSON types: 
-nested objects `{...}`, arrays `[]`, numbers `789.0` and boolean `true` | `false`. In addition to 
+nested objects `{...}`, arrays `[]`, numbers `789.0` and boolean `true` or `false`. In addition to 
 these basic types some configuration parameters are parsed with some restrictions. In the 
 documentation below we will refer to the following types:
 
@@ -54,6 +60,39 @@ uri | An URI path to a resource like a file or a URL. | `"gs://bucket/path/a.obj
 linear function | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x` | `"600 + 2.0 x"`
 
 
+## System environment and project information substitution
+
+OTP support injecting system environment variables and project information parameters into the 
+configuration. A pattern like `${VAR_NAME}` in a configuration file is substituted with an
+environment variable with name `VAR_NAME`. The substitution is done BEFORE the JSON is parsed, so
+both json keys and values is subject to substitution. This is useful if you want OTPs version 
+number to be part of the _graph-file-name_, or you want to inject credentials in a cloud based 
+deployment.
+
+```JSON
+{
+  storage : {
+    gsCredentials: "${GCS_SERVICE_CREDENTIALS}",
+    graph: "file:///var/otp/graph-${maven.version.short}.obj",
+  }
+}
+```     
+In the example above the environment variable `GCS_SERVICE_CREDENTIALS` on the local machine where
+OTP is deployed is injected into the config. Also, the Maven version number `x.y.z` is injected.
+
+The project information variables available are:
+
+  - `maven.version`
+  - `maven.version.short`
+  - `maven.version.major`
+  - `maven.version.minor`
+  - `maven.version.patch`
+  - `maven.version.qualifier`
+  - `git.branch`
+  - `git.commit`
+  - `git.commit.timestamp`
+
+
 # System-wide Configuration
 
 Using the file `otp-config.json` you can enable or disable different APIs and experimental
@@ -61,27 +100,27 @@ Using the file `otp-config.json` you can enable or disable different APIs and ex
 sandbox features are disabled. So for most OTP2 use cases it is not necessary to create this file.
 Features that can be toggled in this file are generally only affect the routing phase of OTP2
 usage, but for consistency all such "feature flags", even those that would affect graph building,
-are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/util/OTPFeature.java) 
+are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/util/OTPFeature.java) 
 Java class for an enumeration of all available features and their default settings. Here is an 
 example:
 
 ```JSON
 // otp-config.json
 {
-    otpFeatures : {
-        APIBikeRental : false,
-        SandboxExampleAPIGraphStatistics : true
+    "otpFeatures" : {
+        "APIBikeRental" : false,
+        "SandboxExampleAPIGraphStatistics" : true
     }
 }
 ```
 
+
 # Graph Build Configuration
 
-This table lists the possible settings that can be defined in a `build-config.json` file. These will be stored in the graph itself, and affect any server that subsequently loads that graph. Sections follow that describe particular settings in more depth.
+This table lists all the JSON properties that can be defined in a `build-config.json` file. These will be stored in the graph itself, and affect any server that subsequently loads that graph. Sections follow that describe particular settings in more depth.
 
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
-`` |  TODO | boolean | false |
 `areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
 `banDiscouragedWalking` | should walking should be allowed on OSM ways tagged with `foot=discouraged"` | boolean | false | 
 `banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
@@ -92,7 +131,6 @@ config key | description | value type | value default | notes
 `embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
-`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
 `islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
 `islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
 `matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
@@ -102,13 +140,11 @@ config key | description | value type | value default | notes
 `multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
 `osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`
-`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
 `platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
 `readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
 `staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
 `staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
-`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
 `streets` | Include street input files (OSM/PBF) | boolean | true | 
 `storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
 `subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
@@ -118,34 +154,55 @@ config key | description | value type | value default | notes
 `useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 
-This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
+This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
 
 
 ## Storage
-Nested inside `storage {...}` in `build-config.json`.
 
-Using other data-sources than the local file system is new in OTP2. This allow for access to cloud 
-based storage as well as using local disk. If you run OTP in the cloud you might get faster start-up 
-and build times if you use the cloud storage instead of copying the files, it also simplefy the 
-deplyment. Nested `storage` build-config. 
+The storage section of `build-config.json` allows you to override the default behavior of scanning for input files in the [base directory](Configuration.md#Base Directory) and writing output files (such as the graph and error reports) to that same directory. In OTP2 it is now possible to read and write data located outside the local filesystem (including cloud storage services) or at various different locations around the local filesystem.
 
-See (StorageConfig.java)[https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java] 
-for up-to-date detailed description of each config parameter. Here is an overview:
+If your OTP instance is running on a cloud compute service, you may get significantly faster start-up and graph build times if you use the cloud storage directly instead of copying the files back and forth to cloud server instances. This also simplifies the deployment process. 
+
+### Specifying Data Sources
+
+Here is a summary of the configuration keys that can be nested inside the`storage` property of the build-config JSON to specify input and output data sources:
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
 `gsCredentials` | Use an environment variable to point to the Google Cloud credentials: `"${MY_GOC_SERVICE}"`. | string | `null`
-`graph` | Absolute path to the graph file. | uri | `null`
-`streetGraph` | Absolute path to the street-graph file. | uri | `null`
-`osm` | List of absolute paths of Open Street Map files to build. | uri [] | `null`
-`dem` | List of absolute paths of Elevation DEM files to build. | uri [] | `null`
-`gtfs` | List of GTFS transit data files to build. | uri [] | `null`
-`netex` | List of NeTEx transit data files to build. | uri [] | `null`
-`buildReportDir` | Path to directory for the build issue report generated by OTP. | uri | `null`
-`localFileNamePatterns` | Patterns to use for auto resolving local filenames to input data types. | object | `null`
+`graph` | Absolute path where the graph file will be written, overriding the default of `graph.obj` in the base directory. Note that currently this option will also affect where the server _reads_ the graph from. | uri | `null`
+`streetGraph` | Absolute path to the input street-graph file. | uri | `null`
+`osm` | List of absolute paths of OpenStreetMap input files to read. | uri [] | `null`
+`dem` | List of absolute paths of Elevation DEM input files to read. | uri [] | `null`
+`gtfs` | List of GTFS transit data files to read. | uri [] | `null`
+`netex` | List of NeTEx transit data files to read. | uri [] | `null`
+`buildReportDir` | Path to directory where the build issue report will be written. | uri | `null`
+`localFileNamePatterns` | Patterns used in determining the type of input files from their names. | object | `null`
+
+For example, this configuration could be used to load GTFS and OSM inputs from Google Cloud Storage:
+
+```JSON
+// build-config.json
+{
+  "storage": {
+      "osm": ["gs://bucket-name/streets.pbf"],
+      "gtfs": ["gs://bucket-name/transit1.zip", "gs://bucket-name/transit2.zip"]
+  }
+}
+```
+
+The Google Storage system will inherit the permissions of the server it's running on within Google Cloud. It is also possible to supply credentials in this configuration file (see example below).
+
+Note that when files are specified with URIs in this configuration, the file types do not need to be inferred from the file names so these GTFS files can have any names - there is no requirement that they have the letters "gtfs" in them.
+
+The default behavior of scanning the base directory for inputs is overridden independently for each file type. So in the above configuration, GTFS and OSM will be loaded from Google Cloud Storage, but OTP2 will still scan the base directory for all other types such as DEM files. Supplying an empty array for a particular file type will ensure that no inputs of that type are loaded, including by local directory scanning.
+
+See the comments in the source code of class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java) 
+for an up-to-date detailed description of each config parameter.
 
 ### Local Filename Patterns
-Nested inside `storage : { localFileNamePatterns : { ... } }` in `build-config.json`.
+
+When scanning the base directory for inputs, each file's name is checked against patterns to detect what kind of file it is. These patterns can be overridden in the config, by nesting a `localFileNamePatterns` property inside the `storage` property (see example below). Here are the keys you can place inside `localFileNamePatterns`:
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
@@ -154,20 +211,25 @@ config key | description | value type | value default
 `gtfs` | Pattern used to match GTFS files on local disk | regexp pattern | `(?i)gtfs` 
 `netex` | Pattern used to match NeTEx files on local disk | regexp pattern | `(?i)netex` 
 
-### Storage example:
-```
-storage : {
-  // Use the GCS_SERVICE_CREDENTIALS environment variable to locate GCS credentials
-  gsCredentials: "${GCS_SERVICE_CREDENTIALS}",
-  streetGraph: "file:///Users/kelvin/otp/streetGraph.obj",
-  osm: ["gs://bucket-name/shared-osm-file.pbf"]
-  localFileNamePatterns: {
-    // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
-    gtfs : "^g-.*\.zip$", 
+OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow seeking within files to guess what they are. Therefore, like all other file types GTFS is now detected from a filename pattern. It is not sufficient to look for the `.zip` extension because Netex data is also often supplied in a ZIP file. 
+
+### Storage example
+
+```JSON
+// build-config.json 
+{
+  "storage": {
+    // Use the GCS_SERVICE_CREDENTIALS environment variable to locate GCS credentials
+    "gsCredentials": "${GCS_SERVICE_CREDENTIALS}",
+    "streetGraph": "file:///Users/kelvin/otp/streetGraph.obj",
+    "osm": ["gs://bucket-name/shared-osm-file.pbf"],
+    "localFileNamePatterns": {
+      // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
+      "gtfs" : "^g-.*\\.zip$"
+    }
   }
 }
 ```
-
 
 ## Limit the transit service period
 
@@ -233,47 +295,51 @@ routing for bicyclists. It even helps avoid hills for walking itineraries. DEMs 
 
 ### U.S. National Elevation Dataset
 
-In the United States, a high resolution [National Elevation Dataset](http://ned.usgs.gov/) is available for the entire
-territory. The US Geological Survey (USGS) delivers this dataset in tiles via a somewhat awkward heavyweight web-based GIS
-which generates and emails you download links. OpenTripPlanner contains a module which will automatically contact this
-service and download the proper tiles to completely cover your transit and street network area. This process is rather
-slow (download is around 1.5 hours, then setting elevation for streets takes about 5 minutes for the Portland, Oregon region),
-but once the tiles are downloaded OTP will keep them in local cache for the next graph build operation.
-
-To auto-download NED tiles when building your graph, add the following line to `build-config.json` in your router
-directory:
-
-```JSON
-// build-config.json
-{
-  "fetchElevationUS": true
-}
-```
-
-You may also want to add the `--cache <directory>` command line parameter to specify a custom NED tile cache location.
-
-NED downloads take quite a long time and slow down the graph building process. The USGS will also deliver the
-whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA). OpenTripPlanner contains
-another module that will then automatically fetch data in this format from an Amazon S3 copy of your bulk data.
-You can configure it as follows in `build-config.json`:
+In the United States, a high resolution [National Elevation Dataset](http://ned.usgs.gov/) is 
+available for the entire territory. It used to be possible for OTP to download NED tiles on the fly 
+from a rather complex USGS SOAP service. This process was somewhat unreliable and would greatly slow
+ down the graph building process. In any case the service has since been replaced. But the USGS 
+ would also deliver the whole dataset in bulk if you [sent them a hard drive](https://web.archive.org/web/20150811051917/http://ned.usgs.gov:80/faq.html#DATA). We did this many years back and uploaded 
+ the entire data set to Amazon AWS S3. OpenTripPlanner contains another module that can automatically 
+ fetch data in this format from any Amazon S3 copy of the bulk data. You can configure it as follows
+  in `build-config.json`:
 
 ```JSON
+// router-config.json
 {
-    "elevationBucket" : {
-        "accessKey" : "your-aws-access-key",
-        "secretKey" : "corresponding-aws-secret-key",
-        "bucketName" : "ned13"
+    "elevationBucket": {
+        "accessKey": "your-aws-access-key",
+        "secretKey": "corresponding-aws-secret-key",
+        "bucketName": "ned13"
     }
 }
 ```
 
+This `ned13` bucket is still available on S3 under a "requester pays" policy. As long as you specify 
+valid AWS account credentials you should be able to download tiles, and any bandwidth costs will be 
+billed to your AWS account.
+
+Once the tiles are downloaded for a particular geographic area, OTP will keep them in local cache 
+for the next graph build operation. You should add the `--cache <directory>` command line parameter 
+to specify your NED tile cache location.
+
+
 ### Geoid Difference
 
-With some elevation data, the elevation values are specified as relative to the a geoid (irregular estimate of mean sea level). See [issue #2301](https://github.com/opentripplanner/OpenTripPlanner/issues/2301) for detailed discussion of this. In these cases, it is necessary to also add this geoid value onto the elevation value to get the correct result. OTP can automatically calculate these values in one of two ways. 
+Some elevation data sets are relative to mean sea level. At a global scale sea level is represented 
+as a surface called the geoid, which is irregular in shape due to local gravitational anomalies. 
+ On the other hand, GPS elevations are reported relative to the  WGS84 spheroid, a perfectly smooth 
+ mathematical surface approximating the geoid. 
+In cases where the two elevation definitions are mixed, it may be necessary to adjust elevation 
+values to avoid confusing users with things like negative elevation values in places clearly above 
+sea level. See [issue #2301](https://github.com/opentripplanner/OpenTripPlanner/issues/2301) 
+for detailed discussion of this. 
 
-The first way is to use the geoid difference value that is calculated once at the center of the 
-graph. This value is returned in each trip plan response in the 
-[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field. 
+OTP allows you to adjust the elevation values reported in API responses in two ways.
+The first way is to store ellipsoid (GPS) elevation values internally, but apply a single geoid 
+difference value in the OTP client where appropriate to display elevations above sea level.
+This ellipsoid to geoid difference is returned in each trip plan response in the 
+[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field. 
 Using a single value can be sufficient for smaller OTP deployments, but might result in incorrect 
 values at the edges of larger OTP deployments. If your OTP instance uses this, it is recommended 
 to set a default request value in the `router-config.json` file as follows:
@@ -282,12 +348,18 @@ to set a default request value in the `router-config.json` file as follows:
 // router-config.json
 {
     "routingDefaults": {
-        "geoidElevation ": true   
+        "geoidElevation": true   
     }
 }
 ```
 
-The second way is to precompute these geoid difference values at a more granular level and include them when calculating elevations for each sampled point along each street edge. In order to speed up calculations, the geoid difference values are calculated and cached using only 2 significant digits of GPS coordinates. This is more than enough detail for most regions of the world and should result in less than one meter of difference in areas that have large changes in geoid difference values. To enable this, include the following in the `build-config.json` file: 
+The second way is to precompute these geoid difference values at a more granular level and store 
+all elevations internally relative to the geoid (sea level). Elevations returned in the API 
+responses will then not need to be adjusted to match end users' intuitive understanding of elevation.
+In order to speed up calculations, these geoid difference values are calculated and cached using only 
+2 significant digits of GPS coordinates. This is more than enough detail for most regions of the 
+world and should result in less than one meter of vertical error even in areas that have the largest
+ geoid irregularities. To enable this, include the following in the `build-config.json` file: 
 
 ```JSON
 // build-config.json
@@ -458,7 +530,7 @@ To add your own custom property set have a look at `org.opentripplanner.graph_bu
 ```JSON
 // build-config.json
 {
-  osmWayPropertySet: "norway"
+  "osmWayPropertySet": "norway"
 }
 ```
 
@@ -499,11 +571,12 @@ There are many trip planning options used in the OTP web API, and more exist
 internally that are not exposed via the API. You may want to change the default value for some of these parameters,
 i.e. the value which will be applied unless it is overridden in a web API request.
 
-A full list of them can be found in the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java).
+A full list of them can be found in the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java).
 Any public field or setter method in this class can be given a default value using the routingDefaults section of
 `router-config.json` as follows:
 
 ```JSON
+// router-config.json
 {
     "routingDefaults": {
         "walkSpeed": 2.0,
@@ -563,6 +636,7 @@ from the stop (offboard) vertex to the onboard vertex, and the alight time is ad
 seconds needed for the ride and alighting processes in `router-config.json` as follows:
 
 ```JSON
+// router-config.json
 {
   "boardTimes": {
     "AIRPLANE": 2700
@@ -635,7 +709,7 @@ config key | description | value type | value default
 `iterationDepartureStepInSeconds` | Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds. | int | `60`
 `searchThreadPoolSize` | Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread. | int | `0`
 `dynamicSearchWindow` | The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics. | object | `null`
-`stopTransferCost` | Use this to set a stop transfer cost for the given [TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/model/TransferPriority.java). The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | enum map | `null`
+`stopTransferCost` | Use this to set a stop transfer cost for the given [TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/model/TransferPriority.java). The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | enum map | `null`
 
 ### Tuning transit routing - Dynamic search window
 Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.json`.
@@ -667,26 +741,26 @@ config key | description | value type
 Use values in a range from `0` to `100 000`. **All key/value pairs are required if the `stopTransferCost` is listed.** 
 
 
-### Transit example section from router-config.json
-```
+### Transit example
+```JSON
+// router-config.json
 {
-    transit: {
-        maxNumberOfTransfers: 12,
-        scheduledTripBinarySearchThreshold: 50,
-        iterationDepartureStepInSeconds: 60,
-        searchThreadPoolSize: 0,
-        dynamicSearchWindow: {
-            minTripTimeCoefficient: 0.4,
-            minTripTimeCoefficient: 0.3,
-            minTimeMinutes: 30,
-            maxLengthMinutes : 360,
-            stepMinutes: 10
+    "transit": {
+        "maxNumberOfTransfers": 12,
+        "scheduledTripBinarySearchThreshold": 50,
+        "iterationDepartureStepInSeconds": 60,
+        "searchThreadPoolSize": 0,
+        "dynamicSearchWindow": {
+            "minTripTimeCoefficient": 0.4,
+            "minTimeMinutes": 30,
+            "maxLengthMinutes" : 360,
+            "stepMinutes": 10
         },
-        stopTransferCost: {
-            DISCOURAGED: 72000,
-            ALLOWED:       150,
-            RECOMMENDED:    60,
-            PREFERRED:       0
+        "stopTransferCost": {
+            "DISCOURAGED": 72000,
+            "ALLOWED":       150,
+            "RECOMMENDED":    60,
+            "PREFERRED":       0
         }
     }
 }
@@ -798,7 +872,6 @@ connect to a network resource is the `url` field.
           "url": "http://coast.socialbicycles.com/opendata/"
         },
 
-
         // Polling bike rental updater for DC bikeshare (a Bixi system)
         // Negative update frequency means to run once and then stop updating (essentially static data)
         {
@@ -806,7 +879,7 @@ connect to a network resource is the `url` field.
             "sourceType": "bixi",
             "url": "https://www.capitalbikeshare.com/data/stations/bikeStations.xml",
             "frequencySec": -1
-		},
+        },
 
         // Bike parking availability
         {
@@ -837,6 +910,7 @@ Steps to add a GBFS feed to a router:
 - Add one entry in the `updater` field of `router-config.json` in the format
 
 ```JSON
+// router-config.json
 {
      "type": "bike-rental",
      "frequencySec": 60,
@@ -868,4 +942,4 @@ To configure and url for the [BikeRentalServiceDirectory](sandbox/BikeRentalServ
 
 # Configure using command-line arguments
 
-Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java).
+Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java).

@@ -1,13 +1,10 @@
 package org.opentripplanner.routing.trippattern;
 
-import static org.opentripplanner.routing.trippattern.TripTimes.formatSeconds;
-
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.common.MavenVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+
+import static org.opentripplanner.routing.trippattern.TripTimes.formatSeconds;
 
 /**
  * Uses a TripTimes to represent multiple trips following the same template at regular intervals.
@@ -15,8 +12,7 @@ import java.io.Serializable;
  */
 public class FrequencyEntry implements Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FrequencyEntry.class);
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     public final int startTime; // sec after midnight
     public final int endTime;   // sec after midnight

@@ -77,8 +77,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
 
     /**
-     * Here the updater can be configured using the properties in the file 'Graph.properties'.
-     * The property frequencySec is already read and used by the abstract base class.
+     * The property 'frequencySec' is already read and used by the abstract base class.
      */
     public WFSNotePollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config) {
         super(config);

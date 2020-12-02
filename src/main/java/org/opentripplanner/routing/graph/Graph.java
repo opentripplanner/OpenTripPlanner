@@ -15,7 +15,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.ProjectInfo;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
@@ -97,9 +97,9 @@ public class Graph implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
-    private final MavenVersion mavenVersion = MavenVersion.VERSION;
+    private final ProjectInfo projectInfo = ProjectInfo.INSTANCE;
 
     // TODO Remove this field, use Router.routerId ?
     public String routerId;
@@ -630,8 +630,8 @@ public class Graph implements Serializable {
      *         graphs are otherwise obviously incompatible.
      */
     boolean graphVersionMismatch() {
-        MavenVersion v = MavenVersion.VERSION;
-        MavenVersion gv = this.mavenVersion;
+        ProjectInfo v = ProjectInfo.INSTANCE;
+        ProjectInfo gv = this.projectInfo;
         LOG.info("Graph version: {}", gv);
         LOG.info("OTP version:   {}", v);
         if (!v.equals(gv)) {
