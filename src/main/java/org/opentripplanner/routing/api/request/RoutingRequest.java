@@ -29,9 +29,10 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.model.modes.TransitMainMode;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -142,7 +143,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        EnumSet.allOf(TransitMode.class)
+        AllowedTransitMode.getAllTransitModes()
     );
 
     /**
@@ -282,14 +283,14 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /**
      * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add
      * a penalty to other modes (> 1.0). The type used here it the internal model
-     * {@link TransitMode} make sure to create a mapping for this before using it on the API.
+     * {@link TransitMainMode} make sure to create a mapping for this before using it on the API.
      * <p>
      * If set, the alight-slack-for-mode override the default value {@code 1.0}.
      * <p>
      * This is a scalar multiplied with the time in second on board the transit vehicle. Default
      * value is not-set(empty map).
      */
-    private Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
+    private Map<TransitMainMode, Double> transitReluctanceForMode = new HashMap<>();
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
@@ -770,12 +771,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
+    public void setTransitReluctanceForMode(Map<TransitMainMode, Double> reluctanceForMode) {
         transitReluctanceForMode.clear();
         transitReluctanceForMode.putAll(reluctanceForMode);
     }
 
-    public Map<TransitMode, Double> transitReluctanceForMode() {
+    public Map<TransitMainMode, Double> transitReluctanceForMode() {
         return Collections.unmodifiableMap(transitReluctanceForMode);
     }
 

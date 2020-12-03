@@ -28,7 +28,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
         // Trip times are sorted based on the arrival times at stop 0,
         this.sortIndex = arrival(0);
         // Mode ordinal is used to index the transit factor/reluctance
-        this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().ordinal();
+        this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().getMainMode().ordinal();
     }
 
     @Override

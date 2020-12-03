@@ -7,6 +7,7 @@ import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.config.SubmodesConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,11 +56,14 @@ public class OTPConfiguration {
      */
     private RouterConfig routerConfig;
 
+    private SubmodesConfig submodesConfig;
+
     private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
         this.cli = cli;
         this.otpConfig = configLoader.loadOtpConfig();
         this.buildConfig = configLoader.loadBuildConfig();
         this.routerConfig = configLoader.loadRouterConfig();
+        this.submodesConfig = configLoader.loadSubmodesConfig();
     }
 
     /**
@@ -129,6 +133,8 @@ public class OTPConfiguration {
     public RouterConfig routerConfig() {
         return routerConfig;
     }
+
+    public SubmodesConfig submodesConfig() { return submodesConfig; }
 
     /**
      * Create plug in config to the data store.

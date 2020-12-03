@@ -595,11 +595,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "20"
               },
               "longName": "Burnside/Stark",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -1000,11 +1003,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "15"
               },
               "longName": "Belmont/NW 23rd",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {
@@ -1439,11 +1445,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "20"
               },
               "longName": "Burnside/Stark",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -1844,11 +1853,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "15"
               },
               "longName": "Belmont/NW 23rd",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {
@@ -2253,11 +2265,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "70"
               },
               "longName": "12th Ave",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "70",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r070.htm"
             },
             "serviceId": {
@@ -2397,11 +2412,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "77"
               },
               "longName": "Broadway/Halsey",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "77",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r077.htm"
             },
             "serviceId": {
@@ -3080,11 +3098,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "20"
               },
               "longName": "Burnside/Stark",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -3559,11 +3580,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "20"
               },
               "longName": "Burnside/Stark",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -4038,11 +4062,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "20"
               },
               "longName": "Burnside/Stark",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -4504,11 +4531,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "70"
               },
               "longName": "12th Ave",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "70",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r070.htm"
             },
             "serviceId": {
@@ -4648,11 +4678,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "77"
               },
               "longName": "Broadway/Halsey",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "77",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r077.htm"
             },
             "serviceId": {
@@ -5093,11 +5126,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "id": "15"
               },
               "longName": "Belmont/NW 23rd",
-              "mode": "BUS",
+              "mode": {
+                "gtfsExtendRouteTypes": [ ],
+                "mainMode": "BUS",
+                "netexSubmodes": [ ]
+              },
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {

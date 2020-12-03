@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.model.modes.TransitMainMode;
+import org.opentripplanner.model.modes.TransitMode;
 import org.opentripplanner.model.BikeAccess;
 
 import java.util.Collection;
@@ -28,7 +30,9 @@ public class RouteMapperTest {
 
     private static final String DESC = "Desc";
 
-    private static final int TYPE = 2;
+    private static final int ROUTE_TYPE = 2;
+
+    private static final TransitMode TRANSIT_MODE = TransitMode.RAIL;
 
     private static final String URL = "www.url.me";
 
@@ -54,7 +58,7 @@ public class RouteMapperTest {
         ROUTE.setShortName(SHORT_NAME);
         ROUTE.setLongName(LONG_NAME);
         ROUTE.setDesc(DESC);
-        ROUTE.setType(TYPE);
+        ROUTE.setType(ROUTE_TYPE);
         ROUTE.setUrl(URL);
         ROUTE.setColor(COLOR);
         ROUTE.setTextColor(TEXT_COLOR);
@@ -63,7 +67,10 @@ public class RouteMapperTest {
         ROUTE.setBrandingUrl(BRANDING_URL);
     }
 
-    private final RouteMapper subject = new RouteMapper(new AgencyMapper(FEED_ID));
+    private RouteMapper subject = new RouteMapper(
+        new AgencyMapper(FEED_ID),
+        null
+    );
 
     @Test
     public void testMapCollection() throws Exception {
@@ -81,7 +88,7 @@ public class RouteMapperTest {
         assertEquals(SHORT_NAME, result.getShortName());
         assertEquals(LONG_NAME, result.getLongName());
         assertEquals(DESC, result.getDesc());
-        assertEquals(TYPE, result.getType());
+        assertEquals(TRANSIT_MODE, result.getMode());
         assertEquals(URL, result.getUrl());
         assertEquals(COLOR, result.getColor());
         assertEquals(TEXT_COLOR, result.getTextColor());
@@ -102,7 +109,7 @@ public class RouteMapperTest {
         assertNull(result.getShortName());
         assertNull(result.getLongName());
         assertNull(result.getDesc());
-        assertEquals(0, result.getType());
+        assertEquals(TransitMode.TRAM, result.getMode());
         assertNull(result.getUrl());
         assertNull(result.getColor());
         assertNull(result.getTextColor());

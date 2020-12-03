@@ -6,6 +6,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.modes.TransitMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
@@ -37,13 +38,14 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
         .stream()
         .max(Map.Entry.comparingByValue())
         .map(Map.Entry::getKey)
+        .map(TransitMode::getMainMode)
         .map(Enum::name)
         .orElse(null);
 
     String patterns = JSONArray.toJSONString(patternsForStop.stream().map(tripPattern -> {
       JSONObject pattern = new JSONObject();
       pattern.put("headsign", tripPattern.getScheduledTimetable().getTripTimes().get(0).getHeadsign(tripPattern.getStopIndex(stop)));
-      pattern.put("type", tripPattern.getRoute().getMode().name());
+      pattern.put("type", tripPattern.getRoute().getMode().getMainMode().name());
       pattern.put("shortName", tripPattern.getRoute().getShortName());
       return pattern;
     }).collect(Collectors.toList()));

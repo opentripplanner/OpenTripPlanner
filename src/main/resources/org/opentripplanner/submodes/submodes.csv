@@ -1,0 +1,31 @@
+name,mode,description,netexSubmodes,gtfsExtendedRouteTypes,netexOutputSubmode,gtfsOutputExtendedRouteType
+DOMESTIC,AIRPLANE,"An aeroplane service to a domestic destination.",domesticFlight,1102,domesticFlight,1102
+HELICOPTER,AIRPLANE,"A helicopter service.",helicopterService,1110,helicopterService,1110
+INTERNATIONAL,AIRPLANE,"An aeroplane service to an international destination.",internationalFlight,1101,internationalFlight,1101
+AIRPORT_LINK,BUS,"A bus route specifically aimed at transporting passengers to and from airports. Usually with special board/alight-rules on the intermediary stops.",airportLinkBus,,airportLinkBus,
+EXPRESS,BUS,"A regional bus serving fewer stops than its regionalBus counterpart (express departure). Not to be confused with coach services.",expressBus,702,expressBus,702
+LOCAL,BUS,"Any short range bus routes, city buses, or open school lines which are not distinctly marked with the school bus mode.",localBus,704,localBus,704
+NIGHT,BUS,"A local bus operating exclusively and specifically at night (usually midnight-5:00).",nightBus,705,nightBus,705
+RAIL_REPLACEMENT,BUS,"A temporary bus service replacing a temporarily disabled rail line.",railReplacementBus,714,railReplacementBus,714
+REGIONAL,BUS,"Any medium range buses which are not localBus, express bus, airport link bus, or a coach.",regionalBus,701,regionalBus,701
+SCHOOL,BUS,"A local bus specifically transporting students from their homes to their schools, but which may be used by the general public.",schoolBus,712 713,schoolBus,712
+SHUTTLE,BUS,"A local bus which acts only as a feeder route to other transports. Usually connecting to coaches, trains or airports.",shuttleBus,711,shuttleBus,711
+SIGHTSEEING,BUS,"A bus focusing primarily on the experience (tourism) of the journey instead of efficiency and speed.",sightseeingBus,710,sightseeingBus,710
+INTERNATIONAL,COACH,"A long-distance coach service which crosses an international border.",internationalCoach,201,internationalCoach,201
+NATIONAL,COACH,"A long-distance coach service which does not cross an international border.",nationalCoach,202 204 208,nationalCoach,202
+AIRPORT_LINK,RAIL,"Airport express trains.",airportLinkRail,,airportLinkRail,
+INTERNATIONAL,RAIL,"Diesel-trains which are not local- or intercity trains.",international,,international,
+INTERREGIONAL,RAIL,"Trains which cross an international border.",interregionalRail,103,interregionalRail,103
+LOCAL,RAIL,"Local train services for commuters and suburban transport.",local,109,local,109
+LONG_DISTANCE,RAIL,"Intercity trains.",longDistance,102 114,longDistance,102
+NIGHT,RAIL,"Train services with a particular focus on overnight journeys with sleeping compartments.",nightRail,105,nightRail,105
+REGIONAL,RAIL,"Electrical trains which are not local- or intercity trains.",regionalRail,106,regionalRail,106
+TOURIST,RAIL,"A train focusing primarily on the experience (tourism) of the journey instead of efficiency and speed. Usually outdated train models, sometimes on different gauge rails.",touristRailway,107,touristRailway,107
+HIGH_SPEED_PASSENGER_SERVICE,FERRY,"A high speed boat service which does not carry cars. The ship type is usually a catamaran.",highSpeedPassengerService,,highSpeedPassengerService,
+HIGH_SPEED_VEHICLE_SERVICE,FERRY,"A high speed boat service with car carrying capacity. The ship type is usually a catamaran.",highSpeedVehicleService,,highSpeedVehicleService,
+INTERNATIONAL_CAR_FERRY,FERRY,"Car-carrying cruise ships between countries.",internationalCarFerry,,internationalCarFerry,
+INTERNATIONAL_PASSENGER_FERRY,FERRY,"Ships to international destinations which do not carry cars.",internationalPassengerFerry,,internationalPassengerFerry,
+LOCAL_CAR_FERRY,FERRY,"Car-carrying ships between, or as part of road networks. Does not include high speed services.",localCarFerry,,localCarFerry,
+LOCAL_PASSENGER_FERRY,FERRY,"Boat services which are not: international, car carrying, or high-speed services.",localPassengerFerry,,localPassengerFerry,
+NATIONAL_CAR_FERRY,FERRY,"A long-distance car-carrying ship which does not cross and international border.",nationalCarFerry,,nationalCarFerry,
+SIGHTSEEING_SERVICE,FERRY,"A boat service focusing primarily on the experience (tourism) of the journey instead of efficiency and speed. Usually older ships.",sightseeingService,,sightseeingService,

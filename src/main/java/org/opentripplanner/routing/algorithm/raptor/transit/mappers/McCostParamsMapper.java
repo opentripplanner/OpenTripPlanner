@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import java.util.Arrays;
 import java.util.Map;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.TransitMainMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -31,7 +31,7 @@ public class McCostParamsMapper {
     }
 
 
-    public static double[] mapTransitReluctance(Map<TransitMode, Double> map) {
+    public static double[] mapTransitReluctance(Map<TransitMainMode, Double> map) {
 
         if(map.isEmpty()) { return null; }
 
@@ -41,9 +41,9 @@ public class McCostParamsMapper {
         // and passed that into the transit layer and used it to set the
         // {@link TripScheduleWithOffset#transitReluctanceIndex}, but this is difficult with the
         // current transit model design.
-        double[] transitReluctance = new double[TransitMode.values().length];
+        double[] transitReluctance = new double[TransitMainMode.values().length];
         Arrays.fill(transitReluctance, McCostParams.DEFAULT_TRANSIT_RELUCTANCE);
-        for (TransitMode mode : map.keySet()) {
+        for (TransitMainMode mode : map.keySet()) {
             transitReluctance[mode.ordinal()] = map.get(mode);
         }
         return transitReluctance;

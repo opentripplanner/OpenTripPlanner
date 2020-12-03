@@ -1,6 +1,6 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.TransitMode;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import java.util.HashMap;
@@ -63,8 +63,9 @@ public class TraverseModeMapper {
             return null;
         }
 
-        switch (domain) {
+        switch (domain.getMainMode()) {
             case AIRPLANE: return "AIRPLANE";
+            case COACH:
             case BUS: return "BUS";
             case CABLE_CAR: return "CABLE_CAR";
             case FERRY: return "FERRY";

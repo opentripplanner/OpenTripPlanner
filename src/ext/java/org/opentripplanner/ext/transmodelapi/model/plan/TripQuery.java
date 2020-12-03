@@ -20,6 +20,7 @@ public class TripQuery {
   public static GraphQLFieldDefinition create(
       DefaultRoutingRequestType routing,
       GraphQLOutputType tripType,
+      GraphQLEnumType transportSubMode,
       GqlUtil gqlUtil
   ) {
     return GraphQLFieldDefinition.newFieldDefinition()
@@ -143,9 +144,10 @@ public class TripQuery {
         )
         .argument(GraphQLArgument.newArgument()
             .name("modes")
-            .description("The set of access/egress/direct/transit modes to be used for this search."
-                + "Defaults to access/egress/direct mode foot and all transportModes.")
-            .type(ModeInputType.INPUT_TYPE)
+            .description("The set of access/egress/direct/transit modes to be used for this search. "
+                + "Note that this only works at the Line level. If individual ServiceJourneys have "
+                + "modes that differ from the Line mode, this will NOT be accounted for.")
+            .type( ModeInputType.createModesInputType(transportSubMode))
             .build()
         )
         .argument(GraphQLArgument.newArgument()

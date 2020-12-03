@@ -75,6 +75,7 @@ public class NetexModule implements GraphBuilderModule {
 
                 OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(
                         graph.deduplicator,
+                        graph.getTransitModeService(),
                         issueStore
                 );
                 transitBuilder.limitServiceDays(transitPeriodLimit);

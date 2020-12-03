@@ -127,7 +127,8 @@ public class GtfsModule implements GraphBuilderModule {
                 GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
                         gtfsBundle.getFeedId().getId(),
                         issueStore,
-                        gtfsDao
+                        gtfsDao,
+                        graph.getTransitModeService()
                 );
                 mapper.mapStopTripAndRouteDatantoBuilder();
 

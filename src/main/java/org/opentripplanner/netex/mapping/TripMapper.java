@@ -4,6 +4,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
+import org.opentripplanner.model.modes.TransitModeService;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
@@ -34,6 +35,7 @@ class TripMapper {
     private final Map<String, FeedScopedId> serviceIds;
     private final Set<FeedScopedId> shapePointIds;
     private final EntityById<Operator> operatorsById;
+    private final TransportModeMapper transportModeMapper;
 
     TripMapper(
             FeedScopedIdFactory idFactory,
@@ -42,7 +44,8 @@ class TripMapper {
             ReadOnlyHierarchicalMap<String, Route> routeById,
             ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById,
             Map<String, FeedScopedId> serviceIds,
-            Set<FeedScopedId> shapePointIds
+            Set<FeedScopedId> shapePointIds,
+            TransitModeService transitModeService
     ) {
         this.idFactory = idFactory;
         this.otpRouteById = otpRouteById;
@@ -51,6 +54,7 @@ class TripMapper {
         this.serviceIds = serviceIds;
         this.shapePointIds = shapePointIds;
         this.operatorsById = operatorsById;
+        this.transportModeMapper = new TransportModeMapper(transitModeService);
     }
 
     /**
@@ -86,6 +90,14 @@ class TripMapper {
 
         trip.setTripShortName(serviceJourney.getPublicCode());
         trip.setTripOperator(findOperator(serviceJourney));
+
+        if (serviceJourney.getTransportMode() != null) {
+            trip.setMode(transportModeMapper.map(
+                    serviceJourney.getTransportMode(),
+                    serviceJourney.getTransportSubmode()
+                )
+            );
+        }
 
         trip.setDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
 

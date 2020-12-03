@@ -10,7 +10,8 @@ import org.opentripplanner.model.TripStopTimes;
 public class TransferMapperTest {
     private static final String FEED_ID = "FEED";
 
-    private static final RouteMapper ROUTE_MAPPER = new RouteMapper(new AgencyMapper(FEED_ID));
+    private static final RouteMapper ROUTE_MAPPER =
+        new RouteMapper(new AgencyMapper(FEED_ID), null);
 
     private static final TripMapper TRIP_MAPPER = new TripMapper(ROUTE_MAPPER);
 

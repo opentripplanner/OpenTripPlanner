@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.impl;
 
+import org.opentripplanner.api.mapping.RouteTypeMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
@@ -325,7 +326,7 @@ public class NycFareServiceImpl implements FareService {
 				}
 				TripPattern tripPattern = leg.asTransitLeg().trip().getOriginalTripPattern();
 				Route route = tripPattern.getRoute();
-				int routeType = route.getType();
+				int routeType = RouteTypeMapper.mapToApi(route.getMode());
 				// Note the old implementation directly used the ints as classifiers here.
 				if (routeType == 1) {
 					ride.classifier = NycRideClassifier.SUBWAY;

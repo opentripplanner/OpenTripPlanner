@@ -84,6 +84,7 @@ public class OTPAppConstruction {
         LOG.info("Wiring up and configuring graph builder task.");
         return GraphBuilder.create(
                 config.buildConfig(),
+                config.submodesConfig(),
                 graphBuilderDataSources(),
                 baseGraph
         );

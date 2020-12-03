@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.timetable;
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -11,8 +12,8 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
-import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -21,7 +22,7 @@ import org.opentripplanner.util.PolylineEncoder;
 
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 
 public class ServiceJourneyType {
   private static final String NAME = "ServiceJourney";
@@ -38,6 +39,7 @@ public class ServiceJourneyType {
       GraphQLOutputType journeyPatternType,
       GraphQLOutputType estimatedCallType,
       GraphQLOutputType timetabledPassingTimeType,
+      GraphQLEnumType transportSubMode,
       GqlUtil gqlUtil
   ) {
     return GraphQLObjectType.newObject()
@@ -68,13 +70,6 @@ public class ServiceJourneyType {
 //                        .description("Whether journey is as planned, a cancellation or an extra journey. Default is as planned")
 //                        .dataFetcher(environment -> (((Trip) trip(environment)).getServiceAlteration()))
 //                        .build())
-
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name("transportSubmode")
-                    .type(TRANSPORT_SUBMODE)
-                    .description("The transport submode of the journey, if different from lines transport submode. NOT IMPLEMENTED")
-                    .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
-                    .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("publicCode")
                     .type(Scalars.GraphQLString)
@@ -218,6 +213,19 @@ public class ServiceJourneyType {
                     .description("Booking arrangements for flexible services.")
                     .type(bookingArrangementType)
                     .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("transportMode")
+                .type(TRANSPORT_MODE)
+                .dataFetcher(environment -> ((trip(environment)).getMode().getMainMode()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("transportSubmode")
+                .type(transportSubMode)
+                .dataFetcher(environment ->
+                    ((trip(environment))).getMode().getNetexOutputSubmode() != null
+                        ? ((trip(environment))).getMode()
+                        : null)
+                .build())
             .build();
   }
 

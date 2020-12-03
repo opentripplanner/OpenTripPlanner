@@ -3,6 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.opentripplanner.api.mapping.RouteTypeMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.Agency;
@@ -47,12 +48,12 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> mode() {
-    return environment -> getSource(environment).getMode().name();
+    return environment -> getSource(environment).getMode().getMainMode().name();
   }
 
   @Override
   public DataFetcher<Integer> type() {
-    return environment -> getSource(environment).getType();
+    return environment -> RouteTypeMapper.mapToApi(getSource(environment).getMode());
   }
 
   @Override

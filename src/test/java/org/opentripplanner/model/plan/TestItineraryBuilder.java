@@ -13,8 +13,9 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.modes.TransitMainMode;
+import org.opentripplanner.model.modes.TransitMode;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -31,8 +32,8 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 public class TestItineraryBuilder implements PlanTestConstants {
   public static final LocalDate SERVICE_DAY = LocalDate.of(2020, Month.FEBRUARY, 2);
-  public static final Route BUS_ROUTE = route(TransitMode.BUS);
-  public static final Route RAIL_ROUTE = route(TransitMode.RAIL);
+  public static final Route BUS_ROUTE = route( TransitMode.BUS);
+  public static final Route RAIL_ROUTE = route( TransitMode.RAIL);
 
   /**
    * For Transit Legs the stopIndex in from/to palce should be increasing. We do not use/lookup
@@ -197,7 +198,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /** Create a dummy route */
   private  static Route route(TransitMode mode) {
-    Route route = new Route(new FeedScopedId(FEED_ID, mode.name()));
+    Route route = new Route(new FeedScopedId(FEED_ID, mode.getMainMode().name()));
     route.setMode(mode);
     return route;
   }

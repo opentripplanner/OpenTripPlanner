@@ -9,6 +9,7 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.modes.TransitModeService;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -74,13 +75,14 @@ public class GTFSToOtpTransitServiceMapper {
     public GTFSToOtpTransitServiceMapper(
             String feedId,
             DataImportIssueStore issueStore,
-            GtfsRelationalDao data
+            GtfsRelationalDao data,
+            TransitModeService transitModeService
     ) {
         this.issueStore = issueStore;
         this.data = data;
         feedInfoMapper = new FeedInfoMapper(feedId);
         agencyMapper = new AgencyMapper(feedId);
-        routeMapper = new RouteMapper(agencyMapper);
+        routeMapper = new RouteMapper(agencyMapper, transitModeService);
         tripMapper = new TripMapper(routeMapper);
         bookingRuleMapper = new BookingRuleMapper();
         stopTimeMapper = new StopTimeMapper(stopMapper, locationMapper, locationGroupMapper, tripMapper, bookingRuleMapper);

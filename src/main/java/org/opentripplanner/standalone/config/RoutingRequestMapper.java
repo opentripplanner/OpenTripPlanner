@@ -1,13 +1,17 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.TransitMainMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
 
 public class RoutingRequestMapper {
 
@@ -83,7 +87,7 @@ public class RoutingRequestMapper {
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
         request.transferCost = c.asInt("transferPenalty", dft.transferCost);
         request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
-        request.setTransitReluctanceForMode(c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble));
+        request.setTransitReluctanceForMode(c.asEnumMap("transitReluctanceForMode", TransitMainMode.class, NodeAdapter::asDouble));
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useVehicleRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useVehicleRentalAvailabilityInformation);
         request.useUnpreferredRoutesPenalty = c.asInt("useUnpreferredRoutesPenalty", dft.useUnpreferredRoutesPenalty);

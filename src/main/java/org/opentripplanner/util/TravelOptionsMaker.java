@@ -1,8 +1,8 @@
 package org.opentripplanner.util;
 
+import org.opentripplanner.model.modes.TransitMode;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.model.TransitMode;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,8 +41,8 @@ public final class TravelOptionsMaker {
 
             for (TransitMode transitMode: transitModes) {
                 travelOptions.add(new TravelOption(
-                    String.join(",", transitMode.toString(), TraverseMode.WALK.toString()),
-                    transitMode.toString()));
+                    String.join(",", transitMode.getMainMode().toString(), TraverseMode.WALK.toString()),
+                    transitMode.getMainMode().toString()));
             }
         }
 

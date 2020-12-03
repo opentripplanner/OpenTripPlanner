@@ -2,15 +2,16 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.ConstrainedBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.model.modes.TransitMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TripPatternWithRaptorStopIndexes {

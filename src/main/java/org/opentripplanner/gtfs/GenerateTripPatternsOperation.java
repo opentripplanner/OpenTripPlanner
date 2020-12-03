@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.model.Direction;
@@ -102,7 +101,8 @@ public class GenerateTripPatternsOperation {
         // TODO: move to a validator module
         // Check that the mode is supported
         if(trip.getRoute().getMode() == null) {
-            issueStore.add(new GTFSModeNotSupported(trip, Integer.toString(trip.getRoute().getType())));
+            // TODO Check if this is needed
+            //issueStore.add(new GTFSModeNotSupported(trip, Integer.toString(trip.getRoute().getType())));
             return;
         }
 

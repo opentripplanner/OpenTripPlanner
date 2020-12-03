@@ -45,8 +45,9 @@ public class FareRuleMapperTest {
         FARE_RULE.setRoute(ROUTE);
     }
 
-    private FareRuleMapper subject = new FareRuleMapper(new RouteMapper(new AgencyMapper(FEED_ID)),
-            new FareAttributeMapper());
+    private FareRuleMapper subject = new FareRuleMapper(
+        new RouteMapper(new AgencyMapper(FEED_ID), null),
+        new FareAttributeMapper());
 
     @Test
     public void testMapCollection() throws Exception {

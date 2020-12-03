@@ -7,9 +7,9 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.modes.TransitMainMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
 
         for (Route route : allRoutes) {
             for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
-                if (pattern.getMode() == TransitMode.BUS) {
+                if (pattern.getMode().getMainMode() == TransitMainMode.BUS) {
                     /* we can only match geometry to streets on bus routes */
                     log.debug("Matching {}", pattern);
                     //If there are no shapes in GTFS pattern geometry is generated

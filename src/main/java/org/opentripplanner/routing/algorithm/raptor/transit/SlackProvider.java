@@ -67,7 +67,7 @@ public final class SlackProvider implements RaptorSlackProvider {
      * Return the trip-pattern ordinal as an index.
      */
     private static int index(RaptorTripPattern pattern) {
-        return ((TripPatternForDates)pattern).getTripPattern().getTransitMode().ordinal();
+        return ((TripPatternForDates)pattern).getTripPattern().getTransitMode().getMainMode().ordinal();
     }
 
     private static int[] slackByMode(Map<TraverseMode, Integer> modeSlack, int defaultSlack) {

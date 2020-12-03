@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.model.modes.TransitMode;
+
 public final class Route extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
@@ -14,8 +16,6 @@ public final class Route extends TransitEntity {
     private String shortName;
 
     private String longName;
-
-    private int type;
 
     private TransitMode mode;
 
@@ -85,14 +85,6 @@ public final class Route extends TransitEntity {
 
     public void setDesc(String desc) {
         this.desc = desc;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public TransitMode getMode() {

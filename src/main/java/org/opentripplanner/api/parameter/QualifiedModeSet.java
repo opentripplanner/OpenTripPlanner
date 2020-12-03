@@ -1,18 +1,15 @@
 package org.opentripplanner.api.parameter;
 
 import com.beust.jcommander.internal.Sets;
-
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 /**
  * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift to "long distance
@@ -40,42 +37,12 @@ public class QualifiedModeSet implements Serializable {
         StreetMode egressMode = null;
         StreetMode directMode = null;
         StreetMode transferMode = null;
-        Set<TransitMode> transitModes = new HashSet<>();
 
         // Set transit modes
-        for (QualifiedMode qMode : qModes) {
-             switch (qMode.mode) {
-                 case TRANSIT:
-                     transitModes.addAll(Arrays.asList(TransitMode.values()));
-                 case RAIL:
-                     transitModes.add(TransitMode.RAIL);
-                     break;
-                 case SUBWAY:
-                     transitModes.add(TransitMode.SUBWAY);
-                     break;
-                 case BUS:
-                     transitModes.add(TransitMode.BUS);
-                     break;
-                 case TRAM:
-                     transitModes.add(TransitMode.TRAM);
-                     break;
-                 case FERRY:
-                     transitModes.add(TransitMode.FERRY);
-                     break;
-                 case AIRPLANE:
-                     transitModes.add(TransitMode.AIRPLANE);
-                     break;
-                 case CABLE_CAR:
-                     transitModes.add(TransitMode.CABLE_CAR);
-                     break;
-                 case GONDOLA:
-                     transitModes.add(TransitMode.GONDOLA);
-                     break;
-                 case FUNICULAR:
-                     transitModes.add(TransitMode.FUNICULAR);
-                     break;
-             }
-        }
+        Set<AllowedTransitMode> transitModes = qModes
+            .stream()
+            .flatMap(q -> q.mode.getTransitModes().stream())
+            .collect(Collectors.toSet());
 
         //  This is a best effort at mapping QualifiedModes to access/egress/direct StreetModes.
         //  It was unclear what exactly each combination of QualifiedModes should mean.

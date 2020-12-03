@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.model.modes.TransitMode;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;

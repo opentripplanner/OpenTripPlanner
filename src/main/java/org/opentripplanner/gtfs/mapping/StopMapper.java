@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.FareZone;
+import org.opentripplanner.model.modes.TransitModeService;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
@@ -15,6 +16,18 @@ import java.util.TimeZone;
 class StopMapper {
 
   private Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
+
+  private final TransitModeService transitModeService;
+
+  public StopMapper() {
+    this.transitModeService = null;
+  }
+
+  public StopMapper(
+      TransitModeService transitModeService
+  ) {
+    this.transitModeService = transitModeService;
+  }
 
   Collection<Stop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
     return MapUtils.mapToList(allStops, this::map);
@@ -49,7 +62,9 @@ class StopMapper {
         gtfsStop.getPlatformCode(), fareZones,
         gtfsStop.getUrl(),
         gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
-        TransitModeMapper.mapMode(gtfsStop.getVehicleType())
+        (
+            TransitModeMapper.mapMode(gtfsStop.getVehicleType(), transitModeService)
+        )
     );
   }
 

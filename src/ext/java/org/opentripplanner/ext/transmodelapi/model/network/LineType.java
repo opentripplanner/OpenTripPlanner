@@ -2,6 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.network;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -10,7 +11,6 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
-import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
@@ -36,7 +36,8 @@ public class LineType {
       GraphQLObjectType presentationType,
       GraphQLOutputType journeyPatternType,
       GraphQLOutputType serviceJourneyType,
-      GraphQLOutputType ptSituationElementType
+      GraphQLOutputType ptSituationElementType,
+      GraphQLEnumType transportSubMode
   ) {
     return GraphQLObjectType.newObject()
             .name(NAME)
@@ -70,14 +71,13 @@ public class LineType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("transportMode")
                     .type(TRANSPORT_MODE)
-                    .dataFetcher(environment -> ((Route)environment.getSource()).getMode())
+                    .dataFetcher(environment -> ((Route)environment.getSource()).getMode().getMainMode())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name("transportSubmode")
-                    .type(EnumTypes.TRANSPORT_SUBMODE)
-                    .description("NOT IMPLEMENTED")
-                    .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
-                    .build())
+                .name("transportSubmode")
+                .type(transportSubMode)
+                .dataFetcher(environment -> ((Route)environment.getSource()).getMode().getNetexOutputSubmode() != null ? ((Route)environment.getSource()).getMode(): null)
+                .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("description")
                     .type(Scalars.GraphQLString)

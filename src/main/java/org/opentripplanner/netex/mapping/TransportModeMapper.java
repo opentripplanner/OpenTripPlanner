@@ -1,17 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
-import org.rutebanken.netex.model.AirSubmodeEnumeration;
+import org.opentripplanner.model.modes.TransitMode;
+import org.opentripplanner.model.modes.TransitModeService;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.CoachSubmodeEnumeration;
-import org.rutebanken.netex.model.FunicularSubmodeEnumeration;
-import org.rutebanken.netex.model.MetroSubmodeEnumeration;
-import org.rutebanken.netex.model.RailSubmodeEnumeration;
-import org.rutebanken.netex.model.TelecabinSubmodeEnumeration;
-import org.rutebanken.netex.model.TramSubmodeEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
-import org.rutebanken.netex.model.WaterSubmodeEnumeration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a best effort at mapping the NeTEx transport modes to the OTP route codes which are identical to the
@@ -19,230 +13,99 @@ import org.rutebanken.netex.model.WaterSubmodeEnumeration;
  */
 class TransportModeMapper {
 
-    private static final Integer DEFAULT_OTP_VALUE = 3;
+    private static final Logger LOG = LoggerFactory.getLogger(TransportModeMapper.class);
 
-    int getTransportMode(
-            AllVehicleModesOfTransportEnumeration netexMode,
-            TransportSubmodeStructure submode
+    private final TransitModeService transitModeService;
+
+    public TransportModeMapper(
+        TransitModeService transitModeService
     ) {
-        if (submode == null) {
-            return mapAllVehicleModesOfTransport(netexMode);
-        } else {
-            if (submode.getAirSubmode() != null) {
-                return mapAirSubmode(submode.getAirSubmode());
-            } else if (submode.getBusSubmode() != null) {
-                return mapBusSubmode(submode.getBusSubmode());
-            } else if (submode.getTelecabinSubmode() != null) {
-                return mapTelecabinSubmode(submode.getTelecabinSubmode());
-            } else if (submode.getCoachSubmode() != null) {
-                return mapCoachSubmode(submode.getCoachSubmode());
-            } else if (submode.getFunicularSubmode() != null) {
-                return mapFunicularSubmode(submode.getFunicularSubmode());
-            } else if (submode.getMetroSubmode() != null) {
-                return mapMetroSubmode(submode.getMetroSubmode());
-            } else if (submode.getRailSubmode() != null) {
-                return mapRailSubmode(submode.getRailSubmode());
-            } else if (submode.getTramSubmode() != null) {
-                return mapTramSubmode(submode.getTramSubmode());
-            } else if (submode.getWaterSubmode() != null) {
-                return mapWaterSubmode(submode.getWaterSubmode());
-            }
-            else {
-                return DEFAULT_OTP_VALUE;
-            }
-        }
+        this.transitModeService = transitModeService;
     }
 
-    private static int mapAllVehicleModesOfTransport(AllVehicleModesOfTransportEnumeration mode) {
+    public TransitMode map(
+        AllVehicleModesOfTransportEnumeration netexMode,
+        TransportSubmodeStructure submode
+    ) {
+        TransitMode result = null;
+        if (submode != null) {
+            result = mapSubmodeFromConfiguration(getSubmodeAsString(submode));
+        }
+        // Fallback to main mode
+        if (result == null) {
+            result = mapAllVehicleModesOfTransport(netexMode);
+        }
+
+        return result;
+    }
+
+    private TransitMode mapAllVehicleModesOfTransport(AllVehicleModesOfTransportEnumeration mode) {
         switch (mode) {
             case AIR:
-                return 1100;
+                return TransitMode.AIRPLANE;
             case BUS:
-                return 700;
-            case CABLEWAY:
-                return 1700;
-            case COACH:
-                return 200;
-            case FUNICULAR:
-                return 1400;
-            case METRO:
-                return 400;
-            case RAIL:
-                return 100;
             case TAXI:
-                return 1500;
-            case TRAM:
-                return 900;
-            case WATER:
-                return 1000;
-            default:
-                return DEFAULT_OTP_VALUE;
-        }
-    }
-
-    static int mapVehicleMode(VehicleModeEnumeration mode) {
-        // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is private.
-        if (mode == null) { return -999; }
-
-        switch (mode) {
-        case AIR:
-            return 1100;
-        case BUS:
-            return 700;
-        case CABLEWAY:
-            return 1700;
-        case COACH:
-            return 200;
-        case FUNICULAR:
-            return 1400;
-        case METRO:
-            return 400;
-        case RAIL:
-            return 100;
-        case TRAM:
-            return 900;
-        case WATER:
-            return 1000;
-        default:
-            return DEFAULT_OTP_VALUE;
-        }
-    }
-
-    static int mapAirSubmode(AirSubmodeEnumeration mode) {
-        switch (mode) {
-            case DOMESTIC_FLIGHT:
-                return 1102;
-            case HELICOPTER_SERVICE:
-                return 1110;
-            case INTERNATIONAL_FLIGHT:
-                return 1101;
-            default:
-                return 1000;
-        }
-    }
-
-    static int mapBusSubmode(BusSubmodeEnumeration mode) {
-        switch (mode) {
-        case AIRPORT_LINK_BUS:
-            return 700; // ?
-        case EXPRESS_BUS:
-            return 702;
-        case LOCAL_BUS:
-            return 704;
-        case NIGHT_BUS:
-            return 705;
-        case RAIL_REPLACEMENT_BUS:
-            return 714;
-        case REGIONAL_BUS:
-            return 701;
-        case SCHOOL_BUS:
-            return 712;
-        case SHUTTLE_BUS:
-            return 711;
-        case SIGHTSEEING_BUS:
-            return 710;
-        default:
-            return 700;
-        }
-    }
-
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
-    static int mapTelecabinSubmode(TelecabinSubmodeEnumeration mode) {
-        switch (mode) {
-            case TELECABIN:
-                return 1301;
-            default:
-                return 1300;
-        }
-    }
-
-    static int mapCoachSubmode(CoachSubmodeEnumeration mode) {
-        switch (mode) {
-            case INTERNATIONAL_COACH:
-                return 201;
-            case NATIONAL_COACH:
-                return 202;
-            case TOURIST_COACH:
-                return 207;
-            default:
-                return 200;
-        }
-    }
-
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
-    static int mapFunicularSubmode(FunicularSubmodeEnumeration mode) {
-        switch (mode) {
+                return TransitMode.BUS;
+            case CABLEWAY:
+                return TransitMode.CABLE_CAR;
+            case COACH:
+                return TransitMode.COACH;
             case FUNICULAR:
-                return 1401;
-            default:
-                return 1400;
-        }
-    }
-
-    static int mapMetroSubmode(MetroSubmodeEnumeration mode) {
-        switch (mode) {
+                return TransitMode.FUNICULAR;
             case METRO:
-                return 401;
-            case URBAN_RAILWAY:
-                return 403;
+                return TransitMode.SUBWAY;
+            case RAIL:
+                return TransitMode.RAIL;
+            case TRAM:
+                return TransitMode.TRAM;
+            case WATER:
+                return TransitMode.FERRY;
             default:
-                return 401;
+                throw new IllegalArgumentException();
         }
     }
 
-    static int mapRailSubmode(RailSubmodeEnumeration mode) {
-        switch (mode) {
-            case AIRPORT_LINK_RAIL:
-                return 100; // ?
-            case INTERNATIONAL:
-                return 100; // ?
-            case INTERREGIONAL_RAIL:
-                return 103;
-            case LOCAL:
-                return 100; // ?
-            case LONG_DISTANCE:
-                return 102;
-            case NIGHT_RAIL:
-                return 100;
-            case REGIONAL_RAIL:
-                return 103;
-            case TOURIST_RAILWAY:
-                return 107;
-            default:
-                return 100;
+    private String getSubmodeAsString(TransportSubmodeStructure submode) {
+        if (submode.getAirSubmode() != null) {
+            return submode.getAirSubmode().value();
+        } else if (submode.getBusSubmode() != null) {
+            return submode.getBusSubmode().value();
+        } else if (submode.getTelecabinSubmode() != null) {
+            return submode.getTelecabinSubmode().value();
+        } else if (submode.getCoachSubmode() != null) {
+            return submode.getCoachSubmode().value();
+        } else if (submode.getFunicularSubmode() != null) {
+            return submode.getFunicularSubmode().value();
+        } else if (submode.getMetroSubmode() != null) {
+            return submode.getMetroSubmode().value();
+        } else if (submode.getRailSubmode() != null) {
+            return submode.getRailSubmode().value();
+        } else if (submode.getTramSubmode() != null) {
+            return submode.getTramSubmode().value();
+        } else if (submode.getWaterSubmode() != null) {
+            return submode.getWaterSubmode().value();
         }
+        throw new IllegalArgumentException();
     }
 
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
-    static int mapTramSubmode(TramSubmodeEnumeration mode) {
-        switch (mode) {
-            case LOCAL_TRAM:
-                return 902;
-            default:
-                return 900;
-        }
-    }
+    private TransitMode mapSubmodeFromConfiguration(
+        String subModeString) {
 
-    static int mapWaterSubmode(WaterSubmodeEnumeration mode) {
-        switch (mode) {
-            case HIGH_SPEED_PASSENGER_SERVICE:
-                return 1014;
-            case HIGH_SPEED_VEHICLE_SERVICE:
-                return 1013;
-            case INTERNATIONAL_CAR_FERRY:
-                return 1001;
-            case INTERNATIONAL_PASSENGER_FERRY:
-                return 1005;
-            case LOCAL_CAR_FERRY:
-                return 1004;
-            case LOCAL_PASSENGER_FERRY:
-                return 1008;
-            case NATIONAL_CAR_FERRY:
-                return 1002;
-            case SIGHTSEEING_SERVICE:
-                return 1015;
-            default:
-                return 1000;
+        if (transitModeService == null) {
+            LOG.info("No transitModeService configured.");
+            return null;
         }
+
+        TransitMode transitMode;
+
+        try {
+            transitMode = transitModeService.getTransitModeByNetexSubMode(
+                String.valueOf(subModeString));
+        } catch (IllegalArgumentException e) {
+            LOG.info("SubMode {} not configured. Falling back to main mode.", subModeString);
+            transitMode = null;
+        }
+
+        return transitMode;
     }
 }

@@ -13,6 +13,7 @@ import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
+import org.opentripplanner.model.modes.TransitMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;

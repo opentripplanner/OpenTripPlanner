@@ -24,6 +24,7 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.modes.TransitModeService;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.calendar.DatedServiceJourneyMapper;
@@ -61,6 +62,7 @@ public class NetexMapper {
 
     private final FeedScopedIdFactory idFactory;
     private final OtpTransitServiceBuilder transitBuilder;
+    private final TransitModeService transitModeService;
     private final Deduplicator deduplicator;
     private final DataImportIssueStore issueStore;
     private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
@@ -86,11 +88,13 @@ public class NetexMapper {
             String feedId,
             Deduplicator deduplicator,
             DataImportIssueStore issueStore,
-            Set<String> ferryIdsNotAllowedForBicycle
+            Set<String> ferryIdsNotAllowedForBicycle,
+            TransitModeService transitModeService
     ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
         this.idFactory = new FeedScopedIdFactory(feedId);
+        this.transitModeService = transitModeService;
         this.issueStore = issueStore;
         this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
         this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
@@ -333,7 +337,8 @@ public class NetexMapper {
                 transitBuilder.getOperatorsById(),
                 currentNetexIndex,
                 currentNetexIndex.getTimeZone(),
-                ferryIdsNotAllowedForBicycle
+                ferryIdsNotAllowedForBicycle,
+                transitModeService
         );
         for (Line line : currentNetexIndex.getLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
@@ -362,7 +367,8 @@ public class NetexMapper {
                 currentNetexIndex.getServiceJourneyById(),
                 currentNetexIndex.getFlexibleLineById(),
                 serviceIds,
-                deduplicator
+                deduplicator,
+                transitModeService
         );
 
         for (JourneyPattern journeyPattern : currentNetexIndex.getJourneyPatternsById().localValues()) {

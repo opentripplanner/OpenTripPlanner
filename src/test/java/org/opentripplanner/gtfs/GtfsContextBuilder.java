@@ -43,7 +43,8 @@ public class GtfsContextBuilder {
         var mapper = new GTFSToOtpTransitServiceMapper(
                 feedId.getId(),
                 new DataImportIssueStore(false),
-                gtfsImport.getDao()
+                gtfsImport.getDao(),
+                null
         );
         mapper.mapStopTripAndRouteDatantoBuilder();
         OtpTransitServiceBuilder transitBuilder = mapper.getBuilder();

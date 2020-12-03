@@ -11,7 +11,6 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceJourney;
 
 import javax.xml.bind.JAXBElement;
@@ -47,7 +46,8 @@ public class TripMapperTest {
             new HierarchicalMapById<>(),
             new HierarchicalMap<>(),
             Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-            Collections.emptySet()
+            Collections.emptySet(),
+            null
         );
 
         ServiceJourney serviceJourney = createExampleServiceJourney();
@@ -89,7 +89,8 @@ public class TripMapperTest {
                 routeById,
                 journeyPatternById,
                 Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-                Collections.emptySet()
+                Collections.emptySet(),
+                null
         );
 
         Trip trip = tripMapper.mapServiceJourney(serviceJourney);

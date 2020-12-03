@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.TransitMode;
 
 import java.util.EnumSet;
 
@@ -37,7 +37,7 @@ public enum TraverseMode {
     }
 
     public static TraverseMode fromTransitMode(TransitMode transitMode) {
-        switch (transitMode) {
+        switch (transitMode.getMainMode()) {
             case RAIL:
                 return TraverseMode.RAIL;
             case COACH:

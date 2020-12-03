@@ -22,11 +22,12 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.modes.TransitMainMode;
+import org.opentripplanner.model.modes.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -265,7 +266,7 @@ public class LegacyGraphQLQueryTypeImpl
       List<TransitMode> filterByModes = args.getLegacyGraphQLFilterByModes() != null ? StreamSupport
           .stream(args.getLegacyGraphQLFilterByModes().spliterator(), false)
           .map(mode -> {
-            try { return TransitMode.valueOf(mode.label); }
+            try { return TransitMode.fromMainModeEnum(TransitMainMode.valueOf(mode.label)); }
             catch (IllegalArgumentException ignored) { return null; }
           })
           .filter(Objects::nonNull)
@@ -381,7 +382,7 @@ public class LegacyGraphQLQueryTypeImpl
       if (args.getLegacyGraphQLTransportModes() != null) {
         List<TransitMode> modes = StreamSupport
                 .stream(args.getLegacyGraphQLTransportModes().spliterator(), false)
-                .map(mode -> TransitMode.valueOf(mode.label))
+                .map(mode -> TransitMode.fromMainModeEnum(TransitMainMode.valueOf(mode.label)))
                 .collect(Collectors.toList());
         routeStream = routeStream.filter(route -> modes.contains(route.getMode()));
       }
@@ -626,7 +627,7 @@ public class LegacyGraphQLQueryTypeImpl
               "modeWeight", (Map<String, Object> v) -> request.setTransitReluctanceForMode(
                       v.entrySet()
                               .stream()
-                              .collect(Collectors.toMap(e -> TransitMode.valueOf(e.getKey()),
+                              .collect(Collectors.toMap(e -> TransitMainMode.valueOf(e.getKey()),
                                       e -> (Double) e.getValue()
                               ))));
       callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
