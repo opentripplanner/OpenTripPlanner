@@ -41,6 +41,7 @@ public class TripMapperTest {
 
         TripMapper tripMapper = new TripMapper(
             ID_FACTORY,
+            transitBuilder.getOperatorsById(),
             transitBuilder.getRoutes(),
             new HierarchicalMapById<>(),
             new HierarchicalMap<>(),
@@ -82,6 +83,7 @@ public class TripMapperTest {
 
         TripMapper tripMapper = new TripMapper(
                 ID_FACTORY,
+                transitBuilder.getOperatorsById(),
                 transitBuilder.getRoutes(),
                 routeById,
                 journeyPatternById,

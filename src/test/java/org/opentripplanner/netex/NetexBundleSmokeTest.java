@@ -154,7 +154,7 @@ public class NetexBundleSmokeTest {
         assertNull(t.getTripShortName());
         assertNotNull(t.getServiceId());
         assertEquals("Ruter", t.getOperator().getName());
-        assertNull(t.getTripOperator());
+        assertEquals("Ruter", t.getTripOperator().getName());
         assertEquals(0, t.getBikesAllowed());
         assertEquals(0, t.getWheelchairAccessible());
         assertEquals(4, trips.size());

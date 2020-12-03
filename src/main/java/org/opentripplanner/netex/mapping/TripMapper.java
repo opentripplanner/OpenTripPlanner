@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
@@ -31,9 +32,11 @@ class TripMapper {
     private final ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
     private final Map<String, FeedScopedId> serviceIds;
     private final Set<FeedScopedId> shapePointIds;
+    private final EntityById<Operator> operatorsById;
 
     TripMapper(
             FeedScopedIdFactory idFactory,
+            EntityById<Operator> operatorsById,
             EntityById<org.opentripplanner.model.Route> otpRouteById,
             ReadOnlyHierarchicalMap<String, Route> routeById,
             ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById,
@@ -46,6 +49,7 @@ class TripMapper {
         this.journeyPatternsById = journeyPatternsById;
         this.serviceIds = serviceIds;
         this.shapePointIds = shapePointIds;
+        this.operatorsById = operatorsById;
     }
 
     /**
@@ -80,6 +84,7 @@ class TripMapper {
         }
 
         trip.setTripShortName(serviceJourney.getPublicCode());
+        trip.setTripOperator(findOperator(serviceJourney));
 
         return trip;
     }
@@ -122,5 +127,12 @@ class TripMapper {
             );
         }
         return route;
+    }
+
+    @Nullable
+    private Operator findOperator(ServiceJourney serviceJourney) {
+        var opeRef = serviceJourney.getOperatorRef();
+        if(opeRef == null) { return null; }
+        return operatorsById.get(idFactory.createId(opeRef.getRef()));
     }
 }

@@ -14,6 +14,9 @@ import java.util.List;
 
 public class TripTimeShortHelper {
 
+    /** Utility class with private constructor to prevent instantiation. */
+    private TripTimeShortHelper() { }
+
     /**
      * Find trip time short for the from place in transit leg, or null.
      */
