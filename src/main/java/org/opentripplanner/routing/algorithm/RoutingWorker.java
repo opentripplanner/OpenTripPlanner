@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
-import org.opentripplanner.ext.flex.FlexRouter;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
@@ -10,6 +9,7 @@ import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptor.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -163,63 +163,56 @@ public class RoutingWorker {
 
         this.debugAggregator.finishedPatternFiltering();
 
-        // Prepare access/egress transfers
-        Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-            request,
-            StreetMode.FLEXIBLE.equals(request.modes.accessMode)
-                ? StreetMode.WALK
-                : request.modes.accessMode,
-            false,
-            2000
-        );
-        Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
-            request,
-            StreetMode.FLEXIBLE.equals(request.modes.egressMode)
-                ? StreetMode.WALK
-                : request.modes.egressMode,
-            true,
-            2000
-        );
-
         AccessEgressMapper accessEgressMapper = new AccessEgressMapper(transitLayer.getStopIndex());
-        Collection<AccessEgress> accessTransfers = new ArrayList<>();
-        Collection<AccessEgress> egressTransfers = new ArrayList<>();
+        Collection<AccessEgress> accessList;
+        Collection<AccessEgress> egressList;
+
+        // Prepare access/egress lists
+
+        // Special handling of flex accesses
+        if (OTPFeature.FlexRouting.isOn() && request.modes.accessMode.equals(StreetMode.FLEXIBLE)) {
+            Collection<FlexAccessEgress> flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
+                request,
+                false,
+                ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
+                ADDITIONAL_SEARCH_DAYS_AFTER_TODAY
+            );
+            accessList = accessEgressMapper.mapFlexAccessEgresses(flexAccessList);
+        }
+        // Regular access routing
+        else {
+            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(request,
+                request.modes.accessMode,
+                false,
+                2000
+            );
+            accessList = accessEgressMapper.mapNearbyStops(accessStops, false);
+        }
+
+        // Special handling of flex egresses
+        if (OTPFeature.FlexRouting.isOn() && request.modes.egressMode.equals(StreetMode.FLEXIBLE)) {
+            Collection<FlexAccessEgress> flexEgressList = FlexAccessEgressRouter.routeAccessEgress(
+                request,
+                true,
+                ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
+                ADDITIONAL_SEARCH_DAYS_AFTER_TODAY
+            );
+            egressList = accessEgressMapper.mapFlexAccessEgresses(flexEgressList);
+        }
+        // Regular egress routing
+        else {
+            // Prepare access/egress transfers
+            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(request,
+                request.modes.egressMode,
+                true,
+                2000
+            );
+            egressList = accessEgressMapper.mapNearbyStops(accessStops, true);
+        }
+
+        verifyEgressAccess(accessList, egressList);
 
         List<Itinerary> itineraries = new ArrayList<>();
-
-        // Add non-flex access transfers
-        if (!StreetMode.FLEXIBLE.equals(request.modes.accessMode)) {
-            accessTransfers.addAll(accessEgressMapper.mapNearbyStops(accessStops, false));
-        }
-        // Add non-flex egress transfers
-        if (!StreetMode.FLEXIBLE.equals(request.modes.egressMode)) {
-            egressTransfers.addAll(accessEgressMapper.mapNearbyStops(egressStops, true));
-        }
-
-        if (OTPFeature.FlexRouting.isOn()) {
-            if (request.modes.contains(StreetMode.FLEXIBLE)) {
-                FlexRouter flexRouter = new FlexRouter(
-                    request.rctx.graph,
-                    request.getDateTime().toInstant(),
-                    request.arriveBy,
-                    ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
-                    ADDITIONAL_SEARCH_DAYS_AFTER_TODAY,
-                    accessStops,
-                    egressStops
-                );
-
-                // Add flex access transfers
-                if (StreetMode.FLEXIBLE.equals(request.modes.accessMode)) {
-                    accessTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.createFlexAccesses()));
-                }
-                // Add flex egress transfers
-                if (StreetMode.FLEXIBLE.equals(request.modes.egressMode)) {
-                    egressTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.createFlexEgresses()));
-                }
-            }
-        }
-
-        verifyEgressAccess(accessTransfers, egressTransfers);
 
         this.debugAggregator.finishedAccessEgress();
 
@@ -227,8 +220,8 @@ public class RoutingWorker {
         RaptorRequest<TripSchedule> raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
                 requestTransitDataProvider.getStartOfTime(),
-                accessTransfers,
-                egressTransfers
+                accessList,
+                egressList
         );
 
         // Route transit
