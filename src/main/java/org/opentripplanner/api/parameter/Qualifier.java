@@ -1,5 +1,5 @@
 package org.opentripplanner.api.parameter;
 
 public enum Qualifier {
-  RENT, HAVE, PARK, KEEP, PICKUP, DROPOFF
+  RENT, HAVE, PARK, KEEP, PICKUP, DROPOFF, ACCESS, EGRESS, DIRECT
 }

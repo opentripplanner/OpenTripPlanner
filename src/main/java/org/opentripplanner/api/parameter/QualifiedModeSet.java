@@ -135,16 +135,14 @@ public class QualifiedModeSet implements Serializable {
 
         // These modes are set last in order to take precedence over other modes
         for (QualifiedMode qMode : qModes) {
-            switch (qMode.mode) {
-                case FLEXACCESS:
+            if (qMode.mode.equals(ApiRequestMode.FLEX)) {
+                if (qMode.qualifiers.contains(Qualifier.ACCESS)) {
                     accessMode = StreetMode.FLEXIBLE;
-                    break;
-                case FLEXEGRESS:
+                } else if (qMode.qualifiers.contains(Qualifier.EGRESS)) {
                     egressMode = StreetMode.FLEXIBLE;
-                    break;
-                case FLEXDIRECT:
+                } else if (qMode.qualifiers.contains(Qualifier.DIRECT)) {
                     directMode = StreetMode.FLEXIBLE;
-                    break;
+                }
             }
         }
 
