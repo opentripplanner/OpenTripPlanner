@@ -30,6 +30,7 @@ public class TripPatternMapperTest {
 
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
                 MappingSupport.ID_FACTORY,
+                new EntityById<>(),
                 sample.getStopsById(),
                 new EntityById<>(),
                 sample.getOtpRouteByid(),

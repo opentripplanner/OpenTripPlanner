@@ -36,8 +36,6 @@ public class LegType {
       GqlUtil gqlUtil
 
   ) {
-    TripTimeShortHelper tripTimeShortHelper = new TripTimeShortHelper();
-
     return GraphQLObjectType
         .newObject()
         .name("Leg")
@@ -185,17 +183,17 @@ public class LegType {
             .name("fromEstimatedCall")
             .description("EstimatedCall for the quay where the leg originates.")
             .type(estimatedCallType)
-            .dataFetcher(environment -> tripTimeShortHelper.getTripTimeShortForFromPlace(environment
-                .getSource(), gqlUtil.getRoutingService(environment)))
+            .dataFetcher(environment -> TripTimeShortHelper.getTripTimeShortForFromPlace(environment
+                .getSource(), GqlUtil.getRoutingService(environment)))
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("toEstimatedCall")
             .description("EstimatedCall for the quay where the leg ends.")
             .type(estimatedCallType)
-            .dataFetcher(environment -> tripTimeShortHelper.getTripTimeShortForToPlace(
+            .dataFetcher(environment -> TripTimeShortHelper.getTripTimeShortForToPlace(
                 environment.getSource(),
-                gqlUtil.getRoutingService(environment)
+                GqlUtil.getRoutingService(environment)
             ))
             .build())
         .field(GraphQLFieldDefinition
@@ -236,9 +234,10 @@ public class LegType {
             .newFieldDefinition()
             .name("intermediateEstimatedCalls")
             .description(
-                "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list.")
+                "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
+            )
             .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
-            .dataFetcher(environment -> tripTimeShortHelper.getIntermediateTripTimeShortsForLeg((
+            .dataFetcher(environment -> TripTimeShortHelper.getIntermediateTripTimeShortsForLeg((
                 environment.getSource()
             ), GqlUtil.getRoutingService(environment)))
             .build())
@@ -248,11 +247,12 @@ public class LegType {
             .description(
                 "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list.")
             .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
-            .dataFetcher(environment -> {
-              return tripTimeShortHelper.getAllTripTimeShortsForLegsTrip(environment.getSource(),
-                  GqlUtil.getRoutingService(environment)
-              );
-            })
+            .dataFetcher(environment ->
+                TripTimeShortHelper.getAllTripTimeShortsForLegsTrip(
+                    environment.getSource(),
+                    GqlUtil.getRoutingService(environment)
+                )
+            )
             .build())
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("via")
