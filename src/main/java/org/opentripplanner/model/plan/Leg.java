@@ -59,9 +59,11 @@ public class Leg {
    public Boolean realTime = false;
 
   /**
-   * Whether this Leg describes a flexible trip
+   * Whether this Leg describes a flexible trip. The reason we need this is that FlexTrip does
+   * not inherit from Trip, so that the information that the Trip is flexible would be lost when
+   * creating this object.
    */
-  public Boolean flexible = false;
+  public Boolean flexibleTrip = false;
 
    /**
     * Is this a frequency-based trip with non-strict departure times?
@@ -198,8 +200,8 @@ public class Leg {
         return mode.isOnStreetNonTransit();
     }
 
-    public boolean isFlexible() {
-     return flexible;
+    public boolean isFlexibleTrip() {
+     return flexibleTrip;
     }
 
     /**
