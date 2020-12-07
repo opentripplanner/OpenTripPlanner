@@ -196,7 +196,7 @@ public class TransmodelGraphQLPlanner {
 
             if (transitModes.get() == null) {
                 // Default to no transport modes if transport modes not specified
-                transitModes.set(Collections.emptyList());
+                transitModes.set(List.of());
             }
 
             request.modes = new RequestModes(

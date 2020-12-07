@@ -5,6 +5,7 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
@@ -46,7 +47,7 @@ class ModeInputType {
       .field(GraphQLInputObjectField
           .newInputObjectField()
           .name("transportMode")
-          .defaultValue(Collections.emptyList())
+          .defaultValue(List.of())
           .description("The allowed modes for the transit part of the trip. Use an empty list "
               + "to disallow transit for this search. If the element is not present or null, "
               + "it will default to an empty list.")

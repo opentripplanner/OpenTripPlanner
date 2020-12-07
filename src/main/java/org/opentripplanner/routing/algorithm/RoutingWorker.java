@@ -181,7 +181,8 @@ public class RoutingWorker {
         }
         // Regular access routing
         else {
-            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(request,
+            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
+                request,
                 request.modes.accessMode,
                 false,
                 2000
@@ -202,7 +203,8 @@ public class RoutingWorker {
         // Regular egress routing
         else {
             // Prepare access/egress transfers
-            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(request,
+            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
+                request,
                 request.modes.egressMode,
                 true,
                 2000
