@@ -200,10 +200,6 @@ public class Leg {
         return mode.isOnStreetNonTransit();
     }
 
-    public boolean isFlexibleTrip() {
-     return flexibleTrip;
-    }
-
     /**
     * The leg's duration in seconds
     */
