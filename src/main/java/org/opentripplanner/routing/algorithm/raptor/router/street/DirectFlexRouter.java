@@ -14,23 +14,19 @@ import java.util.List;
 public class DirectFlexRouter {
 
   public static List<Itinerary> route(
-      RoutingRequest request,
-      int additionalPastSearchDays,
-      int additionalFutureSearchDays
+      RoutingRequest request
   ) {
     if (!StreetMode.FLEXIBLE.equals(request.modes.directMode)) {
       return Collections.emptyList();
     }
 
     // Prepare access/egress transfers
-    Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-        request,
+    Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(request,
         StreetMode.WALK,
         false,
         2000
     );
-    Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
-        request,
+    Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(request,
         StreetMode.WALK,
         true,
         2000
@@ -40,8 +36,8 @@ public class DirectFlexRouter {
         request.rctx.graph,
         request.getDateTime().toInstant(),
         request.arriveBy,
-        additionalPastSearchDays,
-        additionalFutureSearchDays,
+        request.additionalSearchDaysBeforeToday,
+        request.additionalSearchDaysAfterToday,
         accessStops,
         egressStops
     );

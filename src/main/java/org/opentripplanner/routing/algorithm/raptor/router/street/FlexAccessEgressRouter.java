@@ -14,8 +14,8 @@ public class FlexAccessEgressRouter {
   private FlexAccessEgressRouter() {}
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
-      RoutingRequest request, boolean isEgress, int additionalPastSearchDays,
-      int additionalFutureSearchDays
+      RoutingRequest request,
+      boolean isEgress
   ) {
 
     Collection<NearbyStop> accessStops = !isEgress ? AccessEgressRouter.streetSearch(request,
@@ -33,8 +33,8 @@ public class FlexAccessEgressRouter {
     FlexRouter flexRouter = new FlexRouter(request.rctx.graph,
         request.getDateTime().toInstant(),
         request.arriveBy,
-        additionalPastSearchDays,
-        additionalFutureSearchDays,
+        request.additionalSearchDaysBeforeToday,
+        request.additionalSearchDaysAfterToday,
         accessStops,
         egressStops
     );
