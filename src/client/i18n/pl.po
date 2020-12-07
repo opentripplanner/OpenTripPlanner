@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner 0.19.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-12-04 13:13+0100\n"
+"POT-Creation-Date: 2020-12-07 09:22+0100\n"
 "PO-Revision-Date: 2016-03-10 21:02+0100\n"
 "Last-Translator: Piotr Tekieli <p.s.tekieli@student.tudelft.nl>\n"
 "Language: pl\n"
@@ -78,34 +78,34 @@ msgid "Bike and Ride"
 msgstr "schemat B+R (Bike and Ride)"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:320
-msgid "Transit with flex access"
-msgstr ""
-
-#. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:322
-msgid "Transit with flex egress"
-msgstr ""
-
-#. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:324
-msgid "Transit with flex access and egress"
-msgstr ""
-
-#. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:326
-msgid "Direct flex search"
-msgstr ""
-
-#. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:332
 msgid "Rented Bicycle"
 msgstr "wypożyczonym rowerem"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:334
+#: src/client/js/otp/config.js:326
 msgid "Transit & Rented Bicycle"
 msgstr "kom. publiczną & wypoż. rowerem"
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:328
+msgid "Transit with flex access"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:330
+msgid "Transit with flex egress"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:332
+msgid "Transit with flex access and egress"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:334
+msgid "Direct flex search"
+msgstr ""
 
 #. Context menu
 #: src/client/js/otp/core/MapContextMenu.js:36

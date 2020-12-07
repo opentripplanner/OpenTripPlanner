@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-12-04 13:13+0100\n"
+"POT-Creation-Date: 2020-12-07 09:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,33 +79,33 @@ msgid "Bike and Ride"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:320
-msgid "Transit with flex access"
-msgstr ""
-
-#. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:322
-msgid "Transit with flex egress"
-msgstr ""
-
-#. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:324
-msgid "Transit with flex access and egress"
-msgstr ""
-
-#. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:326
-msgid "Direct flex search"
-msgstr ""
-
-#. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:332
 msgid "Rented Bicycle"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
-#: src/client/js/otp/config.js:334
+#: src/client/js/otp/config.js:326
 msgid "Transit & Rented Bicycle"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:328
+msgid "Transit with flex access"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:330
+msgid "Transit with flex egress"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:332
+msgid "Transit with flex access and egress"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:334
+msgid "Direct flex search"
 msgstr ""
 
 #. Context menu

@@ -316,14 +316,6 @@ otp.config.modes = {
     "CAR,WALK,TRANSIT"          : _tr('Kiss and Ride'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "BICYCLE_PARK,WALK,TRANSIT" : _tr('Bike and Ride'),
-    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "FLEX_ACCESS,WALK,TRANSIT" : _tr('Transit with flex access'),
-    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "FLEX_EGRESS,WALK,TRANSIT" : _tr('Transit with flex egress'),
-    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "FLEX_ACCESS,FLEX_EGRESS,TRANSIT" : _tr('Transit with flex access and egress'),
-    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "FLEX_DIRECT" : _tr('Direct flex search'),
     //uncomment only if bike rental exists in a map
     // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
     //       (note that we've been broken for awhile here, since many agencies don't have a 'Train' mode either...this needs attention)
@@ -331,5 +323,13 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     'WALK,BICYCLE_RENT'        : _tr('Rented Bicycle'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle')
+    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    "FLEX_ACCESS,WALK,TRANSIT" : _tr('Transit with flex access'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    "FLEX_EGRESS,WALK,TRANSIT" : _tr('Transit with flex egress'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    "FLEX_ACCESS,FLEX_EGRESS,TRANSIT" : _tr('Transit with flex access and egress'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    "FLEX_DIRECT" : _tr('Direct flex search')
 };
