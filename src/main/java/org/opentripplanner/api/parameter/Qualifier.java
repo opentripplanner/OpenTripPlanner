@@ -1,5 +1,32 @@
 package org.opentripplanner.api.parameter;
 
 public enum Qualifier {
-  RENT, HAVE, PARK, KEEP, PICKUP, DROPOFF, ACCESS, EGRESS, DIRECT
+  /** The vehicle has to be rented */
+  RENT,
+  @Deprecated
+  HAVE,
+  /** The vehicle has to be parked before proceeding */
+  PARK,
+  @Deprecated
+  KEEP,
+  /**
+   * The user is picked up by the vehicle.
+   */
+  PICKUP,
+  /**
+   * The user is dropped off from the vehicle.
+   */
+  DROPOFF,
+  /**
+   * The mode is used for the access part of the search.
+   */
+  ACCESS,
+  /**
+   * The mode is used for the egress part of the search.
+   */
+  EGRESS,
+  /**
+   * The mode is used for the direct street search.
+   */
+  DIRECT
 }
