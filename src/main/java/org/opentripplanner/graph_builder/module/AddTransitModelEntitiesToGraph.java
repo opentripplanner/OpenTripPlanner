@@ -205,7 +205,8 @@ public class AddTransitModelEntitiesToGraph {
                         pathway.getLength(),
                         pathway.getStairCount(),
                         pathway.getSlope(),
-                        pathway.isPathwayModeWheelchairAccessible()
+                        pathway.isPathwayModeWheelchairAccessible(),
+                        pathway.getId()
                     );
                     if (pathway.isBidirectional()) {
                         new PathwayEdge(
@@ -216,7 +217,8 @@ public class AddTransitModelEntitiesToGraph {
                             pathway.getLength(),
                             -1 * pathway.getStairCount(),
                             -1 * pathway.getSlope(),
-                            pathway.isPathwayModeWheelchairAccessible()
+                            pathway.isPathwayModeWheelchairAccessible(),
+                            pathway.getId()
                         );
                     }
                 }

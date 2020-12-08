@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -23,6 +24,7 @@ public class PathwayEdge extends Edge {
     private String name = "pathway";
 
     private boolean wheelchairAccessible = true;
+    private FeedScopedId id;
 
     public PathwayEdge(Vertex fromv, Vertex tov, String name) {
         super(fromv, tov);
@@ -37,7 +39,8 @@ public class PathwayEdge extends Edge {
         double distance,
         int steps,
         double angle,
-        boolean wheelchairAccessible
+        boolean wheelchairAccessible,
+        FeedScopedId id
     ) {
         super(fromv, tov);
         this.traversalTime = traversalTime;
@@ -50,6 +53,7 @@ public class PathwayEdge extends Edge {
         } else if (tov.getName() != null) {
             this.name = tov.getName();
         }
+        this.id = id;
     }
 
     private static final long serialVersionUID = -3311099256178798982L;
@@ -85,6 +89,8 @@ public class PathwayEdge extends Edge {
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
         this.wheelchairAccessible = wheelchairAccessible;
     }
+
+    public FeedScopedId getId( ){ return id; }
 
     public State traverse(State s0) {
         /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
