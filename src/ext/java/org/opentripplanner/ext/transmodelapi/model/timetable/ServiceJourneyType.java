@@ -210,11 +210,7 @@ public class ServiceJourneyType {
     return environment.getSource();
   }
 
-  private static int directIdStringToInt(String directionId) {
-    try {
-      return Integer.parseInt(directionId);
-    } catch (NumberFormatException nfe) {
-      return -1;
-    }
+  private static int directIdStringToInt(Integer directionId) {
+    return directionId == null ? -1 : directionId;
   }
 }
