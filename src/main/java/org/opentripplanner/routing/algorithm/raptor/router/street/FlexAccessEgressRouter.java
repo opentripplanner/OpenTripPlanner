@@ -18,19 +18,22 @@ public class FlexAccessEgressRouter {
       boolean isEgress
   ) {
 
-    Collection<NearbyStop> accessStops = !isEgress ? AccessEgressRouter.streetSearch(request,
+    Collection<NearbyStop> accessStops = !isEgress ? AccessEgressRouter.streetSearch(
+        request,
         StreetMode.WALK,
         false,
         2000
     ) : List.of();
 
-    Collection<NearbyStop> egressStops = isEgress ? AccessEgressRouter.streetSearch(request,
+    Collection<NearbyStop> egressStops = isEgress ? AccessEgressRouter.streetSearch(
+        request,
         StreetMode.WALK,
         true,
         2000
     ) : List.of();
 
-    FlexRouter flexRouter = new FlexRouter(request.rctx.graph,
+    FlexRouter flexRouter = new FlexRouter(
+        request.rctx.graph,
         request.getDateTime().toInstant(),
         request.arriveBy,
         request.additionalSearchDaysBeforeToday,
