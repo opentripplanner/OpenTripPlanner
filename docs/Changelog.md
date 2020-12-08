@@ -2,6 +2,8 @@
 
 ## 2.1.0 (in progress)
 
+- Fix NullPointerException when a RealTime update do not match an existing TripPattern [#3284](https://github.com/opentripplanner/OpenTripPlanner/issues/3284)
+
 
 ## 2.0.0 (2020-11-27)
 
