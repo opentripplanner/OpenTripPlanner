@@ -3,12 +3,8 @@ package org.opentripplanner.api.parameter;
 public enum Qualifier {
   /** The vehicle has to be rented */
   RENT,
-  @Deprecated
-  HAVE,
   /** The vehicle has to be parked before proceeding */
   PARK,
-  @Deprecated
-  KEEP,
   /**
    * The user is picked up by the vehicle.
    */
