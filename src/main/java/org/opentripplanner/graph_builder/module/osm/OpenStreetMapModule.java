@@ -444,7 +444,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             } else {
                 ProgressTracker progress = ProgressTracker.track(
                     "Build visibility graph for areas",
-                    100,
+                    50,
                     areaGroups.size()
                 );
                 for (AreaGroup group : areaGroups) {
