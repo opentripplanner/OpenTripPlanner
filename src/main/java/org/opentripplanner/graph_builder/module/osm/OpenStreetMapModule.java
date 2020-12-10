@@ -452,6 +452,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     //Keep lambda! A method-ref would causes incorrect class and line number to be logged
                     progress.step(m -> LOG.info(m));
                 }
+                LOG.info(progress.completeMessage());
 
                 if(platformEntriesLinking){
                     List<Area> platforms = osmdb.getWalkableAreas().stream().
