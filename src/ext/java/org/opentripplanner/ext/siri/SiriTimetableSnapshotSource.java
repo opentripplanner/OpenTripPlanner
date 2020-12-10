@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri;
 import com.google.common.base.Preconditions;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -10,6 +11,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -450,7 +452,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
         // TODO - SIRI: Where is the Operator?
-//        Operator operator = graphIndex.operatorForId.get(new FeedScopedId(feedId, operatorRef));
+        Operator operator = graph.index.getOperatorForId().get(new FeedScopedId(feedId, operatorRef));
 //        Preconditions.checkNotNull(operator, "Operator " + operatorRef + " is unknown");
 
         FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
@@ -466,20 +468,22 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         if (route == null) { // Route is unknown - create new
             route = new Route(routeId);
-            route.setType(getRouteType(estimatedVehicleJourney.getVehicleModes()));
-//            route.setOperator(operator);
+            route.setMode(getRouteMode(estimatedVehicleJourney.getVehicleModes()));
+            route.setOperator(operator);
 
             // TODO - SIRI: Is there a better way to find authority/Agency?
             // Finding first Route with same Operator, and using same Authority
             Agency agency = graph.index.getAllRoutes().stream()
-//                    .filter(route1 -> route1 != null &&
-//                            route1.getOperator() != null &&
-//                            route1.getOperator().equals(operator))
+                    .filter(route1 -> route1 != null &&
+                            route1.getOperator() != null &&
+                            route1.getOperator().equals(operator))
                     .findFirst().get().getAgency();
             route.setAgency(agency);
 
             if (estimatedVehicleJourney.getPublishedLineNames() != null && !estimatedVehicleJourney.getPublishedLineNames().isEmpty()) {
                 route.setShortName("" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue());
+            } else {
+                route.setShortName("");
             }
             LOG.info("Adding route {} to graph.", routeId);
             graph.index.addRoutes(route);
@@ -513,7 +517,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             trip.setTripHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
         }
 
-//        trip.setTripOperator(operator);
+        trip.setTripOperator(operator);
 
         // TODO - SIRI: Populate these?
         trip.setShapeId(null);          // Replacement-trip has different shape
@@ -669,27 +673,27 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     /*
      * Resolves TransportMode from SIRI VehicleMode
      */
-    private int getRouteType(List<VehicleModesEnumeration> vehicleModes) {
+    private TransitMode getRouteMode(List<VehicleModesEnumeration> vehicleModes) {
         if (vehicleModes != null && !vehicleModes.isEmpty()) {
             VehicleModesEnumeration vehicleModesEnumeration = vehicleModes.get(0);
             switch (vehicleModesEnumeration) {
                 case RAIL:
-                    return 100;
+                    return TransitMode.RAIL;
                 case COACH:
-                    return 200;
+                    return TransitMode.COACH;
                 case BUS:
-                    return 700;
+                    return TransitMode.BUS;
                 case METRO:
-                    return 701;
+                    return TransitMode.SUBWAY;
                 case TRAM:
-                    return 900;
+                    return TransitMode.TRAM;
                 case FERRY:
-                    return 1000;
+                    return TransitMode.FERRY;
                 case AIR:
-                    return 1100;
+                    return TransitMode.AIRPLANE;
             }
         }
-        return 700;
+        return TransitMode.BUS;
     }
 
     private boolean handleModifiedTrip(Graph graph, String feedId, EstimatedVehicleJourney estimatedVehicleJourney) {
