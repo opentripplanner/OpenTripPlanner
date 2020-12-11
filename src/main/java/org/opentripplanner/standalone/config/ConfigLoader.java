@@ -122,6 +122,16 @@ public class ConfigLoader {
     }
 
     /**
+     * Log the config-version for each configuration file. The logging is only performed if the
+     * config-version is set.
+     */
+    public static void logConfigVersion(String otpConfigVersion, String buildConfigVersion, String routerConfigVersion) {
+        logConfigVersion(otpConfigVersion, OTP_CONFIG_FILENAME);
+        logConfigVersion(buildConfigVersion, BUILD_CONFIG_FILENAME);
+        logConfigVersion(routerConfigVersion, ROUTER_CONFIG_FILENAME);
+    }
+
+    /**
      * Load the router configuration file as a JsonNode three. An empty node is
      * returned if the given {@code configDir}  is {@code null} or config file is NOT found.
      * <p>
@@ -205,6 +215,12 @@ public class ConfigLoader {
             throw new IllegalArgumentException(
                     configDir + " is not a readable configuration directory."
             );
+        }
+    }
+
+    private static void logConfigVersion(String configVersion, String filename) {
+        if(configVersion != null) {
+            LOG.info("{} config-version is {}.", filename, configVersion);
         }
     }
 }

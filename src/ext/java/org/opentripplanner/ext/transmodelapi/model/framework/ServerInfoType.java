@@ -4,7 +4,8 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.common.ProjectInfo;
+
+import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
 
 public class ServerInfoType {
   public static GraphQLOutputType create() {
@@ -16,35 +17,56 @@ public class ServerInfoType {
             .name("version")
             .description("Maven version")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> ProjectInfo.INSTANCE.version)
+            .dataFetcher(e -> projectInfo().version)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("buildTime")
             .description("OTP Build timestamp")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> ProjectInfo.INSTANCE.buildTime)
+            .dataFetcher(e -> projectInfo().versionControl.buildTime)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("gitBranch")
             .description("")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> ProjectInfo.INSTANCE.branch)
+            .dataFetcher(e -> projectInfo().versionControl.branch)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("gitCommit")
             .description("")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> ProjectInfo.INSTANCE.commit)
+            .dataFetcher(e -> projectInfo().versionControl.commit)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("gitCommitTime")
             .description("")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> ProjectInfo.INSTANCE.commitTime)
+            .dataFetcher(e -> projectInfo().versionControl.commitTime)
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("otpConfigVersion")
+            .description("The 'configVersion' of the otp-config.json file.")
+            .type(Scalars.GraphQLString)
+            .dataFetcher(e -> projectInfo().otpConfigVersion)
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("buildConfigVersion")
+            .description("The 'configVersion' of the build-config.json file.")
+            .type(Scalars.GraphQLString)
+            .dataFetcher(e -> projectInfo().buildConfigVersion)
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("routerConfigVersion")
+            .description("The 'configVersion' of the router-config.json file.")
+            .type(Scalars.GraphQLString)
+            .dataFetcher(e -> projectInfo().routerConfigVersion)
             .build())
         .build();
   }

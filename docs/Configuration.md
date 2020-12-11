@@ -93,6 +93,19 @@ The project information variables available are:
   - `git.commit.timestamp`
 
 
+## Config version 
+
+All three configuration files have an optional `configVersion` property. The property can be used
+to version the configuration in a deployment pipeline. The `configVersion` is not used by OTP in 
+any way, but is logged at startup and is available as part of the _server-info_ data in the REST 
+API. The intended usage is to be able to check witch version of the configuration the graph was 
+build with and witch version the router uses. In an deployment with many OTP instances it can be 
+useful to ask an instance about the version, instead of tracking the deployment pipline backwards 
+to find the version used. How you inject a version into the configuration file is up to you, but
+you can do it in your build-pipline, at deployment time or use system environment variable 
+substituton. 
+
+
 # System-wide Configuration
 
 Using the file `otp-config.json` you can enable or disable different APIs and experimental

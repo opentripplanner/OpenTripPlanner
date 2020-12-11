@@ -1,12 +1,13 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.common.ProjectInfo;
 import org.opentripplanner.util.OtpAppException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
 
 /**
  * Replaces environment variable placeholders specified on the format ${variable} in a text
@@ -36,15 +37,15 @@ class EnvironmentVariableReplacer {
     private final static Pattern PATTERN = Pattern.compile("\\$\\{([.\\w]+)}");
 
     private static final Map<String, String> PROJECT_INFO = Map.of(
-        "maven.version" , ProjectInfo.INSTANCE.version,
-        "maven.version.short" , ProjectInfo.INSTANCE.unqualifiedVersion(),
-        "maven.version.major" , Integer.toString(ProjectInfo.INSTANCE.major),
-        "maven.version.minor" , Integer.toString(ProjectInfo.INSTANCE.minor),
-        "maven.version.patch" , Integer.toString(ProjectInfo.INSTANCE.patch),
-        "maven.version.qualifier" , ProjectInfo.INSTANCE.qualifier,
-        "git.branch" , ProjectInfo.INSTANCE.branch,
-        "git.commit" , ProjectInfo.INSTANCE.commit,
-        "git.commit.timestamp" , ProjectInfo.INSTANCE.commitTime
+        "maven.version" , projectInfo().version.version,
+        "maven.version.short" , projectInfo().version.unqualifiedVersion(),
+        "maven.version.major" , Integer.toString(projectInfo().version.major),
+        "maven.version.minor" , Integer.toString(projectInfo().version.minor),
+        "maven.version.patch" , Integer.toString(projectInfo().version.patch),
+        "maven.version.qualifier" , projectInfo().version.qualifier,
+        "git.branch" , projectInfo().versionControl.branch,
+        "git.commit" , projectInfo().versionControl.commit,
+        "git.commit.timestamp" , projectInfo().versionControl.commitTime
     );
 
 

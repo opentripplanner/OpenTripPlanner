@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import org.opentripplanner.common.ProjectInfo;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -35,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
 
 /**
  * Test response times for a large batch of origin/destination points.
@@ -123,7 +124,7 @@ public class SpeedTest {
         printProfileStatistics();
 
         service.shutdown();
-        System.err.println("\nSpeedTest done! " + ProjectInfo.INSTANCE.getShortVersionString());
+        System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
     }
 
     private void runSingleTest(int sample, int nSamples) throws Exception {
