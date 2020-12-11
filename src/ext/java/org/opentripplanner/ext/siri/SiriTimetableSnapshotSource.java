@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri;
 import com.google.common.base.Preconditions;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -449,8 +450,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             externalLineRef = lineRef;
         }
 
-        // TODO - SIRI: Where is the Operator?
-//        Operator operator = graphIndex.operatorForId.get(new FeedScopedId(feedId, operatorRef));
+        Operator operator = graph.index.getOperatorForId().get(new FeedScopedId(feedId, operatorRef));
 //        Preconditions.checkNotNull(operator, "Operator " + operatorRef + " is unknown");
 
         FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
@@ -467,14 +467,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         if (route == null) { // Route is unknown - create new
             route = new Route(routeId);
             route.setType(getRouteType(estimatedVehicleJourney.getVehicleModes()));
-//            route.setOperator(operator);
+            route.setOperator(operator);
 
             // TODO - SIRI: Is there a better way to find authority/Agency?
             // Finding first Route with same Operator, and using same Authority
             Agency agency = graph.index.getAllRoutes().stream()
-//                    .filter(route1 -> route1 != null &&
-//                            route1.getOperator() != null &&
-//                            route1.getOperator().equals(operator))
+                    .filter(route1 -> route1 != null &&
+                            route1.getOperator() != null &&
+                            route1.getOperator().equals(operator))
                     .findFirst().get().getAgency();
             route.setAgency(agency);
 
@@ -513,7 +513,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             trip.setTripHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
         }
 
-//        trip.setTripOperator(operator);
+        trip.setTripOperator(operator);
 
         // TODO - SIRI: Populate these?
         trip.setShapeId(null);          // Replacement-trip has different shape
