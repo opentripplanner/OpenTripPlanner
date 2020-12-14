@@ -1,0 +1,44 @@
+name: Test and build
+
+on:
+  push:
+  pull_request:
+    branches: [ $default-branch ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Maven cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+
+    - name: Test
+      run: mvn -B -V clean verify --settings maven-settings.xml -Dgpg.skip
+
+    - name: Build container image
+      run: |
+        BRANCH=${GITHUB_REF#refs/heads/}
+        if [ $BRANCH = dev-2.x -o $BRANCH = ci-github-action-container-image ];
+        then
+          JIB_ACTION=build
+        else
+          JIB_ACTION=buildTar
+        fi
+        # lowercase to match image name rules (DNS without underscores)
+        CONTAINER_IMAGE=ghcr.io/$(echo $GITHUB_REPOSITORY | tr A-Z a-z | tr -d _)
+        mvn compile com.google.cloud.tools:jib-maven-plugin:2.7.0:${JIB_ACTION} \
+          -Dimage=${CONTAINER_IMAGE}:${GITHUB_SHA} \
+          -Djib.container.mainClass=org.opentripplanner.standalone.OTPMain \
+          -Djib.container.labels=org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}
+
