@@ -27,18 +27,30 @@ jobs:
       run: mvn -B -V clean verify --settings maven-settings.xml -Dgpg.skip
 
     - name: Build container image
+      env:
+        GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+        GHCR_PASSWORD: ${{ secrets.GHCR_PASSWORD }}
       run: |
         BRANCH=${GITHUB_REF#refs/heads/}
+        # lowercase to match image name rules (DNS without underscores)
+        CONTAINER_IMAGE=ghcr.io/$(echo "${GITHUB_REPOSITORY}" | tr A-Z a-z | tr -d _)
+        JIB_ARGS="-Dimage=${CONTAINER_IMAGE}:${GITHUB_SHA} -Djib.container.mainClass=org.opentripplanner.standalone.OTPMain -Djib.container.labels=org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}"
+
         if [ $BRANCH = dev-2.x -o $BRANCH = ci-github-action-container-image ];
         then
           JIB_ACTION=build
+          JIB_ARGS="${JIB_ARGS} -Djib.to.tags=latest"
         else
           JIB_ACTION=buildTar
         fi
-        # lowercase to match image name rules (DNS without underscores)
-        CONTAINER_IMAGE=ghcr.io/$(echo $GITHUB_REPOSITORY | tr A-Z a-z | tr -d _)
-        mvn compile com.google.cloud.tools:jib-maven-plugin:2.7.0:${JIB_ACTION} \
-          -Dimage=${CONTAINER_IMAGE}:${GITHUB_SHA} \
-          -Djib.container.mainClass=org.opentripplanner.standalone.OTPMain \
-          -Djib.container.labels=org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}
-
+        if [ -n "${GHCR_USERNAME-}" ]; then
+          JIB_ARGS="${JIB_ARGS} -Djib.to.auth.username=${GHCR_USERNAME}"
+        else
+          JIB_ACTION=buildTar
+        fi
+        if [ -n "${GHCR_PASSWORD-}" ]; then
+          JIB_ARGS="${JIB_ARGS} -Djib.to.auth.password=${GHCR_PASSWORD}"
+        else
+          JIB_ACTION=buildTar
+        fi
+        mvn -B compile com.google.cloud.tools:jib-maven-plugin:2.7.0:${JIB_ACTION} ${JIB_ARGS}
