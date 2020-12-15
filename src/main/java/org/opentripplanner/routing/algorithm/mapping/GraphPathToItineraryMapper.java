@@ -254,6 +254,7 @@ public abstract class GraphPathToItineraryMapper {
                 .orElse(null);
             if (flexEdge != null) {
                 leg = new Leg(flexEdge.getTrip());
+                leg.flexibleTrip = true;
             }
         }
 
