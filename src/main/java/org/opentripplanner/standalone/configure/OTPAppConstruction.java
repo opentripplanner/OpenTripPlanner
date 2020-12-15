@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 /**
  * This class is responsible for creating the top level services like {@link OTPConfiguration}
  * and {@link OTPServer}. The purpose of this class is to wire the
@@ -118,6 +120,12 @@ public class OTPAppConstruction {
             server = new OTPServer(config.getCli(), router);
         }
         return server;
+    }
+
+    public void setOtpConfigVersionsOnServerInfo() {
+        projectInfo().otpConfigVersion = config.otpConfig().configVersion;
+        projectInfo().buildConfigVersion = config.buildConfig().configVersion;
+        projectInfo().routerConfigVersion = config.routerConfig().getConfigVersion();
     }
 
     private GraphBuilderDataSources graphBuilderDataSources() {

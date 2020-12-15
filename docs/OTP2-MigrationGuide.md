@@ -213,6 +213,11 @@ Parameters that have changed:
     - `effectiveEndDate` is added to show the end time of the alert validity. 
 
 
+### ServerInfo
+
+The returned data structure is changed and more info is available.
+
+
 ### AlertPatcher 
 
 The AlertPatcher, which was under the `/patch` path, is removed. In order to update alerts, please 
