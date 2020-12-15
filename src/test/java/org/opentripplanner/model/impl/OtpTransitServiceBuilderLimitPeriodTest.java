@@ -188,7 +188,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     private Trip createTrip(String id, FeedScopedId serviceId) {
         Trip trip = new Trip(new FeedScopedId(FEED_ID, id));
         trip.setServiceId(serviceId);
-        trip.setDirectionId("1");
+        trip.setDirectionId(1);
         trip.setRoute(route);
         return trip;
     }
