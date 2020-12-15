@@ -23,12 +23,15 @@ public class TripTimeShortHelper {
     @Nullable
     public static TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
+        if (leg.flexibleTrip) { return null; }
 
         ServiceDate serviceDate = leg.serviceDate;
         List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
-        /* TODO OTP2
+        /* TODO OTP2 This method is only used for EstimatedCalls for from place. We have to decide
+                     if EstimatedCalls are applicable to flex trips, and if that is the case, add
+                     the necessary mappings.
         if (leg.isFlexible()) {
             TripTimeShort tripTimeShort = tripTimes.get(leg.from.stopSequence);
             tripTimeShort.scheduledDeparture = (int) startTimeSeconds;
@@ -49,12 +52,15 @@ public class TripTimeShortHelper {
     @Nullable
     public static TripTimeShort getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
+        if (leg.flexibleTrip) { return null; }
 
         ServiceDate serviceDate = leg.serviceDate;
         List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long endTimeSeconds = (leg.endTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
-        /* TODO OTP2
+        /* TODO OTP2 This method is only used for EstimatedCalls for to place. We have to decide
+                     if EstimatedCalls are applicable to flex trips, and if that is the case, add
+                     the necessary mappings.
         if (leg.isFlexible()) {
             TripTimeShort tripTimeShort = tripTimes.get(leg.to.stopSequence);
             tripTimeShort.scheduledArrival = (int) endTimeSeconds;
@@ -75,6 +81,7 @@ public class TripTimeShortHelper {
      */
     public static List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
+        if (leg.flexibleTrip) { return List.of(); }
 
         ServiceDate serviceDate = leg.serviceDate;
         return routingService.getTripTimesShort(leg.getTrip(), serviceDate);
@@ -85,6 +92,7 @@ public class TripTimeShortHelper {
      */
     public static List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
+        if (leg.flexibleTrip) { return List.of(); }
 
         ServiceDate serviceDate = leg.serviceDate;
 

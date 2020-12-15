@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptor.router.street;
 
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class AccessEgressRouter {
      */
     public static Collection<NearbyStop> streetSearch (
         RoutingRequest rr,
+        StreetMode streetMode,
         boolean fromTarget,
         int distanceMeters
     ) {
@@ -39,9 +41,7 @@ public class AccessEgressRouter {
         //      main request.
         Set<Vertex> vertices = fromTarget ^ rr.arriveBy ? rr.rctx.toVertices : rr.rctx.fromVertices;
 
-        RoutingRequest nonTransitRoutingRequest = rr.getStreetSearchRequest(
-            fromTarget ? rr.modes.egressMode : rr.modes.accessMode
-        );
+        RoutingRequest nonTransitRoutingRequest = rr.getStreetSearchRequest(streetMode);
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
         // We set removeTempEdges to false because this is a sub-request - the temporary edges for the origin and
