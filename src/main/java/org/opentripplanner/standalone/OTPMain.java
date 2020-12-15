@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up

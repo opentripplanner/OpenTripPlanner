@@ -6,16 +6,16 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.Properties;
 
-class MavenVersionParser {
-  private static final Logger LOG = LoggerFactory.getLogger(ProjectInfo.class);
-  private static final String FILENAME = "maven-version.properties";
+class OtpProjectInfoParser {
+  private static final Logger LOG = LoggerFactory.getLogger(OtpProjectInfo.class);
+  private static final String FILENAME = "otp-project-info.properties";
 
-  static ProjectInfo loadFromProperties() {
+  static OtpProjectInfo loadFromProperties() {
     try {
-      InputStream in = ProjectInfo.class.getClassLoader().getResourceAsStream(FILENAME);
+      InputStream in = OtpProjectInfo.class.getClassLoader().getResourceAsStream(FILENAME);
       Properties props = new java.util.Properties();
       props.load(in);
-      ProjectInfo version = new ProjectInfo(
+      OtpProjectInfo version = new OtpProjectInfo(
           normalize(props.getProperty("project.version")),
           new VersionControlInfo(
               normalize(props.getProperty("git.commit.id")),
@@ -29,13 +29,13 @@ class MavenVersionParser {
       return version;
     } catch (Exception e) {
       LOG.error("Error reading version from properties file: {}", e.getMessage());
-      return new ProjectInfo();
+      return new OtpProjectInfo();
     }
   }
 
   private static String normalize(String text) {
-    if(text == null || text.isBlank()) { return ProjectInfo.UNKNOWN; }
-    if(text.startsWith("${") && text.endsWith("}")) { return ProjectInfo.UNKNOWN; }
+    if(text == null || text.isBlank()) { return OtpProjectInfo.UNKNOWN; }
+    if(text.startsWith("${") && text.endsWith("}")) { return OtpProjectInfo.UNKNOWN; }
     return text;
   }
 }

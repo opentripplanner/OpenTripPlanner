@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * Replaces environment variable placeholders specified on the format ${variable} in a text

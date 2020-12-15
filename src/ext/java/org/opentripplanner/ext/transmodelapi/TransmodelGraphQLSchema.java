@@ -87,7 +87,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
-import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;

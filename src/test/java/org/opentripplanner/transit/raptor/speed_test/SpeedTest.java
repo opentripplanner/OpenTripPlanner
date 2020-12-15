@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * Test response times for a large batch of origin/destination points.

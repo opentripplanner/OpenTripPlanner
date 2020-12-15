@@ -5,7 +5,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 
-import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 public class ServerInfoType {
   public static GraphQLOutputType create() {

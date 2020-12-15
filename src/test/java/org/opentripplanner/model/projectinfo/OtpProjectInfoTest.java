@@ -7,11 +7,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class ProjectInfoTest {
+public class OtpProjectInfoTest {
 
   @Test
   public void projectInfo() {
-    ProjectInfo p = ProjectInfo.projectInfo();
+    OtpProjectInfo p = OtpProjectInfo.projectInfo();
 
     p.otpConfigVersion = "1";
     assertEquals("1", p.otpConfigVersion);

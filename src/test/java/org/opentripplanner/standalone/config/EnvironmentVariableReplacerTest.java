@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.model.projectinfo.MavenProjectVersion;
-import org.opentripplanner.model.projectinfo.ProjectInfo;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.model.projectinfo.VersionControlInfo;
 import org.opentripplanner.util.OtpAppException;
 
@@ -55,7 +55,7 @@ public class EnvironmentVariableReplacerTest {
         // Given: a text and a expected result
         String text = "Env.var: ${" + envName + "}, project branch: ${git.branch}.";
         String expectedResult = "Env.var: " + envValue + ", project branch: " +
-            ProjectInfo.projectInfo().versionControl.branch + ".";
+            OtpProjectInfo.projectInfo().versionControl.branch + ".";
 
         // When:
         String result = insertEnvironmentVariables(text, "test");
@@ -80,7 +80,7 @@ public class EnvironmentVariableReplacerTest {
     @Test
     public void verifyProjectInfo() {
         // Given
-        ProjectInfo p = ProjectInfo.projectInfo();
+        OtpProjectInfo p = OtpProjectInfo.projectInfo();
         MavenProjectVersion version = p.version;
         VersionControlInfo verControl = p.versionControl;
 

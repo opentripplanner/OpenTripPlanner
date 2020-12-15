@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.model.projectinfo.ProjectInfo.projectInfo;
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 public class OtpStartupInfo {
     private static final Logger LOG = LoggerFactory.getLogger(OtpStartupInfo.class);

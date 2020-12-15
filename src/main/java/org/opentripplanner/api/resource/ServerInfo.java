@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
 import org.opentripplanner.api.model.serverinfo.ApiServerInfo;
-import org.opentripplanner.model.projectinfo.ProjectInfo;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -48,6 +48,6 @@ public class ServerInfo {
         catch (Exception ignore) {}
 
 
-        return new ApiServerInfo(cpuName, nCores, ProjectInfo.projectInfo());
+        return new ApiServerInfo(cpuName, nCores, OtpProjectInfo.projectInfo());
     }
 }

@@ -6,11 +6,11 @@ import org.opentripplanner.standalone.config.RouterConfig;
 
 import java.io.Serializable;
 
-public class ProjectInfo implements Serializable {
+public class OtpProjectInfo implements Serializable {
 
     private static final long serialVersionUID = 1;
 
-    private static final ProjectInfo INSTANCE = MavenVersionParser.loadFromProperties();
+    private static final OtpProjectInfo INSTANCE = OtpProjectInfoParser.loadFromProperties();
 
 
     static final String UNKNOWN = "UNKNOWN";
@@ -18,7 +18,7 @@ public class ProjectInfo implements Serializable {
     /* Info derived from version string */
     public final MavenProjectVersion version;
 
-    /* Other info from git-commit-id-plugin via maven-version.properties */
+    /* Other info from git-commit-id-plugin via otp-project-info.properties */
     public final VersionControlInfo versionControl;
 
 
@@ -36,12 +36,12 @@ public class ProjectInfo implements Serializable {
     /** See {@link RouterConfig#getConfigVersion()} */
     public String routerConfigVersion;
 
-    public static ProjectInfo projectInfo() {
+    public static OtpProjectInfo projectInfo() {
         return INSTANCE;
     }
 
 
-    ProjectInfo() {
+    OtpProjectInfo() {
         this(
             "0.0.0-ParseFailure",
             new VersionControlInfo(
@@ -54,7 +54,7 @@ public class ProjectInfo implements Serializable {
         );
     }
     
-    public ProjectInfo(
+    public OtpProjectInfo(
             String version,
             VersionControlInfo versionControl
     ) {
@@ -83,7 +83,7 @@ public class ProjectInfo implements Serializable {
      * This method compare the maven project version, an return {@code true} if both are
      * the same. Two different SNAPSHOT versions are considered the same - work in progress.
      */
-    public boolean sameVersion(ProjectInfo other) {
+    public boolean sameVersion(OtpProjectInfo other) {
         return this.version.sameVersion(other.version);
     }
 }
