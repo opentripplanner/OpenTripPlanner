@@ -25,15 +25,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -188,15 +188,15 @@ public class TransmodelGraphQLPlanner {
             ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
-            ElementWrapper<ArrayList<TransitMode>> transitModes = new ElementWrapper<>();
+            ElementWrapper<List<TransitMode>> transitModes = new ElementWrapper<>();
             callWith.argument("modes.accessMode", accessMode::set);
             callWith.argument("modes.egressMode", egressMode::set);
             callWith.argument("modes.directMode", directMode::set);
             callWith.argument("modes.transportMode", transitModes::set);
 
             if (transitModes.get() == null) {
-                // Default to all transport modes if transport modes not specified
-                transitModes.set(new ArrayList<>(Arrays.asList(TransitMode.values())));
+                // Default to no transport modes if transport modes not specified
+                transitModes.set(List.of());
             }
 
             request.modes = new RequestModes(
@@ -242,22 +242,6 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
         //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 
-        /*
-        if (!request.modes.isTransit() && request.modes.getCar()) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.kissAndRide) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.rideAndKiss) {
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.parkAndRide) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.useFlexService) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        }
-         */
-
         return request;
     }
 
@@ -268,22 +252,6 @@ public class TransmodelGraphQLPlanner {
             .collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
         return new HashMap<>(bannedTrips);
     }
-
-    /*
-    private String getLocationOfFirstQuay(String vertexId, GraphIndex graphIndex) {
-        // TODO THIS DOES NOT WORK !!
-        Vertex vertex = graphIndex.stopVertexForStop.get(vertexId);
-        if (vertex instanceof TransitStopVertex) {
-            TransitStopVertex stopVertex = (TransitStopVertex) vertex;
-
-            FeedScopedId stopId = stopVertex.getStop().getId();
-
-            return stopId.getFeedId().concat(":").concat(stopId.getId());
-        } else {
-            return vertexId;
-        }
-    }
-    */
 
     /**
      * Simple wrapper in order to pass a consumer into the CallerWithEnvironment.argument method.
