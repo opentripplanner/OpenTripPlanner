@@ -35,9 +35,6 @@ public class GenerateTripPatternsOperation {
 
     private final Map<String, Integer> tripPatternIdCounters = new HashMap<>();
 
-
-    private static final int UNKNOWN_DIRECTION_ID = -1;
-
     private final OtpTransitServiceBuilder transitDaoBuilder;
     private final DataImportIssueStore issueStore;
     private final Deduplicator deduplicator;
@@ -114,7 +111,6 @@ public class GenerateTripPatternsOperation {
             return; // Invalid trip, skip it, it will break later
         }
 
-        int directionId = getDirectionId(trip);
         Collection<StopTime> stopTimes = transitDaoBuilder.getStopTimesSortedByTrip().get(trip);
 
         // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
@@ -126,8 +122,9 @@ public class GenerateTripPatternsOperation {
         // Get the existing TripPattern for this filtered StopPattern, or create one.
         StopPattern stopPattern = new StopPattern(stopTimes);
 
+        Integer directionId = trip.getDirectionId();
         TripPattern tripPattern = findOrCreateTripPattern(
-            stopPattern, trip.getRoute(), directionId
+            stopPattern, trip.getRoute(), directionId == null ? -1 : directionId
         );
 
         // Create a TripTimes object for this list of stoptimes, which form one trip.
@@ -148,18 +145,6 @@ public class GenerateTripPatternsOperation {
             tripPattern.add(tripTimes);
             scheduledCount++;
         }
-    }
-
-    /**
-     * Try to get the direction id for the trip, set to UNKNOWN if not found
-     */
-    private int getDirectionId(Trip trip) {
-        try {
-            return Integer.parseInt(trip.getDirectionId());
-        } catch (NumberFormatException e) {
-            LOG.debug("Trip {} does not have direction id, defaults to -1", trip);
-        }
-        return UNKNOWN_DIRECTION_ID;
     }
 
     private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, int directionId) {
