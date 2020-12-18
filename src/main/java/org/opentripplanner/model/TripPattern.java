@@ -209,7 +209,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         if(hopGeometries == null || hopGeometries.length==0) { return null; }
 
         List<LineString> lineStrings = new ArrayList<>();
-        for (int i = 0; i < hopGeometries.length - 1; i++) {
+        for (int i = 0; i < hopGeometries.length; i++) {
             lineStrings.add(getHopGeometry(i));
         }
         return GeometryUtils.concatenateLineStrings(lineStrings);
