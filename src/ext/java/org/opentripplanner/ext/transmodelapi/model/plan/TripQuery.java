@@ -166,6 +166,16 @@ public class TripQuery {
             .build()
         )
         .argument(GraphQLArgument.newArgument()
+            .name("useBikeRentalAvailabilityInformation")
+            .description(
+                "Whether or not bike rental availability information will be used to plan bike "
+                    + "rental trips."
+            )
+            .type(Scalars.GraphQLBoolean)
+            .defaultValue(routing.request.useBikeRentalAvailabilityInformation)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
             .name("transferPenalty")
             .description(
                 "An extra penalty added on transfers (i.e. all boardings except the first one). "

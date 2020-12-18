@@ -232,12 +232,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
         callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
-
-        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
-
-
+        callWith.argument("useBikeRentalAvailabilityInformation", (Boolean v) -> request.useBikeRentalAvailabilityInformation = v);
         callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
         //callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
         //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
