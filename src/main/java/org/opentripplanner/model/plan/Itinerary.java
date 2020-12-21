@@ -138,6 +138,19 @@ public class Itinerary {
         return lastLeg().endTime;
     }
 
+    /**
+     * Reflects the departureDelay on the first Leg
+     */
+    public int departureDelay() {
+        return firstLeg().departureDelay;
+    }
+    /**
+     * Reflects the arrivalDelay on the last Leg
+     */
+    public int arrivalDelay() {
+        return lastLeg().arrivalDelay;
+    }
+
 
     /**
      * This is the amount of time used to travel. {@code waitingTime} is NOT
