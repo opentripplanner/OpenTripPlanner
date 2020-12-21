@@ -24,12 +24,13 @@ import java.util.Iterator;
 /**
  * The algorithm used herein is described in
  * <p>
- * Conway, Matthew Wigginton, Andrew Byrd, and Marco van der Linden. “Evidence-Based Transit and Land Use Sketch Planning
- * Using Interactive Accessibility Methods on Combined Schedule and Headway-Based Networks.” Transportation Research
- * Record 2653 (2017). doi:10.3141/2653-06.
+ * Conway, Matthew Wigginton, Andrew Byrd, and Marco van der Linden. “Evidence-Based Transit and
+ * Land Use Sketch Planning
+ * Using Interactive Accessibility Methods on Combined Schedule and Headway-Based Networks.”
+ * Transportation Research Record 2653 (2017). doi:10.3141/2653-06.
  * <p>
- * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,” January 1, 2012.
- * http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
+ * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,”
+ * January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
  * <p>
  * This version do support the following features:
  * <ul>
@@ -40,7 +41,8 @@ import java.util.Iterator;
  * </ul>
  * This version do NOT support the following features:
  * <ul>
- *     <li>Frequency routes, supported by the original code using Monte Carlo methods (generating randomized schedules)
+ *     <li>Frequency routes, supported by the original code using Monte Carlo methods
+ *     (generating randomized schedules)
  * </ul>
  * <p>
  * This class originated as a rewrite of Conveyals RAPTOR code: https://github.com/conveyal/r5.
@@ -48,7 +50,7 @@ import java.util.Iterator;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends WorkerState<T>> implements Worker<T> {
+public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Worker<T> {
 
 
     private final RoutingStrategy<T> transitWorker;
@@ -63,7 +65,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      * current object-oriented approach. There were no performance differences(=> GC is not
      * the bottle neck), so we dropped the integer array implementation.
      */
-    private final S state;
+    private final WorkerState<T> state;
 
     /**
      * The round tracker keep track for the current Raptor round, and abort the search if the
@@ -91,7 +93,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
 
     public RangeRaptorWorker(
-            S state,
+            WorkerState<T> state,
             RoutingStrategy<T> transitWorker,
             RaptorTransitDataProvider<T> transitData,
             Collection<RaptorTransfer> accessLegs,
@@ -152,8 +154,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
         while (hasMoreRounds()) {
             lifeCycle.prepareForNextRound(roundTracker.round());
 
-            // NB since we have transfer limiting not bothering to cut off search when there are no more transfers
-            // as that will be rare and complicates the code
+            // NB since we have transfer limiting not bothering to cut off search when there are no
+            // more transfers as that will be rare and complicates the code
             timerByMinuteScheduleSearch().time(this::findAllTransitForRound);
 
             timerByMinuteTransfers().time(this::transfersForRound);
