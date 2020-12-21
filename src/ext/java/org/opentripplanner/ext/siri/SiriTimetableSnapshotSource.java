@@ -37,7 +37,6 @@ import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.HashSet;
@@ -454,7 +453,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 //        Preconditions.checkNotNull(operator, "Operator " + operatorRef + " is unknown");
 
         FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
-        FeedScopedId serviceId = new FeedScopedId(feedId, newServiceJourneyRef);
 
         Route replacedRoute = null;
         if (externalLineRef != null) {
@@ -501,7 +499,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 //            }
 //        }
 
-        trip.setServiceId(serviceId);
+        ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
+        FeedScopedId calServiceId = graph.getOrCreateServiceIdForDate(serviceDate);
+
+        trip.setServiceId(calServiceId);
 
         // TODO - SIRI: PublishedLineName not defined in SIRI-profile
         if (estimatedVehicleJourney.getPublishedLineNames() != null && !estimatedVehicleJourney.getPublishedLineNames().isEmpty()) {
@@ -643,25 +644,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             tripTimes.setRealTimeState(RealTimeState.ADDED);
         }
 
-
-        if (!graph.getServiceCodes().containsKey(serviceId)) {
-            graph.getServiceCodes().put(serviceId, graph.getServiceCodes().size());
-        }
-        tripTimes.serviceCode = graph.getServiceCodes().get(serviceId);
+        tripTimes.serviceCode = graph.getServiceCodes().get(calServiceId);
 
         pattern.add(tripTimes);
 
         Preconditions.checkState(tripTimes.timesIncreasing(), "Non-increasing triptimes for added trip");
-
-        ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
-
-        if (graph.getCalendarService().getServiceDatesForServiceId(serviceId) == null ||
-                graph.getCalendarService().getServiceDatesForServiceId(serviceId).isEmpty()) {
-            LOG.info("Adding serviceId {} to CalendarService", serviceId);
-            // TODO - SIRI: Need to add the ExtraJourney as a Trip - alerts may be attached to it
-           graph.getCalendarService().addServiceIdAndServiceDates(serviceId, Arrays.asList(serviceDate));
-        }
-
 
         return addTripToGraphAndBuffer(feedId, graph, trip, aimedStopTimes, addedStops, tripTimes, serviceDate);
     }
