@@ -97,16 +97,12 @@ public class GraphBuilder implements Runnable {
     ) {
 
         boolean hasOsm  = dataSources.has(OSM);
-        // TODO OTP2 - Refactor fetchElevationUS to be used as a regular datasource
-        //           - By supporting AWS buckets and NED downloads as a datasource,
-        //           - the '|| config.fetchElevationUS' would become obsolete.
-        boolean hasDem  = dataSources.has(DEM) || config.fetchElevationUS;
+        boolean hasDem  = dataSources.has(DEM);
         boolean hasGtfs = dataSources.has(GTFS);
         boolean hasNetex = dataSources.has(NETEX);
         boolean hasTransitData = hasGtfs || hasNetex;
 
         GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
-
 
         if ( hasOsm ) {
             List<BinaryOpenStreetMapProvider> osmProviders = Lists.newArrayList();
@@ -164,7 +160,7 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(netexModule(config, dataSources.get(NETEX)));
         }
 
-        if(hasTransitData && hasOsm) {
+        if(hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
             if (config.matchBusRoutesToStreets) {
                 graphBuilder.addModule(new BusRouteStreetMatcher());
             }
@@ -189,11 +185,6 @@ public class GraphBuilder implements Runnable {
             awsTileSource.awsBucketName = bucketConfig.bucketName;
             elevationGridCoverageFactories.add(
                 new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource));
-        } else if (config.fetchElevationUS) {
-            // Download the elevation tiles from the official web service
-            File cacheDirectory = new File(dataSources.getCacheDirectory(), "ned");
-            elevationGridCoverageFactories.add(
-                new NEDGridCoverageFactoryImpl(cacheDirectory));
         } else if (dataSources.has(DEM)) {
             // Load the elevation from a file in the graph inputs directory
             for (DataSource demSource : dataSources.get(DEM)) {

@@ -3,7 +3,6 @@ package org.opentripplanner.routing.api.request;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -64,7 +63,7 @@ import java.util.function.DoubleFunction;
  */
 public class RoutingRequest implements Cloneable, Serializable {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
@@ -709,6 +708,21 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public Double groupBySimilarityKeepNumOfItineraries = 0.68;
 
+    /**
+     * The numbers of days before the search date to consider when filtering trips for this search.
+     * This is set to 1 to account for trips starting yesterday and crossing midnight so that they
+     * can be boarded today. If there are trips that last multiple days, this will need to be
+     * increased.
+     */
+    public int additionalSearchDaysBeforeToday = 1;
+
+    /**
+     * The number of days after the search date to consider when filtering trips for this search.
+     * This is set to 1 to account for searches today having a search window that crosses midnight
+     * and would also need to board trips starting tomorrow. If a search window that lasts more than
+     * a day is used, this will need to be increased.
+     */
+    public int additionalSearchDaysAfterToday = 2;
 
     /* CONSTRUCTORS */
 

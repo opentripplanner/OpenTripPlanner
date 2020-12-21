@@ -90,6 +90,11 @@ public class OTPConfiguration {
             LOG.info("Using the graph embedded JSON router configuration.");
             this.routerConfig = routerConfig;
         }
+        ConfigLoader.logConfigVersion(
+            this.otpConfig.configVersion,
+            this.buildConfig.configVersion,
+            this.routerConfig.getConfigVersion()
+        );
     }
 
     /**

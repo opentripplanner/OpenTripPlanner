@@ -285,6 +285,7 @@ public class NetexMapper {
     ) {
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
                 idFactory,
+                transitBuilder.getOperatorsById(),
                 transitBuilder.getStops(),
                 transitBuilder.getLocations(),
                 transitBuilder.getRoutes(),

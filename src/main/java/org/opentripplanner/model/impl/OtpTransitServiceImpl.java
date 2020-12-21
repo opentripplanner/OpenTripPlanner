@@ -28,6 +28,8 @@ import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +50,8 @@ import java.util.Map;
  * create a new unmodifiable instance.
  */
 class OtpTransitServiceImpl implements OtpTransitService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceImpl.class);
 
     private final Collection<Agency> agencies;
 
@@ -122,6 +126,13 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
         this.trips = immutableList(builder.getTripsById().values());
         this.flexTrips = immutableList(builder.getFlexTripsById().values());
+
+        if(!builder.getFrequencies().isEmpty()) {
+            LOG.error(
+                "OTP2 do not support GTFS Trip Frequencies. "
+                + "See https://github.com/opentripplanner/OpenTripPlanner/issues/3243."
+            );
+        }
     }
 
     @Override

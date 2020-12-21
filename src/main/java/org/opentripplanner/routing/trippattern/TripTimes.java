@@ -3,14 +3,13 @@ package org.opentripplanner.routing.trippattern;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +27,7 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
  */
 public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
 
     /**

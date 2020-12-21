@@ -19,7 +19,7 @@ public final class Trip extends TransitEntity {
 
     private String routeShortName;
 
-    private String directionId;
+    private Integer directionId;
 
     private String blockId;
 
@@ -133,11 +133,15 @@ public final class Trip extends TransitEntity {
         this.routeShortName = routeShortName;
     }
 
-    public String getDirectionId() {
+    public Integer getDirectionId() {
         return directionId;
     }
 
-    public void setDirectionId(String directionId) {
+    public String getDirectionIdAsString(String unknownValue) {
+        return directionId == null ? unknownValue : Integer.toString(directionId);
+    }
+
+    public void setDirectionId(Integer directionId) {
         this.directionId = directionId;
     }
 

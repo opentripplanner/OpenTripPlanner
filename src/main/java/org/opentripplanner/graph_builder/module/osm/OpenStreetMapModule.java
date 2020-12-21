@@ -442,9 +442,17 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     walkableAreaBuilder.buildWithoutVisibility(group);
                 }
             } else {
+                ProgressTracker progress = ProgressTracker.track(
+                    "Build visibility graph for areas",
+                    50,
+                    areaGroups.size()
+                );
                 for (AreaGroup group : areaGroups) {
                     walkableAreaBuilder.buildWithVisibility(group, platformEntriesLinking);
+                    //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+                    progress.step(m -> LOG.info(m));
                 }
+                LOG.info(progress.completeMessage());
 
                 if(platformEntriesLinking){
                     List<Area> platforms = osmdb.getWalkableAreas().stream().

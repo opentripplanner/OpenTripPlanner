@@ -2,7 +2,6 @@ package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -18,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 /**
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up
  * an OTP server depending on command line options. OTPMain is a concrete class making it possible
@@ -32,6 +33,7 @@ public class OTPMain {
     static {
 
         // Disable HSQLDB reconfiguration of Java Unified Logging (j.u.l)
+        //noinspection AccessOfSystemProperties
         System.setProperty("hsqldb.reconfig_logging", "false");
 
         // Remove existing handlers attached to the j.u.l root logger
@@ -45,8 +47,8 @@ public class OTPMain {
      */
     public static void main(String[] args) {
         try {
-            OtpStartupInfo.logInfo();
             CommandLineParameters params = parseAndValidateCmdLine(args);
+            OtpStartupInfo.logInfo();
             startOTPServer(params);
         }
         catch (OtpAppException ae) {
@@ -71,18 +73,17 @@ public class OTPMain {
             // parsed commands, since there will be three separate objects.
             JCommander jc = JCommander.newBuilder().addObject(params).args(args).build();
             if (params.version) {
-                System.out.println(MavenVersion.VERSION.getLongVersionString());
+                System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
                 System.exit(0);
             }
             if (params.help) {
-                System.out.println(MavenVersion.VERSION.getShortVersionString());
+                System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
                 jc.setProgramName("java -Xmx4G -jar otp.jar");
                 jc.usage();
                 System.exit(0);
             }
             params.inferAndValidate();
         } catch (ParameterException pex) {
-            System.out.println(MavenVersion.VERSION.getShortVersionString());
             LOG.error("Parameter error: {}", pex.getMessage());
             System.exit(1);
         }
@@ -152,6 +153,9 @@ public class OTPMain {
 
         // Index graph for travel search
         graph.index();
+
+        // publishing the config version info make it available to the APIs
+        app.setOtpConfigVersionsOnServerInfo();
 
         Router router = new Router(graph, app.config().routerConfig());
         router.startup();

@@ -15,7 +15,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
@@ -90,6 +90,8 @@ import java.util.function.Function;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -97,9 +99,9 @@ public class Graph implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
-    private final MavenVersion mavenVersion = MavenVersion.VERSION;
+    private final OtpProjectInfo projectInfo = projectInfo();
 
     // TODO Remove this field, use Router.routerId ?
     public String routerId;
@@ -630,15 +632,15 @@ public class Graph implements Serializable {
      *         graphs are otherwise obviously incompatible.
      */
     boolean graphVersionMismatch() {
-        MavenVersion v = MavenVersion.VERSION;
-        MavenVersion gv = this.mavenVersion;
+        OtpProjectInfo v = projectInfo();
+        OtpProjectInfo gv = this.projectInfo;
         LOG.info("Graph version: {}", gv);
         LOG.info("OTP version:   {}", v);
-        if (!v.equals(gv)) {
+        if (!v.sameVersion(gv)) {
             LOG.error("This graph was built with a different version of OTP. Please rebuild it.");
             return true; // do not allow graph use
-        } else if (!v.commit.equals(gv.commit)) {
-            if (v.qualifier.equals("SNAPSHOT")) {
+        } else if (!v.versionControl.commit.equals(gv.versionControl.commit)) {
+            if (v.version.qualifier.equals("SNAPSHOT")) {
                 LOG.warn("This graph was built with the same SNAPSHOT version of OTP, but a "
                         + "different commit. Please rebuild the graph if you experience incorrect "
                         + "behavior. ");

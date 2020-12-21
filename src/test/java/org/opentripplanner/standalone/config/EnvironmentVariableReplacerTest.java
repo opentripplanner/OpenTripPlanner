@@ -1,12 +1,16 @@
-package org.opentripplanner.util;
+package org.opentripplanner.standalone.config;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.model.projectinfo.MavenProjectVersion;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
+import org.opentripplanner.model.projectinfo.VersionControlInfo;
+import org.opentripplanner.util.OtpAppException;
 
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.standalone.config.EnvironmentVariableReplacer.insertEnvironmentVariables;
 
 public class EnvironmentVariableReplacerTest {
     private String envName = "<not set>";
@@ -47,13 +51,14 @@ public class EnvironmentVariableReplacerTest {
      * variable.
      */
     @Test
-    public void insertEnvironmentVariables() {
+    public void insertEnvironmentVariablesTest() {
         // Given: a text and a expected result
-        String text = "Env.var: ${" + envName + "}.";
-        String expectedResult = "Env.var: " + envValue + ".";
+        String text = "Env.var: ${" + envName + "}, project branch: ${git.branch}.";
+        String expectedResult = "Env.var: " + envValue + ", project branch: " +
+            OtpProjectInfo.projectInfo().versionControl.branch + ".";
 
         // When:
-        String result = EnvironmentVariableReplacer.insertEnvironmentVariables(text, "test");
+        String result = insertEnvironmentVariables(text, "test");
 
         // Then:
         assertEquals(expectedResult, result);
@@ -66,12 +71,30 @@ public class EnvironmentVariableReplacerTest {
         String expectedResult = "Env. var1: " + envValue + " and var2: " + envValue + ".";
 
         // When:
-        String result = EnvironmentVariableReplacer.insertEnvironmentVariables(text, "test");
+        String result = insertEnvironmentVariables(text, "test");
 
         // Then:
         assertEquals(expectedResult, result);
     }
 
+    @Test
+    public void verifyProjectInfo() {
+        // Given
+        OtpProjectInfo p = OtpProjectInfo.projectInfo();
+        MavenProjectVersion version = p.version;
+        VersionControlInfo verControl = p.versionControl;
+
+        // Expect
+        assertEquals(p.version.version, insertEnvironmentVariables("${maven.version}", "test"));
+        assertEquals(p.version.unqualifiedVersion(), insertEnvironmentVariables("${maven.version.short}", "test"));
+        assertEquals(Integer.toString(version.major), insertEnvironmentVariables("${maven.version.major}", "test"));
+        assertEquals(Integer.toString(version.minor), insertEnvironmentVariables("${maven.version.minor}", "test"));
+        assertEquals(Integer.toString(version.patch), insertEnvironmentVariables("${maven.version.patch}", "test"));
+        assertEquals(version.qualifier, insertEnvironmentVariables("${maven.version.qualifier}", "test"));
+        assertEquals(verControl.branch, insertEnvironmentVariables("${git.branch}", "test"));
+        assertEquals(verControl.commit, insertEnvironmentVariables("${git.commit}", "test"));
+        assertEquals(verControl.commitTime, insertEnvironmentVariables("${git.commit.timestamp}", "test"));
+    }
 
     /**
      * Test replacing environment variable fails for unknown environment variable.
