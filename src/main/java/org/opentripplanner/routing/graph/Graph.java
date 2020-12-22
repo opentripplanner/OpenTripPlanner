@@ -677,8 +677,9 @@ public class Graph implements Serializable {
      * @param serviceDate service date for the added service id
      */
     public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
-        // We make an explicit cast here, because we know the type, and we do not want
-        // to expose the "unsafe" method in the {@link CalendarService} interface.
+        // We make an explicit cast here to avoid adding the 'getOrCreateServiceIdForDate(..)'
+        // method to the {@link CalendarService} interface. We do not want to expose it because it
+        // is not thread-safe - and we want to limit the usage. See JavaDoc above as well.
         FeedScopedId serviceId = ((CalendarServiceImpl)getCalendarService()).getOrCreateServiceIdForDate(serviceDate);
 
         if (!serviceCodes.containsKey(serviceId)) {
