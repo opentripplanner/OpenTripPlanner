@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri;
 import com.google.common.base.Preconditions;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -448,12 +449,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             externalLineRef = lineRef;
         }
 
-        // TODO - SIRI: Where is the Operator?
-//        Operator operator = graphIndex.operatorForId.get(new FeedScopedId(feedId, operatorRef));
+        Operator operator = graph.index.getOperatorForId().get(new FeedScopedId(feedId, operatorRef));
 //        Preconditions.checkNotNull(operator, "Operator " + operatorRef + " is unknown");
 
         FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
-        FeedScopedId serviceId = new FeedScopedId(feedId, newServiceJourneyRef);
 
         Route replacedRoute = null;
         if (externalLineRef != null) {
@@ -466,14 +465,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         if (route == null) { // Route is unknown - create new
             route = new Route(routeId);
             route.setType(getRouteType(estimatedVehicleJourney.getVehicleModes()));
-//            route.setOperator(operator);
+            route.setOperator(operator);
 
             // TODO - SIRI: Is there a better way to find authority/Agency?
             // Finding first Route with same Operator, and using same Authority
             Agency agency = graph.index.getAllRoutes().stream()
-//                    .filter(route1 -> route1 != null &&
-//                            route1.getOperator() != null &&
-//                            route1.getOperator().equals(operator))
+                    .filter(route1 -> route1 != null &&
+                            route1.getOperator() != null &&
+                            route1.getOperator().equals(operator))
                     .findFirst().get().getAgency();
             route.setAgency(agency);
 
@@ -500,14 +499,22 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 //            }
 //        }
 
-        trip.setServiceId(serviceId);
+        ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
+        FeedScopedId calServiceId = graph.getOrCreateServiceIdForDate(serviceDate);
+
+        trip.setServiceId(calServiceId);
 
         // TODO - SIRI: PublishedLineName not defined in SIRI-profile
         if (estimatedVehicleJourney.getPublishedLineNames() != null && !estimatedVehicleJourney.getPublishedLineNames().isEmpty()) {
             trip.setRouteShortName("" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue());
         }
 
-//        trip.setTripOperator(operator);
+        // Use destinationName as default headsign - if provided
+        if (estimatedVehicleJourney.getDestinationNames() != null && !estimatedVehicleJourney.getDestinationNames().isEmpty()) {
+            trip.setTripHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
+        }
+
+        trip.setTripOperator(operator);
 
         // TODO - SIRI: Populate these?
         trip.setShapeId(null);          // Replacement-trip has different shape
@@ -515,11 +522,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 //        trip.setTripPublicCode(null);
         trip.setBlockId(null);
         trip.setTripShortName(null);
-        trip.setTripHeadsign(null);
 //        trip.setKeyValues(null);
 
         List<Stop> addedStops = new ArrayList<>();
         List<StopTime> aimedStopTimes = new ArrayList<>();
+
+        // TODO - SIRI: Handle RecordedCalls. Finding departureTime++ from first stop will fail when
+        //              trip passes midnight, and the first stops are RecordedCalls.
+
+        ZonedDateTime departureTime = null;
 
         List<EstimatedCall> estimatedCalls = estimatedVehicleJourney.getEstimatedCalls().getEstimatedCalls();
         for (int i = 0; i < estimatedCalls.size(); i++) {
@@ -535,11 +546,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             ZonedDateTime aimedArrivalTime = estimatedCall.getAimedArrivalTime();
             ZonedDateTime aimedDepartureTime = estimatedCall.getAimedDepartureTime();
 
+            if (departureTime == null) {
+                departureTime = aimedDepartureTime;
+            }
+
             if (aimedArrivalTime != null) {
-                stopTime.setArrivalTime(calculateSecondsSinceMidnight(aimedArrivalTime));
+                stopTime.setArrivalTime(calculateSecondsSinceMidnight(departureTime, aimedArrivalTime));
             }
             if (aimedDepartureTime != null) {
-                stopTime.setDepartureTime(calculateSecondsSinceMidnight(aimedDepartureTime));
+                stopTime.setDepartureTime(calculateSecondsSinceMidnight(departureTime, aimedDepartureTime));
             }
 
             if (estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.ALIGHTING) {
@@ -557,6 +572,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             if (estimatedCall.getDestinationDisplaies() != null && !estimatedCall.getDestinationDisplaies().isEmpty()) {
                 NaturalLanguageStringStructure destinationDisplay = estimatedCall.getDestinationDisplaies().get(0);
                 stopTime.setStopHeadsign(destinationDisplay.getValue());
+            } else if (trip.getTripHeadsign() == null) {
+                // Fallback to empty string
+                stopTime.setStopHeadsign("");
             }
 
             if (i == 0) {
@@ -591,11 +609,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             int aimedDepartureTime = aimedStopTimes.get(i).getDepartureTime();
 
             if (expectedArrival != null) {
-                int expectedArrivalTime = calculateSecondsSinceMidnight(expectedArrival);
+                int expectedArrivalTime = calculateSecondsSinceMidnight(departureTime, expectedArrival);
                 tripTimes.updateArrivalDelay(i, expectedArrivalTime - aimedArrivalTime);
             }
             if (expectedDeparture != null) {
-                int expectedDepartureTime = calculateSecondsSinceMidnight(expectedDeparture);
+                int expectedDepartureTime = calculateSecondsSinceMidnight(departureTime, expectedDeparture);
                 tripTimes.updateDepartureDelay(i, expectedDepartureTime - aimedDepartureTime);
             }
 
@@ -626,25 +644,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             tripTimes.setRealTimeState(RealTimeState.ADDED);
         }
 
-
-        if (!graph.getServiceCodes().containsKey(serviceId)) {
-            graph.getServiceCodes().put(serviceId, graph.getServiceCodes().size());
-        }
-        tripTimes.serviceCode = graph.getServiceCodes().get(serviceId);
+        tripTimes.serviceCode = graph.getServiceCodes().get(calServiceId);
 
         pattern.add(tripTimes);
 
         Preconditions.checkState(tripTimes.timesIncreasing(), "Non-increasing triptimes for added trip");
-
-        ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
-
-        if (graph.getCalendarService().getServiceDatesForServiceId(serviceId) == null ||
-                graph.getCalendarService().getServiceDatesForServiceId(serviceId).isEmpty()) {
-            LOG.info("Adding serviceId {} to CalendarService", serviceId);
-            // TODO - SIRI: Need to add the ExtraJourney as a Trip - alerts may be attached to it
-//           graph.getCalendarService().addServiceIdAndServiceDates(serviceId, Arrays.asList(serviceDate));
-        }
-
 
         return addTripToGraphAndBuffer(feedId, graph, trip, aimedStopTimes, addedStops, tripTimes, serviceDate);
     }
@@ -825,6 +829,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
         return DateMapper.secondsSinceStartOfService(dateTime, dateTime, routingService.getTimeZone().toZoneId());
+    }
+
+    private int calculateSecondsSinceMidnight(ZonedDateTime startOfService, ZonedDateTime dateTime) {
+        return DateMapper.secondsSinceStartOfService(startOfService, dateTime, routingService.getTimeZone().toZoneId());
     }
 
 
