@@ -1000,4 +1000,8 @@ public class Graph implements Serializable {
     public Collection<SimpleTransfer> getTransfersByStop(StopLocation stop) {
         return transfersByStop.get(stop);
     }
+
+    public FlexStopLocation getLocationById(FeedScopedId id) {
+        return locationsById.get(id);
+    }
 }

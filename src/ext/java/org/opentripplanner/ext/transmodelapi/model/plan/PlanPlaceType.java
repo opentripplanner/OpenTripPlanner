@@ -6,6 +6,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
+import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
@@ -56,10 +57,20 @@ public class PlanPlaceType {
             .name("quay")
             .description("The quay related to the place.")
             .type(quayType)
-            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(
-                VertexType.TRANSIT) ? GqlUtil
-                .getRoutingService(environment)
+            .dataFetcher(environment -> ((Place) environment.getSource()).stopId != null
+                ? GqlUtil.getRoutingService(environment)
                 .getStopForId(((Place) environment.getSource()).stopId) : null)
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("flexibleArea")
+            .description("The flexible area related to the place.")
+            .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
+            .dataFetcher(environment -> ((Place) environment.getSource()).stopId != null
+                ? GqlUtil.getRoutingService(environment)
+                .getLocationById(((Place) environment.getSource()).stopId)
+                .getGeometry().getCoordinates()
+                : null)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
