@@ -667,6 +667,27 @@ public class Graph implements Serializable {
         return this.calendarService;
     }
 
+    /**
+     * Get or create a serviceId for a given date. This method is used when a new trip is
+     * added from a realtime data update.
+     *
+     * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+     *           - this when doing the issue #3030.
+     *
+     * @param serviceDate service date for the added service id
+     */
+    public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+        // We make an explicit cast here to avoid adding the 'getOrCreateServiceIdForDate(..)'
+        // method to the {@link CalendarService} interface. We do not want to expose it because it
+        // is not thread-safe - and we want to limit the usage. See JavaDoc above as well.
+        FeedScopedId serviceId = ((CalendarServiceImpl)getCalendarService()).getOrCreateServiceIdForDate(serviceDate);
+
+        if (!serviceCodes.containsKey(serviceId)) {
+            serviceCodes.put(serviceId, serviceCodes.size());
+        }
+        return serviceId;
+    }
+
     public int removeEdgelessVertices() {
         int removed = 0;
         List<Vertex> toRemove = new LinkedList<>();
