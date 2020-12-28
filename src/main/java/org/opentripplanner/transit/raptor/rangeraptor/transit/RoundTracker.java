@@ -59,13 +59,14 @@ public class RoundTracker implements RoundProvider {
         }
     }
 
-    /**
-     * Is there more rounds to process (or is the upper limit reached).
-     */
+    /** Is there more rounds to process (or is the upper limit reached). */
     public boolean hasMoreRounds() {
-        // Round is incremented here; This grantee that the round is correct in
-        // the WorkerLifeCycle, 'prepareForNextRound' and 'roundComplete' phase.
-        return  ++round < roundMaxLimit;
+        return  round+1 < roundMaxLimit;
+    }
+
+    /** Increment round counter */
+    public int nextRound() {
+        return  ++round;
     }
 
     /**

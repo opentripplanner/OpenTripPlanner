@@ -70,7 +70,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     // This method is private, but is part of Worker life cycle
     private void setupIteration() {
         arrivalsCache.clear();
-        // clear all touched stops to avoid constant rexploration
+        // clear all touched stops to avoid constant re-exploration
         stops.clearTouchedStopsAndSetStopMarkers();
     }
 
