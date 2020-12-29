@@ -44,6 +44,21 @@ public class BuildConfig {
     private final JsonNode rawJson;
 
     /**
+     * The config-version is a parameter witch each OTP deployment may set to be able to
+     * query the OTP server and verify that it uses the correct version of the config. The
+     * version must be injected into the config in the operation deployment pipeline. How this
+     * is done is up to the deployment.
+     * <p>
+     * The config-version have no effect on OTP, and is provided as is on the API. There is
+     * no syntax or format check on the version and it can be any string.
+     * <p>
+     * Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+     * <p>
+     * This parameter is optional, and the default is {@code null}.
+     */
+    public final String configVersion;
+
+    /**
      * Generates nice HTML report of Graph errors/warnings. They are stored in the same location
      * as the graph.
      */
@@ -299,6 +314,7 @@ public class BuildConfig {
         areaVisibility = c.asBoolean("areaVisibility", false);
         banDiscouragedWalking = c.asBoolean("banDiscouragedWalking", false);
         banDiscouragedBiking = c.asBoolean("banDiscouragedBiking", false);
+        configVersion = c.asText("configVersion", null);
         dataImportReport = c.asBoolean("dataImportReport", false);
         distanceBetweenElevationSamples = c.asDouble("distanceBetweenElevationSamples",
             CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS

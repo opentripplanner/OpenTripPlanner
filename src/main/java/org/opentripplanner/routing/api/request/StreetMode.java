@@ -45,7 +45,12 @@ public enum StreetMode {
    * This can include car rental at fixed locations or free-floating services.
    */
   // TODO OTP2 Not implemented
-  CAR_RENTAL(true, true);
+  CAR_RENTAL(true, true),
+
+  /**
+   * Encompasses all types of on-demand and flexible transportation.
+   */
+  FLEXIBLE(true, true);
 
   boolean access;
 
