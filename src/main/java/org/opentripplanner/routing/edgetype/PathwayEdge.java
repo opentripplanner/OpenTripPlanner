@@ -36,13 +36,13 @@ public class PathwayEdge extends Edge {
     public PathwayEdge(
         Vertex fromv,
         Vertex tov,
+        FeedScopedId id,
         String name,
         int traversalTime,
         double distance,
         int steps,
         double angle,
-        boolean wheelchairAccessible,
-        FeedScopedId id
+        boolean wheelchairAccessible
     ) {
         super(fromv, tov);
         this.id = id;

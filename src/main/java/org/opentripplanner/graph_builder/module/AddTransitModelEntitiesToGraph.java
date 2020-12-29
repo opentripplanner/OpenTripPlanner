@@ -212,13 +212,13 @@ public class AddTransitModelEntitiesToGraph {
                         new PathwayEdge(
                             toVertex,
                             fromVertex,
+                            pathway.getId(),
                             pathway.getReversedName(),
                             pathway.getTraversalTime(),
                             pathway.getLength(),
                             -1 * pathway.getStairCount(),
                             -1 * pathway.getSlope(),
-                            pathway.isPathwayModeWheelchairAccessible(),
-                            pathway.getId()
+                            pathway.isPathwayModeWheelchairAccessible()
                         );
                     }
                 }
