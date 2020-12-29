@@ -1,6 +1,8 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.model.*;
+
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -25,7 +27,7 @@ public class Leg {
    */
   public final TraverseMode mode;
 
-    public FeedScopedId edgeIdentifier;
+  public FeedScopedId edgeIdentifier;
 
   private final Trip trip;
 

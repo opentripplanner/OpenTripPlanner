@@ -17,6 +17,8 @@ import java.util.Locale;
  */
 public class PathwayEdge extends Edge {
 
+    private static final long serialVersionUID = -3311099256178798982L;
+
     private int traversalTime;
     private double distance;
     private int steps;
@@ -43,6 +45,7 @@ public class PathwayEdge extends Edge {
         FeedScopedId id
     ) {
         super(fromv, tov);
+        this.id = id;
         this.traversalTime = traversalTime;
         this.distance = distance;
         this.steps = steps;
@@ -53,10 +56,7 @@ public class PathwayEdge extends Edge {
         } else if (tov.getName() != null) {
             this.name = tov.getName();
         }
-        this.id = id;
     }
-
-    private static final long serialVersionUID = -3311099256178798982L;
 
     public String getDirection() {
         return null;
