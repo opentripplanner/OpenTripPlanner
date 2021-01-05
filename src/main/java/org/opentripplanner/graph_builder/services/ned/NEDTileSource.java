@@ -12,15 +12,12 @@ import java.util.List;
  */
 public interface NEDTileSource {
 
-    public abstract void setGraph(Graph graph);
-
     /**
-     * The cache directory stores NED tiles.  It is crucial that this be somewhere permanent
-     * with plenty of disk space.  Don't use /tmp -- the downloading process takes a long time
+     * Fetches all of the required data and stores it in the specified cache directory. It is crucial that this be
+     * somewhere permanent with plenty of disk space.  Don't use /tmp -- the downloading process takes a long time
      * and you don't want to repeat it if at all possible.
-     * @param cacheDirectory
      */
-    public abstract void setCacheDirectory(File cacheDirectory);
+    public abstract void fetchData(Graph graph, File cacheDirectory);
 
     /**
      * Download all the NED tiles into the cache.

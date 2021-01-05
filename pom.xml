@@ -8,7 +8,7 @@
 
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -420,7 +420,7 @@
         <repository>
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
-            <url>https://download.osgeo.org/webdav/geotools/</url>
+            <url>https://repo.osgeo.org/repository/release/</url>
         </repository>
         <repository>
             <id>axis</id>
@@ -440,7 +440,7 @@
         <repository>
             <id>onebusaway-releases</id>
             <name>Onebusaway Releases Repo</name>
-            <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
+            <url>https://repo.camsys-apps.com/releases/</url>
         </repository>
     </repositories>
 
