@@ -71,7 +71,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
            runHeuristics();
 
             RaptorRequest<T> mcRequest = originalRequest;
-            mcRequest = mcRequestWithDynamicSearchParams(mcRequest);
+            mcRequest = requestWithDynamicSearchParams(mcRequest);
 
             return createAndRunWorker(mcRequest);
         }
@@ -79,7 +79,10 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
             return new RaptorResponse<>(
                     Collections.emptyList(),
                     originalRequest,
-                    originalRequest
+                    // If a trip exist(forward heuristics succeed), but is outside the calculated
+                    // search-window, then set the search-window params as if the request was
+                    // performed. This enable the client to page to the next window
+                    requestWithDynamicSearchParams(originalRequest)
             );
         }
     }
@@ -182,7 +185,9 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
         task.withRequest(originalRequest).run();
         calculateDynamicSearchParametersFromHeuristics(task.result());
 
-        if(tasks.size() == 1) { return; }
+        if(tasks.size() == 1) {
+            return;
+        }
 
         // Run the second heuristic search
         task = tasks.get(1);
@@ -230,7 +235,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
                 .build();
     }
 
-    private RaptorRequest<T> mcRequestWithDynamicSearchParams(RaptorRequest<T> request) {
+    private RaptorRequest<T> requestWithDynamicSearchParams(RaptorRequest<T> request) {
 
         SearchParamsBuilder<T> builder = request.mutate().searchParams();
 

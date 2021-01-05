@@ -84,7 +84,10 @@
     </distributionManagement>
 
     <build>
-        <!-- Filtering will perform substitution on maven-version.properties, see git commit id plugin below. -->
+        <!--
+        Filtering will perform substitution on otp-project-info.properties,
+        see git commit id plugin below.
+        -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -579,7 +582,7 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>siri-protobuf-mapper</artifactId>
-            <version>0.5</version>
+            <version>0.6</version>
         </dependency>
 
         <!--

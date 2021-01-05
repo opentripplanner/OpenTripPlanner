@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
@@ -60,6 +61,7 @@ class TripPatternMapper {
 
     TripPatternMapper(
             FeedScopedIdFactory idFactory,
+            EntityById<Operator> operatorById,
             EntityById<Stop> stopsById,
             EntityById<FlexStopLocation> flexStopLocationsById,
             EntityById<org.opentripplanner.model.Route> otpRouteById,
@@ -78,6 +80,7 @@ class TripPatternMapper {
         this.otpRouteById = otpRouteById;
         this.tripMapper = new TripMapper(
             idFactory,
+            operatorById,
             otpRouteById,
             routeById,
             journeyPatternById,

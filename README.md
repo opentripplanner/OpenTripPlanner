@@ -6,7 +6,7 @@ Note that this branch contains **OpenTripPlanner 2**, the second major version o
 
 If you do not want to test or explore this cutting edge version, please switch to the `master` or `dev-1.x` branches for the latest stable 1.x release and upcoming final 1.x release respectively.
 
-## Respository layout
+## Repository layout
 
 The main Java server code is in `src/main/`. OTP also includes a Javascript client based on the Leaflet mapping library in `src/client/`. This client is now primarily used for testing, with most major deployments building custom clients from reusable components. The Maven build produces a unified ("shaded") JAR file at `target/otp-VERSION.jar` containing all necessary code and dependencies to run OpenTripPlanner.
 

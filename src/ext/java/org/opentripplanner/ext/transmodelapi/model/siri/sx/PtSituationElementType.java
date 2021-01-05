@@ -175,7 +175,7 @@ public class PtSituationElementType {
                     .description("Period this situation is in effect")
                     .dataFetcher(environment -> {
                       TransitAlert alert = environment.getSource();
-                        Long startTime = alert.getEffectiveStartDate() != null ? alert.getEffectiveEndDate().getTime() : null;
+                        Long startTime = alert.getEffectiveStartDate() != null ? alert.getEffectiveStartDate().getTime() : null;
                         Long endTime = alert.getEffectiveEndDate() != null ? alert.getEffectiveEndDate().getTime() : null;
                         return Pair.of(startTime, endTime);
                     })

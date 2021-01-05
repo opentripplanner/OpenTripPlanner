@@ -29,6 +29,7 @@ public class RouterConfig implements Serializable {
      * The raw JsonNode three kept for reference and (de)serialization.
      */
     private final JsonNode rawJson;
+    private final String configVersion;
     private final String requestLogFile;
     private final boolean transmodelApiHideFeedId;
     private final double streetRoutingTimeoutSeconds;
@@ -40,6 +41,7 @@ public class RouterConfig implements Serializable {
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
         this.rawJson = node;
+        this.configVersion = adapter.asText("configVersion", null);
         this.requestLogFile = adapter.asText("requestLogFile", null);
         this.transmodelApiHideFeedId = adapter.path("transmodelApi").asBoolean("hideFeedId", false);
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
@@ -53,6 +55,23 @@ public class RouterConfig implements Serializable {
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
         }
+    }
+
+    /**
+     * The config-version is a parameter witch each OTP deployment may set to be able to
+     * query the OTP server and verify that it uses the correct version of the config. The
+     * version must be injected into the config in the operation deployment pipeline. How this
+     * is done is up to the deployment.
+     * <p>
+     * The config-version have no effect on OTP, and is provided as is on the API. There is
+     * not syntax or format check on the version and it can be any string.
+     * <p>
+     * Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+     * <p>
+     * This parameter is optional, and the default is {@code null}.
+     */
+    public String getConfigVersion() {
+        return configVersion;
     }
 
     public String requestLogFile() {

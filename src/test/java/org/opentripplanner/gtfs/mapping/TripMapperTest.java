@@ -22,7 +22,7 @@ public class TripMapperTest {
 
     private static final String BLOCK_ID = "Block Id";
 
-    private static final String DIRECTION_ID = "Direction Id";
+    private static final Integer DIRECTION_ID = 1;
 
     private static final String FARE_ID = "Fare Id";
 
@@ -46,7 +46,7 @@ public class TripMapperTest {
         TRIP.setId(AGENCY_AND_ID);
         TRIP.setBikesAllowed(BIKES_ALLOWED);
         TRIP.setBlockId(BLOCK_ID);
-        TRIP.setDirectionId(DIRECTION_ID);
+        TRIP.setDirectionId(Integer.toString(DIRECTION_ID));
         TRIP.setFareId(FARE_ID);
         TRIP.setRoute(ROUTE);
         TRIP.setRouteShortName(ROUTE_SHORT_NAME);

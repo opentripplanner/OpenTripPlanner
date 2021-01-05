@@ -1,11 +1,12 @@
 package org.opentripplanner.standalone;
 
-import org.opentripplanner.common.ProjectInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 public class OtpStartupInfo {
     private static final Logger LOG = LoggerFactory.getLogger(OtpStartupInfo.class);
@@ -24,20 +25,26 @@ public class OtpStartupInfo {
     static {
         INFO = ""
                 + HEADER.stream().map(OtpStartupInfo::line).collect(Collectors.joining())
-                + line("Version:  " + ProjectInfo.INSTANCE.version)
-                + line("Commit:   " + ProjectInfo.INSTANCE.commit)
-                + line("Branch:   " + ProjectInfo.INSTANCE.branch)
-                + line("Build:    " + ProjectInfo.INSTANCE.buildTime)
+                + line("Version:  " + projectInfo().version.version)
+                + line("Commit:   " + projectInfo().versionControl.commit)
+                + line("Branch:   " + projectInfo().versionControl.branch)
+                + line("Build:    " + projectInfo().versionControl.buildTime)
                 + dirtyLineIfDirty();
     }
 
     private static String dirtyLineIfDirty() {
-        return ProjectInfo.INSTANCE.dirty
+        return projectInfo().versionControl.dirty
         ? line("Dirty:    Local modification exist!")
         : "";
     }
 
     public static void logInfo() {
+        // This is good when aggregating logs across multiple load balanced instances of OTP
+        // Hint: a reg-exp filter like "^OTP (START|SHUTTING)" will list nodes going up/down
+        LOG.info("OTP STARTING UP (" + projectInfo().getVersionString() + ")");
+        Runtime.getRuntime().addShutdownHook(new Thread(() ->
+            LOG.info("OTP SHUTTING DOWN (" + projectInfo().getVersionString() + ")"))
+        );
         LOG.info(NEW_LINE + INFO);
     }
 

@@ -1,30 +1,32 @@
 # How to migrate from OTP1 to OTP2
 
-## Command line
-The command line parameters are changed. Use the `--help` option to get the current documentation,
-and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#starting-otp) for examples. The 
-possibility to build the graph in 2 steps (streets then transit) is new in OTP2. OTP2 does not support
-multiple routers.
+## Command Line
+
+The OTP2 command line parameters are different than in OTP1. Use the `--help` option to get the 
+current documentation, and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#starting-otp) 
+for examples. The possibility to build the graph in 2 steps (streets then transit) is new in OTP2. 
+OTP2 does not support multiple routers.
 
 
-## File loading
-OTP1 access all files using the local file system, no other _data-source_ is supported. In OTP2 we 
+## File Loading
+
+OTP1 accesses all files using the local file system, no other _data-source_ is supported. In OTP2 we 
 support accessing cloud storage. So far Google Cloud Storage is added and we plan to add support 
-for AWS S3 as well. Config files(_otp-config.json, build-config.json, router-config.json_) are read 
+for AWS S3 as well. Config files (_otp-config.json, build-config.json, router-config.json_) are read 
 from the local file system, while other files can be read/written from the local file-system or the
-cloud. OTP2 support mixing any data sources that is supported. 
+cloud. OTP2 supports mixing any data sources that are supported. 
 
-OTP1 loads input data files(_DEM, OSM, GTFS, NeTEx_) based on the suffix(file extension). But for 
-GTFS files OTP1 also open the zip-file and look for _stops.txt_. OTP2 identify GTFS files by the 
-name only. OTP2 will read any zip-file or directory that contains "gtfs" as part of the name. All 
-files-types in OTP2 is resolved by matching the name with a regexp pattern. You can configure the 
-patterns in the _build-config.json_ if the defaults does not suites you. 
+OTP1 loads input data files (_DEM, OSM, GTFS, NeTEx_) based on the suffix (file extension). But for 
+GTFS files OTP1 also opens the zip-file and looks for _stops.txt_. OTP2 identifies GTFS files by the 
+name only: it will detect any zip-file or directory that contains "gtfs" as part of the name. All 
+file types in OTP2 are resolved by matching the name with a regexp pattern. You can configure the 
+patterns in the _build-config.json_ if the defaults do not suit you. 
 
-OTP2 do not support for multiple routers, but you can load as many GTFS and/or NeTEx feeds as 
+OTP2 does not support multiple routers, but you can load as many GTFS and/or NeTEx feeds as 
 you want into a single instance of OTP2.
 
 
-## Build config
+## Build Config
 
 New parameters:
 
@@ -45,24 +47,25 @@ These parameters are no longer supported:
  - `parentStopLinking`
  - `stationTransfers`
  
- OTP2 keeps the stops and stations relationship(called "parentStation") in the transit model. OTP 
- imports the relation from the GTFS and/or NeTEx input. There is no way to automatically generate
- this relation based on geographic proximity in OTP2. This enables OTP to search from any stop 
- part of a station _without_ walking/waiting when the request from/to input field is a station id.
+ OTP2 records the "parentStation" relationship between stops and stations in its internal transit 
+ model, based on the GTFS and/or NeTEx input. This enables OTP to search from all stop in a station 
+ _without_ walking/waiting when the request from/to input field is a station id. There is no way to 
+ automatically infer this parent station relationship based on geographic proximity in OTP2. 
  
  Transfers in OTP2 are generated based on the stop location and the OSM data or GTFS Pathways. In 
  future versions of OTP2 we also want to support generating simple transfers based on 
  "line-of-sight" if no pathways or OSM data exist. See issue
  [#3204](https://github.com/opentripplanner/OpenTripPlanner/issues/3204).
  
- Improving/patching input data is NOT a core feature of OTP, but anyone is welcome to implement 
+ Cleaning and patching input data is NOT a core feature of OTP, but anyone is welcome to implement 
  a sandbox plugin to patch data. So, if any of the features above are needed they can be ported
- from OTP1 into a OTP2 sandbox feature.
+ from OTP1 into an OTP2 sandbox feature.
  
  
-## Router config
-Se the [Router Configuration](Configuration.md#router-configuration) for a description of the 
-new and continued routing parameters.
+## Router Config
+
+See the [Router Configuration](Configuration.md#router-configuration) for a description of the 
+new and existing routing parameters.
 
 New parameters:
 
@@ -87,8 +90,8 @@ Support for XML as a request/response format is removed. The only supported form
 
 #### Query parameter changes
 
-A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java) 
- and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java) 
+ and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
  class for the documentation on what is now supported in 2.0. A few features did not make it into 
  the 2.0, but is sheduled for the 2.1 release.
  See [GitHub issues 2.1](https://github.com/opentripplanner/OpenTripPlanner/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.1).  
@@ -208,6 +211,11 @@ Parameters that have changed:
     - The `id` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
   - `Alert`
     - `effectiveEndDate` is added to show the end time of the alert validity. 
+
+
+### ServerInfo
+
+The returned data structure is changed and more info is available.
 
 
 ### AlertPatcher 

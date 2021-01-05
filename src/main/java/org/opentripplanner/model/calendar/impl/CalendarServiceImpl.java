@@ -1,8 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.calendar.impl;
 
-import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 
@@ -49,5 +49,18 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public TimeZone getTimeZoneForAgencyId(FeedScopedId agencyId) {
         return data.getTimeZoneForAgencyId(agencyId);
+    }
+
+    /**
+     * Get or create a serviceId for a given date. This method is used when a new trip is
+     * added from during realtime data updates.
+     *
+     * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+     *           - this when doing the issue #3030.
+     *
+     * @param serviceDate service date for the added service id
+     */
+    public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+        return data.getOrCreateServiceIdForDate(serviceDate);
     }
 }

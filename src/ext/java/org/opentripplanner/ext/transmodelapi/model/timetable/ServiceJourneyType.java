@@ -89,13 +89,12 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("operator")
                     .type(operatorType)
-                    .dataFetcher(
-                            environment -> ((trip(environment)).getOperator()))
+                    .dataFetcher(environment -> ((trip(environment)).getOperator()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("directionType")
                     .type(EnumTypes.DIRECTION_TYPE)
-                    .dataFetcher(environment -> directIdStringToInt(((Trip) trip(environment)).getDirectionId()))
+                    .dataFetcher(environment -> directionIdToInt(trip(environment).getDirectionId()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("wheelchairAccessible")
@@ -210,11 +209,7 @@ public class ServiceJourneyType {
     return environment.getSource();
   }
 
-  private static int directIdStringToInt(String directionId) {
-    try {
-      return Integer.parseInt(directionId);
-    } catch (NumberFormatException nfe) {
-      return -1;
-    }
+  private static int directionIdToInt(Integer directionId) {
+    return directionId == null ? -1 : directionId;
   }
 }
