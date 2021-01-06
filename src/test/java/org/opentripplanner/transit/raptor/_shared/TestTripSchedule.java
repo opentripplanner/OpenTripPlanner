@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * <p>
  * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }.
  */
-public class TestRaptorTripSchedule implements RaptorTripSchedule {
+public class TestTripSchedule implements RaptorTripSchedule {
     private static final int DELAY_BETWEEN_ALIGHT_AND_BOARD = 10;
     private final String name;
     private final int[] arrivalTimes;
@@ -39,7 +39,7 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
         }
     };
 
-    private TestRaptorTripSchedule(String name, int[] arrivalTimes, int[] departureTimes, int[] stopIndexes, int[] restrictions) {
+    private TestTripSchedule(String name, int[] arrivalTimes, int[] departureTimes, int[] stopIndexes, int[] restrictions) {
         this.name = name;
         this.arrivalTimes = arrivalTimes;
         this.departureTimes = departureTimes;
@@ -71,7 +71,7 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
     @Override
     public String toString() {
         return ToStringBuilder
-                .of(TestRaptorTripSchedule.class)
+                .of(TestTripSchedule.class)
                 .addServiceTimeSchedule("arrivals", arrivalTimes)
                 .addServiceTimeSchedule("departures", departureTimes)
                 .addInts("stops", stopIndexes)
@@ -124,7 +124,7 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
             this.boardAlightRestrictions = boardAlightRestrictions;
         }
 
-        public TestRaptorTripSchedule build() {
+        public TestTripSchedule build() {
             if(arrivalTimes == null && departureTimes == null) {
                 throw new IllegalArgumentException("Either arrival or departure time must be set.");
             }
@@ -146,7 +146,7 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
                     stopIndexes[i] = i + 1;
                 }
             }
-            return new TestRaptorTripSchedule(
+            return new TestTripSchedule(
                     name,
                     arrivalTimes,
                     departureTimes,

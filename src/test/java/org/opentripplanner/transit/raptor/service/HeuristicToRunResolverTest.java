@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.service;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -26,7 +26,7 @@ public class HeuristicToRunResolverTest {
     private boolean reverse = false;
 
     // Request to test
-    private RaptorRequest<TestRaptorTripSchedule> request;
+    private RaptorRequest<TestTripSchedule> request;
     private String msg;
 
 
@@ -53,7 +53,7 @@ public class HeuristicToRunResolverTest {
 
     @Test
     public void resolveHeuristicOffForNoneRangeRaptorProfile() {
-        RaptorRequestBuilder<TestRaptorTripSchedule> b = new RaptorRequestBuilder<>();
+        RaptorRequestBuilder<TestTripSchedule> b = new RaptorRequestBuilder<>();
         b.profile(RaptorProfile.NO_WAIT_BEST_TIME);
         // Add some dummy legs
         b.searchParams().accessPaths().add(dummyPath());
@@ -70,7 +70,7 @@ public class HeuristicToRunResolverTest {
     }
 
     private HeuristicToRunResolverTest given(boolean dest, boolean edt, boolean lat, boolean win) {
-        RaptorRequestBuilder<TestRaptorTripSchedule> b = new RaptorRequestBuilder<>();
+        RaptorRequestBuilder<TestTripSchedule> b = new RaptorRequestBuilder<>();
         b.profile(RaptorProfile.MULTI_CRITERIA);
         // Add some dummy legs
         b.searchParams().accessPaths().add(dummyPath());

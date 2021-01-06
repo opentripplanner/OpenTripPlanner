@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.api.path;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.A_START;
@@ -11,7 +11,7 @@ import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.E_
 
 public class PathTest {
 
-    private final Path<TestRaptorTripSchedule> subject = StopArrivalsTestData.basicTripAsPath();
+    private final Path<TestTripSchedule> subject = StopArrivalsTestData.basicTripAsPath();
 
     @Test
     public void startTime() {

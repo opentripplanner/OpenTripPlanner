@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.Egress;
 import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
@@ -17,18 +17,18 @@ public class ReversePathMapperTest {
     public void mapToPathReverseSearch() {
         // Given:
         Egress egress = basicTripByReverseSearch();
-        DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
+        DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(
                 new TestRaptorTransfer(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );
-        PathMapper<TestRaptorTripSchedule> mapper = new ReversePathMapper<>(
+        PathMapper<TestTripSchedule> mapper = new ReversePathMapper<>(
                 StopArrivalsTestData.WORKER_LIFE_CYCLE
         );
 
         //When:
-        Path<TestRaptorTripSchedule> path = mapper.mapToPath(destArrival);
+        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
 
         // Then:
         PathLeg<?> leg = path.accessLeg();

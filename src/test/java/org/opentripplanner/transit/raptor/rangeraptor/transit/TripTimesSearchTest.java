@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.Access;
 import org.opentripplanner.transit.raptor._shared.Bus;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -24,7 +24,7 @@ public class TripTimesSearchTest {
 
 
     // Given a trip-schedule with board-times [110, 210, -] and alight-times [-, 200, 300].
-    private TestRaptorTripSchedule schedule = TestRaptorTripSchedule
+    private TestTripSchedule schedule = TestTripSchedule
             .create("T1")
             .withBoardTimes(A_BOARD_TIME, 210, 310)
             .withAlightTimes(100, 200, C_ALIGHT_TIME)
@@ -160,7 +160,7 @@ public class TripTimesSearchTest {
         // stops: Start at 1, loop twice: 111, 122, 133, 144, 155, and end at 1155
         // alight times:    [  -, 100, 200, 300, 400, .., 1100] and
         // departure times: [ 10, 110, 210, 310, 410, .., 1110].
-        schedule = TestRaptorTripSchedule
+        schedule = TestTripSchedule
                 .create("T2")
                 .withBoardTimes( 10, 110, 210, 310, 410, 510, 610, 710, 810, 910, 1010, 1110)
                 .withAlightTimes( 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)

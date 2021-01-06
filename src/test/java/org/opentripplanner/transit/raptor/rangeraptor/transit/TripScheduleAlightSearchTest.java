@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.TestRoute;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 
 import java.util.ArrayList;
@@ -52,24 +52,24 @@ public class TripScheduleAlightSearchTest {
     private static final int TRIP_C_INDEX = 2;
 
     // Trips in service
-    private TestRaptorTripSchedule tripA = TestRaptorTripSchedule
+    private TestTripSchedule tripA = TestTripSchedule
             .create("T-A")
             .withAlightTimes(TIME_A1, TIME_A2)
             .build();
-    private TestRaptorTripSchedule tripB = TestRaptorTripSchedule
+    private TestTripSchedule tripB = TestTripSchedule
             .create("T-B")
             .withAlightTimes(TIME_B1, TIME_B2)
             .build();
-    private TestRaptorTripSchedule tripC = TestRaptorTripSchedule
+    private TestTripSchedule tripC = TestTripSchedule
             .create("T-C")
             .withAlightTimes(TIME_C1, TIME_C2)
             .build();
 
     // Trip pattern with trip A and B.
-    private RaptorRoute<TestRaptorTripSchedule> route = new TestRoute(tripA, tripB, tripC);
+    private RaptorRoute<TestTripSchedule> route = new TestRoute(tripA, tripB, tripC);
 
     // The service under test - the subject
-    private TripScheduleAlightSearch<TestRaptorTripSchedule> subject = new TripScheduleAlightSearch<>(
+    private TripScheduleAlightSearch<TestTripSchedule> subject = new TripScheduleAlightSearch<>(
             TRIPS_BINARY_SEARCH_THRESHOLD, route.timetable()
     );
 
@@ -149,12 +149,12 @@ public class TripScheduleAlightSearchTest {
         final int N = 7 * n + 3;
         final int dT = 1000;
 
-        List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
+        List<TestTripSchedule> tripSchedules = new ArrayList<>();
         int arrivalTime = firstArrivalTime;
 
         for (int i = 0; i < N; ++i, arrivalTime += dT) {
             tripSchedules.add(
-                    TestRaptorTripSchedule.create("T-" + i+1).withAlightTimes(arrivalTime).build()
+                    TestTripSchedule.create("T-" + i+1).withAlightTimes(arrivalTime).build()
             );
         }
         useTripPattern(new TestRoute(tripSchedules));
@@ -193,7 +193,7 @@ public class TripScheduleAlightSearchTest {
     @Test
     public void assertTripIsFoundEvenIfItIsBeforeTheBinarySearchUpperAndLowerBound() {
         // Given a pattern with N + 1 trip schedules
-        List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
+        List<TestTripSchedule> tripSchedules = new ArrayList<>();
 
         // Where the first trip is in service
         tripSchedules.add(tripA);
@@ -218,11 +218,11 @@ public class TripScheduleAlightSearchTest {
                 .withAlightTime(TIME_A2);
     }
 
-    private void withTrips(TestRaptorTripSchedule... schedules) {
+    private void withTrips(TestTripSchedule... schedules) {
         useTripPattern(new TestRoute(schedules));
     }
 
-    private void withTrips(List<TestRaptorTripSchedule> schedules) {
+    private void withTrips(List<TestTripSchedule> schedules) {
         useTripPattern(new TestRoute(schedules));
     }
 
@@ -234,7 +234,7 @@ public class TripScheduleAlightSearchTest {
         );
     }
 
-    private static void addNTimes(List<TestRaptorTripSchedule> trips, TestRaptorTripSchedule tripS, int n) {
+    private static void addNTimes(List<TestTripSchedule> trips, TestTripSchedule tripS, int n) {
         for (int i = 0; i < n; i++) {
             trips.add(tripS);
         }

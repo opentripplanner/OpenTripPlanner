@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.Egress;
 import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
@@ -16,18 +16,18 @@ public class ForwardPathMapperTest {
     @Test
     public void mapToPathForwardSearch() {
         Egress egress = StopArrivalsTestData.basicTripByForwardSearch();
-        DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
+        DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(
                 new TestRaptorTransfer(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );
 
-        PathMapper<TestRaptorTripSchedule> mapper = new ForwardPathMapper<>(
+        PathMapper<TestTripSchedule> mapper = new ForwardPathMapper<>(
             StopArrivalsTestData.WORKER_LIFE_CYCLE
         );
 
-        Path<TestRaptorTripSchedule> path = mapper.mapToPath(destArrival);
+        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
 
         PathLeg<?> leg = path.accessLeg();
         assertEquals("Access 10:00-10:03(3m) -> Stop 1", leg.toString());

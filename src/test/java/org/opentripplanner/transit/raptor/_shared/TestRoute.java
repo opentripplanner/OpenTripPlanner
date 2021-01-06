@@ -8,22 +8,22 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import java.util.Collection;
 
 public class TestRoute
-        implements RaptorRoute<TestRaptorTripSchedule>,
-        RaptorTimeTable<TestRaptorTripSchedule>
+        implements RaptorRoute<TestTripSchedule>,
+        RaptorTimeTable<TestTripSchedule>
 {
 
-    private final TestRaptorTripSchedule[] schedules;
+    private final TestTripSchedule[] schedules;
 
-    public TestRoute(TestRaptorTripSchedule... schedules) {
+    public TestRoute(TestTripSchedule... schedules) {
         this.schedules = schedules;
     }
 
-    public TestRoute(Collection<TestRaptorTripSchedule> schedules) {
-        this.schedules = schedules.toArray(new TestRaptorTripSchedule[0]);
+    public TestRoute(Collection<TestTripSchedule> schedules) {
+        this.schedules = schedules.toArray(new TestTripSchedule[0]);
     }
 
     @Override
-    public TestRaptorTripSchedule getTripSchedule(int index) {
+    public TestTripSchedule getTripSchedule(int index) {
         return schedules[index];
     }
 
@@ -33,7 +33,7 @@ public class TestRoute
     }
 
     @Override
-    public RaptorTimeTable<TestRaptorTripSchedule> timetable() {
+    public RaptorTimeTable<TestTripSchedule> timetable() {
         return this;
     }
 

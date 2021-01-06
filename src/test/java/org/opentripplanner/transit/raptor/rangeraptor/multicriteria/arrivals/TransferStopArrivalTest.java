@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestLeg;
+import org.opentripplanner.transit.raptor._shared.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -53,7 +53,7 @@ public class TransferStopArrivalTest {
 
     private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
             TRANSIT_ARRIVAL,
-            new TestLeg(TRANSFER_TO_STOP,TRANSFER_LEG_DURATION),
+            new TestTransfer(TRANSFER_TO_STOP,TRANSFER_LEG_DURATION),
             TRANSFER_ALIGHT_TIME,
             TRANSFER_COST
     );

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 import org.opentripplanner.transit.raptor._shared.TestRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 
@@ -52,24 +52,24 @@ public class TripScheduleBoardSearchTest {
     private static final int TRIP_C_INDEX = 2;
 
     // Trips in service
-    private TestRaptorTripSchedule tripA = TestRaptorTripSchedule
+    private TestTripSchedule tripA = TestTripSchedule
             .create("T-A")
             .withBoardTimes(TIME_A1, TIME_A2)
             .build();
-    private TestRaptorTripSchedule tripB = TestRaptorTripSchedule
+    private TestTripSchedule tripB = TestTripSchedule
             .create("T-B")
             .withBoardTimes(TIME_B1, TIME_B2)
             .build();
-    private TestRaptorTripSchedule tripC = TestRaptorTripSchedule
+    private TestTripSchedule tripC = TestTripSchedule
             .create("T-C")
             .withBoardTimes(TIME_C1, TIME_C2)
             .build();
 
     // Trip pattern with trip A, B, C.
-    private RaptorRoute<TestRaptorTripSchedule> route = new TestRoute(tripA, tripB, tripC);
+    private RaptorRoute<TestTripSchedule> route = new TestRoute(tripA, tripB, tripC);
 
     // The service under test - the subject
-    private TripScheduleBoardSearch<TestRaptorTripSchedule> subject = new TripScheduleBoardSearch<>(
+    private TripScheduleBoardSearch<TestTripSchedule> subject = new TripScheduleBoardSearch<>(
             TRIPS_BINARY_SEARCH_THRESHOLD, route.timetable()
     );
 
@@ -154,12 +154,12 @@ public class TripScheduleBoardSearchTest {
         final int N = 7 * TRIPS_BINARY_SEARCH_THRESHOLD + 3;
         final int dT = 1000;
 
-        List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
+        List<TestTripSchedule> tripSchedules = new ArrayList<>();
         int departureTime = 1000;
         int latestDepartureTime = -1;
 
         for (int i = 0; i < N; ++i, departureTime += dT) {
-            tripSchedules.add(TestRaptorTripSchedule
+            tripSchedules.add(TestTripSchedule
                     .create("T-N")
                     .withBoardTimes(departureTime)
                     .build());
@@ -193,11 +193,11 @@ public class TripScheduleBoardSearchTest {
         }
     }
 
-    private void withTrips(TestRaptorTripSchedule... schedules) {
+    private void withTrips(TestTripSchedule... schedules) {
         useTripPattern(new TestRoute(schedules));
     }
 
-    private void withTrips(List<TestRaptorTripSchedule> schedules) {
+    private void withTrips(List<TestTripSchedule> schedules) {
         useTripPattern(new TestRoute(schedules));
     }
 

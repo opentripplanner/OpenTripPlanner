@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 import static org.junit.Assert.assertEquals;
@@ -88,7 +88,7 @@ public class ReverseTransitCalculatorTest {
     public void latestArrivalTime() {
         // Ignore board slack for reverse search, boardSlack is added to alight times.
         slackInSeconds = 75;
-        TestRaptorTripSchedule s = TestRaptorTripSchedule.create("T1").withBoardTimes(500).build();
+        TestTripSchedule s = TestTripSchedule.create("T1").withBoardTimes(500).build();
         assertEquals(425, create().stopArrivalTime(s, 0, slackInSeconds));
     }
 
