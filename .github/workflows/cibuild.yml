@@ -1,16 +1,19 @@
 name: OTP CI Build
 # On [push, pull_request] causes double-builds when creating PRs.
 # But triggering on push only will miss pull requests from outside authors.
+# The push event's ref is the name of the pushed branch;
+# The pull_request event's branch name is the merge target branch.
 on:
-  # Should catch merged pull requests, pushes to Conveyal PR branches, and tags.
-  # The push event's ref is the name of the pushed branch;
-  # The pull_request event's branch name is the merge target branch.
-  push
-  # Try to catch PRs from outside authors, which don't need to be uploaded to S3.
-  # pull_request:
-  #   branches:
-  #     - dev
-#     - master
+  push:
+    branches:
+      - master
+      - dev-1.x
+      - dev-2.x
+  pull_request:
+    branches:
+      - master
+      - dev-1.x
+      - dev-2.x
 jobs:
   build:
     runs-on: ubuntu-latest
