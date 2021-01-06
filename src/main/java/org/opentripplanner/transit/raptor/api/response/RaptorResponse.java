@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.api.response;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -53,5 +54,14 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
      */
     public RaptorRequest<T> requestUsed() {
         return requestUsed;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(RaptorResponse.class)
+            .addObj("paths", paths)
+            .addObj("requestOriginal", requestOriginal)
+            .addObj("requestUsed", requestUsed)
+            .toString();
     }
 }
