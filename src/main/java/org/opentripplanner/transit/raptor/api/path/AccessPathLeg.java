@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.api.path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
+import javax.annotation.Nonnull;
 import java.util.Objects;
 
 /**
@@ -20,7 +21,14 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     private final PathLeg<T> next;
 
 
-    public AccessPathLeg(RaptorTransfer access, int toStop, int fromTime, int toTime, int cost, PathLeg<T> next) {
+    public AccessPathLeg(
+        @Nonnull RaptorTransfer access,
+        int toStop,
+        int fromTime,
+        int toTime,
+        int cost,
+        @Nonnull PathLeg<T> next
+    ) {
         this.access = access;
         this.fromTime = fromTime;
         this.toStop = toStop;

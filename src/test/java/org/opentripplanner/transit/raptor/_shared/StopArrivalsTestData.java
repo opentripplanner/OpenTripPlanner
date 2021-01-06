@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
@@ -77,6 +78,9 @@ public class StopArrivalsTestData {
     private static final int STOP_4 = 4;
     private static final int STOP_5 = 5;
 
+    private static final RaptorTransfer ACCESS = new TestRaptorTransfer(STOP_1, A_END - A_START);
+    private static final RaptorTransfer EGRESS = new TestRaptorTransfer(STOP_5, E_END - E_START);
+
     private static final TestRaptorTripSchedule TRIP_1 = TestRaptorTripSchedule
             .create("T1")
             .withBoardAndAlightTimes(T1_START, T1_END)
@@ -132,7 +136,7 @@ public class StopArrivalsTestData {
      */
     public static Path<TestRaptorTripSchedule> basicTripAsPath() {
         PathLeg<TestRaptorTripSchedule> leg6 = new EgressPathLeg<>(
-            null, STOP_5, E_START, E_END, 1_000
+                EGRESS, STOP_5, E_START, E_END, 1_000
         );
         TransitPathLeg<TestRaptorTripSchedule> leg5 = new TransitPathLeg<>(
                 STOP_4, T3_START, STOP_5, T3_END, 1_000, TRIP_3, leg6
@@ -147,7 +151,7 @@ public class StopArrivalsTestData {
                 STOP_1, T1_START, STOP_2, T1_END, 1_000, TRIP_1, leg3
         );
         AccessPathLeg<TestRaptorTripSchedule> leg1 = new AccessPathLeg<>(
-                null, STOP_1, A_START, A_END, 1_000, leg2.asTransitLeg()
+                ACCESS, STOP_1, A_START, A_END, 1_000, leg2.asTransitLeg()
         );
         return new Path<>(1, leg1, RaptorCostConverter.toOtpDomainCost(6_000));
     }

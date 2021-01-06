@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Path<T extends RaptorTripSchedule> {
+public final class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private final int iterationDepartureTime;
     private final int startTime;
     private final int endTime;
@@ -144,35 +144,36 @@ public final class Path<T extends RaptorTripSchedule> {
     @Override
     public String toString() {
         PathStringBuilder buf = new PathStringBuilder();
-        PathLeg<T> leg = accessLeg.nextLeg();
+        if(accessLeg != null) {
+            buf.accessEgress(accessLeg.access());
+            PathLeg<T> leg = accessLeg.nextLeg();
 
-        buf.walk(accessLeg.duration());
-
-        while (!leg.isEgressLeg()) {
-            buf.sep();
-            if(leg.isTransitLeg()) {
-                TransitPathLeg<T> transitLeg = leg.asTransitLeg();
-                buf.stop(transitLeg.fromStop())
-                    .sep()
-                    .transit(
+            while (!leg.isEgressLeg()) {
+                buf.sep();
+                if (leg.isTransitLeg()) {
+                    TransitPathLeg<T> transitLeg = leg.asTransitLeg();
+                    buf.stop(transitLeg.fromStop()).sep().transit(
                         transitLeg.trip().pattern().debugInfo(),
                         transitLeg.fromTime(),
                         transitLeg.toTime()
                     );
+                }
+                // Transfer
+                else {
+                    buf.stop(leg.asTransferLeg().fromStop()).sep().walk(leg.duration());
+                }
+                leg = leg.nextLeg();
             }
-            // Transfer
-            else {
-                buf.stop(leg.asTransferLeg().fromStop()).sep().walk(leg.duration());
-            }
-            leg = leg.nextLeg();
+            EgressPathLeg<T> egressLeg = leg.asEgressLeg();
+            buf.sep().stop(egressLeg.fromStop());
+            buf.sep().accessEgress(egressLeg.egress());
         }
-        buf.sep().stop(leg.asEgressLeg().fromStop()).sep().walk(leg.duration());
 
         return buf.toString() +
                 " [" + TimeUtils.timeToStrLong(startTime) +
                 " " + TimeUtils.timeToStrLong(endTime) +
                 " " + TimeUtils.durationToStr(endTime-startTime) +
-                (generalizedCost <= 0 ? "" : ", cost: " + (int)generalizedCost) + "]";
+                (generalizedCost == 0 ? "" : ", cost: " + generalizedCost) + "]";
     }
 
     @Override
@@ -206,5 +207,26 @@ public final class Path<T extends RaptorTripSchedule> {
             leg = leg.nextLeg();
         }
         return i;
+    }
+
+    /**
+     * Sort paths in order:
+     * <ol>
+     *   <li>Earliest arrival time first,
+     *   <li>Then latest departure time
+     *   <li>Then lowest cost
+     *   <li>Then lowest number of transfers
+     * </ol>
+     */
+    @Override
+    public int compareTo(Path<T> other) {
+        int c = endTime - other.endTime;
+        if(c != 0) { return c; }
+        c = other.startTime - startTime;
+        if(c != 0) { return c; }
+        c = generalizedCost - other.generalizedCost;
+        if(c != 0) { return c; }
+        c = numberOfTransfers - other.numberOfTransfers;
+        return c;
     }
 }
