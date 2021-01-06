@@ -4,7 +4,7 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
@@ -39,8 +39,8 @@ public class SearchParams {
     private final int maxNumberOfTransfers;
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
-    private final Collection<RaptorTransfer> accessLegs;
-    private final Collection<RaptorTransfer> egressLegs;
+    private final Collection<RaptorTransfer> accessPaths;
+    private final Collection<RaptorTransfer> egressPaths;
 
     /**
      * Default values is defined in the default constructor.
@@ -54,8 +54,8 @@ public class SearchParams {
         maxNumberOfTransfers = NOT_SET;
         relaxCostAtDestination = NOT_SET;
         timetableEnabled = false;
-        accessLegs = Collections.emptyList();
-        egressLegs = Collections.emptyList();
+        accessPaths = List.of();
+        egressPaths = List.of();
     }
 
     SearchParams(SearchParamsBuilder<?> builder) {
@@ -67,8 +67,8 @@ public class SearchParams {
         this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
-        this.accessLegs = java.util.List.copyOf(builder.accessLegs());
-        this.egressLegs = java.util.List.copyOf(builder.egressLegs());
+        this.accessPaths = List.copyOf(builder.accessPaths());
+        this.egressPaths = List.copyOf(builder.egressPaths());
     }
 
     static SearchParams defaults() {
@@ -210,24 +210,24 @@ public class SearchParams {
     }
 
     /**
-     * Times to access each transit stop using the street network in seconds.
+     * List of access paths from the origin to all transit stops using the street network.
      * <p/>
      * Required, at least one access leg must exist.
      */
-    public Collection<RaptorTransfer> accessLegs() {
-        return accessLegs;
+    public Collection<RaptorTransfer> accessPaths() {
+        return accessPaths;
     }
 
     /**
-     * List of all possible egress stops and time to reach destination in seconds.
+     * List of all possible egress paths to reach the destination using the street network.
      * <p>
      * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress leg
      * start, NOT the destination - think of it as a reversed leg.
      * <p/>
      * Required, at least one egress leg must exist.
      */
-    public Collection<RaptorTransfer> egressLegs() {
-        return egressLegs;
+    public Collection<RaptorTransfer> egressPaths() {
+        return egressPaths;
     }
 
     @Override
@@ -238,8 +238,8 @@ public class SearchParams {
             .addDurationSec("searchWindow", searchWindowInSeconds)
             .addDurationSec("boardSlack", boardSlackInSeconds)
             .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
-            .addColLimited("accessLegs", accessLegs, 5)
-            .addColLimited("egressLegs", egressLegs, 5)
+            .addColLimited("accessPaths", accessPaths, 5)
+            .addColLimited("egressPaths", egressPaths, 5)
             .toString();
     }
 
@@ -253,15 +253,15 @@ public class SearchParams {
                 searchWindowInSeconds == that.searchWindowInSeconds &&
                 boardSlackInSeconds == that.boardSlackInSeconds &&
                 numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
-                accessLegs.equals(that.accessLegs) &&
-                egressLegs.equals(that.egressLegs);
+                accessPaths.equals(that.accessPaths) &&
+                egressPaths.equals(that.egressPaths);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                earliestDepartureTime, latestArrivalTime, searchWindowInSeconds, accessLegs,
-                egressLegs, boardSlackInSeconds, numberOfAdditionalTransfers
+                earliestDepartureTime, latestArrivalTime, searchWindowInSeconds,
+                accessPaths, egressPaths, boardSlackInSeconds, numberOfAdditionalTransfers
         );
     }
 
@@ -273,7 +273,7 @@ public class SearchParams {
                 earliestDepartureTime != TIME_NOT_SET || latestArrivalTime != TIME_NOT_SET,
                 "'earliestDepartureTime' or 'latestArrivalTime' is required."
         );
-        assertProperty(!accessLegs.isEmpty(), "At least one 'accessLegs' is required.");
-        assertProperty(!egressLegs.isEmpty(), "At least one 'egressLegs' is required.");
+        assertProperty(!accessPaths.isEmpty(), "At least one 'accessLegs' is required.");
+        assertProperty(!egressPaths.isEmpty(), "At least one 'egressLegs' is required.");
     }
 }

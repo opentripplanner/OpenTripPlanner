@@ -56,8 +56,8 @@ public class HeuristicToRunResolverTest {
         RaptorRequestBuilder<TestRaptorTripSchedule> b = new RaptorRequestBuilder<>();
         b.profile(RaptorProfile.NO_WAIT_BEST_TIME);
         // Add some dummy legs
-        b.searchParams().accessLegs().add(dummyLeg());
-        b.searchParams().egressLegs().add(dummyLeg());
+        b.searchParams().accessPaths().add(dummyPath());
+        b.searchParams().egressPaths().add(dummyPath());
         b.searchParams().earliestDepartureTime(10_000);
 
         resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters(
@@ -73,8 +73,8 @@ public class HeuristicToRunResolverTest {
         RaptorRequestBuilder<TestRaptorTripSchedule> b = new RaptorRequestBuilder<>();
         b.profile(RaptorProfile.MULTI_CRITERIA);
         // Add some dummy legs
-        b.searchParams().accessLegs().add(dummyLeg());
-        b.searchParams().egressLegs().add(dummyLeg());
+        b.searchParams().accessPaths().add(dummyPath());
+        b.searchParams().egressPaths().add(dummyPath());
         msg = "Params:";
 
         if (dest) {
@@ -119,7 +119,7 @@ public class HeuristicToRunResolverTest {
         reverse = true;
     }
 
-    private RaptorTransfer dummyLeg() {
+    private RaptorTransfer dummyPath() {
         return new RaptorTransfer() {
             @Override public int stop() { return 1; }
             @Override public int durationInSeconds() { return 10; }

@@ -82,14 +82,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     public Collection<RaptorTransfer> accessLegs() {
         return request.searchDirection().isForward()
-                ? request.searchParams().accessLegs()
-                : request.searchParams().egressLegs();
+                ? request.searchParams().accessPaths()
+                : request.searchParams().egressPaths();
     }
 
     public Collection<RaptorTransfer> egressLegs() {
         return request.searchDirection().isForward()
-                ? request.searchParams().egressLegs()
-                : request.searchParams().accessLegs();
+                ? request.searchParams().egressPaths()
+                : request.searchParams().accessPaths();
     }
 
     public int[] egressStops() {

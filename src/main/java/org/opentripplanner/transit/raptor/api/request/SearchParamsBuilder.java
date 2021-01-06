@@ -24,8 +24,8 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private int maxNumberOfTransfers;
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
-    private final Collection<RaptorTransfer> accessLegs = new ArrayList<>();
-    private final Collection<RaptorTransfer> egressLegs = new ArrayList<>();
+    private final Collection<RaptorTransfer> accessPaths = new ArrayList<>();
+    private final Collection<RaptorTransfer> egressPaths = new ArrayList<>();
 
     public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
         this.parent = parent;
@@ -37,8 +37,8 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
         this.timetableEnabled = defaults.timetableEnabled();
-        this.accessLegs.addAll(defaults.accessLegs());
-        this.egressLegs.addAll(defaults.egressLegs());
+        this.accessPaths.addAll(defaults.accessPaths());
+        this.egressPaths.addAll(defaults.egressPaths());
     }
 
     public int earliestDepartureTime() {
@@ -124,35 +124,21 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public Collection<RaptorTransfer> accessLegs() {
-        return accessLegs;
+    public Collection<RaptorTransfer> accessPaths() {
+        return accessPaths;
     }
 
-    public SearchParamsBuilder<T> addAccessStop(RaptorTransfer accessLeg) {
-        this.accessLegs.add(accessLeg);
+    public SearchParamsBuilder<T> addAccessPaths(Collection<? extends RaptorTransfer> accessPaths) {
+        this.accessPaths.addAll(accessPaths);
         return this;
     }
 
-    public SearchParamsBuilder<T> addAccessStops(Iterable<RaptorTransfer> accessLegs) {
-        for (RaptorTransfer it : accessLegs) {
-            addAccessStop(it);
-        }
-        return this;
+    public Collection<RaptorTransfer> egressPaths() {
+        return egressPaths;
     }
 
-    public Collection<RaptorTransfer> egressLegs() {
-        return egressLegs;
-    }
-
-    public SearchParamsBuilder<T> addEgressStop(RaptorTransfer egressLeg) {
-        this.egressLegs.add(egressLeg);
-        return this;
-    }
-
-    public SearchParamsBuilder<T> addEgressStops(Iterable<RaptorTransfer> egressLegs) {
-        for (RaptorTransfer it : egressLegs) {
-            addEgressStop(it);
-        }
+    public SearchParamsBuilder<T> addEgressPaths(Collection<? extends RaptorTransfer> egressPaths) {
+        this.egressPaths.addAll(egressPaths);
         return this;
     }
 

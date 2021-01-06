@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor._shared;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.view.AccessLegView;
+import org.opentripplanner.transit.raptor.api.view.AccessPathView;
 
 public class Access extends AbstractStopArrival {
 
@@ -14,7 +14,7 @@ public class Access extends AbstractStopArrival {
     @Override public boolean arrivedByAccessLeg() { return true; }
 
     @Override
-    public AccessLegView accessLeg() {
+    public AccessPathView accessLeg() {
         return () -> access;
     }
 }

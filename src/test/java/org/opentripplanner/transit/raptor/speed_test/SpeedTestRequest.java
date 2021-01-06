@@ -2,9 +2,9 @@ package org.opentripplanner.transit.raptor.speed_test;
 
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -12,19 +12,20 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.transit.AccessEgressLeg;
+import org.opentripplanner.transit.raptor.speed_test.transit.AccessEgressPath;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 
 public class SpeedTestRequest {
@@ -132,8 +133,12 @@ public class SpeedTestRequest {
 
         builder.searchDirection(profile.direction);
 
-        addAccessEgressStopArrivals(streetRouter.getAccessTimesInSecondsByStopIndex(), builder.searchParams()::addAccessStop);
-        addAccessEgressStopArrivals(streetRouter.getEgressTimesInSecondsByStopIndex(), builder.searchParams()::addEgressStop);
+        builder.searchParams().addAccessPaths(
+            createAccessEgress(streetRouter.getAccessTimesInSecondsByStopIndex())
+        );
+        builder.searchParams().addEgressPaths(
+            createAccessEgress(streetRouter.getEgressTimesInSecondsByStopIndex())
+        );
 
         addDebugOptions(builder, opts);
 
@@ -146,11 +151,13 @@ public class SpeedTestRequest {
         return req;
     }
 
-    private static void addAccessEgressStopArrivals(TIntIntMap timesToStopsInSeconds, Consumer<AccessEgressLeg> addStop) {
+    private static Collection<AccessEgressPath> createAccessEgress(TIntIntMap timesToStopsInSeconds) {
+        List<AccessEgressPath> paths = new ArrayList<>();
         for(TIntIntIterator it = timesToStopsInSeconds.iterator(); it.hasNext(); ) {
             it.advance();
-            addStop.accept(new AccessEgressLeg(it.key(), it.value()));
+            paths.add(new AccessEgressPath(it.key(), it.value()));
         }
+        return paths;
     }
 
     private static void addDebugOptions(RaptorRequestBuilder<TripSchedule> builder, SpeedTestCmdLineOpts opts) {

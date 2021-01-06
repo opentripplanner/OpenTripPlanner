@@ -11,15 +11,14 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public class RaptorRequestMapper {
 
     public static RaptorRequest<TripSchedule> mapRequest(
             RoutingRequest request,
             ZonedDateTime startOfTime,
-            Collection<? extends RaptorTransfer> accessTimes,
-            Collection<? extends RaptorTransfer> egressTimes
+            Collection<? extends RaptorTransfer> accessPaths,
+            Collection<? extends RaptorTransfer> egressPaths
     ) {
         RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
 
@@ -52,10 +51,8 @@ public class RaptorRequestMapper {
         builder
                 .searchParams()
                 .searchWindow(request.searchWindow)
-                .addAccessStops(accessTimes.stream()
-                    .map(t -> (RaptorTransfer) t).collect(Collectors.toList()))
-                .addEgressStops(egressTimes.stream()
-                    .map(t -> (RaptorTransfer) t).collect(Collectors.toList()))
+                .addAccessPaths(accessPaths)
+                .addEgressPaths(egressPaths)
                 .boardSlackInSeconds(request.boardSlack)
                 .timetableEnabled(true);
 
