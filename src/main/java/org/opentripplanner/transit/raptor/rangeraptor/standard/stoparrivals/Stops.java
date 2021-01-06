@@ -36,12 +36,19 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     ) {
         for (int round = 1; round < stops.length; round++) {
             for (RaptorTransfer egressPath : egressPaths) {
-                EgressStopArrivalState<T> state = new EgressStopArrivalState<>(
+                if(stops[round][egressPath.stop()] == null) {
+                    EgressStopArrivalState<T> state = new EgressStopArrivalState<>(
                         round,
                         egressPath,
                         transitArrivalCallback
-                );
-                stops[round][egressPath.stop()] = state;
+                    );
+                    stops[round][egressPath.stop()] = state;
+                }
+                else {
+                    throw new IllegalStateException(
+                        "State exist for stop: " + egressPath.stop() + ", round: " + round
+                    );
+                }
             }
         }
     }
