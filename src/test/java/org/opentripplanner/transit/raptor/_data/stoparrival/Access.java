@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.AccessPathView;
+
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class Access extends AbstractStopArrival {
 
@@ -10,7 +11,7 @@ public class Access extends AbstractStopArrival {
 
     public Access(int stop, int departureTime, int arrivalTime) {
         super(0, stop, arrivalTime, 1000, null);
-        this.access = new TestTransfer(stop, Math.abs(arrivalTime - departureTime));
+        this.access = walk(stop, Math.abs(arrivalTime - departureTime));
     }
     @Override public boolean arrivedByAccess() { return true; }
 

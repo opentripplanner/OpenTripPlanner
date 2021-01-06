@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.raptor.util;
 
 
+import javax.annotation.Nonnull;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Calendar;
 
 
@@ -30,6 +32,21 @@ public class TimeUtils {
         return hms2time(hour, minute, 0);
     }
 
+
+    public static int parseTimeCompact(String hhmmss) {
+        String[] tokens = hhmmss.split(":");
+
+        if(tokens.length > 3 || tokens.length < 1) {
+            throw new IllegalStateException(
+                "Parse error, not a valid time (HH|HH:MM|HH:MM:SS): '" + hhmmss + "'"
+            );
+        }
+        int hh = Integer.parseInt(tokens[0]);
+        int mm = tokens.length>1 ? Integer.parseInt(tokens[1]) : 0;
+        int ss = tokens.length==3 ? Integer.parseInt(tokens[2]) : 0;
+        return hms2time(hh, mm, ss);
+    }
+
     public static int parseHHMM(String hhmm, int defaultValue) {
         String[] tokens = hhmm.split(":");
         if(tokens.length != 2) {
@@ -56,6 +73,17 @@ public class TimeUtils {
         return hms2time(hh, mm, ss);
     }
 
+    /**
+     * Parse a string of times like "00:20 01:20 05:57:30" into an array of local times.
+     * This can be very helpful when specifying a schedule using a sting instead of using a
+     * int array with seconds past midnight.
+     */
+    public static int[] times(@Nonnull String input) {
+        return Arrays.stream(input.split("[ ,;]+"))
+            .mapToInt(TimeUtils::parseTimeCompact)
+            .toArray();
+    }
+
 
     public static String timeToStrCompact(int time) {
         return timeToStrCompact(time, -1);
@@ -79,6 +107,12 @@ public class TimeUtils {
 
     public static String durationToStr(int timeSeconds, int notSetValue) {
         return timeStr(timeSeconds, notSetValue, FormatType.DURATION);
+    }
+
+    /** Parse a sting on format {@code nHnMn.nS}. */
+    public static int parseDuration(String duration) {
+        Duration d = Duration.parse("PT" + duration);
+        return (int)d.toSeconds();
     }
 
     public static String msToSecondsStr(long timeMs) {

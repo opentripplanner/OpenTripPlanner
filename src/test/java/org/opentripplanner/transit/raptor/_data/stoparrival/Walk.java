@@ -8,7 +8,11 @@ class Walk extends AbstractStopArrival {
     private final int durationInSeconds;
 
     Walk(
-            int round, int stop, int departureTime, int arrivalTime, ArrivalView<TestTripSchedule> previous
+        int round,
+        int stop,
+        int departureTime,
+        int arrivalTime,
+        ArrivalView<TestTripSchedule> previous
     ) {
         super(round, stop, arrivalTime, 1000, previous);
         // In a reverse search we the arrival is before the departure

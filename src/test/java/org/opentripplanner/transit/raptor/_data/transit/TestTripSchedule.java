@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor._data.transit;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
@@ -11,43 +12,20 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 public class TestTripSchedule implements RaptorTripSchedule {
     private static final int DELAY_BETWEEN_ALIGHT_AND_BOARD = 10;
-    private final String name;
+    private final RaptorTripPattern pattern;
     private final int[] arrivalTimes;
     private final int[] departureTimes;
-    private final int[] stopIndexes;
-    private final int[] restrictions;
 
-    private final RaptorTripPattern pattern = new RaptorTripPattern() {
-        @Override public int stopIndex(int stopPositionInPattern) {
-            return stopIndexes[stopPositionInPattern];
-        }
-        @Override
-        public boolean boardingPossibleAt(int stopPositionInPattern) {
-            return isNotRestricted(stopPositionInPattern, 0b001);
-        }
-        @Override
-        public boolean alightingPossibleAt(int stopPositionInPattern) {
-            return isNotRestricted(stopPositionInPattern, 0b010);
-        }
-        @Override public int numberOfStopsInPattern() { return stopIndexes.length; }
 
-        @Override
-        public String debugInfo() { return "BUS " + name; }
-
-        private boolean isNotRestricted(int index, int mask) {
-            return restrictions == null || (restrictions[index] & mask) > 0;
-        }
-    };
-
-    private TestTripSchedule(String name, int[] arrivalTimes, int[] departureTimes, int[] stopIndexes, int[] restrictions) {
-        this.name = name;
+    private TestTripSchedule(
+        TestTripPattern pattern,
+        int[] arrivalTimes,
+        int[] departureTimes
+    ) {
+        this.pattern = pattern;
         this.arrivalTimes = arrivalTimes;
         this.departureTimes = departureTimes;
-        this.stopIndexes = stopIndexes;
-        this.restrictions = restrictions;
     }
-
-    public static Builder create(String name) { return new Builder(name); }
 
     @Override
     public int arrival(int stopPosInPattern) {
@@ -70,89 +48,101 @@ public class TestTripSchedule implements RaptorTripSchedule {
 
     @Override
     public String toString() {
+        if(arrivalTimes == departureTimes) {
+            return ToStringBuilder
+                .of(TestTripSchedule.class)
+                .addServiceTimeSchedule("times", arrivalTimes)
+                .toString();
+        }
         return ToStringBuilder
                 .of(TestTripSchedule.class)
                 .addServiceTimeSchedule("arrivals", arrivalTimes)
                 .addServiceTimeSchedule("departures", departureTimes)
-                .addInts("stops", stopIndexes)
                 .toString();
     }
 
-    public static class Builder {
-        private final String name;
-        private int[] departureTimes = null;
-        private int[] arrivalTimes = null;
-        private int[] stopIndexes = null;
-        private int[] boardAlightRestrictions;
+    public static TestTripSchedule.Builder schedule() {
+        return new TestTripSchedule.Builder();
+    }
 
-        private Builder(String name) {
-            this.name = name;
+    public static TestTripSchedule.Builder schedule(TestTripPattern pattern) {
+        return schedule().pattern(pattern);
+    }
+
+
+    public static TestTripSchedule.Builder schedule(String times) {
+        return new TestTripSchedule.Builder().times(times);
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public static class Builder {
+        private TestTripPattern pattern;
+        private int[] arrivalTimes;
+        private int[] departureTimes;
+
+        public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
+            this.pattern = pattern;
+            return this;
         }
 
-        public Builder withAlightTimes(int ... arrivalTimes) {
+        /** @param times departure and arrival times per stop. Example: "0:10, 0:20, 0:45 .." */
+        public TestTripSchedule.Builder times(String times) {
+            return times(TimeUtils.times(times));
+        }
+
+        /** @param times departure and arrival times per stop in seconds past midnight. */
+        public TestTripSchedule.Builder times(int ... times) {
+            arrivals(times);
+            departures(times);
+            return this;
+        }
+
+        /** @param arrivalTimes arrival times per stop in seconds past midnight. */
+        public TestTripSchedule.Builder arrivals(int ... arrivalTimes) {
             this.arrivalTimes = arrivalTimes;
             return this;
         }
 
-        public Builder withBoardTimes(int ... departureTimes) {
+        /** @param departureTimes departure times per stop in seconds past midnight. */
+        public TestTripSchedule.Builder departures(int ... departureTimes) {
             this.departureTimes = departureTimes;
             return this;
         }
 
-        public Builder withBoardAndAlightTimes(int ... times) {
-            this.departureTimes = times;
-            this.arrivalTimes = times;
-            return this;
-        }
-
-        public Builder withStopIndexes(int ... stopIndexes) {
-            this.stopIndexes = stopIndexes;
-            return this;
-        }
-
-        /**
-         * 0 - 000 : No restriction
-         * 1 - 001 : No Boarding.
-         * 2 - 010 : No Alighting.
-         * 3 - 011 : No Boarding. No Alighting.
-         * 4 - 100 : No wheelchair.
-         * 5 - 101 : No wheelchair. No Boarding. No Alighting.
-         * 6 - 110 : No wheelchair. No Alighting.
-         * 7 - 111 : No wheelchair. No Boarding. No Alighting.
-         */
-        public void setBoardAlightRestrictions(int[] boardAlightRestrictions) {
-            this.boardAlightRestrictions = boardAlightRestrictions;
-        }
-
         public TestTripSchedule build() {
-            if(arrivalTimes == null && departureTimes == null) {
-                throw new IllegalArgumentException("Either arrival or departure time must be set.");
-            }
             if(arrivalTimes == null) {
-                arrivalTimes = new int[departureTimes.length];
-                for (int i = 0; i < departureTimes.length; i++) {
-                    arrivalTimes[i] = departureTimes[i] - DELAY_BETWEEN_ALIGHT_AND_BOARD;
-                }
+                arrivalTimes = copyDelta(-DELAY_BETWEEN_ALIGHT_AND_BOARD, departureTimes);
             }
             else if(departureTimes == null) {
-                departureTimes = new int[arrivalTimes.length];
-                for (int i = 0; i < arrivalTimes.length; i++) {
-                    departureTimes[i] = arrivalTimes[i] + DELAY_BETWEEN_ALIGHT_AND_BOARD;
-                }
+                departureTimes = copyDelta(DELAY_BETWEEN_ALIGHT_AND_BOARD, arrivalTimes);
             }
-            if(stopIndexes == null) {
-                stopIndexes = new int[arrivalTimes.length];
-                for (int i = 0; i < stopIndexes.length; i++) {
-                    stopIndexes[i] = i + 1;
-                }
+            if(arrivalTimes.length != departureTimes.length) {
+                throw new IllegalStateException(
+                    "Number of arrival and departure times do not match."
+                        + " Arrivals: " + arrivalTimes.length
+                        + ", departures: " + arrivalTimes.length
+                );
             }
-            return new TestTripSchedule(
-                    name,
-                    arrivalTimes,
-                    departureTimes,
-                    stopIndexes,
-                    boardAlightRestrictions
-            );
+            if(pattern == null) {
+                pattern = TestTripPattern.pattern("DummyPattern", new int[arrivalTimes.length]);
+
+            }
+            if(arrivalTimes.length != pattern.numberOfStopsInPattern()) {
+                throw new IllegalStateException(
+                    "Number of arrival and departure times do not match stops in pattern."
+                        + " Arrivals/departures: " + arrivalTimes.length
+                        + ", stops: " + pattern.numberOfStopsInPattern()
+                );
+            }
+            return new TestTripSchedule(pattern, arrivalTimes, departureTimes);
+        }
+
+        private static int[] copyDelta(int delta, int[] source) {
+            int[] target = new int[source.length];
+            for (int i = 0; i < source.length; i++) {
+                target[i] = source[i] + delta;
+            }
+            return target;
         }
     }
 }

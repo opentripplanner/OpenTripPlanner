@@ -9,10 +9,10 @@ import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.transit.AccessEgressPath;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 
 import java.time.LocalDate;
@@ -20,12 +20,13 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 
 public class SpeedTestRequest {
@@ -134,10 +135,10 @@ public class SpeedTestRequest {
         builder.searchDirection(profile.direction);
 
         builder.searchParams().addAccessPaths(
-            createAccessEgress(streetRouter.getAccessTimesInSecondsByStopIndex())
+            mapToAccessEgress(streetRouter.getAccessTimesInSecondsByStopIndex())
         );
         builder.searchParams().addEgressPaths(
-            createAccessEgress(streetRouter.getEgressTimesInSecondsByStopIndex())
+            mapToAccessEgress(streetRouter.getEgressTimesInSecondsByStopIndex())
         );
 
         addDebugOptions(builder, opts);
@@ -151,11 +152,12 @@ public class SpeedTestRequest {
         return req;
     }
 
-    private static Collection<AccessEgressPath> createAccessEgress(TIntIntMap timesToStopsInSeconds) {
-        List<AccessEgressPath> paths = new ArrayList<>();
-        for(TIntIntIterator it = timesToStopsInSeconds.iterator(); it.hasNext(); ) {
+    private static List<RaptorTransfer> mapToAccessEgress(TIntIntMap timesToStopsInSeconds) {
+        List<RaptorTransfer> paths = new ArrayList<>();
+        TIntIntIterator it = timesToStopsInSeconds.iterator();
+        while (it.hasNext()) {
             it.advance();
-            paths.add(new AccessEgressPath(it.key(), it.value()));
+            paths.add(walk(it.key(), it.value()));
         }
         return paths;
     }

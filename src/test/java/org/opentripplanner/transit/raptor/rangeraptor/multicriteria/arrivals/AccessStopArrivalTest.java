@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class AccessStopArrivalTest {
 
@@ -20,7 +21,7 @@ public class AccessStopArrivalTest {
     private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
         DEPARTURE_TIME,
         COST,
-        new TestTransfer(ALIGHT_STOP, ACCESS_DURATION)
+        walk(ALIGHT_STOP, ACCESS_DURATION)
     );
 
     @Test

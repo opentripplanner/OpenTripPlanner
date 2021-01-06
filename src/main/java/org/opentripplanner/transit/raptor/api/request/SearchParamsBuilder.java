@@ -1,10 +1,11 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -133,6 +134,10 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
+    public SearchParamsBuilder<T> addAccessPaths(RaptorTransfer ... accessPaths) {
+        return addAccessPaths(Arrays.asList(accessPaths));
+    }
+
     public Collection<RaptorTransfer> egressPaths() {
         return egressPaths;
     }
@@ -140,6 +145,10 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     public SearchParamsBuilder<T> addEgressPaths(Collection<? extends RaptorTransfer> egressPaths) {
         this.egressPaths.addAll(egressPaths);
         return this;
+    }
+
+    public SearchParamsBuilder<T> addEgressPaths(RaptorTransfer ... egressPaths) {
+        return addEgressPaths(Arrays.asList(egressPaths));
     }
 
     public RaptorRequest<T> build() {

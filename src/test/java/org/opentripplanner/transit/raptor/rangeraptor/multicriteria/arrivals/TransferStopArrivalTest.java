@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
@@ -9,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class TransferStopArrivalTest {
 
@@ -39,7 +39,7 @@ public class TransferStopArrivalTest {
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
         ACCESS_DEPARTURE_TIME,
         ACCESS_COST,
-        new TestTransfer(ACCESS_TO_STOP, ACCESS_DURATION)
+        walk(ACCESS_TO_STOP, ACCESS_DURATION)
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
@@ -52,7 +52,7 @@ public class TransferStopArrivalTest {
 
     private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
             TRANSIT_ARRIVAL,
-            new TestTransfer(TRANSFER_TO_STOP,TRANSFER_LEG_DURATION),
+            walk(TRANSFER_TO_STOP, TRANSFER_LEG_DURATION),
             TRANSFER_ALIGHT_TIME,
             TRANSFER_COST
     );

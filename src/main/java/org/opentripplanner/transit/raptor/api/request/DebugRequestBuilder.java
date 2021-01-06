@@ -7,10 +7,12 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Mutable version of {@link DebugRequest}.
@@ -43,6 +45,10 @@ public class DebugRequestBuilder<T extends RaptorTripSchedule> {
     public DebugRequestBuilder<T> addStops(Collection<Integer> stops) {
         this.stops.addAll(stops);
         return this;
+    }
+
+    public DebugRequestBuilder<T> addStops(int ... stops) {
+        return addStops(Arrays.stream(stops).boxed().collect(Collectors.toList()));
     }
 
     public List<Integer> path() {

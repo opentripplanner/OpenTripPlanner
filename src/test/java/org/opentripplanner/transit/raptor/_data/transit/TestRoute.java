@@ -5,31 +5,35 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class TestRoute
-        implements RaptorRoute<TestTripSchedule>,
-        RaptorTimeTable<TestTripSchedule>
-{
+public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
 
-    private final TestTripSchedule[] schedules;
+    private final TestTripPattern pattern;
+    private final List<TestTripSchedule> schedules = new ArrayList<>();
 
-    public TestRoute(TestTripSchedule... schedules) {
-        this.schedules = schedules;
+    private TestRoute(TestTripPattern pattern) {
+        this.pattern = pattern;
     }
 
-    public TestRoute(Collection<TestTripSchedule> schedules) {
-        this.schedules = schedules.toArray(new TestTripSchedule[0]);
+    public static TestRoute route(TestTripPattern pattern){
+        return new TestRoute(pattern);
+    }
+
+    public static TestRoute route(String name, int ... stopIndexes){
+        return route(TestTripPattern.pattern(name, stopIndexes));
     }
 
     @Override
     public TestTripSchedule getTripSchedule(int index) {
-        return schedules[index];
+        return schedules.get(index);
     }
 
     @Override
     public int numberOfTripSchedules() {
-        return schedules.length;
+        return schedules.size();
     }
 
     @Override
@@ -39,6 +43,19 @@ public class TestRoute
 
     @Override
     public RaptorTripPattern pattern() {
-        return schedules[0].pattern();
+        return pattern;
+    }
+
+    public TestRoute withTimetable(TestTripSchedule ... trips) {
+        Collections.addAll(schedules, trips);
+        return this;
+    }
+
+    public TestRoute withTimetable(TestTripSchedule.Builder ... scheduleBuilders) {
+        for (TestTripSchedule.Builder builder : scheduleBuilders) {
+            var tripSchedule = builder.pattern(pattern).build();
+            schedules.add(tripSchedule);
+        }
+        return this;
     }
 }
