@@ -17,50 +17,7 @@
         </license>
     </licenses>
 
-    <!-- Developer entries are provided for only first six contributors on the Github stats page for to the 2.x branch.
-       For other contributors, see https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors -->
-    <developers>
-        <developer>
-            <name>Andrew Byrd</name>
-            <email>andrew@fastmail.net</email>
-            <organization>Conveyal</organization>
-            <organizationUrl>http://conveyal.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Matt Conway</name>
-            <email>matt@indicatrix.org</email>
-            <organization>Conveyal</organization>
-            <organizationUrl>http://conveyal.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Thomas Gran</name>
-            <email>tgr@capraconsulting.no</email>
-            <organization>Ruter and Entur</organization>
-            <organizationUrl>http://entur.org/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Laurent Grégoire</name>
-            <email>laurent.gregoire@protonmail.ch</email>
-            <organization>Mecatran</organization>
-            <organizationUrl>http://www.mecatran.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Gard Mellemstrand</name>
-            <email>gard.mellemstrand@entur.org</email>
-            <organization>Entur</organization>
-            <organizationUrl>http://entur.org/</organizationUrl>
-        </developer>
-        <developer>
-            <name>David Novalis Turner</name>
-            <email>novalis@novalis.org</email>
-            <organization>Ex-OpenPlans</organization>
-            <organizationUrl>http://openplans.org/</organizationUrl>
-        </developer>
-    </developers>
-
     <scm>
-        <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
         <url>http://github.com/opentripplanner/OpenTripPlanner</url>
     </scm>
 
@@ -75,12 +32,11 @@
     </properties>
 
     <distributionManagement>
-        <!-- We are using Sonatype Nexus Staging instead of Maven Release plugin.
-             Only a snapshot repo should be configured. Releases are done from that snapshot staging repo. -->
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
+        <repository>
+            <id>github</id>
+            <name>OpenTripPlanner Maven Repository on Github Packages</name>
+            <url>https://maven.pkg.github.com/opentripplanner/OpenTripPlanner/</url>
+        </repository>
     </distributionManagement>
 
     <build>
@@ -204,18 +160,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
                 <version>2.12.0</version>
@@ -231,13 +175,6 @@
                 <configuration>
                     <docsDir>${project.build.directory}/site/enunciate</docsDir>
                 </configuration>
-            </plugin>
-            <plugin>
-                <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration><skip>true</skip></configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -282,21 +219,6 @@
                                 <source>src/ext-test/java</source>
                             </sources>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <!-- We sign in the verify phase, which means it will happen for install and deploy but not package. -->
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
