@@ -3,7 +3,8 @@ name: OTP CI Build
 # But triggering on push only will miss pull requests from outside authors.
 on:
   # Should catch merged pull requests, pushes to Conveyal PR branches, and tags.
-  # The push event's ref reveals the branch name for S3 upload, unlike pull_request which sees the merge target.
+  # The push event's ref is the name of the pushed branch;
+  # The pull_request event's branch name is the merge target branch.
   push
   # Try to catch PRs from outside authors, which don't need to be uploaded to S3.
   # pull_request:
@@ -29,4 +30,11 @@ jobs:
           path: ~/.m2
           key: maven-local-repo
       - name: Build and Test
-        run: mvn --batch-mode --update-snapshots package
+        run: mvn --batch-mode --update-snapshots verify
+      - name: Deploy to Github Package Registry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings><servers><server><id>github</id><username>NA</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
+          mvn deploy

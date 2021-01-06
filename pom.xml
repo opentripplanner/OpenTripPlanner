@@ -18,62 +18,7 @@
         </license>
     </licenses>
 
-    <!-- Developer entries are provided only for Steering Committee members.
-       For other contributors, see https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors -->
-    <developers>
-        <developer>
-            <name>Andrew Byrd</name>
-            <email>andrew@fastmail.net</email>
-            <organization>Conveyal</organization>
-            <organizationUrl>http://conveyal.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>David Emory</name>
-            <email>david.emory@gmail.com</email>
-            <organization>Conveyal</organization>
-            <organizationUrl>http://conveyal.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Matt Conway</name>
-            <email>matt@indicatrix.org</email>
-            <organization>Conveyal</organization>
-            <organizationUrl>http://conveyal.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>David Novalis Turner</name>
-            <email>novalis@novalis.org</email>
-            <organization>Ex-OpenPlans</organization>
-            <organizationUrl>http://openplans.org/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Laurent Grégoire</name>
-            <email>laurent.gregoire@protonmail.ch</email>
-            <organization>Mecatran</organization>
-            <organizationUrl>http://www.mecatran.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Frank Purcell</name>
-            <email>fxpurcell@gmail.com</email>
-            <organization>Portland TriMet</organization>
-            <organizationUrl>https://trimet.org/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Tuukka Hastrup</name>
-            <email>tuukka.hastrup@hsl.fi</email>
-            <organization>Helsingin Seudun Liikenne</organization>
-            <organizationUrl>https://www.hsl.fi/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Jasper Hartong</name>
-            <email>jasper@calendar42.com</email>
-            <organization>Calendar42</organization>
-            <organizationUrl>http://site.calendar42.com/</organizationUrl>
-        </developer>
-    </developers>
-
     <scm>
-        <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
         <url>http://github.com/opentripplanner/OpenTripPlanner</url>
     </scm>
 
@@ -86,12 +31,11 @@
     </properties>
 
     <distributionManagement>
-        <!-- We are using Sonatype Nexus Staging instead of Maven Release plugin.
-             Only a snapshot repo should be configured. Releases are done from that snapshot staging repo. -->
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
+        <repository>
+            <id>github</id>
+            <name>OpenTripPlanner Maven Repository on Github Packages</name>
+            <url>https://maven.pkg.github.com/opentripplanner/OpenTripPlanner/</url>
+        </repository>
     </distributionManagement>
 
     <build>
@@ -180,18 +124,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
                 <version>2.11.1</version>
@@ -237,21 +169,6 @@
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <!-- We sign in the verify phase, which means it will happen for install and deploy but not package. -->
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
