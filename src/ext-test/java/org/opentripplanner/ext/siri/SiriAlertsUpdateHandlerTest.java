@@ -15,6 +15,7 @@ import uk.org.siri.siri20.*;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -903,6 +904,40 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
     assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
+  }
+
+
+
+  @Test
+  public void testSiriSxWithOpenEndedValidity() {
+    init();
+
+    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+
+    final String situationNumber = "TST:SituationNumber:1234";
+    final String stopId0 = "stop0";
+    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
+        ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+        null,
+        createAffectsStop(new ArrayList<>(), stopId0)
+    );
+
+    final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
+    alertsUpdateHandler.update(serviceDelivery);
+
+    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+
+    final FeedScopedId stopId = new FeedScopedId("FEED", stopId0);
+
+    Collection<TransitAlert> tripPatches = transitAlertService.getStopAlerts(stopId);
+
+    assertNotNull(tripPatches);
+    assertEquals(1, tripPatches.size());
+    TransitAlert transitAlert = tripPatches.iterator().next();
+    assertEquals(situationNumber, transitAlert.getId());
+
+    assertNotNull(transitAlert.getEffectiveStartDate());
+    assertNull(transitAlert.getEffectiveEndDate());
   }
 
   private AffectsScopeStructure createAffectsLineWithExternallyDefinedStopPoints(

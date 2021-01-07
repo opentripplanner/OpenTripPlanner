@@ -112,9 +112,10 @@ public class TransitAlert implements Serializable {
     public Date getEffectiveEndDate() {
         return timePeriods
             .stream()
+            .filter(timePeriod -> timePeriod.endTime > 0)
             .map(timePeriod -> timePeriod.endTime)
             .max(Comparator.naturalOrder())
-            .map(startTime -> new Date(startTime * 1000))
+            .map(endTime -> new Date(endTime * 1000))
             .orElse(null);
     }
 
