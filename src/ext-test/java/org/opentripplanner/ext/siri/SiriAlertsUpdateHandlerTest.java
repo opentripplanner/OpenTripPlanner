@@ -916,11 +916,25 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
+
     PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+        null,
         null,
         createAffectsStop(new ArrayList<>(), stopId0)
     );
+
+    // Add period with start- and endtime
+    HalfOpenTimestampOutputRangeStructure period_1 = new HalfOpenTimestampOutputRangeStructure();
+    period_1.setStartTime(ZonedDateTime.parse("2020-01-01T10:00:00+01:00"));
+    period_1.setEndTime(ZonedDateTime.parse("2020-02-01T11:00:00+01:00"));
+    ptSituation.getValidityPeriods().add(period_1);
+
+
+    // Add period with start-, but NO endtime - i.e. open-ended
+    HalfOpenTimestampOutputRangeStructure period_2 = new HalfOpenTimestampOutputRangeStructure();
+    period_2.setStartTime(ZonedDateTime.parse("2020-02-02T10:00:00+01:00"));
+    period_2.setEndTime(null);
+    ptSituation.getValidityPeriods().add(period_2);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
     alertsUpdateHandler.update(serviceDelivery);
@@ -937,6 +951,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
 
     assertNotNull(transitAlert.getEffectiveStartDate());
+
+    assertEquals(period_1.getStartTime().toEpochSecond(), (transitAlert.getEffectiveStartDate().getTime()/1000));
+
     assertNull(transitAlert.getEffectiveEndDate());
   }
 
