@@ -146,18 +146,6 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
-                <executions>
-                    <execution>
-                        <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
-                        <id>package-javadoc</id>
-                        <phase>package</phase>
-                        <goals><goal>jar</goal></goals>
-                        <configuration>
-                            <classesDirectory>${basedir}/docs/javadoc</classesDirectory>
-                            <classifier>javadoc</classifier>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
