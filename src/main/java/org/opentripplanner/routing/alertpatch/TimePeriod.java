@@ -12,6 +12,8 @@ public class TimePeriod {
     //           - a external API version should be created to decouple the internal model
     //           - from any API usage.
 
+    public static final long OPEN_ENDED = Long.MAX_VALUE;
+
     public TimePeriod(long start, long end) {
         this.startTime = start;
         this.endTime = end;

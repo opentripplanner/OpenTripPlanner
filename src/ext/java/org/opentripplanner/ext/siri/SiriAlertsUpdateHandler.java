@@ -135,13 +135,14 @@ public class SiriAlertsUpdateHandler {
                 final long realStart = activePeriod.getStartTime() != null ? getEpochSecond(activePeriod.getStartTime()) : 0;
                 final long start = activePeriod.getStartTime() != null? realStart - earlyStart : 0;
 
-                final long realEnd = activePeriod.getEndTime() != null ? getEpochSecond(activePeriod.getEndTime()) : 0;
-                final long end = activePeriod.getEndTime() != null? realEnd  : 0;
+                final long realEnd = activePeriod.getEndTime() != null ? getEpochSecond(activePeriod.getEndTime()) : TimePeriod.OPEN_ENDED;
+                final long end = activePeriod.getEndTime() != null? realEnd  : TimePeriod.OPEN_ENDED;
+
                 periods.add(new TimePeriod(start, end));
             }
         } else {
             // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-            periods.add(new TimePeriod(0, Long.MAX_VALUE));
+            periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
         }
 
         alert.setTimePeriods(periods);
