@@ -125,7 +125,7 @@ public class TransitAlert implements Serializable {
             .stream()
             .map(timePeriod -> timePeriod.endTime)
             .max(Comparator.naturalOrder())
-            .filter(timePeriod -> timePeriod < TimePeriod.OPEN_ENDED) //If open-ended, null should be returned
+            .filter(endTime -> endTime < TimePeriod.OPEN_ENDED) //If open-ended, null should be returned
             .map(endTime -> new Date(endTime * 1000))
             .orElse(null);
     }
