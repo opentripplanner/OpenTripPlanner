@@ -50,7 +50,7 @@ public class DefaultCostCalculator<T extends RaptorTripSchedule> implements Cost
         int boardTime,
         T trip
     ) {
-        // The relative-transit-ime is time spent on transit. We do not know the alight-stop, so
+        // The relative-transit-time is time spent on transit. We do not know the alight-stop, so
         // it is impossible to calculate the "correct" time. But the only thing that maters is that
         // the relative difference between to boardings are correct, assuming riding the same trip.
         // So, we can use the negative board time as relative-transit-time.

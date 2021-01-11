@@ -23,7 +23,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     private final SearchDirection searchDirection;
     private final Set<Optimization> optimizations;
     private final McCostParams mcCostParams;
-    private final DebugRequest<T> debug;
+    private final DebugRequest debug;
     private final RaptorSlackProvider slackProvider;
 
 
@@ -137,7 +137,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
      * <p/>
      * This feature is optional, by default debugging is turned off.
      */
-    public DebugRequest<T> debug() {
+    public DebugRequest debug() {
         return debug;
     }
 

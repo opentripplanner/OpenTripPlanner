@@ -16,7 +16,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 class StateDebugger<T extends RaptorTripSchedule> {
     private final StopsCursor<T> cursor;
     private final RoundProvider roundProvider;
-    private final DebugHandler<ArrivalView<T>> debugHandlerStopArrivals;
+    private final DebugHandler<ArrivalView<?>> debugHandlerStopArrivals;
 
     StateDebugger(
             StopsCursor<T> cursor,

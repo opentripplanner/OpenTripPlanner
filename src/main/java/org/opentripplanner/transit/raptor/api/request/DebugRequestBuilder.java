@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.api.request;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 import java.util.ArrayList;
@@ -16,19 +15,17 @@ import java.util.stream.Collectors;
 
 /**
  * Mutable version of {@link DebugRequest}.
- *
- * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DebugRequestBuilder<T extends RaptorTripSchedule> {
+public class DebugRequestBuilder {
     private final List<Integer> stops = new ArrayList<>();
     private final List<Integer> path = new ArrayList<>();
     private int debugPathFromStopIndex;
-    private Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener;
-    private Consumer<DebugEvent<Path<T>>> pathFilteringListener;
+    private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
+    private Consumer<DebugEvent<Path<?>>> pathFilteringListener;
     private DebugLogger logger;
 
 
-    DebugRequestBuilder(DebugRequest<T> debug) {
+    DebugRequestBuilder(DebugRequest debug) {
         this.stops.addAll(debug.stops());
         this.path.addAll(debug.path());
         this.debugPathFromStopIndex = debug.debugPathFromStopIndex();
@@ -42,12 +39,12 @@ public class DebugRequestBuilder<T extends RaptorTripSchedule> {
         return stops;
     }
 
-    public DebugRequestBuilder<T> addStops(Collection<Integer> stops) {
+    public DebugRequestBuilder addStops(Collection<Integer> stops) {
         this.stops.addAll(stops);
         return this;
     }
 
-    public DebugRequestBuilder<T> addStops(int ... stops) {
+    public DebugRequestBuilder addStops(int ... stops) {
         return addStops(Arrays.stream(stops).boxed().collect(Collectors.toList()));
     }
 
@@ -55,7 +52,7 @@ public class DebugRequestBuilder<T extends RaptorTripSchedule> {
         return path;
     }
 
-    public DebugRequestBuilder<T> addPath(Collection<Integer> path) {
+    public DebugRequestBuilder addPath(Collection<Integer> path) {
         if(!path.isEmpty()) {
             throw new IllegalStateException("The API support only one debug path. Existing: " + this.path + ", new: " + path);
         }
@@ -67,26 +64,26 @@ public class DebugRequestBuilder<T extends RaptorTripSchedule> {
         return debugPathFromStopIndex;
     }
 
-    public DebugRequestBuilder<T> debugPathFromStopIndex(Integer debugPathStartAtStopIndex) {
+    public DebugRequestBuilder debugPathFromStopIndex(Integer debugPathStartAtStopIndex) {
         this.debugPathFromStopIndex = debugPathStartAtStopIndex;
         return this;
     }
 
-    public Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener() {
+    public Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener() {
         return stopArrivalListener;
     }
 
-    public DebugRequestBuilder<T> stopArrivalListener(Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener) {
-        this.stopArrivalListener = stopArrivalListener;
+    public DebugRequestBuilder stopArrivalListener(Consumer<DebugEvent<ArrivalView<?>>> listener) {
+        this.stopArrivalListener = listener;
         return this;
     }
 
-    public Consumer<DebugEvent<Path<T>>> pathFilteringListener() {
+    public Consumer<DebugEvent<Path<?>>> pathFilteringListener() {
         return pathFilteringListener;
     }
 
-    public DebugRequestBuilder<T> pathFilteringListener(Consumer<DebugEvent<Path<T>>> pathFilteringListener) {
-        this.pathFilteringListener = pathFilteringListener;
+    public DebugRequestBuilder pathFilteringListener(Consumer<DebugEvent<Path<?>>> listener) {
+        this.pathFilteringListener = listener;
         return this;
     }
 
@@ -94,18 +91,17 @@ public class DebugRequestBuilder<T extends RaptorTripSchedule> {
         return logger;
     }
 
-    public DebugRequestBuilder<T> logger(DebugLogger logger) {
+    public DebugRequestBuilder logger(DebugLogger logger) {
         this.logger = logger;
         return this;
     }
 
-    public DebugRequestBuilder<T> reverseDebugRequest() {
+    public DebugRequestBuilder reverseDebugRequest() {
         Collections.reverse(this.path);
         return this;
     }
 
-    public DebugRequest<T> build() {
-        return new DebugRequest<>(this);
+    public DebugRequest build() {
+        return new DebugRequest(this);
     }
-
 }

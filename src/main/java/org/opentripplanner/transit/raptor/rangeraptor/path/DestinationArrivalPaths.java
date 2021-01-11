@@ -33,7 +33,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final TransitCalculator transitCalculator;
     private final CostCalculator<T> costCalculator;
     private final PathMapper<T> pathMapper;
-    private final DebugHandler<ArrivalView<T>> debugHandler;
+    private final DebugHandler<ArrivalView<?>> debugHandler;
     private boolean reachedCurrentRound = false;
     private int iterationDepartureTime = -1;
 

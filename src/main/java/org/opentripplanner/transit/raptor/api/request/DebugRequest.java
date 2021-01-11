@@ -40,23 +40,21 @@ import java.util.function.Consumer;
  * This is very effect if you expect a trip and don´t get it. Most likely you will get a
  * REJECT or DROP event for your trip in return. You will also get a list of tips dominating
  * the particular trip.
- *
- * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DebugRequest<T extends RaptorTripSchedule> {
+public class DebugRequest {
 
     /**
      * Return a debug request with defaults values.
      */
-    static <T extends RaptorTripSchedule> DebugRequest<T> defaults() {
-        return new DebugRequest<>();
+    static <T extends RaptorTripSchedule> DebugRequest defaults() {
+        return new DebugRequest();
     }
 
     private final List<Integer> stops;
     private final List<Integer> path;
     private final int debugPathFromStopIndex;
-    private final Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener;
-    private final Consumer<DebugEvent<Path<T>>> pathFilteringListener;
+    private final Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
+    private final Consumer<DebugEvent<Path<?>>> pathFilteringListener;
     private final DebugLogger logger;
 
     private DebugRequest() {
@@ -68,7 +66,7 @@ public class DebugRequest<T extends RaptorTripSchedule> {
         logger = (topic, message) -> {};
     }
 
-    DebugRequest(DebugRequestBuilder<T> builder) {
+    DebugRequest(DebugRequestBuilder builder) {
         this.stops = Collections.unmodifiableList(builder.stops());
         this.path = Collections.unmodifiableList(builder.path());
         this.debugPathFromStopIndex = builder.debugPathFromStopIndex();
@@ -104,14 +102,14 @@ public class DebugRequest<T extends RaptorTripSchedule> {
     /**
      * Stop arrival debug event listener
      */
-    public Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener() {
+    public Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener() {
         return stopArrivalListener;
     }
 
     /**
      * Path debug event listener
      */
-    public Consumer<DebugEvent<Path<T>>> pathFilteringListener() {
+    public Consumer<DebugEvent<Path<?>>> pathFilteringListener() {
         return pathFilteringListener;
     }
 
@@ -142,7 +140,7 @@ public class DebugRequest<T extends RaptorTripSchedule> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DebugRequest<?> that = (DebugRequest<?>) o;
+        DebugRequest that = (DebugRequest) o;
         return debugPathFromStopIndex == that.debugPathFromStopIndex &&
                 Objects.equals(stops, that.stops) &&
                 Objects.equals(path, that.path);

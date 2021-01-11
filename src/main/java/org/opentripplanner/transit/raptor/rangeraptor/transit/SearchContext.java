@@ -197,8 +197,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
                 : new ReverseTransitCalculator(s, t);
     }
 
-    private static <S extends RaptorTripSchedule> DebugRequest<S> debugRequest(
-            RaptorRequest<S> request
+    private static <S extends RaptorTripSchedule> DebugRequest debugRequest(
+        RaptorRequest<S> request
     ) {
         return request.searchDirection().isForward()
                 ? request.debug()

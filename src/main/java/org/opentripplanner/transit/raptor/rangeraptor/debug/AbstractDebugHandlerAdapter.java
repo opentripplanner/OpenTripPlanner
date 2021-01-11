@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * is provide a common logic for the adapters between the Range Raptor domain and the
  * outside client - the event listeners and the request API.
  *
- * @param <T> The TripSchedule type defined by the user of the raptor API.
+ * @param <T> The element type for the debug event
  */
 abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
     private final List<Integer> stops;
@@ -24,7 +24,7 @@ abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
     private int iterationDepartureTime = -1;
 
     AbstractDebugHandlerAdapter(
-            DebugRequest<?> debugRequest,
+            DebugRequest debugRequest,
             Consumer<DebugEvent<T>> eventListener,
             WorkerLifeCycle lifeCycle
     ) {

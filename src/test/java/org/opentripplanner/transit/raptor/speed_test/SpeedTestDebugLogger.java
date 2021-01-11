@@ -5,7 +5,6 @@ import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.util.IntUtils;
@@ -22,7 +21,7 @@ import static org.opentripplanner.util.TableFormatter.Align.Center;
 import static org.opentripplanner.util.TableFormatter.Align.Left;
 import static org.opentripplanner.util.TableFormatter.Align.Right;
 
-class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger {
+class SpeedTestDebugLogger implements DebugLogger {
     private static final int NOT_SET = Integer.MIN_VALUE;
 
     private final boolean enableDebugLogging;
@@ -48,7 +47,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         this.enableDebugLogging = enableDebugLogging;
     }
 
-    void stopArrivalLister(DebugEvent<ArrivalView<T>> e) {
+    public void stopArrivalLister(DebugEvent<ArrivalView<?>> e) {
 
         printIterationHeader(e.iterationStartTime());
         printRoundHeader(e.element().round());
@@ -60,7 +59,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         }
     }
 
-    void pathFilteringListener(DebugEvent<Path<T>> e) {
+    void pathFilteringListener(DebugEvent<Path<?>> e) {
         if (pathHeader) {
             System.err.println();
             System.err.println(pathTableFormatter.printHeader());

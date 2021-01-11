@@ -29,7 +29,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     private final DestinationArrivalPaths<T> paths;
     private final TransitCalculator calculator;
     private final StopsCursor<T> cursor;
-    private final DebugHandler<ArrivalView<T>> debugHandler;
+    private final DebugHandler<ArrivalView<?>> debugHandler;
 
     private boolean newElementSet;
     private EgressStopArrivalState<T> bestEgressStopArrival = null;
@@ -48,8 +48,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
         this.cursor = cursor;
         lifeCycle.onSetupIteration((ignore) -> setupIteration());
         lifeCycle.onRoundComplete((ignore) -> roundComplete());
-
-        debugHandler = debugHandlerFactory.debugStopArrival();
+        this.debugHandler = debugHandlerFactory.debugStopArrival();
     }
 
     public void add(EgressStopArrivalState<T> egressStopArrival) {

@@ -8,6 +8,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
+import javax.annotation.Nullable;
+
 
 /**
  * Use this factory to create debug handlers. If a routing request has not enabled debugging
@@ -17,52 +19,50 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class DebugHandlerFactory<T extends RaptorTripSchedule> {
-    private DebugHandler<ArrivalView<T>> stopHandler;
-    private DebugHandler<Path<T>> pathHandler;
+  private final DebugHandler<ArrivalView<?>> stopHandler;
+  private final DebugHandler<Path<?>> pathHandler;
 
-    public DebugHandlerFactory(DebugRequest<T> request, WorkerLifeCycle lifeCycle) {
-        this.stopHandler = isDebug(request.stopArrivalListener())
-                ? new DebugHandlerStopArrivalAdapter<>(request, lifeCycle)
-                : null;
+  public DebugHandlerFactory(DebugRequest request, WorkerLifeCycle lifeCycle) {
+    this.stopHandler = isDebug(request.stopArrivalListener())
+        ? new DebugHandlerStopArrivalAdapter(request, lifeCycle)
+        : null;
 
-        this.pathHandler = isDebug(request.pathFilteringListener())
-                ? new DebugHandlerPathAdapter<>(request, lifeCycle)
-                : null;
-    }
+    this.pathHandler = isDebug(request.pathFilteringListener())
+        ? new DebugHandlerPathAdapter(request, lifeCycle)
+        : null;
+  }
 
-    /* Stop Arrival */
+  /* Stop Arrival */
 
-    public boolean isDebugStopArrival() {
-        return stopHandler != null;
-    }
+  public DebugHandler<ArrivalView<?>> debugStopArrival() {
+    return stopHandler;
+  }
 
-    public boolean isDebugStopArrival(int stop) {
-        return stopHandler != null && stopHandler.isDebug(stop);
-    }
+  @Nullable
+  public ParetoSetEventListener<ArrivalView<T>> paretoSetStopArrivalListener(int stop) {
+    return isDebugStopArrival(stop) ? new ParetoSetDebugHandlerAdapter<>(stopHandler) : null;
+  }
 
-    public DebugHandler<ArrivalView<T>> debugStopArrival() {
-        return stopHandler;
-    }
-
-    public ParetoSetEventListener<ArrivalView<T>> paretoSetStopArrivalListener(int stop) {
-        return isDebugStopArrival(stop) ? new ParetoSetDebugHandlerAdapter<>(stopHandler) : null;
-    }
+  public boolean isDebugStopArrival(int stop) {
+    return stopHandler != null && stopHandler.isDebug(stop);
+  }
 
 
-    /* path */
+  /* path */
 
-    @SuppressWarnings("WeakerAccess")
-    public boolean isDebugPath() {
-        return pathHandler != null;
-    }
+  @Nullable
+  public ParetoSetDebugHandlerAdapter<Path<?>> paretoSetDebugPathListener() {
+    return pathHandler == null ? null : new ParetoSetDebugHandlerAdapter<>(pathHandler);
+  }
 
-    public ParetoSetDebugHandlerAdapter<Path<T>> paretoSetDebugPathListener() {
-        return isDebugPath() ? new ParetoSetDebugHandlerAdapter<>(pathHandler) : null;
-    }
 
-    /* private methods */
+  /* private methods */
 
-    private boolean isDebug(Object handler) {
-        return handler != null;
-    }
+  private boolean isDebug(Object handler) {
+    return handler != null;
+  }
+
+  public boolean isDebugStopArrival() {
+    return stopHandler != null;
+  }
 }
