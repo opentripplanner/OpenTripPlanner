@@ -5,7 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 /**
  * Provide egress leg information to debugger and path mapping.
  */
-public interface EgressLegView {
+public interface EgressPathView {
 
   /**
    * The transit model egress connecting this leg to the start or end location of the search.

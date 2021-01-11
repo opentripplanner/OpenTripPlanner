@@ -109,7 +109,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         return false;
     }
 
-    default EgressLegView egressLeg() {
+    default EgressPathView egressLeg() {
         throw new UnsupportedOperationException();
     }
 
