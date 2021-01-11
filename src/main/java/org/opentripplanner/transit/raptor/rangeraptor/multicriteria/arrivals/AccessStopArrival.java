@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.AccessLegView;
+import org.opentripplanner.transit.raptor.api.view.AccessPathView;
 
 
 /**
@@ -25,7 +25,7 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
     }
 
     @Override
-    public AccessLegView accessLeg() { return () -> access; }
+    public AccessPathView accessLeg() { return () -> access; }
 
     @Override
     public AbstractStopArrival<T> timeShiftNewArrivalTime(int newRequestedArrivalTime) {

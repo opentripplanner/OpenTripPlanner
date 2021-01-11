@@ -73,7 +73,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         return false;
     }
 
-    default AccessLegView accessLeg() {
+    default AccessPathView accessLeg() {
         throw new UnsupportedOperationException();
     }
 
