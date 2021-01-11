@@ -54,17 +54,27 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
 
-    public void add(ArrivalView<T> egressStopArrival, RaptorTransfer egressLeg, int additionalCost) {
-        int departureTime = transitCalculator.departureTime(egressLeg, egressStopArrival.arrivalTime());
+    public void add(
+        ArrivalView<T> egressStopArrival,
+        RaptorTransfer egressPath,
+        int additionalCost
+    ) {
+        int departureTime = transitCalculator.departureTime(
+            egressPath,
+            egressStopArrival.arrivalTime()
+        );
 
         if (departureTime == -1) { return; }
 
-        int arrivalTime = transitCalculator.plusDuration(departureTime, egressLeg.durationInSeconds());
+        int arrivalTime = transitCalculator.plusDuration(
+            departureTime,
+            egressPath.durationInSeconds()
+        );
 
         int waitTimeInSeconds = Math.abs(departureTime - egressStopArrival.arrivalTime());
 
         DestinationArrival<T> destArrival = new DestinationArrival<>(
-            egressLeg,
+            egressPath,
             egressStopArrival,
             arrivalTime,
             additionalCost + costCalculator.waitCost(waitTimeInSeconds)

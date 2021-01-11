@@ -14,7 +14,7 @@ import java.util.Iterator;
  */
 public interface WorkerState<T extends RaptorTripSchedule> {
 
-    void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int iterationDepartureTime);
+    void setInitialTimeForIteration(RaptorTransfer accessPath, int iterationDepartureTime);
 
     boolean isNewRoundAvailable();
 

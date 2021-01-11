@@ -113,7 +113,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
     }
 
     private void print(ArrivalView<?> a, String action, String optReason) {
-        String pattern = a.arrivedByTransit() ? a.transitLeg().trip().pattern().debugInfo() : "";
+        String pattern = a.arrivedByTransit() ? a.transitPath().trip().pattern().debugInfo() : "";
         System.err.println(
             arrivalTableFormatter.printRow(
                 action,
@@ -137,7 +137,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
     }
 
     private static PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
-        if (a.arrivedByAccessLeg()) {
+        if (a.arrivedByAccess()) {
             return buf.walk(legDuration(a)).sep().stop(a.stop());
         }
         // Recursively call this method to insert arrival in front of this arrival
@@ -150,7 +150,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
                 throw new IllegalStateException("TODO: Add support for REVERSE search!");
             }
             TripTimesSearch.BoarAlightTimes b = TripTimesSearch.findTripForwardSearch(a);
-            buf.transit(a.transitLeg().trip().pattern().debugInfo(), b.boardTime, a.arrivalTime());
+            buf.transit(a.transitPath().trip().pattern().debugInfo(), b.boardTime, a.arrivalTime());
         } else {
             buf.walk(legDuration(a));
         }
@@ -161,14 +161,14 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
      * The absolute time duration in seconds of a trip.
      */
     private static int legDuration(ArrivalView<?> a) {
-        if(a.arrivedByAccessLeg()) {
-            return a.accessLeg().access().durationInSeconds();
+        if(a.arrivedByAccess()) {
+            return a.accessPath().access().durationInSeconds();
         }
         if(a.arrivedByTransfer()) {
-            return a.transferLeg().durationInSeconds();
+            return a.transferPath().durationInSeconds();
         }
         if(a.arrivedAtDestination()) {
-            return a.egressLeg().egress().durationInSeconds();
+            return a.egressPath().egress().durationInSeconds();
         }
         throw new IllegalStateException("Unsuported type: " + a.getClass());
     }
@@ -189,7 +189,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
     }
 
     private String legType(ArrivalView<?> a) {
-        if (a.arrivedByAccessLeg()) { return "Access"; }
+        if (a.arrivedByAccess()) { return "Access"; }
         if (a.arrivedByTransit()) { return "Transit"; }
         // We use Walk instead of Transfer so it is easier to distinguish from Transit
         if (a.arrivedByTransfer()) { return "Walk"; }

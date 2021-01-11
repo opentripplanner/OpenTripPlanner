@@ -13,7 +13,7 @@ import org.opentripplanner.transit.raptor.util.TimeUtils;
  * latest-alight-time - this is done to avoid boarding at the correct stop, but at the wrong time.
  * This can happen for patterns goes in a loop, visit the same stop more than once.
  * <p>
- * This class is used to find board- and alight-times for transfer legs when mapping stop-arrivals
+ * This class is used to find board- and alight-times for transfer paths when mapping stop-arrivals
  * to paths. The board and alight times are not stored in the stop-arrival state to save memory and
  * to speed up the search. Searching for this after the search is done to create paths is ok, since
  * the number of paths are a very small number compared to stop-arrivals during the search.
@@ -37,7 +37,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     public static <S extends RaptorTripSchedule> BoarAlightTimes findTripForwardSearch(
         ArrivalView<S> arrival
     ) {
-        S trip = arrival.transitLeg().trip();
+        S trip = arrival.transitPath().trip();
         int fromStop = arrival.previous().stop();
         int toStop = arrival.stop();
         int latestArrivalTime = arrival.arrivalTime();
@@ -53,7 +53,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     public static <S extends RaptorTripSchedule> BoarAlightTimes findTripReverseSearch(
         ArrivalView<S> arrival
     ) {
-        S trip = arrival.transitLeg().trip();
+        S trip = arrival.transitPath().trip();
         int fromStop = arrival.stop();
         int toStop = arrival.previous().stop();
         int earliestBoardTime = arrival.arrivalTime();

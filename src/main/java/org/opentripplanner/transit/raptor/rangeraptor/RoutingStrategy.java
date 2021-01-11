@@ -14,6 +14,12 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch
 public interface RoutingStrategy<T extends RaptorTripSchedule> {
 
     /**
+     * Sets the access times for the departure stops. This method is called for each possible
+     * access path.
+     */
+    void setInitialTimeForIteration(RaptorTransfer it, int iterationDepartureTime);
+
+    /**
      * Prepare the {@link RoutingStrategy} to route using the given pattern and tripSearch.
      */
     void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch);
@@ -29,10 +35,4 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
      *                              #prepareForTransitWith(RaptorTripPattern, TripScheduleSearch)}
      */
     void routeTransitAtStop(final int stopPositionInPattern);
-
-    /**
-     * Sets the access times for the departure stops. This method is called for each possible access
-     * leg.
-     */
-    void setInitialTimeForIteration(RaptorTransfer it, int iterationDepartureTime);
 }

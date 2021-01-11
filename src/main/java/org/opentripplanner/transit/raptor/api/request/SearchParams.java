@@ -212,7 +212,7 @@ public class SearchParams {
     /**
      * List of access paths from the origin to all transit stops using the street network.
      * <p/>
-     * Required, at least one access leg must exist.
+     * Required, at least one access path must exist.
      */
     public Collection<RaptorTransfer> accessPaths() {
         return accessPaths;
@@ -221,10 +221,10 @@ public class SearchParams {
     /**
      * List of all possible egress paths to reach the destination using the street network.
      * <p>
-     * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress leg
-     * start, NOT the destination - think of it as a reversed leg.
+     * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path
+     * start, NOT the destination - think of it as a reversed path.
      * <p/>
-     * Required, at least one egress leg must exist.
+     * Required, at least one egress path must exist.
      */
     public Collection<RaptorTransfer> egressPaths() {
         return egressPaths;
@@ -273,7 +273,7 @@ public class SearchParams {
                 earliestDepartureTime != TIME_NOT_SET || latestArrivalTime != TIME_NOT_SET,
                 "'earliestDepartureTime' or 'latestArrivalTime' is required."
         );
-        assertProperty(!accessPaths.isEmpty(), "At least one 'accessLegs' is required.");
-        assertProperty(!egressPaths.isEmpty(), "At least one 'egressLegs' is required.");
+        assertProperty(!accessPaths.isEmpty(), "At least one 'accessPath' is required.");
+        assertProperty(!egressPaths.isEmpty(), "At least one 'egressPath' is required.");
     }
 }

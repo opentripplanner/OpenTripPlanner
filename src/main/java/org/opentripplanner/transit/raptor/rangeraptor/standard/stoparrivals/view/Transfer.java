@@ -29,7 +29,7 @@ final class Transfer<T extends RaptorTripSchedule>
     }
 
     @Override
-    public TransferPathView transferLeg() {
+    public TransferPathView transferPath() {
         return this;
     }
 

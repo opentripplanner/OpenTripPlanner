@@ -7,7 +7,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 /**
  * Round tracker to keep track of round index and when to stop exploring new rounds.
  * <p>
- * In round 0 the access legs are added. In round 1 the first transit and transfers is added, ...
+ * In round 0 the access paths with one leg are added. In round 1 the first transit and transfers
+ * is added, ...
  */
 public class RoundTracker implements RoundProvider {
 
@@ -77,7 +78,7 @@ public class RoundTracker implements RoundProvider {
     }
 
     /**
-     * Return true if this round is the fist round, calculating the first transit leg.
+     * Return true if this round is the fist round, calculating the first transit path.
      * Access is calculated in round zero (0).
      */
     public boolean isFirstRound() {

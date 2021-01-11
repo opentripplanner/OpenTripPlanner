@@ -36,7 +36,7 @@ final class DebugHandlerStopArrivalAdapter<T extends RaptorTripSchedule>
     private Iterable<Integer> listStopsForDebugging(ArrivalView<T> it) {
         LinkedList<Integer> stops = new LinkedList<>();
 
-        while (!it.arrivedByAccessLeg()) {
+        while (!it.arrivedByAccess()) {
             stops.addFirst(it.stop());
             it = it.previous();
         }

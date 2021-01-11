@@ -11,10 +11,10 @@ public class Access extends AbstractStopArrival {
         super(0, stop, arrivalTime, 1000, null);
         this.access = new TestRaptorTransfer(stop, Math.abs(arrivalTime - departureTime));
     }
-    @Override public boolean arrivedByAccessLeg() { return true; }
+    @Override public boolean arrivedByAccess() { return true; }
 
     @Override
-    public AccessPathView accessLeg() {
+    public AccessPathView accessPath() {
         return () -> access;
     }
 }

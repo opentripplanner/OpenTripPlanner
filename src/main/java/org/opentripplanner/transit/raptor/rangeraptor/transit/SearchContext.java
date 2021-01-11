@@ -80,20 +80,20 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
 
-    public Collection<RaptorTransfer> accessLegs() {
+    public Collection<RaptorTransfer> accessPaths() {
         return request.searchDirection().isForward()
                 ? request.searchParams().accessPaths()
                 : request.searchParams().egressPaths();
     }
 
-    public Collection<RaptorTransfer> egressLegs() {
+    public Collection<RaptorTransfer> egressPaths() {
         return request.searchDirection().isForward()
                 ? request.searchParams().egressPaths()
                 : request.searchParams().accessPaths();
     }
 
     public int[] egressStops() {
-        return egressLegs().stream().mapToInt(RaptorTransfer::stop).toArray();
+        return egressPaths().stream().mapToInt(RaptorTransfer::stop).toArray();
     }
 
     public SearchParams searchParams() {
@@ -127,7 +127,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     /**
      * The board-slack (duration time in seconds) to add to the stop arrival time,
      * before boarding the given trip pattern. THIS DO NOT INCLUDE THE transfer-slack,
-     * and should only be used to time-shift the access-leg.
+     * and should only be used to time-shift the access-path.
      * <p>
      * Unit: seconds.
      */

@@ -75,12 +75,11 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     }
 
     @Override
-    public void setInitialTimeForIteration(RaptorTransfer accessLeg, int departureTime) {
+    public void setInitialTimeForIteration(RaptorTransfer accessPath, int departureTime) {
         addStopArrival(
                 new AccessStopArrival<>(
                         departureTime,
-                        costCalculator.walkCost(accessLeg.durationInSeconds()),
-                        accessLeg
+                        costCalculator.walkCost(accessPath.durationInSeconds()), accessPath
                 )
         );
     }
@@ -117,10 +116,10 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
 
         if (exceedsTimeLimit(stopArrivalTime)) { return; }
 
-        // Calculate wait time before and after the transit leg
+        // Calculate wait time before and after the transit path
         final int waitTime = ride.boardWaitTime + alightSlack;
 
-        final int costTransitLeg = costCalculator.transitArrivalCost(
+        final int costTransit = costCalculator.transitArrivalCost(
             ride.prevArrival,
             waitTime,
             alightTime - ride.boardTime,
@@ -132,7 +131,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
                         ride.prevArrival,
                         alightStop,
                         stopArrivalTime,
-                        costTransitLeg,
+                        costTransit,
                         ride.trip
                 )
         );

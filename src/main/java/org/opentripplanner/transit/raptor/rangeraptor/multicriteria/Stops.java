@@ -39,7 +39,7 @@ public final class Stops<T extends RaptorTripSchedule> {
      */
     public Stops(
             int nStops,
-            Collection<RaptorTransfer> egressLegs,
+            Collection<RaptorTransfer> egressPath,
             DestinationArrivalPaths<T> paths,
             CostCalculator<T> costCalculator,
             DebugHandlerFactory<T> debugHandlerFactory,
@@ -51,12 +51,12 @@ public final class Stops<T extends RaptorTripSchedule> {
         this.debugHandlerFactory = debugHandlerFactory;
         this.debugStats = new DebugStopArrivalsStatistics(debugLogger);
 
-        Collection<Map.Entry<Integer, List<RaptorTransfer>>> groupedEgressLegs = egressLegs
+        Collection<Map.Entry<Integer, List<RaptorTransfer>>> groupedEgressPaths = egressPath
             .stream()
             .collect(Collectors.groupingBy(RaptorTransfer::stop))
             .entrySet();
 
-        for (Map.Entry<Integer, List<RaptorTransfer>> it : groupedEgressLegs) {
+        for (Map.Entry<Integer, List<RaptorTransfer>> it : groupedEgressPaths) {
             glueTogetherEgressStopWithDestinationArrivals(it, costCalculator, paths);
         }
     }
@@ -112,14 +112,14 @@ public final class Stops<T extends RaptorTripSchedule> {
      * stop, the "glue" make sure new destination arrivals is added to the destination arrivals.
      */
     private void glueTogetherEgressStopWithDestinationArrivals(
-            Map.Entry<Integer, List<RaptorTransfer>> egressLegs,
+            Map.Entry<Integer, List<RaptorTransfer>> egressPaths,
             CostCalculator<T> costCalculator,
             DestinationArrivalPaths<T> paths
     ) {
-        int stop = egressLegs.getKey();
+        int stop = egressPaths.getKey();
         // The factory is creating the actual "glue"
         this.stops[stop] = StopArrivalParetoSet.createEgressStopArrivalSet(
-                egressLegs,
+                egressPaths,
                 costCalculator,
                 paths,
                 debugHandlerFactory

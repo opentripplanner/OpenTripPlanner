@@ -31,17 +31,17 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
      * Setup egress arrivals with a callback witch is notified when a new transit egress arrival happens.
      */
     public void setupEgressStopStates(
-            Iterable<RaptorTransfer> egressLegs,
+            Iterable<RaptorTransfer> egressPaths,
             Consumer<EgressStopArrivalState<T>> transitArrivalCallback
     ) {
         for (int round = 1; round < stops.length; round++) {
-            for (RaptorTransfer leg : egressLegs) {
+            for (RaptorTransfer egressPath : egressPaths) {
                 EgressStopArrivalState<T> state = new EgressStopArrivalState<>(
                         round,
-                        leg,
+                        egressPath,
                         transitArrivalCallback
                 );
-                stops[round][leg.stop()] = state;
+                stops[round][egressPath.stop()] = state;
             }
         }
     }
@@ -82,11 +82,11 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     /**
      * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
      */
-    void transferToStop(int fromStop, RaptorTransfer transferLeg, int arrivalTime) {
-        int stop = transferLeg.stop();
+    void transferToStop(int fromStop, RaptorTransfer transfer, int arrivalTime) {
+        int stop = transfer.stop();
         StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
 
-        state.transferToStop(fromStop, arrivalTime, transferLeg.durationInSeconds());
+        state.transferToStop(fromStop, arrivalTime, transfer.durationInSeconds());
     }
 
     int bestTimePreviousRound(int stop) {

@@ -56,11 +56,11 @@ public final class StdStopArrivalsState<T extends RaptorTripSchedule> implements
     }
 
     @Override
-    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
-        stops.transferToStop(fromStop, transferLeg, arrivalTime);
+    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
+        stops.transferToStop(fromStop, transfer, arrivalTime);
     }
 
     @Override
-    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
+    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
     }
 }

@@ -85,7 +85,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     }
 
     private int destinationArrivalTime(EgressStopArrivalState<T> arrival) {
-        return calculator.plusDuration(arrival.transitTime(), arrival.egressLeg().durationInSeconds());
+        return calculator.plusDuration(arrival.transitTime(), arrival.egressPath().durationInSeconds());
     }
 
     @Override
@@ -94,6 +94,6 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     }
 
     private void addToPath(final EgressStopArrivalState<T> it) {
-        paths.add(cursor.transit(it.round(), it.stop()), it.egressLeg(), 0);
+        paths.add(cursor.transit(it.round(), it.stop()), it.egressPath(), 0);
     }
 }

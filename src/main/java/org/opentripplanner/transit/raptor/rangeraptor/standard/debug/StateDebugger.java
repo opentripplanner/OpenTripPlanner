@@ -50,9 +50,9 @@ class StateDebugger<T extends RaptorTripSchedule> {
         }
     }
 
-    void rejectTransfer(int fromStop, RaptorTransfer transferLeg, int toStop, int arrivalTime) {
-        if (isDebug(transferLeg.stop())) {
-            reject(cursor.rejectedTransfer(round(), fromStop, transferLeg, toStop, arrivalTime));
+    void rejectTransfer(int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
+        if (isDebug(transfer.stop())) {
+            reject(cursor.rejectedTransfer(round(), fromStop, transfer, toStop, arrivalTime));
         }
     }
 

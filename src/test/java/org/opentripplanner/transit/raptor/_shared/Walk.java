@@ -18,7 +18,7 @@ class Walk extends AbstractStopArrival {
         return true;
     }
 
-    @Override public TransferPathView transferLeg() {
+    @Override public TransferPathView transferPath() {
         return () -> durationInSeconds;
     }
 }

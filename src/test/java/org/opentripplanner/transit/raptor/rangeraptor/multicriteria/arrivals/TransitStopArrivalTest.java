@@ -65,7 +65,7 @@ public class TransitStopArrivalTest {
     public void arrivedByTransit() {
         assertTrue(subject.arrivedByTransit());
         assertFalse(subject.arrivedByTransfer());
-        assertFalse(subject.arrivedByAccessLeg());
+        assertFalse(subject.arrivedByAccess());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class TransitStopArrivalTest {
 
     @Test
     public void access() {
-        assertSame(ACCESS_ARRIVAL.accessLeg().access(), subject.previous().accessLeg().access());
+        assertSame(ACCESS_ARRIVAL.accessPath().access(), subject.previous().accessPath().access());
     }
 
     @Test

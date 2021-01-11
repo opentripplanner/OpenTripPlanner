@@ -107,7 +107,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         return new HeuristicsAdapter(
                 bestTimes(),
                 this.bestNumberOfTransfers,
-                ctx.egressLegs(),
+                ctx.egressPaths(),
                 ctx.calculator(),
                 ctx.lifeCycle()
         );
@@ -188,7 +188,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         // Use the  adapter to play the role of the destination arrival check
         setDestinationCheck(pathsAdapter);
 
-        stops().setupEgressStopStates(ctx.egressLegs(), pathsAdapter::add);
+        stops().setupEgressStopStates(ctx.egressPaths(), pathsAdapter::add);
 
         return destinationArrivalPaths;
     }

@@ -67,10 +67,10 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule> implem
     public void rejectNewBestTransitTime(int stop, int alightTime, T trip, int boardStop, int boardTime) { }
 
     @Override
-    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
-        bestNumberOfTransfers.arriveAtStop(transferLeg.stop());
+    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
+        bestNumberOfTransfers.arriveAtStop(transfer.stop());
     }
 
     @Override
-    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) { }
+    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) { }
 }

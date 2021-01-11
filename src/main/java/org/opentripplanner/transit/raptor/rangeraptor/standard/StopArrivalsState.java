@@ -33,7 +33,7 @@ public interface StopArrivalsState<T extends RaptorTripSchedule> {
 
     void rejectNewBestTransitTime(int alightStop, int alightTime, T trip, int boardStop, int boardTime);
 
-    void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg);
+    void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer);
 
-    void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg);
+    void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer);
 }

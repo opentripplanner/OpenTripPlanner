@@ -93,7 +93,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
                 workerState,
                 routingStrategy,
                 ctx.transit(),
-                ctx.accessLegs(),
+                ctx.accessPaths(),
                 ctx.roundProvider(),
                 ctx.calculator(),
                 ctx.createLifeCyclePublisher(),

@@ -15,14 +15,14 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 
 /**
- * Build a path from a destination arrival - this maps between the domain of routing
- * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
+ * Build a path from a destination arrival - this maps between the domain of routing to the domain
+ * of result paths. All values not needed for routing is computed as part of this mapping.
  * <p/>
- * This mapper maps the result of a reverse-search. And is therefor responsible for doing some adjustments
- * to the result. The internal state stores 'latest possible arrivaltimes', so to map back to paths the
- * 'board slack' is removed from the 'latest possible arrivaltime' to get next legs 'boardTime'. Also,
- * the path is reversed again, so the original origin - temporally made destination - is returned to origin
- * again ;-)
+ * This mapper maps the result of a reverse-search. And is therefore responsible for doing some
+ * adjustments to the result. The internal state stores 'latest possible arrival-times', so to map
+ * back to paths the 'board slack' is removed from the 'latest possible arrival-time' to get the
+ * next legs 'boardTime'. Also, the path is reversed again, so the original origin - temporally made
+ * destination - is returned to origin again ;-)
  * <p/>
  * This mapper uses recursion to reverse the results.
  */
@@ -52,7 +52,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
 
     AccessPathLeg<T> mapAccessLeg(DestinationArrival<T> destArrival) {
         ArrivalView<T> prevArrival = destArrival.previous();
-        RaptorTransfer access = destArrival.egressLeg().egress();
+        RaptorTransfer access = destArrival.egressPath().egress();
         int targetDepartureTime = destArrival.arrivalTime();
         int targetArrivalTime = destArrival.arrivalTime() + access.durationInSeconds();
 
@@ -69,7 +69,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     private TransitPathLeg<T> mapToTransit(ArrivalView<T> fromStopArrival) {
         // In reverse the previous is in our "toStop"
         ArrivalView<T> toStopArrival = fromStopArrival.previous();
-        T trip = fromStopArrival.transitLeg().trip();
+        T trip = fromStopArrival.transitPath().trip();
 
         // Map stops and times into a forward search context
         int fromStop = fromStopArrival.stop();
@@ -98,17 +98,17 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         else if(fromStopArrival.arrivedByTransfer()) {
             return mapToTransfer(fromStopArrival);
         }
-        else if(fromStopArrival.arrivedByAccessLeg()) {
+        else if(fromStopArrival.arrivedByAccess()) {
             return mapToEgressLeg(fromStopArrival);
         }
-        throw new IllegalStateException("Unknown leg type for: " + fromStopArrival);
+        throw new IllegalStateException("Unknown path type for: " + fromStopArrival);
     }
 
     private TransferPathLeg<T> mapToTransfer(ArrivalView<T> fromStopArrival) {
         ArrivalView<T> toStopArrival = fromStopArrival.previous();
 
         int targetArrivalTime = fromStopArrival.arrivalTime() + fromStopArrival
-            .transferLeg()
+            .transferPath()
             .durationInSeconds();
         return new TransferPathLeg<T>(
                 fromStopArrival.stop(),
@@ -121,7 +121,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     }
 
     private EgressPathLeg<T> mapToEgressLeg(ArrivalView<T> accessArrival) {
-        RaptorTransfer egress = accessArrival.accessLeg().access();
+        RaptorTransfer egress = accessArrival.accessPath().access();
         int targetDepartureTime = accessArrival.arrivalTime();
         int targetArrivalTime = accessArrival.arrivalTime() + egress.durationInSeconds();
 

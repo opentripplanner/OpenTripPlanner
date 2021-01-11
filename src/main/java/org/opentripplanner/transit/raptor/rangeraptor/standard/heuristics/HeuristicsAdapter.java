@@ -23,7 +23,7 @@ public class HeuristicsAdapter implements Heuristics {
     private int originDepartureTime = -1;
     private final BestTimes times;
     private final BestNumberOfTransfers transfers;
-    private final Collection<RaptorTransfer> egressLegs;
+    private final Collection<RaptorTransfer> egressPaths;
     private final TransitCalculator calculator;
     private boolean aggregatedResultsCalculated = false;
 
@@ -33,13 +33,13 @@ public class HeuristicsAdapter implements Heuristics {
     public HeuristicsAdapter(
             BestTimes times,
             BestNumberOfTransfers transfers,
-            Collection<RaptorTransfer> egressLegs,
+            Collection<RaptorTransfer> egressPaths,
             TransitCalculator calculator,
             WorkerLifeCycle lifeCycle
     ) {
         this.times = times;
         this.transfers = transfers;
-        this.egressLegs = egressLegs;
+        this.egressPaths = egressPaths;
         this.calculator = calculator;
         lifeCycle.onSetupIteration(this::setUpIteration);
     }
@@ -111,7 +111,7 @@ public class HeuristicsAdapter implements Heuristics {
     private void calculateAggregatedResults() {
         if(aggregatedResultsCalculated) { return; }
 
-        for (RaptorTransfer it : egressLegs) {
+        for (RaptorTransfer it : egressPaths) {
             if(reached(it.stop())) {
                 int t = bestTravelDuration(it.stop()) + it.durationInSeconds();
                 minJourneyTravelDuration = Math.min(minJourneyTravelDuration, t);

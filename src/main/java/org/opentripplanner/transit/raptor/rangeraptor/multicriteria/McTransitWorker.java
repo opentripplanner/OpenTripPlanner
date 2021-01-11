@@ -84,17 +84,15 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                 final T trip = tripSearch.getCandidateTrip();
                 final int boardTime = trip.departure(stopPos);
 
-                // It the previous leg can
-                if(prevArrival.arrivedByAccessLeg()) {
+                if(prevArrival.arrivedByAccess()) {
                     prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
                 }
 
-                // TODO OTP2 - Some access legs can be time-shifted towards the board time and
+                // TODO OTP2 - Some access paths can be time-shifted towards the board time and
                 //           - we need to account for this here, not in the calculator as done
-                //           - now. If we don´t do that the alight slack of the first transit
-                //           - is not added to the cost, giving the first transit leg a lower cost
-                //           - than other transit legs.
-                //           - See
+                //           - now. If we don´t do that the alight slack of the first transit is
+                //           - not added to the cost, giving the first transit path a lower cost
+                //           - than other transit paths.
                 final int boardWaitTime = boardTime - prevArrival.arrivalTime();
 
                 final int relativeBoardCost = calculateOnTripRelativeCost(

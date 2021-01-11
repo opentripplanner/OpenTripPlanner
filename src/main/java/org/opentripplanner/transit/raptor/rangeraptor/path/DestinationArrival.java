@@ -78,7 +78,7 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
     }
 
     @Override
-    public EgressPathView egressLeg() {
+    public EgressPathView egressPath() {
         return () -> egress;
     }
 

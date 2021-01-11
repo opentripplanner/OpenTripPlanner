@@ -99,7 +99,7 @@ public class DefaultCostCalculator<T extends RaptorTripSchedule> implements Cost
 
     private void initWaitFactor(int round) {
         // For access(round 0) and the first transit round(1) skip adding a cost for waiting,
-        // we assume we can time-shift the access leg.
+        // we assume we can time-shift the access path.
         this.waitFactorApplied = round < 2 ? 0 : waitFactor;
     }
 }

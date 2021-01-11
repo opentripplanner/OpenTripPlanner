@@ -36,7 +36,7 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
     }
 
     @Override
-    public TransitPathView<T> transitLeg() {
+    public TransitPathView<T> transitPath() {
         return this;
     }
 

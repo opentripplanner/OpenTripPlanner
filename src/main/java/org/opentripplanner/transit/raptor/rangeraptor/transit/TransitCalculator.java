@@ -11,7 +11,7 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
- * <em>earliest boarding time</em> and time-shifting the access legs.
+ * <em>earliest boarding time</em> and time-shifting the access paths.
  * <p/>
  * The calculator is shared between the state, worker and path mapping code. This
  * make the calculations consistent and let us hide the request parameters. Hiding the

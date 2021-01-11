@@ -106,14 +106,16 @@ public final class Path<T extends RaptorTripSchedule> {
     }
 
     /**
-     * The first leg of this journey - witch is linked to the next and so on.
+     * The first leg/path of this journey - witch is linked to the next and so on. The leg
+     * can contain sub-legs, for example: walk-flex-walk.
+     *
      */
     public final AccessPathLeg<T> accessLeg() {
         return accessLeg;
     }
 
     /**
-     * The last leg of this journey.
+     * The last leg of this journey. The leg can contain sub-legs, for example: walk-flex-walk.
      */
     public final EgressPathLeg<T> egressLeg() {
         return egressPathLeg;

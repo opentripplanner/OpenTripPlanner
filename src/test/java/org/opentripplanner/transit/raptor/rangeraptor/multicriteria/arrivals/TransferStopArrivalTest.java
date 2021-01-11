@@ -64,7 +64,7 @@ public class TransferStopArrivalTest {
     public void arrivedByTransfer() {
         assertTrue(subject.arrivedByTransfer());
         assertFalse(subject.arrivedByTransit());
-        assertFalse(subject.arrivedByAccessLeg());
+        assertFalse(subject.arrivedByAccess());
     }
 
     @Test

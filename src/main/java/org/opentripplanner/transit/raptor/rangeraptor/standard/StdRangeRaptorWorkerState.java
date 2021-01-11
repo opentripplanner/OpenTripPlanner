@@ -71,16 +71,16 @@ public final class StdRangeRaptorWorkerState<T
     }
 
     @Override
-    public final void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int departureTime) {
-        int durationInSeconds = accessEgressLeg.durationInSeconds();
-        int stop = accessEgressLeg.stop();
+    public final void setInitialTimeForIteration(RaptorTransfer accessPath, int departureTime) {
+        int durationInSeconds = accessPath.durationInSeconds();
+        int stop = accessPath.stop();
 
         // The time of arrival at the given stop for the current iteration
         // (or departure time at the last stop if we search backwards).
         int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
 
-        bestTimes.setAccessStopTime(stop, arrivalTime, accessEgressLeg.stopReachedOnBoard());
-        stopArrivalsState.setAccess(stop, arrivalTime, accessEgressLeg);
+        bestTimes.setAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
+        stopArrivalsState.setAccess(stop, arrivalTime, accessPath);
     }
 
     @Override
@@ -159,23 +159,23 @@ public final class StdRangeRaptorWorkerState<T
         return stopArrivalsState.extractPaths();
     }
 
-    private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transferLeg) {
+    private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
         // Use the calculator to make sure the calculation is done correct for a normal
         // forward search and a reverse search.
-        final int arrivalTime = calculator.plusDuration(arrivalTimeTransit, transferLeg.durationInSeconds());
+        final int arrivalTime = calculator.plusDuration(arrivalTimeTransit, transfer.durationInSeconds());
 
         if (exceedsTimeLimit(arrivalTime)) {
             return;
         }
 
-        final int toStop = transferLeg.stop();
+        final int toStop = transfer.stop();
 
         // transitTimes upper bounds bestTimes so we don't need to update wait time and in-vehicle time here, if we
         // enter this conditional it has already been updated.
         if (newOverallBestTime(toStop, arrivalTime)) {
-            stopArrivalsState.setNewBestTransferTime(fromStop, arrivalTime, transferLeg);
+            stopArrivalsState.setNewBestTransferTime(fromStop, arrivalTime, transfer);
         } else {
-            stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transferLeg);
+            stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
         }
     }
 

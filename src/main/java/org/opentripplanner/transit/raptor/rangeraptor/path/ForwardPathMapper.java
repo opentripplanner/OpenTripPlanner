@@ -42,7 +42,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
                 lastLeg = createTransitLeg(arrival, lastLeg);
             } else if (arrival.arrivedByTransfer()) {
                 lastLeg = createTransferLeg(arrival, lastLeg);
-            } else if (arrival.arrivedByAccessLeg()) {
+            } else if (arrival.arrivedByAccess()) {
                 accessLeg = createAccessPathLeg(arrival, lastLeg);
                 break;
             } else {
@@ -54,7 +54,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     }
 
     private EgressPathLeg<T> createEgressPathLeg(DestinationArrival<T> destinationArrival) {
-        RaptorTransfer egress = destinationArrival.egressLeg().egress();
+        RaptorTransfer egress = destinationArrival.egressPath().egress();
         int departureTime = destinationArrival.arrivalTime() - egress.durationInSeconds();
 
         return new EgressPathLeg<>(
@@ -75,13 +75,13 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
                 arrival.stop(),
                 r.alightTime,
                 domainCost(arrival),
-                arrival.transitLeg().trip(),
+                arrival.transitPath().trip(),
                 lastLeg
         );
     }
 
     private TransferPathLeg<T> createTransferLeg(ArrivalView<T> arrival, PathLeg<T> nextLeg) {
-        int departureTime = arrival.arrivalTime() - arrival.transferLeg().durationInSeconds();
+        int departureTime = arrival.arrivalTime() - arrival.transferPath().durationInSeconds();
 
         return new TransferPathLeg<>(
                 arrival.previous().stop(),
@@ -94,7 +94,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     }
 
     private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, PathLeg<T> nextLeg) {
-        RaptorTransfer access = from.accessLeg().access();
+        RaptorTransfer access = from.accessPath().access();
         int departureTime = from.arrivalTime() - access.durationInSeconds();
 
         return new AccessPathLeg<>(

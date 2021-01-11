@@ -20,12 +20,12 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
     }
 
     @Override
-    public boolean arrivedByAccessLeg() {
+    public boolean arrivedByAccess() {
         return true;
     }
 
     @Override
-    public AccessPathView accessLeg() { return () -> access; }
+    public AccessPathView accessPath() { return () -> access; }
 
     @Override
     public AbstractStopArrival<T> timeShiftNewArrivalTime(int newRequestedArrivalTime) {

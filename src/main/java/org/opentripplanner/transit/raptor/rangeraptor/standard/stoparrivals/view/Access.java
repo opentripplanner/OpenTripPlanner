@@ -24,12 +24,12 @@ final class Access<T extends RaptorTripSchedule>
     }
 
     @Override
-    public boolean arrivedByAccessLeg() {
+    public boolean arrivedByAccess() {
         return true;
     }
 
     @Override
-    public AccessPathView accessLeg() {
+    public AccessPathView accessPath() {
         return this;
     }
 
@@ -40,6 +40,6 @@ final class Access<T extends RaptorTripSchedule>
 
     @Override
     public ArrivalView<T> previous() {
-        throw new UnsupportedOperationException("Access arrival is the first leg.");
+        throw new UnsupportedOperationException("Access path arrival is the first path.");
     }
 }
