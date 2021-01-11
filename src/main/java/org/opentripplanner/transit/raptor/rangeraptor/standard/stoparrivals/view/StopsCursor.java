@@ -74,8 +74,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * @return the current transit state, if found
      */
     public Transit<T> transit(int round, int stop) {
-        StopArrivalState<T> state = stops.get(round, stop);
-        return new Transit<>(round, stop, state, this);
+        StopArrivalState<T> arrival = stops.get(round, stop);
+        return new Transit<>(round, stop, arrival, this);
     }
 
     public ArrivalView<T> stop(int round, int stop) {
@@ -95,28 +95,28 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * and the possible restrictions in the access.
      */
     private ArrivalView<T> newAccessView(int stop, Transit<T> transit) {
-        AccessStopArrivalState<T> state = stops.get(0, stop).asAccessStopArrivalState();
+        AccessStopArrivalState<T> arrival = stops.get(0, stop).asAccessStopArrivalState();
         int transitDepartureTime = transit.boardTime();
         int boardSlack = boardSlackProvider.applyAsInt(transit.trip().pattern());
 
         // Preferred time-shifted access departure
         int preferredDepartureTime = transitCalculator.minusDuration(
             transitDepartureTime,
-            boardSlack + state.transferDuration()
+            boardSlack + arrival.transferDuration()
         );
 
         // Get the real 'departureTime' honoring the time-shift restriction in the access
-        int departureTime = transitCalculator.departureTime(state.accessPath(), preferredDepartureTime);
-        int arrivalTime = transitCalculator.plusDuration(departureTime, state.accessPath().durationInSeconds());
+        int departureTime = transitCalculator.departureTime(arrival.accessPath(), preferredDepartureTime);
+        int arrivalTime = transitCalculator.plusDuration(departureTime, arrival.accessPath().durationInSeconds());
 
-        return new Access<>(stop, arrivalTime, state.accessPath());
+        return new Access<>(stop, arrivalTime, arrival.accessPath());
     }
 
     private ArrivalView<T> newTransitOrTransferView(int round, int stop) {
-        StopArrivalState<T> state = stops.get(round, stop);
+        StopArrivalState<T> arrival = stops.get(round, stop);
 
-        return state.arrivedByTransfer()
-                ? new Transfer<>(round, stop, state, this)
-                : new Transit<>(round, stop, state, this);
+        return arrival.arrivedByTransfer()
+                ? new Transfer<>(round, stop, arrival, this)
+                : new Transit<>(round, stop, arrival, this);
     }
 }

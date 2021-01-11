@@ -10,9 +10,13 @@ public interface RaptorTestConstants {
   int D10s = 10;
   int D20s = 20;
   int D30s = 30;
+  int D1m = parseDuration("1m");
   int D2m = parseDuration("2m");
   int D3m = parseDuration("3m");
+  int D5m = parseDuration("5m");
+  int D6m = parseDuration("6m");
   int D7m = parseDuration("7m");
+  int D10m = parseDuration("10m");
 
   // Time constants, all values are in seconds
   int T00_00 = hm2time(0, 0);
