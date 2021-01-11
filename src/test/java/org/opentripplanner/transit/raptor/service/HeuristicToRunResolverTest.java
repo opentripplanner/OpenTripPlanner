@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.service;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;

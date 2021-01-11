@@ -1,5 +1,6 @@
-package org.opentripplanner.transit.raptor._shared;
+package org.opentripplanner.transit.raptor._data.stoparrival;
 
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.AccessPathView;
 

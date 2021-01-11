@@ -1,15 +1,15 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.Egress;
-import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
-import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
+import org.opentripplanner.transit.raptor._data.stoparrival.Egress;
+import org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor._shared.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.basicTripByReverseSearch;
+import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.basicTripByReverseSearch;
 import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrLong;
 
 public class ReversePathMapperTest {

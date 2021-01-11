@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor._shared;
+package org.opentripplanner.transit.raptor._data.transit;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;

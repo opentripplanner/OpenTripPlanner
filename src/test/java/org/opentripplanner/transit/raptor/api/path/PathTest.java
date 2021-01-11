@@ -2,12 +2,12 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
-import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
+import org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
-import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.A_START;
-import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.E_END;
+import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.A_START;
+import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.E_END;
 
 public class PathTest {
 

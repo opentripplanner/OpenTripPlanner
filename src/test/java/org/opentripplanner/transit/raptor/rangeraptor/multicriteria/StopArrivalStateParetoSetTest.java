@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;

@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.Access;
-import org.opentripplanner.transit.raptor._shared.Bus;
-import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
+import org.opentripplanner.transit.raptor._data.stoparrival.Access;
+import org.opentripplanner.transit.raptor._data.stoparrival.Bus;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

@@ -1,6 +1,8 @@
-package org.opentripplanner.transit.raptor._shared;
+package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import org.junit.Assert;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;

@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRoute;
-import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
+import org.opentripplanner.transit.raptor._data.transit.TestRoute;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 
 import static org.junit.Assert.assertEquals;

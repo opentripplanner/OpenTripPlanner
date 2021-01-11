@@ -1,7 +1,8 @@
-package org.opentripplanner.transit.raptor._shared;
+package org.opentripplanner.transit.raptor._data.stoparrival;
 
 
 
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
