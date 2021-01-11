@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
+import org.opentripplanner.transit.raptor._shared.TestTransfer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,7 +20,7 @@ public class AccessStopArrivalTest {
     private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
         DEPARTURE_TIME,
         COST,
-        new TestRaptorTransfer(ALIGHT_STOP, ACCESS_DURATION)
+        new TestTransfer(ALIGHT_STOP, ACCESS_DURATION)
     );
 
     @Test
@@ -92,7 +92,7 @@ public class AccessStopArrivalTest {
     @Test
     public void timeShiftNotAllowed() {
         AbstractStopArrival<RaptorTripSchedule> original, result;
-        TestRaptorTransfer access = new TestRaptorTransfer(ALIGHT_STOP, ACCESS_DURATION) {
+        TestTransfer access = new TestTransfer(ALIGHT_STOP, ACCESS_DURATION) {
             @Override public int latestArrivalTime(int time) { return -1; }
         };
         original = new AccessStopArrival<>(DEPARTURE_TIME, COST, access);
@@ -109,7 +109,7 @@ public class AccessStopArrivalTest {
         AbstractStopArrival<RaptorTripSchedule> original, result;
 
         // Allow time-shift, but only by dTime
-        TestRaptorTransfer access = new TestRaptorTransfer(ALIGHT_STOP, ACCESS_DURATION) {
+        TestTransfer access = new TestTransfer(ALIGHT_STOP, ACCESS_DURATION) {
             @Override public int latestArrivalTime(int time) { return ALIGHT_TIME + dTime; }
         };
         original = new AccessStopArrival<>(DEPARTURE_TIME, COST, access);

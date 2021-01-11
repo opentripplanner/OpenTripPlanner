@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
+import org.opentripplanner.transit.raptor._shared.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
@@ -116,7 +116,7 @@ public class StopArrivalStateParetoSetTest {
         return new AccessStopArrival<>(
             A_TIME,
             ANY,
-            new TestRaptorTransfer(stop, accessDurationInSeconds)
+            new TestTransfer(stop, accessDurationInSeconds)
         );
     }
 
@@ -125,7 +125,7 @@ public class StopArrivalStateParetoSetTest {
     }
 
     private static TransferStopArrival<RaptorTripSchedule> newTransferStopState(int round, int stop, int arrivalTime, int cost) {
-        return new TransferStopArrival<>(prev(round), new TestRaptorTransfer(stop, ANY), arrivalTime, cost);
+        return new TransferStopArrival<>(prev(round), new TestTransfer(stop, ANY), arrivalTime, cost);
     }
 
     private static AbstractStopArrival<RaptorTripSchedule> prev(int round) {

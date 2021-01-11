@@ -6,11 +6,11 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 /**
  * Simple implementation for {@link RaptorTransfer} for use in unit-tests.
  */
-public class TestRaptorTransfer implements RaptorTransfer {
+public class TestTransfer implements RaptorTransfer {
   private final int stop;
   private final int duration;
 
-  public TestRaptorTransfer(int stop, int duration) {
+  public TestTransfer(int stop, int duration) {
     this.stop = stop;
     this.duration = duration;
   }

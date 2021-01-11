@@ -78,8 +78,8 @@ public class StopArrivalsTestData {
     private static final int STOP_4 = 4;
     private static final int STOP_5 = 5;
 
-    private static final RaptorTransfer ACCESS = new TestRaptorTransfer(STOP_1, A_END - A_START);
-    private static final RaptorTransfer EGRESS = new TestRaptorTransfer(STOP_5, E_END - E_START);
+    private static final RaptorTransfer ACCESS = new TestTransfer(STOP_1, A_END - A_START);
+    private static final RaptorTransfer EGRESS = new TestTransfer(STOP_5, E_END - E_START);
 
     private static final TestTripSchedule TRIP_1 = TestTripSchedule
             .create("T1")

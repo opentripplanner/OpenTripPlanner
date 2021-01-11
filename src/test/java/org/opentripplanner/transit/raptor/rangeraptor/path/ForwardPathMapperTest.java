@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
 import org.opentripplanner.transit.raptor._shared.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
+import org.opentripplanner.transit.raptor._shared.TestTransfer;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -17,7 +17,7 @@ public class ForwardPathMapperTest {
     public void mapToPathForwardSearch() {
         Egress egress = StopArrivalsTestData.basicTripByForwardSearch();
         DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(
-                new TestRaptorTransfer(egress.previous().stop(), egress.durationInSeconds()),
+                new TestTransfer(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
                 egress.arrivalTime(),
                 egress.additionalCost()
