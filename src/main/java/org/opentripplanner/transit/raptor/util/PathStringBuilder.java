@@ -41,7 +41,7 @@ public class PathStringBuilder {
 
     public PathStringBuilder accessEgress(RaptorTransfer leg) {
         if(leg.numberOfLegs() > 1) {
-            return flex(leg.numberOfLegs(), leg.durationInSeconds());
+            return flex(leg.durationInSeconds(), leg.numberOfLegs());
         }
         return walk(leg.durationInSeconds());
     }
