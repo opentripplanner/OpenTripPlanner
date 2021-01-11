@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.TransferLegView;
+import org.opentripplanner.transit.raptor.api.view.TransferPathView;
 
 /**
  *
@@ -25,7 +25,7 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
     }
 
     @Override
-    public TransferLegView transferLeg() {
+    public TransferPathView transferLeg() {
         return this::durationInSeconds;
     }
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor._shared;
 
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.TransferLegView;
+import org.opentripplanner.transit.raptor.api.view.TransferPathView;
 
 class Walk extends AbstractStopArrival {
     private final int durationInSeconds;
@@ -18,7 +18,7 @@ class Walk extends AbstractStopArrival {
         return true;
     }
 
-    @Override public TransferLegView transferLeg() {
+    @Override public TransferPathView transferLeg() {
         return () -> durationInSeconds;
     }
 }
