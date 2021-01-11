@@ -6,12 +6,15 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.mapping.support.ServiceAlterationFilter;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.opentripplanner.netex.mapping.support.ServiceAlterationFilter.*;
 
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
@@ -70,6 +73,13 @@ class TripMapper {
 
         if(route == null) {
             LOG.warn("Unable to map ServiceJourney, missing serviceId. SJ id: {}", serviceJourney.getId());
+            return null;
+        }
+
+        // TODO This currently skips mapping of any trips containing ServiceAlteration CANCELLATION
+        //      or REPLACED. In the future we will want to import these and allow them to be routed
+        //      on if a parameter is set. Also done in DateServiceJourneyMapper.
+        if (!isRunning(serviceJourney.getServiceAlteration())) {
             return null;
         }
 

@@ -11,6 +11,7 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
+import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceJourney;
 
 import javax.xml.bind.JAXBElement;
@@ -19,6 +20,8 @@ import java.util.Collections;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
@@ -94,6 +97,58 @@ public class TripMapperTest {
         Trip trip = tripMapper.mapServiceJourney(serviceJourney);
 
         assertEquals(trip.getId(), ID_FACTORY.createId("RUT:ServiceJourney:1"));
+    }
+
+    @Test
+    public void skipMappingOfCancelledOrReplacedTrips() {
+        OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+        Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
+        transitBuilder.getRoutes().add(route);
+
+        TripMapper tripMapper = new TripMapper(
+            ID_FACTORY,
+            transitBuilder.getOperatorsById(),
+            transitBuilder.getRoutes(),
+            new HierarchicalMapById<>(),
+            new HierarchicalMap<>(),
+            Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
+            Collections.emptySet()
+        );
+
+        ServiceJourney serviceJourney1 = createExampleServiceJourney();
+        serviceJourney1.setServiceAlteration(ServiceAlterationEnumeration.CANCELLATION);
+        serviceJourney1.setLineRef(LINE_REF);
+
+        // Should NOT be mapped
+        assertNull(tripMapper.mapServiceJourney(serviceJourney1));
+
+        ServiceJourney serviceJourney2 = createExampleServiceJourney();
+        serviceJourney2.setServiceAlteration(ServiceAlterationEnumeration.REPLACED);
+        serviceJourney2.setLineRef(LINE_REF);
+
+        // Should NOT be mapped
+        assertNull(tripMapper.mapServiceJourney(serviceJourney2));
+
+        ServiceJourney serviceJourney3 = createExampleServiceJourney();
+        serviceJourney3.setServiceAlteration(ServiceAlterationEnumeration.PLANNED);
+        serviceJourney3.setLineRef(LINE_REF);
+
+        // Should be mapped
+        assertNotNull(tripMapper.mapServiceJourney(serviceJourney3));
+
+        ServiceJourney serviceJourney4 = createExampleServiceJourney();
+        serviceJourney4.setServiceAlteration(ServiceAlterationEnumeration.EXTRA_JOURNEY);
+        serviceJourney4.setLineRef(LINE_REF);
+
+        // Should be mapped
+        assertNotNull(tripMapper.mapServiceJourney(serviceJourney4));
+
+        // ServiceAlteration is null
+        ServiceJourney serviceJourney5 = createExampleServiceJourney();
+        serviceJourney5.setLineRef(LINE_REF);
+
+        // Should be mapped
+        assertNotNull(tripMapper.mapServiceJourney(serviceJourney5));
     }
 
     private ServiceJourney createExampleServiceJourney() {
