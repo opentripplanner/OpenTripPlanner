@@ -4,6 +4,7 @@ import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ public class DebugRequestBuilder {
     private final List<Integer> path = new ArrayList<>();
     private int debugPathFromStopIndex;
     private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
+    private Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener;
     private Consumer<DebugEvent<Path<?>>> pathFilteringListener;
     private DebugLogger logger;
 
@@ -30,6 +32,7 @@ public class DebugRequestBuilder {
         this.path.addAll(debug.path());
         this.debugPathFromStopIndex = debug.debugPathFromStopIndex();
         this.stopArrivalListener = debug.stopArrivalListener();
+        this.patternRideDebugListener = debug.patternRideDebugListener();
         this.pathFilteringListener = debug.pathFilteringListener();
         this.logger = debug.logger();
     }
@@ -75,6 +78,15 @@ public class DebugRequestBuilder {
 
     public DebugRequestBuilder stopArrivalListener(Consumer<DebugEvent<ArrivalView<?>>> listener) {
         this.stopArrivalListener = listener;
+        return this;
+    }
+
+    public Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener() {
+        return patternRideDebugListener;
+    }
+
+    public DebugRequestBuilder patternRideDebugListener(Consumer<DebugEvent<PatternRide<?>>> listener) {
+        this.patternRideDebugListener = listener;
         return this;
     }
 

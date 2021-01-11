@@ -51,6 +51,9 @@ public class B02_EgressTest implements RaptorTestConstants {
         .latestArrivalTime(T00_30)
         .boardSlackInSeconds(D10s)
     ;
+
+    // Enable Raptor debugging by configuring the requestBuilder
+    // data.debugRaptorStateToSdtErr(requestBuilder);
   }
 
   @Test

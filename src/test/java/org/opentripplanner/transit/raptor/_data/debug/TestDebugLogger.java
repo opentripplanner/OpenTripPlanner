@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test;
+package org.opentripplanner.transit.raptor._data.debug;
 
 
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
@@ -6,6 +6,7 @@ import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
@@ -21,7 +22,7 @@ import static org.opentripplanner.util.TableFormatter.Align.Center;
 import static org.opentripplanner.util.TableFormatter.Align.Left;
 import static org.opentripplanner.util.TableFormatter.Align.Right;
 
-class SpeedTestDebugLogger implements DebugLogger {
+public class TestDebugLogger implements DebugLogger {
     private static final int NOT_SET = Integer.MIN_VALUE;
 
     private final boolean enableDebugLogging;
@@ -43,7 +44,7 @@ class SpeedTestDebugLogger implements DebugLogger {
         9, 2, 5, 5, 8, 8, 8, 6, 0
     );
 
-    SpeedTestDebugLogger(boolean enableDebugLogging) {
+    public TestDebugLogger(boolean enableDebugLogging) {
         this.enableDebugLogging = enableDebugLogging;
     }
 
@@ -59,7 +60,18 @@ class SpeedTestDebugLogger implements DebugLogger {
         }
     }
 
-    void pathFilteringListener(DebugEvent<Path<?>> e) {
+    public void patternRideLister(DebugEvent<PatternRide<?>> e) {
+        printIterationHeader(e.iterationStartTime());
+        printRoundHeader(e.element().prevArrival.round() + 1);
+        print(e.element(), e.action().toString());
+
+        PatternRide<?> byElement = e.rejectedDroppedByElement();
+        if (e.action() == DebugEvent.Action.DROP && byElement != null) {
+            print(byElement, "->by");
+        }
+    }
+
+    public void pathFilteringListener(DebugEvent<Path<?>> e) {
         if (pathHeader) {
             System.err.println();
             System.err.println(pathTableFormatter.printHeader());
@@ -123,6 +135,21 @@ class SpeedTestDebugLogger implements DebugLogger {
                 numFormat.format(a.cost()),
                 pattern,
                 details(action, optReason, path(a))
+            )
+        );
+    }
+
+    private void print(PatternRide<?> p, String action) {
+        System.err.println(
+            arrivalTableFormatter.printRow(
+                action,
+                "OnRide",
+                p.prevArrival.round() + 1,
+                p.boardStopIndex,
+                TimeUtils.timeToStrLong(p.boardTime),
+                numFormat.format(p.relativeCost),
+                p.trip.pattern().debugInfo(),
+                p.toString()
             )
         );
     }

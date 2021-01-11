@@ -5,6 +5,7 @@ import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
@@ -12,15 +13,17 @@ import javax.annotation.Nullable;
 
 
 /**
- * Use this factory to create debug handlers. If a routing request has not enabled debugging
- * {@code null} is returned. Use the {@link #isDebugStopArrival(int)} like methods before
- * retrieving a handler.
+ * Use this factory to create debug handlers. If a routing request has not enabled debugging {@code
+ * null} is returned. Use the {@link #isDebugStopArrival(int)} like methods before retrieving a
+ * handler.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class DebugHandlerFactory<T extends RaptorTripSchedule> {
+
   private final DebugHandler<ArrivalView<?>> stopHandler;
   private final DebugHandler<Path<?>> pathHandler;
+  private final DebugHandler<PatternRide<?>> patternRideHandler;
 
   public DebugHandlerFactory(DebugRequest request, WorkerLifeCycle lifeCycle) {
     this.stopHandler = isDebug(request.stopArrivalListener())
@@ -30,9 +33,17 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
     this.pathHandler = isDebug(request.pathFilteringListener())
         ? new DebugHandlerPathAdapter(request, lifeCycle)
         : null;
+
+    this.patternRideHandler = isDebug(request.patternRideDebugListener())
+        ? new DebugHandlerPatternRideAdapter(request, lifeCycle)
+        : null;
   }
 
   /* Stop Arrival */
+
+  public boolean isDebugStopArrival() {
+    return isDebug(stopHandler);
+  }
 
   public DebugHandler<ArrivalView<?>> debugStopArrival() {
     return stopHandler;
@@ -45,6 +56,16 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
 
   public boolean isDebugStopArrival(int stop) {
     return stopHandler != null && stopHandler.isDebug(stop);
+  }
+
+
+  /* PatternRide */
+
+  @Nullable
+  public ParetoSetEventListener<PatternRide<?>> paretoSetPatternRideListener() {
+    return patternRideHandler == null
+        ? null
+        : new ParetoSetDebugHandlerAdapter<>(patternRideHandler);
   }
 
 
@@ -62,7 +83,4 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
     return handler != null;
   }
 
-  public boolean isDebugStopArrival() {
-    return stopHandler != null;
-  }
 }

@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import lombok.val;
+import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -41,6 +44,17 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   public int[] stopBoarAlightCost() {
     // Not implemented, no test for this yet.
     return null;
+  }
+
+  public void debugRaptorStateToSdtErr(RaptorRequestBuilder<TestTripSchedule> request) {
+    List<Integer> stops = new ArrayList<>();
+    for (int i = 0; i < numberOfStops(); i++) { stops.add(i); }
+    val logger = new TestDebugLogger(true);
+    request.debug().addStops(stops)
+        .stopArrivalListener(logger::stopArrivalLister)
+        .patternRideDebugListener(logger::patternRideLister)
+        .pathFilteringListener(logger::pathFilteringListener)
+        .logger(logger);
   }
 
   public TestTransitData add(int fromStop, TestTransfer transfer) {

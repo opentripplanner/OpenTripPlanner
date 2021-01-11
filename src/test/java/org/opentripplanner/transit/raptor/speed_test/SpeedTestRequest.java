@@ -5,6 +5,7 @@ import gnu.trove.map.TIntIntMap;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -174,7 +175,7 @@ public class SpeedTestRequest {
             return;
         }
 
-        SpeedTestDebugLogger logger = new SpeedTestDebugLogger(debugLoggerEnabled);
+        TestDebugLogger logger = new TestDebugLogger(debugLoggerEnabled);
 
         builder.debug()
                 .stopArrivalListener(logger::stopArrivalLister)

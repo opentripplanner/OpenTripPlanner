@@ -56,6 +56,9 @@ public class B10_FlexAccess implements RaptorTestConstants {
     requestBuilder.searchParams()
         .earliestDepartureTime(T00_00)
         .latestArrivalTime(T00_30);
+
+    // Enable Raptor debugging by configuring the requestBuilder
+    // data.debugRaptorStateToSdtErr(requestBuilder);
   }
 
   @Test

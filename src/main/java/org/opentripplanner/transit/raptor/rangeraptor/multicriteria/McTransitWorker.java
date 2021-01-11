@@ -6,10 +6,13 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
+import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
+
+import static org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 
 /**
@@ -24,7 +27,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     private final TransitCalculator calculator;
     private final CostCalculator<T> costCalculator;
     private final SlackProvider slackProvider;
-    private final ParetoSet<PatternRide<T>> patternRides = new ParetoSet<>(PatternRide.paretoComparatorRelativeCost());
+    private final ParetoSet<PatternRide<T>> patternRides;
 
     private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
@@ -33,12 +36,17 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         McRangeRaptorWorkerState<T> state,
         SlackProvider slackProvider,
         TransitCalculator calculator,
-        CostCalculator<T> costCalculator
+        CostCalculator<T> costCalculator,
+        DebugHandlerFactory<T> debugHandlerFactory
     ) {
         this.state = state;
         this.slackProvider = slackProvider;
         this.calculator = calculator;
         this.costCalculator = costCalculator;
+        this.patternRides = new ParetoSet<>(
+            paretoComparatorRelativeCost(),
+            debugHandlerFactory.paretoSetPatternRideListener()
+        );
     }
 
     @Override
@@ -46,7 +54,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         this.pattern = pattern;
         this.tripSearch = tripSearch;
         this.patternRides.clear();
-        slackProvider.setCurrentPattern(pattern);
+        this.slackProvider.setCurrentPattern(pattern);
     }
 
     @Override

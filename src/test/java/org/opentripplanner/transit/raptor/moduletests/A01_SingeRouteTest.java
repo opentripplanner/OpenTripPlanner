@@ -62,20 +62,9 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
         .latestArrivalTime(T00_10)
         .timetableEnabled(true)
         .boardSlackInSeconds(D10s);
-  }
 
-  @Test
-  public void multiCriteriaRouteTest() {
-    var request = requestBuilder
-        .profile(RaptorProfile.MULTI_CRITERIA)
-        .build();
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(
-        "Walk 30s ~ 1 ~ BUS R1 0:01 0:05 ~ 3 ~ Walk 20s [00:00:30 00:05:20 4m50s, cost: 1040]",
-        pathsToString(response)
-    );
+    // Enable Raptor debugging by configuring the requestBuilder
+    // data.debugRaptorStateToSdtErr(requestBuilder);
   }
 
   @Test
@@ -103,6 +92,20 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
 
     assertEquals(
         "Walk 30s ~ 1 ~ BUS R1 0:01 0:05 ~ 3 ~ Walk 20s [00:00:30 00:05:20 4m50s]",
+        pathsToString(response)
+    );
+  }
+
+  @Test
+  public void multiCriteriaRouteTest() {
+    var request = requestBuilder
+        .profile(RaptorProfile.MULTI_CRITERIA)
+        .build();
+
+    var response = raptorService.route(request, data);
+
+    assertEquals(
+        "Walk 30s ~ 1 ~ BUS R1 0:01 0:05 ~ 3 ~ Walk 20s [00:00:30 00:05:20 4m50s, cost: 1040]",
         pathsToString(response)
     );
   }
