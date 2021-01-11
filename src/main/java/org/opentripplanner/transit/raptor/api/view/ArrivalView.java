@@ -85,7 +85,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         return false;
     }
 
-    default TransitLegView<T> transitLeg() {
+    default TransitPathView<T> transitLeg() {
         throw new UnsupportedOperationException();
     }
 

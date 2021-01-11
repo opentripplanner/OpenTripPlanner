@@ -2,12 +2,12 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.vie
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.TransitLegView;
+import org.opentripplanner.transit.raptor.api.view.TransitPathView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 
 final class Transit<T extends RaptorTripSchedule>
     extends StopArrivalViewAdapter<T>
-    implements TransitLegView<T>
+    implements TransitPathView<T>
 {
     private final StopArrivalState<T> arrival;
     private final StopsCursor<T> cursor;
@@ -29,7 +29,7 @@ final class Transit<T extends RaptorTripSchedule>
     }
 
     @Override
-    public TransitLegView<T> transitLeg() {
+    public TransitPathView<T> transitLeg() {
         return this;
     }
 

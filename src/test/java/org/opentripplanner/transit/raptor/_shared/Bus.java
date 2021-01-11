@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor._shared;
 
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.TransitLegView;
+import org.opentripplanner.transit.raptor.api.view.TransitPathView;
 
-public class Bus extends AbstractStopArrival implements TransitLegView<TestRaptorTripSchedule> {
+public class Bus extends AbstractStopArrival implements TransitPathView<TestRaptorTripSchedule> {
     private final TestRaptorTripSchedule trip;
 
     public Bus(
@@ -17,7 +17,7 @@ public class Bus extends AbstractStopArrival implements TransitLegView<TestRapto
         this.trip = trip;
     }
     @Override public boolean arrivedByTransit() { return true; }
-    @Override public TransitLegView<TestRaptorTripSchedule> transitLeg() { return this; }
+    @Override public TransitPathView<TestRaptorTripSchedule> transitLeg() { return this; }
     @Override public int boardStop() { return previous().stop(); }
     @Override public TestRaptorTripSchedule trip() { return trip; }
 }
