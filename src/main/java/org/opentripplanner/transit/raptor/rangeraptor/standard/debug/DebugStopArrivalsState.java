@@ -37,14 +37,9 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     }
 
     @Override
-    public final void setAccess(final int stop, final int arrivalTime, RaptorTransfer access) {
-        delegate.setAccess(stop, arrivalTime, access);
-        debug.acceptAccess(stop);
-    }
-
-    @Override
-    public final Collection<Path<T>> extractPaths() {
-        return delegate.extractPaths();
+    public final void setAccessTime(int arrivalTime, RaptorTransfer access) {
+        delegate.setAccessTime(arrivalTime, access);
+        debug.acceptAccess(access.stop());
     }
 
     @Override
@@ -78,5 +73,10 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
         debug.rejectTransfer(fromStop, transfer, transfer.stop(), arrivalTime);
         delegate.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
+    }
+
+    @Override
+    public final Collection<Path<T>> extractPaths() {
+        return delegate.extractPaths();
     }
 }

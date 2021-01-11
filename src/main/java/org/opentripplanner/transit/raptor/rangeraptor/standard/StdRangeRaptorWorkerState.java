@@ -27,11 +27,9 @@ import java.util.Iterator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class StdRangeRaptorWorkerState<T
-        extends RaptorTripSchedule>
-        implements StdWorkerState<T>
+public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
+    implements StdWorkerState<T>
 {
-
     /**
      * The best times to reach each stop, whether via a transfer or via transit directly.
      * This is the bare minimum to execute the algorithm.
@@ -68,19 +66,6 @@ public final class StdRangeRaptorWorkerState<T
         this.bestTimes = bestTimes;
         this.stopArrivalsState = stopArrivalsState;
         this.arrivedAtDestinationCheck = arrivedAtDestinationCheck;
-    }
-
-    @Override
-    public final void setInitialTimeForIteration(RaptorTransfer accessPath, int departureTime) {
-        int durationInSeconds = accessPath.durationInSeconds();
-        int stop = accessPath.stop();
-
-        // The time of arrival at the given stop for the current iteration
-        // (or departure time at the last stop if we search backwards).
-        int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
-
-        bestTimes.setAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
-        stopArrivalsState.setAccess(stop, arrivalTime, accessPath);
     }
 
     @Override
@@ -123,6 +108,19 @@ public final class StdRangeRaptorWorkerState<T
         // transfers and results paths.
 
         return stopArrivalsState.bestTimePreviousRound(stop);
+    }
+
+    @Override
+    public final void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
+        final int durationInSeconds = accessPath.durationInSeconds();
+        final int stop = accessPath.stop();
+
+        // The time of arrival at the given stop for the current iteration
+        // (or departure time at the last stop if we search backwards).
+        int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
+
+        bestTimes.setAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
+        stopArrivalsState.setAccessTime(arrivalTime, accessPath);
     }
 
     /**
@@ -170,8 +168,6 @@ public final class StdRangeRaptorWorkerState<T
 
         final int toStop = transfer.stop();
 
-        // transitTimes upper bounds bestTimes so we don't need to update wait time and in-vehicle time here, if we
-        // enter this conditional it has already been updated.
         if (newOverallBestTime(toStop, arrivalTime)) {
             stopArrivalsState.setNewBestTransferTime(fromStop, arrivalTime, transfer);
         } else {

@@ -12,8 +12,8 @@ final class Access<T extends RaptorTripSchedule>
     private final int arrivalTime;
     private final RaptorTransfer access;
 
-    Access(int stop, int arrivalTime, RaptorTransfer access) {
-        super(0, stop);
+    Access(int round, int arrivalTime, RaptorTransfer access) {
+        super(round, access.stop());
         this.arrivalTime = arrivalTime;
         this.access = access;
     }

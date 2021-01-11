@@ -40,6 +40,18 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
+    public void setAccessToStop(RaptorTransfer accessPath, int iterationDepartureTime) {
+        // Earliest possible departure time from the origin, or latest possible arrival time at the
+        // destination if searching backwards, using this AccessEgress.
+        int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
+
+        // This access is not available after the iteration departure time
+        if (departureTime == -1) return;
+
+        state.setAccessToStop(accessPath, departureTime);
+    }
+
+    @Override
     public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
@@ -99,17 +111,5 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
                 }
             }
         }
-    }
-
-    @Override
-    public void setInitialTimeForIteration(RaptorTransfer it, int iterationDepartureTime) {
-        // Earliest possible departure time from the origin, or latest possible arrival time at the
-        // destination if searching backwards, using this AccessEgress.
-        int departureTime = calculator.departureTime(it, iterationDepartureTime);
-
-        // This access is not available after the iteration departure time
-        if (departureTime == -1) return;
-
-        state.setInitialTimeForIteration(it, departureTime);
     }
 }

@@ -72,21 +72,12 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         return unreachedMinNumberOfTransfers();
     }
 
-    void setAccess(int stop, int time, RaptorTransfer access) {
+    void setAccessTime(int time, RaptorTransfer access) {
+        final int stop = access.stop();
         if (stops[round()][stop] == null) {
             stops[round()][stop] = new AccessStopArrivalState<>(time, access);
         } else {
             stops[round()][stop] = new AccessStopArrivalState<>(time, access, stops[round()][stop]);
-        }
-    }
-
-    void transitToStop(int stop, int time, int boardStop, int boardTime, T trip, boolean bestTime) {
-        StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
-
-        state.arriveByTransit(time, boardStop, boardTime, trip);
-
-        if (bestTime) {
-            state.setBestTimeTransit(time);
         }
     }
 
@@ -98,6 +89,16 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
 
         state.transferToStop(fromStop, arrivalTime, transfer.durationInSeconds());
+    }
+
+    void transitToStop(int stop, int time, int boardStop, int boardTime, T trip, boolean bestTime) {
+        StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
+
+        state.arriveByTransit(time, boardStop, boardTime, trip);
+
+        if (bestTime) {
+            state.setBestTimeTransit(time);
+        }
     }
 
     int bestTimePreviousRound(int stop) {

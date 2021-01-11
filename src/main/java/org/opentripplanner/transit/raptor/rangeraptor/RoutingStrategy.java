@@ -14,10 +14,12 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch
 public interface RoutingStrategy<T extends RaptorTripSchedule> {
 
     /**
-     * Sets the access times for the departure stops. This method is called for each possible
-     * access path.
+     * Sets the access time for the departure stop. This method is called for each access path
+     * in every Raptor iteration. The access path can have more than one "leg"; hence the
+     * implementation need to be aware of the round (Walk access in round 0, Flex with one leg
+     * in round 1, ...).
      */
-    void setInitialTimeForIteration(RaptorTransfer it, int iterationDepartureTime);
+    void setAccessToStop(RaptorTransfer accessPath, int iterationDepartureTime);
 
     /**
      * Prepare the {@link RoutingStrategy} to route using the given pattern and tripSearch.

@@ -94,6 +94,8 @@ public interface TransitCalculator {
      * Selects the earliest or latest possible departure time depending on the direction.
      * For forward search it will be the earliest possible departure time, while for reverse search
      * it uses the latest arrival time.
+     *
+     * Returns -1 if transfer is not possible after the requested departure time
      */
     int departureTime(RaptorTransfer transfer, int departureTime);
 

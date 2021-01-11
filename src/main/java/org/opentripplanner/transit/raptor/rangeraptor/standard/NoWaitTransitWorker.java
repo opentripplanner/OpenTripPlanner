@@ -42,6 +42,19 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
+    public void setAccessToStop(RaptorTransfer accessPath, int iterationDepartureTime) {
+        // Earliest possible departure time from the origin, or latest possible arrival time at the
+        // destination if searching backwards, using this AccessEgress.
+        int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
+
+        // This access is not available after the iteration departure time
+        if (departureTime == -1) return;
+
+        // Pass in the original departure time, as wait time should not be included
+        state.setAccessToStop(accessPath, iterationDepartureTime);
+    }
+
+    @Override
     public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
@@ -75,7 +88,8 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
         if (state.isStopReachedInPreviousRound(stop)) {
             if (pattern.boardingPossibleAt(stopPositionInPattern)) {
-                int earliestBoardTime = calculator.plusDuration(state.bestTimePreviousRound(stop),
+                int earliestBoardTime = calculator.plusDuration(
+                        state.bestTimePreviousRound(stop),
                         slackProvider.boardSlack()
                 );
 
@@ -108,18 +122,5 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         // calculator because of the way we compute the time-shift. It is positive in the case of a
         // forward-search and negative int he case of a reverse-search.
         return stopArrivalTime - onTripTimeShift;
-    }
-
-    @Override
-    public void setInitialTimeForIteration(RaptorTransfer it, int iterationDepartureTime) {
-        // Earliest possible departure time from the origin, or latest possible arrival time at the
-        // destination if searching backwards, using this AccessEgress.
-        int departureTime = calculator.departureTime(it, iterationDepartureTime);
-
-        // This access is not available after the iteration departure time
-        if (departureTime == -1) return;
-
-        // Pass in the original departure time, as wait time should not be included
-        state.setInitialTimeForIteration(it, iterationDepartureTime);
     }
 }

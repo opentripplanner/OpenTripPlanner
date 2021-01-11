@@ -256,7 +256,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             if (it.numberOfLegs() / 2 == roundTracker.round()
                 && it.stopReachedOnBoard() == inTransit
             ) {
-                transitWorker.setInitialTimeForIteration(it, iterationDepartureTime);
+                transitWorker.setAccessToStop(it, iterationDepartureTime);
             }
         }
     }
