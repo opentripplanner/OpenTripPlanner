@@ -1,6 +1,6 @@
 package fi.metatavu.airquality.configuration_parsing;
 
-public class IndexVariables {
+public class IndexVariable {
     private String name;
     public String variable;
     private DataType dataType;

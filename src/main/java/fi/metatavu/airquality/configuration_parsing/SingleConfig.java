@@ -5,7 +5,7 @@ public class SingleConfig {
     private String latitudeVariable;
     private String longitudeVariable;
     private String timeVariable;
-    private IndexVariables[] indexVariables;
+    private IndexVariable[] indexVariables;
     private RequestParameters[] requestParameters;
 
     public String getFileName() {
@@ -40,11 +40,11 @@ public class SingleConfig {
         this.timeVariable = timeVariable;
     }
 
-    public IndexVariables[] getIndexVariables() {
+    public IndexVariable[] getIndexVariables() {
         return indexVariables;
     }
 
-    public void setIndexVariables(IndexVariables[] indexVariables) {
+    public void setIndexVariables(IndexVariable[] indexVariables) {
         this.indexVariables = indexVariables;
     }
 

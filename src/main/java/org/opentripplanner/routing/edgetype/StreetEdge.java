@@ -38,6 +38,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * This represents a street segment.
@@ -46,7 +47,7 @@ import java.util.Locale;
  * 
  */
 public class StreetEdge extends Edge implements Cloneable {
-    /** Air quality */
+    /** Air quality  todo replace with map of gen values*/
     private long airQualityDataStartTime;
     private float[] carbonMonoxide;
     private float[] nitrogenMonoxide;
@@ -55,6 +56,16 @@ public class StreetEdge extends Edge implements Cloneable {
     private float[] sulfurDioxide;
     private float[] particles2_5;
     private float[] particles10;
+
+    private Map<String, float[]> additionalData;
+
+    public Map<String, float[]> getAdditionalData() {
+        return additionalData;
+    }
+
+    public void setAdditionalData(Map<String, float[]> additionalData) {
+        this.additionalData = additionalData;
+    }
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 

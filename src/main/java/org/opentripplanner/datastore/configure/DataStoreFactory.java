@@ -74,7 +74,7 @@ public class DataStoreFactory {
                         config.netexLocalFilePattern(),
                         config.osmLocalFilePattern(),
                         config.demLocalFilePattern(),
-                        config.airQualityLocalFilePattern()
+                        config.settingsLocalFilePattern()
             )
         );
 

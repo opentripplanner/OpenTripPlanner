@@ -75,7 +75,7 @@ public class OtpDataStore {
         addAll(findMultipleSources(config.demFiles(),  DEM));
         addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
         addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
-        addAll(findMultipleSources(config.airQualityFiles(), AIR_QUALITY));
+        addAll(findMultipleSources(config.settingsFiles(), SETTINGS_GRAPH_API_CONFIGURATION_JSON));
 
         streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
         graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);

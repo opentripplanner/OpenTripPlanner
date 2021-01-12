@@ -1,7 +1,11 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
-import fi.metatavu.airquality.AirQualityDataFile;
+import com.google.gson.Gson;
+import fi.metatavu.airquality.EdgeUpdaterModule;
+import fi.metatavu.airquality.GenericDataFile;
+import fi.metatavu.airquality.GenericEdgeUpdater;
+import fi.metatavu.airquality.configuration_parsing.SingleConfig;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
@@ -25,7 +29,7 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,7 +105,7 @@ public class GraphBuilder implements Runnable {
         boolean hasDem  = dataSources.has(DEM) || config.fetchElevationUS;
         boolean hasGtfs = dataSources.has(GTFS);
         boolean hasNetex = dataSources.has(NETEX);
-        boolean hasAirQuality = dataSources.has(AIR_QUALITY);
+        boolean hasSettings = dataSources.has(SETTINGS_GRAPH_API_CONFIGURATION_JSON);
         boolean hasTransitData = hasGtfs || hasNetex;
         GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
 
@@ -239,11 +243,22 @@ public class GraphBuilder implements Runnable {
             );
         }
 
-        if (hasAirQuality) {
-            for (DataSource airQualitySource : dataSources.get(AIR_QUALITY)) {
-                AirQualityDataFile airQualityDataFile = new AirQualityDataFile(new File(airQualitySource.path()));
-                AirQualityModule airQualityModule = new AirQualityModule(airQualityDataFile);
-                graphBuilder.addModule(airQualityModule);
+        if (hasSettings) {
+            Gson gson = new Gson();
+            for (DataSource settingsSource : dataSources.get(SETTINGS_GRAPH_API_CONFIGURATION_JSON)) {
+                //parse settings file
+                Reader targetReader = new InputStreamReader(settingsSource.asInputStream());
+                SingleConfig[] graphConfigurations = gson.fromJson(targetReader, SingleConfig[].class);
+                for (SingleConfig configuration : graphConfigurations) {
+                    //parse netcdf according to the settings file, use the link from the settings file
+                    GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
+                            configuration);
+                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, configuration);
+                    graphBuilder.addModule(edgeUpdaterModule);
+
+
+
+                }
             }
         }
 

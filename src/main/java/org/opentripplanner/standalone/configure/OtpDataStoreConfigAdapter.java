@@ -64,7 +64,7 @@ class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
     }
 
     @Override
-    public List<URI> airQualityFiles() { return config.airQuality; }
+    public List<URI> settingsFiles() { return config.settings; }
 
     @Override
     public URI graph() {
@@ -97,5 +97,5 @@ class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
     }
 
     @Override
-    public Pattern airQualityLocalFilePattern() { return  config.localFileNamePatterns.airQuality; }
+    public Pattern settingsLocalFilePattern() { return  config.localFileNamePatterns.settings; }
 }

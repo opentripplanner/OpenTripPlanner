@@ -56,7 +56,7 @@ public class GraphBuilderDataSources {
         include(cli.doBuildStreet() && bc.streets, DEM);
         include(cli.doBuildTransit() && bc.transit, GTFS);
         include(cli.doBuildTransit() && bc.transit, NETEX);
-        include(true, AIR_QUALITY);
+        include(true, SETTINGS_GRAPH_API_CONFIGURATION_JSON);
 
         selectFilesToImport();
 

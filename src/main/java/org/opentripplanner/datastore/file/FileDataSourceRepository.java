@@ -32,7 +32,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     private final Pattern netexLocalFilePattern;
     private final Pattern osmLocalFilePattern;
     private final Pattern demLocalFilePattern;
-    private final Pattern airQualityLocalFilePattern;
+    private final Pattern settingsLocalFilePattern;
 
     public FileDataSourceRepository(
         File baseDir,
@@ -40,14 +40,14 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
         Pattern netexLocalFilePattern,
         Pattern osmLocalFilePattern,
         Pattern demLocalFilePattern,
-        Pattern airQualityLocalFilePattern
+        Pattern settingsLocalFilePattern
     ) {
         this.baseDir = baseDir;
         this.gtfsLocalFilePattern = gtfsLocalFilePattern;
         this.netexLocalFilePattern = netexLocalFilePattern;
         this.osmLocalFilePattern = osmLocalFilePattern;
         this.demLocalFilePattern = demLocalFilePattern;
-        this.airQualityLocalFilePattern = airQualityLocalFilePattern;
+        this.settingsLocalFilePattern = settingsLocalFilePattern;
     }
 
     /**
@@ -147,7 +147,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
         if (isTransitFile(file, gtfsLocalFilePattern)) { return GTFS; }
         if (isTransitFile(file, netexLocalFilePattern)) { return NETEX; }
         if (osmLocalFilePattern.matcher(name).find()) { return OSM; }
-        if (airQualityLocalFilePattern.matcher(name).find()) { return AIR_QUALITY; }
+        if (settingsLocalFilePattern.matcher(name).find()) { return SETTINGS_GRAPH_API_CONFIGURATION_JSON; }
         // Digital elevation model (elevation raster)
         if (demLocalFilePattern.matcher(name).find()) { return DEM; }
         if (name.matches("(streetG|g)raph.obj")) { return GRAPH; }

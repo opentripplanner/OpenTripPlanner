@@ -18,7 +18,7 @@ public enum FileType {
   REPORT("📈", "Issue report"),
   OTP_STATUS("⏳", "OTP build status"),
   UNKNOWN("❓", "Unknown file"),
-  AIR_QUALITY("⛅", "Air quality data");
+  SETTINGS_GRAPH_API_CONFIGURATION_JSON("⚙️", "Data/API configuration file");
 
   private final String icon;
   private final String text;
@@ -45,7 +45,7 @@ public enum FileType {
    * At least one input data file must be present to build a graph.
    */
   public boolean isInputDataSource() {
-    return EnumSet.of(GTFS, NETEX, OSM, DEM, AIR_QUALITY).contains(this);
+    return EnumSet.of(GTFS, NETEX, OSM, DEM, SETTINGS_GRAPH_API_CONFIGURATION_JSON).contains(this);
   }
 
   /**
