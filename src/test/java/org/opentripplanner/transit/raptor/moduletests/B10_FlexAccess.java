@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.moduletests;
 
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
@@ -62,7 +61,6 @@ public class B10_FlexAccess implements RaptorTestConstants {
   }
 
   @Test
-  @Ignore("Failes with: ArrayIndexOutOfBoundsException: Index -1")
   public void standard() {
     requestBuilder.profile(RaptorProfile.STANDARD);
 
@@ -94,8 +92,8 @@ public class B10_FlexAccess implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
-    // TODO The 'flexAndWalk STOP_4 D7m 2' alternative is optimal, but missed because
-    //          number-of-transfers is not accounted for in the right way?
+    // TODO OTP2 - The 'flexAndWalk STOP_4 D7m 2' alternative is optimal, but missed because
+    //             number-of-transfers is not accounted for in the right way?
     assertEquals(""
             + "Flex 3m 3legs  ~ 3 ~ BUS R1 0:14 0:18 ~ 5 ~ Walk 1m [00:10:00 00:19:00 9m, cost: 1860]\n"
             + "Flex 2m 4legs  ~ 2 ~ BUS R1 0:12 0:18 ~ 5 ~ Walk 1m [00:09:00 00:19:00 10m, cost: 1740]\n"

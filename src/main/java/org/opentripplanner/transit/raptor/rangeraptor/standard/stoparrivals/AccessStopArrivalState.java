@@ -19,6 +19,11 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> extends StopAr
     setAccessTime(time, accessPath.durationInSeconds());
   }
 
+  @Override
+  public final boolean arrivedByAccess() {
+    return true;
+  }
+
   public RaptorTransfer accessPath() {
     return accessPath;
   }

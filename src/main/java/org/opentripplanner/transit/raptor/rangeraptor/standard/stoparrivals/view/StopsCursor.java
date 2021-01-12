@@ -78,52 +78,58 @@ public class StopsCursor<T extends RaptorTripSchedule> {
         return new Transit<>(round, stop, arrival, this);
     }
 
+    /** @see #stop(int, int, Transit) */
     public ArrivalView<T> stop(int round, int stop) {
-        return round == 0 ? newAccessView(stop) : newTransitOrTransferView(round, stop);
+        return stop(round, stop, null);
     }
 
     /**
-     * A access stop arrival, time-shifted according to the first transit boarding/departure time.
+     * Set cursor to stop followed by the give transit leg - this allow access to be time-shifted
+     * according to the next transit boarding/departure time.
      */
-    ArrivalView<T> access(int stop, Transit<T> transit) {
-        return newAccessView(stop, transit);
-    }
+    public ArrivalView<T> stop(int round, int stop, Transit<T> nextTransitLeg) {
+        var arrival = stops.get(round, stop);
 
-    /**
-     * Access without known transit, uses the iteration departure time without time shift
-     */
-    private ArrivalView<T> newAccessView(int stop) {
-        AccessStopArrivalState<T> arrival = stops.get(0, stop).asAccessStopArrivalState();
-        return new Access<>(0, arrival.time(), arrival.accessPath());
+        if(arrival.arrivedByAccess()) {
+            return newAccessView(round, arrival.asAccessStopArrivalState(), nextTransitLeg);
+        }
+        else {
+            return arrival.arrivedByTransfer()
+                ? new Transfer<>(round, stop, arrival, this)
+                : new Transit<>(round, stop, arrival, this);
+        }
     }
 
     /**
      * A access stop arrival, time-shifted according to the first transit boarding/departure time
      * and the possible restrictions in the access.
+     * <p>
+     * If given transit is {@code null}, then use the iteration departure time without any
+     * time-shifted departure. This is used for logging and debugging, not for returned paths.
      */
-    private ArrivalView<T> newAccessView(int stop, Transit<T> transit) {
-        AccessStopArrivalState<T> arrival = stops.get(0, stop).asAccessStopArrivalState();
+    private ArrivalView<T> newAccessView(
+        int round,
+        AccessStopArrivalState<T> arrival,
+        Transit<T> transit
+    ) {
+        if(transit == null) {
+            return new Access<>(round, arrival.time(), arrival.accessPath());
+        }
         int transitDepartureTime = transit.boardTime();
         int boardSlack = boardSlackProvider.applyAsInt(transit.trip().pattern());
 
         // Preferred time-shifted access departure
-        int preferredDepartureTime = transitCalculator.minusDuration(
-            transitDepartureTime,
+        int preferredDepartureTime = transitCalculator.minusDuration(transitDepartureTime,
             boardSlack + arrival.transferDuration()
         );
 
         // Get the real 'departureTime' honoring the time-shift restriction in the access
-        int departureTime = transitCalculator.departureTime(arrival.accessPath(), preferredDepartureTime);
-        int arrivalTime = transitCalculator.plusDuration(departureTime, arrival.accessPath().durationInSeconds());
-
-        return new Access<>(0, arrivalTime, arrival.accessPath());
-    }
-
-    private ArrivalView<T> newTransitOrTransferView(int round, int stop) {
-        StopArrivalState<T> arrival = stops.get(round, stop);
-
-        return arrival.arrivedByTransfer()
-                ? new Transfer<>(round, stop, arrival, this)
-                : new Transit<>(round, stop, arrival, this);
+        int departureTime = transitCalculator.departureTime(arrival.accessPath(),
+            preferredDepartureTime
+        );
+        int arrivalTime = transitCalculator.plusDuration(departureTime,
+            arrival.accessPath().durationInSeconds()
+        );
+        return new Access<>(round, arrivalTime, arrival.accessPath());
     }
 }

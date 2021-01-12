@@ -85,6 +85,10 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         return accessOrTransferDuration;
     }
 
+    public boolean arrivedByAccess() {
+        return false;
+    }
+
     public final boolean arrivedByTransit() {
         return transitArrivalTime != NOT_SET;
     }
