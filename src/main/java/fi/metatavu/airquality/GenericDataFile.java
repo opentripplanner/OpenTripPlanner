@@ -1,7 +1,7 @@
 package fi.metatavu.airquality;
 
 import fi.metatavu.airquality.configuration_parsing.IndexVariable;
-import fi.metatavu.airquality.configuration_parsing.SingleConfig;
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
 import ucar.nc2.NetcdfFile;
@@ -17,6 +17,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Generic data file which is read according to graphs/*settings.json settings
+ */
 public class GenericDataFile{
 
     private OffsetDateTime originDate;
@@ -28,9 +31,9 @@ public class GenericDataFile{
     storage of the parsed data, where key = name of the peoperty, e.g. o2 and value is the
     array of its data
      */
-    Map<String, ArrayFloat.D4> genericData = new HashMap<>();
+    Map<String, ArrayFloat.D4> netcdfData = new HashMap<>();
 
-    public GenericDataFile(File file, SingleConfig singleConfig) {
+    public GenericDataFile(File file, GenericFileConfiguration genericFileConfiguration) {
         error = null;
 
         //read the netcdf according to the settings in the provided configuration
@@ -40,13 +43,14 @@ public class GenericDataFile{
             }
             NetcdfFile netcdfFile = readNetcdfFile(file);
 
-            Variable time = netcdfFile.findVariable(singleConfig.getTimeVariable());
-            Variable latitude = netcdfFile.findVariable(singleConfig.getLatitudeVariable());
-            Variable longitude = netcdfFile.findVariable(singleConfig.getLongitudeVariable());
+            //read universal variables which always are present
+            Variable time = netcdfFile.findVariable(genericFileConfiguration.getTimeVariable());
+            Variable latitude = netcdfFile.findVariable(genericFileConfiguration.getLatitudeVariable());
+            Variable longitude = netcdfFile.findVariable(genericFileConfiguration.getLongitudeVariable());
 
             //creating map of variables
             HashMap<IndexVariable, Variable> genVariables = new HashMap<>();
-            for (IndexVariable indexVariable : singleConfig.getIndexVariables()){
+            for (IndexVariable indexVariable : genericFileConfiguration.getIndexVariables()){
                 genVariables.put(indexVariable, netcdfFile.findVariable(indexVariable.getVariable()));
                 //todo check if any vars from the conf are missing from the file?
 
@@ -62,13 +66,23 @@ public class GenericDataFile{
                 return;
             }
 
+            if (latitude == null) {
+                error = String.format("Missing latitude variable from %s file", file.getAbsolutePath());
+                return;
+            }
+
+            if (longitude == null) {
+                error = String.format("Missing longitude variable from %s file", file.getAbsolutePath());
+                return;
+            }
+
             originDate = OffsetDateTime.ofInstant(dateOrigin.toInstant(), ZoneId.systemDefault());
             timeArray = time.read();
             latitudeArray = latitude.read();
             longitudeArray = longitude.read();
             //read generic data into arrays
             for (Map.Entry<IndexVariable, Variable> genVariable : genVariables.entrySet()){
-                genericData.put(genVariable.getKey().getName(), (ArrayFloat.D4) genVariable.getValue().read());
+                netcdfData.put(genVariable.getKey().getName(), (ArrayFloat.D4) genVariable.getValue().read());
             }
         }
         catch (Exception e) {
@@ -77,8 +91,8 @@ public class GenericDataFile{
     }
 
 
-    public Map<String, ArrayFloat.D4> getGenericData() {
-        return genericData;
+    public Map<String, ArrayFloat.D4> getNetcdfData() {
+        return netcdfData;
     }
 
 

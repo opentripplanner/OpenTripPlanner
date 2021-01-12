@@ -1,6 +1,6 @@
 package fi.metatavu.airquality.configuration_parsing;
 
-public class SingleConfig {
+public class GenericFileConfiguration {
     private String fileName;
     private String latitudeVariable;
     private String longitudeVariable;

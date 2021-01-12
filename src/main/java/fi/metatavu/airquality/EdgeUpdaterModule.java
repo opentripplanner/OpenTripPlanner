@@ -1,7 +1,7 @@
 package fi.metatavu.airquality;
 
 
-import fi.metatavu.airquality.configuration_parsing.SingleConfig;
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -9,21 +9,19 @@ import org.opentripplanner.routing.graph.Graph;
 import java.util.HashMap;
 
 /**
- * A module to update graph with air quality data
+ * A module to update graph with generic data according
  */
 public class EdgeUpdaterModule implements GraphBuilderModule {
     private final GenericDataFile dataFile;
-    private final SingleConfig config;
 
-    public EdgeUpdaterModule(GenericDataFile dataFile, SingleConfig config) {
+    public EdgeUpdaterModule(GenericDataFile dataFile) {
         this.dataFile = dataFile;
-        this.config = config;
     }
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore) {
-        GenericEdgeUpdater airQualityEdgeUpdater = new GenericEdgeUpdater(dataFile, graph.getStreetEdges(), config);
-        airQualityEdgeUpdater.updateEdges();
+        GenericEdgeUpdater genericEdgeUpdater = new GenericEdgeUpdater(dataFile, graph.getStreetEdges());
+        genericEdgeUpdater.updateEdges();
     }
 
     @Override

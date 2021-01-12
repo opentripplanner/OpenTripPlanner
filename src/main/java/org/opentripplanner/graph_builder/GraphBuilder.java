@@ -4,8 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import fi.metatavu.airquality.EdgeUpdaterModule;
 import fi.metatavu.airquality.GenericDataFile;
-import fi.metatavu.airquality.GenericEdgeUpdater;
-import fi.metatavu.airquality.configuration_parsing.SingleConfig;
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
@@ -248,12 +247,12 @@ public class GraphBuilder implements Runnable {
             for (DataSource settingsSource : dataSources.get(SETTINGS_GRAPH_API_CONFIGURATION_JSON)) {
                 //parse settings file
                 Reader targetReader = new InputStreamReader(settingsSource.asInputStream());
-                SingleConfig[] graphConfigurations = gson.fromJson(targetReader, SingleConfig[].class);
-                for (SingleConfig configuration : graphConfigurations) {
+                GenericFileConfiguration[] graphConfigurations = gson.fromJson(targetReader, GenericFileConfiguration[].class);
+                for (GenericFileConfiguration configuration : graphConfigurations) {
                     //parse netcdf according to the settings file, use the link from the settings file
                     GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
                             configuration);
-                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, configuration);
+                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile);
                     graphBuilder.addModule(edgeUpdaterModule);
 
 

@@ -103,15 +103,15 @@ public class AirQualityEdgeUpdater {
    * @return array of pollutant values samples in time
    */
   private float[] getAveragePollution(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, Pollutant pollutant) {
-    EdgeAirQuality edgeAirQuality = new EdgeAirQuality();
+    EdgeGenQuality edgeGenQuality = new EdgeGenQuality();
 
     getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, pollutant).forEach(sample -> {
       for (int time = 0; time < sample.length; time++) {
-        edgeAirQuality.addPollutantValueSample(time, sample[time]);
+        edgeGenQuality.addPropertyValueSample(time, sample[time]);
       }
     });
 
-    return edgeAirQuality.getPollutantValues((int) airQualityDataFile.getTimeArray().getSize());
+    return edgeGenQuality.getPeroptyValuesAverages((int) airQualityDataFile.getTimeArray().getSize());
   }
 
   /**

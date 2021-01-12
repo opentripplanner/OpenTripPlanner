@@ -1,6 +1,6 @@
 package fi.metatavu.airquality;
 
-import fi.metatavu.airquality.configuration_parsing.SingleConfig;
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -19,26 +19,27 @@ import java.util.*;
 public class GenericEdgeUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericEdgeUpdater.class);
+    private static final int REPORT_EVERY_N_EDGE = 10000;
 
     private final GenericDataFile dataFile;
     private final Collection<StreetEdge> streetEdges;
-    private final SingleConfig singleConfig;
 
     private final Map<String, ArrayFloat.D4> fileGenericData; //this data will update the street edges
 
     private int edgesUpdated;
-    private final long dataStartTime = 0;
+    private final long dataStartTime;
 
-    public GenericEdgeUpdater (GenericDataFile dataFile, Collection<StreetEdge> streetEdges, SingleConfig config){
+    public GenericEdgeUpdater (GenericDataFile dataFile, Collection<StreetEdge> streetEdges){
         super();
         this.dataFile = dataFile;
         this.streetEdges = streetEdges;
-        this.singleConfig = config;
 
         this.edgesUpdated = 0;
-        fileGenericData = dataFile.getGenericData();
-        LOG.info(String.format("Street edges update starting from time stamp "));
+        double startTimeHours = this.dataFile.getTimeArray().getDouble(0);
+        this.dataStartTime = this.dataFile.getOriginDate().toInstant().plusSeconds((long) (startTimeHours * 3600)).toEpochMilli();
 
+        fileGenericData = dataFile.getNetcdfData();
+        LOG.info(String.format("Street edges update starting from time stamp %d", this.dataStartTime));
     }
 
     /**
@@ -46,11 +47,15 @@ public class GenericEdgeUpdater {
      */
     public void updateEdges() {
 
-        System.out.println("updating edges with air quality data");
+        System.out.println("updating edges with air genertic data");
         streetEdges.forEach(this::updateEdge);
+        System.out.println("finished edges with air quality data");
+
     }
-    /*
-    update the edge according to the generic variable descriptions
+
+    /**
+     *  Updates the edge according to the generic variable descriptions
+     * @param streetEdge
      */
     private void updateEdge(StreetEdge streetEdge) {
         Vertex fromVertex = streetEdge.getFromVertex();
@@ -58,12 +63,12 @@ public class GenericEdgeUpdater {
         Coordinate fromCoordinate = fromVertex.getCoordinate();
         Coordinate toCoordinate = toVertex.getCoordinate();
 
-        //set the edge values
+        //calculate average generic values
         HashMap<String, float[]> edgeGenericDataValues = new HashMap<>();
-        for (Map.Entry<String, ArrayFloat.D4> oneExtraDataTypeVals : fileGenericData.entrySet()) {
-            float[] averageDataValue = getAveragePollution(fromCoordinate.x, fromCoordinate.y,
-                    toCoordinate.x, toCoordinate.y, oneExtraDataTypeVals.getKey());
-            edgeGenericDataValues.put(oneExtraDataTypeVals.getKey(), averageDataValue);
+        for (Map.Entry<String, ArrayFloat.D4> variableValues : fileGenericData.entrySet()) {
+            float[] averageDataValue = getAverageValue(fromCoordinate.x, fromCoordinate.y,
+                    toCoordinate.x, toCoordinate.y, variableValues.getKey());
+            edgeGenericDataValues.put(variableValues.getKey(), averageDataValue);
         }
 
 
@@ -71,34 +76,38 @@ public class GenericEdgeUpdater {
 
         edgesUpdated++;
 
+        if (LOG.isInfoEnabled() && (edgesUpdated % REPORT_EVERY_N_EDGE) == 0) {
+            LOG.info(String.format("%d / %d street edges updated", edgesUpdated, streetEdges.size()));
+        }
+
     }
     /**
-     * Returns average air quality sample data near given line.
+     * Returns average property sample data near given line.
      *
-     * Each cell of returned array represent an average of air quality index in time
+     * Each cell of returned array represent an average of quality of the selected property in time
      *
      * @param fromLongitude from longitude
      * @param fromLatitude from latitude
      * @param toLongitude to longitude
      * @param toLatitude to latitude
-     * @param pollutant pollutant
+     * @param propertyName propertyName
      *
-     * @return array of pollutant values samples in time
+     * @return array of propertyName values samples in time
      */
-    private float[] getAveragePollution(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String pollutant) {
-        EdgeAirQuality edgeAirQuality = new EdgeAirQuality();
+    private float[] getAverageValue(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String propertyName) {
+        EdgeGenQuality edgeGenQuality = new EdgeGenQuality();
 
-        getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, pollutant).forEach(sample -> {
+        getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, propertyName).forEach(sample -> {
             for (int time = 0; time < sample.length; time++) {
-                edgeAirQuality.addPollutantValueSample(time, sample[time]);
+                edgeGenQuality.addPropertyValueSample(time, sample[time]);
             }
         });
 
-        return edgeAirQuality.getPollutantValues((int) dataFile.getTimeArray().getSize());
+        return edgeGenQuality.getPeroptyValuesAverages((int) dataFile.getTimeArray().getSize());
     }
 
     /**
-     * Returns closest air quality samples for given line
+     * Returns closest property value samples for given line
      *
      * Each list cell represent an average of air quality index in time
      *
@@ -106,11 +115,11 @@ public class GenericEdgeUpdater {
      * @param fromLatitude from latitude
      * @param toLongitude to longitude
      * @param toLatitude to latitude
-     * @param pollutant pollutant
+     * @param propertyName propertyName
      *
      * @return closest air quality samples for given line
      */
-    private List<float[]> getClosestSamples(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String pollutant) {
+    private List<float[]> getClosestSamples(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String propertyName) {
         List<float[]> result = new ArrayList<>();
         double azimuth = getAzimuth(fromLongitude, fromLatitude, toLongitude, toLatitude);
         double distance = getDistance(fromLongitude, fromLatitude, toLongitude, toLatitude);
@@ -118,7 +127,7 @@ public class GenericEdgeUpdater {
 
         for (int i = 0; i < distance / spacing; i++) {
             Point2D samplePoint = moveTo(fromLongitude, fromLatitude, azimuth, i * spacing);
-            result.add(getClosestPollutionValue(samplePoint, pollutant));
+            result.add(getClosestPropertyValue(samplePoint, propertyName));
         }
 
         return result;
@@ -126,17 +135,17 @@ public class GenericEdgeUpdater {
 
 
     /**
-     * Returns closest a pollution value for given point.
+     * Returns closest a value of selected property for given point.
      *
-     * Returned array represent an air quality index in time
+     * Returned array represent value for selected property time
      *
      *
      * @param samplePoint point
-     * @param pollutant pollutant
+     * @param propertyName propertyName
      *
-     * @return closest pollution for given point
+     * @return closest value for selected property for given point
      */
-    private float[] getClosestPollutionValue(Point2D samplePoint, String pollutant) {
+    private float[] getClosestPropertyValue(Point2D samplePoint, String propertyName) {
         double lon = samplePoint.getX();
         double lat = samplePoint.getY();
 
@@ -148,7 +157,7 @@ public class GenericEdgeUpdater {
         int height = 0;
 
         for (int timeIndex = 0; timeIndex < timeSize; timeIndex++) {
-            result[timeIndex] = fileGenericData.get(pollutant).get(timeIndex, height, latIndex, lonIndex);
+            result[timeIndex] = fileGenericData.get(propertyName).get(timeIndex, height, latIndex, lonIndex);
 
         }
 
