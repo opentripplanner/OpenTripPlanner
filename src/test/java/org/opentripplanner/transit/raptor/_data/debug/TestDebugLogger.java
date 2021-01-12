@@ -193,11 +193,8 @@ public class TestDebugLogger implements DebugLogger {
         buf.sep();
 
         if (a.arrivedByTransit()) {
-            if(a.previous().arrivalTime() > a.arrivalTime()) {
-                throw new IllegalStateException("TODO: Add support for REVERSE search!");
-            }
-            TripTimesSearch.BoarAlightTimes b = TripTimesSearch.findTripForwardSearch(a);
-            buf.transit(a.transitPath().trip().pattern().debugInfo(), b.boardTime, a.arrivalTime());
+            int boardTime = TripTimesSearch.findTripSearch(a).boardTime;
+            buf.transit(a.transitPath().trip().pattern().debugInfo(), boardTime, a.arrivalTime());
         } else {
             buf.walk(legDuration(a));
         }
