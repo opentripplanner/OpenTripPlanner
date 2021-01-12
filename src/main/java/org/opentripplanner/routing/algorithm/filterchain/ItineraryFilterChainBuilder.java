@@ -190,11 +190,9 @@ public class ItineraryFilterChainBuilder {
             }
         }
 
-        // Do the final itineraries sort
-        filters.add(new OtpDefaultSortOrder(arriveBy));
-
         // Remove itineraries if max limit is set
         if (maxNumberOfItineraries > 0) {
+            filters.add(new OtpDefaultSortOrder(arriveBy));
             filters.add(
                 new MaxLimitFilter(
                     "number-of-itineraries-filter",
@@ -203,6 +201,9 @@ public class ItineraryFilterChainBuilder {
                 )
             );
         }
+
+        // Do the final itineraries sort
+        filters.add(new OtpDefaultSortOrder(arriveBy));
         
         if(debug) {
             filters = addDebugWrappers(filters);
