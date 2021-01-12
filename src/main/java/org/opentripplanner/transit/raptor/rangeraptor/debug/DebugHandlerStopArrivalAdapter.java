@@ -6,9 +6,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 import java.util.LinkedList;
 
-/**
- * StopArrival debug adapter.
- */
 final class DebugHandlerStopArrivalAdapter extends AbstractDebugHandlerAdapter<ArrivalView<?>> {
 
     DebugHandlerStopArrivalAdapter(DebugRequest debug, WorkerLifeCycle lifeCycle) {

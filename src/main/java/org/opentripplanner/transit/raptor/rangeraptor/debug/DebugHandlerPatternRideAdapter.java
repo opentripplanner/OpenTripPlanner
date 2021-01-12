@@ -7,9 +7,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 
 import java.util.LinkedList;
 
-/**
- * PatternRide debug adapter.
- */
 final class DebugHandlerPatternRideAdapter extends AbstractDebugHandlerAdapter<PatternRide<?>> {
 
     DebugHandlerPatternRideAdapter(DebugRequest debug, WorkerLifeCycle lifeCycle) {

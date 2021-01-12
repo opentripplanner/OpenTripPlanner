@@ -16,6 +16,9 @@ import javax.annotation.Nullable;
  * Use this factory to create debug handlers. If a routing request has not enabled debugging {@code
  * null} is returned. Use the {@link #isDebugStopArrival(int)} like methods before retrieving a
  * handler.
+ *<p>
+ * See the <b>package.md</b> for Debugging implementation notes in the
+ * raptor root package {@link org.opentripplanner.transit}.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

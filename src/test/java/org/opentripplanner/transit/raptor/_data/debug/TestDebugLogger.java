@@ -5,9 +5,11 @@ import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
+import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
@@ -16,12 +18,20 @@ import org.opentripplanner.util.TableFormatter;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrCompact;
 import static org.opentripplanner.util.TableFormatter.Align.Center;
 import static org.opentripplanner.util.TableFormatter.Align.Left;
 import static org.opentripplanner.util.TableFormatter.Align.Right;
 
+
+/**
+ * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This
+ * is used by the {@link SpeedTest} and in module tests.
+ * <p>
+ * See the Raptor design doc for a general description of the logging functionality.
+ */
 public class TestDebugLogger implements DebugLogger {
     private static final int NOT_SET = Integer.MIN_VALUE;
 
@@ -48,8 +58,11 @@ public class TestDebugLogger implements DebugLogger {
         this.enableDebugLogging = enableDebugLogging;
     }
 
+    /**
+     * This should be passed into the {@link DebugRequestBuilder#stopArrivalListener(Consumer)}
+     * using a lambda to enable debugging stop arrivals.
+     */
     public void stopArrivalLister(DebugEvent<ArrivalView<?>> e) {
-
         printIterationHeader(e.iterationStartTime());
         printRoundHeader(e.element().round());
         print(e.element(), e.action().toString(), e.reason());
@@ -60,6 +73,10 @@ public class TestDebugLogger implements DebugLogger {
         }
     }
 
+    /**
+     * This should be passed into the {@link DebugRequestBuilder#patternRideDebugListener(Consumer)}
+     * using a lambda to enable debugging pattern ride events.
+     */
     public void patternRideLister(DebugEvent<PatternRide<?>> e) {
         printIterationHeader(e.iterationStartTime());
         printRoundHeader(e.element().prevArrival.round() + 1);
@@ -71,6 +88,10 @@ public class TestDebugLogger implements DebugLogger {
         }
     }
 
+    /**
+     * This should be passed into the {@link DebugRequestBuilder#pathFilteringListener(Consumer)}
+     * using a lambda to enable debugging paths put in the final result pareto-set.
+     */
     public void pathFilteringListener(DebugEvent<Path<?>> e) {
         if (pathHeader) {
             System.err.println();

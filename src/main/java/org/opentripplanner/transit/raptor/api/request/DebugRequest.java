@@ -103,30 +103,18 @@ public class DebugRequest {
         return debugPathFromStopIndex;
     }
 
-    /**
-     * Stop arrival debug event listener
-     */
     public Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener() {
         return stopArrivalListener;
     }
 
-    /**
-     * Pattern Ride debug event listener.
-     */
     public Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener() {
         return patternRideDebugListener;
     }
 
-    /**
-     * Path debug event listener
-     */
     public Consumer<DebugEvent<Path<?>>> pathFilteringListener() {
         return pathFilteringListener;
     }
 
-    /**
-     * Path debug event listener
-     */
     public DebugLogger logger() {
         return logger;
     }
@@ -161,6 +149,4 @@ public class DebugRequest {
     public int hashCode() {
         return Objects.hash(stops, path, debugPathFromStopIndex);
     }
-
-
 }

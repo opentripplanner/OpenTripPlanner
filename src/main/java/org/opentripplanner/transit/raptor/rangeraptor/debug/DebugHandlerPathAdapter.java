@@ -6,9 +6,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 import java.util.List;
 
-/**
- * Path debug adapter.
- */
 final class DebugHandlerPathAdapter extends AbstractDebugHandlerAdapter<Path<?>> {
 
     DebugHandlerPathAdapter(DebugRequest debug, WorkerLifeCycle lifeCycle) {
