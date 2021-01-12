@@ -27,6 +27,8 @@ public interface StopArrivalsState<T extends RaptorTripSchedule> {
 
     void setAccessTime(int arrivalTime, RaptorTransfer access);
 
+    default void rejectAccessTime(int arrivalTime, RaptorTransfer access) { }
+
     int bestTimePreviousRound(int stop);
 
     void setNewBestTransitTime(int alightStop, int alightTime, T trip, int boardStop, int boardTime, boolean newBestOverall);

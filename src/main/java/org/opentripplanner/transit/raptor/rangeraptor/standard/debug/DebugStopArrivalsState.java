@@ -43,6 +43,12 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     }
 
     @Override
+    public void rejectAccessTime(int arrivalTime, RaptorTransfer access) {
+        debug.rejectAccessPath(access, arrivalTime);
+        delegate.rejectAccessTime(arrivalTime, access);
+    }
+
+    @Override
     public final int bestTimePreviousRound(int stop) {
         return delegate.bestTimePreviousRound(stop);
     }

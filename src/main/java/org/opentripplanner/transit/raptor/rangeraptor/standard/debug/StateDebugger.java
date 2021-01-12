@@ -34,6 +34,12 @@ class StateDebugger<T extends RaptorTripSchedule> {
         }
     }
 
+    void rejectAccessPath(RaptorTransfer accessPath, int arrivalTime) {
+        if (isDebug(accessPath.stop())) {
+            reject(cursor.rejectedAccess(round(), accessPath, arrivalTime));
+        }
+    }
+
     void dropOldStateAndAcceptNewState(int stop, Runnable body) {
         if (isDebug(stop)) {
             drop(stop);

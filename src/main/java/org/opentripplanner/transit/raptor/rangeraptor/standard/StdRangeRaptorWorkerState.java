@@ -119,8 +119,17 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
         // (or departure time at the last stop if we search backwards).
         int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
 
-        bestTimes.setAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
-        stopArrivalsState.setAccessTime(arrivalTime, accessPath);
+        if (exceedsTimeLimit(arrivalTime)) {
+            return;
+        }
+
+        if (newOverallBestTime(stop, arrivalTime)) {
+            bestTimes.setAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
+            stopArrivalsState.setAccessTime(arrivalTime, accessPath);
+        }
+        else {
+            stopArrivalsState.rejectAccessTime(arrivalTime, accessPath);
+        }
     }
 
     /**

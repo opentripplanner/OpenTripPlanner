@@ -253,12 +253,23 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      */
     private void addAccessPathsToState(boolean inTransit) {
         for (RaptorTransfer it : accessPaths) {
-            if (it.numberOfLegs() / 2 == roundTracker.round()
-                && it.stopReachedOnBoard() == inTransit
-            ) {
-                transitWorker.setAccessToStop(it, iterationDepartureTime);
-            }
+            // Check if access matches round and time
+            if (!includeAccessInRound(it, inTransit)) { continue; }
+
+            // Earliest possible departure time from the origin, or latest possible arrival
+            // time at the destination if searching backwards.
+            int timeDependentDepartureTime = calculator.departureTime(it, iterationDepartureTime);
+
+            // This access is not available after the iteration departure time
+            if (timeDependentDepartureTime == -1) { continue; }
+
+            transitWorker.setAccessToStop(it, iterationDepartureTime, timeDependentDepartureTime);
         }
+    }
+
+    private boolean includeAccessInRound(RaptorTransfer accessPath, boolean inTransit) {
+        return accessPath.numberOfLegs() / 2 == roundTracker.round()
+            && accessPath.stopReachedOnBoard() == inTransit;
     }
 
     // Track time spent, measure performance

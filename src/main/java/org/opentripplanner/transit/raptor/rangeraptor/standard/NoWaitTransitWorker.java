@@ -42,14 +42,11 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public void setAccessToStop(RaptorTransfer accessPath, int iterationDepartureTime) {
-        // Earliest possible departure time from the origin, or latest possible arrival time at the
-        // destination if searching backwards, using this AccessEgress.
-        int departureTime = calculator.departureTime(accessPath, iterationDepartureTime);
-
-        // This access is not available after the iteration departure time
-        if (departureTime == -1) return;
-
+    public void setAccessToStop(
+        RaptorTransfer accessPath,
+        int iterationDepartureTime,
+        int timeDependentDepartureTime
+    ) {
         // Pass in the original departure time, as wait time should not be included
         state.setAccessToStop(accessPath, iterationDepartureTime);
     }

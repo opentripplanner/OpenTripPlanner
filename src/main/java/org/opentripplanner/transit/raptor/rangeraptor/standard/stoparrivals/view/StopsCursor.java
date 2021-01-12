@@ -43,6 +43,13 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     /**
      * Return a fictive Transfer arrival for the rejected transfer stop arrival.
      */
+    public Access<T> rejectedAccess(int round, RaptorTransfer accessPath, int arrivalTime) {
+        return new Access<T>(round, arrivalTime, accessPath);
+    }
+
+    /**
+     * Return a fictive Transfer arrival for the rejected transfer stop arrival.
+     */
     public Transfer<T> rejectedTransfer(int round, int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
         StopArrivalState<T> arrival = new StopArrivalState<>();
         arrival.transferToStop(fromStop, arrivalTime, transfer.durationInSeconds());
