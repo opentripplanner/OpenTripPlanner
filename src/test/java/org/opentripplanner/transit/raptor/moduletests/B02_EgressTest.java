@@ -62,6 +62,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
+    // expect: one path with the latest departure time.
     assertEquals(
         "Walk 20s ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Walk 3m [00:09:40 00:19:00 9m20s]",
         PathUtils.pathsToString(response)
@@ -76,6 +77,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
+    // expect: one path with the latest departure time, same as found in the forward search.
     assertEquals(
         "Walk 20s ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Walk 3m [00:09:40 00:19:00 9m20s]",
         PathUtils.pathsToString(response)
@@ -88,6 +90,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
+    // expect: All pareto optimal paths
     assertEquals(""
             + "Walk 20s ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Walk 3m [00:09:40 00:19:00 9m20s, cost: 1760]\n"
             + "Walk 20s ~ 1 ~ BUS R1 0:10 0:18 ~ 5 ~ Walk 2m [00:09:40 00:20:00 10m20s, cost: 1640]\n"

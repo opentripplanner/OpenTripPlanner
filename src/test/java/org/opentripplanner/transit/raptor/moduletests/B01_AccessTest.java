@@ -64,6 +64,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
+    // expect: one path with the latest departure time.
     assertEquals(
         "Walk 3m ~ 3 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1s [00:11:00 00:20:01 9m1s]",
         PathUtils.pathsToString(response)
@@ -78,6 +79,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
+    // expect: one path with the latest departure time, same as found in the forward search.
     assertEquals(
         "Walk 3m ~ 3 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1s [00:11:00 00:20:01 9m1s]",
         PathUtils.pathsToString(response)
@@ -91,8 +93,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
-    System.out.println(PathUtils.pathsToString(response));
-
+    // expect: All pareto optimal paths
     assertEquals(""
             + "Walk 3m ~ 3 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1s [00:11:00 00:20:01 9m1s, cost: 1684]\n"
             + "Walk 2m ~ 2 ~ BUS R1 0:12 0:20 ~ 6 ~ Walk 1s [00:10:00 00:20:01 10m1s, cost: 1564]\n"

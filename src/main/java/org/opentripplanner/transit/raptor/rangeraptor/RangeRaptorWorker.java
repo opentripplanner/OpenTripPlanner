@@ -177,10 +177,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Check if the RangeRaptor should continue with a new round.
      */
     private boolean hasMoreRounds() {
-        int round = roundTracker.round();
+        final int round = roundTracker.round();
         boolean hasAccessesLeft = accessPaths
             .stream()
-            .anyMatch(raptorTransfer -> raptorTransfer.numberOfLegs() / 2 > round);
+            .anyMatch(it -> it.numberOfRides() > round);
 
         return (state.isNewRoundAvailable() || hasAccessesLeft) && roundTracker.hasMoreRounds();
     }
@@ -268,7 +268,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     private boolean includeAccessInRound(RaptorTransfer accessPath, boolean inTransit) {
-        return accessPath.numberOfLegs() / 2 == roundTracker.round()
+        return accessPath.numberOfRides() == roundTracker.round()
             && accessPath.stopReachedOnBoard() == inTransit;
     }
 

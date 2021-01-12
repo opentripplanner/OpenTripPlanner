@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PathUtils {
-
-  private static final int UNKNOWN = -999_999;
-
   /** Util class, private constructor */
   private PathUtils() { }
 

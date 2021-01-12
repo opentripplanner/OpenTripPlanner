@@ -49,10 +49,10 @@ public class B11_FlexEgress implements RaptorTestConstants {
         )
         // All egress paths are all pareto-optimal (McRaptor).
         .addEgressPaths(
-            flexAndWalk(STOP_2, D7m, 2),     // best on combination of transfers and time
-            flex(STOP_3, D3m, 3),            // earliest arrival time
-            flexAndWalk(STOP_4, D2m, 4),     // lowest cost
-            walk(STOP_5, D10m)               // lowest num-of-transfers (0)
+            flexAndWalk(STOP_2, D7m),     // best on combination of transfers and time
+            flex(STOP_3, D3m, 2),         // earliest arrival time
+            flexAndWalk(STOP_4, D2m, 2),  // lowest cost
+            walk(STOP_5, D10m)            // lowest num-of-transfers (0)
         );
     requestBuilder.searchParams()
         .earliestDepartureTime(T00_00)
@@ -68,7 +68,8 @@ public class B11_FlexEgress implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
-    assertEquals("Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 3legs  [00:09:00 00:17:00 8m]",
+    assertEquals(
+        "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 2tx [00:09:00 00:17:00 8m]",
         pathsToString(response)
     );
   }
@@ -83,7 +84,7 @@ public class B11_FlexEgress implements RaptorTestConstants {
 
     // TODO OTP2 - Why is this not consistent with the standard search above.
     assertEquals(""
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 3legs  [00:08:00 00:17:00 9m]\n"
+            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 2tx [00:08:00 00:17:00 9m]\n"
             + "Walk 1m ~ 1 ~ BUS R1 0:10 0:18 ~ 5 ~ Walk 10m [00:09:00 00:28:00 19m]",
         pathsToString(response)
     );
@@ -96,9 +97,9 @@ public class B11_FlexEgress implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 3legs  [00:09:00 00:17:00 8m, cost: 1800]\n"
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Flex 2m 4legs  [00:09:00 00:18:00 9m, cost: 1680]\n"
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:12 ~ 2 ~ Flex 7m 2legs  [00:09:00 00:19:00 10m, cost: 2640]\n"
+            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 2tx [00:09:00 00:17:00 8m, cost: 1800]\n"
+            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Flex 2m 2tx [00:09:00 00:18:00 9m, cost: 1680]\n"
+            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:12 ~ 2 ~ Flex 7m 1tx [00:09:00 00:19:00 10m, cost: 2640]\n"
             + "Walk 1m ~ 1 ~ BUS R1 0:10 0:18 ~ 5 ~ Walk 10m [00:09:00 00:28:00 19m, cost: 3720]",
         pathsToString(response)
     );

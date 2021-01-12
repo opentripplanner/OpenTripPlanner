@@ -54,7 +54,7 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
 
     @Override
     public int round() {
-        return numberOfTransfers + egress.numberOfLegs();
+        return 1 + numberOfTransfers + egress.numberOfRides();
     }
 
     @Override

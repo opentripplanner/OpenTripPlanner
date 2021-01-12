@@ -35,13 +35,14 @@ public class PathStringBuilder {
         return append("Walk ").duration(duration);
     }
 
-    public PathStringBuilder flex(int duration, int nLegs) {
-        return append("Flex ").duration(duration).space().append(nLegs).append("legs ");
+    public PathStringBuilder flex(int duration, int nRides) {
+        // The 'tx' is short for eXtra Transfers added by the flex access/egress.
+        return append("Flex ").duration(duration).space().append(nRides).append("tx");
     }
 
     public PathStringBuilder accessEgress(RaptorTransfer leg) {
-        if(leg.numberOfLegs() > 1) {
-            return flex(leg.durationInSeconds(), leg.numberOfLegs());
+        if(leg.numberOfRides() > 0) {
+            return flex(leg.durationInSeconds(), leg.numberOfRides());
         }
         return walk(leg.durationInSeconds());
     }

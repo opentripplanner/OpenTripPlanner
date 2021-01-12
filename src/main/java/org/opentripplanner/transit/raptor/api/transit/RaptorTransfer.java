@@ -65,19 +65,36 @@ public interface RaptorTransfer {
 
     /**
      * Some services involving multiple legs are not handled by the RAPTOR algorithm and need to be
-     * inserted into the algorithm at a specific place of the algorithm, and to be accounted for,
-     * in order to get the number of transfers correct, witch is part of the criteria used to keep
-     * optimal result.
+     * inserted into the algorithm at a specific place of the algorithm. The number-of-rides must
+     * be accounted for in order to get the number of transfers correct. The number-of-transfers is
+     * part of the criteria used to keep an optimal result.
+     * <p>
+     * Note! The number returned should include all "rides" in the access leg resulting in an extra
+     * transfer, including boarding the first Raptor scheduled trip. There is no need to account for
+     * riding yor own bicycle or scooter, and a rental bike is debatable. The guideline is that if
+     * there is a transfer involved that is equivalent to the "human cost" to a normal transit
+     * transfer, then it should be counted. If not, you should account for it using the cost
+     * function instead.
+     * <p>
+     * Examples/guidelines:
+     * <p>
+     * <pre>
+     * Access/egress  | num-of-rides | Description
+     *     walk       |      0       | Plain walking leg
+     *  bicycle+walk  |      0       | Use bicycle to get to stop
+     * rental-bicycle |      0       | Picking up the bike and returning it is is best
+     *                |              | accounted using time and cost penalties, not transfers.
+     *     taxi       |     0/1      | Currently 0 in OTP(car), but this is definitely discussable.
+     *     flex       |      1       | Waking leg followed by a flex transit leg
+     * walk-flex-walk |      1       | Waking , then flex transit and then walking again
+     *   flex-flex    |      2       | Two flex transit legs after each other
+     * </pre>
+     * {@code flex} is used as a placeholder for any type of on-board public service.
      *
-     * Examples:
-     *  1 - One walking leg
-     *  2 - Waking leg followed by a transit leg
-     *  3 - Waking leg followed by a transit leg and a walking leg
-     *
-     * @return the number legs for the transfer, generated outside the RAPTOR algorithm.
+     * @return the number transfers including thefirst boarding in the RAPTOR algorithm.
      */
-    default int numberOfLegs() {
-        return 1;
+    default int numberOfRides() {
+        return 0;
     }
 
     /**

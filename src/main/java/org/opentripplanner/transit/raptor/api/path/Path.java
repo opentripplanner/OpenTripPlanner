@@ -201,12 +201,12 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
     private static <S extends RaptorTripSchedule> int countNumberOfTransfers(AccessPathLeg<S> accessLeg) {
         // Skip first transit
         PathLeg<S> leg = accessLeg.nextLeg().nextLeg();
-        int i = accessLeg.access().numberOfLegs() - 1;
+        int i = accessLeg.access().numberOfRides();
         while (!leg.isEgressLeg()) {
             if(leg.isTransitLeg()) { ++i; }
             leg = leg.nextLeg();
         }
-        i += leg.asEgressLeg().egress().numberOfLegs() - 1;
+        i += leg.asEgressLeg().egress().numberOfRides();
         return i;
     }
 

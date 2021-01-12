@@ -69,6 +69,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
+    // expect: The latest departure combined with the earliest arrival is expected
     assertEquals(
         "Walk 3m ~ 2 ~ BUS R1 0:14 0:20 ~ 5 ~ Walk 3m [00:11:00 00:23:00 12m]",
         PathUtils.pathsToString(response)
@@ -83,6 +84,8 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
+    // expect: The latest departure combined with the earliest arrival is expected - same as
+    //         the forward search above
     assertEquals(
         "Walk 3m ~ 2 ~ BUS R1 0:14 0:20 ~ 5 ~ Walk 3m [00:11:00 00:23:00 12m]",
         PathUtils.pathsToString(response)
@@ -96,8 +99,8 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
-    // With 3 optimal solutions for both access and egress we get 3 x 3 = 9 optimal alternatives
-    // then timetable is enabled.
+    // expect: With 3 optimal solutions for both access and egress we get 3 x 3 = 9 optimal
+    //         alternatives then timetable is enabled.
     assertEquals(""
             + "Walk 3m ~ 2 ~ BUS R1 0:14 0:20 ~ 5 ~ Walk 3m [00:11:00 00:23:00 12m, cost: 2400]\n"
             + "Walk 2m ~ 1 ~ BUS R1 0:12 0:20 ~ 5 ~ Walk 3m [00:10:00 00:23:00 13m, cost: 2280]\n"
@@ -124,6 +127,8 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
+    // expect: Expect pareto optimal results with earliest-arrival-time and cost as the criteria,
+    //         but not departure-time.
     assertEquals(""
             + "Walk 3m ~ 2 ~ BUS R1 0:14 0:20 ~ 5 ~ Walk 3m [00:11:00 00:23:00 12m, cost: 2400]\n"
             + "Walk 2m ~ 1 ~ BUS R1 0:12 0:20 ~ 5 ~ Walk 3m [00:10:00 00:23:00 13m, cost: 2280]\n"

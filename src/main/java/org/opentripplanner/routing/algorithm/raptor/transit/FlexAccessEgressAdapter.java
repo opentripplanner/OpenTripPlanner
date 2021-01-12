@@ -31,8 +31,9 @@ public class FlexAccessEgressAdapter extends AccessEgress {
   }
 
   @Override
-  public int numberOfLegs() {
-    return flexAccessEgress.directToStop ? 2 : 3;
+  public int numberOfRides() {
+    // We only support one flex leg at the moment
+    return 1;
   }
 
   @Override

@@ -40,7 +40,7 @@ public interface WorkerState<T extends RaptorTripSchedule> {
 
     /**
      * Add access path to state. This should be called in the matching round and appropriate place
-     * in the algorithm according to the {@link RaptorTransfer#numberOfLegs()} and
+     * in the algorithm according to the {@link RaptorTransfer#numberOfRides()} and
      * {@link RaptorTransfer#stopReachedOnBoard()}.
      */
     void setAccessToStop(RaptorTransfer accessPath, int iterationDepartureTime);
