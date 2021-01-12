@@ -161,7 +161,7 @@ public class LineType {
                 .name("flexibleLineType")
                 .description("Type of flexible line, or null if line is not flexible.")
                 .type(Scalars.GraphQLString)
-                .dataFetcher(environment -> null)
+                .dataFetcher(environment -> ((Route) environment.getSource()).getFlexibleLineType())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bookingArrangements")
