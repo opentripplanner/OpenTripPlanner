@@ -45,8 +45,13 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
                     stops[round][egressPath.stop()] = state;
                 }
                 else {
-                    throw new IllegalStateException(
-                        "State exist for stop: " + egressPath.stop() + ", round: " + round
+                    throw new IllegalStateException(""
+                        + "Currently Raptor do not support multiple access/egress paths to the "
+                        + "same stop. If this exception occurs and OTP was serving a normal "
+                        + "use-case, then this needs to be fixed. For example this needs to be "
+                        + "fixed if OTP should support more than on access/egress mode. "
+                        + "See issue #3300. Details: "
+                        + "State exist for stop: " + egressPath.stop() + ", round: " + round
                     );
                 }
             }
