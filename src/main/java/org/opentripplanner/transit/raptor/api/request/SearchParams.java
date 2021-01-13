@@ -34,7 +34,6 @@ public class SearchParams {
     private final int earliestDepartureTime;
     private final int latestArrivalTime;
     private final int searchWindowInSeconds;
-    private final int boardSlackInSeconds;
     private final int numberOfAdditionalTransfers;
     private final int maxNumberOfTransfers;
     private final double relaxCostAtDestination;
@@ -49,7 +48,6 @@ public class SearchParams {
         earliestDepartureTime = TIME_NOT_SET;
         latestArrivalTime = TIME_NOT_SET;
         searchWindowInSeconds = NOT_SET;
-        boardSlackInSeconds = 60;
         numberOfAdditionalTransfers = 5;
         maxNumberOfTransfers = NOT_SET;
         relaxCostAtDestination = NOT_SET;
@@ -62,7 +60,6 @@ public class SearchParams {
         this.earliestDepartureTime = builder.earliestDepartureTime();
         this.latestArrivalTime = builder.latestArrivalTime();
         this.searchWindowInSeconds = builder.searchWindowInSeconds();
-        this.boardSlackInSeconds = builder.boardSlackInSeconds();
         this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
         this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
@@ -136,16 +133,6 @@ public class SearchParams {
     }
     public boolean searchOneIterationOnly() {
         return searchWindowInSeconds == 0;
-    }
-
-    /**
-     * The minimum wait time for transit boarding to account for schedule variation.
-     * This is added between transits, between transfer and transit, and between access "walk" and transit.
-     * <p/>
-     * The default value is 60.
-     */
-    public int boardSlackInSeconds() {
-        return boardSlackInSeconds;
     }
 
     /**
@@ -236,7 +223,6 @@ public class SearchParams {
             .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
             .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
             .addDurationSec("searchWindow", searchWindowInSeconds)
-            .addDurationSec("boardSlack", boardSlackInSeconds)
             .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
             .addColLimited("accessPaths", accessPaths, 5)
             .addColLimited("egressPaths", egressPaths, 5)
@@ -251,7 +237,6 @@ public class SearchParams {
         return earliestDepartureTime == that.earliestDepartureTime &&
                 latestArrivalTime == that.latestArrivalTime &&
                 searchWindowInSeconds == that.searchWindowInSeconds &&
-                boardSlackInSeconds == that.boardSlackInSeconds &&
                 numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
                 accessPaths.equals(that.accessPaths) &&
                 egressPaths.equals(that.egressPaths);
@@ -261,7 +246,7 @@ public class SearchParams {
     public int hashCode() {
         return Objects.hash(
                 earliestDepartureTime, latestArrivalTime, searchWindowInSeconds,
-                accessPaths, egressPaths, boardSlackInSeconds, numberOfAdditionalTransfers
+                accessPaths, egressPaths, numberOfAdditionalTransfers
         );
     }
 

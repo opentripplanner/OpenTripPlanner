@@ -60,15 +60,14 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
         .addEgressPaths(walk(STOP_3, D20s))
         .earliestDepartureTime(T00_00)
         .latestArrivalTime(T00_10)
-        .timetableEnabled(true)
-        .boardSlackInSeconds(D10s);
+        .timetableEnabled(true);
 
     // Enable Raptor debugging by configuring the requestBuilder
     // data.debugRaptorStateToSdtErr(requestBuilder);
   }
 
   @Test
-  public void standardRouteTest() {
+  public void standard() {
     var request = requestBuilder
         .profile(RaptorProfile.STANDARD)
         .build();
@@ -82,7 +81,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
   }
 
   @Test
-  public void standardReverseRouteTest() {
+  public void standardReverse() {
     var request = requestBuilder
         .searchDirection(SearchDirection.REVERSE)
         .profile(RaptorProfile.STANDARD)
@@ -97,7 +96,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
   }
 
   @Test
-  public void multiCriteriaRouteTest() {
+  public void multiCriteria() {
     var request = requestBuilder
         .profile(RaptorProfile.MULTI_CRITERIA)
         .build();

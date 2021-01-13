@@ -53,7 +53,6 @@ public class RaptorRequestMapper {
                 .searchWindow(request.searchWindow)
                 .addAccessPaths(accessPaths)
                 .addEgressPaths(egressPaths)
-                .boardSlackInSeconds(request.boardSlack)
                 .timetableEnabled(true);
 
         builder.mcCostFactors()

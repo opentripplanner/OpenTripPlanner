@@ -95,7 +95,6 @@ public class SpeedTestRequest {
 
         RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
         builder.searchParams()
-                .boardSlackInSeconds(120)
                 .timetableEnabled(true)
                 .numberOfAdditionalTransfers(numOfExtraTransfers);
 
