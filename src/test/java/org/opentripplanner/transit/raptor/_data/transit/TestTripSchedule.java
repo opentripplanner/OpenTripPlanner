@@ -11,7 +11,7 @@ import org.opentripplanner.transit.raptor.util.TimeUtils;
  * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }.
  */
 public class TestTripSchedule implements RaptorTripSchedule {
-    private static final int DELAY_BETWEEN_ALIGHT_AND_BOARD = 10;
+    private static final int DEFAULT_DEPATURE_DELAY = 10;
     private final RaptorTripPattern pattern;
     private final int[] arrivalTimes;
     private final int[] departureTimes;
@@ -74,11 +74,22 @@ public class TestTripSchedule implements RaptorTripSchedule {
         return new TestTripSchedule.Builder().times(times);
     }
 
+    /**
+     * Create a schedule with the given departure times and generate arrival times.
+     * The arrival at stop(i) is: {@code arrival[i] = departure[i] - departureDelay}.
+     */
+    public static TestTripSchedule.Builder schedule(String departureTimes, int departureDelay) {
+        return new TestTripSchedule.Builder()
+            .departures(departureTimes)
+            .departureDelay(departureDelay);
+    }
+
     @SuppressWarnings("UnusedReturnValue")
     public static class Builder {
         private TestTripPattern pattern;
         private int[] arrivalTimes;
         private int[] departureTimes;
+        private int departureDelay = DEFAULT_DEPATURE_DELAY;
 
         public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
             this.pattern = pattern;
@@ -104,17 +115,31 @@ public class TestTripSchedule implements RaptorTripSchedule {
         }
 
         /** @param departureTimes departure times per stop in seconds past midnight. */
+        public TestTripSchedule.Builder departures(String departureTimes) {
+            return this.departures(TimeUtils.times(departureTimes));
+        }
+
+        /** @param departureTimes departure times per stop in seconds past midnight. */
         public TestTripSchedule.Builder departures(int ... departureTimes) {
             this.departureTimes = departureTimes;
             return this;
         }
 
+        /**
+         * Set departure delay time in seconds. If not both arrival and depature times are
+         * set, this parameter is used to calculate the unset values. The default is 10 seconds.
+         */
+        public TestTripSchedule.Builder departureDelay(int departureDelay) {
+            this.departureDelay = departureDelay;
+            return this;
+        }
+
         public TestTripSchedule build() {
             if(arrivalTimes == null) {
-                arrivalTimes = copyDelta(-DELAY_BETWEEN_ALIGHT_AND_BOARD, departureTimes);
+                arrivalTimes = copyDelta(-departureDelay, departureTimes);
             }
             else if(departureTimes == null) {
-                departureTimes = copyDelta(DELAY_BETWEEN_ALIGHT_AND_BOARD, arrivalTimes);
+                departureTimes = copyDelta(departureDelay, arrivalTimes);
             }
             if(arrivalTimes.length != departureTimes.length) {
                 throw new IllegalStateException(

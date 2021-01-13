@@ -26,6 +26,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
 import java.util.Collection;
 import java.util.function.ToIntFunction;
 
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.forwardSlackProvider;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
+
 /**
  * The search context is used to hold search scoped instances and to pass these
  * to who ever need them.
@@ -210,8 +213,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
             WorkerLifeCycle lifeCycle
     ) {
         return request.searchDirection().isForward()
-                ? new ForwardSlackProvider<>(request.slackProvider(), lifeCycle)
-                : new ReverseSlackProvider<>(request.slackProvider(), lifeCycle);
+                ? forwardSlackProvider(request.slackProvider(), lifeCycle)
+                : reverseSlackProvider(request.slackProvider(), lifeCycle);
     }
 
     private static ToIntFunction<RaptorTripPattern> createBoardSlackProvider(

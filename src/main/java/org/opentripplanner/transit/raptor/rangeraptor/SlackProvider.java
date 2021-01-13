@@ -13,11 +13,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
  * can be added to the board-slack (in Raptor) assuming the transfer-slack is a constant.
  * <p>
  * The {@code SlackProvider} is also responsible for providing the correct slack according to
- * the search direction. There is two implementations of this interface:
- * <ul>
- *     <li>{@link org.opentripplanner.transit.raptor.rangeraptor.transit.ForwardSlackProvider}
- *     <li>{@link org.opentripplanner.transit.raptor.rangeraptor.transit.ReverseSlackProvider}
- * </ul>
+ * the search direction.
  */
 public interface SlackProvider {
 

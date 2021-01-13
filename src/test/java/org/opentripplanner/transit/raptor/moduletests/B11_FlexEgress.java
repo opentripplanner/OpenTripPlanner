@@ -82,10 +82,8 @@ public class B11_FlexEgress implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
-    // TODO OTP2 - Why is this not consistent with the standard search above.
-    assertEquals(""
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 2tx [00:08:00 00:17:00 9m]\n"
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:18 ~ 5 ~ Walk 10m [00:09:00 00:28:00 19m]",
+    assertEquals(
+        "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 2tx [00:09:00 00:17:00 8m]",
         pathsToString(response)
     );
   }
