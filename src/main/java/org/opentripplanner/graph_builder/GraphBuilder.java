@@ -252,7 +252,7 @@ public class GraphBuilder implements Runnable {
                     //parse netcdf according to the settings file, use the link from the settings file
                     GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
                             configuration);
-                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile);
+                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, configuration.getFileName());
                     graphBuilder.addModule(edgeUpdaterModule);
 
 

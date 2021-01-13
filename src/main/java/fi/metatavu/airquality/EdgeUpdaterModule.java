@@ -9,18 +9,20 @@ import org.opentripplanner.routing.graph.Graph;
 import java.util.HashMap;
 
 /**
- * A module to update graph with generic data according
+ * A module to update graph with generic data according to one of the configurations in the list
  */
 public class EdgeUpdaterModule implements GraphBuilderModule {
     private final GenericDataFile dataFile;
+    private final String configurationName;
 
-    public EdgeUpdaterModule(GenericDataFile dataFile) {
+    public EdgeUpdaterModule(GenericDataFile dataFile, String configurationName) {
         this.dataFile = dataFile;
+        this.configurationName = configurationName;
     }
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore) {
-        GenericEdgeUpdater genericEdgeUpdater = new GenericEdgeUpdater(dataFile, graph.getStreetEdges());
+        GenericEdgeUpdater genericEdgeUpdater = new GenericEdgeUpdater(dataFile, graph.getStreetEdges(), configurationName);
         genericEdgeUpdater.updateEdges();
     }
 

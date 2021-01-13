@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
+import fi.metatavu.airquality.EdgeDataFromGenericFile;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -35,10 +36,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This represents a street segment.
@@ -47,27 +45,19 @@ import java.util.Map;
  * 
  */
 public class StreetEdge extends Edge implements Cloneable {
+    private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
+
     /** Air quality  todo replace with map of gen values*/
-    private long airQualityDataStartTime;
+   /* private long airQualityDataStartTime;
     private float[] carbonMonoxide;
     private float[] nitrogenMonoxide;
     private float[] nitrogenDioxide;
     private float[] ozone;
     private float[] sulfurDioxide;
     private float[] particles2_5;
-    private float[] particles10;
+    private float[] particles10;*/
 
-    private Map<String, float[]> additionalData;
-
-    public Map<String, float[]> getAdditionalData() {
-        return additionalData;
-    }
-
-    public void setAdditionalData(Map<String, float[]> additionalData) {
-        this.additionalData = additionalData;
-    }
-
-    private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
+    private List<EdgeDataFromGenericFile> extraData = new ArrayList<>();
 
     private static final long serialVersionUID = 1L;
 
@@ -139,7 +129,7 @@ public class StreetEdge extends Edge implements Cloneable {
     private byte outAngle;
 
 
-    public void setCarbonMonoxide(float[] carbonMonoxide) {
+ /*   public void setCarbonMonoxide(float[] carbonMonoxide) {
         this.carbonMonoxide = carbonMonoxide;
     }
 
@@ -195,12 +185,33 @@ public class StreetEdge extends Edge implements Cloneable {
         return this.particles10;
     }
 
+    public Map<String, Map<String, float[]>> getDataFromGenericFile() {
+        return dataFromGenericFile;
+    }
+
+    public Map<String, Long> getGenericFilesDataStartTimes() {
+        return genericFilesDataStartTimes;
+    }
+
+    public void setGenericFilesDataStartTimes(Map<String, Long> genericFilesDataStartTimes) {
+        this.genericFilesDataStartTimes = genericFilesDataStartTimes;
+    }
+
     public void setAirQualityDataStartTime(long airQualityDataStartTime) {
         this.airQualityDataStartTime = airQualityDataStartTime;
     }
 
     public long getAirQualityDataStartTime() {
         return this.airQualityDataStartTime;
+    }
+*/
+
+    public List<EdgeDataFromGenericFile> getExtraData() {
+        return extraData;
+    }
+
+    public void setExtraData(List<EdgeDataFromGenericFile> extraData) {
+        this.extraData = extraData;
     }
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
@@ -607,8 +618,8 @@ public class StreetEdge extends Edge implements Cloneable {
          */
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
-        if (walkingOrBiking) {
-            Instant aqiTimeInstant = Instant.ofEpochMilli(getAirQualityDataStartTime());
+        if (walkingOrBiking) { //todo modify this for new gen data
+         /*   Instant aqiTimeInstant = Instant.ofEpochMilli(getAirQualityDataStartTime());
             Instant requestInstant = options.getDateTime().toInstant();
             int airQualityHour = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
             if (airQualityHour >= 0) {
@@ -643,7 +654,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
 
                 s1.incrementWeight(totalPenalty);
-            }
+            }*/
         }
 
         return s1;

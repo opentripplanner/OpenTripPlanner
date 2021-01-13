@@ -73,14 +73,14 @@ public class AirQualityEdgeUpdater {
     float[] particles2_5 = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.PARTICLES_PM2_5);
     float[] particles10 = getAveragePollution(fromCoordinate.x, fromCoordinate.y, toCoordinate.x, toCoordinate.y, Pollutant.PARTICLES_PM10);
 
-    streetEdge.setCarbonMonoxide(carbonMonoxide);
+   /* streetEdge.setCarbonMonoxide(carbonMonoxide);
     streetEdge.setNitrogenMonoxide(nitrogenMonoxide);
     streetEdge.setNitrogenDioxide(nitrogenDioxide);
     streetEdge.setOzone(ozone);
     streetEdge.setSulfurDioxide(sulfurDioxide);
     streetEdge.setParticles2_5(particles2_5);
     streetEdge.setParticles10(particles10);
-    streetEdge.setAirQualityDataStartTime(dataStartTime);
+    streetEdge.setAirQualityDataStartTime(dataStartTime);*/
 
     edgesUpdated++;
 

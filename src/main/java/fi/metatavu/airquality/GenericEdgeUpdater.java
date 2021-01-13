@@ -24,33 +24,32 @@ public class GenericEdgeUpdater {
     private final GenericDataFile dataFile;
     private final Collection<StreetEdge> streetEdges;
 
+    private final String configurationName;
     private final Map<String, ArrayFloat.D4> fileGenericData; //this data will update the street edges
 
     private int edgesUpdated;
     private final long dataStartTime;
 
-    public GenericEdgeUpdater (GenericDataFile dataFile, Collection<StreetEdge> streetEdges){
+    public GenericEdgeUpdater(GenericDataFile dataFile, Collection<StreetEdge> streetEdges,
+                              String configurationName){
         super();
         this.dataFile = dataFile;
         this.streetEdges = streetEdges;
+        this.configurationName = configurationName;
 
         this.edgesUpdated = 0;
         double startTimeHours = this.dataFile.getTimeArray().getDouble(0);
         this.dataStartTime = this.dataFile.getOriginDate().toInstant().plusSeconds((long) (startTimeHours * 3600)).toEpochMilli();
 
         fileGenericData = dataFile.getNetcdfData();
-        LOG.info(String.format("Street edges update starting from time stamp %d", this.dataStartTime));
+        LOG.info(String.format("Street edges update with "+configurationName+" starting from time stamp %d", this.dataStartTime));
     }
 
     /**
      * Updates generic data to street edges
      */
     public void updateEdges() {
-
-        System.out.println("updating edges with air genertic data");
         streetEdges.forEach(this::updateEdge);
-        System.out.println("finished edges with air quality data");
-
     }
 
     /**
@@ -63,7 +62,7 @@ public class GenericEdgeUpdater {
         Coordinate fromCoordinate = fromVertex.getCoordinate();
         Coordinate toCoordinate = toVertex.getCoordinate();
 
-        //calculate average generic values
+        //calculate average generic values for each of the variables from configuration file
         HashMap<String, float[]> edgeGenericDataValues = new HashMap<>();
         for (Map.Entry<String, ArrayFloat.D4> variableValues : fileGenericData.entrySet()) {
             float[] averageDataValue = getAverageValue(fromCoordinate.x, fromCoordinate.y,
@@ -71,8 +70,9 @@ public class GenericEdgeUpdater {
             edgeGenericDataValues.put(variableValues.getKey(), averageDataValue);
         }
 
-
-        streetEdge.setAdditionalData(edgeGenericDataValues);
+        EdgeDataFromGenericFile edgeGenData = new EdgeDataFromGenericFile(configurationName,
+                dataStartTime, edgeGenericDataValues);
+        streetEdge.getExtraData().add(edgeGenData);
 
         edgesUpdated++;
 
