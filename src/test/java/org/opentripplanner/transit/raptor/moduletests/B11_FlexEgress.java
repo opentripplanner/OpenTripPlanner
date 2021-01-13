@@ -59,7 +59,7 @@ public class B11_FlexEgress implements RaptorTestConstants {
         .latestArrivalTime(T00_30);
 
     // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugRaptorStateToSdtErr(requestBuilder);
+    // data.debugToStdErr(requestBuilder);
   }
 
   @Test

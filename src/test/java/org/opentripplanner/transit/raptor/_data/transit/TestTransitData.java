@@ -46,7 +46,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     return null;
   }
 
-  public void debugRaptorStateToSdtErr(RaptorRequestBuilder<TestTripSchedule> request) {
+  public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request) {
     List<Integer> stops = new ArrayList<>();
     for (int i = 0; i < numberOfStops(); i++) { stops.add(i); }
     val logger = new TestDebugLogger(true);

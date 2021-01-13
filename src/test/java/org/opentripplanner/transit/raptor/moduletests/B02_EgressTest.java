@@ -52,7 +52,7 @@ public class B02_EgressTest implements RaptorTestConstants {
     ;
 
     // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugRaptorStateToSdtErr(requestBuilder);
+    // data.debugToStdErr(requestBuilder);
   }
 
   @Test

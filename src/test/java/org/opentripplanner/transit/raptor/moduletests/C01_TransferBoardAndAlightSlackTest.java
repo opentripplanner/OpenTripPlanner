@@ -74,18 +74,18 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
     ;
 
     // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugRaptorStateToSdtErr(requestBuilder);
+    // data.debugToStdErr(requestBuilder);
   }
 
   @Test
-  public void standardRouteTest() {
+  public void standard() {
     var request = requestBuilder.profile(RaptorProfile.STANDARD).build();
     var response = raptorService.route(request, data);
     assertEquals(EXPECTED_RESULT, pathsToString(response));
   }
 
   @Test
-  public void standardReverseRouteTest() {
+  public void standardReverse() {
     var request = requestBuilder
         .searchDirection(SearchDirection.REVERSE)
         .profile(RaptorProfile.STANDARD)
@@ -95,7 +95,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   }
 
   @Test
-  public void multiCriteriaRouteTest() {
+  public void multiCriteria() {
     // Add cost to result string
     String expected = EXPECTED_RESULT.replace("]", ", cost: 1570]");
     var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
