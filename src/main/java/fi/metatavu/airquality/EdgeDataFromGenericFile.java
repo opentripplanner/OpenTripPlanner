@@ -2,14 +2,15 @@ package fi.metatavu.airquality;
 
 import ucar.ma2.ArrayFloat;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Map;
 
 /**
  * this class is to be stored in StreetEdge and to describe the data it received from one of the .nc files
- * according to *settings.json confguration
+ * according to *settings.json configuration
  */
-public class EdgeDataFromGenericFile {
+public class EdgeDataFromGenericFile implements Serializable {
     private final String name;
     private final long dataStartTime;
     private final Map<String, float[]> variableValues;

@@ -5,6 +5,7 @@ public class RequestParameters {
     private String variable;
     private ParameterType parameterType;
     private String formula;
+    private transient String value;
 
     public String getName() {
         return name;
@@ -37,8 +38,12 @@ public class RequestParameters {
     public void setFormula(String formula) {
         this.formula = formula;
     }
-}
-enum ParameterType {
-    TRESHOLD,
-    TIME
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

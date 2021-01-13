@@ -2,6 +2,8 @@ package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
 import fi.metatavu.airquality.EdgeDataFromGenericFile;
+import fi.metatavu.airquality.configuration_parsing.ParameterType;
+import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -47,16 +49,8 @@ import java.util.*;
 public class StreetEdge extends Edge implements Cloneable {
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-    /** Air quality  todo replace with map of gen values*/
-   /* private long airQualityDataStartTime;
-    private float[] carbonMonoxide;
-    private float[] nitrogenMonoxide;
-    private float[] nitrogenDioxide;
-    private float[] ozone;
-    private float[] sulfurDioxide;
-    private float[] particles2_5;
-    private float[] particles10;*/
-
+    /** Air quality */
+    private long airQualityDataStartTime;
     private List<EdgeDataFromGenericFile> extraData = new ArrayList<>();
 
     private static final long serialVersionUID = 1L;
@@ -129,74 +123,6 @@ public class StreetEdge extends Edge implements Cloneable {
     private byte outAngle;
 
 
- /*   public void setCarbonMonoxide(float[] carbonMonoxide) {
-        this.carbonMonoxide = carbonMonoxide;
-    }
-
-    public void setNitrogenMonoxide(float[] nitrogenMonoxide) {
-        this.nitrogenMonoxide = nitrogenMonoxide;
-    }
-
-    public void setNitrogenDioxide(float[] nitrogenDioxide) {
-        this.nitrogenDioxide = nitrogenDioxide;
-    }
-
-    public void setOzone(float[] ozone) {
-        this.ozone = ozone;
-    }
-
-    public void setSulfurDioxide(float[] sulfurDioxide) {
-        this.sulfurDioxide = sulfurDioxide;
-    }
-
-    public void setParticles2_5(float[] particles2_5) {
-        this.particles2_5 = particles2_5;
-    }
-
-    public void setParticles10(float[] particles10) {
-        this.particles10 = particles10;
-    }
-
-    public float[] getCarbonMonoxide() {
-        return this.carbonMonoxide;
-    }
-
-    public float[] getNitrogenMonoxide() {
-        return this.nitrogenMonoxide;
-    }
-
-    public float[] getNitrogenDioxide() {
-        return this.nitrogenDioxide;
-    }
-
-    public float[] getOzone() {
-        return this.ozone;
-    }
-
-    public float[] getSulfurDioxide() {
-        return this.sulfurDioxide;
-    }
-
-    public float[] getParticles2_5() {
-        return this.particles2_5;
-    }
-
-    public float[] getParticles10() {
-        return this.particles10;
-    }
-
-    public Map<String, Map<String, float[]>> getDataFromGenericFile() {
-        return dataFromGenericFile;
-    }
-
-    public Map<String, Long> getGenericFilesDataStartTimes() {
-        return genericFilesDataStartTimes;
-    }
-
-    public void setGenericFilesDataStartTimes(Map<String, Long> genericFilesDataStartTimes) {
-        this.genericFilesDataStartTimes = genericFilesDataStartTimes;
-    }
-
     public void setAirQualityDataStartTime(long airQualityDataStartTime) {
         this.airQualityDataStartTime = airQualityDataStartTime;
     }
@@ -204,7 +130,7 @@ public class StreetEdge extends Edge implements Cloneable {
     public long getAirQualityDataStartTime() {
         return this.airQualityDataStartTime;
     }
-*/
+
 
     public List<EdgeDataFromGenericFile> getExtraData() {
         return extraData;
@@ -619,42 +545,15 @@ public class StreetEdge extends Edge implements Cloneable {
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
         if (walkingOrBiking) { //todo modify this for new gen data
-         /*   Instant aqiTimeInstant = Instant.ofEpochMilli(getAirQualityDataStartTime());
+            Instant aqiTimeInstant = Instant.ofEpochMilli(getAirQualityDataStartTime());
             Instant requestInstant = options.getDateTime().toInstant();
             int airQualityHour = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
             if (airQualityHour >= 0) {
                double totalPenalty = 0d;
 
-               if (carbonMonoxide != null && options.carbonMonoxideThreshold != null) {
-                   totalPenalty += calculatePollutionPenalty(airQualityHour, carbonMonoxide, options.carbonMonoxideThreshold, options.carbonMonoxidePenalty);
-               }
-
-                if (nitrogenMonoxide != null && options.nitrogenMonoxideThreshold != null) {
-                    totalPenalty += calculatePollutionPenalty(airQualityHour, nitrogenMonoxide, options.nitrogenMonoxideThreshold, options.nitrogenMonoxidePenalty);
-                }
-
-                if (nitrogenDioxide != null && options.nitrogenDioxideThreshold != null) {
-                    totalPenalty += calculatePollutionPenalty(airQualityHour, nitrogenDioxide, options.nitrogenDioxideThreshold, options.nitrogenDioxidePenalty);
-                }
-
-                if (ozone != null && options.ozoneThreshold != null) {
-                    totalPenalty += calculatePollutionPenalty(airQualityHour, ozone, options.ozoneThreshold, options.ozonePenalty);
-                }
-
-                if (sulfurDioxide != null && options.sulfurDioxideThreshold != null) {
-                    totalPenalty += calculatePollutionPenalty(airQualityHour, sulfurDioxide, options.sulfurDioxideThreshold, options.sulfurDioxidePenalty);
-                }
-
-                if (particles2_5 != null && options.particles2_5Threshold != null) {
-                    totalPenalty += calculatePollutionPenalty(airQualityHour, particles2_5, options.particles2_5Threshold, options.particles2_5Penalty);
-                }
-
-                if (particles10 != null && options.particles10Threshold != null) {
-                    totalPenalty += calculatePollutionPenalty(airQualityHour, particles10, options.particles10Threshold, options.particles10Penalty);
-                }
 
                 s1.incrementWeight(totalPenalty);
-            }*/
+            }
         }
 
         return s1;
