@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
 import org.opentripplanner.transit.raptor.util.IntUtils;
@@ -196,12 +197,12 @@ public class TestDebugLogger implements DebugLogger {
             // forward search
             String tripInfo = a.transitPath().trip().pattern().debugInfo();
             if(a.arrivalTime() > a.previous().arrivalTime()) {
-                TripTimesSearch.BoarAlightTimes t = TripTimesSearch.findTripForwardSearch(a);
+                BoarAndAlightTime t = TripTimesSearch.findTripForwardSearch(a);
                 buf.transit(tripInfo, t.boardTime, t.alightTime);
             }
             // reverse search
             else {
-                TripTimesSearch.BoarAlightTimes t = TripTimesSearch.findTripReverseSearch(a);
+                BoarAndAlightTime t = TripTimesSearch.findTripReverseSearch(a);
                 buf.transit(tripInfo, t.alightTime, t.boardTime);
             }
         } else if(a.arrivedByTransfer()) {
@@ -209,6 +210,7 @@ public class TestDebugLogger implements DebugLogger {
         } else {
             buf.accessEgress(a.egressPath().egress());
         }
+
         return buf.sep().stop(a.stop());
     }
 

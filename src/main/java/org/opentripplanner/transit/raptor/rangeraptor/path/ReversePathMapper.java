@@ -11,6 +11,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 
@@ -75,7 +76,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         int fromStop = fromStopArrival.stop();
         int toStop = toStopArrival.stop();
 
-        TripTimesSearch.BoarAlightTimes r = TripTimesSearch.findTripReverseSearch(fromStopArrival);
+        BoarAndAlightTime r = TripTimesSearch.findTripReverseSearch(fromStopArrival);
 
         // Recursive call to map next leg
         PathLeg<T> next = mapNextLeg(toStopArrival);

@@ -30,7 +30,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
 
     @Test
     public void findTripWithPlentySlack() {
-        TripTimesSearch.BoarAlightTimes r;
+        BoarAndAlightTime r;
 
         // Search AFTER EDT
         r = findTripForwardSearch(busFwd(STOP_1, STOP_7, C_ALIGHT_LATE));
@@ -47,7 +47,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
 
     @Test
     public void findTripWithoutSlack() {
-        TripTimesSearch.BoarAlightTimes r;
+        BoarAndAlightTime r;
 
         // Search AFTER EDT
         r = findTripForwardSearch(busFwd(STOP_1, STOP_7, C_ALIGHT_TIME));
@@ -163,7 +163,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
                 .arrivals( 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)
                 .build();
 
-        TripTimesSearch.BoarAlightTimes r;
+        BoarAndAlightTime r;
 
         // TEST FORWARD SEARCH
         {

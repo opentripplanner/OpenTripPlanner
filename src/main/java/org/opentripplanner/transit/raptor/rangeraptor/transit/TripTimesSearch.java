@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -33,7 +32,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
      * Search for board- and alight-times for the trip matching the given stop-arrival.
      * This method determine the search direction from the given stop-arrival.
      */
-    public static <S extends RaptorTripSchedule> BoarAlightTimes findTripSearch(
+    public static <S extends RaptorTripSchedule> BoarAndAlightTime findTripSearch(
         ArrivalView<S> arrival
     ) {
         return arrival.arrivalTime() > arrival.previous().arrivalTime()
@@ -46,7 +45,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
      * when searching FORWARD. Hence, searching in the same direction as the trip travel
      * direction.
      */
-    public static <S extends RaptorTripSchedule> BoarAlightTimes findTripForwardSearch(
+    public static <S extends RaptorTripSchedule> BoarAndAlightTime findTripForwardSearch(
         ArrivalView<S> arrival
     ) {
         S trip = arrival.transitPath().trip();
@@ -62,7 +61,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
      * when searching in REVERSE. Hence, searching in the opposite direction of the trip
      * travel direction.
      */
-    public static <S extends RaptorTripSchedule> BoarAlightTimes findTripReverseSearch(
+    public static <S extends RaptorTripSchedule> BoarAndAlightTime findTripReverseSearch(
         ArrivalView<S> arrival
     ) {
         S trip = arrival.transitPath().trip();
@@ -73,7 +72,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         return new TripTimesSearch<>(trip, fromStop, toStop).findTripAfter(earliestBoardTime);
     }
 
-    private BoarAlightTimes findTripAfter(int earliestDepartureTime) {
+    private BoarAndAlightTime findTripAfter(int earliestDepartureTime) {
         RaptorTripPattern p = schedule.pattern();
         final int size = p.numberOfStopsInPattern();
         int i = 0;
@@ -119,10 +118,10 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
 
         int arrivalTime = schedule.arrival(i);
 
-        return new BoarAlightTimes(departureTime, arrivalTime);
+        return new BoarAndAlightTime(departureTime, arrivalTime);
     }
 
-    private BoarAlightTimes findTripBefore(int latestArrivalTime) {
+    private BoarAndAlightTime findTripBefore(int latestArrivalTime) {
         RaptorTripPattern p = schedule.pattern();
         final int size = p.numberOfStopsInPattern();
         int i = size-1;
@@ -155,7 +154,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         // Goto next stop, boarding and alighting can not happen on the same stop
         --i;
 
-        // Search for depature
+        // Search for departure
         while (i >= 0 && p.stopIndex(i) != fromStop) {
             --i;
         }
@@ -170,7 +169,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
 
         int departureTime = schedule.departure(i);
 
-        return new BoarAlightTimes(departureTime, arrivalTime);
+        return new BoarAndAlightTime(departureTime, arrivalTime);
     }
 
     private IllegalStateException noFoundException(String hint, String lbl, int time) {
@@ -183,21 +182,4 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         );
     }
 
-    public static class BoarAlightTimes {
-        public final int boardTime;
-        public final int alightTime;
-
-        private BoarAlightTimes(int boardTime, int alightTime) {
-            this.boardTime = boardTime;
-            this.alightTime = alightTime;
-        }
-
-        @Override
-        public String toString() {
-            return ToStringBuilder.of(BoarAlightTimes.class)
-                    .addServiceTime("boardTime", boardTime, -1)
-                    .addServiceTime("alightTime", alightTime, -1)
-                    .toString();
-        }
-    }
 }

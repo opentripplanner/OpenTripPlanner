@@ -38,7 +38,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         optimizations = Collections.emptySet();
         mcCostParams = McCostParams.DEFAULTS;
         // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
-        slackProvider = RaptorSlackProvider.defaults(60, 0, 0);
+        slackProvider = RaptorSlackProvider.defaultSlackProvider(60, 0, 0);
         debug = DebugRequest.defaults();
     }
 

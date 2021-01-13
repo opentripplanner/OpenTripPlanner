@@ -67,15 +67,17 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
         // for alighting when boarding
         if (onTripIndex != NOT_SET) {
             if (pattern.alightingPossibleAt(stopPositionInPattern)) {
+                // In the normal case the trip alightTime is used,
+                // but in reverse search the board-slack is added; hence the calculator
+                // delegation
+                final int alightTime = calculator.stopArrivalTime(
+                    onTrip,
+                    stopPositionInPattern,
+                    slackProvider.alightSlack()
+                );
                 state.transitToStop(
                         stop,
-                        // In the normal case the trip alightTime is used,
-                        // but in reverse search the board-slack is added; hence the calculator
-                        // delegation
-                        calculator.stopArrivalTime(onTrip,
-                                stopPositionInPattern,
-                                slackProvider.alightSlack()
-                        ),
+                        alightTime,
                         onTripBoardStop,
                         onTripBoardTime,
                         onTrip
