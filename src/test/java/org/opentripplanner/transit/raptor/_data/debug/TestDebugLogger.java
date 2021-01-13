@@ -185,7 +185,7 @@ public class TestDebugLogger implements DebugLogger {
 
     private static PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
         if (a.arrivedByAccess()) {
-            return buf.walk(legDuration(a)).sep().stop(a.stop());
+            return buf.accessEgress(a.accessPath().access()).sep().stop(a.stop());
         }
         // Recursively call this method to insert arrival in front of this arrival
         path(a.previous(), buf);
@@ -193,10 +193,21 @@ public class TestDebugLogger implements DebugLogger {
         buf.sep();
 
         if (a.arrivedByTransit()) {
-            int boardTime = TripTimesSearch.findTripSearch(a).boardTime;
-            buf.transit(a.transitPath().trip().pattern().debugInfo(), boardTime, a.arrivalTime());
-        } else {
+            // forward search
+            String tripInfo = a.transitPath().trip().pattern().debugInfo();
+            if(a.arrivalTime() > a.previous().arrivalTime()) {
+                TripTimesSearch.BoarAlightTimes t = TripTimesSearch.findTripForwardSearch(a);
+                buf.transit(tripInfo, t.boardTime, t.alightTime);
+            }
+            // reverse search
+            else {
+                TripTimesSearch.BoarAlightTimes t = TripTimesSearch.findTripReverseSearch(a);
+                buf.transit(tripInfo, t.alightTime, t.boardTime);
+            }
+        } else if(a.arrivedByTransfer()) {
             buf.walk(legDuration(a));
+        } else {
+            buf.accessEgress(a.egressPath().egress());
         }
         return buf.sep().stop(a.stop());
     }
