@@ -13,10 +13,6 @@ public class PathTest {
 
     private final Path<TestRaptorTripSchedule> subject = StopArrivalsTestData.basicTripAsPath();
 
-    public PathTest() {
-        System.out.println(subject);
-    }
-
     @Test
     public void startTime() {
         Assert.assertEquals(A_START, subject.startTime());

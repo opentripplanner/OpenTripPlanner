@@ -88,6 +88,10 @@ otp.modules.planner.Itinerary = otp.Class({
         return otp.util.Time.secsToHrMin( (this.getEndTime() - this.getStartTime())/1000.0 );
     },
 
+    getGeneralizedCost : function() {
+        return this.itinData.generalizedCost;
+    },
+
     getFareStr : function() {
         if(this.fareDisplayOverride) return this.fareDisplayOverride;
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;

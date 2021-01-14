@@ -51,6 +51,6 @@ public final class BoardingArea extends StationElement {
 
   @Override
   public String toString() {
-    return "<BoardingArea " + this.id + ">";
+    return "<BoardingArea " + getId() + ">";
   }
 }

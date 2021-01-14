@@ -14,8 +14,8 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> extends Intermed
     private final PathLeg<T> next;
     private final T trip;
 
-    public TransitPathLeg(int fromStop, int fromTime, int toStop, int toTime, T trip, PathLeg<T> next) {
-        super(fromStop, fromTime, toStop, toTime);
+    public TransitPathLeg(int fromStop, int fromTime, int toStop, int toTime, int cost, T trip, PathLeg<T> next) {
+        super(fromStop, fromTime, toStop, toTime, cost);
         this.next = next;
         this.trip = trip;
     }

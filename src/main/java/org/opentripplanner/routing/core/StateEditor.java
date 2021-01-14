@@ -182,6 +182,10 @@ public class StateEditor {
     public void setEnteredNoThroughTrafficArea() {
         child.stateData.enteredNoThroughTrafficArea = true;
     }
+
+    public void resetEnteredNoThroughTrafficArea() {
+        child.stateData.enteredNoThroughTrafficArea = false;
+    }
     
 
     public void setBackMode(TraverseMode mode) {

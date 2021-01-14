@@ -49,6 +49,15 @@ public class ApiItinerary {
     public boolean walkLimitExceeded = false;
 
     /**
+     * If a generalized cost is used in the routing algorithm, this should be the total
+     * cost computed by the algorithm. This is relevant for anyone who want to debug an search
+     * and tuning the system. The unit should be equivalent to the cost of "one second of transit".
+     * <p>
+     * -1 indicate that the cost is not set/computed.
+     */
+    public int generalizedCost = -1;
+
+    /**
      * How much elevation is lost, in total, over the course of the trip, in meters. As an example,
      * a trip that went from the top of Mount Everest straight down to sea level, then back up K2,
      * then back down again would have an elevationLost of Everest + K2.

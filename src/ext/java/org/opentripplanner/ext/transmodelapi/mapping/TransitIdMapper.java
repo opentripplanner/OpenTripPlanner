@@ -12,11 +12,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TransitIdMapper {
-  private static final Logger LOG = LoggerFactory.getLogger(TransmodelMappingUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransitIdMapper.class);
 
   private static String fixedFeedId = null;
 
-  public static String mapEntityIDToApi(TransitEntity<FeedScopedId> entity) {
+  public static String mapEntityIDToApi(TransitEntity entity) {
     return mapIDToApi(entity.getId());
   }
 
@@ -64,7 +64,7 @@ public class TransitIdMapper {
    *                 of wrongly set feedIds to block the entire API from working.
    * @return the fixedFeedId - used to unit test this method.
    */
-  public static String setupFixedFeedId(Collection<? extends TransitEntity<FeedScopedId>> entities) {
+  public static String setupFixedFeedId(Collection<? extends TransitEntity> entities) {
     fixedFeedId = "UNKNOWN_FEED";
 
     // Count each feedId

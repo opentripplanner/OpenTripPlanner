@@ -1,6 +1,8 @@
 package org.opentripplanner.updater;
 
 import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
+import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
@@ -117,6 +119,9 @@ public abstract class GraphUpdaterConfigurator {
         }
         for (SiriETUpdaterParameters configItem : config.getSiriETUpdaterParameters()) {
             updaters.add(new SiriETUpdater(configItem));
+        }
+        for (SiriETGooglePubsubUpdaterParameters configItem : config.getSiriETGooglePubsubUpdaterParameters()) {
+            updaters.add(new SiriETGooglePubsubUpdater(configItem));
         }
         for (SiriSXUpdaterParameters configItem : config.getSiriSXUpdaterParameters()) {
             updaters.add(new SiriSXUpdater(configItem));

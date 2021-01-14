@@ -40,7 +40,7 @@ config:
     elevationProfileComponent: org.opentripplanner.common.model.P2#P2<Double>
     fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
-    Feed: org.opentripplanner.model.FeedInfo#FeedInfo
+    Feed: String
     Geometry: org.opentripplanner.util.model.EncodedPolylineBean#EncodedPolylineBean
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
@@ -58,9 +58,9 @@ config:
     serviceTimeRange: Object
     step: org.opentripplanner.model.plan.WalkStep#WalkStep
     Stop: Object # Can be either Stop or Station
-    stopAtDistance: org.opentripplanner.routing.graphfinder.StopAtDistance#StopAtDistance
-    stopAtDistanceConnection: graphql.relay.Connection#Connection<StopAtDistance>
-    stopAtDistanceEdge: graphql.relay.Edge#Edge<StopAtDistance>
+    stopAtDistance: org.opentripplanner.routing.graphfinder.NearbyStop#NearbyStop
+    stopAtDistanceConnection: graphql.relay.Connection#Connection<NearbyStop>
+    stopAtDistanceEdge: graphql.relay.Edge#Edge<NearbyStop>
     Stoptime: org.opentripplanner.model.TripTimeShort#TripTimeShort
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
     TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet

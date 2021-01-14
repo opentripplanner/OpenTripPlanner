@@ -10,7 +10,6 @@
   "areaVisibility": true,
   "platformEntriesLinking": true,
   "matchBusRoutesToStreets": false,
-  "fetchElevationUS": false,
   "osmWayPropertySet": "norway",
   "staticBikeRental": false,
   "staticParkAndRide": true,

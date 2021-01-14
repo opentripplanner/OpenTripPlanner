@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-05-28 00:49+0200\n"
+"POT-Creation-Date: 2020-12-07 09:22+0100\n"
 "PO-Revision-Date: 2014-06-24 10:27+0100\n"
 "Last-Translator: Rafael Aguilar\n"
 "Language: it\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.9.0\n"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:296
@@ -95,6 +95,26 @@ msgstr "Bike sharing"
 msgid "Transit & Rented Bicycle"
 msgstr "Bike sharing & Ride"
 
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:328
+msgid "Transit with flex access"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:330
+msgid "Transit with flex egress"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:332
+msgid "Transit with flex access and egress"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:334
+msgid "Direct flex search"
+msgstr ""
+
 #. Context menu
 #: src/client/js/otp/core/MapContextMenu.js:36
 #, fuzzy
@@ -125,7 +145,7 @@ msgstr "Ripristina tutto"
 
 #. widget title
 #: src/client/js/otp/layers/StopsLayer.js:102
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:600
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:601
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:31
 msgid "Stop Viewer"
 msgstr "Orari"
@@ -346,8 +366,8 @@ msgstr "in orario"
 
 #. [distance] to [name of destination]
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:375
-#: src/client/js/otp/modules/planner/Itinerary.js:258
-#: src/client/js/otp/modules/planner/Itinerary.js:348
+#: src/client/js/otp/modules/planner/Itinerary.js:262
+#: src/client/js/otp/modules/planner/Itinerary.js:352
 msgctxt "direction"
 msgid " to "
 msgstr " fino a "
@@ -356,8 +376,8 @@ msgstr " fino a "
 #. transport
 #. headsign>. Used in showing itinerary
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:393
-#: src/client/js/otp/modules/planner/Itinerary.js:254
-#: src/client/js/otp/modules/planner/Itinerary.js:345
+#: src/client/js/otp/modules/planner/Itinerary.js:258
+#: src/client/js/otp/modules/planner/Itinerary.js:349
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:124
 msgctxt "bus_direction"
 msgid " to "
@@ -384,82 +404,86 @@ msgid "End"
 msgstr "Arrivo"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:483
-#: src/client/js/otp/modules/planner/Itinerary.js:311
+#: src/client/js/otp/modules/planner/Itinerary.js:315
 msgid "Trip Summary"
 msgstr "Riepilogo"
 
 #. Travel: hour date on which this trip is made
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:485
-#: src/client/js/otp/modules/planner/Itinerary.js:312
+#: src/client/js/otp/modules/planner/Itinerary.js:316
 #, fuzzy
 msgid "Travel"
 msgstr "Partenza"
 
 #. Time: minutes How long is this trip
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:487
-#: src/client/js/otp/modules/planner/Itinerary.js:313
+#: src/client/js/otp/modules/planner/Itinerary.js:317
 #, fuzzy
 msgid "Time"
 msgstr "Durata"
 
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:488
+msgid "GenCost"
+msgstr ""
+
 #. Total foot distance for trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:495
-#: src/client/js/otp/modules/planner/Itinerary.js:317
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:496
+#: src/client/js/otp/modules/planner/Itinerary.js:321
 msgid "Total Walk"
 msgstr "A piedi"
 
 #. Total distance on a bike for this trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:502
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:503
 msgid "Total Bike"
 msgstr "In bici"
 
 #. Total distance in a car for this trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:509
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:510
 msgid "Total drive"
 msgstr ""
 
 #. how many public transit transfers in a trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:515
-#: src/client/js/otp/modules/planner/Itinerary.js:315
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:516
+#: src/client/js/otp/modules/planner/Itinerary.js:319
 #, fuzzy
 msgid "Transfers"
 msgstr "Cambi"
 
 #. cost of trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:521
-#: src/client/js/otp/modules/planner/Itinerary.js:320
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:522
+#: src/client/js/otp/modules/planner/Itinerary.js:324
 #, fuzzy
 msgid "Fare"
 msgstr "Costo"
 
 #. Valid date time; When is this trip correct
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:529
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:530
 #, fuzzy
 msgid "Valid"
 msgstr "Calcolato il "
 
 #. Links to this itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:534
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:535
 msgid "Link to Itinerary"
 msgstr "Link a questo percorso"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:539
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:540
 #, fuzzy
 msgid "Print"
 msgstr "Stampa"
 
 #. Default subject when sending trip to email
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:549
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:550
 msgid "Your Trip"
 msgstr "Il tuo percorso"
 
 #. Link to send trip by email
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:552
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:553
 msgid "Email"
 msgstr "Invia mail"
 
 #. public transport drives every N minutes
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:572
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:573
 #, python-format
 msgid "every %d min"
 msgid_plural "every %d mins"
@@ -467,100 +491,100 @@ msgstr[0] "ogni minuto"
 msgstr[1] "ogni %d minuti"
 
 #. Depart station / Board at station in itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:578
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:579
 #, fuzzy
 msgctxt "itinerary"
 msgid "Depart"
 msgstr "Parti da"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:578
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:579
 msgid "<b>Board</b> at "
 msgstr "<b>Parti</b> da "
 
 #. Public transport <Stop> (stop name)
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:598
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:599
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:92
 msgid "Stop"
 msgstr "Fermata"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:622
-#: src/client/js/otp/modules/planner/Itinerary.js:274
-#: src/client/js/otp/modules/planner/Itinerary.js:357
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:623
+#: src/client/js/otp/modules/planner/Itinerary.js:278
+#: src/client/js/otp/modules/planner/Itinerary.js:361
 msgid "Time in transit"
 msgstr "Tempo a bordo"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:624
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:625
 #: src/client/js/otp/widgets/transit/TripViewerWidget.js:35
 msgid "Trip Viewer"
 msgstr "Percorso"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:682
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:683
 msgid "late as"
 msgstr "al più"
 
 #. Stay on board/Alight [at stop name]
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:688
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:689
 #, fuzzy
 msgid "Stay on board"
 msgstr "Rimani a bordo"
 
 #. Alight Public transit route name (agency name
 #. Stop ID ) end time
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:688
-#: src/client/js/otp/modules/planner/Itinerary.js:277
-#: src/client/js/otp/modules/planner/Itinerary.js:360
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:689
+#: src/client/js/otp/modules/planner/Itinerary.js:281
+#: src/client/js/otp/modules/planner/Itinerary.js:364
 msgid "Alight"
 msgstr "Scendi"
 
 #. [Stay on board/Alight] at [stop name]
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:690
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:691
 #, fuzzy
 msgid "at"
 msgstr "a"
 
 #. Fare Currency Fare price
-#: src/client/js/otp/modules/planner/Itinerary.js:101
+#: src/client/js/otp/modules/planner/Itinerary.js:105
 #, python-format
 msgid "%(currency)s %(price)s"
 msgstr "%(currency)s %(price)s"
 
 #. Start: location at [time date] (Used in print itinerary
 #. when do you start your trip)
-#: src/client/js/otp/modules/planner/Itinerary.js:243
-#: src/client/js/otp/modules/planner/Itinerary.js:334
+#: src/client/js/otp/modules/planner/Itinerary.js:247
+#: src/client/js/otp/modules/planner/Itinerary.js:338
 #, python-format
 msgid "Start: %(location)s at %(time_date)s"
 msgstr "Partenza: %(location)s alle %(time_date)s"
 
 #. Board Public transit route name (agency name
 #. Stop ID ) start time
-#: src/client/js/otp/modules/planner/Itinerary.js:273
-#: src/client/js/otp/modules/planner/Itinerary.js:356
+#: src/client/js/otp/modules/planner/Itinerary.js:277
+#: src/client/js/otp/modules/planner/Itinerary.js:360
 msgid "Board"
 msgstr "Sali a bordo"
 
-#: src/client/js/otp/modules/planner/Itinerary.js:273
 #: src/client/js/otp/modules/planner/Itinerary.js:277
+#: src/client/js/otp/modules/planner/Itinerary.js:281
 #, python-format
 msgid "(%(agency_id)s Stop ID #%(stop_id)s),"
 msgstr "(%(agency_id)s fermata n.%(stop_id)s),"
 
 #. End: location at [time date] (Used in print itinerary
 #. when do you come at a destination)
-#: src/client/js/otp/modules/planner/Itinerary.js:307
-#: src/client/js/otp/modules/planner/Itinerary.js:378
+#: src/client/js/otp/modules/planner/Itinerary.js:311
+#: src/client/js/otp/modules/planner/Itinerary.js:382
 #, python-format
 msgid "End: %(location)s at %(time_date)s"
 msgstr "Arrivo: %(location)s alle %(time_date)s"
 
-#: src/client/js/otp/modules/planner/Itinerary.js:356
 #: src/client/js/otp/modules/planner/Itinerary.js:360
+#: src/client/js/otp/modules/planner/Itinerary.js:364
 #, python-format
 msgid "(%(agencyId)s Stop ID #%(id)s),"
 msgstr ""
 
 #. text at end of email %s is link to this itinerary
-#: src/client/js/otp/modules/planner/Itinerary.js:382
+#: src/client/js/otp/modules/planner/Itinerary.js:386
 #, python-format
 msgid ""
 "\n"

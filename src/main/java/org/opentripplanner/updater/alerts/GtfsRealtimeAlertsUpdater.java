@@ -18,7 +18,7 @@ import java.net.URI;
 /**
  * GTFS-RT alerts updater
  *
- * Usage example ('myalert' name is an example) in file 'Graph.properties':
+ * Usage example:
  *
  * <pre>
  * myalert.type = real-time-alerts

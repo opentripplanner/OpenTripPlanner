@@ -33,7 +33,9 @@ import static org.opentripplanner.datastore.FileType.*;
  * data - like the streetGraph.
  */
 public class GraphBuilderDataSources {
+
     private static final Logger LOG = LoggerFactory.getLogger(GraphBuilderDataSources.class);
+    private static final String BULLET_POINT = "- ";
 
     private final OtpDataStore store;
     private final Multimap<FileType, DataSource> inputData = ArrayListMultimap.create();
@@ -119,22 +121,29 @@ public class GraphBuilderDataSources {
     }
 
     private void logSkippedAndSelectedFiles() {
-        LOG.info("Loading files from: {}", String.join(", ", store.getRepositoryDescriptions()));
+        LOG.info("Data source location(s): {}",
+            String.join(", ", store.getRepositoryDescriptions())
+        );
+
         // Sort data input files by type
+        LOG.info("Files expected to be read or written:");
         for (FileType type : FileType.values()) {
             for (DataSource source : inputData.get(type)) {
                 if (type == FileType.CONFIG) {
-                    log("%s loaded", source);
+                    LOG.info(BULLET_POINT + source.detailedInfo());
                 }
                 else {
-                    log("Found %s", source);
+                    LOG.info(BULLET_POINT + source.detailedInfo());
                 }
             }
         }
-        for (FileType type : FileType.values()) {
 
-            for (DataSource source : skipData.get(type)) {
-                log("Skipping %s", source);
+        if (!skipData.values().isEmpty()) {
+            LOG.info("Files excluded due to command line switches or unknown type:");
+            for (FileType type : FileType.values()) {
+                for (DataSource source : skipData.get(type)) {
+                    LOG.info(BULLET_POINT + source.detailedInfo());
+                }
             }
         }
     }
@@ -176,11 +185,6 @@ public class GraphBuilderDataSources {
             return store.getStreetGraph();
         }
         return null;
-    }
-
-    private void log(String op, DataSource source) {
-        String opTxt = String.format(op, source.type().text());
-        LOG.info("- {} {}", opTxt, source.detailedInfo());
     }
 
     private void include(boolean include, FileType type) {

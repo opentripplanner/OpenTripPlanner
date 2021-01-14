@@ -175,7 +175,7 @@ public class PtSituationElementType {
                     .description("Period this situation is in effect")
                     .dataFetcher(environment -> {
                       TransitAlert alert = environment.getSource();
-                        Long startTime = alert.getEffectiveStartDate() != null ? alert.getEffectiveEndDate().getTime() : null;
+                        Long startTime = alert.getEffectiveStartDate() != null ? alert.getEffectiveStartDate().getTime() : null;
                         Long endTime = alert.getEffectiveEndDate() != null ? alert.getEffectiveEndDate().getTime() : null;
                         return Pair.of(startTime, endTime);
                     })
@@ -190,14 +190,14 @@ public class PtSituationElementType {
                     .name("situationNumber")
                     .type(Scalars.GraphQLString)
                     .description("Operator's internal id for this situation")
-                    .dataFetcher(environment -> null)
+                    .dataFetcher(environment -> ((TransitAlert) environment.getSource()).getId())
                     .build())
-//                .field(GraphQLFieldDefinition.newFieldDefinition()
-//                        .name("severity")
-//                        .type(severityEnum)
-//                        .description("Severity of this situation ")
-//                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().severity)
-//                        .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("severity")
+                    .type(EnumTypes.SEVERITY)
+                    .description("Severity of this situation ")
+                    .dataFetcher(environment -> ((TransitAlert) environment.getSource()).severity)
+                    .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("reportAuthority")
                     .type(authorityType)

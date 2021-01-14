@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
@@ -10,6 +11,7 @@ import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriETGooglePubsubUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.SiriETUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterConfig;
@@ -46,6 +48,7 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final String BIKE_PARK = "bike-park";
   private static final String WINKKI_POLLING_UPDATER = "winkki-polling-updater";
   private static final String SIRI_ET_UPDATER = "siri-et-updater";
+  private static final String SIRI_ET_GOOGLE_PUBSUB_UPDATER = "siri-et-google-pubsub-updater";
   private static final String SIRI_VM_UPDATER = "siri-vm-updater";
   private static final String SIRI_SX_UPDATER = "siri-sx-updater";
 
@@ -60,6 +63,7 @@ public class UpdatersConfig implements UpdatersParameters {
     CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::create);
     CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::create);
+    CONFIG_CREATORS.put(SIRI_ET_GOOGLE_PUBSUB_UPDATER, SiriETGooglePubsubUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterConfig::create);
   }
@@ -110,6 +114,11 @@ public class UpdatersConfig implements UpdatersParameters {
   @Override
   public List<SiriETUpdaterParameters> getSiriETUpdaterParameters() {
     return getParameters(SIRI_ET_UPDATER);
+  }
+
+  @Override
+  public List<SiriETGooglePubsubUpdaterParameters> getSiriETGooglePubsubUpdaterParameters() {
+    return getParameters(SIRI_ET_GOOGLE_PUBSUB_UPDATER);
   }
 
   @Override

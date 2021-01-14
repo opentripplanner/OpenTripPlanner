@@ -6,6 +6,7 @@ import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -44,13 +45,16 @@ public class EnumTypes {
 
     public static GraphQLEnumType SEVERITY = GraphQLEnumType.newEnum()
             .name("Severity") //SIRI - SeverityEnumeration
+            .value("unknown", "unknown", "Situation has unknown impact on trips.")
             .value("noImpact", "noImpact", "Situation has no impact on trips.")
-            .value("slight", "slight", "Situation has a small impact on trips.")
+            .value("verySlight", "verySlight", "Situation has a very slight impact on trips.")
+            .value("slight", "slight", "Situation has a slight impact on trips.")
             .value("normal", "normal", "Situation has an impact on trips (default).")
             .value("severe", "severe", "Situation has a severe impact on trips.")
+            .value("verySevere", "verySevere", "Situation has a very severe impact on trips.")
+            .value("undefined", "undefined", "Severity is undefined.")
             .build();
 
-    /* TODO OTP2 - StopCondition does not exist yet
     public static GraphQLEnumType stopConditionEnum = GraphQLEnumType.newEnum()
             .name("StopCondition") //SIRI - RoutePointTypeEnumeration
             .value("destination", StopCondition.DESTINATION, "Situation applies when stop is the destination of the leg.")
@@ -59,7 +63,7 @@ public class EnumTypes {
             .value("notStopping", StopCondition.NOT_STOPPING, "Situation applies when passing the stop, without stopping.")
             .value("requestStop", StopCondition.REQUEST_STOP, "Situation applies when at the stop, and the stop requires a request to stop.")
             .build();
-     */
+
 
     public static GraphQLEnumType REALTIME_STATE = GraphQLEnumType.newEnum()
             .name("RealtimeState")
@@ -104,6 +108,9 @@ public class EnumTypes {
         .value("car_pickup", StreetMode.CAR_PICKUP, "Walk to a pickup point along "
             + "the road, drive to a drop-off point along the road, and walk the rest of the way. "
             + "This can include various taxi-services or kiss & ride.")
+        .value("flexible", StreetMode.FLEXIBLE, "Walk to an eligible pickup area for "
+            + "flexible transportation, ride to an eligible drop-off area and then walk the rest of "
+            + "the way.")
         .build();
 
     public static GraphQLEnumType MODE = GraphQLEnumType.newEnum()
@@ -208,7 +215,7 @@ public class EnumTypes {
 
     public static GraphQLEnumType bookingMethodEnum = TransmodelIndexGraphQLSchema.createEnum("BookingMethod", BookingArrangement.BookingMethodEnum.values(), (t -> t.name()));
 */
-/*
+
     public static GraphQLEnumType filterPlaceTypeEnum = GraphQLEnumType.newEnum()
             .name("FilterPlaceType")
             .value("quay", TransmodelPlaceType.QUAY, "Quay")
@@ -217,7 +224,7 @@ public class EnumTypes {
             .value("bikePark",TransmodelPlaceType.BIKE_PARK, "Bike parks")
             .value("carPark", TransmodelPlaceType.CAR_PARK, "Car parks")
             .build();
-*/
+
 
     public static GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType.newEnum()
             .name("BicycleOptimisationMethod")

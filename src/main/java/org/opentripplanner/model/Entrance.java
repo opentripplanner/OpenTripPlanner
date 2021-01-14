@@ -28,6 +28,6 @@ public final class Entrance extends StationElement {
 
   @Override
   public String toString() {
-    return "<Entrance " + this.id + ">";
+    return "<Entrance " + getId() + ">";
   }
 }

@@ -10,10 +10,8 @@ import java.util.stream.Collectors;
  * several StopPlaces into a hub. It can be a grouping of major stops within a city or a cluster
  * of stops that naturally belong together.
  */
-public class GroupOfStations extends TransitEntity<FeedScopedId> implements StopCollection {
+public class GroupOfStations extends TransitEntity implements StopCollection {
     private static final long serialVersionUID = 1L;
-
-    private FeedScopedId id;
 
     private String name;
 
@@ -24,18 +22,11 @@ public class GroupOfStations extends TransitEntity<FeedScopedId> implements Stop
 
     private Set<StopCollection> childStations = new HashSet<>();
 
-    public GroupOfStations() {
+
+    public GroupOfStations(FeedScopedId id) {
+        super(id);
     }
 
-    @Override
-    public FeedScopedId getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(FeedScopedId id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -84,7 +75,7 @@ public class GroupOfStations extends TransitEntity<FeedScopedId> implements Stop
 
     @Override
     public String toString() {
-        return "<GroupOfStations " + this.id + ">";
+        return "<GroupOfStations " + getId() + ">";
     }
 
     /**

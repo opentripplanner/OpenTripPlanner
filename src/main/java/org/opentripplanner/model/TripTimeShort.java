@@ -24,6 +24,7 @@ public class TripTimeShort {
     public int departureDelay = UNDEFINED ;
     public boolean timepoint = false;
     public boolean realtime = false;
+    public boolean isCancelledStop;
     public RealTimeState realtimeState = RealTimeState.SCHEDULED ;
     public long serviceDay;
     public FeedScopedId tripId;
@@ -47,6 +48,24 @@ public class TripTimeShort {
         departureDelay     = tt.getDepartureDelay(i);
         timepoint          = tt.isTimepoint(i);
         realtime           = !tt.isScheduled();
+        isCancelledStop    = tt.isCancelledStop(i);
+
+        if (realtime && isCancelledStop) {
+            /*
+             Trips/stops cancelled in realtime should not present "23:59:59, yesterday" as arrival-/departureTime
+             Setting realtime arrival and departure to planned times
+             */
+            realtimeArrival = scheduledArrival;
+            realtimeDeparture = scheduledDeparture;
+            arrivalDelay = 0;
+            departureDelay = 0;
+        } else {
+            realtimeArrival    = tt.getArrivalTime(i);
+            arrivalDelay       = tt.getArrivalDelay(i);
+            realtimeDeparture  = tt.getDepartureTime(i);
+            departureDelay     = tt.getDepartureDelay(i);
+        }
+
         realtimeState      = tt.getRealTimeState();
         blockId            = tt.trip.getBlockId();
         headsign           = tt.getHeadsign(i);

@@ -76,8 +76,7 @@ public class ToStringBuilderTest {
 
   @Test
   public void addTransitEntity() {
-    Trip trip = new Trip();
-    trip.setId(new FeedScopedId("F", "1"));
+    Trip trip = new Trip(new FeedScopedId("F", "1"));
     assertEquals(
         "ToStringBuilderTest{tripId: F:1}",
         subject().addEntityId("tripId", trip).toString()
@@ -159,10 +158,10 @@ public class ToStringBuilderTest {
 
   @Test
   public void addDuration() {
-    assertEquals("ToStringBuilderTest{d: 35s}", subject().addDuration("d", 35).toString());
+    assertEquals("ToStringBuilderTest{d: 35s}", subject().addDurationSec("d", 35).toString());
     assertEquals(
         "ToStringBuilderTest{d: 1d2h50m45s}",
-        subject().addDuration("d", (26 * 60 + 50) * 60 + 45).toString()
+        subject().addDurationSec("d", (26 * 60 + 50) * 60 + 45).toString()
     );
     assertEquals(
         "ToStringBuilderTest{d: 2m5s}",

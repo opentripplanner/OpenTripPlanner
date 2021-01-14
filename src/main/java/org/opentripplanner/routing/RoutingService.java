@@ -63,14 +63,15 @@ public class RoutingService {
      * <p>
      * TODO: Add frequency based trips
      *
-     * @param stop               Stop object to perform the search for
-     * @param startTime          Start time for the search. Seconds from UNIX epoch
-     * @param timeRange          Searches forward for timeRange seconds from startTime
-     * @param numberOfDepartures Number of departures to fetch per pattern
-     * @param omitNonPickups     If true, do not include vehicles that will not pick up passengers.
+     * @param stop                  Stop object to perform the search for
+     * @param startTime             Start time for the search. Seconds from UNIX epoch
+     * @param timeRange             Searches forward for timeRange seconds from startTime
+     * @param numberOfDepartures    Number of departures to fetch per pattern
+     * @param omitNonPickups        If true, do not include vehicles that will not pick up passengers.
+     * @param includeCancelledTrips If true, cancelled trips will also be included in result.
      */
     public List<StopTimesInPattern> stopTimesForStop(
-            Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
+            Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups, boolean includeCancelledTrips
     ) {
         return StopTimesHelper.stopTimesForStop(
                 this,
@@ -79,7 +80,8 @@ public class RoutingService {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups
+                omitNonPickups,
+                includeCancelledTrips
         );
     }
 

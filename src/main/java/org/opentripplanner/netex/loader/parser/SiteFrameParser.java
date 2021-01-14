@@ -1,20 +1,27 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.util.OTPFeature;
+import org.rutebanken.netex.model.FlexibleStopPlace;
+import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.Site_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone;
+import org.rutebanken.netex.model.Zone_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     private static final Logger LOG = LoggerFactory.getLogger(NetexParser.class);
+
+    private final Collection<FlexibleStopPlace> flexibleStopPlaces = new ArrayList<>();
 
     private final Collection<GroupOfStopPlaces> groupsOfStopPlaces = new ArrayList<>();
 
@@ -34,6 +41,10 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         if (frame.getGroupsOfStopPlaces() != null) {
             parseGroupsOfStopPlaces(frame.getGroupsOfStopPlaces().getGroupOfStopPlaces());
         }
+        if (OTPFeature.FlexRouting.isOn() && frame.getFlexibleStopPlaces() != null) {
+            parseFlexibleStopPlaces(frame.getFlexibleStopPlaces().getFlexibleStopPlace());
+        }
+
         if (frame.getTariffZones() != null) {
             parseTariffZones(frame.getTariffZones().getTariffZone());
         }
@@ -44,7 +55,6 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         warnOnMissingMapping(LOG, frame.getCheckConstraints());
         warnOnMissingMapping(LOG, frame.getCheckConstraintDelays());
         warnOnMissingMapping(LOG, frame.getCheckConstraintThroughputs());
-        warnOnMissingMapping(LOG, frame.getFlexibleStopPlaces());
         warnOnMissingMapping(LOG, frame.getNavigationPaths());
         warnOnMissingMapping(LOG, frame.getParkings());
         warnOnMissingMapping(LOG, frame.getPathJunctions());
@@ -59,12 +69,17 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     }
 
     @Override
-    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+    void setResultOnIndex(NetexEntityIndex netexIndex) {
+        netexIndex.flexibleStopPlaceById.addAll(flexibleStopPlaces);
         netexIndex.groupOfStopPlacesById.addAll(groupsOfStopPlaces);
         netexIndex.multiModalStopPlaceById.addAll(multiModalStopPlaces);
         netexIndex.stopPlaceById.addAll(stopPlaces);
         netexIndex.tariffZonesById.addAll(tariffZones);
         netexIndex.quayById.addAll(quays);
+    }
+
+    private void parseFlexibleStopPlaces(Collection<FlexibleStopPlace> flexibleStopPlacesList ) {
+        flexibleStopPlaces.addAll(flexibleStopPlacesList);
     }
 
     private void parseGroupsOfStopPlaces(Collection<GroupOfStopPlaces> groupsOfStopPlacesList ) {
@@ -82,8 +97,12 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         }
     }
 
-    private void parseTariffZones(Collection<TariffZone> tariffZoneList) {
-        tariffZones.addAll(tariffZoneList);
+    private void parseTariffZones(List<JAXBElement<? extends Zone_VersionStructure>> tariffZoneList) {
+        for (JAXBElement<? extends Zone_VersionStructure> tariffZone : tariffZoneList) {
+            if(tariffZone.getValue() instanceof TariffZone) {
+                tariffZones.add((TariffZone) tariffZone.getValue());
+            }
+        }
     }
 
     private void parseQuays(Quays_RelStructure quayRefOrQuay) {

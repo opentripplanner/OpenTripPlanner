@@ -5,7 +5,7 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.netex.NetexModule;
-import org.opentripplanner.netex.loader.NetexBundle;
+import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.standalone.config.BuildConfig;
 
@@ -55,8 +55,6 @@ public class NetexConfig {
 
         return new NetexModule(
                 buildParams.netex.netexFeedId,
-                buildParams.parentStopLinking,
-                buildParams.stationTransfers,
                 buildParams.getSubwayAccessTimeSeconds(),
                 buildParams.maxInterlineDistance,
                 buildParams.getTransitServicePeriod(),

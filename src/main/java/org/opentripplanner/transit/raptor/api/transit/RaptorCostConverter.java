@@ -11,7 +11,7 @@ package org.opentripplanner.transit.raptor.api.transit;
  * to win over a cost factor of {@code 1.00}.
  */
 public final class RaptorCostConverter {
-
+  private static final int NOT_SET = -1;
   private static final int PRECISION = 100;
 
   /* private constructor to prevent instantiation of utility class. */
@@ -21,6 +21,7 @@ public final class RaptorCostConverter {
    * Convert Raptor internal cost to OTP domain model cost.
    */
   public static int toOtpDomainCost(int raptorCost) {
+    if(raptorCost == NOT_SET) { return NOT_SET; }
     return (int) Math.round((double) raptorCost / PRECISION);
   }
 

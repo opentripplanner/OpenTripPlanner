@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.common.MavenVersion;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -11,8 +12,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
 
 /**
@@ -22,7 +21,7 @@ import java.util.Locale;
  */
 public class ParkAndRideLinkEdge extends Edge {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     /*
      * By how much we have to really walk compared to straight line distance. This is a magic factor

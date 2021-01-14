@@ -53,6 +53,7 @@ public class LegMapper {
         api.isNonExactFrequency = domain.isNonExactFrequency;
         api.headway = domain.headway;
         api.distance = domain.distanceMeters;
+        api.generalizedCost = domain.generalizedCost;
         api.pathway = domain.pathway;
         api.mode = TraverseModeMapper.mapToApi(domain.mode);
         api.agencyTimeZoneOffset = domain.agencyTimeZoneOffset;

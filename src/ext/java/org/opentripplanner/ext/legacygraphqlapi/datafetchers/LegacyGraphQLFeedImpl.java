@@ -5,7 +5,6 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.routing.RoutingService;
 
 import java.util.stream.Collectors;
@@ -14,13 +13,13 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> feedId() {
-    return environment -> getSource(environment).getId();
+    return this::getSource;
   }
 
   @Override
   public DataFetcher<Iterable<Agency>> agencies() {
     return environment -> {
-      String id = getSource(environment).getId();
+      String id = getSource(environment);
       return getRoutingService(environment)
           .getAgencies()
           .stream()
@@ -33,7 +32,7 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }
 
-  private FeedInfo getSource(DataFetchingEnvironment environment) {
+  private String getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

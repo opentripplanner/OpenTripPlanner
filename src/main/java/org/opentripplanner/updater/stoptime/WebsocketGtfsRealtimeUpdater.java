@@ -25,8 +25,6 @@ import java.util.concurrent.ExecutionException;
  * callback is registered which handles incoming GTFS-RT messages as they stream in by placing a
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
  *
- * Usage example ('websocket' name is an example) in the file 'Graph.properties':
- *
  * <pre>
  * websocket.type = websocket-gtfs-rt-updater
  * websocket.defaultAgencyId = agency

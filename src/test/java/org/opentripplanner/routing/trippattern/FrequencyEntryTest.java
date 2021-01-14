@@ -18,8 +18,7 @@ public class FrequencyEntryTest {
     private static final TripTimes tripTimes;
 
     static {
-        Trip trip = new Trip();
-        trip.setId(new FeedScopedId("agency", "testtrip"));
+        Trip trip = new Trip(new FeedScopedId("agency", "testtrip"));
 
         List<StopTime> stopTimes = new ArrayList<StopTime>();
 

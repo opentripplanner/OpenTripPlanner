@@ -23,6 +23,8 @@ import java.util.BitSet;
 public class GtfsRealtimeFuzzyTripMatcher {
 
     private RoutingService routingService;
+    private BitSet servicesRunningForDate;
+    private ServiceDate date;
 
     public GtfsRealtimeFuzzyTripMatcher(RoutingService routingService) {
         this.routingService = routingService;
@@ -71,13 +73,17 @@ public class GtfsRealtimeFuzzyTripMatcher {
         return trip.toBuilder().setTripId(matchedTrip.getId().getId()).build();
     }
 
-    public Trip getTrip (Route route, int direction, int startTime, ServiceDate date) {
-        BitSet services = routingService.getServicesRunningForDate(date);
+    public synchronized Trip getTrip (Route route, int direction, int startTime, ServiceDate date) {
+        if (!date.equals(this.date)) {
+            this.date = date;
+            // TODO: This is slow, we should either precalculate or cache these for all dates in graph
+            this.servicesRunningForDate = routingService.getServicesRunningForDate(date);
+        }
         for (TripPattern pattern : routingService.getPatternsForRoute().get(route)) {
             if (pattern.directionId != direction) continue;
             for (TripTimes times : pattern.scheduledTimetable.tripTimes) {
                 if (times.getScheduledDepartureTime(0) == startTime &&
-                        services.get(times.serviceCode)) {
+                        servicesRunningForDate.get(times.serviceCode)) {
                     return times.trip;
                 }
             }

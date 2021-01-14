@@ -5,7 +5,6 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
 
 
@@ -35,7 +33,7 @@ import java.util.TimeZone;
 public class Timetable implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Timetable.class);
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     /**
      * A circular reference between TripPatterns and their scheduled (non-updated) timetables.
@@ -265,6 +263,8 @@ public class Timetable implements Serializable {
             int numStops = newTimes.getNumStops();
             Integer delay = null;
 
+            final long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
+
             for (int i = 0; i < numStops; i++) {
                 boolean match = false;
                 if (update != null) {
@@ -289,8 +289,6 @@ public class Timetable implements Serializable {
                         newTimes.updateDepartureDelay(i, 0);
                         delay = 0;
                     } else {
-                        long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
-
                         if (update.hasArrival()) {
                             StopTimeEvent arrival = update.getArrival();
                             if (arrival.hasDelay()) {

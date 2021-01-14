@@ -2,13 +2,15 @@ package org.opentripplanner.netex.loader.parser;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeAssignmentsInFrame_RelStructure;
 import org.rutebanken.netex.model.DayTypeAssignments_RelStructure;
 import org.rutebanken.netex.model.DayTypesInFrame_RelStructure;
 import org.rutebanken.netex.model.DayTypes_RelStructure;
+import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.OperatingDaysInFrame_RelStructure;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.OperatingPeriodsInFrame_RelStructure;
@@ -26,11 +28,9 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     private static final Logger LOG = LoggerFactory.getLogger(ServiceCalendarFrameParser.class);
 
     private final Collection<DayType> dayTypes = new ArrayList<>();
-
     private final Collection<OperatingPeriod> operatingPeriods = new ArrayList<>();
-
-    private final Multimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId =
-            ArrayListMultimap.create();
+    private final Collection<OperatingDay> operatingDays = new ArrayList<>();
+    private final Multimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId = ArrayListMultimap.create();
 
 
     @Override
@@ -38,7 +38,8 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
         parseServiceCalendar(frame.getServiceCalendar());
         parseDayTypes(frame.getDayTypes());
         parseOperatingPeriods(frame.getOperatingPeriods());
-        parseRequiredDayTypeAssignments(frame.getDayTypeAssignments());
+        parseOperatingDays(frame.getOperatingDays());
+        parseDayTypeAssignments(frame.getDayTypeAssignments());
 
         // Keep list sorted alphabetically
 
@@ -50,9 +51,10 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     }
 
     @Override
-    void setResultOnIndex(NetexImportDataIndex netexIndex) {
+    void setResultOnIndex(NetexEntityIndex netexIndex) {
         netexIndex.dayTypeById.addAll(dayTypes);
         netexIndex.operatingPeriodById.addAll(operatingPeriods);
+        netexIndex.operatingDayById.addAll(operatingDays);
         netexIndex.dayTypeAssignmentByDayTypeId.addAll(dayTypeAssignmentByDayTypeId);
     }
 
@@ -61,46 +63,53 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
 
         parseDayTypes(serviceCalendar.getDayTypes());
         // TODO OTP2 - What about OperatingPeriods here?
-        parseRequiredDayTypeAssignments(serviceCalendar.getDayTypeAssignments());
+        parseDayTypeAssignments(serviceCalendar.getDayTypeAssignments());
     }
 
     //List<JAXBElement<? extends DataManagedObjectStructure>>
     private void parseDayTypes(DayTypesInFrame_RelStructure element) {
         if(element == null) return;
-        for (JAXBElement dt : element.getDayType_()) {
+        for (JAXBElement<?> dt : element.getDayType_()) {
             parseDayType(dt);
         }
     }
 
     private void parseDayTypes(DayTypes_RelStructure dayTypes) {
-        for (JAXBElement dt : dayTypes.getDayTypeRefOrDayType_()) {
+        for (JAXBElement<?> dt : dayTypes.getDayTypeRefOrDayType_()) {
             parseDayType(dt);
         }
     }
 
-    private void parseDayType(JAXBElement dt) {
+    private void parseDayType(JAXBElement<?> dt) {
         if (dt.getValue() instanceof DayType) {
             dayTypes.add((DayType) dt.getValue());
         }
     }
 
     private void parseOperatingPeriods(OperatingPeriodsInFrame_RelStructure element) {
-        if(element == null) return;
+        if(element == null) { return; }
 
         for (OperatingPeriod_VersionStructure p : element.getOperatingPeriodOrUicOperatingPeriod()) {
             operatingPeriods.add((OperatingPeriod) p);
         }
     }
 
-    private void parseRequiredDayTypeAssignments(DayTypeAssignments_RelStructure element) {
-        parseRequiredDayTypeAssignments(element.getDayTypeAssignment());
+    private void parseOperatingDays(OperatingDaysInFrame_RelStructure element) {
+        if(element == null) { return; }
+        operatingDays.addAll(element.getOperatingDay());
     }
 
-    private void parseRequiredDayTypeAssignments(DayTypeAssignmentsInFrame_RelStructure element) {
-        parseRequiredDayTypeAssignments(element.getDayTypeAssignment());
+    private void parseDayTypeAssignments(DayTypeAssignments_RelStructure element) {
+        if(element == null) { return; }
+        parseDayTypeAssignments(element.getDayTypeAssignment());
     }
 
-    private void parseRequiredDayTypeAssignments(List<DayTypeAssignment> elements) {
+    private void parseDayTypeAssignments(DayTypeAssignmentsInFrame_RelStructure element) {
+        if(element == null) { return; }
+        parseDayTypeAssignments(element.getDayTypeAssignment());
+    }
+
+    private void parseDayTypeAssignments(List<DayTypeAssignment> elements) {
         for (DayTypeAssignment it : elements) {
             String ref = it.getDayTypeRef().getValue().getRef();
             dayTypeAssignmentByDayTypeId.put(ref, it);

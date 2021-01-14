@@ -13,17 +13,13 @@ public class TestSpecificTransfer extends TestCase {
      */
     public void testSpecificTransfer() {
         // Setup from trip with route
-        Route fromRoute = new Route();
-        fromRoute.setId(new FeedScopedId("A1", "R1"));
-        Trip fromTrip = new Trip();
-        fromTrip.setId(new FeedScopedId("A1", "T1"));
+        Route fromRoute = new Route(new FeedScopedId("A1", "R1"));
+        Trip fromTrip = new Trip(new FeedScopedId("A1", "T1"));
         fromTrip.setRoute(fromRoute);
         
         // Setup to trip with route
-        Route toRoute = new Route();
-        toRoute.setId(new FeedScopedId("A1", "R2"));
-        Trip toTrip = new Trip();
-        toTrip.setId(new FeedScopedId("A1", "T2"));
+        Route toRoute = new Route(new FeedScopedId("A1", "R2"));
+        Trip toTrip = new Trip(new FeedScopedId("A1", "T2"));
         toTrip.setRoute(toRoute);
         
         // Create full SpecificTransfer

@@ -45,11 +45,13 @@ public class Leg {
    /**
     * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
     * "scheduled time of departure at boarding stop" = startTime - departureDelay
+    * Unit: seconds.
     */
    public int departureDelay = 0;
    /**
     * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg.
     * "scheduled time of arrival at alighting stop" = endTime - arrivalDelay
+    * Unit: seconds.
     */
    public int arrivalDelay = 0;
 
@@ -57,6 +59,13 @@ public class Leg {
     * Whether there is real-time data about this Leg
     */
    public Boolean realTime = false;
+
+  /**
+   * Whether this Leg describes a flexible trip. The reason we need this is that FlexTrip does
+   * not inherit from Trip, so that the information that the Trip is flexible would be lost when
+   * creating this object.
+   */
+  public Boolean flexibleTrip = false;
 
    /**
     * Is this a frequency-based trip with non-strict departure times?
@@ -153,6 +162,16 @@ public class Leg {
    public String alightRule;
 
    public Boolean rentedBike;
+
+  /**
+   * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
+   * computed by the algorithm for the section this leg account for. This is relevant for anyone
+   * who want to debug an search and tuning the system. The unit should be equivalent to the cost
+   * of "one second of transit".
+   * <p>
+   * -1 indicate that the cost is not set/computed.
+   */
+  public int generalizedCost = -1;
 
   public Leg(TraverseMode mode) {
     if(mode.isTransit()) {
@@ -261,9 +280,10 @@ public class Leg {
                 .addBool("realTime", realTime)
                 .addBool("isNonExactFrequency", isNonExactFrequency)
                 .addNum("headway", headway)
-                .addNum("distance", distanceMeters, "m")
-                .addBool("pathway", pathway)
                 .addEnum("mode", mode)
+                .addNum("distance", distanceMeters, "m")
+                .addNum("cost", generalizedCost)
+                .addBool("pathway", pathway)
                 .addNum("agencyTimeZoneOffset", agencyTimeZoneOffset, 0)
                 .addNum("routeType", routeType)
                 .addEntityId("agencyId", getAgency())

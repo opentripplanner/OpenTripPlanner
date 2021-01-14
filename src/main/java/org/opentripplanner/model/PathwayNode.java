@@ -20,6 +20,6 @@ public final class PathwayNode extends StationElement {
 
   @Override
   public String toString() {
-    return "<PathwayNode " + this.id + ">";
+    return "<PathwayNode " + getId() + ">";
   }
 }

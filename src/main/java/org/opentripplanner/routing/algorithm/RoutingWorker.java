@@ -1,18 +1,23 @@
 package org.opentripplanner.routing.algorithm;
 
+import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptor.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -20,6 +25,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugAggregator;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -27,6 +33,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,22 +50,6 @@ import java.util.List;
  */
 public class RoutingWorker {
     private static final int NOT_SET = -1;
-
-    /**
-     * The numbers of days before the search date to consider when filtering trips for this search.
-     * This is set to 1 to account for trips starting yesterday and crossing midnight so that they
-     * can be boarded today. If there are trips that last multiple days, this will need to be
-     * increased.
-     */
-    private static final int ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY = 1;
-
-    /**
-     * The number of days after the search date to consider when filtering trips for this search.
-     * This is set to 1 to account for searches today having a search window that crosses midnight
-     * and would also need to board trips starting tomorrow. If a search window that lasts more than
-     * a day is used, this will need to be increased.
-     */
-    private static final int ADDITIONAL_SEARCH_DAYS_AFTER_TODAY = 1;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
@@ -89,6 +80,16 @@ public class RoutingWorker {
             itineraries.addAll(DirectStreetRouter.route(router, request));
         } catch (RoutingValidationException e) {
             routingErrors.addAll(e.getRoutingErrors());
+        }
+
+        // Direct flex routing
+        if (OTPFeature.FlexRouting.isOn()) {
+            try {
+                itineraries.addAll(DirectFlexRouter.route(request));
+            }
+            catch (RoutingValidationException e) {
+                routingErrors.addAll(e.getRoutingErrors());
+            }
         }
 
         this.debugAggregator.finishedDirectStreetRouter();
@@ -134,8 +135,7 @@ public class RoutingWorker {
         requestTransitDataProvider = new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDateTime().toInstant(),
-                ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
-                ADDITIONAL_SEARCH_DAYS_AFTER_TODAY,
+                request.additionalSearchDaysAfterToday,
                 request.modes.transitModes,
                 request.rctx.bannedRoutes,
                 request.walkSpeed
@@ -143,11 +143,54 @@ public class RoutingWorker {
 
         this.debugAggregator.finishedPatternFiltering();
 
-        // Prepare access/egress transfers
-        Collection<AccessEgress> accessTransfers = AccessEgressRouter.streetSearch(request, false, 2000, transitLayer.getStopIndex());
-        Collection<AccessEgress> egressTransfers = AccessEgressRouter.streetSearch(request, true, 2000, transitLayer.getStopIndex());
+        AccessEgressMapper accessEgressMapper = new AccessEgressMapper(transitLayer.getStopIndex());
+        Collection<AccessEgress> accessList;
+        Collection<AccessEgress> egressList;
 
-        verifyEgressAccess(accessTransfers, egressTransfers);
+        // Prepare access/egress lists
+
+        // Special handling of flex accesses
+        if (OTPFeature.FlexRouting.isOn() && request.modes.accessMode.equals(StreetMode.FLEXIBLE)) {
+            Collection<FlexAccessEgress> flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
+                request,
+                false
+            );
+            accessList = accessEgressMapper.mapFlexAccessEgresses(flexAccessList);
+        }
+        // Regular access routing
+        else {
+            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
+                request,
+                request.modes.accessMode,
+                false,
+                2000
+            );
+            accessList = accessEgressMapper.mapNearbyStops(accessStops, false);
+        }
+
+        // Special handling of flex egresses
+        if (OTPFeature.FlexRouting.isOn() && request.modes.egressMode.equals(StreetMode.FLEXIBLE)) {
+            Collection<FlexAccessEgress> flexEgressList = FlexAccessEgressRouter.routeAccessEgress(
+                request,
+                true
+            );
+            egressList = accessEgressMapper.mapFlexAccessEgresses(flexEgressList);
+        }
+        // Regular egress routing
+        else {
+            // Prepare access/egress transfers
+            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
+                request,
+                request.modes.egressMode,
+                true,
+                2000
+            );
+            egressList = accessEgressMapper.mapNearbyStops(accessStops, true);
+        }
+
+        verifyEgressAccess(accessList, egressList);
+
+        List<Itinerary> itineraries = new ArrayList<>();
 
         this.debugAggregator.finishedAccessEgress();
 
@@ -155,8 +198,8 @@ public class RoutingWorker {
         RaptorRequest<TripSchedule> raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
                 requestTransitDataProvider.getStartOfTime(),
-                accessTransfers,
-                egressTransfers
+                accessList,
+                egressList
         );
 
         // Route transit
@@ -178,7 +221,6 @@ public class RoutingWorker {
         );
         FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
 
-        List<Itinerary> itineraries = new ArrayList<>();
         for (Path<TripSchedule> path : transitResponse.paths()) {
             // Convert the Raptor/Astar paths to OTP API Itineraries
             Itinerary itinerary = itineraryMapper.createItinerary(path);
