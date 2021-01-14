@@ -14,7 +14,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
@@ -22,28 +23,23 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should find the correct path using the given the transfer-slack, board-slack,
- * alight-slack.
- * <p>
- * The expected result is an itinerary with 3 transit legs:
- * <p>
- * <pre>
- *    Walk 1m ~ R1 ~ 2 ~ R2 ~ Walk ~ R3 ~ Walk 1m
- * </pre>
+ * Raptor should add transit-slack + board-slack after flex access, and transit-slack + alight-slack
+ * before flex egress.
  */
-public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants {
+public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(RaptorConfig.defaultConfigForTest());
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+      RaptorConfig.defaultConfigForTest()
+  );
 
   /** The expected result is tha same for all tests */
   private static final String EXPECTED_RESULT
-      = "Walk 30s ~ 1 ~ "
-      + "BUS R1 0:02:11 0:03:01 ~ 2 ~ "
-      + "BUS R2 0:04:41 0:05:01 ~ 3 ~ "
-      + "Walk 20s "
-      + "[00:01:11 00:05:31 4m20s]";
+      = "Flex 2m 1tx ~ 1 ~ "
+      + "BUS R1 0:04 0:06 ~ 2 ~ "
+      + "Flex 2m 1tx "
+      + "[00:00:30 00:09:10 8m40s]";
 
   @Before
   public void setup() {
@@ -55,21 +51,26 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
     data.add(
         // Pattern arrive at stop 2 at 0:03:00
         route(pattern("R1",  STOP_1, STOP_2))
-            .withTimetable(schedule().departures("00:02:11, 00:03:11").arrDepOffset(D10s))
-    );
-    data.add(
-        // earliest-departure-time: 0:03:00 + 10s + 1m + 30s = 0:04:40
-        route(pattern("R2",  STOP_2, STOP_3))
             .withTimetable(
-                schedule().departures("00:04:40, 00:05:10").arrDepOffset(D10s),  // Missed by 1 second
-                schedule().departures("00:04:41, 00:05:11").arrDepOffset(D10s)   // Exact match
+                // First trip is too early: It takes 2m to get to the point of boarding:
+                // --> 00:00:00 + flex 30s + slack(1m + 30s) = 00:02:00
+                schedule().departures("0:03:29, 0:05:29"),
+                // This is the trip we expect to board
+                schedule().departures("0:04:00, 0:10:00").arrivals("0, 00:06:00"),
+                // REVERSE SEARCH: The last trip arrives to late: It takes 1m40s to get to the
+                // point of "boarding" in the reverse search:
+                // --> 00:10:00 - (flex 20s + slack(1m + 10s)) = 00:08:30  (arrival time)
+                schedule().arrivals("0:04:51, 0:06:51")
             )
     );
     requestBuilder.searchParams()
-        .addAccessPaths(walk(STOP_1, D30s))  // Start walking 1m before: 30s walk + 30s board-slack
-        .addEgressPaths(walk(STOP_3, D20s))  // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
+        // Start walking 1m before: 30s walk + 30s board-slack
+        .addAccessPaths(flexAndWalk(STOP_1, D2m))
+        // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
+        .addEgressPaths(flex(STOP_2, D2m))
         .earliestDepartureTime(T00_00)
-        .latestArrivalTime(T00_30)
+        .latestArrivalTime(T00_10)
+        // Only one iteration is needed - the access should be time-shifted
         .searchWindowInSeconds(D3m)
     ;
 
@@ -97,7 +98,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   @Test
   public void multiCriteria() {
     // Add cost to result string
-    String expected = EXPECTED_RESULT.replace("]", ", cost: 1570]");
+    String expected = EXPECTED_RESULT.replace("]", ", cost: 1840]");
     var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
     var response = raptorService.route(request, data);
     assertEquals(expected, pathsToString(response));

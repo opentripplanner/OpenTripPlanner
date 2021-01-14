@@ -7,6 +7,7 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -21,9 +22,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
  */
 public final class ForwardPathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
     private int iterationDepartureTime = -1;
+    private final RaptorSlackProvider slackProvider;
 
-
-    public ForwardPathMapper(WorkerLifeCycle lifeCycle) {
+    public ForwardPathMapper(RaptorSlackProvider slackProvider, WorkerLifeCycle lifeCycle) {
+        this.slackProvider = slackProvider;
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
 
@@ -96,13 +98,21 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
     private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, PathLeg<T> nextLeg) {
         RaptorTransfer access = from.accessPath().access();
-        int departureTime = from.arrivalTime() - access.durationInSeconds();
+        int boardSlack = slackProvider.boardSlack(nextLeg.asTransitLeg().trip().pattern());
+        int targetToTime = nextLeg.fromTime() - boardSlack;
+
+        if(access.hasRides()) {
+            targetToTime -= slackProvider.transferSlack();
+            targetToTime = access.latestArrivalTime(targetToTime);
+        }
+
+        int targetFromTime = targetToTime - access.durationInSeconds();
 
         return new AccessPathLeg<>(
             access,
             from.stop(),
-            departureTime,
-            from.arrivalTime(),
+            targetFromTime,
+            targetToTime,
             RaptorCostConverter.toOtpDomainCost(from.cost()),
             nextLeg
         );

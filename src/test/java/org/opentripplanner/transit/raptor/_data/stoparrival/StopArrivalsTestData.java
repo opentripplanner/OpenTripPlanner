@@ -10,6 +10,7 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
@@ -45,10 +46,8 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
  */
 public class StopArrivalsTestData implements RaptorTestConstants {
 
-    public static final WorkerLifeCycle WORKER_LIFE_CYCLE = new LifeCycleSubscriptions();
-
-    // We use 2 minutes slack distributed by (in seconds):
-    private static final int BOARD_SLACK = 2 * 60;
+    // We use 2+1 minutes slack distributed by (in seconds):
+    private static final int BOARD_SLACK = 120;
     private static final int ALIGHT_SLACK = 60;
 
     // Some times witch should not have eny effect on tests
@@ -101,6 +100,13 @@ public class StopArrivalsTestData implements RaptorTestConstants {
         Assert.assertEquals(T3_END + ALIGHT_SLACK, E_START);
     }
 
+    public static WorkerLifeCycle lifeCycle() {
+        return new LifeCycleSubscriptions();
+    }
+
+    public static RaptorSlackProvider slackProvider() {
+        return RaptorSlackProvider.defaultSlackProvider(0, BOARD_SLACK, ALIGHT_SLACK);
+    }
 
     public static Egress basicTripByForwardSearch() {
         AbstractStopArrival prevArrival;

@@ -6,49 +6,83 @@ import org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.basicTripByReverseSearch;
+import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.lifeCycle;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrLong;
 
-public class ReversePathMapperTest {
+public class PathMapperTest {
+
     @Test
-    public void mapToPathReverseSearch() {
+    public void mapToPathForwardSearch() {
         // Given:
-        Egress egress = basicTripByReverseSearch();
+        Egress egress = StopArrivalsTestData.basicTripByForwardSearch();
         DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(
                 walk(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );
-        PathMapper<TestTripSchedule> mapper = new ReversePathMapper<>(
-                StopArrivalsTestData.WORKER_LIFE_CYCLE
+
+        WorkerLifeCycle lifeCycle = StopArrivalsTestData.lifeCycle();
+        PathMapper<TestTripSchedule> mapper = new ForwardPathMapper<>(
+            StopArrivalsTestData.slackProvider(),
+            lifeCycle
         );
 
         //When:
         Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
 
-        // Then:
+        // Then: verify path - should be the same for reverse and forward mapper
+        assertPath(path);
+    }
+
+    @Test
+    public void mapToPathReverseSearch() {
+        // Given:
+        Egress egress = basicTripByReverseSearch();
+        DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(walk(egress
+            .previous()
+            .stop(), egress.durationInSeconds()),
+            egress.previous(),
+            egress.arrivalTime(),
+            egress.additionalCost()
+        );
+        WorkerLifeCycle lifeCycle = lifeCycle();
+        PathMapper<TestTripSchedule> mapper = new ReversePathMapper<>(
+            StopArrivalsTestData.slackProvider(),
+            lifeCycle
+        );
+
+        //When:
+        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+
+        // Then: verify path - should be the same for reverse and forward mapper
+        assertPath(path);
+    }
+
+    private void assertPath(Path<TestTripSchedule> path) {
         PathLeg<?> leg = path.accessLeg();
-        assertEquals("Access 10:00-10:03(3m) -> Stop 1", leg.toString());
+        assertEquals("Access 10:00-10:03(3m) ~ 1", leg.toString());
         assertEquals(10, leg.generalizedCost());
 
         leg = leg.nextLeg();
-        assertEquals("BUS T1 10:05-10:35(30m) -> Stop 2", leg.toString());
+        assertEquals("BUS T1 10:05-10:35(30m) ~ 2", leg.toString());
         assertEquals(10, leg.generalizedCost());
 
         leg = leg.nextLeg();
-        assertEquals("Walk 10:36-10:39(3m) -> Stop 3", leg.toString());
+        assertEquals("Walk 10:36-10:39(3m) ~ 3", leg.toString());
         assertEquals(10, leg.generalizedCost());
 
         leg = leg.nextLeg();
-        assertEquals("BUS T2 11:00-11:23(23m) -> Stop 4", leg.toString());
+        assertEquals("BUS T2 11:00-11:23(23m) ~ 4", leg.toString());
         assertEquals(10, leg.generalizedCost());
 
         leg = leg.nextLeg();
-        assertEquals("BUS T3 11:40-11:52(12m) -> Stop 5", leg.toString());
+        assertEquals("BUS T3 11:40-11:52(12m) ~ 5", leg.toString());
         assertEquals(10, leg.generalizedCost());
 
         leg = leg.nextLeg();
@@ -71,6 +105,6 @@ public class ReversePathMapperTest {
     }
 
     private void assertTime(String msg, int expTime, int actualTime) {
-        assertEquals(msg, timeToStrLong(expTime), timeToStrLong(actualTime));
+        assertEquals(msg, TimeUtils.timeToStrLong(expTime), TimeUtils.timeToStrLong(actualTime));
     }
 }

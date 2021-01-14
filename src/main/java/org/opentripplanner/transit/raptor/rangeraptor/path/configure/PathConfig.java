@@ -40,6 +40,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
                 paretoComparator(includeCost),
                 ctx.calculator(),
                 ctx.costCalculator(),
+                ctx.slackProvider(),
                 ctx.pathMapper(),
                 ctx.debugFactory(),
                 ctx.lifeCycle()

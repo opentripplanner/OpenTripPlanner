@@ -12,6 +12,7 @@ public interface RaptorTestConstants {
   int D30s = 30;
   int D1m = parseDuration("1m");
   int D2m = parseDuration("2m");
+  int D2m1s = parseDuration("2m1s");
   int D3m = parseDuration("3m");
   int D5m = parseDuration("5m");
   int D6m = parseDuration("6m");

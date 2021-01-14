@@ -5,6 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -32,6 +33,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final ParetoSet<Path<T>> paths;
     private final TransitCalculator transitCalculator;
     private final CostCalculator<T> costCalculator;
+    private final SlackProvider slackProvider;
     private final PathMapper<T> pathMapper;
     private final DebugHandler<ArrivalView<?>> debugHandler;
     private boolean reachedCurrentRound = false;
@@ -41,15 +43,17 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
             ParetoComparator<Path<T>> paretoComparator,
             TransitCalculator transitCalculator,
             CostCalculator<T> costCalculator,
+            SlackProvider slackProvider,
             PathMapper<T> pathMapper,
             DebugHandlerFactory<T> debugHandlerFactory,
             WorkerLifeCycle lifeCycle
     ) {
-        this.costCalculator = costCalculator;
         this.paths = new ParetoSet<>(paretoComparator, debugHandlerFactory.paretoSetDebugPathListener());
-        this.debugHandler = debugHandlerFactory.debugStopArrival();
         this.transitCalculator = transitCalculator;
+        this.costCalculator = costCalculator;
+        this.slackProvider = slackProvider;
         this.pathMapper = pathMapper;
+        this.debugHandler = debugHandlerFactory.debugStopArrival();
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
@@ -66,18 +70,26 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
         if (departureTime == -1) { return; }
 
+        if(egressPath.hasRides()) {
+            departureTime = transitCalculator.plusDuration(
+                departureTime,
+                slackProvider.accessEgressWithRidesTransferSlack()
+            );
+        }
+
         int arrivalTime = transitCalculator.plusDuration(
             departureTime,
             egressPath.durationInSeconds()
         );
 
         int waitTimeInSeconds = Math.abs(departureTime - egressStopArrival.arrivalTime());
+        int cost = additionalCost == 0 ? 0 : additionalCost + costCalculator.waitCost(waitTimeInSeconds);
 
         DestinationArrival<T> destArrival = new DestinationArrival<>(
             egressPath,
             egressStopArrival,
             arrivalTime,
-            additionalCost + costCalculator.waitCost(waitTimeInSeconds)
+            cost
         );
 
         if (transitCalculator.exceedsTimeLimit(arrivalTime)) {

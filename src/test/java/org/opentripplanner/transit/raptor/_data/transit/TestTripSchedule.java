@@ -69,19 +69,8 @@ public class TestTripSchedule implements RaptorTripSchedule {
         return schedule().pattern(pattern);
     }
 
-
     public static TestTripSchedule.Builder schedule(String times) {
         return new TestTripSchedule.Builder().times(times);
-    }
-
-    /**
-     * Create a schedule with the given departure times and generate arrival times.
-     * The arrival at stop(i) is: {@code arrival[i] = departure[i] - departureDelay}.
-     */
-    public static TestTripSchedule.Builder schedule(String departureTimes, int departureDelay) {
-        return new TestTripSchedule.Builder()
-            .departures(departureTimes)
-            .departureDelay(departureDelay);
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -89,7 +78,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
         private TestTripPattern pattern;
         private int[] arrivalTimes;
         private int[] departureTimes;
-        private int departureDelay = DEFAULT_DEPATURE_DELAY;
+        private int arrivalDepartureOffset = DEFAULT_DEPATURE_DELAY;
 
         public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
             this.pattern = pattern;
@@ -108,13 +97,18 @@ public class TestTripSchedule implements RaptorTripSchedule {
             return this;
         }
 
+        /** @param arrivalTimes arrival times per stop. Example: "0:10, 0:20, 0:45 ..*/
+        public TestTripSchedule.Builder arrivals(String arrivalTimes) {
+            return this.arrivals(TimeUtils.times(arrivalTimes));
+        }
+
         /** @param arrivalTimes arrival times per stop in seconds past midnight. */
         public TestTripSchedule.Builder arrivals(int ... arrivalTimes) {
             this.arrivalTimes = arrivalTimes;
             return this;
         }
 
-        /** @param departureTimes departure times per stop in seconds past midnight. */
+        /** @param departureTimes departure times per stop. Example: "0:10, 0:20, 0:45 .. */
         public TestTripSchedule.Builder departures(String departureTimes) {
             return this.departures(TimeUtils.times(departureTimes));
         }
@@ -126,20 +120,24 @@ public class TestTripSchedule implements RaptorTripSchedule {
         }
 
         /**
-         * Set departure delay time in seconds. If not both arrival and depature times are
-         * set, this parameter is used to calculate the unset values. The default is 10 seconds.
+         * The time between arrival and departure for each stop in the pattern.
+         * If not both arrival and departure times are set, this parameter is used
+         * to calculate the unset values.
+         * <p>
+         * Unit: seconds.
+         * The default is 10 seconds.
          */
-        public TestTripSchedule.Builder departureDelay(int departureDelay) {
-            this.departureDelay = departureDelay;
+        public TestTripSchedule.Builder arrDepOffset(int arrivalDepartureOffset) {
+            this.arrivalDepartureOffset = arrivalDepartureOffset;
             return this;
         }
 
         public TestTripSchedule build() {
             if(arrivalTimes == null) {
-                arrivalTimes = copyDelta(-departureDelay, departureTimes);
+                arrivalTimes = copyWithOffset(departureTimes, -arrivalDepartureOffset);
             }
             else if(departureTimes == null) {
-                departureTimes = copyDelta(departureDelay, arrivalTimes);
+                departureTimes = copyWithOffset(arrivalTimes, arrivalDepartureOffset);
             }
             if(arrivalTimes.length != departureTimes.length) {
                 throw new IllegalStateException(
@@ -162,10 +160,10 @@ public class TestTripSchedule implements RaptorTripSchedule {
             return new TestTripSchedule(pattern, arrivalTimes, departureTimes);
         }
 
-        private static int[] copyDelta(int delta, int[] source) {
+        private static int[] copyWithOffset(int[] source, int offset) {
             int[] target = new int[source.length];
             for (int i = 0; i < source.length; i++) {
-                target[i] = source[i] + delta;
+                target[i] = source[i] + offset;
             }
             return target;
         }

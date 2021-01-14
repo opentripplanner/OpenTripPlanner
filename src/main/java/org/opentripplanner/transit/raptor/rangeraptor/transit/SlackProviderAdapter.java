@@ -20,7 +20,7 @@ import java.util.function.ToIntFunction;
  */
 public final class SlackProviderAdapter implements SlackProvider {
 
-    private boolean ignoreTransferSlack = true;
+    private int transferSlack;
     private int boardSlack;
     private int alightSlack;
 
@@ -65,12 +65,12 @@ public final class SlackProviderAdapter implements SlackProvider {
     }
 
     public void notifyNewRound(int round) {
-        ignoreTransferSlack = round < 2;
+        transferSlack = round < 2 ? 0 : sourceTransferSlack.getAsInt();
     }
 
     @Override
     public void setCurrentPattern(RaptorTripPattern pattern) {
-        this.boardSlack = sourceBoardSlack.applyAsInt(pattern) + transferSlack();
+        this.boardSlack = sourceBoardSlack.applyAsInt(pattern) + transferSlack;
         this.alightSlack = sourceAlightSlack.applyAsInt(pattern);
     }
 
@@ -84,7 +84,8 @@ public final class SlackProviderAdapter implements SlackProvider {
         return alightSlack;
     }
 
-    private int transferSlack() {
-        return ignoreTransferSlack ? 0 : sourceTransferSlack.getAsInt();
+    @Override
+    public int accessEgressWithRidesTransferSlack() {
+        return sourceTransferSlack.getAsInt();
     }
 }
