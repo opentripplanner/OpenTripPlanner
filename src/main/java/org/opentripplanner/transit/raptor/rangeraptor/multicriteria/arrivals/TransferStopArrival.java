@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.TransferLegView;
+import org.opentripplanner.transit.raptor.api.view.TransferPathView;
 
 /**
  *
@@ -10,10 +10,15 @@ import org.opentripplanner.transit.raptor.api.view.TransferLegView;
  */
 public final class TransferStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
 
-    public TransferStopArrival(AbstractStopArrival<T> previousState, RaptorTransfer transferLeg, int arrivalTime, int additionalCost) {
+    public TransferStopArrival(
+        AbstractStopArrival<T> previousState,
+        RaptorTransfer transferPath,
+        int arrivalTime,
+        int additionalCost
+    ) {
         super(
                 previousState,
-                transferLeg.stop(),
+                transferPath.stop(),
                 arrivalTime,
                 additionalCost
         );
@@ -25,7 +30,7 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
     }
 
     @Override
-    public TransferLegView transferLeg() {
+    public TransferPathView transferPath() {
         return this::durationInSeconds;
     }
 

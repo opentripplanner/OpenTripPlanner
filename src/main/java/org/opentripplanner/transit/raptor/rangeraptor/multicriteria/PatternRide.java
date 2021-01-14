@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
@@ -50,16 +51,16 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-final class PatternRide<T extends RaptorTripSchedule> {
-    final AbstractStopArrival<T> prevArrival;
-    final int boardStopIndex;
-    final int boardPos;
-    final int boardTime;
-    final int boardWaitTime;
-    final T trip;
+public final class PatternRide<T extends RaptorTripSchedule> {
+    public final AbstractStopArrival<T> prevArrival;
+    public final int boardStopIndex;
+    public final int boardPos;
+    public final int boardTime;
+    public final int boardWaitTime;
+    public final T trip;
 
     // Pareto vector
-    private final int relativeCost;
+    public final int relativeCost;
     private final int tripId;
 
     public PatternRide(
@@ -110,5 +111,19 @@ final class PatternRide<T extends RaptorTripSchedule> {
     public static <T extends RaptorTripSchedule>
     ParetoComparator<PatternRide<T>> paretoComparatorRelativeCost() {
         return (l, r) -> l.tripId != r.tripId || l.relativeCost < r.relativeCost;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(PatternRide.class)
+            .addNum("prevArrival", prevArrival.stop())
+            .addNum("boardStop", boardStopIndex)
+            .addNum("boardPos", boardPos)
+            .addServiceTime("boardTime", boardTime , -1)
+            .addDurationSec("boardWaitTime", boardWaitTime)
+            .addObj("trip", trip)
+            .addNum("relativeCost", relativeCost)
+            .addNum("tripId", tripId)
+            .toString();
     }
 }

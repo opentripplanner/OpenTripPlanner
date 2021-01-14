@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.util;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -80,6 +81,14 @@ public class TimeUtilsTest {
     }
 
     @Test
+    public void parseDuration() {
+        assertEquals(1, TimeUtils.parseDuration("1s"));
+        assertEquals(60, TimeUtils.parseDuration("1m"));
+        assertEquals(3600, TimeUtils.parseDuration("1h"));
+        assertEquals(3723, TimeUtils.parseDuration("1h2m3s"));
+    }
+
+    @Test
     public void timeMsToStrInSec() {
         Locale defaultLocale = Locale.getDefault();
         try {
@@ -100,6 +109,29 @@ public class TimeUtilsTest {
         finally {
             Locale.setDefault(defaultLocale);
         }
+    }
+
+    @Test
+    public void parseTimeCompact() {
+        assertEquals(0, TimeUtils.parseTimeCompact("0"));
+        assertEquals(0, TimeUtils.parseTimeCompact("0:0"));
+        assertEquals(0, TimeUtils.parseTimeCompact("0:0:0"));
+        assertEquals(3 * 3600, TimeUtils.parseTimeCompact("3"));
+        assertEquals(3 * 3600 + 2 * 60, TimeUtils.parseTimeCompact("3:2"));
+        assertEquals(5 * 3600 + 2 * 60 + 3, TimeUtils.parseTimeCompact("5:2:3"));
+        assertEquals(9 * 3600, TimeUtils.parseTimeCompact("09"));
+        assertEquals(9 * 3600 + 8 * 60, TimeUtils.parseTimeCompact("09:08"));
+        assertEquals(9 * 3600 + 8 * 60 + 9, TimeUtils.parseTimeCompact("09:08:09"));
+    }
+
+    @Test
+    public void times() {
+        assertEquals("[3600]", Arrays.toString(TimeUtils.times("1")));
+        assertEquals("[120]", Arrays.toString(TimeUtils.times("0:2")));
+        assertEquals("[3]", Arrays.toString(TimeUtils.times("0:0:3")));
+        assertEquals("[3723]", Arrays.toString(TimeUtils.times("01:02:03")));
+        assertEquals("[3600, 60, 1]", Arrays.toString(TimeUtils.times("1 0:1 0:0:1")));
+        assertEquals("[3600, 60, 1, 7200]", Arrays.toString(TimeUtils.times("1,0:1;0:0:1,; 2")));
     }
 
     @Test

@@ -1,6 +1,8 @@
-package org.opentripplanner.transit.raptor._shared;
+package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import org.junit.Assert;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -8,12 +10,16 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 
 
@@ -38,12 +44,10 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
  * </pre>
  * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 09:53 and ends at 12:00.
  */
-public class StopArrivalsTestData {
+public class StopArrivalsTestData implements RaptorTestConstants {
 
-    public static final WorkerLifeCycle WORKER_LIFE_CYCLE = new LifeCycleSubscriptions();
-
-    // We use 2 minutes slack distributed by (in seconds):
-    private static final int BOARD_SLACK = 2 * 60;
+    // We use 2+1 minutes slack distributed by (in seconds):
+    private static final int BOARD_SLACK = 120;
     private static final int ALIGHT_SLACK = 60;
 
     // Some times witch should not have eny effect on tests
@@ -71,29 +75,24 @@ public class StopArrivalsTestData {
 
     public static final int TRIP_DURATION = E_END - A_START;
 
-    private static final int STOP_1 = 1;
-    private static final int STOP_2 = 2;
-    private static final int STOP_3 = 3;
-    private static final int STOP_4 = 4;
-    private static final int STOP_5 = 5;
+    private static final RaptorTransfer ACCESS = walk(STOP_1, A_END - A_START);
+    private static final RaptorTransfer EGRESS = walk(STOP_5, E_END - E_START);
 
-    private static final TestRaptorTripSchedule TRIP_1 = TestRaptorTripSchedule
-            .create("T1")
-            .withBoardAndAlightTimes(T1_START, T1_END)
-            .withStopIndexes(STOP_1, STOP_2)
-            .build();
-    private static final TestRaptorTripSchedule TRIP_2 = TestRaptorTripSchedule
-            .create("T2")
-            .withBoardAndAlightTimes(T2_START, T2_END)
-            .withStopIndexes(STOP_3, STOP_4)
-            .build();
-    private static final TestRaptorTripSchedule TRIP_3 = TestRaptorTripSchedule
-            .create("T3")
-            // The early arrival and late departure should not have any effect on tests
-            .withAlightTimes(VERY_EARLY, T3_END)
-            .withBoardTimes(T3_START, VERY_LATE)
-            .withStopIndexes(STOP_4, STOP_5)
-            .build();
+
+    private static final TestTripSchedule TRIP_1 = TestTripSchedule
+        .schedule(pattern("T1", STOP_1, STOP_2))
+        .times(T1_START, T1_END)
+        .build();
+    private static final TestTripSchedule TRIP_2 = TestTripSchedule
+        .schedule(pattern("T2", STOP_3, STOP_4))
+        .times(T2_START, T2_END)
+        .build();
+    private static final TestTripSchedule TRIP_3 = TestTripSchedule
+        .schedule(pattern("T3", STOP_4, STOP_5))
+        // The early arrival and late departure should not have any effect on tests
+        .arrivals(VERY_EARLY, T3_END)
+        .departures(T3_START, VERY_LATE)
+        .build();
 
     static {
         // Assert test data is configured correct
@@ -101,6 +100,13 @@ public class StopArrivalsTestData {
         Assert.assertEquals(T3_END + ALIGHT_SLACK, E_START);
     }
 
+    public static WorkerLifeCycle lifeCycle() {
+        return new LifeCycleSubscriptions();
+    }
+
+    public static RaptorSlackProvider slackProvider() {
+        return RaptorSlackProvider.defaultSlackProvider(0, BOARD_SLACK, ALIGHT_SLACK);
+    }
 
     public static Egress basicTripByForwardSearch() {
         AbstractStopArrival prevArrival;
@@ -130,24 +136,24 @@ public class StopArrivalsTestData {
      * Both {@link #basicTripByForwardSearch()} and {@link #basicTripByReverseSearch()} should return the same trip,
      * here returned as a path.
      */
-    public static Path<TestRaptorTripSchedule> basicTripAsPath() {
-        PathLeg<TestRaptorTripSchedule> leg6 = new EgressPathLeg<>(
-            null, STOP_5, E_START, E_END, 1_000
+    public static Path<TestTripSchedule> basicTripAsPath() {
+        PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
+                EGRESS, STOP_5, E_START, E_END, 1_000
         );
-        TransitPathLeg<TestRaptorTripSchedule> leg5 = new TransitPathLeg<>(
-                STOP_4, T3_START, STOP_5, T3_END, 1_000, TRIP_3, leg6
+        TransitPathLeg<TestTripSchedule> leg5 = new TransitPathLeg<>(
+            STOP_4, T3_START, STOP_5, T3_END, 1_000, TRIP_3, leg6
         );
-        TransitPathLeg<TestRaptorTripSchedule> leg4 = new TransitPathLeg<>(
-                STOP_3, T2_START, STOP_4, T2_END, 1_000, TRIP_2, leg5
+        TransitPathLeg<TestTripSchedule> leg4 = new TransitPathLeg<>(
+            STOP_3, T2_START, STOP_4, T2_END, 1_000, TRIP_2, leg5
         );
-        PathLeg<TestRaptorTripSchedule> leg3 = new TransferPathLeg<>(
-                STOP_2, W1_START, STOP_3, W1_END, 1_000, leg4.asTransitLeg()
+        PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
+            STOP_2, W1_START, STOP_3, W1_END, 1_000, leg4.asTransitLeg()
         );
-        TransitPathLeg<TestRaptorTripSchedule> leg2 = new TransitPathLeg<>(
-                STOP_1, T1_START, STOP_2, T1_END, 1_000, TRIP_1, leg3
+        TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
+            STOP_1, T1_START, STOP_2, T1_END, 1_000, TRIP_1, leg3
         );
-        AccessPathLeg<TestRaptorTripSchedule> leg1 = new AccessPathLeg<>(
-                null, STOP_1, A_START, A_END, 1_000, leg2.asTransitLeg()
+        AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
+            ACCESS, STOP_1, A_START, A_END, 1_000, leg2.asTransitLeg()
         );
         return new Path<>(1, leg1, RaptorCostConverter.toOtpDomainCost(6_000));
     }
@@ -155,6 +161,5 @@ public class StopArrivalsTestData {
     public static List<Integer> basicTripStops() {
         return Arrays.asList(STOP_1, STOP_2, STOP_3, STOP_4, STOP_5);
     }
-
 }
 

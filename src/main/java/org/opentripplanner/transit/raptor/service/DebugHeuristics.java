@@ -23,7 +23,7 @@ public class DebugHeuristics {
     private final DebugLogger logger;
     private final int[] stops;
 
-    private DebugHeuristics(String aName, String bName, DebugRequest<?> debugRequest) {
+    private DebugHeuristics(String aName, String bName, DebugRequest debugRequest) {
         this.aName = aName;
         this.bName = bName;
         this.logger = debugRequest.logger();
@@ -37,7 +37,7 @@ public class DebugHeuristics {
             Heuristics h2,
             RaptorRequest<?> request
     ) {
-        DebugRequest<?> debug = request.debug();
+        DebugRequest debug = request.debug();
         if (debug.logger().isEnabled(HEURISTICS)) {
             new DebugHeuristics(aName, bName, debug).debug(h1, h2, request.searchDirection());
         }

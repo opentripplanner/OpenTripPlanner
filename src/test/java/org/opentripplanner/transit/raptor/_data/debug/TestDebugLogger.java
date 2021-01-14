@@ -1,13 +1,16 @@
-package org.opentripplanner.transit.raptor.speed_test;
+package org.opentripplanner.transit.raptor._data.debug;
 
 
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
+import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
@@ -16,13 +19,21 @@ import org.opentripplanner.util.TableFormatter;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrCompact;
 import static org.opentripplanner.util.TableFormatter.Align.Center;
 import static org.opentripplanner.util.TableFormatter.Align.Left;
 import static org.opentripplanner.util.TableFormatter.Align.Right;
 
-class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger {
+
+/**
+ * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This
+ * is used by the {@link SpeedTest} and in module tests.
+ * <p>
+ * See the Raptor design doc for a general description of the logging functionality.
+ */
+public class TestDebugLogger implements DebugLogger {
     private static final int NOT_SET = Integer.MIN_VALUE;
 
     private final boolean enableDebugLogging;
@@ -44,12 +55,15 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         9, 2, 5, 5, 8, 8, 8, 6, 0
     );
 
-    SpeedTestDebugLogger(boolean enableDebugLogging) {
+    public TestDebugLogger(boolean enableDebugLogging) {
         this.enableDebugLogging = enableDebugLogging;
     }
 
-    void stopArrivalLister(DebugEvent<ArrivalView<T>> e) {
-
+    /**
+     * This should be passed into the {@link DebugRequestBuilder#stopArrivalListener(Consumer)}
+     * using a lambda to enable debugging stop arrivals.
+     */
+    public void stopArrivalLister(DebugEvent<ArrivalView<?>> e) {
         printIterationHeader(e.iterationStartTime());
         printRoundHeader(e.element().round());
         print(e.element(), e.action().toString(), e.reason());
@@ -60,7 +74,26 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         }
     }
 
-    void pathFilteringListener(DebugEvent<Path<T>> e) {
+    /**
+     * This should be passed into the {@link DebugRequestBuilder#patternRideDebugListener(Consumer)}
+     * using a lambda to enable debugging pattern ride events.
+     */
+    public void patternRideLister(DebugEvent<PatternRide<?>> e) {
+        printIterationHeader(e.iterationStartTime());
+        printRoundHeader(e.element().prevArrival.round() + 1);
+        print(e.element(), e.action().toString());
+
+        PatternRide<?> byElement = e.rejectedDroppedByElement();
+        if (e.action() == DebugEvent.Action.DROP && byElement != null) {
+            print(byElement, "->by");
+        }
+    }
+
+    /**
+     * This should be passed into the {@link DebugRequestBuilder#pathFilteringListener(Consumer)}
+     * using a lambda to enable debugging paths put in the final result pareto-set.
+     */
+    public void pathFilteringListener(DebugEvent<Path<?>> e) {
         if (pathHeader) {
             System.err.println();
             System.err.println(pathTableFormatter.printHeader());
@@ -113,7 +146,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
     }
 
     private void print(ArrivalView<?> a, String action, String optReason) {
-        String pattern = a.arrivedByTransit() ? a.transitLeg().trip().pattern().debugInfo() : "";
+        String pattern = a.arrivedByTransit() ? a.transitPath().trip().pattern().debugInfo() : "";
         System.err.println(
             arrivalTableFormatter.printRow(
                 action,
@@ -128,6 +161,21 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         );
     }
 
+    private void print(PatternRide<?> p, String action) {
+        System.err.println(
+            arrivalTableFormatter.printRow(
+                action,
+                "OnRide",
+                p.prevArrival.round() + 1,
+                p.boardStopIndex,
+                TimeUtils.timeToStrLong(p.boardTime),
+                numFormat.format(p.relativeCost),
+                p.trip.pattern().debugInfo(),
+                p.toString()
+            )
+        );
+    }
+
     private static String details(String action, String optReason, String element) {
         return concat(optReason,  action + "ed element: " + element);
     }
@@ -137,8 +185,8 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
     }
 
     private static PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
-        if (a.arrivedByAccessLeg()) {
-            return buf.walk(legDuration(a)).sep().stop(a.stop());
+        if (a.arrivedByAccess()) {
+            return buf.accessEgress(a.accessPath().access()).sep().stop(a.stop());
         }
         // Recursively call this method to insert arrival in front of this arrival
         path(a.previous(), buf);
@@ -146,14 +194,23 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         buf.sep();
 
         if (a.arrivedByTransit()) {
-            if(a.previous().arrivalTime() > a.arrivalTime()) {
-                throw new IllegalStateException("TODO: Add support for REVERSE search!");
+            // forward search
+            String tripInfo = a.transitPath().trip().pattern().debugInfo();
+            if(a.arrivalTime() > a.previous().arrivalTime()) {
+                BoarAndAlightTime t = TripTimesSearch.findTripForwardSearch(a);
+                buf.transit(tripInfo, t.boardTime, t.alightTime);
             }
-            TripTimesSearch.BoarAlightTimes b = TripTimesSearch.findTripForwardSearch(a);
-            buf.transit(a.transitLeg().trip().pattern().debugInfo(), b.boardTime, a.arrivalTime());
-        } else {
+            // reverse search
+            else {
+                BoarAndAlightTime t = TripTimesSearch.findTripReverseSearch(a);
+                buf.transit(tripInfo, t.alightTime, t.boardTime);
+            }
+        } else if(a.arrivedByTransfer()) {
             buf.walk(legDuration(a));
+        } else {
+            buf.accessEgress(a.egressPath().egress());
         }
+
         return buf.sep().stop(a.stop());
     }
 
@@ -161,14 +218,14 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
      * The absolute time duration in seconds of a trip.
      */
     private static int legDuration(ArrivalView<?> a) {
-        if(a.arrivedByAccessLeg()) {
-            return a.accessLeg().access().durationInSeconds();
+        if(a.arrivedByAccess()) {
+            return a.accessPath().access().durationInSeconds();
         }
         if(a.arrivedByTransfer()) {
-            return a.transferLeg().durationInSeconds();
+            return a.transferPath().durationInSeconds();
         }
         if(a.arrivedAtDestination()) {
-            return a.egressLeg().egress().durationInSeconds();
+            return a.egressPath().egress().durationInSeconds();
         }
         throw new IllegalStateException("Unsuported type: " + a.getClass());
     }
@@ -189,7 +246,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
     }
 
     private String legType(ArrivalView<?> a) {
-        if (a.arrivedByAccessLeg()) { return "Access"; }
+        if (a.arrivedByAccess()) { return "Access"; }
         if (a.arrivedByTransit()) { return "Transit"; }
         // We use Walk instead of Transfer so it is easier to distinguish from Transit
         if (a.arrivedByTransfer()) { return "Walk"; }

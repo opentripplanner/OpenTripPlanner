@@ -67,24 +67,6 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     // The below methods are ordered after the sequence they naturally appear in the algorithm,
     // also private life-cycle callbacks are listed here (not in the private method section).
 
-    // This method is private, but is part of Worker life cycle
-    private void setupIteration() {
-        arrivalsCache.clear();
-        // clear all touched stops to avoid constant rexploration
-        stops.clearTouchedStopsAndSetStopMarkers();
-    }
-
-    @Override
-    public void setInitialTimeForIteration(RaptorTransfer accessLeg, int departureTime) {
-        addStopArrival(
-                new AccessStopArrival<>(
-                        departureTime,
-                        costCalculator.walkCost(accessLeg.durationInSeconds()),
-                        accessLeg
-                )
-        );
-    }
-
     @Override
     public boolean isNewRoundAvailable() {
         return stops.updateExist();
@@ -98,6 +80,39 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     @Override
     public IntIterator stopsTouchedByTransitCurrentRound() {
         return stops.stopsTouchedIterator();
+    }
+
+    @Override
+    public boolean isDestinationReachedInCurrentRound() {
+        return paths.isReachedCurrentRound();
+    }
+
+    @Override
+    public void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
+        addStopArrival(
+            new AccessStopArrival<>(
+                departureTime,
+                costCalculator.walkCost(accessPath.durationInSeconds()), accessPath
+            )
+        );
+    }
+
+    /**
+     * Set the time at a transit stops iff it is optimal.
+     */
+    @Override
+    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+        Iterable<? extends AbstractStopArrival<T>> fromArrivals = stops.listArrivalsAfterMarker(fromStop);
+
+        while (transfers.hasNext()) {
+            transferToStop(fromArrivals, transfers.next());
+        }
+    }
+
+    @Override
+    public Collection<Path<T>> extractPaths() {
+        stops.debugStateInfo();
+        return paths.listPaths();
     }
 
     Iterable<? extends AbstractStopArrival<T>> listStopArrivalsPreviousRound(int stop) {
@@ -117,10 +132,10 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
 
         if (exceedsTimeLimit(stopArrivalTime)) { return; }
 
-        // Calculate wait time before and after the transit leg
+        // Calculate wait time before and after the transit path
         final int waitTime = ride.boardWaitTime + alightSlack;
 
-        final int costTransitLeg = costCalculator.transitArrivalCost(
+        final int costTransit = costCalculator.transitArrivalCost(
             ride.prevArrival,
             waitTime,
             alightTime - ride.boardTime,
@@ -132,49 +147,32 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
                         ride.prevArrival,
                         alightStop,
                         stopArrivalTime,
-                        costTransitLeg,
+                        costTransit,
                         ride.trip
                 )
         );
     }
 
-    /**
-     * Set the time at a transit stops iff it is optimal.
-     */
-    @Override
-    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
-        Iterable<? extends AbstractStopArrival<T>> fromArrivals = stops.listArrivalsAfterMarker(fromStop);
 
-        while (transfers.hasNext()) {
-            transferToStop(fromArrivals, transfers.next());
-        }
+    /* private methods */
+
+    /** This method is part of the Worker life cycle */
+    private void setupIteration() {
+        arrivalsCache.clear();
+        // clear all touched stops to avoid constant re-exploration
+        stops.clearTouchedStopsAndSetStopMarkers();
     }
 
-    // This method is private, but is part of Worker life cycle
+    /** This method is part of Worker life cycle */
     private void transitsForRoundComplete() {
         stops.clearTouchedStopsAndSetStopMarkers();
         commitCachedArrivals();
     }
 
-    // This method is private, but is part of Worker life cycle
+    /** This method is part of Worker life cycle */
     private void transfersForRoundComplete() {
         commitCachedArrivals();
     }
-
-    @Override
-    public Collection<Path<T>> extractPaths() {
-        stops.debugStateInfo();
-        return paths.listPaths();
-    }
-
-    @Override
-    public boolean isDestinationReachedInCurrentRound() {
-        return paths.isReachedCurrentRound();
-    }
-
-
-    /* private methods */
-
 
     private void transferToStop(Iterable<? extends AbstractStopArrival<T>> fromArrivals, RaptorTransfer transfer) {
         final int transferTimeInSeconds = transfer.durationInSeconds();

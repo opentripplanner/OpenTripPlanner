@@ -42,8 +42,7 @@ public class AccessEgress implements RaptorTransfer {
   public String toString() {
     return ToStringBuilder
         .of(AccessEgress.class)
-        .addNum("stop", toFromStop)
-        .addDurationSec("duration", durationInSeconds)
+        .addStr("transfer", asString())
         .addObj("state", lastState)
         .toString();
   }

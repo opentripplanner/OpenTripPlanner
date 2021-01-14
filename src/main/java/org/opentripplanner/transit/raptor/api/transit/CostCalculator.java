@@ -39,7 +39,7 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
     int walkCost(int walkTimeInSeconds);
 
     /**
-     * Calculate the value, when waiting between the last transit and egress legs
+     * Calculate the value, when waiting between the last transit and egress paths
      */
     int waitCost(int waitTimeInSeconds);
 

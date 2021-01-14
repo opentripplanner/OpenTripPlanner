@@ -25,9 +25,10 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     private final AbstractStopArrival<T> previous;
 
     /**
-     * We want transits to dominate transfers so we increment the round not only between RangeRaptor rounds,
-     * but for transits and transfers also. The access leg is paretoRound 0, the first transit leg is 1.
-     * The following transfer leg, if it exist, is paretoRound 2, and the next transit is 3, and so on.
+     * We want transits to dominate transfers so we increment the round not only between
+     * RangeRaptor rounds, but for transits and transfers also. The access path is paretoRound 0,
+     * the first transit path is 1. The following transfer path, if it exist, is paretoRound 2, and
+     * the next transit is 3, and so on.
      * <p/>
      * The relationship between Range Raptor round and paretoRound can be described by this formula:
      * <pre>

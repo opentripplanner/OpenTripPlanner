@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.TransitLegView;
+import org.opentripplanner.transit.raptor.api.view.TransitPathView;
 
 /**
  *
@@ -10,7 +10,7 @@ import org.opentripplanner.transit.raptor.api.view.TransitLegView;
  */
 public final class TransitStopArrival<T extends RaptorTripSchedule>
     extends AbstractStopArrival<T>
-    implements TransitLegView<T>
+    implements TransitPathView<T>
 {
     private final T trip;
 
@@ -36,7 +36,7 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
     }
 
     @Override
-    public TransitLegView<T> transitLeg() {
+    public TransitPathView<T> transitPath() {
         return this;
     }
 

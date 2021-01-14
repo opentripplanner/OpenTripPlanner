@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.service;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
@@ -24,7 +24,7 @@ public class RaptorSearchWindowCalculatorTest {
 
     @Test
     public void calcEarliestDeparture() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestRaptorTripSchedule>()
+        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
                 .searchParams()
                 // 35 minutes = 2100 seconds
                 .latestArrivalTime(10_200)
@@ -53,7 +53,7 @@ public class RaptorSearchWindowCalculatorTest {
 
     @Test
     public void calcSearchWindow() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestRaptorTripSchedule>()
+        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
                 .searchParams()
                 .earliestDepartureTime(10_200)
                 .buildSearchParam();
@@ -77,7 +77,7 @@ public class RaptorSearchWindowCalculatorTest {
 
     @Test
     public void calcSearchWindowLimitByMaxLength() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestRaptorTripSchedule>()
+        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
                 .searchParams()
                 .earliestDepartureTime(10_000)
                 .buildSearchParam();
@@ -102,7 +102,7 @@ public class RaptorSearchWindowCalculatorTest {
 
     @Test
     public void calcLatestArrivalTime() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestRaptorTripSchedule>()
+        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
                 .searchParams()
                 // 35 minutes = 2100 seconds
                 .searchWindowInSeconds(35 * 60)

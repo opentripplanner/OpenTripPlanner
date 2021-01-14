@@ -23,7 +23,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     private final SearchDirection searchDirection;
     private final Set<Optimization> optimizations;
     private final McCostParams mcCostParams;
-    private final DebugRequest<T> debug;
+    private final DebugRequest debug;
     private final RaptorSlackProvider slackProvider;
 
 
@@ -38,7 +38,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         optimizations = Collections.emptySet();
         mcCostParams = McCostParams.DEFAULTS;
         // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
-        slackProvider = RaptorSlackProvider.defaults(60, 0, 0);
+        slackProvider = RaptorSlackProvider.defaultSlackProvider(60, 0, 0);
         debug = DebugRequest.defaults();
     }
 
@@ -137,7 +137,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
      * <p/>
      * This feature is optional, by default debugging is turned off.
      */
-    public DebugRequest<T> debug() {
+    public DebugRequest debug() {
         return debug;
     }
 

@@ -6,15 +6,26 @@ import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 public class AccessStopArrivalState<T extends RaptorTripSchedule> extends StopArrivalState<T> {
 
-  private RaptorTransfer access;
+  private final RaptorTransfer accessPath;
 
-  public RaptorTransfer access() {
-    return access;
+  public AccessStopArrivalState(int time, RaptorTransfer accessPath) {
+    this.accessPath = accessPath;
+    setAccessTime(time, accessPath.durationInSeconds());
   }
 
-  void setAccess(int time, RaptorTransfer access) {
-    super.setAccessTime(time, access.durationInSeconds());
-    this.access = access;
+  public AccessStopArrivalState(int time, RaptorTransfer accessPath, StopArrivalState<T> other) {
+    super(other);
+    this.accessPath = accessPath;
+    setAccessTime(time, accessPath.durationInSeconds());
+  }
+
+  @Override
+  public final boolean arrivedByAccess() {
+    return true;
+  }
+
+  public RaptorTransfer accessPath() {
+    return accessPath;
   }
 
   @Override

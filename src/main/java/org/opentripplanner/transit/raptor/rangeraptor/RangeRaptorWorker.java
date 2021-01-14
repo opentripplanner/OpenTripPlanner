@@ -24,12 +24,13 @@ import java.util.Iterator;
 /**
  * The algorithm used herein is described in
  * <p>
- * Conway, Matthew Wigginton, Andrew Byrd, and Marco van der Linden. “Evidence-Based Transit and Land Use Sketch Planning
- * Using Interactive Accessibility Methods on Combined Schedule and Headway-Based Networks.” Transportation Research
- * Record 2653 (2017). doi:10.3141/2653-06.
+ * Conway, Matthew Wigginton, Andrew Byrd, and Marco van der Linden. “Evidence-Based Transit and
+ * Land Use Sketch Planning
+ * Using Interactive Accessibility Methods on Combined Schedule and Headway-Based Networks.”
+ * Transportation Research Record 2653 (2017). doi:10.3141/2653-06.
  * <p>
- * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,” January 1, 2012.
- * http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
+ * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,”
+ * January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
  * <p>
  * This version do support the following features:
  * <ul>
@@ -40,7 +41,8 @@ import java.util.Iterator;
  * </ul>
  * This version do NOT support the following features:
  * <ul>
- *     <li>Frequency routes, supported by the original code using Monte Carlo methods (generating randomized schedules)
+ *     <li>Frequency routes, supported by the original code using Monte Carlo methods
+ *     (generating randomized schedules)
  * </ul>
  * <p>
  * This class originated as a rewrite of Conveyals RAPTOR code: https://github.com/conveyal/r5.
@@ -48,7 +50,7 @@ import java.util.Iterator;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends WorkerState<T>> implements Worker<T> {
+public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Worker<T> {
 
 
     private final RoutingStrategy<T> transitWorker;
@@ -63,7 +65,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      * current object-oriented approach. There were no performance differences(=> GC is not
      * the bottle neck), so we dropped the integer array implementation.
      */
-    private final S state;
+    private final WorkerState<T> state;
 
     /**
      * The round tracker keep track for the current Raptor round, and abort the search if the
@@ -77,7 +79,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
     private final WorkerPerformanceTimers timers;
 
-    private final Collection<RaptorTransfer> accessLegs;
+    private final Collection<RaptorTransfer> accessPaths;
 
     /**
      * The life cycle is used to publish life cycle events to everyone who
@@ -91,10 +93,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
 
     public RangeRaptorWorker(
-            S state,
+            WorkerState<T> state,
             RoutingStrategy<T> transitWorker,
             RaptorTransitDataProvider<T> transitData,
-            Collection<RaptorTransfer> accessLegs,
+            Collection<RaptorTransfer> accessPaths,
             RoundProvider roundProvider,
             TransitCalculator calculator,
             LifeCycleEventPublisher lifeCyclePublisher,
@@ -105,7 +107,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
         this.transitData = transitData;
         this.calculator = calculator;
         this.timers = timers;
-        this.accessLegs = accessLegs;
+        this.accessPaths = accessPaths;
         // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
         // "everyone" by providing access to it in the context.
         this.roundTracker = (RoundTracker) roundProvider;
@@ -147,14 +149,18 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      * Perform one minute of a RAPTOR search.
      */
     private void runRaptorForMinute() {
-        doTransfersForAccessLegs(false);
+        addAccessPathsToState(false);
 
         while (hasMoreRounds()) {
-            lifeCycle.prepareForNextRound(roundTracker.round());
 
-            // NB since we have transfer limiting not bothering to cut off search when there are no more transfers
-            // as that will be rare and complicates the code
+            lifeCycle.prepareForNextRound(roundTracker.nextRound());
+
+            // NB since we have transfer limiting not bothering to cut off search when there are no
+            // more transfers as that will be rare and complicates the code
             timerByMinuteScheduleSearch().time(this::findAllTransitForRound);
+
+            // This needs to be below transitsForRoundComplete to not clear touched stops
+            addAccessPathsToState(true);
 
             timerByMinuteTransfers().time(this::transfersForRound);
 
@@ -167,29 +173,14 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
         lifeCycle.iterationComplete();
     }
 
-
-    /**
-     * Set the departure time in the scheduled search to the given departure time,
-     * and prepare for the scheduled search at the next-earlier minute.
-     */
-    private void doTransfersForAccessLegs(boolean inTransit) {
-        for (RaptorTransfer it : accessLegs) {
-            if (it.numberOfLegs() / 2 == roundTracker.round()
-                && it.stopReachedOnBoard() == inTransit
-            ) {
-                transitWorker.setInitialTimeForIteration(it, iterationDepartureTime);
-            }
-        }
-    }
-
     /**
      * Check if the RangeRaptor should continue with a new round.
      */
     private boolean hasMoreRounds() {
-        int round = roundTracker.round();
-        boolean hasAccessesLeft = accessLegs
+        final int round = roundTracker.round();
+        boolean hasAccessesLeft = accessPaths
             .stream()
-            .anyMatch(raptorTransfer -> raptorTransfer.numberOfLegs() / 2 > round);
+            .anyMatch(it -> it.numberOfRides() > round);
 
         return (state.isNewRoundAvailable() || hasAccessesLeft) && roundTracker.hasMoreRounds();
     }
@@ -216,9 +207,6 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             }
         }
         lifeCycle.transitsForRoundComplete();
-
-        // TODO this needs to be below transitsForRoundComplete to not clear touched stops
-        doTransfersForAccessLegs(true);
     }
 
     private void transfersForRound() {
@@ -231,7 +219,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             state.transferToStops(fromStop, transitData.getTransfers(fromStop));
         }
 
-        doTransfersForAccessLegs(false);
+        addAccessPathsToState(false);
 
         lifeCycle.transfersForRoundComplete();
     }
@@ -245,11 +233,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
         if(!inFirstIteration && roundTracker.isFirstRound()) {
             // For the first round of every iteration(except the first) we restrict the first
             // departure to happen within the time-window of the iteration. Another way to put this,
-            // is to say that we allow for the access leg to be time-shifted to a later departure,
+            // is to say that we allow for the access path to be time-shifted to a later departure,
             // but not past the previous iteration departure time. This save a bit of processing,
             // but most importantly allow us to use the departure-time as a pareto criteria in
             // time-table view. This is not valid for the first iteration, because we could jump on
-            // a bus, take it on stop and walk back and then wait to board a later trip - this kind
+            // a bus, take it one stop and walk back and then wait to board a later trip - this kind
             // of results would be rejected by earlier iterations, for all iterations except the
             // first.
             return calculator.createExactTripSearch(timeTable);
@@ -257,6 +245,31 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
         // Default: create a standard trip search
         return calculator.createTripSearch(timeTable);
+    }
+
+    /**
+     * Set the departure time in the scheduled search to the given departure time,
+     * and prepare for the scheduled search at the next-earlier minute.
+     */
+    private void addAccessPathsToState(boolean inTransit) {
+        for (RaptorTransfer it : accessPaths) {
+            // Check if access matches round and time
+            if (!includeAccessInRound(it, inTransit)) { continue; }
+
+            // Earliest possible departure time from the origin, or latest possible arrival
+            // time at the destination if searching backwards.
+            int timeDependentDepartureTime = calculator.departureTime(it, iterationDepartureTime);
+
+            // This access is not available after the iteration departure time
+            if (timeDependentDepartureTime == -1) { continue; }
+
+            transitWorker.setAccessToStop(it, iterationDepartureTime, timeDependentDepartureTime);
+        }
+    }
+
+    private boolean includeAccessInRound(RaptorTransfer accessPath, boolean inTransit) {
+        return accessPath.numberOfRides() == roundTracker.round()
+            && accessPath.stopReachedOnBoard() == inTransit;
     }
 
     // Track time spent, measure performance

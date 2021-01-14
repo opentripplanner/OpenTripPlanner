@@ -1,9 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.view;
 
 /**
- * This interface serve as a debug handler for the Worker and State classes.
- * They ues this interface to report stop arrival events and destination arrival
- * events, but are not limited to those two.
+ * This interface serve as a debug handler for the Worker and State classes. They ues this
+ * interface to report stop arrival events, pattern ride events and destination arrival events.
  * <p/>
  * The implementation of this interface will take these events and report them
  * back to the API listeners, passed in as part of the debug request.

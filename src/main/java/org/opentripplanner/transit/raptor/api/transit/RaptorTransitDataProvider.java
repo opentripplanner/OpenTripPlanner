@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 
 
@@ -28,13 +29,12 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      * <p/>
      * The implementation may implement a lightweight {@link RaptorTransfer} representation.
      * The iterator element only needs to be valid for the duration og a single iterator step.
-     * Hence; It is safe to use a cursor/flyweight pattern to represent both the TransferLeg
-     * and the Iterator<TransferLeg> - this will most likely be the best performing
-     * implementation.
+     * Hence; It is safe to use a cursor/flyweight pattern to represent both the Transfer
+     * and the Iterator<Transfer> - this will most likely be the best performing implementation.
      * <p/>
      * Example:
      * <pre>
-     *class LightweightTransferIterator implements Iterator&lt;TransferLeg&gt;, TransferLeg {
+     *class LightweightTransferIterator implements Iterator&lt;RaptorTransfer&gt;, RaptorTransfer {
      *     private static final int[] EMPTY_ARRAY = new int[0];
      *     private final int[] a;
      *     private int index;
@@ -47,7 +47,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      *     public int stop()              { return a[index]; }
      *     public int durationInSeconds() { return a[index+1]; }
      *     public boolean hasNext()       { index += 2; return index < a.length; }
-     *     public TransferLeg next()   { return this; }
+     *     public RaptorTransfer next()   { return this; }
      * }
      * </pre>
      * @return a map of distances from the given input stop to all other stops.
@@ -65,14 +65,17 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
     Iterator<? extends RaptorRoute<T>> routeIterator(IntIterator stops);
 
     /**
-     * This is the total number of stops, it should be possible to retrieve transfers and pattern for every stop
-     * from 0 to {@code numberOfStops()-1}.
+     * This is the total number of stops, it should be possible to retrieve transfers and pattern
+     * for every stop from 0 to {@code numberOfStops()-1}.
      */
     int numberOfStops();
 
 
     /**
      * Return a the cost of boarding and alighting a trip at a particular stop.
+     *
+     * Nor extra costs exist this method returns {@code null}.
      */
+    @Nullable
     int[] stopBoarAlightCost();
 }

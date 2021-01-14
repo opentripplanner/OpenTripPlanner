@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.Access;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._data.stoparrival.Access;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -20,7 +20,7 @@ public class CostCalculatorTest {
     private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
 
-    private final CostCalculator<TestRaptorTripSchedule> subject = new DefaultCostCalculator<>(
+    private final CostCalculator<TestTripSchedule> subject = new DefaultCostCalculator<>(
             new int[] { 0, 25 },
             BOARD_COST,
             WALK_RELUCTANCE_FACTOR,
@@ -30,7 +30,7 @@ public class CostCalculatorTest {
 
     @Test
     public void transitArrivalCost() {
-        ArrivalView<TestRaptorTripSchedule> prev = new Access(0, 0, 2);
+        ArrivalView<TestTripSchedule> prev = new Access(0, 0, 2);
         assertEquals(1000, prev.cost());
 
         LifeCycleEventPublisher lifeCycle = new LifeCycleEventPublisher(lifeCycleSubscriptions);

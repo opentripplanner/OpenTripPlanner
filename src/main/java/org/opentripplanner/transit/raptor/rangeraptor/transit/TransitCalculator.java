@@ -11,7 +11,7 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
- * <em>earliest boarding time</em> and time-shifting the access legs.
+ * <em>earliest boarding time</em> and time-shifting the access paths.
  * <p/>
  * The calculator is shared between the state, worker and path mapping code. This
  * make the calculations consistent and let us hide the request parameters. Hiding the
@@ -94,6 +94,8 @@ public interface TransitCalculator {
      * Selects the earliest or latest possible departure time depending on the direction.
      * For forward search it will be the earliest possible departure time, while for reverse search
      * it uses the latest arrival time.
+     *
+     * Returns -1 if transfer is not possible after the requested departure time
      */
     int departureTime(RaptorTransfer transfer, int departureTime);
 

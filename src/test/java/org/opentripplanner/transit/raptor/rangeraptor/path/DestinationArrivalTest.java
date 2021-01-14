@@ -2,12 +2,12 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class DestinationArrivalTest {
 
@@ -35,7 +35,7 @@ public class DestinationArrivalTest {
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
             ACCESS_DEPARTURE_TIME,
             ACCESS_COST,
-            new TestRaptorTransfer(ACCESS_STOP, ACCESS_DURATION_TIME)
+            walk(ACCESS_STOP, ACCESS_DURATION_TIME)
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
@@ -47,7 +47,7 @@ public class DestinationArrivalTest {
     );
 
     private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
-            new TestRaptorTransfer(TRANSIT_STOP, DESTINATION_DURATION_TIME),
+            walk(TRANSIT_STOP, DESTINATION_DURATION_TIME),
             TRANSIT_ARRIVAL,
             TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
             DESTINATION_COST
