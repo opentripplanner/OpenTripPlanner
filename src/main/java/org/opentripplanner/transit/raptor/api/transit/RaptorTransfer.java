@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
+import static org.opentripplanner.transit.raptor.util.TimeUtils.durationToStr;
+
 /**
  * Encapsulate information about a access, transfer or egress path. We do not distinguish
  * between the access (origin to first stop), transfer (stop to stop) or egress (last stop to
@@ -97,6 +99,10 @@ public interface RaptorTransfer {
         return 0;
     }
 
+    default boolean hasRides() {
+        return numberOfRides() > 0;
+    }
+
     /**
      * Is this {@link RaptorTransfer} is connected to the given {@code stop} directly by
      * <b>transit</b>? For access and egress paths we allow plugging in flexible transit and other
@@ -109,5 +115,13 @@ public interface RaptorTransfer {
      */
     default boolean stopReachedOnBoard() {
         return false;
+    }
+
+    /** Call this from toString */
+    default String asString() {
+        String duration = durationToStr(durationInSeconds());
+        return hasRides()
+            ? String.format("Flex %s %dtx ~ %d", duration, numberOfRides(), stop())
+            : String.format("Walk %s ~ %d", duration, stop());
     }
 }

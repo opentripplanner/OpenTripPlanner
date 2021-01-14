@@ -23,4 +23,9 @@ public class TransferWithDuration implements RaptorTransfer {
     public int durationInSeconds() {
         return this.durationSeconds;
     }
+
+    @Override
+    public String toString() {
+        return asString();
+    }
 }

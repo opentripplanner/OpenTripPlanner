@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor._data.transit;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +93,6 @@ public class TestTransfer implements RaptorTransfer {
 
     @Override
     public String toString() {
-        return TimeUtils.timeToStrCompact(durationInSeconds) + " " + stop;
+        return asString();
     }
 }

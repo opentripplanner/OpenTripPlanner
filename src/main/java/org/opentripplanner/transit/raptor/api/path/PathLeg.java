@@ -127,7 +127,7 @@ public interface PathLeg<T extends RaptorTripSchedule> {
 
 
     default String asString(int toStop) {
-        return asString() + " -> Stop " + toStop;
+        return asString() + " ~ " + toStop;
     }
 
     default String asString() {

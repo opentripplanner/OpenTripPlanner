@@ -123,6 +123,7 @@ public class HeuristicToRunResolverTest {
         return new RaptorTransfer() {
             @Override public int stop() { return 1; }
             @Override public int durationInSeconds() { return 10; }
+            @Override public String toString() { return asString(); }
         };
     }
 }

@@ -40,4 +40,9 @@ public class FlexAccessEgressAdapter extends AccessEgress {
   public boolean stopReachedOnBoard() {
     return flexAccessEgress.directToStop;
   }
+
+  @Override
+  public String toString() {
+    return asString();
+  }
 }
