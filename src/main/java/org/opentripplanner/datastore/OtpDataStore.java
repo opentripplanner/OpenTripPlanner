@@ -37,6 +37,7 @@ import static org.opentripplanner.datastore.FileType.*;
 public class OtpDataStore {
     public static final String BUILD_REPORT_DIR = "report";
     private static final String STREET_GRAPH_FILENAME = "streetGraph.obj";
+    private static final String CONFIGURATION_JSON_FILENAME="settings.json";
     private static final String GRAPH_FILENAME = "graph.obj";
 
     private final OtpDataStoreConfig config;
@@ -49,6 +50,8 @@ public class OtpDataStore {
     private DataSource streetGraph;
     private DataSource graph;
     private CompositeDataSource buildReportDir;
+
+    private DataSource dataSettings;
 
     /**
      * Use the {@link DataStoreFactory} to
@@ -75,13 +78,13 @@ public class OtpDataStore {
         addAll(findMultipleSources(config.demFiles(),  DEM));
         addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
         addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
-        addAll(findMultipleSources(config.settingsFiles(), SETTINGS_GRAPH_API_CONFIGURATION_JSON));
 
+        dataSettings = findSingleSource(null, CONFIGURATION_JSON_FILENAME, SETTINGS_GRAPH_API_CONFIGURATION_JSON);
         streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
         graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
         buildReportDir = findCompositeSource(config.reportDirectory(), BUILD_REPORT_DIR, REPORT);
 
-        addAll(Arrays.asList(streetGraph, graph, buildReportDir));
+        addAll(Arrays.asList(dataSettings, streetGraph, graph, buildReportDir) );
 
         // Also read in unknown sources in case the data input source is miss-spelled,
         // We look for files on the local-file-system, other repositories ignore this call.
@@ -123,6 +126,10 @@ public class OtpDataStore {
     @NotNull
     public Collection<DataSource> listExistingSourcesFor(FileType type) {
         return sources.get(type).stream().filter(DataSource::exists).collect(Collectors.toList());
+    }
+
+    public DataSource getDataSettings() {
+        return dataSettings;
     }
 
     @NotNull

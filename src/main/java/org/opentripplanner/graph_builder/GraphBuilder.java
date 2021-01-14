@@ -236,21 +236,18 @@ public class GraphBuilder implements Runnable {
 
         if (hasSettings) {
             Gson gson = new Gson();
-            for (DataSource settingsSource : dataSources.get(SETTINGS_GRAPH_API_CONFIGURATION_JSON)) {
-                //parse settings file
-                Reader targetReader = new InputStreamReader(settingsSource.asInputStream());
-                GenericFileConfiguration[] graphConfigurations = gson.fromJson(targetReader, GenericFileConfiguration[].class);
-                for (GenericFileConfiguration configuration : graphConfigurations) {
-                    //parse netcdf according to the settings file, use the link from the settings file
-                    GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
+            DataSource settingsSource = dataSources.getDataSettings();
+            //parse settings file
+            GenericFileConfiguration[] graphConfigurations = gson.fromJson(new InputStreamReader(settingsSource.asInputStream())
+                    , GenericFileConfiguration[].class);
+            for (GenericFileConfiguration configuration : graphConfigurations) {
+                //parse netcdf according to the settings file, use the link from the settings file
+                GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
                             configuration);
-                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, configuration.getFileName());
-                    graphBuilder.addModule(edgeUpdaterModule);
-
-
-
-                }
+                EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile);
+                graphBuilder.addModule(edgeUpdaterModule);
             }
+
         }
 
         return graphBuilder;

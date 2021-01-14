@@ -244,22 +244,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Deprecated
     public boolean wheelchairAccessible = false;
 
-    public Double carbonMonoxideThreshold = null;
-    public Double nitrogenMonoxideThreshold = null;
-    public Double nitrogenDioxideThreshold = null;
-    public Double ozoneThreshold = null;
-    public Double sulfurDioxideThreshold = null;
-    public Double particles2_5Threshold = null;
-    public Double particles10Threshold = null;
-
-    public Double carbonMonoxidePenalty = null;
-    public Double nitrogenMonoxidePenalty = null;
-    public Double nitrogenDioxidePenalty = null;
-    public Double ozonePenalty = null;
-    public Double sulfurDioxidePenalty = null;
-    public Double particles2_5Penalty = null;
-    public Double particles10Penalty = null;
-
     /**
      * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,
      * but in OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is

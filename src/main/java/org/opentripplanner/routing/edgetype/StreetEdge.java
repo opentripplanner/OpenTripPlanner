@@ -49,8 +49,6 @@ import java.util.*;
 public class StreetEdge extends Edge implements Cloneable {
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-    /** Air quality */
-    private long airQualityDataStartTime;
     private List<EdgeDataFromGenericFile> extraData = new ArrayList<>();
 
     private static final long serialVersionUID = 1L;
@@ -121,15 +119,6 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
-
-
-    public void setAirQualityDataStartTime(long airQualityDataStartTime) {
-        this.airQualityDataStartTime = airQualityDataStartTime;
-    }
-
-    public long getAirQualityDataStartTime() {
-        return this.airQualityDataStartTime;
-    }
 
 
     public List<EdgeDataFromGenericFile> getExtraData() {
@@ -545,7 +534,7 @@ public class StreetEdge extends Edge implements Cloneable {
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
         if (walkingOrBiking) { //todo modify this for new gen data
-            Instant aqiTimeInstant = Instant.ofEpochMilli(getAirQualityDataStartTime());
+        /*  Instant aqiTimeInstant = Instant.ofEpochMilli(getAirQualityDataStartTime());
             Instant requestInstant = options.getDateTime().toInstant();
             int airQualityHour = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
             if (airQualityHour >= 0) {
@@ -553,7 +542,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
 
                 s1.incrementWeight(totalPenalty);
-            }
+            }*/
         }
 
         return s1;

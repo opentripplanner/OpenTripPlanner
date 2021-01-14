@@ -58,7 +58,6 @@ public class GraphBuilderDataSources {
         include(cli.doBuildStreet() && bc.streets, DEM);
         include(cli.doBuildTransit() && bc.transit, GTFS);
         include(cli.doBuildTransit() && bc.transit, NETEX);
-        include(true, SETTINGS_GRAPH_API_CONFIGURATION_JSON);
 
         selectFilesToImport();
 
@@ -108,6 +107,9 @@ public class GraphBuilderDataSources {
         return outputGraph;
     }
 
+    public DataSource getDataSettings(){
+        return store.getDataSettings();
+    }
 
     /* private methods */
 

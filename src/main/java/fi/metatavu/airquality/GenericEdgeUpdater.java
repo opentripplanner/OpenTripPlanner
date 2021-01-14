@@ -24,25 +24,22 @@ public class GenericEdgeUpdater {
     private final GenericDataFile dataFile;
     private final Collection<StreetEdge> streetEdges;
 
-    private final String configurationName;
     private final Map<String, ArrayFloat.D4> fileGenericData; //this data will update the street edges
 
     private int edgesUpdated;
     private final long dataStartTime;
 
-    public GenericEdgeUpdater(GenericDataFile dataFile, Collection<StreetEdge> streetEdges,
-                              String configurationName){
+    public GenericEdgeUpdater(GenericDataFile dataFile, Collection<StreetEdge> streetEdges){
         super();
         this.dataFile = dataFile;
         this.streetEdges = streetEdges;
-        this.configurationName = configurationName;
 
         this.edgesUpdated = 0;
         double startTimeHours = this.dataFile.getTimeArray().getDouble(0);
         this.dataStartTime = this.dataFile.getOriginDate().toInstant().plusSeconds((long) (startTimeHours * 3600)).toEpochMilli();
 
         fileGenericData = dataFile.getNetcdfData();
-        LOG.info(String.format("Street edges update with "+configurationName+" starting from time stamp %d", this.dataStartTime));
+        LOG.info(String.format("Street edges update starting from time stamp %d", this.dataStartTime));
     }
 
     /**
@@ -70,8 +67,7 @@ public class GenericEdgeUpdater {
             edgeGenericDataValues.put(variableValues.getKey(), averageDataValue);
         }
 
-        EdgeDataFromGenericFile edgeGenData = new EdgeDataFromGenericFile(configurationName,
-                dataStartTime, edgeGenericDataValues);
+        EdgeDataFromGenericFile edgeGenData = new EdgeDataFromGenericFile(dataStartTime, edgeGenericDataValues);
         streetEdge.getExtraData().add(edgeGenData);
 
         edgesUpdated++;

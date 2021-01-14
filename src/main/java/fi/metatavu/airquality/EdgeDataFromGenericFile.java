@@ -11,18 +11,12 @@ import java.util.Map;
  * according to *settings.json configuration
  */
 public class EdgeDataFromGenericFile implements Serializable {
-    private final String name;
     private final long dataStartTime;
     private final Map<String, float[]> variableValues;
 
-    public EdgeDataFromGenericFile(String name, long dataStartTime, Map<String, float[]> variableValues) {
-        this.name = name;
+    public EdgeDataFromGenericFile(long dataStartTime, Map<String, float[]> variableValues) {
         this.dataStartTime = dataStartTime;
         this.variableValues = variableValues;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public long getDataStartTime() {

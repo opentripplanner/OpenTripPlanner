@@ -13,16 +13,15 @@ import java.util.HashMap;
  */
 public class EdgeUpdaterModule implements GraphBuilderModule {
     private final GenericDataFile dataFile;
-    private final String configurationName;
 
-    public EdgeUpdaterModule(GenericDataFile dataFile, String configurationName) {
+
+    public EdgeUpdaterModule(GenericDataFile dataFile) {
         this.dataFile = dataFile;
-        this.configurationName = configurationName;
     }
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore) {
-        GenericEdgeUpdater genericEdgeUpdater = new GenericEdgeUpdater(dataFile, graph.getStreetEdges(), configurationName);
+        GenericEdgeUpdater genericEdgeUpdater = new GenericEdgeUpdater(dataFile, graph.getStreetEdges());
         genericEdgeUpdater.updateEdges();
     }
 
