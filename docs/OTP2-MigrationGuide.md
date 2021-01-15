@@ -234,3 +234,8 @@ The analyst API endpoints have been removed.
 ### Scripting
 
 The scripting API endpoint has been removed.
+
+### Updaters
+
+- The GbfsBikeRentalDataSource has been changed disable floating bikes unless explicitly turned on
+via OTPFeature.

@@ -80,6 +80,8 @@ abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
 
     @Override
     public boolean update() {
+        if (url == null) return false;
+
         try {
             InputStream data;
         	
