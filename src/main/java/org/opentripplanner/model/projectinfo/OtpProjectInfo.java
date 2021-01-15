@@ -12,13 +12,17 @@ public class OtpProjectInfo implements Serializable {
 
     private static final OtpProjectInfo INSTANCE = OtpProjectInfoParser.loadFromProperties();
 
-
     static final String UNKNOWN = "UNKNOWN";
 
-    /* Info derived from version string */
+    /** Info derived from version string */
     public final MavenProjectVersion version;
 
-    /* Other info from git-commit-id-plugin via otp-project-info.properties */
+    /**
+     * The graph file header expected for this instance of OTP.
+     */
+    public final GraphFileHeader graphFileHeaderInfo;
+
+    /** Other info from git-commit-id-plugin via otp-project-info.properties */
     public final VersionControlInfo versionControl;
 
 
@@ -44,26 +48,34 @@ public class OtpProjectInfo implements Serializable {
     OtpProjectInfo() {
         this(
             "0.0.0-ParseFailure",
-            new VersionControlInfo(
-                UNKNOWN,
-                UNKNOWN,
-                UNKNOWN,
-                UNKNOWN,
-                true
-            )
+            new GraphFileHeader(),
+            new VersionControlInfo()
         );
     }
     
     public OtpProjectInfo(
             String version,
+            GraphFileHeader graphFileHeaderInfo,
             VersionControlInfo versionControl
     ) {
         this.version = MavenProjectVersion.parse(version);
+        this.graphFileHeaderInfo = graphFileHeaderInfo;
         this.versionControl = versionControl;
     }
 
     public long getUID() {
         return hashCode();
+    }
+
+    /**
+     * Return {@code true} if the graph file and the running instance of OTP is the
+     * same instance. If the running instance of OTP or the Graph.obj serialization id
+     * is unknown, then {@code true} is returned.
+     */
+    public boolean matchesRunningOTPInstance(GraphFileHeader graphFileHeader) {
+        if(graphFileHeader.isUnknown()) { return true; }
+        if(this.graphFileHeaderInfo.isUnknown()) { return true; }
+        return this.graphFileHeaderInfo.equals(graphFileHeader);
     }
 
     public String toString() {
@@ -72,11 +84,17 @@ public class OtpProjectInfo implements Serializable {
 
     /**
      * Return a version string:
-     * {@code version: 2.1.0, commit: 2121212.., branch: dev-2.x}
+     * {@code version: 2.1.0, graph-id: 00001, commit: 2121212.., branch: dev-2.x}
      */
     public String getVersionString() {
-        String format = "version: %s, commit: %s, branch: %s";
-        return String.format(format, version.version, versionControl.commit, versionControl.branch);
+        String format = "version: %s, graph-id: %s, commit: %s, branch: %s";
+        return String.format(
+            format,
+            version.version,
+            getExpectedGraphVersion(),
+            versionControl.commit,
+            versionControl.branch
+        );
     }
 
     /**
@@ -85,5 +103,11 @@ public class OtpProjectInfo implements Serializable {
      */
     public boolean sameVersion(OtpProjectInfo other) {
         return this.version.sameVersion(other.version);
+    }
+
+    public String getExpectedGraphVersion() {
+        return graphFileHeaderInfo.isUnknown()
+            ? UNKNOWN
+            : graphFileHeaderInfo.serializationId();
     }
 }

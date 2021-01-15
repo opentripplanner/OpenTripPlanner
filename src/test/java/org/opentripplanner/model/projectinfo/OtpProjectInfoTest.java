@@ -3,6 +3,7 @@ package org.opentripplanner.model.projectinfo;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -29,10 +30,34 @@ public class OtpProjectInfoTest {
       assertNotNull(p.versionControl.commitTime);
     }
     else {
+      assertEquals("------", p.graphFileHeaderInfo.serializationId());
       assertEquals(p.versionControl.commit, "UNKNOWN");
       assertEquals(p.versionControl.branch, "UNKNOWN");
       assertEquals(p.versionControl.buildTime, "UNKNOWN");
       assertEquals(p.versionControl.commitTime, "UNKNOWN");
     }
+  }
+
+  @Test
+  public void matchesRunningOTPInstance() {
+    VersionControlInfo vci = new VersionControlInfo();
+    GraphFileHeader unknown = new GraphFileHeader();
+    GraphFileHeader ver1 = new GraphFileHeader("1");
+    GraphFileHeader verX = new GraphFileHeader("X");
+
+    // Given: project info with known version: 1
+    OtpProjectInfo p = new OtpProjectInfo("1.1.1", ver1, vci);
+
+    // Match same version and unknown
+    assertTrue(p.matchesRunningOTPInstance(ver1));
+    assertTrue(p.matchesRunningOTPInstance(unknown));
+    // Fail to match other version
+    assertFalse(p.matchesRunningOTPInstance(verX));
+
+    // Given: project info with unknown version
+    p = new OtpProjectInfo("1.1.1", unknown, vci);
+    // Match any version
+    assertTrue(p.matchesRunningOTPInstance(verX));
+    assertTrue(p.matchesRunningOTPInstance(unknown));
   }
 }

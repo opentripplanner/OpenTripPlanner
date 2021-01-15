@@ -22,6 +22,7 @@
     </scm>
 
     <properties>
+        <otp.graph.serialization.id>1</otp.graph.serialization.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>21.2</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
@@ -262,6 +263,7 @@
                         <includeOnlyProperty>git.build.time</includeOnlyProperty>
                         <includeOnlyProperty>git.branch</includeOnlyProperty>
                         <includeOnlyProperty>git.dirty</includeOnlyProperty>
+                        <includeOnlyProperty>otp.graph.serialization.id</includeOnlyProperty>
                     </includeOnlyProperties>
                 </configuration>
             </plugin>
@@ -332,6 +334,7 @@
                                         <Implementation-Version>1.1</Implementation-Version>
                                         <Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
                                         <Extension-Name>com.sun.media.imageio</Extension-Name>
+                                        <OTP-Graph-Serialization-Id>${otp.graph.serialization.id}</OTP-Graph-Serialization-Id>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

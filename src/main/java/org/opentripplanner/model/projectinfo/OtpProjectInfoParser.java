@@ -15,14 +15,18 @@ class OtpProjectInfoParser {
       InputStream in = OtpProjectInfo.class.getClassLoader().getResourceAsStream(FILENAME);
       Properties props = new java.util.Properties();
       props.load(in);
+
+      String gId = get(props, "otp.graph.serialization.id");
+
       OtpProjectInfo version = new OtpProjectInfo(
           normalize(props.getProperty("project.version")),
+          isUnknown(gId) ? new GraphFileHeader() : new GraphFileHeader(gId),
           new VersionControlInfo(
-              normalize(props.getProperty("git.commit.id")),
-              normalize(props.getProperty("git.branch")),
-              normalize(props.getProperty("git.commit.time")),
-              normalize(props.getProperty("git.build.time")),
-              "true".equalsIgnoreCase(props.getProperty("git.dirty", "true"))
+              get(props, "git.commit.id"),
+              get(props,"git.branch"),
+              get(props,"git.commit.time"),
+              get(props,"git.build.time"),
+              getBool(props, "git.dirty")
           )
       );
       LOG.debug("Parsed Maven artifact version: {}", version.toString());
@@ -31,6 +35,18 @@ class OtpProjectInfoParser {
       LOG.error("Error reading version from properties file: {}", e.getMessage());
       return new OtpProjectInfo();
     }
+  }
+
+  private static String get(Properties props, String key) {
+    return normalize(props.getProperty(key));
+  }
+
+  private static boolean getBool(Properties props, String key) {
+    return "true".equalsIgnoreCase(props.getProperty(key, "true"));
+  }
+
+  private static boolean isUnknown(String text) {
+    return OtpProjectInfo.UNKNOWN.equals(text);
   }
 
   private static String normalize(String text) {

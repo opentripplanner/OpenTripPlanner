@@ -38,6 +38,7 @@ class EnvironmentVariableReplacer {
 
     private static final Map<String, String> PROJECT_INFO = Map.of(
         "maven.version" , projectInfo().version.version,
+        "otp.graph.serialization.id", projectInfo().graphFileHeaderInfo.serializationId(),
         "maven.version.short" , projectInfo().version.unqualifiedVersion(),
         "maven.version.major" , Integer.toString(projectInfo().version.major),
         "maven.version.minor" , Integer.toString(projectInfo().version.minor),
