@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
+import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
@@ -66,6 +67,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
+
+    //special fields from the settings.json file
+    public List<RequestParameters> genDataRequestParameters;
 
     /**
      * The model that computes turn/traversal costs.

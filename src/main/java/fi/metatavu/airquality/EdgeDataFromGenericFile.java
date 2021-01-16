@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * this class is to be stored in StreetEdge and to describe the data it received from one of the .nc files
- * according to *settings.json configuration
+ * according to settings.json configuration
  */
 public class EdgeDataFromGenericFile implements Serializable {
     private final long dataStartTime;

@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
+import com.google.gson.Gson;
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
@@ -17,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
+
+import java.io.InputStreamReader;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
@@ -43,6 +47,7 @@ public class OTPAppConstruction {
     private OtpDataStore store = null;
     private OTPServer server = null;
     private GraphBuilderDataSources graphBuilderDataSources = null;
+    private GenericFileConfiguration[] configurations;
 
 
     /**
@@ -109,6 +114,16 @@ public class OTPAppConstruction {
         return config;
     }
 
+    public GenericFileConfiguration [] genericFileConfigurations(){
+        if (this.configurations != null){
+            return this.configurations;
+        }
+        DataSource dataSettings = store().getDataSettings();
+        if (dataSettings.exists())
+            return new Gson().fromJson(new InputStreamReader(dataSettings.asInputStream()),
+                GenericFileConfiguration[].class);
+        else return null;
+    }
     /**
      * Create the top-level objects that represent the OTP server. There is one server and it
      * is created lazy at the first invocation of this method.

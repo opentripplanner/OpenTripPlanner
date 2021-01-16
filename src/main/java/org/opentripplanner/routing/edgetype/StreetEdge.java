@@ -528,21 +528,38 @@ public class StreetEdge extends Edge implements Cloneable {
         s1.incrementWeight(weight);
 
         /*
-         * If traverse mode is WALK or BICYCLE then the weight is updated based on air quality.
-         * Weight is increased for each pollutant defined in the request.
+         * If traverse mode is WALK or BICYCLE and the request contains the parameters from settings.json
+         * then the weight is updated based on additional parameters (like air quality)
+         * Weight is increased for each quality parameter defined in the request.
          */
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
-        if (walkingOrBiking) { //todo modify this for new gen data
-        /*  Instant aqiTimeInstant = Instant.ofEpochMilli(getAirQualityDataStartTime());
+        //if walking or biking and request includes the generic data parameters then calculate penalties
+        if (walkingOrBiking && options.genDataRequestParameters != null) {
+            double totalPenalty = 0d;
             Instant requestInstant = options.getDateTime().toInstant();
-            int airQualityHour = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
-            if (airQualityHour >= 0) {
-               double totalPenalty = 0d;
 
+            for (RequestParameters requestParam : options.genDataRequestParameters) {
+                //find the StreetEdge data entry which corresponds with the the requestParam (for example, co2)
+                Optional<EdgeDataFromGenericFile> edgeData = extraData.stream().filter(
+                        genData-> genData.getVariableValues().containsKey(requestParam.getName())).findAny();
+                if (edgeData.isEmpty())
+                    continue;
+                //there's a match in data and parameters -> calculate penalty
+                Instant dataStartTime = Instant.ofEpochMilli(edgeData.get().getDataStartTime());
+                int paramQualityHr = (int) ChronoUnit.HOURS.between(dataStartTime, requestInstant);
+                if (paramQualityHr >= 0) {
 
-                s1.incrementWeight(totalPenalty);
-            }*/
+                    /*just checking the values
+                    for (Map.Entry<String, float[]> entry: edgeData.get().getVariableValues().entrySet()){
+                        System.out.println(entry.getKey()+" val "+Arrays.toString(entry.getValue()));
+                    }*/
+                    //todo do the sorting based on the parameters
+                    if (requestParam.getParameterType().equals(ParameterType.THRESHOLD)) {
+
+                    }
+                }
+            }
         }
 
         return s1;

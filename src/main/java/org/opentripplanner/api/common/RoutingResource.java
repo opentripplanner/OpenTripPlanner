@@ -1,5 +1,7 @@
 package org.opentripplanner.api.common;
 
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -18,11 +20,8 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.Duration;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
+
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -599,8 +598,9 @@ public abstract class RoutingResource {
      * Range/sanity check the query parameter fields and build a Request object from them.
      *
      * @throws ParameterException when there is a problem interpreting a query parameter
+     * @param requestParameters
      */
-    protected RoutingRequest buildRequest() throws ParameterException {
+    protected RoutingRequest buildRequest(HashMap<String, String> requestParameters) throws ParameterException {
         Router router = otpServer.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
 
@@ -636,7 +636,21 @@ public abstract class RoutingResource {
             }
         }
 
-        //todo accept only the allowed parameters (according to the settings file)
+        //compare request parameters with the ones from the settings and accept only those ones
+        GenericFileConfiguration[] genericFileConfigurations = this.otpServer.getRouter().genericFileConfigurations;
+        if (genericFileConfigurations != null) {
+            List<RequestParameters> discoveredParameters = new ArrayList<>();
+            for (Map.Entry<String, String> requestParam : requestParameters.entrySet()) {
+                //find parameters from the settings.json which fit the real ones passed from the request
+                for (GenericFileConfiguration fileConf : genericFileConfigurations)
+                    for (RequestParameters genParams : fileConf.getRequestParameters())
+                        if (genParams.getName().equals(requestParam.getKey())) {
+                            genParams.setValue(requestParam.getValue());
+                            discoveredParameters.add(genParams);
+                        }
+            }
+            request.genDataRequestParameters = discoveredParameters;
+        }
 
         if(searchWindow != null) {
             request.searchWindow = Duration.ofSeconds(searchWindow);
