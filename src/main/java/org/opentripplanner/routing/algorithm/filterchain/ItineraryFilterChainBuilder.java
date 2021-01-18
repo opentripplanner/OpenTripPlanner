@@ -171,19 +171,6 @@ public class ItineraryFilterChainBuilder {
             filters.add(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit));
         }
 
-        // Remove itineraries if max limit is set
-        if (maxNumberOfItineraries > 0) {
-            // Sort first to make sure we keep the most relevant itineraries
-            filters.add(new OtpDefaultSortOrder(arriveBy));
-            filters.add(
-                new MaxLimitFilter(
-                    "number-of-itineraries-filter",
-                    maxNumberOfItineraries,
-                    maxLimitReachedSubscriber
-                )
-            );
-        }
-
         // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
         // remove elements/ based on the given itinerary properties - not considering other
         // itineraries. This may remove itineraries in the "groupBy" filters that are considered
@@ -203,9 +190,21 @@ public class ItineraryFilterChainBuilder {
             }
         }
 
+        // Remove itineraries if max limit is set
+        if (maxNumberOfItineraries > 0) {
+            filters.add(new OtpDefaultSortOrder(arriveBy));
+            filters.add(
+                new MaxLimitFilter(
+                    "number-of-itineraries-filter",
+                    maxNumberOfItineraries,
+                    maxLimitReachedSubscriber
+                )
+            );
+        }
+
         // Do the final itineraries sort
         filters.add(new OtpDefaultSortOrder(arriveBy));
-
+        
         if(debug) {
             filters = addDebugWrappers(filters);
         }
