@@ -197,17 +197,15 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
 
             while (routeIterator.hasNext()) {
-                RaptorRoute<T> next = routeIterator.next();
-                RaptorTripPattern pattern = next.pattern();
-                TripScheduleSearch<T> tripSearch = createTripSearch(next.timetable());
+                RaptorRoute<T> route = routeIterator.next();
+                RaptorTripPattern pattern = route.pattern();
+                TripScheduleSearch<T> tripSearch = createTripSearch(route.timetable());
 
-                // Prepare for transit
                 transitWorker.prepareForTransitWith(pattern, tripSearch);
 
-                // perform transit - iterate over given pattern and calculate transit for each stop.
-                IntIterator it = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
-                while (it.hasNext()) {
-                    transitWorker.routeTransitAtStop(it.next());
+                IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
+                while (stop.hasNext()) {
+                    transitWorker.routeTransitAtStop(stop.next());
                 }
             }
             lifeCycle.transitsForRoundComplete();

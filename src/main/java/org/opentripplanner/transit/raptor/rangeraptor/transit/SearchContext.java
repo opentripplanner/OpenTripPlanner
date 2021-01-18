@@ -200,16 +200,16 @@ public class SearchContext<T extends RaptorTripSchedule> {
                 : new ReverseTransitCalculator(s, t);
     }
 
-    private static <S extends RaptorTripSchedule> DebugRequest debugRequest(
-        RaptorRequest<S> request
+    private static DebugRequest debugRequest(
+        RaptorRequest<?> request
     ) {
         return request.searchDirection().isForward()
                 ? request.debug()
                 : request.mutate().debug().reverseDebugRequest().build();
     }
 
-    private static <S extends RaptorTripSchedule> SlackProvider createSlackProvider(
-            RaptorRequest<S> request,
+    private static SlackProvider createSlackProvider(
+            RaptorRequest<?> request,
             WorkerLifeCycle lifeCycle
     ) {
         return request.searchDirection().isForward()
@@ -246,6 +246,4 @@ public class SearchContext<T extends RaptorTripSchedule> {
                 lifeCycle
         );
     }
-
-
 }

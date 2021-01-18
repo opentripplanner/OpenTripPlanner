@@ -60,24 +60,19 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         this.onTripBoardStop = NOT_SET;
         this.onTrip = null;
         this.onTripTimeShift = NOT_SET;
-        slackProvider.setCurrentPattern(pattern);
+        this.slackProvider.setCurrentPattern(pattern);
     }
 
     @Override
     public void routeTransitAtStop(int stopPositionInPattern) {
         int stop = pattern.stopIndex(stopPositionInPattern);
 
-        // attempt to alight if we're on board, done above the board search so that we don't check for alighting
-        // when boarding
+        // attempt to alight if we're on board, done above the board search so that we don't check
+        // for alighting when boarding
         if (onTripIndex != NOT_SET) {
             if (pattern.alightingPossibleAt(stopPositionInPattern)) {
-                state.transitToStop(
-                        stop,
-                        stopArrivalTime(onTrip, stopPositionInPattern),
-                        onTripBoardStop,
-                        onTripBoardTime,
-                        onTrip
-                );
+                final int alightTime = alightTime(onTrip, stopPositionInPattern);
+                state.transitToStop(stop, alightTime, onTripBoardStop, onTripBoardTime, onTrip);
             }
         }
 
@@ -85,15 +80,17 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
         if (state.isStopReachedInPreviousRound(stop)) {
             if (pattern.boardingPossibleAt(stopPositionInPattern)) {
+                // Add board-slack(forward-search) or alight-slack(reverse-search)
                 int earliestBoardTime = calculator.plusDuration(
-                        state.bestTimePreviousRound(stop),
-                        slackProvider.boardSlack()
+                    state.bestTimePreviousRound(stop),
+                    slackProvider.boardSlack()
                 );
 
                 // check if we can back up to an earlier trip due to this stop being reached earlier
-                boolean found = tripSearch.search(earliestBoardTime,
-                        stopPositionInPattern,
-                        onTripIndex
+                boolean found = tripSearch.search(
+                    earliestBoardTime,
+                    stopPositionInPattern,
+                    onTripIndex
                 );
 
                 if (found) {
@@ -109,11 +106,12 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         }
     }
 
-    public int stopArrivalTime(final T trip, final int stopPositionInPattern) {
-        int stopArrivalTime = calculator.stopArrivalTime(
-                trip,
-                stopPositionInPattern,
-                slackProvider.alightSlack()
+    private int alightTime(final T trip, final int stopPositionInPattern) {
+        // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
+        final int stopArrivalTime = calculator.stopArrivalTime(
+            trip,
+            stopPositionInPattern,
+            slackProvider.alightSlack()
         );
         // Remove the wait time from the arrival-time. We don´t need to use the transit
         // calculator because of the way we compute the time-shift. It is positive in the case of a
