@@ -206,7 +206,7 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
-    // TODO This is not currently safe to use
+    // TODO This is not currently safe to use. See javadoc on GbfsBikeRentalDataSource class.
     class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
 
         public GbfsFloatingBikeDataSource (GbfsBikeRentalDataSourceParameters config) {
