@@ -22,6 +22,8 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.kryo.BuildConfigSerializer;
 import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
+import org.opentripplanner.model.projectinfo.GraphFileHeader;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.util.OtpAppException;
@@ -204,6 +206,7 @@ public class SerializedGraphObject implements Serializable {
         try(inputStream) {
             LOG.info("Reading graph from '{}'", sourceDescription);
             Input input = new Input(inputStream);
+            input.skip(GraphFileHeader.headerLength());
             Kryo kryo = makeKryo();
             SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
             Graph graph = serObj.graph;
@@ -232,6 +235,7 @@ public class SerializedGraphObject implements Serializable {
         outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
         Kryo kryo = makeKryo();
         Output output = new Output(outputStream);
+        output.write(OtpProjectInfo.projectInfo().graphFileHeaderInfo.header());
         kryo.writeClassAndObject(output, this);
         output.close();
         LOG.info("Graph written: {}", graphName);
