@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Map.entry;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
@@ -36,19 +37,19 @@ class EnvironmentVariableReplacer {
      */
     private final static Pattern PATTERN = Pattern.compile("\\$\\{([.\\w]+)}");
 
-    private static final Map<String, String> PROJECT_INFO = Map.of(
-        "maven.version" , projectInfo().version.version,
-        "otp.graph.serialization.id", projectInfo().graphFileHeaderInfo.serializationId(),
-        "maven.version.short" , projectInfo().version.unqualifiedVersion(),
-        "maven.version.major" , Integer.toString(projectInfo().version.major),
-        "maven.version.minor" , Integer.toString(projectInfo().version.minor),
-        "maven.version.patch" , Integer.toString(projectInfo().version.patch),
-        "maven.version.qualifier" , projectInfo().version.qualifier,
-        "git.branch" , projectInfo().versionControl.branch,
-        "git.commit" , projectInfo().versionControl.commit,
-        "git.commit.timestamp" , projectInfo().versionControl.commitTime
+    private static final Map<String, String> PROJECT_INFO = Map.ofEntries(
+        entry("maven.version" , projectInfo().version.version),
+        entry("maven.version.short" , projectInfo().version.unqualifiedVersion()),
+        entry("maven.version.major" , Integer.toString(projectInfo().version.major)),
+        entry("maven.version.minor" , Integer.toString(projectInfo().version.minor)),
+        entry("maven.version.patch" , Integer.toString(projectInfo().version.patch)),
+        entry("maven.version.qualifier" , projectInfo().version.qualifier),
+        entry("graph.file.header", projectInfo().graphFileHeaderInfo.asString()),
+        entry("graph.file.header.id", projectInfo().graphFileHeaderInfo.otpSerializationVersionIdPadded()),
+        entry("git.branch" , projectInfo().versionControl.branch),
+        entry("git.commit" , projectInfo().versionControl.commit),
+        entry("git.commit.timestamp" , projectInfo().versionControl.commitTime)
     );
-
 
     /**
      * Search for {@link #PATTERN}s and replace each placeholder with the value of the

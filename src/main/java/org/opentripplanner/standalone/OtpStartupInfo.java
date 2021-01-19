@@ -25,11 +25,11 @@ public class OtpStartupInfo {
     static {
         INFO = ""
             + HEADER.stream().map(OtpStartupInfo::line).collect(Collectors.joining())
-            + line("Version:   " + projectInfo().version.version)
-            + line("Graph id:  " + projectInfo().getExpectedGraphVersion())
-            + line("Commit:    " + projectInfo().versionControl.commit)
-            + line("Branch:    " + projectInfo().versionControl.branch)
-            + line("Build:     " + projectInfo().versionControl.buildTime)
+            + line("Version:    " + projectInfo().version.version)
+            + line("Ser.ver.id: " + projectInfo().getOtpSerializationVersionId())
+            + line("Commit:     " + projectInfo().versionControl.commit)
+            + line("Branch:     " + projectInfo().versionControl.branch)
+            + line("Build:      " + projectInfo().versionControl.buildTime)
             + dirtyLineIfDirty();
     }
 

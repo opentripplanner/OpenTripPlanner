@@ -84,14 +84,14 @@ public class OtpProjectInfo implements Serializable {
 
     /**
      * Return a version string:
-     * {@code version: 2.1.0, graph-id: 00001, commit: 2121212.., branch: dev-2.x}
+     * {@code version: 2.1.0, ser.ver.id: 7, commit: 2121212.., branch: dev-2.x}
      */
     public String getVersionString() {
-        String format = "version: %s, graph-id: %s, commit: %s, branch: %s";
+        String format = "version: %s, ser.ver.id: %s, commit: %s, branch: %s";
         return String.format(
             format,
             version.version,
-            getExpectedGraphVersion(),
+            getOtpSerializationVersionId(),
             versionControl.commit,
             versionControl.branch
         );
@@ -105,9 +105,12 @@ public class OtpProjectInfo implements Serializable {
         return this.version.sameVersion(other.version);
     }
 
-    public String getExpectedGraphVersion() {
-        return graphFileHeaderInfo.isUnknown()
-            ? UNKNOWN
-            : graphFileHeaderInfo.serializationId();
+    /**
+     * The OTP Serialization version id is used to determine if OTP and a serialized blob(Graph.obj)
+     * of the otp internal model are compatible. This filed is writen into the Graph.obj file header
+     * and checked when loading the graph later.
+     */
+    public String getOtpSerializationVersionId() {
+        return graphFileHeaderInfo.otpSerializationVersionId();
     }
 }

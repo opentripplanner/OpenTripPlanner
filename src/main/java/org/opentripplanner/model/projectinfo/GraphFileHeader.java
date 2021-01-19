@@ -1,5 +1,6 @@
 package org.opentripplanner.model.projectinfo;
 
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
@@ -15,30 +16,33 @@ import java.util.regex.Pattern;
  *
  * This class represent the header and contain logic to parse and validate it.
  */
-public class GraphFileHeader {
+public class GraphFileHeader implements Serializable {
 
-  private static final String MAGIC_NUMBER = "OpenTripPlannerGraph-01";
+  private static final long serialVersionUID = 1L;
+
+  private static final String MAGIC_NUMBER = "OpenTripPlannerGraph";
   private static final char ID_PREFIX = '0';
   private static final char DELIMITER = ';';
-  private static final int SER_ID_LENGTH = 6;
-  private static final int HEADER_LENGTH = MAGIC_NUMBER.length() + SER_ID_LENGTH + 2;
+  private static final int ID_LENGTH = 7;
+  private static final int HEADER_LENGTH = MAGIC_NUMBER.length() + ID_LENGTH + 2;
 
   private static final Pattern HEADER_PATTERN = Pattern.compile(
-      MAGIC_NUMBER + DELIMITER + "([-\\w/+:]{6})" + DELIMITER
+      MAGIC_NUMBER + DELIMITER + "([-\\w/+:]{7})" + DELIMITER
   );
-  public static final Charset CHARSET = StandardCharsets.ISO_8859_1;
-  public static final String UNKNOWN_ID = "------";
 
-  private final String serializationId;
+  public static final Charset CHARSET = StandardCharsets.ISO_8859_1;
+  public static final String UNKNOWN_ID = "UNKNOWN";
+
+  private final String otpSerializationVersionId;
   private final byte[] bytes;
 
   GraphFileHeader() {
     this(UNKNOWN_ID);
   }
 
-  public GraphFileHeader(String serializationId) {
-    this.serializationId = padId(serializationId);
-    this.bytes = toString().getBytes(CHARSET);
+  GraphFileHeader(String otpSerializationVersionId) {
+    this.otpSerializationVersionId = stripId(otpSerializationVersionId);
+    this.bytes = asString().getBytes(CHARSET);
   }
 
   public static int headerLength() {
@@ -64,6 +68,7 @@ public class GraphFileHeader {
     return new GraphFileHeader(m.group(1));
   }
 
+  /** Return the entire header including magic-number and version id as a byte array */
   public byte[] header() {
     return bytes;
   }
@@ -73,19 +78,26 @@ public class GraphFileHeader {
   }
 
   /**
-   * The graph file serialization compatibility id. If OTP and a Graph.obj file have the same
-   * version, then OTP is compatible with the graph and should be able to deserialize it.
+   * The OTP serialization version id. If OTP and a Graph.obj file have the same id,
+   * then OTP is compatible with the graph and should be able to deserialize it.
+   * <p>
+   * The returned id do NOT include the prefix '0's. In the serialized form as bytes
+   * it have a fixed length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
    */
-  public String serializationId() {
-    return serializationId;
+  public String otpSerializationVersionId() {
+    return otpSerializationVersionId;
+  }
+
+  public String otpSerializationVersionIdPadded() {
+    return padId(otpSerializationVersionId);
   }
 
   public String asString() {
-    return MAGIC_NUMBER + DELIMITER + serializationId + DELIMITER;
+    return MAGIC_NUMBER + DELIMITER + otpSerializationVersionIdPadded() + DELIMITER;
   }
 
   public boolean isUnknown() {
-    return UNKNOWN_ID.equals(serializationId);
+    return UNKNOWN_ID.equals(otpSerializationVersionId);
   }
 
   @Override
@@ -93,12 +105,12 @@ public class GraphFileHeader {
     if (this == o) { return true; }
     if (o == null || getClass() != o.getClass()) { return false; }
     GraphFileHeader that = (GraphFileHeader) o;
-    return serializationId.equals(that.serializationId);
+    return otpSerializationVersionId.equals(that.otpSerializationVersionId);
   }
 
   @Override
   public int hashCode() {
-    return serializationId.hashCode();
+    return otpSerializationVersionId.hashCode();
   }
 
   @Override
@@ -106,11 +118,24 @@ public class GraphFileHeader {
     return asString();
   }
 
+  /**
+   * Pad the given text until it have the expected length {@link #ID_LENGTH}
+   * using the {@link #ID_PREFIX}.
+   */
   static String padId(String text) {
     StringBuilder buf = new StringBuilder();
-    while (buf.length() + text.length() < SER_ID_LENGTH) { buf.append(ID_PREFIX); }
+    while (buf.length() + text.length() < ID_LENGTH) { buf.append(ID_PREFIX); }
     buf.append(text);
     return buf.toString();
+  }
+
+  /**
+   * Strip of  any {@link #ID_PREFIX} characters form the beginning of the given text.
+   */
+  static String stripId(String text) {
+    int pos = 0;
+    while (pos < text.length() && text.charAt(pos) == ID_PREFIX) { ++pos; }
+    return text.substring(pos);
   }
 
   /** Example: 41 6C 66 61 2D 31  "Alfa-1" */

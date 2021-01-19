@@ -30,11 +30,11 @@ public class OtpProjectInfoTest {
       assertNotNull(p.versionControl.commitTime);
     }
     else {
-      assertEquals("------", p.graphFileHeaderInfo.serializationId());
-      assertEquals(p.versionControl.commit, "UNKNOWN");
-      assertEquals(p.versionControl.branch, "UNKNOWN");
-      assertEquals(p.versionControl.buildTime, "UNKNOWN");
-      assertEquals(p.versionControl.commitTime, "UNKNOWN");
+      assertEquals("UNKNOWN", p.graphFileHeaderInfo.otpSerializationVersionIdPadded());
+      assertEquals("UNKNOWN", p.versionControl.commit);
+      assertEquals("UNKNOWN", p.versionControl.branch);
+      assertEquals("UNKNOWN", p.versionControl.buildTime);
+      assertEquals("UNKNOWN", p.versionControl.commitTime);
     }
   }
 

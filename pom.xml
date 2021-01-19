@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.graph.serialization.id>1</otp.graph.serialization.id>
+        <otp.serialization.version.id>1</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>21.2</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
@@ -144,6 +144,7 @@
                             <!-- For Java 11 Modules, specify a module name. Do not create module-info.java until all
                                  our dependencies specify a module name. -->
                             <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
+                            <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -256,14 +257,12 @@
                     <verbose>false</verbose>
                     <includeOnlyProperties>
                         <!-- Including each property used reduce the plugin execution time. -->
-                        <includeOnlyProperty>project.version</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.id</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.id.describe</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.time</includeOnlyProperty>
                         <includeOnlyProperty>git.build.time</includeOnlyProperty>
                         <includeOnlyProperty>git.branch</includeOnlyProperty>
                         <includeOnlyProperty>git.dirty</includeOnlyProperty>
-                        <includeOnlyProperty>otp.graph.serialization.id</includeOnlyProperty>
                     </includeOnlyProperties>
                 </configuration>
             </plugin>
@@ -334,7 +333,6 @@
                                         <Implementation-Version>1.1</Implementation-Version>
                                         <Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
                                         <Extension-Name>com.sun.media.imageio</Extension-Name>
-                                        <OTP-Graph-Serialization-Id>${otp.graph.serialization.id}</OTP-Graph-Serialization-Id>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

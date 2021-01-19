@@ -16,11 +16,9 @@ class OtpProjectInfoParser {
       Properties props = new java.util.Properties();
       props.load(in);
 
-      String gId = get(props, "otp.graph.serialization.id");
-
       OtpProjectInfo version = new OtpProjectInfo(
           normalize(props.getProperty("project.version")),
-          isUnknown(gId) ? new GraphFileHeader() : new GraphFileHeader(gId),
+          new GraphFileHeader(get(props, "otp.serialization.version.id")),
           new VersionControlInfo(
               get(props, "git.commit.id"),
               get(props,"git.branch"),
@@ -43,10 +41,6 @@ class OtpProjectInfoParser {
 
   private static boolean getBool(Properties props, String key) {
     return "true".equalsIgnoreCase(props.getProperty(key, "true"));
-  }
-
-  private static boolean isUnknown(String text) {
-    return OtpProjectInfo.UNKNOWN.equals(text);
   }
 
   private static String normalize(String text) {

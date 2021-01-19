@@ -5,13 +5,13 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class GraphFileHeaderTest {
-  private static final String HEADER = "OpenTripPlannerGraph-01;00000A;";
+  private static final String HEADER = "OpenTripPlannerGraph;000000A;";
   private static final byte[] HEADER_BYTES = HEADER.getBytes(GraphFileHeader.CHARSET);
   private static final GraphFileHeader SUBJECT = new GraphFileHeader("A");
 
   @Test
   public void headerLength() {
-    assertEquals(31, GraphFileHeader.headerLength());
+    assertEquals(29, GraphFileHeader.headerLength());
   }
 
   @Test
@@ -36,30 +36,41 @@ public class GraphFileHeaderTest {
 
   @Test
   public void magicNumber() {
-    assertEquals("OpenTripPlannerGraph-01", SUBJECT.magicNumber());
+    assertEquals("OpenTripPlannerGraph", SUBJECT.magicNumber());
   }
 
   @Test
-  public void serializationId() {
-    assertEquals("00000A", SUBJECT.serializationId());
+  public void otpSerializationVersionId() {
+    assertEquals("A", SUBJECT.otpSerializationVersionId());
   }
+
+  @Test
+  public void otpSerializationVersionIdPadded() {
+    assertEquals("000000A", SUBJECT.otpSerializationVersionIdPadded());
+  }
+
 
   @Test
   public void asString() {
-    assertEquals("OpenTripPlannerGraph-01;00000A;", SUBJECT.asString());
+    assertEquals("OpenTripPlannerGraph;000000A;", SUBJECT.asString());
   }
 
   @Test
   public void testToString() {
     assertEquals(
-        "OpenTripPlannerGraph-01;00000A;",
+        "OpenTripPlannerGraph;000000A;",
         SUBJECT.toString()
     );
   }
 
   @Test
   public void padId() {
-    assertEquals("00000A", GraphFileHeader.padId("A"));
+    assertEquals("000000A", GraphFileHeader.padId("A"));
+  }
+
+  @Test
+  public void stripId() {
+    assertEquals("A", GraphFileHeader.stripId("000000A"));
   }
 
   @Test
