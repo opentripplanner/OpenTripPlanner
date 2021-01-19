@@ -38,9 +38,6 @@ public final class Route extends TransitEntity {
 
     private String brandingUrl;
 
-    /**
-     * Pass-through information from NeTEx FlexibleLineType. This information is not used by OTP.
-     */
     private String flexibleLineType;
 
     public Route(FeedScopedId id) {
@@ -180,6 +177,9 @@ public final class Route extends TransitEntity {
         this.brandingUrl = brandingUrl;
     }
 
+    /**
+     * Pass-through information from NeTEx FlexibleLineType. This information is not used by OTP.
+     */
     public String getFlexibleLineType() {
         return flexibleLineType;
     }
