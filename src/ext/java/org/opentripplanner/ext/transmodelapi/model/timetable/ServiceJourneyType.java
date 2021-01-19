@@ -14,6 +14,7 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.PolylineEncoder;
@@ -157,17 +158,19 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("pointsOnLink")
                     .type(linkGeometryType)
-                    .description("Detailed path travelled by service journey.")
+                    .description("Detailed path travelled by service journey. Not available for flexible trips.")
                     .dataFetcher(environment -> {
-                      LineString geometry = GqlUtil.getRoutingService(environment).getPatternForTrip()
-                                        .get(trip(environment))
-                                        .getGeometry();
-                                if (geometry == null) {
-                                    return null;
-                                }
-                                return PolylineEncoder.createEncodings(geometry);
-                            }
-                    )
+                        TripPattern tripPattern = GqlUtil
+                            .getRoutingService(environment)
+                            .getPatternForTrip()
+                            .get(trip(environment));
+                        if (tripPattern == null) { return null; }
+
+                        LineString geometry = tripPattern.getGeometry();
+                        if (geometry == null) { return null; }
+
+                        return PolylineEncoder.createEncodings(geometry);
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
