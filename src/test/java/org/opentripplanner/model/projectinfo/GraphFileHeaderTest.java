@@ -1,8 +1,10 @@
 package org.opentripplanner.model.projectinfo;
 
 import org.junit.Test;
+import org.opentripplanner.util.OtpAppException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class GraphFileHeaderTest {
   private static final String HEADER = "OpenTripPlannerGraph;000000A;";
@@ -19,12 +21,12 @@ public class GraphFileHeaderTest {
     assertEquals(SUBJECT, GraphFileHeader.parse(HEADER_BYTES));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = OtpAppException.class)
   public void parseToShort() {
     GraphFileHeader.parse(new byte[10]);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = OtpAppException.class)
   public void parseIllegalId() {
     GraphFileHeader.parse("OpenTripPlannerGraph-01;#$%&/(;".getBytes(GraphFileHeader.CHARSET));
   }
