@@ -58,8 +58,8 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         routeAsCar = parameters.routeAsCar();
         stationInformationSource = new GbfsStationDataSource(parameters);
         stationStatusSource = new GbfsStationStatusDataSource(parameters);
-        floatingBikeSource = OTPFeature.FloatingBike.isOn() ?
-            new GbfsFloatingBikeDataSource(parameters)
+        floatingBikeSource = OTPFeature.FloatingBike.isOn()
+            ? new GbfsFloatingBikeDataSource(parameters)
             : null;
 
         configureUrls(parameters.getUrl());
@@ -78,10 +78,10 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     private String getBaseUrl(String url) {
         String baseUrl = url;
-        if (baseUrl.endsWith("gbfs.json")) baseUrl =
-            baseUrl.substring(0, url.length() - "gbfs.json".length());
-        if (baseUrl.endsWith("gbfs")) baseUrl =
-            baseUrl.substring(0, url.length() - "gbfs".length());
+        if (baseUrl.endsWith("gbfs.json"))
+            baseUrl = baseUrl.substring(0, url.length() - "gbfs.json".length());
+        if (baseUrl.endsWith("gbfs"))
+            baseUrl = baseUrl.substring(0, url.length() - "gbfs".length());
         if (!baseUrl.endsWith("/")) baseUrl += "/";
         return baseUrl;
     }
