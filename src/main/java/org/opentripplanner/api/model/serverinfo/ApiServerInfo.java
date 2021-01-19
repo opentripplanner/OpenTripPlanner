@@ -8,6 +8,7 @@ public class ApiServerInfo {
   public final ApiProjectVersion version;
   public final ApiVersionControlInfo versionControl;
   public final ApiConfigInfo config;
+  public final String otpSerializationVersionId;
 
   public ApiServerInfo(String cpuName, int nCores, OtpProjectInfo projectInfo) {
     this.cpuName = cpuName;
@@ -15,6 +16,7 @@ public class ApiServerInfo {
     this.version = new ApiProjectVersion(projectInfo.version);
     this.versionControl = new ApiVersionControlInfo(projectInfo.versionControl);
     this.config = new ApiConfigInfo(projectInfo);
+    this.otpSerializationVersionId = projectInfo.getOtpSerializationVersionId();
   }
 
 }

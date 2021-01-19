@@ -70,10 +70,10 @@ public class ServerInfoType {
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
-            .name("graphSerializationId")
-            .description("The 'serializationId' in the pom.xml and graph header.")
+            .name("otpSerializationVersionId")
+            .description("The otp-serialization-version-id used to check graphs for compatibility with current version of OTP.")
             .type(Scalars.GraphQLString)
-            .dataFetcher(e -> projectInfo().graphFileHeaderInfo.serializationId())
+            .dataFetcher(e -> projectInfo().getOtpSerializationVersionId())
             .build())
         .build();
   }
