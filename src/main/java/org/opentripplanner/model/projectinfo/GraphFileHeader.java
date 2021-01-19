@@ -1,5 +1,7 @@
 package org.opentripplanner.model.projectinfo;
 
+import org.opentripplanner.util.OtpAppException;
+
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -51,7 +53,7 @@ public class GraphFileHeader implements Serializable {
 
   public static GraphFileHeader parse(byte[] buf) {
     if(buf.length < HEADER_LENGTH) {
-      throw new IllegalArgumentException(
+      throw new OtpAppException(
           "Input file header is not large enough. At least " + HEADER_LENGTH + " bytes is needed. "
               + "Input: " + prettyBytesToString(buf)
       );
@@ -60,9 +62,9 @@ public class GraphFileHeader implements Serializable {
 
     Matcher m = HEADER_PATTERN.matcher(header);
     if(!m.matches()) {
-      throw new IllegalArgumentException(
+      throw new OtpAppException(
           "The file is no recognized as an OTP Graph file. The header do not match \""
-              + HEADER_PATTERN.pattern() + "\". Input: " + prettyBytesToString(buf)
+              + HEADER_PATTERN.pattern() + "\".\n\tInput: " + prettyBytesToString(buf)
       );
     }
     return new GraphFileHeader(m.group(1));

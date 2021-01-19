@@ -43,6 +43,8 @@ import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collection;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 /**
  * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.
  * <p>
@@ -206,14 +208,16 @@ public class SerializedGraphObject implements Serializable {
         try(inputStream) {
             LOG.info("Reading graph from '{}'", sourceDescription);
             Input input = new Input(inputStream);
-            input.skip(GraphFileHeader.headerLength());
+
+            validateGraphSerializationId(
+                input.readBytes(GraphFileHeader.headerLength()),
+                sourceDescription
+            );
+
             Kryo kryo = makeKryo();
             SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
             Graph graph = serObj.graph;
             LOG.debug("Graph read.");
-            if (graph.graphVersionMismatch()) {
-                throw new RuntimeException("Graph version mismatch detected.");
-            }
             serObj.reconstructEdgeLists();
             LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
             return serObj;
@@ -255,4 +259,23 @@ public class SerializedGraphObject implements Serializable {
         );
     }
 
+    private static void validateGraphSerializationId(byte[] header, String sourceName) {
+        var expFileHeader = projectInfo().graphFileHeaderInfo;
+        var graphFileHeader = GraphFileHeader.parse(header);
+
+        if(!expFileHeader.equals(graphFileHeader)) {
+            LOG.info("Graph file serialization version id: {}", graphFileHeader.otpSerializationVersionId());
+            LOG.info("OTP expected graph serialization version id: {}", expFileHeader.otpSerializationVersionId());
+            if (!expFileHeader.equals(graphFileHeader)) {
+                throw new OtpAppException(
+                    "The graph file is incompatible with this version of OTP. "
+                        + "The OTP serialization version id '%s' do not match the id "
+                        + "'%s' in '%s' file-header.",
+                    expFileHeader.otpSerializationVersionId(),
+                    graphFileHeader.otpSerializationVersionId(),
+                    sourceName
+                );
+            }
+        }
+    }
 }

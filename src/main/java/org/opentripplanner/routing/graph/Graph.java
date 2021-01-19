@@ -15,8 +15,6 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.model.projectinfo.GraphFileHeader;
-import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
@@ -28,10 +26,10 @@ import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
@@ -50,6 +48,7 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -625,25 +624,6 @@ public class Graph implements Serializable {
         LOG.info("Index graph complete.");
     }
     
-    /**
-     * Checks if the graph file is compatible with the current version of OTP.
-     */
-    boolean graphVersionMismatch() {
-        GraphFileHeader graphFileHeader = this.projectInfo.graphFileHeaderInfo;
-        GraphFileHeader expectedGraphFileHeader = projectInfo().graphFileHeaderInfo;
-        LOG.info("Graph file serialization version: {}",
-            graphFileHeader.serializationId());
-        LOG.info("OTP expected graph serialization version: {}",
-            expectedGraphFileHeader.serializationId());
-        if (!graphFileHeader.equals(expectedGraphFileHeader)) {
-            LOG.error("The graph file is incompatible with this version of OTP.");
-            return true; // do not allow graph use
-        } else {
-            LOG.info("The graph file is compatible with this version of OTP.");
-            return false;
-        }
-    }
-
     public CalendarService getCalendarService() {
         if (calendarService == null) {
             CalendarServiceData data = this.getService(CalendarServiceData.class);
