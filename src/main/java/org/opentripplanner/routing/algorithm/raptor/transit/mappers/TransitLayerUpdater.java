@@ -123,10 +123,9 @@ public class TransitLayerUpdater {
 
       Set<TripPatternForDate> patternsForDate = tripPatternsRunningOnDateMapCache.get(date);
 
-      for (Map.Entry<TripPattern, TripPatternForDate> entry : newTripPatternsForDate.entrySet()) {
+      for (Map.Entry<TripPattern, TripPatternForDate> entry : oldTripPatternsForDate.entrySet()) {
         TripPattern tripPattern = entry.getKey();
         TripPatternForDate oldTripPatternForDate = oldTripPatternsForDate.get(tripPattern);
-        TripPatternForDate newTripPatternForDate = entry.getValue();
 
         // Remove old TripPatternForDate for this date if it was valid on this date
         if (oldTripPatternForDate != null) {
@@ -134,6 +133,10 @@ public class TransitLayerUpdater {
             patternsForDate.remove(oldTripPatternForDate);
           }
         }
+      }
+
+      for (Map.Entry<TripPattern, TripPatternForDate> entry : newTripPatternsForDate.entrySet()) {
+        TripPatternForDate newTripPatternForDate = entry.getValue();
 
         // Add new TripPatternForDate for this date if it mapped correctly and is valid on this date
         if (newTripPatternForDate != null) {
