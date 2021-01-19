@@ -237,5 +237,5 @@ The scripting API endpoint has been removed.
 
 ### Updaters
 
-- The GbfsBikeRentalDataSource has been changed disable floating bikes unless explicitly turned on
-via OTPFeature.
+- Floating bikes have been disabled by default in the GbfsBikeRentalDataSource unless explicitly 
+turned on via OTPFeature.
