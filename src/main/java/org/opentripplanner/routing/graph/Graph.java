@@ -15,6 +15,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
@@ -625,34 +626,20 @@ public class Graph implements Serializable {
     }
     
     /**
-     * Compares the OTP version number stored in the graph with that of the currently running instance. Logs warnings explaining that mismatched
-     * versions can cause problems.
-     * 
-     * @return false if Maven versions match (even if commit ids do not match), true if Maven version of graph does not match this version of OTP or
-     *         graphs are otherwise obviously incompatible.
+     * Checks if the graph file is compatible with the current version of OTP.
      */
     boolean graphVersionMismatch() {
-        OtpProjectInfo v = projectInfo();
-        OtpProjectInfo gv = this.projectInfo;
-        LOG.info("Graph version: {}", gv);
-        LOG.info("OTP version:   {}", v);
-        if (!v.sameVersion(gv)) {
-            LOG.error("This graph was built with a different version of OTP. Please rebuild it.");
+        GraphFileHeader graphFileHeader = this.projectInfo.graphFileHeaderInfo;
+        GraphFileHeader expectedGraphFileHeader = projectInfo().graphFileHeaderInfo;
+        LOG.info("Graph file serialization version: {}",
+            graphFileHeader.serializationId());
+        LOG.info("OTP expected graph serialization version: {}",
+            expectedGraphFileHeader.serializationId());
+        if (!graphFileHeader.equals(expectedGraphFileHeader)) {
+            LOG.error("The graph file is incompatible with this version of OTP.");
             return true; // do not allow graph use
-        } else if (!v.versionControl.commit.equals(gv.versionControl.commit)) {
-            if (v.version.qualifier.equals("SNAPSHOT")) {
-                LOG.warn("This graph was built with the same SNAPSHOT version of OTP, but a "
-                        + "different commit. Please rebuild the graph if you experience incorrect "
-                        + "behavior. ");
-                return false; // graph might still work
-            } else {
-                LOG.error("Commit mismatch in non-SNAPSHOT version. This implies a problem with "
-                        + "the build or release process.");
-                return true; // major problem
-            }
         } else {
-            // no version mismatch, no commit mismatch
-            LOG.info("This graph was built with the currently running version and commit of OTP.");
+            LOG.info("The graph file is compatible with this version of OTP.");
             return false;
         }
     }
