@@ -68,6 +68,13 @@ public class ServerInfoType {
             .type(Scalars.GraphQLString)
             .dataFetcher(e -> projectInfo().routerConfigVersion)
             .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("graphSerializationId")
+            .description("The 'serializationId' in the pom.xml and graph header.")
+            .type(Scalars.GraphQLString)
+            .dataFetcher(e -> projectInfo().graphFileHeaderInfo.serializationId())
+            .build())
         .build();
   }
 }
