@@ -80,7 +80,7 @@ abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
 
     @Override
     public boolean update() {
-        if (url == null) return false;
+        if (url == null) { return false; }
 
         try {
             InputStream data;
@@ -142,8 +142,9 @@ abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
                 continue;
             }
             BikeRentalStation brstation = makeStation(node);
-            if (brstation != null)
+            if (brstation != null) {
                 out.add(brstation);
+            }
         }
         synchronized(this) {
             stations = out;
@@ -161,8 +162,9 @@ abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
         }
         finally
         {
-           if(scanner!=null)
+           if(scanner!=null) {
                scanner.close();
+           }
         }
         return result;
         
