@@ -1,14 +1,18 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.AdjustedCost;
+import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
+import org.opentripplanner.routing.api.request.GroupBySimilarityParams;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import java.time.Instant;
 import java.util.function.Consumer;
 
 public class RoutingRequestToFilterChainMapper {
+  private static final int KEEP_ONE = 1;
 
   /** Filter itineraries down to this limit, but not below. */
   private static final int MIN_NUMBER_OF_ITINERARIES = 3;
@@ -23,16 +27,29 @@ public class RoutingRequestToFilterChainMapper {
   ) {
     var builder = new ItineraryFilterChainBuilder(request.arriveBy);
 
-    if (request.groupBySimilarityKeepOne >= 0.5) {
-      builder.addGroupBySimilarity(request.groupBySimilarityKeepOne, 1);
-    }
+    // Group by similar legs filter
+    if(request.groupBySimilarity != null) {
+      GroupBySimilarityParams p = request.groupBySimilarity;
 
-    if (request.groupBySimilarityKeepNumOfItineraries >= 0.5) {
-      int minLimit = request.numItineraries;
-      if (minLimit < 0 || minLimit > MIN_NUMBER_OF_ITINERARIES) {
-        minLimit = MIN_NUMBER_OF_ITINERARIES;
+      AdjustedCost adjustedCost = AdjustedCost.create(p.idealTransferTimeFactor);
+
+      if (p.keepOne >= 0.5) {
+        builder.addGroupBySimilarity(
+            new GroupBySimilarity(p.keepOne, KEEP_ONE, adjustedCost)
+        );
       }
-      builder.addGroupBySimilarity(request.groupBySimilarityKeepNumOfItineraries, minLimit);
+
+      if (p.keepNumOfItineraries >= 0.5) {
+        int minLimit = request.numItineraries;
+
+        if (minLimit < 0 || minLimit > MIN_NUMBER_OF_ITINERARIES) {
+          minLimit = MIN_NUMBER_OF_ITINERARIES;
+        }
+
+        builder.addGroupBySimilarity(
+            new GroupBySimilarity(p.keepNumOfItineraries, minLimit, adjustedCost)
+        );
+      }
     }
 
     builder
