@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import com.google.gson.Gson;
 import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
@@ -18,9 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.ws.rs.core.Application;
 
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.IllegalFormatException;
+import java.util.stream.Collectors;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
@@ -119,9 +125,23 @@ public class OTPAppConstruction {
             return this.configurations;
         }
         DataSource dataSettings = store().getDataSettings();
-        if (dataSettings.exists())
-            return new Gson().fromJson(new InputStreamReader(dataSettings.asInputStream()),
-                GenericFileConfiguration[].class);
+        if (dataSettings.exists()) {
+            GenericFileConfiguration[] configurations = new Gson().fromJson(new InputStreamReader(dataSettings.asInputStream()),
+                    GenericFileConfiguration[].class);
+            //validate the configurations
+            for (GenericFileConfiguration configuration : configurations){
+                RequestParameters[] requestParametersList = configuration.getRequestParameters();
+                Arrays.stream(requestParametersList)
+                        .collect(Collectors.groupingBy(RequestParameters::getVariable))
+                        .forEach((k, v) -> {
+                            if (v.size() != 2)
+                                throw new IllegalArgumentException("The settings file has incorrect request parameters");
+                        });
+
+
+            }
+            return configurations;
+        }
         else return null;
     }
     /**
