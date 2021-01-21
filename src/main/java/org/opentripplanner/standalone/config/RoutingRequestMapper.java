@@ -1,15 +1,10 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 public class RoutingRequestMapper {
 
@@ -51,8 +46,7 @@ public class RoutingRequestMapper {
         request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
         request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
         request.debugItineraryFilter = c.asBoolean("debugItineraryFilter", dft.debugItineraryFilter);
-        request.groupBySimilarityKeepOne = c.asDouble("groupBySimilarityKeepOne", dft.groupBySimilarityKeepOne);
-        request.groupBySimilarityKeepNumOfItineraries = c.asDouble("groupBySimilarityKeepNumOfItineraries", dft.groupBySimilarityKeepNumOfItineraries);
+        request.groupBySimilarity = GroupBySimilarityMapper.map(c.path("groupBySimilarity"));
         request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
         request.disableRemainingWeightHeuristic = c.asBoolean("disableRemainingWeightHeuristic", dft.disableRemainingWeightHeuristic);
         request.driveOnRight = c.asBoolean("driveOnRight", dft.driveOnRight);

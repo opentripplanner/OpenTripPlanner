@@ -26,12 +26,14 @@ public class GroupBySimilarLegsFilter extends GroupByFilter<GroupByTripIdAndDist
    *                            itineraries down to. This is NOT the limit for each group, the group
    *                            limit is calculated by the filter given the number of groups and the
    *                            min limit. See {@link GroupByFilter#groupMaxLimit(int, int)}.
+   * @param sortOrder           Each group is sorted using the {@code sortOrder}, before elements
+   *                            are removed from the tail of the sorted list.
    */
-  public GroupBySimilarLegsFilter(double groupByP, int minNumOfItineraries) {
+  public GroupBySimilarLegsFilter(double groupByP, int minNumOfItineraries, SortFilter sortOrder) {
     super(
         name(groupByP, minNumOfItineraries),
         it -> new GroupByTripIdAndDistance(it, groupByP),
-        new SortOnGeneralizedCost(),
+        sortOrder,
         minNumOfItineraries
     );
   }
