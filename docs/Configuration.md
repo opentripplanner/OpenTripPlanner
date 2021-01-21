@@ -24,7 +24,10 @@ graph.obj
 
 You could have more than one of these directories if you are building separate graphs for separate regions. Each one should contain one or more GTFS feeds, a PBF OpenStreetMap file, some JSON configuration files, and any output files such as `graph.obj`. For convenience, especially if you work with only one graph at a time, you may want to place your OTP2 JAR file in this same directory. Note that file types are detected through a case-insensitive combination of file extension and words within the file name. GTFS file names must end in `.zip` and contain the letters `gtfs`, and OSM files must end in `.pbf`.
 
-It is also possible to provide a list of input files in the configuration, which will override this default behavior of scanning the base directory for input files. Scanning is overridden independently for each file type, and can point to remote cloud storage with arbitrary URIs. See [the storage section](Configuration.md#Storage) for further details. 
+It is also possible to provide a list of input files in the configuration, which will override the
+default behavior of scanning the base directory for input files. Scanning is overridden 
+independently for each file type, and can point to remote cloud storage with arbitrary URIs. 
+See [the storage section](Configuration.md#Storage) for further details. 
 
 ## Three Scopes of Configuration
 
@@ -56,7 +59,7 @@ locale | _`Language[\_country[\_variant]]`_. A Locale object represents a specif
 date | Local date. The format is _YYYY-MM-DD_ (ISO-8601). | `2020-09-21`
 date or period | A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number. | `P1Y` is one year from now, `-P3M2D` means 3 months and 2 days ago, and `P1D` means tomorrow.
 regexp pattern | A regular expression pattern used to match a sting. | `"$^"` matches an empty string. `"gtfs"` matches `"A-*gtfs*-file.zip"`. `"$\w{3})-.*\.xml^"` matches a filename with 3 alpha-numeric characters in the beginning of the filename and _.xml_ as file extension.   
-uri | An URI path to a resource like a file or a URL. | `"gs://bucket/path/a.obj"` `"http://foo.bar/"` `"file:///Users/x/local/file"
+uri | An URI path to a resource like a file or a URL. Relative URIs are resolved relative to the OTP base path. | `"gs://bucket/path/a.obj"` `"http://foo.bar/"` `"file:///Users/x/local/file"` `"myGraph.obj"` `"../street/streetGraph-${otp.serialization.version.id}.obj"`
 linear function | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x` | `"600 + 2.0 x"`
 
 
@@ -231,11 +234,18 @@ For example, this configuration could be used to load GTFS and OSM inputs from G
 }
 ```
 
-The Google Storage system will inherit the permissions of the server it's running on within Google Cloud. It is also possible to supply credentials in this configuration file (see example below).
+The Google Storage system will inherit the permissions of the server it's running on within Google 
+Cloud. It is also possible to supply credentials in this configuration file (see example below).
 
-Note that when files are specified with URIs in this configuration, the file types do not need to be inferred from the file names so these GTFS files can have any names - there is no requirement that they have the letters "gtfs" in them.
+Note that when files are specified with URIs in this configuration, the file types do not need to 
+be inferred from the file names, so these GTFS files can have any names - there is no requirement
+that they have the letters "gtfs" in them.
 
-The default behavior of scanning the base directory for inputs is overridden independently for each file type. So in the above configuration, GTFS and OSM will be loaded from Google Cloud Storage, but OTP2 will still scan the base directory for all other types such as DEM files. Supplying an empty array for a particular file type will ensure that no inputs of that type are loaded, including by local directory scanning.
+The default behavior of scanning the base directory for inputs is overridden independently for each
+file type. So in the above configuration, GTFS and OSM will be loaded from Google Cloud Storage, but
+OTP2 will still scan the base directory for all other types such as DEM files. Supplying an empty
+array for a particular file type will ensure that no inputs of that type are loaded, including by
+local directory scanning.
 
 See the comments in the source code of class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java) 
 for an up-to-date detailed description of each config parameter.
@@ -243,7 +253,10 @@ for an up-to-date detailed description of each config parameter.
 
 ### Local Filename Patterns
 
-When scanning the base directory for inputs, each file's name is checked against patterns to detect what kind of file it is. These patterns can be overridden in the config, by nesting a `localFileNamePatterns` property inside the `storage` property (see example below). Here are the keys you can place inside `localFileNamePatterns`:
+When scanning the base directory for inputs, each file's name is checked against patterns to detect
+what kind of file it is. These patterns can be overridden in the config, by nesting a
+`localFileNamePatterns` property inside the `storage` property (see example below). Here are the
+keys you can place inside `localFileNamePatterns`:
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
@@ -252,7 +265,11 @@ config key | description | value type | value default
 `gtfs` | Pattern used to match GTFS files on local disk | regexp pattern | `(?i)gtfs` 
 `netex` | Pattern used to match NeTEx files on local disk | regexp pattern | `(?i)netex` 
 
-OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow seeking within files to guess what they are. Therefore, like all other file types GTFS is now detected from a filename pattern. It is not sufficient to look for the `.zip` extension because Netex data is also often supplied in a ZIP file. 
+OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now
+that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow
+seeking within files to guess what they are. Therefore, like all other file types GTFS is now
+detected from a filename pattern. It is not sufficient to look for the `.zip` extension because
+Netex data is also often supplied in a ZIP file. 
 
 
 ### Storage example
