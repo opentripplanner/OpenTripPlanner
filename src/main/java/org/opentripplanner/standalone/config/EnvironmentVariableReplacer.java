@@ -45,7 +45,7 @@ class EnvironmentVariableReplacer {
         entry("maven.version.patch" , Integer.toString(projectInfo().version.patch)),
         entry("maven.version.qualifier" , projectInfo().version.qualifier),
         entry("graph.file.header", projectInfo().graphFileHeaderInfo.asString()),
-        entry("graph.file.header.id", projectInfo().graphFileHeaderInfo.otpSerializationVersionIdPadded()),
+        entry("otp.serialization.version.id", projectInfo().graphFileHeaderInfo.otpSerializationVersionId()),
         entry("git.branch" , projectInfo().versionControl.branch),
         entry("git.commit" , projectInfo().versionControl.commit),
         entry("git.commit.timestamp" , projectInfo().versionControl.commitTime)

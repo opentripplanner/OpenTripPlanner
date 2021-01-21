@@ -41,6 +41,12 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--version"}, description = "Print the version, and then exit.")
     public boolean version = false;
 
+    @Parameter(
+        names = {"--serializationVersionId"},
+        description = "Print the OTP serialization-version-id, and then exit."
+    )
+    public boolean serializationVersionId = false;
+
     /* Options for graph building and loading. */
 
     @Parameter(

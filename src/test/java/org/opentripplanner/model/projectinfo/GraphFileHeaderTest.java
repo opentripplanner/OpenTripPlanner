@@ -5,10 +5,11 @@ import org.opentripplanner.util.OtpAppException;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.model.projectinfo.GraphFileHeader.CHARSET;
 
 public class GraphFileHeaderTest {
   private static final String HEADER = "OpenTripPlannerGraph;000000A;";
-  private static final byte[] HEADER_BYTES = HEADER.getBytes(GraphFileHeader.CHARSET);
+  private static final byte[] HEADER_BYTES = HEADER.getBytes(CHARSET);
   private static final GraphFileHeader SUBJECT = new GraphFileHeader("A");
 
   @Test
@@ -28,7 +29,9 @@ public class GraphFileHeaderTest {
 
   @Test(expected = OtpAppException.class)
   public void parseIllegalId() {
-    GraphFileHeader.parse("OpenTripPlannerGraph-01;#$%&/(;".getBytes(GraphFileHeader.CHARSET));
+    String illegalVersionId = "€€€€€€";
+    byte[] header = ("OpenTripPlannerGraph;"+ illegalVersionId +";").getBytes(CHARSET);
+    GraphFileHeader.parse(header);
   }
 
   @Test

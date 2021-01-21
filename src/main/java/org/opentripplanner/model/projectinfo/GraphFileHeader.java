@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 /**
  * The Graph.obj file start with file header. The header have two things:
  * <ol>
- *   <li>Magic number: {@code "OpenTripPlannerGraph-01"}</li>
+ *   <li>Magic number: {@code "OpenTripPlannerGraph"}</li>
  *   <li>The graph file serialization compatibility id</li>
  * </ol>
  *

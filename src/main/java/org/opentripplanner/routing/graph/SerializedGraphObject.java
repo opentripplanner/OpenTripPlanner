@@ -264,8 +264,6 @@ public class SerializedGraphObject implements Serializable {
         var graphFileHeader = GraphFileHeader.parse(header);
 
         if(!expFileHeader.equals(graphFileHeader)) {
-            LOG.info("Graph file serialization version id: {}", graphFileHeader.otpSerializationVersionId());
-            LOG.info("OTP expected graph serialization version id: {}", expFileHeader.otpSerializationVersionId());
             if (!expFileHeader.equals(graphFileHeader)) {
                 throw new OtpAppException(
                     "The graph file is incompatible with this version of OTP. "

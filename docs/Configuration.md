@@ -73,7 +73,7 @@ deployment.
 {
   storage : {
     gsCredentials: "${GCS_SERVICE_CREDENTIALS}",
-    graph: "file:///var/otp/graph-${maven.version.short}.obj",
+    graph: "file:///var/otp/graph-${otp.serialization.version.id}.obj",
   }
 }
 ```     
@@ -92,7 +92,7 @@ The project information variables available are:
   - `git.commit`
   - `git.commit.timestamp`
   - `graph.file.header`
-  - `graph.file.header.id`
+  - `otp.serialization.version.id`
   
 
 ## Config version 
@@ -114,8 +114,8 @@ OTP has a _OTP Serialization Version Id_ maintained in the pom.xml_ file. OTP st
 serialized _Graph.obj_ file header, allowing OTP the check for compatibility issues when loading
 the graph. The header info is available to configuration substitution:
 
-  - `${graph.file.header}` Will expand to the entire file header: "OpenTripPlannerGraph;0000007;"
-  - `${graph.file.header.id}` Will expand to the serialization version id: "000000A"
+  - `${graph.file.header}` Will expand to: `OpenTripPlannerGraph;0000007;`
+  - `${otp.serialization.version.id}` Will expand to: `7`
  
 The intended usage is to be able to have a graph build pipeline which "knows" witch graph 
 that matches OTP planner instances. For example, you may build new graphs for every OTP 
