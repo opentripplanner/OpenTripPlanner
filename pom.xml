@@ -22,6 +22,7 @@
     </scm>
 
     <properties>
+        <otp.serialization.version.id>1</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>21.2</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
@@ -143,6 +144,7 @@
                             <!-- For Java 11 Modules, specify a module name. Do not create module-info.java until all
                                  our dependencies specify a module name. -->
                             <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
+                            <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -255,7 +257,6 @@
                     <verbose>false</verbose>
                     <includeOnlyProperties>
                         <!-- Including each property used reduce the plugin execution time. -->
-                        <includeOnlyProperty>project.version</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.id</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.id.describe</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.time</includeOnlyProperty>

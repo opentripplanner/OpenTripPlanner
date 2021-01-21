@@ -68,6 +68,13 @@ public class ServerInfoType {
             .type(Scalars.GraphQLString)
             .dataFetcher(e -> projectInfo().routerConfigVersion)
             .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("otpSerializationVersionId")
+            .description("The otp-serialization-version-id used to check graphs for compatibility with current version of OTP.")
+            .type(Scalars.GraphQLString)
+            .dataFetcher(e -> projectInfo().getOtpSerializationVersionId())
+            .build())
         .build();
   }
 }

@@ -76,6 +76,10 @@ public class OTPMain {
                 System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
                 System.exit(0);
             }
+            if (params.serializationVersionId) {
+                System.out.println(projectInfo().getOtpSerializationVersionId());
+                System.exit(0);
+            }
             if (params.help) {
                 System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
                 jc.setProgramName("java -Xmx4G -jar otp.jar");
