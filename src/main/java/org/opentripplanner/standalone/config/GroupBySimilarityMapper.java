@@ -10,7 +10,7 @@ public class GroupBySimilarityMapper {
     return new GroupBySimilarityParams(
         c.asDouble("keepOne", DEFAULT.keepOne),
         c.asDouble("keepNumOfItineraries", DEFAULT.keepNumOfItineraries),
-        c.asDouble("idealTransferTimeFactor", DEFAULT.idealTransferTimeFactor)
+        c.asDouble("minSafeTransferTimeFactor", DEFAULT.minSafeTransferTimeFactor)
     );
   }
 }

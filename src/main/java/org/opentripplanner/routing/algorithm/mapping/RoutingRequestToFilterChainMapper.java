@@ -31,7 +31,7 @@ public class RoutingRequestToFilterChainMapper {
     if(request.groupBySimilarity != null) {
       GroupBySimilarityParams p = request.groupBySimilarity;
 
-      AdjustedCost adjustedCost = AdjustedCost.create(p.idealTransferTimeFactor);
+      AdjustedCost adjustedCost = AdjustedCost.create(p.minSafeTransferTimeFactor);
 
       if (p.keepOne >= 0.5) {
         builder.addGroupBySimilarity(

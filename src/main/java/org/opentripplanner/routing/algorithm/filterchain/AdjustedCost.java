@@ -26,17 +26,17 @@ import java.util.Collection;
  * Example:
  * <pre>
  *   preferredTransferTimeLongJourneys: 30 minutes
- *   lessThanIdealTransferTimeFactor: f = 2.0
+ *   minSafeTransferTimeFactor: f = 2.0
  *
  *   Itineraries returned from search:
  *     - I1: Train R1 10:00 16:24 (Cost: 23040)
  *     - I2: Train R1 10:00 15:00 ~ A ~ Bus L1 15:05 16:05 (Cost: 22200)
  *     - I3: Train R1 10:00 15:05 ~ B ~ Bus L2 15:15 16:12 (Cost: 22120)
  *
- *   Calculate the "ideal" transfer time relative to travel-time:
+ *   Calculate the  min-safe-transfer-time relative to travel-time:
  *
- *      travel-time:             min(6h30m, 6h, 6h) = 6h
- *      ideal-transfer-time(T):  6h * 5% = 18m
+ *      min travel-time across all itineraries:  min(6h30m, 6h, 6h) = 6h
+ *      min-safe-transfer-time:  T = 6h * 5% = 18m
  *
  *   All transfers less than 18 minutes will be given an extra cost.
  *
@@ -49,7 +49,7 @@ import java.util.Collection;
  *     - I3: 22 000 + 2.0 * (18m - 10m) = 22 000 + 2 * 480 = 23 080
  * </pre>
  *
- * The table below show the ideal-transfer-time for some example total travel times:
+ * The table below show the min-safe-transfer-time for some example total travel times:
  * <pre>
  *  | tot-tr-time | ideal-transfer-time |
  *  |   < 40m     |      2m             |
@@ -61,45 +61,41 @@ import java.util.Collection;
 public class AdjustedCost {
 
   /**
-   * Ideal-transfer-time is defined as P=5% of total-travel-time, at maximum 30 minutes.
+   * Min-safe-transfer-time is defined as P=5% of total-travel-time, maximum 30 minutes.
+   * There is no need to put a lower bound on this.
    */
   private static final int P = 5;
 
   /**
-   * This is used as an upper limit for adding a penalty to short transfer times.
-   * <p>
-   * The ideal-transfer-time-limit used is calculated by taking the:
-   * <pre>
-   *   ideal-transfer-time-limit = min(5% of total-travel-time, preferredTransferTimeLongJourneys)
-   * </pre>
-   * The calculated limit is then used to add a penalty to all transfers with a time
-   * less than the limit.
+   * This is an upper bound for adding a penalty to short transfer times.
+   * Journeys that last for more than 10 hours will ues 30 minutes as a
+   * {@code minSafeTransferTime}.
    */
-  public final int PREFERRED_TRANSFER_TIME_LONG_JOURNEYS = 30 * 60;
+  public final int MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND = 30 * 60;
 
   /**
-   * If the transfer-time for an itinerary is less than the ideal-transfer-time-limit, then
-   * the delta is multiplied with this factor and added to the adjusted-cost.
+   * If the transfer-time for an itinerary is less than the min-safe-transfer-time-limit, then
+   * the difference is multiplied with this factor and added to the adjusted-cost.
    */
-  public final float lessThanIdealTransferTimeFactor;
+  public final float minSafeTransferTimeFactor;
 
 
-  private AdjustedCost (float lessThanIdealTransferTimeFactor) {
-    this.lessThanIdealTransferTimeFactor = lessThanIdealTransferTimeFactor;
+  private AdjustedCost (float minSafeTransferTimeFactor) {
+    this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
   }
 
   @Nullable
-  public static AdjustedCost create(double idealTransferTimeFactor) {
-    return idealTransferTimeFactor <= 0.0
+  public static AdjustedCost create(double minSafeTransferTimeFactor) {
+    return minSafeTransferTimeFactor <= 0.0
         ?  null
-        : new AdjustedCost((float) idealTransferTimeFactor);
+        : new AdjustedCost((float) minSafeTransferTimeFactor);
   }
 
 
   /**
-   * Calculate the ideal-cost based on the given {@code idealTransferTime} and {@code itinerary}.
+   * Calculate the ideal-cost based on the given {@code minSafeTransferTime} and {@code itinerary}.
    */
-  public int calculate(int idealTransferTime, Itinerary i) {
+  public int calculate(int minSafeTransferTime, Itinerary i) {
     int cost = i.generalizedCost;
     Leg prev = null;
 
@@ -107,8 +103,8 @@ public class AdjustedCost {
       if(prev != null && leg.isScheduled()) {
         int waitTime = durationInSeconds(prev.endTime, leg.startTime);
 
-        if(waitTime < idealTransferTime) {
-          cost += (int)((idealTransferTime - waitTime) * lessThanIdealTransferTimeFactor);
+        if(waitTime < minSafeTransferTime) {
+          cost += (int)((minSafeTransferTime - waitTime) * minSafeTransferTimeFactor);
         }
       }
       prev = leg;
@@ -119,12 +115,12 @@ public class AdjustedCost {
   /**
    * Calculate the ideal-cost based on the given {@code idealTransferTime} and {@code itinerary}.
    */
-  public int idealTransferTime(Collection<Itinerary> list) {
+  public int minSafeTransferTime(Collection<Itinerary> list) {
     int minTransitTime = list.stream()
         .mapToInt(it -> it.transitTimeSeconds)
         .min()
         .orElse(0);
-    return Math.max(PREFERRED_TRANSFER_TIME_LONG_JOURNEYS, minTransitTime * P / 100);
+    return Math.max(MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND, minTransitTime * P / 100);
   }
 
 
@@ -137,7 +133,7 @@ public class AdjustedCost {
   public String toString() {
     return ToStringBuilder
         .of(AdjustedCost.class)
-        .addNum("lessThanIdealTransferTimeFactor", lessThanIdealTransferTimeFactor)
+        .addNum("minSafeTransferTimeFactor", minSafeTransferTimeFactor)
         .toString();
   }
 }

@@ -21,7 +21,7 @@ public class SortOnAdjustedCost extends SortFilter {
     private final boolean arriveBy;
     private final AdjustedCost adjustedCost;
 
-    private int idealTransferTime = 0;
+    private int minSafeTransferTime = 0;
 
 
     public SortOnAdjustedCost(
@@ -34,7 +34,7 @@ public class SortOnAdjustedCost extends SortFilter {
 
     @Override
     public List<Itinerary> filter(List<Itinerary> itineraries) {
-        this.idealTransferTime = adjustedCost.idealTransferTime(itineraries);
+        this.minSafeTransferTime = adjustedCost.minSafeTransferTime(itineraries);
         return super.filter(itineraries);
     }
 
@@ -46,7 +46,7 @@ public class SortOnAdjustedCost extends SortFilter {
     @Override
     public Comparator<Itinerary> comparator() {
         return new CompositeComparator<>(
-            comparingInt(i -> adjustedCost.calculate(idealTransferTime, i)),
+            comparingInt(i -> adjustedCost.calculate(minSafeTransferTime, i)),
             arriveBy ? DEPARTURE_TIME : ARRIVAL_TIME
         );
     }

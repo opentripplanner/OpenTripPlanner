@@ -33,22 +33,22 @@ public class GroupBySimilarityParams {
    *
    * @see AdjustedCost for details on calculating the adjusted-cost.
    */
-  public final double idealTransferTimeFactor;
+  public final double minSafeTransferTimeFactor;
 
 
   private GroupBySimilarityParams() {
     this.keepOne = 0.85;
     this.keepNumOfItineraries = 0.68;
-    this.idealTransferTimeFactor = 0.0;
+    this.minSafeTransferTimeFactor = 0.0;
   }
 
   public GroupBySimilarityParams(
       double keepOne,
       double keepNumOfItineraries,
-      double idealTransferTimeFactor
+      double minSafeTransferTimeFactor
   ) {
     this.keepOne = keepOne;
     this.keepNumOfItineraries = keepNumOfItineraries;
-    this.idealTransferTimeFactor = idealTransferTimeFactor;
+    this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
   }
 }

@@ -95,13 +95,13 @@ public class AdjustedCostTest {
   }
 
   @Test
-  public void idealTransferTime() {
-    assertEquals(1_800,     subject.idealTransferTime(List.of(i1_0tx, i2_1m, i3_10m)));
+  public void minSafeTransferTime() {
+    assertEquals(1_800,     subject.minSafeTransferTime(List.of(i1_0tx, i2_1m, i3_10m)));
   }
 
   @Test
   public void testToString() {
-    assertEquals("AdjustedCost{lessThanIdealTransferTimeFactor: 2.0}", subject.toString());
+    assertEquals("AdjustedCost{minSafeTransferTimeFactor: 2.0}", subject.toString());
   }
 
   @Test

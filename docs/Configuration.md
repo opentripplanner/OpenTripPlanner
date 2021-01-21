@@ -609,7 +609,7 @@ config key | description | value type | value default
 `debugItineraryFilter` | Enable this to attach a system notice to itineraries instead of removing them. Some filters are not configurable, byt will show up in the system-notice if debugging is enabled. | boolean | `false`
 `groupBySimilarity.keepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
 `groupBySimilarity.keepNumOfItineraries` | Reduce the number of itineraries to the requested number by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
-`groupBySimilarity.idealTransferTimeFactor` | Used add a additional cost for short transfers on long transit itineraries. See javaDoc on `AdjustedCost` details. | double | `0.0`
+`groupBySimilarity.minSafeTransferTimeFactor` | Used add a additional cost for short transfers on long transit itineraries. See javaDoc on `AdjustedCost` details. | double | `0.0`
 `transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be 1 hour plus 2 times the best cost use: `3600 + 2.0 x`. To set an absolute value(3000) use: `3000 + 0x`  | linear function | `null`
 
 
@@ -634,12 +634,12 @@ each group. The `keepNumOfItineraries` is a bit more complex, because it uses th
 returning between 4 and 6 elements depending on the distribution. The _max-limit_ can never be less
 than 1.
 
-The `idealTransferTimeFactor` will cause the filter to use a _adjusted-cost_, not the standard 
+The `minSafeTransferTimeFactor` will cause the filter to use a _adjusted-cost_, not the standard 
 itinerary _generalized-cost_. The adjusted cost add cost to the generalized-cost to better reflect
-"human-experienced-cost". The filter calculates an ideal-transfer-time based on the
-total-travel-time. The _ideal-transfer-time_ range from 2 minutes for a 10 minutes journey to 
-30 minutes for a 10 hours journey. Then for each transfer the delta between the 
-actual-transfer-time and the ideal-transfer-time is multiplied with the `idealTransferTimeFactor`. 
+"human-experienced-cost". The filter calculates a _min-safe-transfer-time_ based on the
+total-travel-time. The _min-safe-transfer-time_ range from 2 minutes for a 10 minutes journey to 
+30 minutes for a 10 hours journey. Then for each transfer the difference between the 
+actual-transfer-time and the min-safe-transfer-time is multiplied with the `minSafeTransferTimeFactor`. 
 
 
 ### Drive-to-transit routing defaults
