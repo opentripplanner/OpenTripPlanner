@@ -269,12 +269,12 @@ public class OSMDatabase {
         }
 
         if (relation.isTag("type", "multipolygon")
-                && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide())) {
+                && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide()) || relation.isBikeParking()) {
             // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
             // without reference to the ways that compose them. Accordingly, we will merely
             // mark the ways for preservation here, and deal with the details once we have
             // the ways loaded.
-            if (!OSMFilter.isWayRoutable(relation) && !relation.isParkAndRide()) {
+            if (!OSMFilter.isWayRoutable(relation) && !relation.isParkAndRide() && !relation.isBikeParking()) {
                 return;
             }
             for (OSMRelationMember member : relation.getMembers()) {
@@ -688,7 +688,7 @@ public class OSMDatabase {
                 continue;
             }
             if (!(relation.isTag("type", "multipolygon") && (OSMFilter
-                    .isOsmEntityRoutable(relation) || relation.isParkAndRide()))) {
+                    .isOsmEntityRoutable(relation) || relation.isParkAndRide() || relation.isBikeParking()))) {
                 continue;
             }
             // Area multipolygons -- pedestrian plazas
