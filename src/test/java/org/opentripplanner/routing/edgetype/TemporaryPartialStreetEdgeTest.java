@@ -17,7 +17,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.location.RequestScopedStreetLocation;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
@@ -49,7 +49,7 @@ public class TemporaryPartialStreetEdgeTest {
 
     @Test
     public void testConstruction() {
-        TemporaryPartialStreetEdge pEdge = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+        RequestScopedPartialStreetEdge pEdge = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getDistanceMeters());
 
         assertTrue(pEdge.isEquivalentTo(e1));
@@ -68,9 +68,9 @@ public class TemporaryPartialStreetEdgeTest {
         options.setRoutingContext(graph, v1, v2);
 
         // Partial edge with same endpoints as the parent.
-        TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+        RequestScopedPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getDistanceMeters());
-        TemporaryPartialStreetEdge pEdge2 = newTemporaryPartialStreetEdge(e2, v2, v3, e2.getGeometry(),
+        RequestScopedPartialStreetEdge pEdge2 = newTemporaryPartialStreetEdge(e2, v2, v3, e2.getGeometry(),
                 "partial e2", e2.getDistanceMeters());
 
         // Traverse both the partial and parent edges.
@@ -100,9 +100,9 @@ public class TemporaryPartialStreetEdgeTest {
         Coordinate nearestPoint = new Coordinate(0.5, 2.0);
         List<StreetEdge> edges = new ArrayList<StreetEdge>();
         edges.add(e2);
-        TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocation(
+        RequestScopedStreetLocation end = StreetVertexIndex.createTemporaryStreetLocation(
                 graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true);
-        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocation(
+        RequestScopedStreetLocation start = StreetVertexIndex.createTemporaryStreetLocation(
                 graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false);
 
         RoutingRequest options = new RoutingRequest();
@@ -172,9 +172,9 @@ public class TemporaryPartialStreetEdgeTest {
     
     @Test
     public void testReverseEdge() {
-        TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+        RequestScopedPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getDistanceMeters());
-        TemporaryPartialStreetEdge pEdge2 = newTemporaryPartialStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
+        RequestScopedPartialStreetEdge pEdge2 = newTemporaryPartialStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
                 "partial e2", e1Reverse.getDistanceMeters());
         
         assertFalse(e1.isReverseOf(pEdge1));
@@ -193,8 +193,8 @@ public class TemporaryPartialStreetEdgeTest {
     
     /* Private Methods */
 
-    static TemporaryPartialStreetEdge newTemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2, LineString geometry, String name, double length) {
-        return new TemporaryPartialStreetEdge(parentEdge, v1, v2, geometry, new NonLocalizedString(name), length);
+    static RequestScopedPartialStreetEdge newTemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2, LineString geometry, String name, double length) {
+        return new RequestScopedPartialStreetEdge(parentEdge, v1, v2, geometry, new NonLocalizedString(name), length);
     }
 
     private IntersectionVertex vertex(String label, double lat, double lon) {

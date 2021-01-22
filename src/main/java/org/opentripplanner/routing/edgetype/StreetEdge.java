@@ -24,7 +24,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.routing.vertextype.RequestScopedSplitterVertex;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -854,12 +854,12 @@ public class StreetEdge extends Edge implements Cloneable {
                 e.setBack(isBack());
             }
         } else {
-            if (((TemporarySplitterVertex) v).isEndVertex()) {
-                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
+            if (((RequestScopedSplitterVertex) v).isEndVertex()) {
+                e1 = new RequestScopedPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
                 e1.setNoThruTraffic(this.isNoThruTraffic());
                 e1.setStreetClass(this.getStreetClass());
             } else {
-                e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
+                e2 = new RequestScopedPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
                 e2.setNoThruTraffic(this.isNoThruTraffic());
                 e2.setStreetClass(this.getStreetClass());
             }

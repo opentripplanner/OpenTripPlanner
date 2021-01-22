@@ -2,7 +2,7 @@ package org.opentripplanner.routing.services.notes;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
+import org.opentripplanner.routing.edgetype.RequestScopedPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.util.Set;
@@ -33,8 +33,8 @@ public class DynamicStreetNotesSource implements StreetNotesSource {
     @Override
     public Set<MatcherAndStreetNote> getNotes(Edge edge) {
         /* If the edge is temporary, we look for notes in it's parent edge. */
-        if (edge instanceof TemporaryPartialStreetEdge) {
-            edge = ((TemporaryPartialStreetEdge) edge).getParentEdge();
+        if (edge instanceof RequestScopedPartialStreetEdge) {
+            edge = ((RequestScopedPartialStreetEdge) edge).getParentEdge();
         }
         Set<MatcherAndStreetNote> maas = notesForEdge.get(edge);
         if (maas == null || maas.isEmpty()) {

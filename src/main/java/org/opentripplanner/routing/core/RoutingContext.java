@@ -11,15 +11,15 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
+import org.opentripplanner.routing.edgetype.RequestScopedFreeEdge;
+import org.opentripplanner.routing.edgetype.RequestScopedPartialStreetEdge;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.RequestScopedVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,14 +101,14 @@ public class RoutingContext implements Cloneable {
     }
 
     /**
-     * Find all parent edges ({@link TemporaryPartialStreetEdge#getParentEdge()}) for
+     * Find all parent edges ({@link RequestScopedPartialStreetEdge#getParentEdge()}) for
      * {@link Vertex#getIncoming()} and {@link Vertex#getIncoming()} edges.
      * Edges of other types are ignored.
      */
     private static Set<StreetEdge> getConnectedParentEdges(Vertex loc) {
         return Stream.concat(loc.getIncoming().stream(), loc.getOutgoing().stream())
-                .filter(it -> it instanceof TemporaryPartialStreetEdge)
-                .map(it -> ((TemporaryPartialStreetEdge)it).getParentEdge())
+                .filter(it -> it instanceof RequestScopedPartialStreetEdge)
+                .map(it -> ((RequestScopedPartialStreetEdge)it).getParentEdge())
                 .collect(Collectors.toSet());
     }
 
@@ -131,7 +131,7 @@ public class RoutingContext implements Cloneable {
 
             //TODO: localize this
             String name = from.getLabel() + " to " + to.getLabel();
-            new TemporaryPartialStreetEdge(streetEdge, from, to, partial, new NonLocalizedString(name), length);
+            new RequestScopedPartialStreetEdge(streetEdge, from, to, partial, new NonLocalizedString(name), length);
         }
     }
 
@@ -218,16 +218,16 @@ public class RoutingContext implements Cloneable {
                 if (from == null) { continue; }
                 for (Edge outgoing : from.getOutgoing()) {
                     Vertex toVertex = outgoing.getToVertex();
-                    if (outgoing instanceof TemporaryFreeEdge && toVertex instanceof StreetVertex
+                    if (outgoing instanceof RequestScopedFreeEdge && toVertex instanceof StreetVertex
                         && toVertex
                         .getOutgoing()
                         .stream()
-                        .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
+                        .anyMatch(edge -> edge instanceof RequestScopedPartialStreetEdge)) {
                         // The vertex is connected with an TemporaryFreeEdge connector to the
                         // TemporaryPartialStreetEdge
                         fromStreetVertices.add((StreetVertex) toVertex);
                     }
-                    else if (outgoing instanceof TemporaryPartialStreetEdge
+                    else if (outgoing instanceof RequestScopedPartialStreetEdge
                         && from instanceof StreetVertex) {
                         fromStreetVertices.add((StreetVertex) from);
                     }
@@ -239,16 +239,16 @@ public class RoutingContext implements Cloneable {
                 if (to == null) { continue; }
                 for (Edge incoming : to.getIncoming()) {
                     Vertex fromVertex = incoming.getFromVertex();
-                    if (incoming instanceof TemporaryFreeEdge && fromVertex instanceof StreetVertex
+                    if (incoming instanceof RequestScopedFreeEdge && fromVertex instanceof StreetVertex
                         && fromVertex
                         .getIncoming()
                         .stream()
-                        .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
+                        .anyMatch(edge -> edge instanceof RequestScopedPartialStreetEdge)) {
                         // The vertex is connected with an TemporaryFreeEdge connector to the
                         // TemporaryPartialStreetEdge
                         toStreetVertices.add((StreetVertex) fromVertex);
                     }
-                    else if (incoming instanceof TemporaryPartialStreetEdge
+                    else if (incoming instanceof RequestScopedPartialStreetEdge
                         && to instanceof StreetVertex) {
                         toStreetVertices.add((StreetVertex) to);
                     }
@@ -300,12 +300,12 @@ public class RoutingContext implements Cloneable {
     public void destroy() {
         if (fromVertices != null) {
             for (Vertex fromVertex : fromVertices) {
-                TemporaryVertex.dispose(fromVertex);
+                RequestScopedVertex.dispose(fromVertex);
             }
         }
         if (toVertices != null) {
             for (Vertex toVertex : toVertices) {
-                TemporaryVertex.dispose(toVertex);
+                RequestScopedVertex.dispose(toVertex);
             }
         }
     }

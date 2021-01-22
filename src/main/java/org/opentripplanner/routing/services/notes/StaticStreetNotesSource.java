@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
+import org.opentripplanner.routing.edgetype.RequestScopedPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +56,8 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
     @Override
     public Set<MatcherAndStreetNote> getNotes(Edge edge) {
         /* If the edge is temporary, we look for notes in it's parent edge. */
-        if (edge instanceof TemporaryPartialStreetEdge) {
-            edge = ((TemporaryPartialStreetEdge) edge).getParentEdge();
+        if (edge instanceof RequestScopedPartialStreetEdge) {
+            edge = ((RequestScopedPartialStreetEdge) edge).getParentEdge();
         }
         Set<MatcherAndStreetNote> maas = notesForEdge.get(edge);
         if (maas == null || maas.isEmpty()) {

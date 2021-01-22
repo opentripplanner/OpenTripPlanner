@@ -1222,7 +1222,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         return this.rctx;
     }
 
-    /** Tear down any routing context (remove temporary edges from edge lists) */
+    /** Tear down any routing context (remove request scoped edges from edge lists) */
     public void cleanup() {
         if (this.rctx == null)
             LOG.warn("routing context was not set, cannot destroy it.");

@@ -11,7 +11,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.location.RequestScopedStreetLocation;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ class StreetSearch {
             vertex = graph.getVertex(place.stopId.getId());
         }
         if(vertex == null) {
-            vertex = new TemporaryStreetLocation(
+            vertex = new RequestScopedStreetLocation(
                     place.name,
                     new Coordinate(place.coordinate.longitude(), place.coordinate.latitude()),
                     new NonLocalizedString(place.name),

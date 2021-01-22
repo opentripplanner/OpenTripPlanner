@@ -18,6 +18,8 @@ import java.util.Set;
  * The static {@link #dispose(Vertex)} utility method is the only way to access the logic,
  * hence preventing this class from reuse. This make the class thread safe, and simplify
  * the implementation.
+ *
+ * // TODO This should be able to both remove request scoped vertices and realtime vertices
  */
 class TemporaryVertexDispose {
     /**
@@ -41,7 +43,7 @@ class TemporaryVertexDispose {
      * @param tempVertex any temporary vertex part of the temporary subgrap.
      */
     static void dispose(Vertex tempVertex) {
-        if(tempVertex instanceof TemporaryVertex) {
+        if(tempVertex instanceof RequestScopedVertex) {
             new TemporaryVertexDispose(tempVertex).dispose();
         }
     }
@@ -76,7 +78,7 @@ class TemporaryVertexDispose {
      * @param incoming true if the edge is an incoming edge, false if it is an outgoing edge
      */
     private void disposeVertex(Vertex v, Edge connectedEdge, boolean incoming) {
-        if(v instanceof TemporaryVertex) {
+        if(v instanceof RequestScopedVertex) {
             addVertexToProcessTodoList(v);
         }
         else {

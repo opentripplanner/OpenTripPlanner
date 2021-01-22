@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.RequestScopedVertex;
 
-public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
+public class RequestScopedFreeEdge extends FreeEdge implements RequestScopedEdge {
 
-    public TemporaryFreeEdge(TemporaryVertex from, Vertex to) {
+    public RequestScopedFreeEdge(RequestScopedVertex from, Vertex to) {
         super((Vertex) from, to);
 
         if (from.isEndVertex()) {
@@ -13,7 +13,7 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
         }
     }
 
-    public TemporaryFreeEdge(Vertex from, TemporaryVertex to) {
+    public RequestScopedFreeEdge(Vertex from, RequestScopedVertex to) {
         super(from, (Vertex) to);
 
         if (!to.isEndVertex()) {

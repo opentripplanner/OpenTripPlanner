@@ -7,12 +7,12 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
-import org.opentripplanner.routing.edgetype.TemporaryEdge;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.edgetype.RequestScopedEdge;
+import org.opentripplanner.routing.vertextype.RequestScopedVertex;
 
-public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
+public class RequestScopedConcreteEdge extends Edge implements RequestScopedEdge {
 
-    public TemporaryConcreteEdge(TemporaryVertex v1, Vertex v2) {
+    public RequestScopedConcreteEdge(RequestScopedVertex v1, Vertex v2) {
         super((Vertex) v1, v2);
 
         if (v1.isEndVertex()) {
@@ -20,7 +20,7 @@ public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
         }
     }
 
-    public TemporaryConcreteEdge(Vertex v1, TemporaryVertex v2) {
+    public RequestScopedConcreteEdge(Vertex v1, RequestScopedVertex v2) {
         super(v1, (Vertex) v2);
 
         if (!v2.isEndVertex()) {

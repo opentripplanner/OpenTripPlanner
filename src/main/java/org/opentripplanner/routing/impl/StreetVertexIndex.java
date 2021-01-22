@@ -14,17 +14,13 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.response.InputField;
-import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.edgetype.RequestScopedFreeEdge;
+import org.opentripplanner.routing.edgetype.RequestScopedPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.location.RequestScopedStreetLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
@@ -113,11 +109,11 @@ public class StreetVertexIndex {
      *
      * @return the new TemporaryStreetLocation
      */
-    public static TemporaryStreetLocation createTemporaryStreetLocation(Graph graph, String label,
+    public static RequestScopedStreetLocation createTemporaryStreetLocation(Graph graph, String label,
             I18NString name, Iterable<StreetEdge> edges, Coordinate nearestPoint, boolean endVertex) {
         boolean wheelchairAccessible = false;
 
-        TemporaryStreetLocation location = new TemporaryStreetLocation(label, nearestPoint, name, endVertex);
+        RequestScopedStreetLocation location = new RequestScopedStreetLocation(label, nearestPoint, name, endVertex);
 
         for (StreetEdge street : edges) {
             Vertex fromv = street.getFromVertex();
@@ -131,18 +127,18 @@ public class StreetVertexIndex {
                 edgeLocation = fromv;
 
                 if (endVertex) {
-                    new TemporaryFreeEdge(edgeLocation, location);
+                    new RequestScopedFreeEdge(edgeLocation, location);
                 } else {
-                    new TemporaryFreeEdge(location, edgeLocation);
+                    new RequestScopedFreeEdge(location, edgeLocation);
                 }
             } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
                 // no need to link to area edges caught on-end
                 edgeLocation = tov;
 
                 if (endVertex) {
-                    new TemporaryFreeEdge(edgeLocation, location);
+                    new RequestScopedFreeEdge(edgeLocation, location);
                 } else {
-                    new TemporaryFreeEdge(location, edgeLocation);
+                    new RequestScopedFreeEdge(location, edgeLocation);
                 }
             } else {
                 // location is somewhere in the middle of the edge.
@@ -158,7 +154,8 @@ public class StreetVertexIndex {
 
     }
 
-    private static void createHalfLocation(TemporaryStreetLocation base, I18NString name,
+    private static void createHalfLocation(
+        RequestScopedStreetLocation base, I18NString name,
                 Coordinate nearestPoint, StreetEdge street, boolean endVertex) {
         StreetVertex tov = (StreetVertex) street.getToVertex();
         StreetVertex fromv = (StreetVertex) street.getFromVertex();
@@ -173,13 +170,13 @@ public class StreetVertexIndex {
         double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
 
         if (endVertex) {
-            TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
+            RequestScopedPartialStreetEdge temporaryPartialStreetEdge = new RequestScopedPartialStreetEdge(
                     street, fromv, base, geometries.first, name, lengthIn);
 
             temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
             temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
         } else {
-            TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
+            RequestScopedPartialStreetEdge temporaryPartialStreetEdge = new RequestScopedPartialStreetEdge(
                     street, base, tov, geometries.second, name, lengthOut);
 
             temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());

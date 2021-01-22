@@ -11,14 +11,14 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.edgetype.RequestScopedEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.RequestScopedVertex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -145,7 +145,7 @@ public class RoutingContextDestroyTest {
 
     private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {
         String sourceName = src.getName();
-        assertFalse(sourceName + " -> " + e.getName(), e instanceof TemporaryEdge);
-        assertFalse(sourceName + " -> " + v.getName(), v instanceof TemporaryVertex);
+        assertFalse(sourceName + " -> " + e.getName(), e instanceof RequestScopedEdge);
+        assertFalse(sourceName + " -> " + v.getName(), v instanceof RequestScopedVertex);
     }
 }

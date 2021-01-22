@@ -34,7 +34,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.location.RequestScopedStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -454,7 +454,7 @@ public abstract class GraphPathToItineraryMapper {
         //This gets nicer names instead of osm:node:id when changing mode of transport
         //Names are generated from all the streets in a corner, same as names in origin and destination
         //We use name in TemporaryStreetLocation since this name generation already happened when temporary location was generated
-        if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
+        if (vertex instanceof StreetVertex && !(vertex instanceof RequestScopedStreetLocation)) {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
         Place place = new Place(

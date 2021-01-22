@@ -6,7 +6,7 @@ import org.opentripplanner.routing.graph.Vertex;
 
 import static org.junit.Assert.assertEquals;
 
-public class TemporaryVertexDisposeTest {
+public class RequestScopedVertexDisposeTest {
 
     private static final double ANY_LOC = 1;
 
@@ -19,52 +19,52 @@ public class TemporaryVertexDisposeTest {
     }
 
     @Test public void disposeNormalCase() {
-        // Given a temporary vertex 'origin' and 'destination' connected to graph
+        // Given a request scoped vertex 'origin' and 'destination' connected to graph
         Vertex origin = new TempVertex("origin");
         Vertex destination = new TempVertex("dest");
         edge(origin, a);
         edge(b, destination);
 
-        // Then before we dispose temporary vertexes
+        // Then before we dispose request scoped vertexes
         assertEquals("[origin->A]", a.getIncoming().toString());
         assertEquals("[B->dest]", b.getOutgoing().toString());
 
         // When
-        TemporaryVertex.dispose(origin);
-        TemporaryVertex.dispose(destination);
+        RequestScopedVertex.dispose(origin);
+        RequestScopedVertex.dispose(destination);
 
         // Then
         assertOriginalGraphIsIntact();
     }
 
     @Test public void disposeShouldNotDeleteOtherIncomingEdges() {
-        // Given a temporary vertex 'origin' connected to B - has other incoming edges
+        // Given a request scoped vertex 'origin' connected to B - has other incoming edges
         Vertex origin = new TempVertex("origin");
         Vertex otherTemp = new TempVertex("OT");
         edge(origin, b);
         edge(otherTemp, b);
 
-        // Then before we dispose temporary vertexes
+        // Then before we dispose request scoped vertexes
         assertEquals("[A->B, origin->B, OT->B]", b.getIncoming().toString());
         // When
-        TemporaryVertex.dispose(origin);
+        RequestScopedVertex.dispose(origin);
 
         // Then B is back to normal
         assertEquals("[A->B, OT->B]", b.getIncoming().toString());
     }
 
     @Test public void disposeShouldNotDeleteOtherOutgoingEdges() {
-        // Given a temporary vertex 'destination' connected from A - with one other outgoing edge
+        // Given a request scoped vertex 'destination' connected from A - with one other outgoing edge
         Vertex destination = new TempVertex("destination");
         Vertex otherTemp = new TempVertex("OT");
         edge(a, destination);
         edge(a, otherTemp);
 
-        // Then before we dispose temporary vertexes
+        // Then before we dispose request scoped vertexes
         assertEquals("[A->B, A->destination, A->OT]", a.getOutgoing().toString());
 
         // When
-        TemporaryVertex.dispose(destination);
+        RequestScopedVertex.dispose(destination);
 
         // A is back to normal
         assertEquals("[A->B, A->OT]", a.getOutgoing().toString());
@@ -85,7 +85,7 @@ public class TemporaryVertexDisposeTest {
         edge(z, a);
 
         // When
-        TemporaryVertex.dispose(x);
+        RequestScopedVertex.dispose(x);
 
         // Then do return without stack overflow and:
         assertOriginalGraphIsIntact();
@@ -129,7 +129,7 @@ public class TemporaryVertexDisposeTest {
         assertEquals("[B->A, B->y]", b.getOutgoing().toString());
 
         // When
-        TemporaryVertex.dispose(x);
+        RequestScopedVertex.dispose(x);
 
         // Then
         assertEquals("[B->A]", a.getIncoming().toString());
@@ -159,7 +159,7 @@ public class TemporaryVertexDisposeTest {
         assertEquals("[A->B, y->B]", b.getIncoming().toString());
 
         // When
-        TemporaryVertex.dispose(x);
+        RequestScopedVertex.dispose(x);
 
         // Then
         assertOriginalGraphIsIntact();
@@ -189,7 +189,7 @@ public class TemporaryVertexDisposeTest {
         assertEquals("[T0->A]", a.getIncoming().toString());
 
         // When
-        TemporaryVertex.dispose(origin);
+        RequestScopedVertex.dispose(origin);
 
         // Then
         assertOriginalGraphIsIntact();
@@ -218,7 +218,7 @@ public class TemporaryVertexDisposeTest {
         }
     }
 
-    private static class TempVertex extends V implements TemporaryVertex {
+    private static class TempVertex extends V implements RequestScopedVertex {
         private TempVertex(String label) {
             super(label);
         }

@@ -139,22 +139,24 @@ public class NearbyStopFinder {
 
 
     /**
-     * Return all stops within a certain radius of the given vertex, using network distance along streets.
-     * If the origin vertex is a StopVertex, the result will include it.
+     * Return all stops within a certain radius of the given vertex, using network distance along
+     * streets. If the origin vertex is a StopVertex, the result will include it.
      *
-     * @param originVertices the origin point of the street search
-     * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
-     *                         originVertex as the destination
-     * @param removeTempEdges after creating a new routing request and routing context, remove all the temporary
-     *                        edges that are part of that context. NOTE: this will remove _all_ temporary edges
-     *                        coming out of the origin and destination vertices, including those in any other
-     *                        RoutingContext referencing them, making routing from/to them totally impossible.
-     *                        This is a stopgap solution until we rethink the lifecycle of RoutingContext.
+     * @param originVertices           the origin point of the street search
+     * @param reverseDirection         if true the paths returned instead originate at the nearby
+     *                                 stops and have the originVertex as the destination
+     * @param removeRequestScopedEdges after creating a new routing request and routing context,
+     *                                 remove all the request scoped edges that are part of that
+     *                                 context. NOTE: this will remove _all_ request scoped edges
+     *                                 coming out of the origin and destination vertices, including
+     *                                 those in any other RoutingContext referencing them, making
+     *                                 routing from/to them totally impossible. This is a stopgap
+     *                                 solution until we rethink the lifecycle of RoutingContext.
      */
     public List<NearbyStop> findNearbyStopsViaStreets (
             Set<Vertex> originVertices,
             boolean reverseDirection,
-            boolean removeTempEdges,
+            boolean removeRequestScopedEdges,
             RoutingRequest routingRequest
     ) {
         routingRequest.arriveBy = reverseDirection;
@@ -217,7 +219,7 @@ public class NearbyStopFinder {
                     ));
             }
         }
-        if (removeTempEdges) {
+        if (removeRequestScopedEdges) {
             routingRequest.cleanup();
         }
         return stopsFound;

@@ -1,15 +1,16 @@
 package org.opentripplanner.routing.location;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.edgetype.RequestScopedEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.RequestScopedVertex;
 import org.opentripplanner.util.I18NString;
 
-final public class TemporaryStreetLocation extends StreetLocation implements TemporaryVertex {
+final public class RequestScopedStreetLocation extends StreetLocation implements
+    RequestScopedVertex {
     final private boolean endVertex;
 
-    public TemporaryStreetLocation(String id, Coordinate nearestPoint, I18NString name,
+    public RequestScopedStreetLocation(String id, Coordinate nearestPoint, I18NString name,
                                    boolean endVertex) {
         super(id, nearestPoint, name);
         this.endVertex = endVertex;
@@ -17,7 +18,7 @@ final public class TemporaryStreetLocation extends StreetLocation implements Tem
 
     @Override
     public void addIncoming(Edge edge) {
-        if (edge instanceof TemporaryEdge) {
+        if (edge instanceof RequestScopedEdge) {
             if (endVertex) {
                 super.addIncoming(edge);
             } else {
@@ -30,7 +31,7 @@ final public class TemporaryStreetLocation extends StreetLocation implements Tem
 
     @Override
     public void addOutgoing(Edge edge) {
-        if (edge instanceof TemporaryEdge) {
+        if (edge instanceof RequestScopedEdge) {
             if (endVertex) {
                 throw new UnsupportedOperationException("Can't add outgoing edge to end vertex");
             } else {

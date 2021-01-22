@@ -11,9 +11,9 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteEdge;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
-import org.opentripplanner.routing.graph.TemporaryConcreteEdge;
+import org.opentripplanner.routing.graph.RequestScopedConcreteEdge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.location.RequestScopedStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.NonLocalizedString;
@@ -144,13 +144,13 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
 
-        TemporaryStreetLocation from = new TemporaryStreetLocation("near_shilshole_22nd",
+        RequestScopedStreetLocation from = new RequestScopedStreetLocation("near_shilshole_22nd",
                 new Coordinate(-122.385050, 47.666620), new NonLocalizedString("near_shilshole_22nd"), false);
-        new TemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
+        new RequestScopedConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
-        TemporaryStreetLocation to = new TemporaryStreetLocation("near_56th_20th",
+        RequestScopedStreetLocation to = new RequestScopedStreetLocation("near_56th_20th",
                 new Coordinate(-122.382347, 47.669518), new NonLocalizedString("near_56th_20th"), true);
-        new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
+        new RequestScopedConcreteEdge(graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(graph, from, to);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
@@ -180,13 +180,13 @@ public class AStarTest {
         options.walkSpeed = 1.0;
         options.setArriveBy(true);
 
-        TemporaryStreetLocation from = new TemporaryStreetLocation("near_shilshole_22nd",
+        RequestScopedStreetLocation from = new RequestScopedStreetLocation("near_shilshole_22nd",
                 new Coordinate(-122.385050, 47.666620), new NonLocalizedString("near_shilshole_22nd"), false);
-        new TemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
+        new RequestScopedConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
-        TemporaryStreetLocation to = new TemporaryStreetLocation("near_56th_20th",
+        RequestScopedStreetLocation to = new RequestScopedStreetLocation("near_56th_20th",
                 new Coordinate(-122.382347, 47.669518), new NonLocalizedString("near_56th_20th"), true);
-        new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
+        new RequestScopedConcreteEdge(graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(graph, from, to);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);

@@ -7,13 +7,14 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.RequestScopedVertex;
 import org.opentripplanner.util.I18NString;
 
 import java.util.List;
 
 
-final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge implements TemporaryEdge {
+final public class RequestScopedPartialStreetEdge extends StreetWithElevationEdge implements
+    RequestScopedEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +29,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
      * If the length is negative, a new length is calculated from the geometry.
      * The elevation data is calculated using the 'parentEdge' and given 'length'.
      */
-    public TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+    public RequestScopedPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
             LineString geometry, I18NString name, double length) {
         super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
@@ -45,7 +46,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
      * The length is calculated using the provided geometry.
      * The elevation data is calculated using the 'parentEdge' and the calculated 'length'.
      */
-    TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+    RequestScopedPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
             LineString geometry, I18NString name) {
         super(v1, v2, geometry, name, 0, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
@@ -103,8 +104,8 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     @Override
     public boolean isReverseOf(Edge e) {
         Edge other = e;
-        if (e instanceof TemporaryPartialStreetEdge) {
-            other = ((TemporaryPartialStreetEdge) e).parentEdge;
+        if (e instanceof RequestScopedPartialStreetEdge) {
+            other = ((RequestScopedPartialStreetEdge) e).parentEdge;
         }
 
         // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
@@ -137,16 +138,16 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     }
 
     private void assertEdgeIsNotDirectedAwayFromTemporaryEndVertex(StreetVertex v1) {
-        if(v1 instanceof TemporaryVertex) {
-            if (((TemporaryVertex)v1).isEndVertex()) {
+        if(v1 instanceof RequestScopedVertex) {
+            if (((RequestScopedVertex)v1).isEndVertex()) {
                 throw new IllegalStateException("A temporary edge is directed away from an end vertex");
             }
         }
     }
 
     private void assertEdgeIsDirectedTowardsTemporaryEndVertex(StreetVertex v2) {
-        if(v2 instanceof TemporaryVertex) {
-            if (!((TemporaryVertex)v2).isEndVertex()) {
+        if(v2 instanceof RequestScopedVertex) {
+            if (!((RequestScopedVertex)v2).isEndVertex()) {
                 throw new IllegalStateException("A temporary edge is directed towards a start vertex");
             }
         }

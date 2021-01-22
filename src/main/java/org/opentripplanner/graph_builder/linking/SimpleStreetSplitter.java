@@ -30,25 +30,25 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.RequestScopedFreeEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TransitEntranceLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.location.RequestScopedStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.RequestScopedSplitterVertex;
+import org.opentripplanner.routing.vertextype.RequestScopedVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
@@ -323,7 +323,7 @@ public class SimpleStreetSplitter {
                     .map(dts -> dts.item)
                     .forEach(sv -> {
                         LOG.debug("Linking vertex to stop: {}", sv.getName());
-                        makeTemporaryEdges((TemporaryStreetLocation)vertex, sv);
+                        makeTemporaryEdges((RequestScopedStreetLocation)vertex, sv);
                     });
 
             return true;
@@ -401,15 +401,15 @@ public class SimpleStreetSplitter {
 
         else {
 
-            TemporaryVertex temporaryVertex = null;
+            RequestScopedVertex RequestScopedVertex = null;
             boolean endVertex = false;
-            if (tstop instanceof TemporaryVertex) {
-                temporaryVertex = (TemporaryVertex) tstop;
-                endVertex = temporaryVertex.isEndVertex();
+            if (tstop instanceof RequestScopedVertex) {
+                RequestScopedVertex = (RequestScopedVertex) tstop;
+                endVertex = RequestScopedVertex.isEndVertex();
 
             }
             // split the edge, get the split vertex
-            SplitterVertex v0 = split(edge, ll, temporaryVertex != null, endVertex);
+            SplitterVertex v0 = split(edge, ll, RequestScopedVertex != null, endVertex);
             makeLinkEdges(tstop, v0);
 
             if (OTPFeature.FlexRouting.isOn() && graph.index != null
@@ -453,7 +453,7 @@ public class SimpleStreetSplitter {
         SplitterVertex v;
         String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
         if (temporarySplit) {
-            TemporarySplitterVertex tsv = new TemporarySplitterVertex(
+            RequestScopedSplitterVertex tsv = new RequestScopedSplitterVertex(
                     uniqueSplitLabel, splitPoint.x, splitPoint.y, edge, endVertex);
             tsv.setWheelchairAccessible(edge.isWheelchairAccessible());
             v = tsv;
@@ -485,8 +485,8 @@ public class SimpleStreetSplitter {
 
     /** Make the appropriate type of link edges from a vertex */
     private void makeLinkEdges(Vertex from, StreetVertex to) {
-        if (from instanceof TemporaryStreetLocation) {
-            makeTemporaryEdges((TemporaryStreetLocation) from, to);
+        if (from instanceof RequestScopedStreetLocation) {
+            makeTemporaryEdges((RequestScopedStreetLocation) from, to);
         } else if (from instanceof TransitStopVertex) {
             makeTransitLinkEdges((TransitStopVertex) from, to);
         } else if (from instanceof TransitEntranceVertex) {
@@ -499,19 +499,19 @@ public class SimpleStreetSplitter {
     }
 
     /** Make temporary edges to origin/destination vertex in origin/destination search **/
-    private void makeTemporaryEdges(TemporaryStreetLocation from, Vertex to) {
+    private void makeTemporaryEdges(RequestScopedStreetLocation from, Vertex to) {
         if (destructiveSplitting) {
             throw new RuntimeException("Destructive splitting is used on temporary edges. Something is wrong!");
         }
-        if (to instanceof TemporarySplitterVertex) {
-            from.setWheelchairAccessible(((TemporarySplitterVertex) to).isWheelchairAccessible());
+        if (to instanceof RequestScopedSplitterVertex) {
+            from.setWheelchairAccessible(((RequestScopedSplitterVertex) to).isWheelchairAccessible());
         }
         if (from.isEndVertex()) {
             LOG.debug("Linking end vertex to {} -> {}", to, from);
-            new TemporaryFreeEdge(to, from);
+            new RequestScopedFreeEdge(to, from);
         } else {
             LOG.debug("Linking start vertex to {} -> {}", from, to);
-            new TemporaryFreeEdge(from, to);
+            new RequestScopedFreeEdge(from, to);
         }
     }
 
@@ -636,7 +636,7 @@ public class SimpleStreetSplitter {
         } else {
             name = location.label;
         }
-        TemporaryStreetLocation closest = new TemporaryStreetLocation(UUID.randomUUID().toString(),
+        RequestScopedStreetLocation closest = new RequestScopedStreetLocation(UUID.randomUUID().toString(),
             coord, new NonLocalizedString(name), endVertex);
 
         TraverseMode nonTransitMode = TraverseMode.WALK;
