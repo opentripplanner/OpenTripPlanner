@@ -18,6 +18,8 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
  */
 public class GroupBySimilarLegsFilterTest {
 
+  public static final SortOnGeneralizedCost SORT_ON_COST = new SortOnGeneralizedCost();
+
   @Test
   public void groupByTheLongestItineraryAndTwoGroups() {
     List<Itinerary> result;
@@ -40,7 +42,7 @@ public class GroupBySimilarLegsFilterTest {
     List<Itinerary> input = List.of(i1, i2, i3);
 
     // With min Limit = 1, expect the best trips from both groups
-    result = new GroupBySimilarLegsFilter(.5, 1).filter(input);
+    result = new GroupBySimilarLegsFilter(.5, 1, SORT_ON_COST).filter(input);
 
     assertEquals(toStr(List.of(i1, i2)), toStr(result));
   }

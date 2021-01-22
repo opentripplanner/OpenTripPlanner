@@ -8,6 +8,9 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDeparture
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.SortFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnAdjustedCost;
+import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
 
 import java.time.Instant;
@@ -58,33 +61,13 @@ public class ItineraryFilterChainBuilder {
      * Group itineraries by the main legs and keeping approximately the given total number of
      * itineraries. The itineraries are grouped by the legs that account for more then 'p' % for the
      * total distance.
-     * <p/>
-     * If the time-table-view is enabled, the result may contain similar itineraries where only the
-     * first and/or last legs are different. This can happen by walking to/from another stop,
-     * saving time, but getting a higher generalized-cost; Or, by taking a short ride.
-     * Use {@code groupByP} in the range {@code 0.80-0.90} and {@code approximateMinLimit=1} will
-     * remove these itineraries an keep only the itineraries with the lowest generalized-cost.
-     * <p>
-     * When this filter is enabled, itineraries are grouped by the "main" transit legs. Short legs
-     * are skipped. Than for each group of itineraries the itinerary with the lowest generalized-cost
-     * is kept. All other itineraries are dropped.
-     * <p>
-     * A good way to allow for some variation is to include several entries, relaxing the min-limit,
-     * while tightening the group-by-p criteria. For example:
-     * <pre>
-     * groupByP | minLimit | Description
-     *   0.90   |    1     | Keep 1 itinerary where 90% of the legs are the same
-     *   0.80   |    2     | Keep 2 itineraries where 80% of the legs are the same
-     *   0.68   |    3     | Keep 3 itineraries where 68% of the legs are the same
-     * </pre>
-     * Normally, we want some variation, so a good value to use for this parameter is the combined
-     * cost of board- and alight-cost including indirect cost from board- and alight-slack.
+     *
+     * @see GroupBySimilarity for more details.
      */
-    public ItineraryFilterChainBuilder addGroupBySimilarity(double groupByP, int approximateMinLimit) {
-        this.groupBySimilarity.add(new GroupBySimilarity(groupByP, approximateMinLimit));
+    public ItineraryFilterChainBuilder addGroupBySimilarity(GroupBySimilarity groupBySimilarity) {
+        this.groupBySimilarity.add(groupBySimilarity);
         return this;
     }
-
 
     /**
      * This function is used to compute a max-limit for generalized-cost. The limit
@@ -162,7 +145,13 @@ public class ItineraryFilterChainBuilder {
                 .collect(Collectors.toList());
 
             for (GroupBySimilarity it : groupBy) {
-                filters.add(new GroupBySimilarLegsFilter(it.groupByP, it.approximateMinLimit));
+                filters.add(
+                    new GroupBySimilarLegsFilter(
+                        it.groupByP,
+                        it.approximateMinLimit,
+                        createGroupBySimilaritySortFilter(it.adjustedCost)
+                    )
+                );
             }
         }
 
@@ -210,6 +199,12 @@ public class ItineraryFilterChainBuilder {
         }
 
         return new FilterChain(filters);
+    }
+
+    private SortFilter createGroupBySimilaritySortFilter(AdjustedCost adjustedCost) {
+        return adjustedCost == null
+            ? new SortOnGeneralizedCost()
+            : new SortOnAdjustedCost(arriveBy, adjustedCost);
     }
 
 

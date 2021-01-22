@@ -693,20 +693,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public boolean debugItineraryFilter = false;
 
-    /**
-     * Keep ONE itinerary for each group with at least this part of the legs in common.
-     * Default value is 0.85 (85%), use a value less than 0.50 to turn off.
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder#addGroupBySimilarity(double, int)
-     */
-    public Double groupBySimilarityKeepOne = 0.85;
 
-    /**
-     * Keep {@link #numItineraries} itineraries for each group with at least this part of the legs
-     * in common.
-     * Default value is 0.68 (68%), use a value less than 0.50 to turn off.
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder#addGroupBySimilarity(double, int)
-     */
-    public Double groupBySimilarityKeepNumOfItineraries = 0.68;
+    public GroupBySimilarityParams groupBySimilarity;
 
     /**
      * The numbers of days before the search date to consider when filtering trips for this search.
