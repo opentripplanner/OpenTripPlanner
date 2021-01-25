@@ -1,5 +1,6 @@
 package org.opentripplanner.api.common;
 
+import fi.metatavu.airquality.GenericFileConfigurationParser;
 import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -636,20 +637,16 @@ public abstract class RoutingResource {
             }
         }
 
-        //compare request parameters with the ones from the settings and accept only those ones
-        GenericFileConfiguration[] genericFileConfigurations = this.otpServer.getRouter().genericFileConfigurations;
-        if (genericFileConfigurations != null) {
-            List<RequestParameters> discoveredParameters = new ArrayList<>();
-            for (Map.Entry<String, String> requestParam : requestParameters.entrySet()) {
-                //find parameters from the settings.json which fit the real ones passed from the request
-                for (GenericFileConfiguration fileConf : genericFileConfigurations)
-                    for (RequestParameters genParams : fileConf.getRequestParameters())
-                        if (genParams.getName().equals(requestParam.getKey())) {
-                            genParams.setValue(requestParam.getValue());
-                            discoveredParameters.add(genParams);
-                        }
+
+        //fill the map of generic parameters
+        if (otpServer.getRouter().genericFileConfigurations != null) {
+            request.genDataRequestParameters = this.otpServer.getRouter().genericFileConfigurations;
+            for (Map.Entry<RequestParameters, RequestParameters> genParam : request.genDataRequestParameters.entrySet()) {
+                RequestParameters thresholdEmpty = genParam.getKey();
+                RequestParameters penaltyEmpty = genParam.getValue();
+                thresholdEmpty.setValue(requestParameters.get(thresholdEmpty.getName()));
+                penaltyEmpty.setValue(requestParameters.get(penaltyEmpty.getName()));
             }
-            request.genDataRequestParameters = discoveredParameters;
         }
 
         if(searchWindow != null) {

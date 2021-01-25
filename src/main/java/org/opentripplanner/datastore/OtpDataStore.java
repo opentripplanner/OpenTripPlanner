@@ -51,7 +51,7 @@ public class OtpDataStore {
     private DataSource graph;
     private CompositeDataSource buildReportDir;
 
-    private DataSource dataSettings;
+    private DataSource genericDataSettings;
 
     /**
      * Use the {@link DataStoreFactory} to
@@ -79,12 +79,12 @@ public class OtpDataStore {
         addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
         addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
 
-        dataSettings = findSingleSource(null, CONFIGURATION_JSON_FILENAME, SETTINGS_GRAPH_API_CONFIGURATION_JSON);
+        genericDataSettings = findSingleSource(null, CONFIGURATION_JSON_FILENAME, SETTINGS_GRAPH_API_CONFIGURATION_JSON);
         streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
         graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
         buildReportDir = findCompositeSource(config.reportDirectory(), BUILD_REPORT_DIR, REPORT);
 
-        addAll(Arrays.asList(dataSettings, streetGraph, graph, buildReportDir) );
+        addAll(Arrays.asList(genericDataSettings, streetGraph, graph, buildReportDir) );
 
         // Also read in unknown sources in case the data input source is miss-spelled,
         // We look for files on the local-file-system, other repositories ignore this call.
@@ -128,8 +128,8 @@ public class OtpDataStore {
         return sources.get(type).stream().filter(DataSource::exists).collect(Collectors.toList());
     }
 
-    public DataSource getDataSettings() {
-        return dataSettings;
+    public DataSource getGenericDataSettings() {
+        return genericDataSettings;
     }
 
     @NotNull

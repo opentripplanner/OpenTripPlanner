@@ -162,7 +162,7 @@ public class OTPMain {
         // publishing the config version info make it available to the APIs
         app.setOtpConfigVersionsOnServerInfo();
 
-        Router router = new Router(graph, app.config().routerConfig(), app.genericFileConfigurations());
+        Router router = new Router(graph, app.config().routerConfig(), app.genericFileParameters());
         router.startup();
 
         /* Start visualizer if requested. */

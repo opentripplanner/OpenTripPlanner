@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import fi.metatavu.airquality.EdgeUpdaterModule;
 import fi.metatavu.airquality.GenericDataFile;
+import fi.metatavu.airquality.GenericFileConfigurationParser;
 import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
@@ -235,12 +236,11 @@ public class GraphBuilder implements Runnable {
         }
 
         if (hasSettings) {
-            Gson gson = new Gson();
             DataSource settingsSource = dataSources.getDataSettings();
+            GenericFileConfiguration[] genericFileConfigurations = GenericFileConfigurationParser.parse(settingsSource);
             //parse settings file
-            GenericFileConfiguration[] graphConfigurations = gson.fromJson(new InputStreamReader(settingsSource.asInputStream())
-                    , GenericFileConfiguration[].class);
-            for (GenericFileConfiguration configuration : graphConfigurations) {
+
+            for (GenericFileConfiguration configuration : genericFileConfigurations) {
                 //parse netcdf according to the settings file, use the link from the settings file
                 GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
                             configuration);

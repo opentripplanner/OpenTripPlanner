@@ -108,7 +108,7 @@ public class GraphBuilderDataSources {
     }
 
     public DataSource getDataSettings(){
-        return store.getDataSettings();
+        return store.getGenericDataSettings();
     }
 
     /* private methods */

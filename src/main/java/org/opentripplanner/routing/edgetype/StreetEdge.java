@@ -4,6 +4,8 @@ import com.google.common.collect.Iterables;
 import fi.metatavu.airquality.EdgeDataFromGenericFile;
 import fi.metatavu.airquality.configuration_parsing.ParameterType;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -39,6 +41,7 @@ import java.io.ObjectOutputStream;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * This represents a street segment.
@@ -534,58 +537,69 @@ public class StreetEdge extends Edge implements Cloneable {
          */
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
+
         //if walking or biking and request includes the generic data parameters then calculate penalties
         if (walkingOrBiking && options.genDataRequestParameters != null) {
             double totalPenalty = 0d;
             Instant requestInstant = options.getDateTime().toInstant();
+            //go over each pair of params and count penalty based on tha pair
+            for (Map.Entry<RequestParameters, RequestParameters> thresholdPenaltyPair : options.genDataRequestParameters.entrySet()) {
+                String indexVariableName = thresholdPenaltyPair.getKey().getVariable();
 
-            for (RequestParameters requestParam : options.genDataRequestParameters) {
-                //find the StreetEdge data entry which corresponds with the the requestParam (for example, co2)
-                Optional<EdgeDataFromGenericFile> edgeData = extraData.stream().filter(
-                        genData-> genData.getVariableValues().containsKey(requestParam.getName())).findAny();
-                if (edgeData.isEmpty())
-                    continue;
-                //there's a match in data and parameters -> calculate penalty
-                Instant dataStartTime = Instant.ofEpochMilli(edgeData.get().getDataStartTime());
-                int paramQualityHr = (int) ChronoUnit.HOURS.between(dataStartTime, requestInstant);
-                if (paramQualityHr >= 0) {
+                long dataStartTime = 0;
+                float[] genDataValuesForTime = new float[0];
 
-                    /*just checking the values
-                    for (Map.Entry<String, float[]> entry: edgeData.get().getVariableValues().entrySet()){
-                        System.out.println(entry.getKey()+" val "+Arrays.toString(entry.getValue()));
-                    }*/
-                    //todo do the sorting based on the parameters
-                    if (requestParam.getParameterType().equals(ParameterType.THRESHOLD)) {
+                //find the corresponding values to the variable from edge extra data
+                for (EdgeDataFromGenericFile edgeDataFile : extraData) {
+                    Map<String, float[]> variableValues = edgeDataFile.getVariableValues();
+                    if (variableValues.containsKey(indexVariableName)) {
+                        dataStartTime = edgeDataFile.getDataStartTime();
+                        genDataValuesForTime = variableValues.get(indexVariableName);
+                        break;
+                    }
+                }
 
+                //calculate penalty for the given parameters
+                Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
+                int dataQualityHour = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
+                if (dataQualityHour >= 0) {
+                    if (dataQualityHour < genDataValuesForTime.length) {
+                        float value = genDataValuesForTime[dataQualityHour];
+                        String penaltyFormulaString = thresholdPenaltyPair.getValue().getFormula();
+
+                        if (penaltyFormulaString.isEmpty()) {
+                            throw new IllegalArgumentException(String.format("Formula for %s should not be empty", thresholdPenaltyPair.getValue().getName()));
+                        }
+
+                        totalPenalty += calculatePenaltyFromParameters(penaltyFormulaString, value, thresholdPenaltyPair.getKey(),
+                                thresholdPenaltyPair.getValue());
                     }
                 }
             }
+
+            s1.incrementWeight(totalPenalty);
+
         }
 
         return s1;
     }
 
     /**
-     * Calculates penalty for a single pollutant at a given time
-     *
-     * @param airQualityHour time for which the penalty is calculated
-     * @param pollutionValues array of pollutant values to fetch the current value from
-     * @param penaltyThreshold threshold for pollution above which the penalty will be enforced
-     * @param penaltyMultiplier penalty multiplier for pollution that will be used to calculate penalty
-     *
+     * Uses the formula from the penalty parameter and calculates the penalty based on that
+     * @param formula penalty formula
+     * @param value data
+     * @param threshold threshold parameter value
+     * @param penalty penalty parameter value
      * @return penalty
      */
-    private double calculatePollutionPenalty (int airQualityHour, float[] pollutionValues, double penaltyThreshold, double penaltyMultiplier) {
-        double penalty = 0d;
-
-        if (airQualityHour < pollutionValues.length) {
-            float value = pollutionValues[airQualityHour];
-            if (value > penaltyThreshold) {
-                penalty = (value + 1 - penaltyThreshold) * penaltyMultiplier;
-            }
-        }
-
-        return penalty;
+    private double calculatePenaltyFromParameters (String formula, float value, RequestParameters threshold, RequestParameters penalty){
+        Expression experssion = new ExpressionBuilder(formula)
+                .variables("VALUE", "THRESHOLD", "PENALTY")
+                .build()
+                .setVariable("VALUE", value)
+                .setVariable("THRESHOLD", Double.parseDouble(threshold.getValue()))
+                .setVariable("PENALTY", Double.parseDouble(penalty.getValue()));
+        return experssion.evaluate();
     }
 
     private double calculateOverageWeight(double firstValue, double secondValue, double maxValue,
@@ -709,142 +723,142 @@ public class StreetEdge extends Edge implements Cloneable {
         return true;
     }
 
-	@Override
-	public String getName() {
-		return this.name.toString();
-	}
+  @Override
+  public String getName() {
+    return this.name.toString();
+  }
 
-	/**
-	* Gets non-localized I18NString (Used when splitting edges)
-	* @return non-localized Name
-	*/
-	public I18NString getRawName() {
-		return this.name;
-	}
+  /**
+  * Gets non-localized I18NString (Used when splitting edges)
+  * @return non-localized Name
+  */
+  public I18NString getRawName() {
+    return this.name;
+  }
 
-	public String getName(Locale locale) {
-		return this.name.toString(locale);
-	}
+  public String getName(Locale locale) {
+    return this.name.toString(locale);
+  }
 
-	public void setName(I18NString name) {
-		this.name = name;
-	}
+  public void setName(I18NString name) {
+    this.name = name;
+  }
 
-	public LineString getGeometry() {
-		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry, isBack());
-	}
+  public LineString getGeometry() {
+    return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry, isBack());
+  }
 
-	private void setGeometry(LineString geometry) {
-		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), isBack() ? (LineString)geometry.reverse() : geometry, isBack());
-	}
+  private void setGeometry(LineString geometry) {
+    this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), isBack() ? (LineString)geometry.reverse() : geometry, isBack());
+  }
 
-	public void shareData(StreetEdge reversedEdge) {
-	    if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
-	        compactGeometry = reversedEdge.compactGeometry;
-	    } else {
-	        LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
-	    }
-	}
+  public void shareData(StreetEdge reversedEdge) {
+      if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
+          compactGeometry = reversedEdge.compactGeometry;
+      } else {
+          LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
+      }
+  }
 
-	public boolean isWheelchairAccessible() {
-		return BitSetUtils.get(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX);
-	}
+  public boolean isWheelchairAccessible() {
+    return BitSetUtils.get(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX);
+  }
 
-	public void setWheelchairAccessible(boolean wheelchairAccessible) {
+  public void setWheelchairAccessible(boolean wheelchairAccessible) {
         flags = BitSetUtils.set(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX, wheelchairAccessible);
-	}
+  }
 
-	public StreetTraversalPermission getPermission() {
-		return permission;
-	}
+  public StreetTraversalPermission getPermission() {
+    return permission;
+  }
 
-	public void setPermission(StreetTraversalPermission permission) {
-		this.permission = permission;
-	}
+  public void setPermission(StreetTraversalPermission permission) {
+    this.permission = permission;
+  }
 
-	public int getStreetClass() {
-		return streetClass;
-	}
+  public int getStreetClass() {
+    return streetClass;
+  }
 
-	public void setStreetClass(int streetClass) {
-		this.streetClass = streetClass;
-	}
+  public void setStreetClass(int streetClass) {
+    this.streetClass = streetClass;
+  }
 
-	/**
-	 * Marks that this edge is the reverse of the one defined in the source
-	 * data. Does NOT mean fromv/tov are reversed.
-	 */
-	public boolean isBack() {
-	    return BitSetUtils.get(flags, BACK_FLAG_INDEX);
-	}
+  /**
+   * Marks that this edge is the reverse of the one defined in the source
+   * data. Does NOT mean fromv/tov are reversed.
+   */
+  public boolean isBack() {
+      return BitSetUtils.get(flags, BACK_FLAG_INDEX);
+  }
 
-	public void setBack(boolean back) {
+  public void setBack(boolean back) {
             flags = BitSetUtils.set(flags, BACK_FLAG_INDEX, back);
-	}
+  }
 
-	public boolean isRoundabout() {
+  public boolean isRoundabout() {
             return BitSetUtils.get(flags, ROUNDABOUT_FLAG_INDEX);
-	}
+  }
 
-	public void setRoundabout(boolean roundabout) {
-	    flags = BitSetUtils.set(flags, ROUNDABOUT_FLAG_INDEX, roundabout);
-	}
+  public void setRoundabout(boolean roundabout) {
+      flags = BitSetUtils.set(flags, ROUNDABOUT_FLAG_INDEX, roundabout);
+  }
 
-	public boolean hasBogusName() {
-	    return BitSetUtils.get(flags, HASBOGUSNAME_FLAG_INDEX);
-	}
+  public boolean hasBogusName() {
+      return BitSetUtils.get(flags, HASBOGUSNAME_FLAG_INDEX);
+  }
 
-	public void setHasBogusName(boolean hasBogusName) {
-	    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
-	}
+  public void setHasBogusName(boolean hasBogusName) {
+      flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
+  }
 
-	public boolean isNoThruTraffic() {
+  public boolean isNoThruTraffic() {
             return BitSetUtils.get(flags, NOTHRUTRAFFIC_FLAG_INDEX);
-	}
+  }
 
-	public void setNoThruTraffic(boolean noThruTraffic) {
-	    flags = BitSetUtils.set(flags, NOTHRUTRAFFIC_FLAG_INDEX, noThruTraffic);
-	}
+  public void setNoThruTraffic(boolean noThruTraffic) {
+      flags = BitSetUtils.set(flags, NOTHRUTRAFFIC_FLAG_INDEX, noThruTraffic);
+  }
 
-	/**
-	 * This street is a staircase
-	 */
-	public boolean isStairs() {
+  /**
+   * This street is a staircase
+   */
+  public boolean isStairs() {
             return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
-	}
+  }
 
-	public void setStairs(boolean stairs) {
-	    flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
-	}
+  public void setStairs(boolean stairs) {
+      flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
+  }
 
-	public float getCarSpeed() {
-		return carSpeed;
-	}
+  public float getCarSpeed() {
+    return carSpeed;
+  }
 
-	public void setCarSpeed(float carSpeed) {
-		this.carSpeed = carSpeed;
-	}
+  public void setCarSpeed(float carSpeed) {
+    this.carSpeed = carSpeed;
+  }
 
-	public boolean isSlopeOverride() {
-	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
-	}
+  public boolean isSlopeOverride() {
+      return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
+  }
 
-	public void setSlopeOverride(boolean slopeOverride) {
-	    flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
-	}
+  public void setSlopeOverride(boolean slopeOverride) {
+      flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
+  }
 
     /**
      * Return the azimuth of the first segment in this edge in integer degrees clockwise from South.
      * TODO change everything to clockwise from North
      */
-	public int getInAngle() {
-		return (int) Math.round(this.inAngle * 180 / 128.0);
-	}
+  public int getInAngle() {
+    return (int) Math.round(this.inAngle * 180 / 128.0);
+  }
 
     /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
-	public int getOutAngle() {
-		return (int) Math.round(this.outAngle * 180 / 128.0);
-	}
+  public int getOutAngle() {
+    return (int) Math.round(this.outAngle * 180 / 128.0);
+  }
 
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);

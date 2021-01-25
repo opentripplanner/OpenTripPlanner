@@ -69,7 +69,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
     //special fields from the settings.json file
-    public List<RequestParameters> genDataRequestParameters;
+    public Map<RequestParameters, RequestParameters> genDataRequestParameters;
 
     /**
      * The model that computes turn/traversal costs.

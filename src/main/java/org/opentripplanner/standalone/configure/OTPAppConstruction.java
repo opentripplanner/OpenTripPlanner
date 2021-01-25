@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.configure;
 
-import com.google.gson.Gson;
+import fi.metatavu.airquality.GenericFileConfigurationParser;
 import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.datastore.DataSource;
@@ -19,14 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import javax.ws.rs.core.Application;
 
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.IllegalFormatException;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
@@ -53,7 +48,7 @@ public class OTPAppConstruction {
     private OtpDataStore store = null;
     private OTPServer server = null;
     private GraphBuilderDataSources graphBuilderDataSources = null;
-    private GenericFileConfiguration[] configurations;
+    private Map<RequestParameters, RequestParameters> configurations;
 
 
     /**
@@ -120,29 +115,17 @@ public class OTPAppConstruction {
         return config;
     }
 
-    public GenericFileConfiguration [] genericFileConfigurations(){
+    /**
+     * Return map of expected request parameters for the generic data
+     * @return map of reques parameters, where key = threshold, value = penalty
+     */
+    public Map<RequestParameters, RequestParameters> genericFileParameters(){
         if (this.configurations != null){
             return this.configurations;
         }
-        DataSource dataSettings = store().getDataSettings();
-        if (dataSettings.exists()) {
-            GenericFileConfiguration[] configurations = new Gson().fromJson(new InputStreamReader(dataSettings.asInputStream()),
-                    GenericFileConfiguration[].class);
-            //validate the configurations
-            for (GenericFileConfiguration configuration : configurations){
-                RequestParameters[] requestParametersList = configuration.getRequestParameters();
-                Arrays.stream(requestParametersList)
-                        .collect(Collectors.groupingBy(RequestParameters::getVariable))
-                        .forEach((k, v) -> {
-                            if (v.size() != 2)
-                                throw new IllegalArgumentException("The settings file has incorrect request parameters");
-                        });
-
-
-            }
-            return configurations;
-        }
-        else return null;
+        GenericFileConfiguration[] configurationsArray = GenericFileConfigurationParser.parse(store().getGenericDataSettings());
+        Map<RequestParameters, RequestParameters> parametersMap = GenericFileConfigurationParser.parseConfParam(configurationsArray);
+        return parametersMap;
     }
     /**
      * Create the top-level objects that represent the OTP server. There is one server and it
