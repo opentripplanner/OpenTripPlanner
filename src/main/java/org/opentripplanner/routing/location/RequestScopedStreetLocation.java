@@ -6,6 +6,10 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.RequestScopedVertex;
 import org.opentripplanner.util.I18NString;
 
+/**
+ * This represents the origin or destination of a single request. These are linked to the street
+ * graph and discarded after the request has finished.
+ */
 final public class RequestScopedStreetLocation extends StreetLocation implements
     RequestScopedVertex {
     final private boolean endVertex;
