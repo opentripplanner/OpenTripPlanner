@@ -809,7 +809,7 @@ public abstract class RoutingResource {
             request.pathComparator = pathComparator;
 
         if(debugItineraryFilter != null ) {
-            request.debugItineraryFilter = debugItineraryFilter;
+            request.itineraryFilters.debug = debugItineraryFilter;
         }
 
         //getLocale function returns defaultLocale if locale is null

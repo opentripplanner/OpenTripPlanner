@@ -302,7 +302,7 @@ public class Itinerary {
                 buf.walk((int)leg.getDuration());
             }
             else if(leg.isTransitLeg()) {
-              buf.transit(leg.mode, leg.getTrip().getId().getId(), leg.startTime, leg.endTime);
+              buf.transit(leg.mode, leg.getTrip().logInfo(), leg.startTime, leg.endTime);
             }
             else {
                 buf.other(leg.mode, leg.startTime, leg.endTime);

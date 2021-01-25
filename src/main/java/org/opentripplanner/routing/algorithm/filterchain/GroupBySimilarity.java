@@ -2,8 +2,6 @@ package org.opentripplanner.routing.algorithm.filterchain;
 
 import org.opentripplanner.model.base.ToStringBuilder;
 
-import javax.annotation.Nullable;
-
 /**
  * Group itineraries by similarity and reduce the number of itineraries down to an approximate
  * minimum number of itineraries for each group.
@@ -20,8 +18,7 @@ import javax.annotation.Nullable;
  * <p>
  * When this filter is enabled, itineraries are grouped by the "main" transit legs. Short legs
  * are skipped. Than for each group of itineraries the itinerary with the lowest cost is kept.
- * All other itineraries are dropped. The default cost is the itinerary generalized-cost, but
- * it is possible to the {@link AdjustedCost} instead.
+ * All other itineraries are dropped.
  * <p>
  * A good way to allow for some variation is to include several entries, relaxing the min-limit,
  * while tightening the group-by-p criteria. For example:
@@ -52,20 +49,10 @@ public class GroupBySimilarity {
    */
   public final int approximateMinLimit;
 
-  /**
-   * Instead of using the generalized-cost to filter itineraries, setting
-   */
-  @Nullable
-  public final AdjustedCost adjustedCost;
 
-  public GroupBySimilarity(
-      double groupByP,
-      int approximateMinLimit,
-      AdjustedCost adjustedCost
-  ) {
+  public GroupBySimilarity(double groupByP, int approximateMinLimit) {
     this.groupByP = groupByP;
     this.approximateMinLimit = approximateMinLimit;
-    this.adjustedCost = adjustedCost;
   }
 
   @Override
@@ -73,7 +60,6 @@ public class GroupBySimilarity {
     return ToStringBuilder.of(GroupBySimilarity.class)
         .addNum("groupByP", groupByP)
         .addNum("approximateMinLimit", approximateMinLimit)
-        .addObj("adjustedCost", adjustedCost)
         .toString();
   }
 }

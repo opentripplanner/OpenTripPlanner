@@ -11,7 +11,7 @@ public class SystemNoticeType {
         .name("SystemNotice")
         .description("A system notice is used to tag elements with system information for "
             + "debugging or other system related purpose. One use-case is to run a "
-            + "routing search with 'debugItineraryFilter: true'. This will then tag "
+            + "routing search with 'itineraryFilters.debug: true'. This will then tag "
             + "itineraries instead of removing them from the result. This make it "
             + "possible to inspect the itinerary-filter-chain. A SystemNotice only "
             + "have english text, because the primary user are technical staff, like "

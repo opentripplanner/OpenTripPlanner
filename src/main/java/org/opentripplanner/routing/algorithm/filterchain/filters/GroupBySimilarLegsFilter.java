@@ -39,6 +39,6 @@ public class GroupBySimilarLegsFilter extends GroupByFilter<GroupByTripIdAndDist
   }
 
   private static String name(double groupByP, int minNumOfItineraries) {
-    return "similar-legs-filter-" + (int)(100d * groupByP) + "p-" + minNumOfItineraries;
+    return "similar-legs-filter-" + (int)(100d * groupByP) + "p-" + minNumOfItineraries + "x";
   }
 }

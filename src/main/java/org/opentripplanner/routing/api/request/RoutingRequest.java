@@ -26,6 +26,7 @@ import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -41,7 +42,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.function.DoubleFunction;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
@@ -532,23 +532,6 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public Map<TraverseMode, Integer> alightSlackForMode = new HashMap<>();
 
-
-    /**
-     * A relative maximum limit for the generalized cost for transit itineraries. The limit is a
-     * linear function of the minimum generalized-cost. The minimum cost is lowest cost from the
-     * set of all returned transit itineraries. The function is used to calculate a max-limit. The
-     * max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost
-     * higher than the max-limit is dropped from the result set. None transit itineraries is
-     * excluded from the filter.
-     * <ul>
-     * <li>To set a filter to be 1 hours plus 2 times the lowest cost use:
-     * {@code 3600 + 2.0 x}
-     * <li>To set an absolute value(3000) use: {@code 3000 + 0x}
-     * </ul>
-     * The default is {@code null} - no filter is applied.
-     */
-    public DoubleFunction<Double> transitGeneralizedCostLimit = null;
-
     /**
      * Ideally maxTransfers should be set in the router config, not here. Instead the client should
      * be able to pass in a parameter for the max number of additional/extra transfers relative to
@@ -688,13 +671,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String pathComparator = null;
 
 
-    /**
-     * Switch on to return all itineraries and mark filtered itineraries as deleted.
-     */
-    public boolean debugItineraryFilter = false;
-
-
-    public GroupBySimilarityParams groupBySimilarity;
+    @Nonnull
+    public ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
 
     /**
      * The numbers of days before the search date to consider when filtering trips for this search.

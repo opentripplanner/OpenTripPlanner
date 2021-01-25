@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
  */
 public class ToStringBuilder {
     private static final String FIELD_SEPARATOR = ", ";
+    private static final String FIELD_VALUE_SEP = ": ";
+    private static final String NULL_VALUE = "null";
     private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
     private final StringBuilder sb = new StringBuilder();
@@ -187,7 +189,7 @@ public class ToStringBuilder {
     private <T> ToStringBuilder addIfNotIgnored(String name, T value, T ignoreValue, Function<T, String> mapToString) {
         if(value == ignoreValue) { return this; }
         if(ignoreValue != null && ignoreValue.equals(value)) { return this; }
-        if(value == null) { return addIt(name, "null"); }
+        if(value == null) { return addIt(name, NULL_VALUE); }
         return addIt(name, mapToString.apply(value));
     }
 
@@ -195,7 +197,7 @@ public class ToStringBuilder {
         if (first) { first = false; }
         else { sb.append(FIELD_SEPARATOR); }
 
-        sb.append(name).append(": ");
+        sb.append(name).append(FIELD_VALUE_SEP);
         sb.append(value);
         return this;
     }
@@ -217,7 +219,7 @@ public class ToStringBuilder {
     }
 
     String formatNumber(Number value) {
-        if (value == null) { return "null"; }
+        if (value == null) { return NULL_VALUE; }
 
         if(value instanceof Integer || value instanceof Long || value instanceof BigInteger) {
             if(integerFormat == null) {

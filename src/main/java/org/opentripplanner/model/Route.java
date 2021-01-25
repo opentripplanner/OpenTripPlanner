@@ -190,9 +190,7 @@ public final class Route extends TransitEntity {
 
     /** @return the route's short name, or the long name if the short name is null. */
     public String getName() {
-        if (shortName != null)
-            return shortName;
-        return longName;
+        return  shortName != null ? shortName : longName;
     }
 
     @Override

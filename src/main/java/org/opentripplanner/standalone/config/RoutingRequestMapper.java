@@ -40,13 +40,11 @@ public class RoutingRequestMapper {
         request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
         request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
         request.boardSlackForMode = c.asEnumMap("boardSlackForMode", TraverseMode.class, NodeAdapter::asInt);
-        request.debugItineraryFilter = c.asBoolean("debugItineraryFilter", dft.debugItineraryFilter);
         request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
         request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
         request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
         request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
-        request.debugItineraryFilter = c.asBoolean("debugItineraryFilter", dft.debugItineraryFilter);
-        request.groupBySimilarity = GroupBySimilarityMapper.map(c.path("groupBySimilarity"));
+        request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"));
         request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
         request.disableRemainingWeightHeuristic = c.asBoolean("disableRemainingWeightHeuristic", dft.disableRemainingWeightHeuristic);
         request.driveOnRight = c.asBoolean("driveOnRight", dft.driveOnRight);
@@ -78,7 +76,6 @@ public class RoutingRequestMapper {
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
         request.transferCost = c.asInt("transferPenalty", dft.transferCost);
         request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
-        request.transitGeneralizedCostLimit = c.asLinearFunction("transitGeneralizedCostLimit", dft.transitGeneralizedCostLimit);
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useBikeRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useBikeRentalAvailabilityInformation);
         request.useRequestedDateTimeInMaxHours = c.asBoolean("useRequestedDateTimeInMaxHours", dft.useRequestedDateTimeInMaxHours);
