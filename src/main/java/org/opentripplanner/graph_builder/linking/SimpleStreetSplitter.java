@@ -106,10 +106,6 @@ public class SimpleStreetSplitter {
 
     private final SpatialIndex transitStopIndex;
 
-    // If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
-    // If false new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
-    private final boolean destructiveSplitting;
-
     private Boolean addExtraEdgesToAreas = false;
 
     /**
@@ -118,15 +114,13 @@ public class SimpleStreetSplitter {
      *
      * @param hashGridSpatialIndex If not null this index is used instead of creating new one
      * @param transitStopIndex Index of all transitStops which is generated in {@link StreetVertexIndex}
-     * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when false Splitting is only for duration of a request. Since they are made from temporary vertices and edges.
      */
     public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex,
-        SpatialIndex transitStopIndex, boolean destructiveSplitting, DataImportIssueStore issueStore
+        SpatialIndex transitStopIndex, DataImportIssueStore issueStore
     ) {
         this.issueStore = issueStore;
         this.graph = graph;
         this.transitStopIndex = transitStopIndex;
-        this.destructiveSplitting = destructiveSplitting;
         this.edgeFactory = new DefaultStreetEdgeFactory();
 
         //We build a spatial index if it isn't provided
@@ -149,23 +143,23 @@ public class SimpleStreetSplitter {
 
      */
     public SimpleStreetSplitter(Graph graph, DataImportIssueStore issueStore) {
-        this(graph, null, null, true, issueStore);
+        this(graph, null, null, issueStore);
     }
 
     public static SimpleStreetSplitter createForTest(Graph graph) {
-        return new SimpleStreetSplitter(graph, null, null, true, new DataImportIssueStore(false));
+        return new SimpleStreetSplitter(graph, null, null, new DataImportIssueStore(false));
     }
 
     /** Link all relevant vertices to the street network */
-    public void link () {
-        link(TransitStopVertex.class, StopUnlinked::new);
-        link(TransitEntranceVertex.class, EntranceUnlinked::new);
-        link(BikeRentalStationVertex.class, BikeRentalStationUnlinked::new);
-        link(BikeParkVertex.class, BikeParkUnlinked::new);
+    public void linkRelevantVerticesPermanently() {
+        linkPermanently(TransitStopVertex.class, StopUnlinked::new);
+        linkPermanently(TransitEntranceVertex.class, EntranceUnlinked::new);
+        linkPermanently(BikeRentalStationVertex.class, BikeRentalStationUnlinked::new);
+        linkPermanently(BikeParkVertex.class, BikeParkUnlinked::new);
     }
 
     @SuppressWarnings("Convert2MethodRef")
-    public <T extends Vertex> void link(
+    public <T extends Vertex> void linkPermanently(
             Class<T> type,
             Function<T, DataImportIssue> unlinkedIssueMapper
     ) {
@@ -196,7 +190,7 @@ public class SimpleStreetSplitter {
                 continue;
             }
 
-            if (!link(v)) {
+            if (!linkToWalkableEdge(v, StreetSplitMode.PERMANENT)) {
                 issueStore.add(unlinkedIssueMapper.apply(v));
             }
             // Keep lambda! A method-ref would cause incorrect class and line number to be logged
@@ -206,8 +200,8 @@ public class SimpleStreetSplitter {
     }
 
     /** Link this vertex into the graph to the closest walkable edge */
-    public boolean link (Vertex vertex) {
-        return link(vertex, TraverseMode.WALK, null);
+    public boolean linkToWalkableEdge(Vertex vertex, StreetSplitMode streetSplitMode) {
+        return linkVertexToStreetGraph(vertex, TraverseMode.WALK, streetSplitMode);
     }
 
     /**
@@ -217,11 +211,11 @@ public class SimpleStreetSplitter {
      * smaller. Therefore we use an expanding-envelope search, which is more efficient in dense areas.
      * @return whether linking succeeded (an edge or edges were found within range)
      */
-    public boolean link(Vertex vertex, TraverseMode traverseMode, RoutingRequest options) {
-        if (linkToStreetEdges(vertex, traverseMode, options, INITIAL_SEARCH_RADIUS_METERS)) {
+    public boolean linkVertexToStreetGraph(Vertex vertex, TraverseMode traverseMode, StreetSplitMode streetSplitMode) {
+        if (linkVertexToStreetGraph(vertex, traverseMode, INITIAL_SEARCH_RADIUS_METERS, streetSplitMode)) {
             return true;
         }
-        return linkToStreetEdges(vertex, traverseMode, options, MAX_SEARCH_RADIUS_METERS);
+        return linkVertexToStreetGraph(vertex, traverseMode, MAX_SEARCH_RADIUS_METERS, streetSplitMode);
     }
 
     private static class DistanceTo<T> {
@@ -235,7 +229,7 @@ public class SimpleStreetSplitter {
         }
     }
 
-    public boolean linkToStreetEdges (Vertex vertex, TraverseMode traverseMode, RoutingRequest options, int radiusMeters) {
+    public boolean linkVertexToStreetGraph(Vertex vertex, TraverseMode traverseMode, int radiusMeters, StreetSplitMode streetSplitMode) {
 
         final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(radiusMeters);
 
@@ -284,7 +278,7 @@ public class SimpleStreetSplitter {
 
                 candidateEdges.stream()
                         .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
-                        .forEach(ce -> link(vertex, ce.item, xscale, options));
+                        .forEach(ce -> linkVertexToEdge(vertex, ce.item, xscale, streetSplitMode));
 
                 // Warn if a linkage was made for a transit stop, but the linkage was suspiciously long.
                 if (vertex instanceof TransitStopVertex) {
@@ -299,7 +293,7 @@ public class SimpleStreetSplitter {
         if (radiusMeters >= MAX_SEARCH_RADIUS_METERS) {
             // There were no candidate edges within the max linking distance, fall back on finding transit stops.
             // We only link to stops if we are searching for origin/destination and for that we need transitStopIndex.
-            if (destructiveSplitting || transitStopIndex == null) {
+            if (streetSplitMode.equals(StreetSplitMode.PERMANENT) || transitStopIndex == null) {
                 return false;
             }
             LOG.debug("No street edge was found for {}, checking transit stop vertices.", vertex);
@@ -323,7 +317,7 @@ public class SimpleStreetSplitter {
                     .map(dts -> dts.item)
                     .forEach(sv -> {
                         LOG.debug("Linking vertex to stop: {}", sv.getName());
-                        makeTemporaryEdges((RequestScopedStreetLocation)vertex, sv);
+                        makeTemporaryEdges((RequestScopedStreetLocation)vertex, sv, streetSplitMode);
                     });
 
             return true;
@@ -373,44 +367,44 @@ public class SimpleStreetSplitter {
         }
     }
 
-    /** split the edge and link in the transit stop */
-    private void link(Vertex tstop, StreetEdge edge, double xscale, RoutingRequest options) {
+    /** split the edge and link in the vertex */
+    private void linkVertexToEdge(Vertex vertex, StreetEdge edge, double xscale, StreetSplitMode streetSplitMode) {
         // TODO: we've already built this line string, we should save it
         LineString orig = edge.getGeometry();
         LineString transformed = equirectangularProject(orig, xscale);
         LocationIndexedLine il = new LocationIndexedLine(transformed);
-        LinearLocation ll = il.project(new Coordinate(tstop.getLon() * xscale, tstop.getLat()));
+        LinearLocation ll = il.project(new Coordinate(vertex.getLon() * xscale, vertex.getLat()));
 
         // if we're very close to one end of the line or the other, or endwise, don't bother to split,
         // cut to the chase and link directly
         // We use a really tiny epsilon here because we only want points that actually snap to exactly the same location on the
         // street to use the same vertices. Otherwise the order the stops are loaded in will affect where they are snapped.
         if (ll.getSegmentIndex() == 0 && ll.getSegmentFraction() < 1e-8) {
-            makeLinkEdges(tstop, (StreetVertex) edge.getFromVertex());
+            makeLinkEdges(vertex, (StreetVertex) edge.getFromVertex(), streetSplitMode);
         }
         // -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
         // past the last point
         else if (ll.getSegmentIndex() == orig.getNumPoints() - 1) {
-            makeLinkEdges(tstop, (StreetVertex) edge.getToVertex());
+            makeLinkEdges(vertex, (StreetVertex) edge.getToVertex(), streetSplitMode);
         }
 
         // nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
         else if (ll.getSegmentIndex() == orig.getNumPoints() - 2 && ll.getSegmentFraction() > 1 - 1e-8) {
-            makeLinkEdges(tstop, (StreetVertex) edge.getToVertex());
+            makeLinkEdges(vertex, (StreetVertex) edge.getToVertex(), streetSplitMode);
         }
 
         else {
 
             RequestScopedVertex RequestScopedVertex = null;
             boolean endVertex = false;
-            if (tstop instanceof RequestScopedVertex) {
-                RequestScopedVertex = (RequestScopedVertex) tstop;
+            if (vertex instanceof RequestScopedVertex) {
+                RequestScopedVertex = (RequestScopedVertex) vertex;
                 endVertex = RequestScopedVertex.isEndVertex();
 
             }
             // split the edge, get the split vertex
-            SplitterVertex v0 = split(edge, ll, RequestScopedVertex != null, endVertex);
-            makeLinkEdges(tstop, v0);
+            SplitterVertex v0 = split(edge, ll, endVertex, streetSplitMode);
+            makeLinkEdges(vertex, v0, streetSplitMode);
 
             if (OTPFeature.FlexRouting.isOn() && graph.index != null
                 && edge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN_AND_CAR)
@@ -429,7 +423,7 @@ public class SimpleStreetSplitter {
 
             // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
             // edges that were missed by WalkableAreaBuilder
-            if (edge instanceof AreaEdge && tstop instanceof TransitStopVertex && this.addExtraEdgesToAreas) {
+            if (edge instanceof AreaEdge && vertex instanceof TransitStopVertex && this.addExtraEdgesToAreas) {
                 linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
             }
         }
@@ -440,11 +434,10 @@ public class SimpleStreetSplitter {
      *
      * @param edge to be split
      * @param ll fraction at which to split the edge
-     * @param temporarySplit if true this is temporary split at origin/destinations search and only temporary edges vertices are created
      * @param endVertex if this is temporary edge this is true if this is end vertex otherwise it doesn't matter
      * @return Splitter vertex with added new edges
      */
-    private SplitterVertex split (StreetEdge edge, LinearLocation ll, boolean temporarySplit, boolean endVertex) {
+    private SplitterVertex split (StreetEdge edge, LinearLocation ll, boolean endVertex, StreetSplitMode streetSplitMode) {
         LineString geometry = edge.getGeometry();
 
         // create the geometries
@@ -452,7 +445,7 @@ public class SimpleStreetSplitter {
 
         SplitterVertex v;
         String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
-        if (temporarySplit) {
+        if (!streetSplitMode.equals(StreetSplitMode.PERMANENT)) {
             RequestScopedSplitterVertex tsv = new RequestScopedSplitterVertex(
                     uniqueSplitLabel, splitPoint.x, splitPoint.y, edge, endVertex);
             tsv.setWheelchairAccessible(edge.isWheelchairAccessible());
@@ -463,9 +456,9 @@ public class SimpleStreetSplitter {
 
         // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
         // existing vertices
-        P2<StreetEdge> edges = edge.split(v, !temporarySplit);
+        P2<StreetEdge> edges = edge.split(v, streetSplitMode.equals(StreetSplitMode.PERMANENT));
 
-        if (destructiveSplitting) {
+        if (streetSplitMode.equals(StreetSplitMode.PERMANENT)) {
             // update indices of new edges
             idx.insert(edges.first.getGeometry(), edges.first);
             idx.insert(edges.second.getGeometry(), edges.second);
@@ -484,24 +477,24 @@ public class SimpleStreetSplitter {
     }
 
     /** Make the appropriate type of link edges from a vertex */
-    private void makeLinkEdges(Vertex from, StreetVertex to) {
+    private void makeLinkEdges(Vertex from, StreetVertex to, StreetSplitMode streetSplitMode) {
         if (from instanceof RequestScopedStreetLocation) {
-            makeTemporaryEdges((RequestScopedStreetLocation) from, to);
+            makeTemporaryEdges((RequestScopedStreetLocation) from, to, streetSplitMode);
         } else if (from instanceof TransitStopVertex) {
-            makeTransitLinkEdges((TransitStopVertex) from, to);
+            makeTransitLinkEdges((TransitStopVertex) from, to, streetSplitMode);
         } else if (from instanceof TransitEntranceVertex) {
-            makeTransitLinkEdges((TransitEntranceVertex) from, to);
+            makeTransitLinkEdges((TransitEntranceVertex) from, to, streetSplitMode);
         } else if (from instanceof BikeRentalStationVertex) {
-            makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
+            makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to, streetSplitMode);
         } else if (from instanceof BikeParkVertex) {
-            makeBikeParkEdges((BikeParkVertex) from, to);
+            makeBikeParkEdges((BikeParkVertex) from, to, streetSplitMode);
         }
     }
 
     /** Make temporary edges to origin/destination vertex in origin/destination search **/
-    private void makeTemporaryEdges(RequestScopedStreetLocation from, Vertex to) {
-        if (destructiveSplitting) {
-            throw new RuntimeException("Destructive splitting is used on temporary edges. Something is wrong!");
+    private void makeTemporaryEdges(RequestScopedStreetLocation from, Vertex to, StreetSplitMode streetSplitMode) {
+        if (streetSplitMode.equals(StreetSplitMode.PERMANENT)) {
+            throw new RuntimeException("Temporary edges are created with non destructive splitting!");
         }
         if (to instanceof RequestScopedSplitterVertex) {
             from.setWheelchairAccessible(((RequestScopedSplitterVertex) to).isWheelchairAccessible());
@@ -516,8 +509,8 @@ public class SimpleStreetSplitter {
     }
 
     /** Make bike park edges */
-    private void makeBikeParkEdges(BikeParkVertex from, StreetVertex to) {
-        if (!destructiveSplitting) {
+    private void makeBikeParkEdges(BikeParkVertex from, StreetVertex to, StreetSplitMode streetSplitMode) {
+        if (!streetSplitMode.equals(StreetSplitMode.PERMANENT)) {
             throw new RuntimeException("Bike park edges are created with non destructive splitting!");
         }
         for (StreetBikeParkLink sbpl : Iterables.filter(from.getOutgoing(), StreetBikeParkLink.class)) {
@@ -532,8 +525,8 @@ public class SimpleStreetSplitter {
     /** 
      * Make street transit link edges, unless they already exist.
      */
-    private void makeTransitLinkEdges (TransitStopVertex tstop, StreetVertex v) {
-        if (!destructiveSplitting) {
+    private void makeTransitLinkEdges (TransitStopVertex tstop, StreetVertex v, StreetSplitMode streetSplitMode) {
+        if (!streetSplitMode.equals(StreetSplitMode.PERMANENT)) {
             throw new RuntimeException("Transitedges are created with non destructive splitting!");
         }
         // ensure that the requisite edges do not already exist
@@ -550,8 +543,8 @@ public class SimpleStreetSplitter {
     /**
      * Make street transit link edges, unless they already exist.
      */
-    private void makeTransitLinkEdges(TransitEntranceVertex entrance, StreetVertex v) {
-        if (!destructiveSplitting) {
+    private void makeTransitLinkEdges(TransitEntranceVertex entrance, StreetVertex v, StreetSplitMode streetSplitMode) {
+        if (streetSplitMode.equals(StreetSplitMode.PERMANENT)) {
             throw new RuntimeException("Transitedges are created with non destructive splitting!");
         }
         // ensure that the requisite edges do not already exist
@@ -565,8 +558,8 @@ public class SimpleStreetSplitter {
     }
 
     /** Make link edges for bike rental */
-    private void makeBikeRentalLinkEdges (BikeRentalStationVertex from, StreetVertex to) {
-        if (!destructiveSplitting) {
+    private void makeBikeRentalLinkEdges (BikeRentalStationVertex from, StreetVertex to, StreetSplitMode streetSplitMode) {
+        if (streetSplitMode.equals(StreetSplitMode.PERMANENT)) {
             throw new RuntimeException("Bike rental edges are created with non destructive splitting!");
         }
         for (StreetBikeRentalLink sbrl : Iterables.filter(from.getOutgoing(), StreetBikeRentalLink.class)) {
@@ -613,11 +606,8 @@ public class SimpleStreetSplitter {
      *
      * @param endVertex true if this is destination vertex
      */
-    public Vertex getClosestVertex(GenericLocation location, RoutingRequest options,
+    public Vertex getClosestVertexForRequest(GenericLocation location, RoutingRequest options,
         boolean endVertex) {
-        if (destructiveSplitting) {
-            throw new RuntimeException("Origin and destination search is used with destructive splitting. Something is wrong!");
-        }
         if (endVertex) {
             LOG.debug("Finding end vertex for {}", location);
         } else {
@@ -659,7 +649,7 @@ public class SimpleStreetSplitter {
                 nonTransitMode = TraverseMode.BICYCLE;
         }
 
-        if(!link(closest, nonTransitMode, options)) {
+        if(!linkVertexToStreetGraph(closest, nonTransitMode, StreetSplitMode.REQUEST_SCOPED)) {
             LOG.warn("Couldn't link {}", location);
         }
         return closest;

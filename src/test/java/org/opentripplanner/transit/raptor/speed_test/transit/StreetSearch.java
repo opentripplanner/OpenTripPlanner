@@ -4,6 +4,7 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.StreetSplitMode;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -63,7 +64,7 @@ class StreetSearch {
                     new NonLocalizedString(place.name),
                     !fromOrigin
             );
-            splitter.link(vertex);
+            splitter.linkToWalkableEdge(vertex, StreetSplitMode.REQUEST_SCOPED);
         }
 
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(

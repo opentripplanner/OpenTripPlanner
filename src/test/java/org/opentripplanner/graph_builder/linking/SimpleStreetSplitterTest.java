@@ -23,7 +23,7 @@ public class SimpleStreetSplitterTest {
     @Before
     public void buildSpy(){
         Graph graph = new Graph();
-        SimpleStreetSplitter simpleStreetSplitter = new SimpleStreetSplitter(graph, null, null,false, new DataImportIssueStore(false));
+        SimpleStreetSplitter simpleStreetSplitter = new SimpleStreetSplitter(graph, null, null, new DataImportIssueStore(false));
         spySimpleStreetSplitter = spy(simpleStreetSplitter);
     }
 
@@ -38,7 +38,7 @@ public class SimpleStreetSplitterTest {
         routingRequest.setMode(TraverseMode.CAR);
         routingRequest.parkAndRide = true;
 
-        spySimpleStreetSplitter.getClosestVertex(genericLocation, routingRequest, true);
-        verify(spySimpleStreetSplitter).link(any(Vertex.class), eq(TraverseMode.WALK), eq(routingRequest));
+        spySimpleStreetSplitter.getClosestVertexForRequest(genericLocation, routingRequest, true);
+        verify(spySimpleStreetSplitter).linkVertexToStreetGraph(any(Vertex.class), eq(TraverseMode.WALK), eq(StreetSplitMode.REQUEST_SCOPED));
     }
 }

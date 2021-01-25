@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_park;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.StreetSplitMode;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
@@ -103,7 +104,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikeParkVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
-                    if (!linker.link(bikeParkVertex)) {
+                    if (!linker.linkToWalkableEdge(bikeParkVertex, StreetSplitMode.REALTIME)) {
                         // the toString includes the text "Bike park"
                         LOG.info("Bike park {} unlinked", bikeParkVertex);
                     }

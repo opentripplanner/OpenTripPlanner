@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.StreetSplitMode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
@@ -114,7 +115,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     vertex = new BikeRentalStationVertex(graph, station);
-                    if (!linker.link(vertex)) {
+                    if (!linker.linkToWalkableEdge(vertex, StreetSplitMode.REALTIME)) {
                         // the toString includes the text "Bike rental station"
                         LOG.info("BikeRentalStation {} is unlinked", vertex);
                     }

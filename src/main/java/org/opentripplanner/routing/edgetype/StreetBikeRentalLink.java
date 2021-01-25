@@ -16,7 +16,8 @@ import java.util.Locale;
  * This represents the connection between a street vertex and a bike rental station vertex.
  * 
  */
-public class StreetBikeRentalLink extends Edge {
+// TODO Implements RequestScopedEdge here is temporary until Realtime edges are implemented
+public class StreetBikeRentalLink extends Edge implements RequestScopedEdge {
 
     private static final long serialVersionUID = 1L;
 

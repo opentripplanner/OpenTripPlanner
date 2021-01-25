@@ -79,7 +79,6 @@ public class StreetVertexIndex {
                     this.graph,
                     null,
                     null,
-                    false,
                     new DataImportIssueStore(
                             false)
             );
@@ -88,7 +87,6 @@ public class StreetVertexIndex {
                     this.graph,
                     (HashGridSpatialIndex<Edge>) edgeTree,
                     transitStopTree,
-                    false,
                     new DataImportIssueStore(false)
             );
         }
@@ -337,7 +335,7 @@ public class StreetVertexIndex {
         if (coordinate != null) {
             //return getClosestVertex(loc, options, endVertex);
             return Collections.singleton(
-                    simpleStreetSplitter.getClosestVertex(location, options, endVertex));
+                    simpleStreetSplitter.getClosestVertexForRequest(location, options, endVertex));
         }
 
         return null;
@@ -361,7 +359,7 @@ public class StreetVertexIndex {
         Coordinate coordinate = location.getCoordinate();
         if (coordinate != null) {
             //return getClosestVertex(loc, options, endVertex);
-            return simpleStreetSplitter.getClosestVertex(location, options, endVertex);
+            return simpleStreetSplitter.getClosestVertexForRequest(location, options, endVertex);
         }
 
         return null;

@@ -27,7 +27,6 @@ public class EgressAccessRouter {
                 graph,
                 null,
                 null,
-                false,
                 new DataImportIssueStore(false)
         );
     }
