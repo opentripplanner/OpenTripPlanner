@@ -276,7 +276,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * An extra penalty added on transfers (i.e. all boardings except the first one).
      * Not to be confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a
      * vehicle with and without a bicycle. The boardCosts are used to model the 'usual' perceived
-     * cost of using a transit vehicle, and the transferPenalty is used when a user requests even
+     * cost of using a transit vehicle, and the transferCost is used when a user requests even
      * less transfers. In the latter case, we don't actually optimize for fewest transfers, as this
      * can lead to absurd results. Consider a trip in New York from Grand Army
      * Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to
@@ -285,12 +285,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they
      * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6.
      * If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-     *                       old functionality the same way, but we will try to map this parameter
-     *                       so it does work similar as before.
      */
-    @Deprecated
     public int transferCost = 0;
 
     /**
@@ -387,20 +382,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Deprecated
     public double waitAtBeginningFactor = 0.4;
 
-    /** This prevents unnecessary transfers by adding a cost for boarding a vehicle.
-     *
-     * @Deprecated TODO OTP2 - Regression. Could be implemented as a part of itinerary-filtering
-     *                          after a Raptor search.
-     * */
-    @Deprecated
+    /**
+     * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
+     * addition to the cost of the transfer(walking) and waiting-time. It is also in addition to
+     * the {@link #transferCost}.
+     */
     public int walkBoardCost = 60 * 10;
 
-    /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.
-     *
-     * @Deprecated TODO OTP2 - Regression. Could be implemented as a part of itinerary-filtering
-     *                          after a Raptor search.
-     * */
-    @Deprecated
+    /**
+     * Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.
+     * This is in addition to the cost of the transfer(biking) and waiting-time. It is also in
+     * addition to the {@link #transferCost}.
+     */
     public int bikeBoardCost = 60 * 10;
 
     /**

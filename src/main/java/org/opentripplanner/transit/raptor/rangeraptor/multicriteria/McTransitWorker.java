@@ -115,8 +115,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                 final int relativeBoardCost = calculateOnTripRelativeCost(
                     prevArrival,
                     boardTime,
-                    boardWaitTime,
-                    trip
+                    boardWaitTime
                 );
 
                 patternRides.add(
@@ -146,19 +145,12 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
      * @param prevArrival The stop-arrival where the trip was boarded.
      * @param boardTime the wait-time at the board stop before boarding.
      * @param boardWaitTime the wait-time at the board stop before boarding.
-     * @param trip boarded trip
      */
     private int calculateOnTripRelativeCost(
         AbstractStopArrival<T> prevArrival,
         int boardTime,
-        int boardWaitTime,
-        T trip
+        int boardWaitTime
     ) {
-        return costCalculator.onTripRidingCost(
-            prevArrival,
-            boardWaitTime,
-            boardTime,
-            trip
-        );
+        return costCalculator.onTripRidingCost(prevArrival, boardWaitTime, boardTime);
     }
 }

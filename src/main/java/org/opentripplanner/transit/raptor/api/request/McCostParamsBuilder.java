@@ -6,12 +6,14 @@ package org.opentripplanner.transit.raptor.api.request;
  */
 public class McCostParamsBuilder {
     private int boardCost;
+    private int transferCost;
     private double walkReluctanceFactor;
     private double waitReluctanceFactor;
 
 
     McCostParamsBuilder(McCostParams defaults) {
         this.boardCost = defaults.boardCost();
+        this.transferCost = defaults.transferCost();
         this.walkReluctanceFactor = defaults.walkReluctanceFactor();
         this.waitReluctanceFactor = defaults.waitReluctanceFactor();
     }
@@ -22,6 +24,15 @@ public class McCostParamsBuilder {
 
     public McCostParamsBuilder boardCost(int boardCost) {
         this.boardCost = boardCost;
+        return this;
+    }
+
+    public int transferCost() {
+        return transferCost;
+    }
+
+    public McCostParamsBuilder transferCost(int transferCost) {
+        this.transferCost = transferCost;
         return this;
     }
 
