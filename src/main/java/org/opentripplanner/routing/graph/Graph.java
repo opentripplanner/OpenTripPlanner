@@ -367,6 +367,15 @@ public class Graph implements Serializable {
         return this.vertices.values();
     }
 
+    public <T extends Vertex> List<T> getVerticesOfType(Class<T> cls) {
+        return this
+            .getVertices()
+            .stream()
+            .filter(cls::isInstance)
+            .map(cls::cast)
+            .collect(Collectors.toList());
+    }
+
     /**
      * Return all the edges in the graph. Derived from vertices on demand.
      */
