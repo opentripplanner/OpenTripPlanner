@@ -22,9 +22,11 @@ class TestCaseResults {
     private final List<Result> expected = new ArrayList<>();
     private final List<Result> actual = new ArrayList<>();
     private TestStatus status = TestStatus.NA;
+    private final boolean skipCost;
 
-    TestCaseResults(String testCaseId) {
+    TestCaseResults(String testCaseId, boolean skipCost) {
         this.testCaseId = testCaseId;
+        this.skipCost  = skipCost;
     }
 
     void addExpectedResult(Result expectedResult) {
@@ -32,7 +34,7 @@ class TestCaseResults {
     }
 
     void matchItineraries(Collection<Itinerary> itineraries) {
-        actual.addAll(ItineraryResultMapper.map(testCaseId, itineraries));
+        actual.addAll(ItineraryResultMapper.map(testCaseId, itineraries, skipCost));
         boolean[] resultsOk = new boolean[actual.size()];
 
         for (Result exp : expected) {

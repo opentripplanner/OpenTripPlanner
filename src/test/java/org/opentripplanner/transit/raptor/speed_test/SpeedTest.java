@@ -130,7 +130,7 @@ public class SpeedTest {
     private void runSingleTest(int sample, int nSamples) throws Exception {
         System.err.println("Run a single test sample (all test cases once)");
 
-        CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
+        CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME, opts.skipCost());
         List<TestCase> testCases = tcIO.readTestCasesFromFile();
         List<TripPlan> tripPlans = new ArrayList<>();
 
