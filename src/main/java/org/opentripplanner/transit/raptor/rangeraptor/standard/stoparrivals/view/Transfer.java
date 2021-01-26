@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.TransferPathView;
@@ -36,6 +37,11 @@ final class Transfer<T extends RaptorTripSchedule>
     @Override
     public int durationInSeconds() {
         return arrival.transferDuration();
+    }
+
+    @Override
+    public RaptorTransfer transfer() {
+        return arrival.transferPath();
     }
 
     @Override

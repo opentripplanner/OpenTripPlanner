@@ -10,6 +10,8 @@ import org.opentripplanner.transit.raptor.api.view.TransferPathView;
  */
 public final class TransferStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
 
+    private final RaptorTransfer transfer;
+
     public TransferStopArrival(
         AbstractStopArrival<T> previousState,
         RaptorTransfer transferPath,
@@ -22,6 +24,7 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
                 arrivalTime,
                 additionalCost
         );
+        this.transfer = transferPath;
     }
 
     @Override
@@ -31,12 +34,6 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
 
     @Override
     public TransferPathView transferPath() {
-        return this::durationInSeconds;
-    }
-
-    private int durationInSeconds() {
-        // We do not keep the reference to the TransitLayer transfer(RaptorTransfer),
-        // so we compute the duration.
-        return arrivalTime() - previous().arrivalTime();
+        return () -> transfer;
     }
 }
