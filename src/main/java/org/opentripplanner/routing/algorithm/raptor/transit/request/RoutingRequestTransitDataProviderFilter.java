@@ -14,44 +14,45 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class RoutingRequestTransitDataProviderFilter implements TransitDataProviderFilter {
 
-    private final boolean requireBikesAllowed;
-    private final boolean requireWheelchairAccessible;
-    private final Set<TransitMode> transitModes;
-    private final Set<FeedScopedId> bannedRoutes;
+  private final boolean requireBikesAllowed;
+  private final boolean requireWheelchairAccessible;
+  private final Set<TransitMode> transitModes;
+  private final Set<FeedScopedId> bannedRoutes;
 
-    public RoutingRequestTransitDataProviderFilter(RoutingRequest request) {
-        this(
-                request.modes.directMode == StreetMode.BIKE,
-                request.wheelchairAccessible,
-                request.modes.transitModes,
-                request.rctx.bannedRoutes
-        );
+  public RoutingRequestTransitDataProviderFilter(RoutingRequest request) {
+    this(
+        request.modes.directMode == StreetMode.BIKE,
+        request.wheelchairAccessible,
+        request.modes.transitModes,
+        request.rctx.bannedRoutes
+    );
+  }
+
+  @Override
+  public <T extends TripPatternForDate> boolean tripPatternPredicate(T tripPatternForDate) {
+    return routeIsNotBanned(tripPatternForDate) && transitModeIsAllowed(tripPatternForDate);
+  }
+
+  @Override
+  public <T extends TripTimes> boolean tripTimesPredicate(T tripTimes) {
+    if (requireBikesAllowed) {
+      return BikeAccess.fromTrip(tripTimes.trip) == BikeAccess.ALLOWED;
     }
 
-    @Override
-    public <T extends TripPatternForDate> boolean tripPatternPredicate(T tripPatternForDate) {
-        return routeIsNotBanned(tripPatternForDate) && transitModeIsAllowed(tripPatternForDate);
+    if (requireWheelchairAccessible) {
+      return tripTimes.trip.getWheelchairAccessible() == 1;
     }
 
-    @Override public <T extends TripTimes> boolean tripTimesPredicate(T tripTimes) {
-        if (requireBikesAllowed) {
-            return BikeAccess.fromTrip(tripTimes.trip) == BikeAccess.ALLOWED;
-        }
+    return true;
+  }
 
-        if (requireWheelchairAccessible) {
-            return tripTimes.trip.getWheelchairAccessible() == 1;
-        }
+  private <T extends TripPatternForDate> boolean routeIsNotBanned(T tripPatternForDate) {
+    FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().route.getId();
+    return !bannedRoutes.contains(routeId);
+  }
 
-        return true;
-    }
-
-    private <T extends TripPatternForDate> boolean routeIsNotBanned(T tripPatternForDate) {
-        FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().route.getId();
-        return !bannedRoutes.contains(routeId);
-    }
-
-    private <T extends TripPatternForDate> boolean transitModeIsAllowed(T tripPatternForDate) {
-        TransitMode transitMode = tripPatternForDate.getTripPattern().getTransitMode();
-        return transitModes.contains(transitMode);
-    }
+  private <T extends TripPatternForDate> boolean transitModeIsAllowed(T tripPatternForDate) {
+    TransitMode transitMode = tripPatternForDate.getTripPattern().getTransitMode();
+    return transitModes.contains(transitMode);
+  }
 }

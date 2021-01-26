@@ -5,7 +5,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 
 public interface TransitDataProviderFilter {
 
-    <T extends TripPatternForDate> boolean tripPatternPredicate(T tripPatternForDate);
+  <T extends TripPatternForDate> boolean tripPatternPredicate(T tripPatternForDate);
 
-    <T extends TripTimes> boolean tripTimesPredicate(T tripTimes);
+  <T extends TripTimes> boolean tripTimesPredicate(T tripTimes);
 }
