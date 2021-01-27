@@ -117,6 +117,10 @@ public class StreetVertexIndex {
     return GeometryUtils.splitGeometryAtPoint(geometry, nearestPoint);
   }
 
+  public VertexLinker getVertexLinker() {
+    return vertexLinker;
+  }
+
   /**
    * Get all transit stops within a given distance of a coordinate
    *

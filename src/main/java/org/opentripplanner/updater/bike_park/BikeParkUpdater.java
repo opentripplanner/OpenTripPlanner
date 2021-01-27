@@ -1,12 +1,15 @@
 package org.opentripplanner.updater.bike_park;
 
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -41,7 +44,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private final BikeParkDataSource source;
 
-    private SimpleStreetSplitter linker;
+    private VertexLinker linker;
 
     private BikeRentalStationService bikeService;
 
@@ -61,7 +64,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
-        linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
+        linker = graph.streetIndex.getVertexLinker() ;
         // Adding a bike park station service needs a graph writer runnable
         bikeService = graph.getService(BikeRentalStationService.class, true);
     }
@@ -103,9 +106,19 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikeParkVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
-                    if (!linker.link(bikeParkVertex)) {
+                    Set<StreetVertex> streetVertices = linker.link(
+                        bikeParkVertex,
+                        TraverseMode.WALK,
+                        LinkingDirection.BOTH_WAYS,
+                        false
+                    );
+                    if (streetVertices.isEmpty()) {
                         // the toString includes the text "Bike park"
                         LOG.info("Bike park {} unlinked", bikeParkVertex);
+                    }
+                    for (StreetVertex v : streetVertices) {
+                        new StreetBikeParkLink(bikeParkVertex, v);
+                        new StreetBikeParkLink(v, bikeParkVertex);
                     }
                     verticesByPark.put(bikePark, bikeParkVertex);
                     new BikeParkEdge(bikeParkVertex);

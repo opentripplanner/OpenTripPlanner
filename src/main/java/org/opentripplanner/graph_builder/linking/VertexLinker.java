@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.linking;
 
-import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
