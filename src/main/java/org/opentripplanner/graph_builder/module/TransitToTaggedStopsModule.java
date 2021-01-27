@@ -61,9 +61,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<>();
-        vertices.addAll(graph.getVertices());
 
-        for (TransitStopVertex ts : Iterables.filter(vertices, TransitStopVertex.class)) {
+        for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;

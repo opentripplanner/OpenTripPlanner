@@ -446,8 +446,7 @@ public class Graph implements Serializable {
      * Return only the StreetEdges in the graph.
      */
     public Collection<StreetEdge> getStreetEdges() {
-        Collection<Edge> allEdges = this.getEdges();
-        return Lists.newArrayList(Iterables.filter(allEdges, StreetEdge.class));
+        return getEdgesOfType(StreetEdge.class);
     }
 
     public TransitLayer getTransitLayer() {
@@ -813,8 +812,8 @@ public class Graph implements Serializable {
             TDoubleList longitudes = new TDoubleLinkedList();
             Median median = new Median();
 
-            getVertices().stream()
-                .filter(v -> v instanceof TransitStopVertex)
+            getVerticesOfType(TransitStopVertex.class)
+                .stream()
                 .forEach(v -> {
                     latitudes.add(v.getLat());
                     longitudes.add(v.getLon());

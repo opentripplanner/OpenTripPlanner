@@ -133,7 +133,7 @@ public class SimpleStreetSplitter {
         if (hashGridSpatialIndex == null) {
             // build a nice private spatial index, since we're adding and removing edges
             idx = new HashGridSpatialIndex<>();
-            for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
+            for (StreetEdge se : graph.getEdgesOfType(StreetEdge.class)) {
                 idx.insert(se.getGeometry(), se);
             }
         } else {
