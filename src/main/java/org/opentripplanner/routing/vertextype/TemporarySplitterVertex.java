@@ -24,21 +24,14 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
 
     @Override
     public void addIncoming(Edge edge) {
-
-        if (edge instanceof TemporaryEdge) {
-            super.addIncoming(edge);
-        } else {
-            throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");
-        }
+        // Removed check for edge being temporary
+        super.addIncoming(edge);
     }
 
     @Override
     public void addOutgoing(Edge edge) {
-        if (edge instanceof TemporaryEdge) {
-            super.addOutgoing(edge);
-        } else {
-            throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");
-        }
+        // Removed check for edge being temporary
+        super.addOutgoing(edge);
     }
 
     @Override
