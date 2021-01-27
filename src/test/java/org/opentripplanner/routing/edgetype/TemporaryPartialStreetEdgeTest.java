@@ -100,10 +100,9 @@ public class TemporaryPartialStreetEdgeTest {
         Coordinate nearestPoint = new Coordinate(0.5, 2.0);
         List<StreetEdge> edges = new ArrayList<StreetEdge>();
         edges.add(e2);
-        TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocation(
-                graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true);
-        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocation(
-                graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false);
+        TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocationForTest("middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true);
+        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
+            "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false);
 
         RoutingRequest options = new RoutingRequest();
         options.setMode(TraverseMode.CAR);

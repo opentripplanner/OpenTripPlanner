@@ -73,7 +73,7 @@ public class VertexLinker {
    * NOTE: Only one VertexLinker should be active on a graph at any given time.
    */
   public VertexLinker(Graph graph) {
-    for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
+    for (StreetEdge se : graph.getEdgesOfType(StreetEdge.class) ) {
       streetSpatialIndex.insert(se.getGeometry(), se);
     }
     this.graph = graph;
@@ -275,6 +275,7 @@ public class VertexLinker {
 
     SplitterVertex v;
     String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
+
     if (!destructive) {
       TemporarySplitterVertex tsv = new TemporarySplitterVertex(uniqueSplitLabel,
           splitPoint.x,
@@ -291,20 +292,23 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
+    // TODO This is where LinkingDirection should be used
     P2<StreetEdge> edges = edge.split(v, destructive);
 
-    // update indices of new edges
-    streetSpatialIndex.insert(edges.first.getGeometry(), edges.first);
-    streetSpatialIndex.insert(edges.second.getGeometry(), edges.second);
+    if (destructive) {
+      // update indices of new edges
+      streetSpatialIndex.insert(edges.first.getGeometry(), edges.first);
+      streetSpatialIndex.insert(edges.second.getGeometry(), edges.second);
 
-    // remove original edge from the graph
-    edge.getToVertex().removeIncoming(edge);
-    edge.getFromVertex().removeOutgoing(edge);
-    // remove original edges from the spatial index
-    // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
-    // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
-    // insert logic is not trivial and would require additional testing of the spatial index.
-    streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge);
+      // remove original edge from the graph
+      edge.getToVertex().removeIncoming(edge);
+      edge.getFromVertex().removeOutgoing(edge);
+      // remove original edges from the spatial index
+      // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
+      // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
+      // insert logic is not trivial and would require additional testing of the spatial index.
+      streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge);
+    }
 
     return v;
   }

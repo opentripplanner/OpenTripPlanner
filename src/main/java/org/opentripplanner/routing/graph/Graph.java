@@ -387,6 +387,15 @@ public class Graph implements Serializable {
         return edges;
     }
 
+    public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
+        return this
+            .getEdges()
+            .stream()
+            .filter(cls::isInstance)
+            .map(cls::cast)
+            .collect(Collectors.toList());
+    }
+
     /**
      * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
      * {@link Edge}. This method is not thread-safe.
