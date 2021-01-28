@@ -72,6 +72,8 @@ New parameters:
  - `streetRoutingTimeout` Maximum time limit for street route queries. Replace the old `timeout`.
  - `transit` Transit tuning parameters, configure the raptor router. A set of parameters to tune 
              the Raptor transit router. 
+ - `itineraryFilters` Configure itinerary filters that may modify itineraries, sort them, and 
+                      filter away less preferable results.            
  
 These parameters are no longer supported:
 

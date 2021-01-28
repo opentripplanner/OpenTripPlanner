@@ -12,7 +12,6 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.routing.api.request.RequestFunctions;
 
 public class TripQuery {
 
@@ -259,29 +258,27 @@ public class TripQuery {
         )
         .argument(GraphQLArgument.newArgument()
             .name("transitGeneralizedCostLimit")
-            .description("Set a relative limit for all transit itineraries. The limit "
-                + "is calculated based on the best transit itinerary generalized-cost. "
-                + "Itineraries without transit legs are excluded from this filter. "
-                + "Example: f(x) = 3600 + 2.0 x. If the lowest cost returned is 10 000, "
-                + "then the limit is set to: 3 600 + 2 * 10 000 = 26 600. Then all "
-                + "itineraries with at least one transit leg and a cost above 26 600 "
-                + "is removed from the result. Default: "
-                + RequestFunctions.serialize(routing.request.transitGeneralizedCostLimit)
-            )
+            .description("DEPRECATED. REPLACED BY 'itineraryFilters.transitGeneralizedCostLimit'")
             .type(gqlUtil.doubleFunctionScalar)
-            // There is a bug in the GraphQL lib. The default value is shown as a `boolean`
-            // with value `false`, not the actual value. Hence; The default is added to the
-            // description above instead. .defaultValue(routing.request.transitGeneralizedCostLimit)
             .build()
         )
         .argument(GraphQLArgument.newArgument()
             .name("debugItineraryFilter")
             .description(
-                "Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, "
-                + "but NOT delete them when this is enabled."
+                "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries "
+                + "instead of removing them. This is very convenient when tuning the filters."
             )
             .type(Scalars.GraphQLBoolean)
-            .defaultValue(routing.request.debugItineraryFilter)
+            .defaultValue(routing.request.itineraryFilters.debug)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
+            .name("itineraryFilters")
+            .description(
+                "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED "
+                + "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
+            )
+            .type(ItineraryFiltersInputType.create(gqlUtil, routing.request.itineraryFilters))
             .build()
         )
         .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))

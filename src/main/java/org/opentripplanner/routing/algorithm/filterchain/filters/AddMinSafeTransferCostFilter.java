@@ -1,12 +1,12 @@
-package org.opentripplanner.routing.algorithm.filterchain;
+package org.opentripplanner.routing.algorithm.filterchain.filters;
 
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 
-import javax.annotation.Nullable;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -36,75 +36,104 @@ import java.util.Collection;
  *   Calculate the  min-safe-transfer-time relative to travel-time:
  *
  *      min travel-time across all itineraries:  min(6h30m, 6h, 6h) = 6h
- *      min-safe-transfer-time:  T = 6h * 5% = 18m
+ *      min-safe-transfer-time:  T = 6h * 6.67% = 24m
  *
- *   All transfers less than 18 minutes will be given an extra cost.
+ *   All transfers less than 24 minutes will be given an extra cost.
  *
  *    Calculate adjusted cost, where w' is transfer-time for each transfer:
  *
  *      adjusted-cost = generalized-cost + f * ∑((T - w'))
  *
  *     - I1 do not have any transfers so cost is unchanged: 23 040
- *     - I2: 22 200 + 2.0 * (18m - 5m) = 22 200 + 2 * 780 = 23 760
- *     - I3: 22 000 + 2.0 * (18m - 10m) = 22 000 + 2 * 480 = 23 080
+ *     - I2: 22 200 + 2.0 * (24m - 5m) = 22 200 + 2 * (17*60) = 24 240
+ *     - I3: 22 000 + 2.0 * (24m - 10m) = 22 000 + 2 * (14*60) = 23 680
  * </pre>
  *
  * The table below show the min-safe-transfer-time for some example total travel times:
  * <pre>
- *  | tot-tr-time | ideal-transfer-time |
- *  |   < 40m     |      2m             |
- *  |     1h      |      3m             |
- *  |     5h      |     15m             |
- *  |   > 10h     |     30m             |
+ *  |   total  |    min safe   |
+ *  | tr. time | transfer time |
+ *  |   30m    |      2m       |
+ *  |    1h    |      4m       |
+ *  |    5h    |     20m       |
+ *  | > 10h    |     40m       |
  * </pre>
+ * Note! Normally the board-/alight-/transfer-slack serve as a lower bound for the
+ *       transfer time; Hence also for the min-safe-transfer-time for short journeys.
  */
-public class AdjustedCost {
+public class AddMinSafeTransferCostFilter implements ItineraryFilter {
 
   /**
-   * Min-safe-transfer-time is defined as P=5% of total-travel-time, maximum 30 minutes.
+   * Min-safe-transfer-time is defined as P=6.67% of total-travel-time, maximum 40 minutes.
    * There is no need to put a lower bound on this.
    */
-  private static final int P = 5;
+  private static final double P = 20.0/3;
 
   /**
    * This is an upper bound for adding a penalty to short transfer times.
    * Journeys that last for more than 10 hours will ues 30 minutes as a
    * {@code minSafeTransferTime}.
    */
-  public final int MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND = 30 * 60;
+  public final int MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND = 40 * 60;
 
   /**
    * If the transfer-time for an itinerary is less than the min-safe-transfer-time-limit, then
    * the difference is multiplied with this factor and added to the adjusted-cost.
    */
-  public final float minSafeTransferTimeFactor;
+  public final double minSafeTransferTimeFactor;
 
 
-  private AdjustedCost (float minSafeTransferTimeFactor) {
+  public AddMinSafeTransferCostFilter(double minSafeTransferTimeFactor) {
     this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
   }
 
-  @Nullable
-  public static AdjustedCost create(double minSafeTransferTimeFactor) {
-    return minSafeTransferTimeFactor <= 0.0
-        ?  null
-        : new AdjustedCost((float) minSafeTransferTimeFactor);
+  @Override
+  public String name() {
+    return "add-min-safe-transfer-cost-filter";
   }
 
+  @Override
+  public List<Itinerary> filter(List<Itinerary> itineraries) {
+    int minSafeTransferTime =  minSafeTransferTime(itineraries);
+
+    for (Itinerary it : itineraries) {
+      it.generalizedCost += calculateAdditionalCost(minSafeTransferTime, it);
+    }
+    return itineraries;
+  }
+
+  @Override
+  public boolean removeItineraries() {
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return name() + "{minSafeTransferTimeFactor: " + minSafeTransferTimeFactor + "}";
+  }
 
   /**
    * Calculate the ideal-cost based on the given {@code minSafeTransferTime} and {@code itinerary}.
    */
-  public int calculate(int minSafeTransferTime, Itinerary i) {
-    int cost = i.generalizedCost;
+  int calculateAdditionalCost(int minSafeTransferTime, Itinerary i) {
+    int cost = 0;
     Leg prev = null;
+    boolean firstTransit = true;
 
     for (Leg leg : i.legs) {
-      if(prev != null && leg.isScheduled()) {
-        int waitTime = durationInSeconds(prev.endTime, leg.startTime);
+      if(leg.isScheduled()) {
+        // Skip the first transit leg, we only want to add "unsafe" cost to transfers between
+        // 2 scheduled legs(it might be walking in between). This is because we assume none
+        // scheduled legs can be time-shifted, hence not unsafe.
+        if(firstTransit) {
+          firstTransit = false;
+        }
+        else {
+          int waitTime = durationInSeconds(prev.endTime, leg.startTime);
 
-        if(waitTime < minSafeTransferTime) {
-          cost += (int)((minSafeTransferTime - waitTime) * minSafeTransferTimeFactor);
+          if (waitTime < minSafeTransferTime) {
+            cost += (int) ((minSafeTransferTime - waitTime) * minSafeTransferTimeFactor);
+          }
         }
       }
       prev = leg;
@@ -115,25 +144,16 @@ public class AdjustedCost {
   /**
    * Calculate the ideal-cost based on the given {@code idealTransferTime} and {@code itinerary}.
    */
-  public int minSafeTransferTime(Collection<Itinerary> list) {
+  int minSafeTransferTime(Collection<Itinerary> list) {
     int minTransitTime = list.stream()
         .mapToInt(it -> it.transitTimeSeconds)
         .min()
         .orElse(0);
-    return Math.max(MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND, minTransitTime * P / 100);
+    int minSafeTravelTime = (int)Math.round(minTransitTime * P / 100.0);
+    return Math.min(MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND, minSafeTravelTime);
   }
 
-
-    private int durationInSeconds(Calendar from, Calendar to) {
+  private int durationInSeconds(Calendar from, Calendar to) {
     return (int) ((to.getTimeInMillis() - from.getTimeInMillis()) / 1000);
-  }
-
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-        .of(AdjustedCost.class)
-        .addNum("minSafeTransferTimeFactor", minSafeTransferTimeFactor)
-        .toString();
   }
 }

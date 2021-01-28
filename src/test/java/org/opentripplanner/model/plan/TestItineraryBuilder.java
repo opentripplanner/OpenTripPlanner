@@ -208,7 +208,6 @@ public class TestItineraryBuilder {
   private  static Route route(TransitMode mode) {
     Route route = new Route(new FeedScopedId(FEED, mode.name()));
     route.setMode(mode);
-    route.setLongName(mode.name());
     return route;
   }
 }
