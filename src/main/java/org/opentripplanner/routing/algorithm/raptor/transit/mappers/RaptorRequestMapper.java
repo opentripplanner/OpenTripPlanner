@@ -68,7 +68,7 @@ public class RaptorRequestMapper {
         else if(request.modes.accessMode == StreetMode.BIKE) {
             // TODO OTP2 - Is it ok to make bike the same as transit (factor=1.0)
             builder.mcCostFactors()
-                    .walkReluctanceFactor(1.0)
+                    .walkReluctanceFactor(request.walkReluctance)
                     .boardCost(request.bikeBoardCost);
         }
 
