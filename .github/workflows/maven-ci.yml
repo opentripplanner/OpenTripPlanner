@@ -1,0 +1,95 @@
+name: OTP CI Build
+
+# TODO: Perhaps reinstate, but doesn't allow for build/test of any branch.
+# On [push, pull_request] causes double-builds when creating PRs.
+# But triggering on push only will miss pull requests from outside authors.
+# The push event's ref is the name of the pushed branch;
+# The pull_request event's branch name is the merge target branch.
+#on:
+#  push:
+#    branches:
+#      - master
+#      - dev-1.x
+#      - dev-2.x
+#      - ibi-dev
+#  pull_request:
+#    branches:
+#      - master
+#      - dev-1.x
+#      - dev-2.x
+#      - ibi-dev
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_OPTS: -Xmx2g
+      OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
+      OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
+      GPG_KEY_NAME: ${{ secrets.GPG_KEY_NAME }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+    steps:
+      # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
+      - uses: actions/checkout@v2.3.2
+        with:
+          fetch-depth: 0
+      # Java setup step completes very fast, no need to run in a preconfigured docker container.
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      # Retain the local Maven repository to speed up builds.
+      - name: Setup Maven Cache
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: ~/.m2
+          key: maven-local-repo
+      # So that the branch name can be reference via $GITHUB_HEAD_REF_SLUG.
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      # Define AWS profile credentials for use by subsequent steps.
+      - name: Add profile credentials to ~/.aws/credentials
+        run: ./scripts/add-aws-credentials.sh
+      # Build and test deployment.
+      - name: Build and Test
+        run: mvn clean verify --settings maven-settings.xml --batch-mode --show-version --update-snapshots -Dgpg.skip
+      # Only prepare deploy files on push events to avoid duplicate pushes to s3 when a commit is
+      # pushed to a branch with an open pull request.
+      - name: Prepare build files for deployment to s3
+          if: github.event_name == 'push'
+            run: ./scripts/prep-build-for-deploy-from-github-actions.sh
+      # Copy build files to AWS.
+      - name: Copy build files to the otp-repo bucket
+          if: github.event_name == 'push'
+            run: |
+              aws s3 sync ./deploy s3://otp-repo --acl public-read
+      # Install mkdocs using pip (already available on Ubuntu image) for use by subsequent steps.
+      - name: Install mkdocs
+          if: github.event_name == 'push'
+            run: |
+              pip install --user mkdocs
+      # Using mkdocs produce docs for deployment.
+      - name: Prepare doc files for deployment to s3
+          if: github.event_name == 'push'
+            run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
+      # Obtain the current branch name.
+      - name: Extract branch name
+          if: github.event_name == 'push'
+            run: |
+              echo "##[set-output name=branch_name;]$(echo ${GITHUB_HEAD_REF_SLUG})"
+            id: extract_branch
+      # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
+      - name: Upload docs to IBI s3 buckets & cloudfront
+          if: github.event_name == 'push' && ${steps.extract_branch.outputs.branch_name} == 'ibi-dev'
+              run: |
+                aws s3 cp --recursive --acl public-read "target/mkdocs" "s3://otp-docs.ibi-transit.com"
+      # TODO: Push notification ot Teams.
+#      - name: Notify us of the build status on MS Teams
+#          notifications:
+#          email: false
+#          webhooks: https://outlook.office.com/webhook/03fa4a79-572f-4c68-b756-e4e851d0215a@9093f1a3-8771-4fb7-8596-d51eeef18cda/TravisCI/0aec73ecb8eb4ad696ea27dd3c6a102d/286c079f-6085-4aa0-8f8d-e2a3e8d1f568
