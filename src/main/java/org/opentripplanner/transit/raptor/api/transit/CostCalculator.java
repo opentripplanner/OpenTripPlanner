@@ -18,9 +18,8 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
      * @param prevStopArrival The previous stop arrival
      * @param waitTime        The time waiting before boarding at the board stop
      * @param boardTime       The time of boarding
-     * @param trip            The trip borded
      */
-    int onTripRidingCost(ArrivalView<T> prevStopArrival, int waitTime, int boardTime, T trip);
+    int onTripRidingCost(ArrivalView<T> prevStopArrival, int waitTime, int boardTime);
 
     /**
      * Calculate the value when arriving by transit.

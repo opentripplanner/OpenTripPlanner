@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -56,8 +57,20 @@ public class RaptorRequestMapper {
                 .timetableEnabled(true);
 
         builder.mcCostFactors()
-                .waitReluctanceFactor(request.waitReluctance)
-                .walkReluctanceFactor(request.walkReluctance);
+                .waitReluctanceFactor(request.waitReluctance);
+
+        if(request.modes.accessMode == StreetMode.WALK) {
+            builder.mcCostFactors()
+                    .walkReluctanceFactor(request.walkReluctance)
+                    .boardCost(request.walkBoardCost)
+                    .transferCost(request.transferCost);
+        }
+        else if(request.modes.accessMode == StreetMode.BIKE) {
+            // TODO OTP2 - Is it ok to make bike the same as transit (factor=1.0)
+            builder.mcCostFactors()
+                    .walkReluctanceFactor(request.walkReluctance)
+                    .boardCost(request.bikeBoardCost);
+        }
 
         return builder.build();
     }

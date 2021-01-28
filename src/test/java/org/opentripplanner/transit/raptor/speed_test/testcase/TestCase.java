@@ -37,7 +37,7 @@ public class TestCase {
         this.description = description;
         this.fromPlace = new Place(origin, FEED_ID, fromPlace, fromLat, fromLon);
         this.toPlace = new Place(destination, FEED_ID, toPlace, toLat, toLon);
-        this.results = testCaseResults == null ? new TestCaseResults(id) : testCaseResults;
+        this.results = testCaseResults;
     }
 
     @Override

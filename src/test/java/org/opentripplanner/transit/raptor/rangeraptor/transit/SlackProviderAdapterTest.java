@@ -13,8 +13,6 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
 
 public class SlackProviderAdapterTest implements RaptorTestConstants {
 
-  private static final LifeCycleSubscriptions LIFE_CYCLE = new LifeCycleSubscriptions();
-
   public static final int BOARD_SLACK = D20s;
   public static final int ALIGHT_SLACK = D10s;
   public static final int TRANSFER_SLACK = D1m;
@@ -27,11 +25,12 @@ public class SlackProviderAdapterTest implements RaptorTestConstants {
 
   @Test
   public void forwardSlackProvider() {
+    LifeCycleSubscriptions subscriptions = new LifeCycleSubscriptions();
     SlackProvider subject = SlackProviderAdapter.forwardSlackProvider(
         EXTERNAL_SLACK_PROVIDER,
-        LIFE_CYCLE
+        subscriptions
     );
-    var lifeCycle = new LifeCycleEventPublisher(LIFE_CYCLE);
+    var lifeCycle = new LifeCycleEventPublisher(subscriptions);
 
     lifeCycle.prepareForNextRound(0);
     subject.setCurrentPattern(PATTERN);
@@ -51,11 +50,12 @@ public class SlackProviderAdapterTest implements RaptorTestConstants {
 
   @Test
   public void reverseSlackProvider() {
+    LifeCycleSubscriptions subscriptions = new LifeCycleSubscriptions();
     SlackProvider subject = SlackProviderAdapter.reverseSlackProvider(
         EXTERNAL_SLACK_PROVIDER,
-        LIFE_CYCLE
+        subscriptions
     );
-    var lifeCycle = new LifeCycleEventPublisher(LIFE_CYCLE);
+    var lifeCycle = new LifeCycleEventPublisher(subscriptions);
 
     lifeCycle.prepareForNextRound(0);
     subject.setCurrentPattern(PATTERN);
