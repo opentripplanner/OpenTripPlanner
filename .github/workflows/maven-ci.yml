@@ -85,7 +85,7 @@ jobs:
         id: extract_branch
       # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
       - name: Upload docs to IBI s3 buckets & cloudfront
-        if: github.event_name == 'push' && ${steps.extract_branch.outputs.branch_name} == 'ibi-dev'
+        if: github.event_name == 'push' && ${{ steps.extract_branch.outputs.branch_name }} == 'ibi-dev'
         run: |
           aws s3 cp --recursive --acl public-read "target/mkdocs" "s3://otp-docs.ibi-transit.com"
       # TODO: Push notification ot Teams.
