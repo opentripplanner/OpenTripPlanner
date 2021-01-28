@@ -61,33 +61,33 @@ jobs:
       # Only prepare deploy files on push events to avoid duplicate pushes to s3 when a commit is
       # pushed to a branch with an open pull request.
       - name: Prepare build files for deployment to s3
-          if: github.event_name == 'push'
-            run: ./scripts/prep-build-for-deploy-from-github-actions.sh
+        if: github.event_name == 'push'
+        run: ./scripts/prep-build-for-deploy-from-github-actions.sh
       # Copy build files to AWS.
       - name: Copy build files to the otp-repo bucket
-          if: github.event_name == 'push'
-            run: |
-              aws s3 sync ./deploy s3://otp-repo --acl public-read
+        if: github.event_name == 'push'
+        run: |
+          aws s3 sync ./deploy s3://otp-repo --acl public-read
       # Install mkdocs using pip (already available on Ubuntu image) for use by subsequent steps.
       - name: Install mkdocs
-          if: github.event_name == 'push'
-            run: |
-              pip install --user mkdocs
+        if: github.event_name == 'push'
+        run: |
+          pip install --user mkdocs
       # Using mkdocs produce docs for deployment.
       - name: Prepare doc files for deployment to s3
-          if: github.event_name == 'push'
-            run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
+        if: github.event_name == 'push'
+        run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
       # Obtain the current branch name.
       - name: Extract branch name
-          if: github.event_name == 'push'
-            run: |
-              echo "##[set-output name=branch_name;]$(echo ${GITHUB_HEAD_REF_SLUG})"
-            id: extract_branch
+        if: github.event_name == 'push'
+        run: |
+          echo "##[set-output name=branch_name;]$(echo ${GITHUB_HEAD_REF_SLUG})"
+        id: extract_branch
       # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
       - name: Upload docs to IBI s3 buckets & cloudfront
-          if: github.event_name == 'push' && ${steps.extract_branch.outputs.branch_name} == 'ibi-dev'
-              run: |
-                aws s3 cp --recursive --acl public-read "target/mkdocs" "s3://otp-docs.ibi-transit.com"
+        if: github.event_name == 'push' && ${steps.extract_branch.outputs.branch_name} == 'ibi-dev'
+        run: |
+          aws s3 cp --recursive --acl public-read "target/mkdocs" "s3://otp-docs.ibi-transit.com"
       # TODO: Push notification ot Teams.
 #      - name: Notify us of the build status on MS Teams
 #          notifications:
