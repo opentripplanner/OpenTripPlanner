@@ -8,6 +8,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -37,6 +38,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     private GraphUpdaterManager updaterManager;
 
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<>();
+
+    Map<BikeRentalStation, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
 
     private final BikeRentalDataSource source;
 
@@ -106,6 +109,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             // Apply stations to graph
             Set<BikeRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Collections.singletonList(network));
+
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
                 if (station.networks == null) {
@@ -117,11 +121,13 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStationVertex bikeRentalVertex = verticesByStation.get(station);
                 if (bikeRentalVertex == null) {
                     bikeRentalVertex = new BikeRentalStationVertex(graph, station);
+                    DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
                     Set<StreetVertex> streetVertices = linker.link(
                         bikeRentalVertex,
                         TraverseMode.WALK,
                         LinkingDirection.BOTH_WAYS,
-                        false
+                        false,
+                        tempEdges
                     );
                     if (streetVertices.isEmpty()) {
                         // the toString includes the text "Bike rental station"
@@ -129,13 +135,19 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     }
                     // Link bike rental vertex to street vertices returned by linker
                     for (StreetVertex v : streetVertices) {
-                        new StreetBikeRentalLink(bikeRentalVertex, v);
-                        new StreetBikeRentalLink(v, bikeRentalVertex);
+                        tempEdges.addEdge(new StreetBikeRentalLink(bikeRentalVertex, v));
+                        tempEdges.addEdge(new StreetBikeRentalLink(v, bikeRentalVertex));
                     }
-                    new RentABikeOnEdge(bikeRentalVertex, bikeRentalVertex, station.networks);
+                    tempEdges.addEdge(new RentABikeOnEdge(bikeRentalVertex, bikeRentalVertex, station.networks));
+                    if (station.allowDropoff) {
+                        tempEdges.addEdge(new RentABikeOffEdge(bikeRentalVertex,
+                            bikeRentalVertex,
+                            station.networks
+                        ));
+                    }
                     verticesByStation.put(station, bikeRentalVertex);
-                    if (station.allowDropoff)
-                        new RentABikeOffEdge(bikeRentalVertex, bikeRentalVertex, station.networks);
+                    tempEdgesByStation.put(station, tempEdges);
+                    System.out.println("Adding station " + station.id);
                 } else {
                     bikeRentalVertex.setBikesAvailable(station.bikesAvailable);
                     bikeRentalVertex.setSpacesAvailable(station.spacesAvailable);
@@ -147,17 +159,15 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
-                BikeRentalStationVertex vertex = entry.getValue();
-                if (graph.containsVertex(vertex)) {
-                    graph.removeVertexAndEdges(vertex);
-                }
                 toRemove.add(station);
                 service.removeBikeRentalStation(station);
-                // TODO: need to unsplit any streets that were split
             }
             for (BikeRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);
+                tempEdgesByStation.get(station).disposeEdges();
+                tempEdgesByStation.remove(station);
+                System.out.println("Removing station " + station.id);
             }
         }
     }

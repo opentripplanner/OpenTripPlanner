@@ -79,7 +79,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
           tStop,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
-          true
+          true,
+          null
       );
       for (StreetVertex v : streetVertices) {
         new StreetTransitLink(tStop, v, tStop.hasWheelchairEntrance());
@@ -95,7 +96,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
           tEntrance,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
-          true
+          true,
+          null
       );
       for (StreetVertex v : streetVertices) {
         new TransitEntranceLink(tEntrance, v, tEntrance.isWheelchairEntrance());
@@ -112,7 +114,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
           bikeRental,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
-          true
+          true,
+          null
       );
       for (StreetVertex v : streetVertices) {
         new StreetBikeRentalLink(bikeRental, v);
@@ -129,7 +132,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
           bikePark,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
-          true
+          true,
+          null
       );
       for (StreetVertex v : streetVertices) {
         // Linkin Park

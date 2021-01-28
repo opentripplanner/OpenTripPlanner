@@ -13,6 +13,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -88,32 +89,41 @@ public class VertexLinker {
    * @return // TODO what is returned
    */
   public Set<StreetVertex> link(
-      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction, boolean destructive
+      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction, boolean destructive, DisposableEdgeCollection tempEdges
   ) {
+
+    if (!destructive && tempEdges == null) {
+      throw new IllegalArgumentException(
+          "Supplying a DisposableEdgeCollection is required when doing non-destructive splitting");
+    }
+    if (destructive && tempEdges != null) {
+      throw new IllegalArgumentException(
+          "Supplying a DisposableEdgeCollection is not allowed when doing destructive splitting");
+    }
+
     Set<StreetVertex> vertices = linkToStreetEdges(
         vertex,
         traverseMode,
         direction,
         destructive,
-        INITIAL_SEARCH_RADIUS_METERS
+        INITIAL_SEARCH_RADIUS_METERS,
+        tempEdges
     );
-    if (!vertices.isEmpty()) {
-      return vertices;
-    }
-    else {
-      return linkToStreetEdges(
-          vertex,
+    if (vertices.isEmpty()) {
+      vertices = linkToStreetEdges(vertex,
           traverseMode,
           direction,
           destructive,
-          MAX_SEARCH_RADIUS_METERS
+          MAX_SEARCH_RADIUS_METERS,
+          tempEdges
       );
     }
+    return vertices;
   }
 
   private Set<StreetVertex> linkToStreetEdges(
       Vertex vertex, TraverseMode traverseMode, LinkingDirection direction, boolean destructive,
-      int radiusMeters
+      int radiusMeters, DisposableEdgeCollection tempEdges
   ) {
 
     final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(radiusMeters);
@@ -167,7 +177,7 @@ public class VertexLinker {
     return candidateEdges
         .stream()
         .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
-        .map(ce -> link(vertex, ce.item, xscale, destructive, direction))
+        .map(ce -> link(vertex, ce.item, xscale, destructive, direction, tempEdges))
         .collect(Collectors.toSet());
 
   }
@@ -196,7 +206,7 @@ public class VertexLinker {
   }
 
   /** Split the edge if necessary return the closest vertex */
-  private StreetVertex link(Vertex vertex, StreetEdge edge, double xScale, boolean destructive, LinkingDirection direction) {
+  private StreetVertex link(Vertex vertex, StreetEdge edge, double xScale, boolean destructive, LinkingDirection direction, DisposableEdgeCollection tempEdges) {
     // TODO: we've already built this line string, we should save it
     LineString orig = edge.getGeometry();
     LineString transformed = equirectangularProject(orig, xScale);
@@ -224,7 +234,7 @@ public class VertexLinker {
 
     else {
       // split the edge, get the split vertex
-      SplitterVertex v0 = split(edge, ll, destructive, direction.equals(LinkingDirection.BACKWARD));
+      SplitterVertex v0 = split(edge, ll, destructive, direction.equals(LinkingDirection.BACKWARD), tempEdges);
       return v0;
     }
   }
@@ -265,7 +275,7 @@ public class VertexLinker {
    * @return Splitter vertex with added new edges
    */
   private SplitterVertex split(
-      StreetEdge edge, LinearLocation ll, boolean destructive, boolean endVertex
+      StreetEdge edge, LinearLocation ll, boolean destructive, boolean endVertex, DisposableEdgeCollection tempEdges
   ) {
     LineString geometry = edge.getGeometry();
 
@@ -291,8 +301,7 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    // TODO This is where LinkingDirection should be used
-    P2<StreetEdge> edges = edge.split(v, destructive);
+    P2<StreetEdge> edges = edge.split(v, destructive, tempEdges);
 
     if (destructive) {
       // update indices of new edges

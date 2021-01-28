@@ -509,24 +509,10 @@ public class Graph implements Serializable {
         vertices.remove(vertex.getLabel());
     }
 
-    public void removeVertexAndEdges(Vertex vertex) {
-        if (!containsVertex(vertex)) {
-            throw new IllegalStateException("attempting to remove vertex that is not in graph.");
+    public void removeIfUnconnected(Vertex v) {
+        if (v.getDegreeIn() == 0 && v.getDegreeOut() == 0) {
+            remove(v);
         }
-
-        /*
-         * Note: We have to handle the removal of looping edges (for example RentABikeOn/OffEdge),
-         * we use a set to prevent having multiple times the same edge.
-         */
-        Set<Edge> edges = new HashSet<Edge>(vertex.getDegreeIn() + vertex.getDegreeOut());
-        edges.addAll(vertex.getIncoming());
-        edges.addAll(vertex.getOutgoing());
-
-        for (Edge edge : edges) {
-            removeEdge(edge);
-        }
-
-        this.remove(vertex);
     }
 
     public Envelope getExtent() {

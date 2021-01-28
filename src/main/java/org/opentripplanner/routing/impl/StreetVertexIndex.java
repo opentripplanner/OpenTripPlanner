@@ -17,6 +17,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
+import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -68,9 +69,9 @@ public class StreetVertexIndex {
     postSetup();
   }
 
-  private static void createHalfLocation(
+  private static void createHalfLocationForTest(
       TemporaryStreetLocation base, I18NString name, Coordinate nearestPoint, StreetEdge street,
-      boolean endVertex
+      boolean endVertex, DisposableEdgeCollection tempEdges
   ) {
     StreetVertex tov = (StreetVertex) street.getToVertex();
     StreetVertex fromv = (StreetVertex) street.getFromVertex();
@@ -96,6 +97,7 @@ public class StreetVertexIndex {
 
       temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
+      tempEdges.addEdge(temporaryPartialStreetEdge);
     }
     else {
       TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
@@ -109,6 +111,7 @@ public class StreetVertexIndex {
 
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
       temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
+      tempEdges.addEdge(temporaryPartialStreetEdge);
     }
   }
 
@@ -185,7 +188,7 @@ public class StreetVertexIndex {
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
   public Set<Vertex> getVerticesForLocation(
-      GenericLocation location, RoutingRequest options, boolean endVertex
+      GenericLocation location, RoutingRequest options, boolean endVertex, DisposableEdgeCollection tempEdges
   ) {
     // Check if Stop/StopCollection is found by FeedScopeId
     if (location.stopId != null) {
@@ -199,14 +202,14 @@ public class StreetVertexIndex {
     Coordinate coordinate = location.getCoordinate();
     if (coordinate != null) {
       //return getClosestVertex(loc, options, endVertex);
-      return Collections.singleton(createVertexFromLocation(location, options, endVertex));
+      return Collections.singleton(createVertexFromLocation(location, options, endVertex, tempEdges));
     }
 
     return null;
   }
 
   private Vertex createVertexFromLocation(
-      GenericLocation location, RoutingRequest options, boolean endVertex
+      GenericLocation location, RoutingRequest options, boolean endVertex, DisposableEdgeCollection tempEdges
   ) {
     if (endVertex) {
       LOG.debug("Finding end vertex for {}", location);
@@ -241,7 +244,8 @@ public class StreetVertexIndex {
         temporaryStreetLocation,
         nonTransitMode,
         endVertex ? LinkingDirection.BACKWARD : LinkingDirection.FORWARD,
-        false
+        false,
+        tempEdges
     );
 
     if (streetVertices.isEmpty()) {
@@ -323,13 +327,13 @@ public class StreetVertexIndex {
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
   public Vertex getVertexForLocationForTest(
-      GenericLocation location, RoutingRequest options, boolean endVertex
+      GenericLocation location, RoutingRequest options, boolean endVertex, DisposableEdgeCollection tempEdges
   ) {
     // Check if coordinate is provided and connect it to graph
     Coordinate coordinate = location.getCoordinate();
     if (coordinate != null) {
       //return getClosestVertex(loc, options, endVertex);
-      return createVertexFromLocation(location, options, endVertex);
+      return createVertexFromLocation(location, options, endVertex, tempEdges);
     }
 
     return null;
@@ -345,7 +349,7 @@ public class StreetVertexIndex {
    */
   public static TemporaryStreetLocation createTemporaryStreetLocationForTest(
       String label, I18NString name, Iterable<StreetEdge> edges, Coordinate nearestPoint,
-      boolean endVertex
+      boolean endVertex, DisposableEdgeCollection tempEdges
   ) {
     boolean wheelchairAccessible = false;
 
@@ -368,10 +372,10 @@ public class StreetVertexIndex {
         edgeLocation = fromv;
 
         if (endVertex) {
-          new TemporaryFreeEdge(edgeLocation, location);
+          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
         }
         else {
-          new TemporaryFreeEdge(location, edgeLocation);
+          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
         }
       }
       else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
@@ -379,15 +383,15 @@ public class StreetVertexIndex {
         edgeLocation = tov;
 
         if (endVertex) {
-          new TemporaryFreeEdge(edgeLocation, location);
+          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
         }
         else {
-          new TemporaryFreeEdge(location, edgeLocation);
+          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
         }
       }
       else {
         // creates links from street head -> location -> street tail.
-        createHalfLocation(location, name, nearestPoint, street, endVertex);
+        createHalfLocationForTest(location, name, nearestPoint, street, endVertex, tempEdges);
       }
     }
     location.setWheelchairAccessible(wheelchairAccessible);

@@ -1188,8 +1188,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         // normally you would want to tear down the routing context...
         // but this method is mostly used in tests, and teardown interferes with testHalfEdges
         // FIXME here, or in test, and/or in other places like TSP that use this method
-        // if (rctx != null)
-        // this.rctx.destroy();
+        if (rctx != null)
+            this.rctx.destroy();
         this.rctx = new RoutingContext(this, graph, from, to);
         this.rctx.originBackEdge = fromBackEdge;
     }

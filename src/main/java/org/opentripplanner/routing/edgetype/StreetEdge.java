@@ -17,6 +17,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
@@ -793,7 +794,7 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     /** Split this street edge and return the resulting street edges */
-    public P2<StreetEdge> split(SplitterVertex v, boolean destructive) {
+    public P2<StreetEdge> split(SplitterVertex v, boolean destructive, DisposableEdgeCollection tempEdges) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = null;
@@ -858,10 +859,12 @@ public class StreetEdge extends Edge implements Cloneable {
                 e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
                 e1.setNoThruTraffic(this.isNoThruTraffic());
                 e1.setStreetClass(this.getStreetClass());
+                tempEdges.addEdge(e1);
             } else {
                 e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
                 e2.setNoThruTraffic(this.isNoThruTraffic());
                 e2.setStreetClass(this.getStreetClass());
+                tempEdges.addEdge(e2);
             }
         }
         return new P2<>(e1, e2);

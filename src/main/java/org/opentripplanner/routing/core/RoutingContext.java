@@ -15,6 +15,7 @@ import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -54,6 +55,8 @@ public class RoutingContext implements Cloneable {
     public final Set<Vertex> toVertices;
 
     public final Set<FeedScopedId> bannedRoutes;
+
+    private final DisposableEdgeCollection tempEdges;
     
     // The back edge associated with the origin - i.e. continuing a previous search.
     // NOTE: not final so that it can be modified post-construction for testing.
@@ -131,7 +134,7 @@ public class RoutingContext implements Cloneable {
 
             //TODO: localize this
             String name = from.getLabel() + " to " + to.getLabel();
-            new TemporaryPartialStreetEdge(streetEdge, from, to, partial, new NonLocalizedString(name), length);
+            tempEdges.addEdge( new TemporaryPartialStreetEdge(streetEdge, from, to, partial, new NonLocalizedString(name), length));
         }
     }
 
@@ -154,6 +157,7 @@ public class RoutingContext implements Cloneable {
         }
         this.opt = routingRequest;
         this.graph = graph;
+        this.tempEdges = new DisposableEdgeCollection(this.graph);
 
         Set<Vertex> fromVertices;
         Set<Vertex> toVertices;
@@ -163,12 +167,14 @@ public class RoutingContext implements Cloneable {
             fromVertices = graph.streetIndex.getVerticesForLocation(
                 opt.from,
                 opt,
-                false
+                false,
+                tempEdges
             );
             toVertices = graph.streetIndex.getVerticesForLocation(
                 opt.to,
                 opt,
-                true
+                true,
+                tempEdges
             );
 
         } else {
@@ -298,15 +304,6 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        if (fromVertices != null) {
-            for (Vertex fromVertex : fromVertices) {
-                TemporaryVertex.dispose(fromVertex);
-            }
-        }
-        if (toVertices != null) {
-            for (Vertex toVertex : toVertices) {
-                TemporaryVertex.dispose(toVertex);
-            }
-        }
+        this.tempEdges.disposeEdges();
     }
 }

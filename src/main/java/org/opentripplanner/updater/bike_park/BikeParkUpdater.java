@@ -7,6 +7,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
+import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -41,6 +42,8 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     private GraphUpdaterManager updaterManager;
 
     private final Map<BikePark, BikeParkVertex> verticesByPark = new HashMap<>();
+
+    private final Map<BikePark, DisposableEdgeCollection> tempEdgesByPark = new HashMap<>();
 
     private final BikeParkDataSource source;
 
@@ -106,22 +109,25 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikeParkVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
+                    DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
                     Set<StreetVertex> streetVertices = linker.link(
                         bikeParkVertex,
                         TraverseMode.WALK,
                         LinkingDirection.BOTH_WAYS,
-                        false
+                        false,
+                        tempEdges
                     );
                     if (streetVertices.isEmpty()) {
                         // the toString includes the text "Bike park"
                         LOG.info("Bike park {} unlinked", bikeParkVertex);
                     }
                     for (StreetVertex v : streetVertices) {
-                        new StreetBikeParkLink(bikeParkVertex, v);
-                        new StreetBikeParkLink(v, bikeParkVertex);
+                        tempEdges.addEdge(new StreetBikeParkLink(bikeParkVertex, v));
+                        tempEdges.addEdge(new StreetBikeParkLink(v, bikeParkVertex));
                     }
+                    tempEdges.addEdge(new BikeParkEdge(bikeParkVertex));
                     verticesByPark.put(bikePark, bikeParkVertex);
-                    new BikeParkEdge(bikeParkVertex);
+                    tempEdgesByPark.put(bikePark, tempEdges);
                 } else {
                     bikeParkVertex.setSpacesAvailable(bikePark.spacesAvailable);
                 }
@@ -132,10 +138,6 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikePark bikePark = entry.getKey();
                 if (bikeParkSet.contains(bikePark))
                     continue;
-                BikeParkVertex vertex = entry.getValue();
-                if (graph.containsVertex(vertex)) {
-                    graph.removeVertexAndEdges(vertex);
-                }
                 toRemove.add(bikePark);
                 bikeService.removeBikePark(bikePark);
                 // TODO: need to unsplit any streets that were split
@@ -143,6 +145,8 @@ public class BikeParkUpdater extends PollingGraphUpdater {
             for (BikePark bikePark : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByPark.remove(bikePark);
+                tempEdgesByPark.get(bikePark).disposeEdges();
+                tempEdgesByPark.remove(bikePark);
             }
         }
     }

@@ -37,6 +37,7 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TransitEntranceLink;
+import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -463,7 +464,7 @@ public class SimpleStreetSplitter {
 
         // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
         // existing vertices
-        P2<StreetEdge> edges = edge.split(v, !temporarySplit);
+        P2<StreetEdge> edges = edge.split(v, !temporarySplit, new DisposableEdgeCollection(this.graph));
 
         if (destructiveSplitting) {
             // update indices of new edges

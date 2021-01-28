@@ -61,8 +61,8 @@ public class LinkingTest {
             SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s0);
             SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s1);
 
-            P2<StreetEdge> sp0 = s0.split(sv0, true);
-            P2<StreetEdge> sp1 = s1.split(sv1, true);
+            P2<StreetEdge> sp0 = s0.split(sv0, true, null);
+            P2<StreetEdge> sp1 = s1.split(sv1, true, null);
 
             // distances expressed internally in mm so this epsilon is plenty good enough to ensure that they
             // have the same values
