@@ -76,11 +76,16 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: 'deploy'
-      # Install mkdocs using pip (already available on Ubuntu image) for use by subsequent steps.
+      # Install mkdocs using pip for use by subsequent steps. The pre-installed version isn't on the env path
+      # reinstalling it fixes this.
       - name: Install mkdocs
         if: github.event_name == 'push'
         run: |
-          sudo -H pip3 install mkdocs
+          wget https://bootstrap.pypa.io/get-pip.py
+          sudo -H python get-pip.py
+          sudo -H pip uninstall mkdocs
+          sudo -H pip install mkdocs
+#          sudo -H pip3 install mkdocs
       #          pip install --user mkdocs
       # Using mkdocs produce docs for deployment.
       - name: Prepare doc files for deployment to s3
