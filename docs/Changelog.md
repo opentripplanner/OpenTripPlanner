@@ -6,6 +6,7 @@
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
 - Prioritize "direct" routes over transfers in group-filters [#3309](https://github.com/opentripplanner/OpenTripPlanner/issues/3309)
 - The itinerary filter configuration is moved from the `RoutingRequest` into its own JSON node `itineraryFilters`.  
+- Remove poor transit results for short trips, when walking is better [#3331](https://github.com/opentripplanner/OpenTripPlanner/issues/3331)
 
 ## 2.0.0 (2020-11-27)
 
