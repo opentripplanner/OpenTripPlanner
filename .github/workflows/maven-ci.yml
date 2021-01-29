@@ -68,9 +68,16 @@ jobs:
         run: ./scripts/prep-build-for-deploy-from-github-actions.sh
       # Copy build files to AWS.
       - name: Copy build files to the otp-repo bucket
-        if: github.event_name == 'push'
-        run: |
-          aws s3 sync ./deploy s3://otp-repo --acl public-read
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read
+        env:
+          AWS_S3_BUCKET: otp-repo
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'deploy'
+#        run: |
+#          aws s3 sync ./deploy s3://otp-repo --acl public-read
       # Install mkdocs using pip (already available on Ubuntu image) for use by subsequent steps.
       - name: Install mkdocs
         if: github.event_name == 'push'
