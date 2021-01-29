@@ -81,7 +81,12 @@ public class EstimatedCallType {
                            .type(gqlUtil.dateTimeScalar)
                            .description("Actual time of arrival at quay. Updated from real time information if available. NOT IMPLEMENTED")
                            .dataFetcher(
-                                   environment -> null)
+                                environment -> {
+                                  TripTimeShort tripTimeShort = environment.getSource();
+                                  if (tripTimeShort.getActualArrival() == -1) { return null; }
+                                  return 1000 * (tripTimeShort.getServiceDay() +
+                                    tripTimeShort.getActualArrival());
+                              })
                            .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                            .name("aimedDepartureTime")
@@ -111,7 +116,12 @@ public class EstimatedCallType {
                            .type(gqlUtil.dateTimeScalar)
                            .description("Actual time of departure from quay. Updated with real time information if available. NOT IMPLEMENTED")
                            .dataFetcher(
-                                   environment -> null)
+                                environment -> {
+                                    TripTimeShort tripTimeShort = environment.getSource();
+                                    if (tripTimeShort.getActualDeparture() == -1) { return null; }
+                                    return 1000 * (tripTimeShort.getServiceDay() +
+                                        tripTimeShort.getActualDeparture());
+                              })
                            .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("timingPoint")

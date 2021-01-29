@@ -21,6 +21,7 @@ public class TripTimeShort {
     private final int scheduledDeparture;
     private final int realtimeArrival;
     private final int realtimeDeparture;
+    private final boolean isRecordedStop;
     private final int arrivalDelay;
     private final int departureDelay;
     private final boolean timepoint;
@@ -48,6 +49,7 @@ public class TripTimeShort {
         timepoint          = tt.isTimepoint(i);
         realtime           = !tt.isScheduled();
         isCancelledStop    = tt.isCancelledStop(i);
+        isRecordedStop     = tt.isRecordedStop(i);
 
         if (isRealtime() && isCancelledStop()) {
             /*
@@ -130,6 +132,20 @@ public class TripTimeShort {
 
     public int getRealtimeDeparture() {
         return realtimeDeparture;
+    }
+
+    /**
+     * Returns the actual arrival time if available. Otherwise -1 is returned.
+     */
+    public int getActualArrival() {
+        return isRecordedStop ? realtimeArrival : UNDEFINED;
+    }
+
+    /**
+     * Returns the actual departure time if available. Otherwise -1 is returned.
+     */
+    public int getActualDeparture() {
+        return isRecordedStop ? realtimeDeparture : UNDEFINED;
     }
 
     public int getArrivalDelay() {
