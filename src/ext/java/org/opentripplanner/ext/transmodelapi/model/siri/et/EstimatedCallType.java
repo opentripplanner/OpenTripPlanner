@@ -48,8 +48,9 @@ public class EstimatedCallType {
                     .name("quay")
                     .type(quayType)
                     .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getStopForId(
-                                  ((TripTimeShort) environment.getSource()).stopId);
+                      return GqlUtil.getRoutingService(environment).getStopForId((
+                          (TripTimeShort) environment.getSource()
+                      ).getStopId());
                         }
                     ).build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -57,8 +58,10 @@ public class EstimatedCallType {
                            .description("Scheduled time of arrival at quay. Not affected by read time updated")
                            .type(gqlUtil.dateTimeScalar)
                            .dataFetcher(
-                                   environment -> 1000 * (((TripTimeShort) environment.getSource()).serviceDay +
-                                                                  ((TripTimeShort) environment.getSource()).scheduledArrival))
+                                   environment -> 1000 * (
+                                       ((TripTimeShort) environment.getSource()).getServiceDay()
+                                           + ((TripTimeShort) environment.getSource()).getScheduledArrival()
+                                   ))
                            .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                            .name("expectedArrivalTime")
@@ -67,8 +70,10 @@ public class EstimatedCallType {
                            .dataFetcher(
                                    environment -> {
                                        TripTimeShort tripTimeShort = environment.getSource();
-                                       return 1000 * (tripTimeShort.serviceDay +
-                                                              tripTimeShort.realtimeArrival);
+                                       return 1000 * (
+                                           tripTimeShort.getServiceDay()
+                                               + tripTimeShort.getRealtimeArrival()
+                                       );
                                    })
                            .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -83,8 +88,10 @@ public class EstimatedCallType {
                            .description("Scheduled time of departure from quay. Not affected by read time updated")
                            .type(gqlUtil.dateTimeScalar)
                            .dataFetcher(
-                                   environment -> 1000 * (((TripTimeShort) environment.getSource()).serviceDay +
-                                                                  ((TripTimeShort) environment.getSource()).scheduledDeparture))
+                                   environment -> 1000 * (
+                                       ((TripTimeShort) environment.getSource()).getServiceDay()
+                                           + ((TripTimeShort) environment.getSource()).getScheduledDeparture()
+                                   ))
                            .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                            .name("expectedDepartureTime")
@@ -93,8 +100,10 @@ public class EstimatedCallType {
                            .dataFetcher(
                                    environment -> {
                                        TripTimeShort tripTimeShort = environment.getSource();
-                                       return 1000 * (tripTimeShort.serviceDay +
-                                                              tripTimeShort.realtimeDeparture);
+                                       return 1000 * (
+                                           tripTimeShort.getServiceDay()
+                                               + tripTimeShort.getRealtimeDeparture()
+                                       );
                                    })
                            .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -108,13 +117,13 @@ public class EstimatedCallType {
                     .name("timingPoint")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether this is a timing point or not. Boarding and alighting is not allowed at timing points.")
-                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).timepoint)
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isTimepoint())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("realtime")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether this call has been updated with real time information.")
-                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtime)
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isRealtime())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("predictionInaccurate")
@@ -125,20 +134,22 @@ public class EstimatedCallType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("realtimeState")
                     .type(EnumTypes.REALTIME_STATE)
-                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtimeState)
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).getRealtimeState())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("forBoarding")
                 .type(Scalars.GraphQLBoolean)
                 .description("Whether vehicle may be boarded at quay.")
                 .dataFetcher(environment -> {
-                    if (((TripTimeShort) environment.getSource()).pickupType >= 0) {
+                    if (((TripTimeShort) environment.getSource()).getPickupType() >= 0) {
                         //Realtime-updated
-                        return ((TripTimeShort) environment.getSource()).pickupType != PICKDROP_NONE;
+                        return ((TripTimeShort) environment.getSource()).getPickupType() != PICKDROP_NONE;
                     }
                   return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                        .get(GqlUtil.getRoutingService(environment).getTripForId().get(((TripTimeShort) environment.getSource()).tripId))
-                        .getBoardType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
+                        .get(GqlUtil.getRoutingService(environment).getTripForId().get((
+                            (TripTimeShort) environment.getSource()
+                        ).getTripId()))
+                        .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -146,13 +157,15 @@ public class EstimatedCallType {
                 .type(Scalars.GraphQLBoolean)
                 .description("Whether vehicle may be alighted at quay.")
                 .dataFetcher(environment -> {
-                    if (((TripTimeShort) environment.getSource()).dropoffType >= 0) {
+                    if (((TripTimeShort) environment.getSource()).getDropoffType() >= 0) {
                         //Realtime-updated
-                        return ((TripTimeShort) environment.getSource()).dropoffType != PICKDROP_NONE;
+                        return ((TripTimeShort) environment.getSource()).getDropoffType() != PICKDROP_NONE;
                     }
                   return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                        .get(GqlUtil.getRoutingService(environment).getTripForId().get(((TripTimeShort) environment.getSource()).tripId))
-                        .getAlightType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
+                        .get(GqlUtil.getRoutingService(environment).getTripForId().get((
+                            (TripTimeShort) environment.getSource()
+                        ).getTripId()))
+                        .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
 
                 })
                 .build())
@@ -162,34 +175,36 @@ public class EstimatedCallType {
                     .description("Whether vehicle will only stop on request.")
                     .dataFetcher(environment -> {
                       return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                              .get(GqlUtil.getRoutingService(environment).getTripForId().get(((TripTimeShort) environment.getSource()).tripId))
-                              .getAlightType(((TripTimeShort) environment.getSource()).stopIndex) == PICKDROP_COORDINATE_WITH_DRIVER;
+                              .get(GqlUtil.getRoutingService(environment).getTripForId().get((
+                                  (TripTimeShort) environment.getSource()
+                              ).getTripId()))
+                              .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) == PICKDROP_COORDINATE_WITH_DRIVER;
                     })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("cancellation")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether stop is cancelled.")
-                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isCancelledStop)
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isCancelledStop())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("date")
                     .type(gqlUtil.dateScalar)
                     .description("The date the estimated call is valid for.")
-                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).serviceDay)
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).getServiceDay())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("serviceJourney")
                     .type(serviceJourneyType)
                     .dataFetcher(environment -> {
                       return GqlUtil.getRoutingService(environment).getTripForId()
-                              .get(((TripTimeShort) environment.getSource()).tripId);
+                              .get(((TripTimeShort) environment.getSource()).getTripId());
                     })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("destinationDisplay")
                     .type(destinationDisplayType)
-                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).getHeadsign())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
@@ -234,11 +249,11 @@ public class EstimatedCallType {
       TripTimeShort tripTimeShort,
       RoutingService routingService
   ) {
-    FeedScopedId tripId = tripTimeShort.tripId;
+    FeedScopedId tripId = tripTimeShort.getTripId();
     Trip trip = routingService.getTripForId().get(tripId);
     FeedScopedId routeId = trip.getRoute().getId();
 
-    FeedScopedId stopId = tripTimeShort.stopId;
+    FeedScopedId stopId = tripTimeShort.getStopId();
 
     Stop stop = routingService.getStopForId(stopId);
     FeedScopedId parentStopId = stop.getParentStation().getId();
@@ -265,9 +280,9 @@ public class EstimatedCallType {
     // TripPattern
     allAlerts.addAll(alertPatchService.getTripPatternAlerts(routingService.getPatternForTrip().get(trip).getId()));
 
-    long serviceDayMillis = 1000 * tripTimeShort.serviceDay;
-    long arrivalMillis = 1000 * tripTimeShort.realtimeArrival;
-    long departureMillis = 1000 * tripTimeShort.realtimeDeparture;
+    long serviceDayMillis = 1000 * tripTimeShort.getServiceDay();
+    long arrivalMillis = 1000 * tripTimeShort.getRealtimeArrival();
+    long departureMillis = 1000 * tripTimeShort.getRealtimeDeparture();
 
     filterSituationsByDateAndStopConditions(allAlerts,
         new Date(serviceDayMillis + arrivalMillis),

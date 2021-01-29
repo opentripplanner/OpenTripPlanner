@@ -153,7 +153,7 @@ public class TimetableHelper {
                     }
 
                     //Flag as recorded
-                    newTimes.setRecorded(callCounter, true);
+                    newTimes.setRecorded(callCounter, true); // TODO only set if actual arrival time is not null
 
                     if (recordedCall.isCancellation() != null) {
                         newTimes.setCancelledStop(callCounter, recordedCall.isCancellation());

@@ -121,7 +121,7 @@ public class TransmodelGraphQLSchema {
   private GraphQLSchema create() {
     /*
     multilingualStringType, validityPeriodType, infoLinkType, bookingArrangementType, systemNoticeType,
-    linkGeometryType, serverInfoType, authorityType, operatorType, noticeType
+    linkGeometryType, serverInfoType, authorityType, operatorType, noticeTypea
 
 
 
