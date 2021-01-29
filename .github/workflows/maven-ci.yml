@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      JAVA_OPTS: -Xmx2g
+#      JAVA_OPTS: -Xmx2g
       OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
       OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
       GPG_KEY_NAME: ${{ secrets.GPG_KEY_NAME }}
@@ -42,12 +42,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+          args: -Xmx2g
       # Retain the local Maven repository to speed up builds.
       - name: Setup Maven Cache
         uses: actions/cache@v2
         id: cache
         with:
-          path: ~/.m2
+          path: ~/.m2/repository
           key: maven-local-repo
       # So that the branch name can be reference via $GITHUB_HEAD_REF_SLUG.
       - name: Inject slug/short variables
@@ -57,7 +58,7 @@ jobs:
         run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
       - name: Build and Test
-#        TODO: Remove skip tests!
+#        TODO: Remove skip tests. Temporary change to allow testing of later steps.
         run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip -DskipTests
 #        TODO: Confirm if OSSRH/GPG secrets are required.
 #        run: mvn clean verify --settings maven-settings.xml --batch-mode --show-version --update-snapshots -Dgpg.skip
@@ -76,18 +77,11 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: 'deploy'
-      # Install mkdocs using pip for use by subsequent steps. The pre-installed version isn't on the env path
-      # reinstalling it fixes this.
+      # Install mkdocs using pip for use by subsequent steps.
       - name: Install mkdocs
         if: github.event_name == 'push'
         run: |
            pip install mkdocs
-#          wget https://bootstrap.pypa.io/get-pip.py
-#          sudo -H python get-pip.py
-#          sudo -H pip uninstall mkdocs
-#          sudo -H pip install mkdocs
-#          sudo -H pip3 install mkdocs
-      #          pip install --user mkdocs
       # Using mkdocs produce docs for deployment.
       - name: Prepare doc files for deployment to s3
         if: github.event_name == 'push'
@@ -100,7 +94,8 @@ jobs:
         id: extract_branch
       # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
       - name: Upload docs to IBI s3 buckets & cloudfront
-        if: github.event_name == 'push' && ${{ steps.extract_branch.outputs.branch_name }} == 'ibi-dev'
+        if: github.event_name == 'push' && ${{ env.GITHUB_HEAD_REF_SLUG }} == 'ibi-dev'
+#        if: github.event_name == 'push' && ${{ steps.extract_branch.outputs.branch_name }} == 'ibi-dev'
         uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read
