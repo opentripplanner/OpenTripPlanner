@@ -56,6 +56,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v3.x
       # Define AWS profile credentials for use by subsequent steps.
       - name: Add profile credentials to ~/.aws/credentials
+        if: github.event_name == 'push'
         run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
       - name: Build and Test
@@ -70,6 +71,7 @@ jobs:
         run: ./scripts/prep-build-for-deploy-from-github-actions.sh
       # Copy build files to AWS.
       - name: Copy build files to the otp-repo bucket
+        if: github.event_name == 'push'
         uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read
