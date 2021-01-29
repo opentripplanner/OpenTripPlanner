@@ -81,10 +81,11 @@ jobs:
       - name: Install mkdocs
         if: github.event_name == 'push'
         run: |
-          wget https://bootstrap.pypa.io/get-pip.py
-          sudo -H python get-pip.py
-          sudo -H pip uninstall mkdocs
-          sudo -H pip install mkdocs
+           pip install mkdocs
+#          wget https://bootstrap.pypa.io/get-pip.py
+#          sudo -H python get-pip.py
+#          sudo -H pip uninstall mkdocs
+#          sudo -H pip install mkdocs
 #          sudo -H pip3 install mkdocs
       #          pip install --user mkdocs
       # Using mkdocs produce docs for deployment.
