@@ -26,7 +26,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-#      JAVA_OPTS: -Xmx2g
+      JAVA_OPTS: -Xmx2g
+      # TODO Remove if not required.
       OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
       OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
       GPG_KEY_NAME: ${{ secrets.GPG_KEY_NAME }}
@@ -42,13 +43,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-          args: -Xmx2g
       # Retain the local Maven repository to speed up builds.
       - name: Setup Maven Cache
         uses: actions/cache@v2
         id: cache
         with:
-          path: ~/.m2/repository
+          path: ~/.m2
+          # TODO Fix error message 'Cache not found for input keys: maven-local-repo'
           key: maven-local-repo
       # So that the branch name can be reference via $GITHUB_HEAD_REF_SLUG.
       - name: Inject slug/short variables
@@ -86,24 +87,19 @@ jobs:
       - name: Prepare doc files for deployment to s3
         if: github.event_name == 'push'
         run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
-      # Obtain the current branch name.
-      - name: Extract branch name
-        if: github.event_name == 'push'
-        run: |
-          echo "##[set-output name=branch_name;]$(echo ${GITHUB_HEAD_REF_SLUG})"
-        id: extract_branch
       # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
       - name: Upload docs to IBI s3 buckets & cloudfront
         if: github.event_name == 'push' && ${{ env.GITHUB_HEAD_REF_SLUG }} == 'ibi-dev'
-#        if: github.event_name == 'push' && ${{ steps.extract_branch.outputs.branch_name }} == 'ibi-dev'
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read
-        env:
-          AWS_S3_BUCKET: otp-docs
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: 'target/mkdocs'
+        run: |
+          aws s3 cp --recursive --acl public-read "target/mkdocs" "s3://otp-docs.ibi-transit.com"
+#        uses: jakejarvis/s3-sync-action@master
+#        with:
+#          args: --acl public-read
+#        env:
+#          AWS_S3_BUCKET: otp-docs
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          SOURCE_DIR: 'target/mkdocs'
       # TODO: Push notification ot Teams.
 #      - name: Notify us of the build status on MS Teams
 #          notifications:
