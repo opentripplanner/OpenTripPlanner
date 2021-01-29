@@ -57,7 +57,8 @@ jobs:
         run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
       - name: Build and Test
-        run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip
+#        TODO: Remove skip tests!
+        run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip -DskipTests
 #        TODO: Confirm if OSSRH/GPG secrets are required.
 #        run: mvn clean verify --settings maven-settings.xml --batch-mode --show-version --update-snapshots -Dgpg.skip
       # Only prepare deploy files on push events to avoid duplicate pushes to s3 when a commit is
