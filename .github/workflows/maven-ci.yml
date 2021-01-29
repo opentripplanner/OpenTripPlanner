@@ -80,7 +80,7 @@ jobs:
       - name: Install mkdocs
         if: github.event_name == 'push'
         run: |
-          sudo pip3 install mkdocs
+          sudo -H pip3 install mkdocs
       #          pip install --user mkdocs
       # Using mkdocs produce docs for deployment.
       - name: Prepare doc files for deployment to s3
