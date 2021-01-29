@@ -6,6 +6,7 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
+import org.opentripplanner.routing.algorithm.raptor.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
@@ -59,6 +60,7 @@ public class RoutingWorker {
     public final DebugAggregator debugAggregator = new DebugAggregator();
 
     private final RoutingRequest request;
+    private final FilterTransitWhenDirectModeIsEmpty emptyDirectModeHandler;
     private Instant filterOnLatestDepartureTime = null;
     private int searchWindowUsedInSeconds = NOT_SET;
     private Itinerary firstRemovedItinerary = null;
@@ -67,11 +69,16 @@ public class RoutingWorker {
         this.debugAggregator.startedCalculating();
         this.raptorService = new RaptorService<>(config);
         this.request = request;
+        this.emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
     }
 
     public RoutingResponse route(Router router) {
         List<Itinerary> itineraries = new ArrayList<>();
         List<RoutingError> routingErrors = new ArrayList<>();
+
+        // If no direct mode is set, then we set one.
+        // See {@link FilterTransitWhenDirectModeIsEmpty}
+        request.modes.directMode = emptyDirectModeHandler.resolveDirectMode();
 
         this.debugAggregator.finishedPrecalculating();
 
@@ -108,6 +115,9 @@ public class RoutingWorker {
         LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
 
         this.debugAggregator.finishedFiltering();
+
+        // Restore original directMode.
+        request.modes.directMode = emptyDirectModeHandler.originalDirectMode();
 
         return new RoutingResponse(
             TripPlanMapper.mapTripPlan(request, itineraries),
@@ -251,7 +261,10 @@ public class RoutingWorker {
 
     private List<Itinerary> filterItineraries(List<Itinerary> itineraries) {
         ItineraryFilter filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
-            request, filterOnLatestDepartureTime, it -> firstRemovedItinerary = it
+            request,
+            filterOnLatestDepartureTime,
+            emptyDirectModeHandler.removeWalkAllTheWayResults(),
+            it -> firstRemovedItinerary = it
         );
         return filterChain.filter(itineraries);
     }

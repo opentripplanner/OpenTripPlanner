@@ -21,6 +21,7 @@ public class RoutingRequestToFilterChainMapper {
   public static ItineraryFilter createFilterChain(
       RoutingRequest request,
       Instant filterOnLatestDepartureTime,
+      boolean removeWalkAllTheWayResults,
       Consumer<Itinerary> maxLimitReachedSubscriber
   ) {
     var builder = new ItineraryFilterChainBuilder(request.arriveBy);
@@ -57,6 +58,7 @@ public class RoutingRequestToFilterChainMapper {
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
         .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
         .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
+        .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
         .withDebugEnabled(p.debug);
 
     return builder.build();

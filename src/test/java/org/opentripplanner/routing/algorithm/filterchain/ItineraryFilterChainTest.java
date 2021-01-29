@@ -112,6 +112,19 @@ public class ItineraryFilterChainTest {
     assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
   }
 
+  @Test
+  public void removeAllWalkingOnly() {
+    var chain = createBuilder(false, false, 20)
+        .withRemoveWalkAllTheWayResults(true)
+        .build();
+
+    Itinerary walk = newItinerary(A, 6).walk(20, E).build();
+    Itinerary bus = newItinerary(A).bus(21, 6, 12, E).build();
+
+    assertEquals(toStr(List.of(bus)), toStr(chain.filter(List.of(walk, bus))));
+  }
+
+
 
   /* private methods */
 
