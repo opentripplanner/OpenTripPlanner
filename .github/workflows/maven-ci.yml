@@ -82,12 +82,12 @@ jobs:
           SOURCE_DIR: 'deploy'
       # Install mkdocs using pip for use by subsequent steps.
       - name: Install mkdocs
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: |
            pip install mkdocs
       # Using mkdocs produce docs for deployment.
       - name: Prepare doc files for deployment to s3
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
       # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
       # TODO Fails with access denied to s3
