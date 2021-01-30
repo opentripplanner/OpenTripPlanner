@@ -73,7 +73,7 @@ public interface RaptorTransfer {
      * <p>
      * Note! The number returned should include all "rides" in the access leg resulting in an extra
      * transfer, including boarding the first Raptor scheduled trip. There is no need to account for
-     * riding yor own bicycle or scooter, and a rental bike is debatable. The guideline is that if
+     * riding your own bicycle or scooter, and a rental bike is debatable. The guideline is that if
      * there is a transfer involved that is equivalent to the "human cost" to a normal transit
      * transfer, then it should be counted. If not, you should account for it using the cost
      * function instead.
