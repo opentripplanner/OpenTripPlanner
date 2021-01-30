@@ -19,6 +19,11 @@ import org.opentripplanner.transit.raptor.util.AvgTimer;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.groupingBy;
 
 
 /**
@@ -52,7 +57,6 @@ import java.util.Iterator;
 @SuppressWarnings("Duplicates")
 public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Worker<T> {
 
-
     private final RoutingStrategy<T> transitWorker;
 
     /**
@@ -79,13 +83,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private final WorkerPerformanceTimers timers;
 
-    private final Collection<RaptorTransfer> accessPaths;
+    private final Map<Integer, List<RaptorTransfer>> accessArrivedByWalking;
 
-    /**
-     * The life cycle is used to publish life cycle events to everyone who
-     * listen.
-     */
+    private final Map<Integer, List<RaptorTransfer>> accessArrivedOnBoard;
+
     private final LifeCycleEventPublisher lifeCycle;
+
+    private final int mimNumberOfRounds;
 
     private boolean inFirstIteration = true;
 
@@ -107,7 +111,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         this.transitData = transitData;
         this.calculator = calculator;
         this.timers = timers;
-        this.accessPaths = accessPaths;
+        this.accessArrivedByWalking = groupByRound(accessPaths, Predicate.not(RaptorTransfer::stopReachedOnBoard));
+        this.accessArrivedOnBoard = groupByRound(accessPaths, RaptorTransfer::stopReachedOnBoard);
+        this.mimNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
+
         // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
         // "everyone" by providing access to it in the context.
         this.roundTracker = (RoundTracker) roundProvider;
@@ -149,22 +156,22 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Perform one minute of a RAPTOR search.
      */
     private void runRaptorForMinute() {
-        addAccessPathsToState(false);
+        addAccessPaths(accessArrivedByWalking.get(0));
 
         while (hasMoreRounds()) {
-
             lifeCycle.prepareForNextRound(roundTracker.nextRound());
 
             // NB since we have transfer limiting not bothering to cut off search when there are no
             // more transfers as that will be rare and complicates the code
-            timerByMinuteScheduleSearch().time(this::findAllTransitForRound);
+            findAllTransitForRound();
 
-            // This needs to be below transitsForRoundComplete to not clear touched stops
-            addAccessPathsToState(true);
+            addAccessPaths(accessArrivedOnBoard.get(round()));
 
-            timerByMinuteTransfers().time(this::transfersForRound);
+            transfersForRound();
 
             lifeCycle.roundComplete(state.isDestinationReachedInCurrentRound());
+
+            addAccessPaths(accessArrivedByWalking.get(round()));
         }
 
         // This state is repeatedly modified as the outer loop progresses over departure minutes.
@@ -177,51 +184,49 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Check if the RangeRaptor should continue with a new round.
      */
     private boolean hasMoreRounds() {
-        final int round = roundTracker.round();
-        boolean hasAccessesLeft = accessPaths
-            .stream()
-            .anyMatch(it -> it.numberOfRides() > round);
-
-        return (state.isNewRoundAvailable() || hasAccessesLeft) && roundTracker.hasMoreRounds();
+        if(round() < mimNumberOfRounds) { return true; }
+        return state.isNewRoundAvailable() && roundTracker.hasMoreRounds();
     }
 
     /**
      * Perform a scheduled search
      */
     private void findAllTransitForRound() {
-        IntIterator stops = state.stopsTouchedPreviousRound();
-        Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
+        timerByMinuteScheduleSearch().time(() -> {
+            IntIterator stops = state.stopsTouchedPreviousRound();
+            Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
 
-        while (routeIterator.hasNext()) {
-            RaptorRoute<T> next = routeIterator.next();
-            RaptorTripPattern pattern = next.pattern();
-            TripScheduleSearch<T> tripSearch = createTripSearch(next.timetable());
+            while (routeIterator.hasNext()) {
+                RaptorRoute<T> next = routeIterator.next();
+                RaptorTripPattern pattern = next.pattern();
+                TripScheduleSearch<T> tripSearch = createTripSearch(next.timetable());
 
-            // Prepare for transit
-            transitWorker.prepareForTransitWith(pattern, tripSearch);
+                // Prepare for transit
+                transitWorker.prepareForTransitWith(pattern, tripSearch);
 
-            // perform transit - iterate over given pattern and calculate transit for each stop.
-            IntIterator it = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
-            while (it.hasNext()) {
-                transitWorker.routeTransitAtStop(it.next());
+                // perform transit - iterate over given pattern and calculate transit for each stop.
+                IntIterator it = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
+                while (it.hasNext()) {
+                    transitWorker.routeTransitAtStop(it.next());
+                }
             }
-        }
-        lifeCycle.transitsForRoundComplete();
+            lifeCycle.transitsForRoundComplete();
+        });
     }
 
     private void transfersForRound() {
-        IntIterator it = state.stopsTouchedByTransitCurrentRound();
+        timerByMinuteTransfers().time(() -> {
+            IntIterator it = state.stopsTouchedByTransitCurrentRound();
 
-        while (it.hasNext()) {
-            final int fromStop = it.next();
-            // no need to consider loop transfers, since we don't mark patterns here any more
-            // loop transfers are already included by virtue of those stops having been reached
-            state.transferToStops(fromStop, transitData.getTransfers(fromStop));
-        }
+            while (it.hasNext()) {
+                final int fromStop = it.next();
+                // no need to consider loop transfers, since we don't mark patterns here any more
+                // loop transfers are already included by virtue of those stops having been reached
+                state.transferToStops(fromStop, transitData.getTransfers(fromStop));
+            }
 
-        addAccessPathsToState(false);
-
-        lifeCycle.transfersForRoundComplete();
+            lifeCycle.transfersForRoundComplete();
+        });
     }
 
     /**
@@ -251,11 +256,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Set the departure time in the scheduled search to the given departure time,
      * and prepare for the scheduled search at the next-earlier minute.
      */
-    private void addAccessPathsToState(boolean inTransit) {
-        for (RaptorTransfer it : accessPaths) {
-            // Check if access matches round and time
-            if (!includeAccessInRound(it, inTransit)) { continue; }
+    private void addAccessPaths(Collection<RaptorTransfer> accessPaths) {
+        if(accessPaths == null) { return; }
 
+        for (RaptorTransfer it : accessPaths) {
             // Earliest possible departure time from the origin, or latest possible arrival
             // time at the destination if searching backwards.
             int timeDependentDepartureTime = calculator.departureTime(it, iterationDepartureTime);
@@ -267,9 +271,24 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         }
     }
 
-    private boolean includeAccessInRound(RaptorTransfer accessPath, boolean inTransit) {
-        return accessPath.numberOfRides() == roundTracker.round()
-            && accessPath.stopReachedOnBoard() == inTransit;
+    private int round() {
+        return roundTracker.round();
+    }
+
+    /**
+     * Filter the given input keeping all elements satisfying the include predicate and return
+     * a unmodifiable list.
+     */
+    private  static <T extends RaptorTransfer> Map<Integer, List<T>> groupByRound(
+        Collection<T> input, Predicate<T> include
+    ) {
+        return input.stream()
+            .filter(include)
+            .collect(groupingBy(RaptorTransfer::numberOfRides));
+    }
+
+    private int calculateMaxNumberOfRides(Collection<RaptorTransfer> accessPaths) {
+        return accessPaths.stream().mapToInt(RaptorTransfer::numberOfRides).max().orElse(0);
     }
 
     // Track time spent, measure performance
