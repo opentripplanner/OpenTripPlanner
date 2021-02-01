@@ -74,9 +74,9 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         return new TransitPathLeg<>(
                 arrival.previous().stop(),
-                r.boardTime,
+                r.boardTime(),
                 arrival.stop(),
-                r.alightTime,
+                r.alightTime(),
                 domainCost(arrival),
                 arrival.transitPath().trip(),
                 lastLeg

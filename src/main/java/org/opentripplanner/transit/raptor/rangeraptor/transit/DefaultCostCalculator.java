@@ -78,7 +78,7 @@ public class DefaultCostCalculator<T extends RaptorTripSchedule> implements Cost
 
     @Override
     public int transitArrivalCost(
-        ArrivalView<T> previousArrival,
+        int fromStop,
         int waitTime,
         int transitTime,
         int toStop,
@@ -86,7 +86,7 @@ public class DefaultCostCalculator<T extends RaptorTripSchedule> implements Cost
     ) {
         int cost = waitFactorApplied * waitTime + transitFactor * transitTime + transferAndBoardCost;
         if(stopVisitCost != null) {
-            cost += stopVisitCost[previousArrival.stop()] + stopVisitCost[toStop];
+            cost += stopVisitCost[fromStop] + stopVisitCost[toStop];
         }
         return cost;
     }

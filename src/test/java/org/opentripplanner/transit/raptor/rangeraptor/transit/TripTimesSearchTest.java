@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.Access;
 import org.opentripplanner.transit.raptor._data.stoparrival.Bus;
+import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,14 +37,14 @@ public class TripTimesSearchTest implements RaptorTestConstants {
         // Search AFTER EDT
         r = findTripForwardSearch(busFwd(STOP_1, STOP_7, C_ALIGHT_LATE));
 
-        assertEquals(A_BOARD_TIME, r.boardTime);
-        assertEquals(C_ALIGHT_TIME, r.alightTime);
+        assertEquals(A_BOARD_TIME, r.boardTime());
+        assertEquals(C_ALIGHT_TIME, r.alightTime());
 
         // Search BEFORE LAT
         r = findTripReverseSearch(busRwd(STOP_7, STOP_1, A_BOARD_EARLY));
 
-        assertEquals(A_BOARD_TIME, r.boardTime);
-        assertEquals(C_ALIGHT_TIME, r.alightTime);
+        assertEquals(A_BOARD_TIME, r.boardTime());
+        assertEquals(C_ALIGHT_TIME, r.alightTime());
     }
 
     @Test
@@ -52,15 +54,33 @@ public class TripTimesSearchTest implements RaptorTestConstants {
         // Search AFTER EDT
         r = findTripForwardSearch(busFwd(STOP_1, STOP_7, C_ALIGHT_TIME));
 
-        assertEquals(A_BOARD_TIME, r.boardTime);
-        assertEquals(C_ALIGHT_TIME, r.alightTime);
+        assertEquals(A_BOARD_TIME, r.boardTime());
+        assertEquals(C_ALIGHT_TIME, r.alightTime());
 
 
         // Search BEFORE LAT
         r = findTripReverseSearch(busRwd(STOP_7, STOP_1, A_BOARD_TIME));
 
-        assertEquals(A_BOARD_TIME, r.boardTime);
-        assertEquals(C_ALIGHT_TIME, r.alightTime);
+        assertEquals(A_BOARD_TIME, r.boardTime());
+        assertEquals(C_ALIGHT_TIME, r.alightTime());
+    }
+
+    @Test
+    public void findTripTimes() {
+        BoarAndAlightTime r;
+
+        // Search AFTER EDT
+        TestTripSchedule trip = TestTripSchedule
+            .schedule(TestTripPattern.pattern(STOP_2, STOP_5, STOP_7))
+            .times(A_BOARD_TIME, A_BOARD_TIME + 10, C_ALIGHT_TIME)
+            .build();
+
+        var leg = new TransitPathLeg<>(STOP_2, A_BOARD_TIME, STOP_7, C_ALIGHT_TIME, -0, trip, null);
+
+        r = TripTimesSearch.findTripTimes(leg);
+
+        assertEquals(A_BOARD_TIME, r.boardTime());
+        assertEquals(C_ALIGHT_TIME, r.alightTime());
     }
 
     @Test
@@ -169,36 +189,36 @@ public class TripTimesSearchTest implements RaptorTestConstants {
         {
             // Board in the 2nd loop at stop 2 and get off at stop 3
             r = findTripForwardSearch(busFwd( 122, 133, 800));
-            assertEquals(710, r.boardTime);
-            assertEquals(800, r.alightTime);
+            assertEquals(710, r.boardTime());
+            assertEquals(800, r.alightTime());
 
             // Board in the 1st loop at stop 4 and get off at stop 3
             r = findTripForwardSearch(busFwd(144, 133, 800));
-            assertEquals(410, r.boardTime);
-            assertEquals(800, r.alightTime);
+            assertEquals(410, r.boardTime());
+            assertEquals(800, r.alightTime());
 
             // Board in the 1st stop, ride the loop twice, alight at the last stop
             r = findTripForwardSearch(busFwd(1, 1155, 1100));
-            assertEquals(10, r.boardTime);
-            assertEquals(1100, r.alightTime);
+            assertEquals(10, r.boardTime());
+            assertEquals(1100, r.alightTime());
         }
 
         // TEST REVERSE SEARCH
         {
             // Board in the 2nd loop at stop 2 and get off at stop 3
             r = findTripReverseSearch(busRwd(133, 122, 710));
-            assertEquals(710, r.boardTime);
-            assertEquals(800, r.alightTime);
+            assertEquals(710, r.boardTime());
+            assertEquals(800, r.alightTime());
 
             // Board in the 1st loop at stop 4 and get off at stop 3
             r = findTripReverseSearch(busRwd(133, 144, 410));
-            assertEquals(410, r.boardTime);
-            assertEquals(800, r.alightTime);
+            assertEquals(410, r.boardTime());
+            assertEquals(800, r.alightTime());
 
             // Board in the 1st stop, ride the loop twice, alight at the last stop
             r = findTripReverseSearch(busRwd( 1155, 1, 10));
-            assertEquals(10, r.boardTime);
-            assertEquals(1100, r.alightTime);
+            assertEquals(10, r.boardTime());
+            assertEquals(1100, r.alightTime());
         }
     }
 

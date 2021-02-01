@@ -136,7 +136,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         final int waitTime = ride.boardWaitTimeForCostCalculation + alightSlack;
 
         final int costTransit = costCalculator.transitArrivalCost(
-            ride.prevArrival,
+            ride.prevArrival.stop(),
             waitTime,
             alightTime - ride.boardTime,
             alightStop,

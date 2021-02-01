@@ -39,23 +39,24 @@ public class CostCalculatorTest {
 
     @Test
     public void transitArrivalCost() {
+        int fromStop = 0;
         ArrivalView<TestTripSchedule> prev = new Access(0, 0, 2);
 
         lifeCycle.prepareForNextRound(0);
         assertEquals(1000, prev.cost());
 
         lifeCycle.prepareForNextRound(1);
-        assertEquals("Board cost", 500, subject.transitArrivalCost(prev, 0, 0, 0, null));
-        assertEquals("Board + transit cost", 600, subject.transitArrivalCost(prev, 0, 1, 0, null));
-        assertEquals("Board + transit + stop cost", 625, subject.transitArrivalCost(prev, 0, 1, 1, null));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(fromStop, 0, 0, 0, null));
+        assertEquals("Board + transit cost", 600, subject.transitArrivalCost(fromStop, 0, 1, 0, null));
+        assertEquals("Board + transit + stop cost", 625, subject.transitArrivalCost(fromStop, 0, 1, 1, null));
         // There is no wait cost for the first transit leg
-        assertEquals("Board cost", 500, subject.transitArrivalCost(prev, 1, 0, 0, null));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(fromStop, 1, 0, 0, null));
 
         // Simulate round 2
         lifeCycle.prepareForNextRound(2);
         // There is a small cost (2-1) * 0.5 * 100 = 50 added for the second transit leg
-        assertEquals("Wait + board cost", 750, subject.transitArrivalCost(prev,1, 0, 0, null));
-        assertEquals("wait + board + transit", 950, subject.transitArrivalCost(prev, 1, 2, 0, null));
+        assertEquals("Wait + board cost", 750, subject.transitArrivalCost(fromStop,1, 0, 0, null));
+        assertEquals("wait + board + transit", 950, subject.transitArrivalCost(fromStop, 1, 2, 0, null));
     }
 
     @Test

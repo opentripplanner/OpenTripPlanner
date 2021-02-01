@@ -25,7 +25,7 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
      * Calculate the value when arriving by transit.
      */
     int transitArrivalCost(
-        ArrivalView<T> previousArrival,
+        int fromStop,
         int waitTime,
         int transitTime,
         int toStop,

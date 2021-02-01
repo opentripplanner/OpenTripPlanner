@@ -4,6 +4,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
+import javax.annotation.Nullable;
+
 /**
  * A leg in a Raptor path. The legs are linked together from the first leg {@link AccessPathLeg},
  * to the last leg {@link EgressPathLeg}. There must be at least one {@link TransitPathLeg}.
@@ -136,5 +138,19 @@ public interface PathLeg<T extends RaptorTripSchedule> {
                 TimeUtils.timeToStrCompact(toTime()) +
                 "(" + DurationUtils.durationToStr(duration()) + ")"
                 ;
+    }
+
+    /**
+     * Return the next transit leg in the path after this one, if no more
+     * transit exist before reaching the destination {@code null} is returned.
+     */
+    @Nullable
+    default TransitPathLeg<T> nextTransitLeg() {
+        PathLeg<T> leg = nextLeg();
+        while (!leg.isEgressLeg()) {
+            if(leg.isTransitLeg()) { return leg.asTransitLeg(); }
+            leg = leg.nextLeg();
+        }
+        return null;
     }
 }

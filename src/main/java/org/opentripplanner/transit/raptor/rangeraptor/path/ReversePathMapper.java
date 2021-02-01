@@ -103,13 +103,13 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
 
         BoarAndAlightTime r = findTripReverseSearch(fromStopArrival);
 
-        alightTime = r.alightTime;
+        alightTime = r.alightTime();
 
         return new TransitPathLeg<>(
             fromStop,
-            r.boardTime,
+            r.boardTime(),
             toStop,
-            r.alightTime,
+            r.alightTime(),
             domainCost(fromStopArrival),
             trip,
             // Recursive call to map next leg
