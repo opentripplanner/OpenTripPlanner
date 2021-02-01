@@ -29,10 +29,6 @@ jobs:
       # So that the branch name can be reference via $GITHUB_HEAD_REF_SLUG.
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
-      # Define AWS profile credentials for use by subsequent steps.
-#      - name: Add profile credentials to ~/.aws/credentials
-#        if: github.event_name == 'push'
-#        run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
       - name: Build and Test
 #        TODO: Remove skip tests. Temporary change to allow testing of later steps.
