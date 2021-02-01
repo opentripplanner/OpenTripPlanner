@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
-import static org.opentripplanner.util.time.TimeUtils.durationToStr;
+import org.opentripplanner.util.time.DurationUtils;
 
 /**
  * Encapsulate information about a access, transfer or egress path. We do not distinguish
@@ -119,7 +119,7 @@ public interface RaptorTransfer {
 
     /** Call this from toString */
     default String asString() {
-        String duration = durationToStr(durationInSeconds());
+      String duration = DurationUtils.durationToStr(durationInSeconds());
         return hasRides()
             ? String.format("Flex %s %dtx ~ %d", duration, numberOfRides(), stop())
             : String.format("Walk %s ~ %d", duration, stop());

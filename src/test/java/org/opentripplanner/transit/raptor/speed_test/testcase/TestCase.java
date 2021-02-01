@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.Collection;
@@ -64,9 +65,9 @@ public class TestCase {
     }
 
     private String durationToString(int orgTime, int calcTime) {
-        return orgTime == NOT_SET && calcTime > 0
-            ? TimeUtils.durationToStr(calcTime) + "*"
-            : TimeUtils.durationToStr(orgTime);
+      return orgTime == NOT_SET && calcTime > 0
+            ? DurationUtils.durationToStr(calcTime) + "*"
+            : DurationUtils.durationToStr(orgTime);
     }
 
     /**

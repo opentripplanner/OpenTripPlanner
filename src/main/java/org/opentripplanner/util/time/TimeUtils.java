@@ -2,9 +2,17 @@ package org.opentripplanner.util.time;
 
 
 import javax.annotation.Nonnull;
-import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.joda.time.DateTimeConstants.SECONDS_PER_DAY;
 
 
 /**
@@ -17,12 +25,12 @@ public class TimeUtils {
      */
     public static final int NOT_SET = -1_000_000;
 
-    private enum FormatType { COMPACT, LONG, SHORT, DURATION }
-    private static final boolean USE_RAW_TIME = false;
+    private static final Pattern DAYS_SUFFIX = Pattern.compile("([-+])(\\d+)d");
 
 
     /** This is a utility class. Do not instantiate this class. It should have only static methods. */
     private TimeUtils() { }
+
 
     public static int hms2time(int hour, int minute, int second) {
         return second + 60 * (minute + (60 * hour));
@@ -33,8 +41,43 @@ public class TimeUtils {
     }
 
 
-    public static int parseTimeCompact(String hhmmss) {
-        String[] tokens = hhmmss.split(":");
+    /**
+     * Parse a time into seconds past midnight.
+     * Format accepted for time: HH, HH:MM and HH:MM:SS
+     * In addition a day offset is allowed: (+|-)DDd. Examples:
+     * <pre>
+     *  00:00:00  =>  01:00:00
+     *         1  =>  01:00:00
+     *       1:2  =>  01:02:00
+     *     1:2:3  =>  01:02:03
+     *  13:59:59  =>  13:59:59
+     *
+     *  // Additional days (plus and minus)
+     *         1+1d  =>  01:00:00+1d
+     *  11:02:03-2d  =>  11:02:03-3d
+     *
+     *  // Negative values are supported
+     *    -10:20     => -01:02:00
+     * -13:59:59     => -13:59:59
+     * -11:02:03-2d  => -(11:02:03-3d)  ==>  12:57:57+2d
+     * </pre>
+     */
+    public static int time(String hhmmss) {
+        int days = 0;
+        String[] tokens;
+        boolean negative = hhmmss.startsWith("-");
+
+        if(negative) { hhmmss =  hhmmss.substring(1); }
+
+        Matcher m = DAYS_SUFFIX.matcher(hhmmss);
+        if (m.find()) {
+            days = Integer.parseInt(m.group(2));
+            if("-".equals(m.group(1))) { days = -days; }
+            tokens = hhmmss.substring(0, m.start()).split(":");
+        }
+        else {
+            tokens = hhmmss.split(":");
+        }
 
         if(tokens.length > 3 || tokens.length < 1) {
             throw new IllegalStateException(
@@ -42,9 +85,14 @@ public class TimeUtils {
             );
         }
         int hh = Integer.parseInt(tokens[0]);
+        if(hh > 23) {
+            days += hh/24;
+            hh = hh % 24;
+        }
         int mm = tokens.length>1 ? Integer.parseInt(tokens[1]) : 0;
         int ss = tokens.length==3 ? Integer.parseInt(tokens[2]) : 0;
-        return hms2time(hh, mm, ss);
+        int seconds = LocalTime.of(hh, mm, ss).toSecondOfDay() + days * SECONDS_PER_DAY;
+        return negative ? -seconds : seconds;
     }
 
     public static int parseHHMM(String hhmm, int defaultValue) {
@@ -80,68 +128,33 @@ public class TimeUtils {
      */
     public static int[] times(@Nonnull String input) {
         return Arrays.stream(input.split("[ ,;]+"))
-            .mapToInt(TimeUtils::parseTimeCompact)
+            .mapToInt(TimeUtils::time)
             .toArray();
     }
 
 
     public static String timeToStrCompact(int time) {
-        return timeToStrCompact(time, -1);
+        return RelativeTime.ofSeconds(time).toCompactStr();
     }
 
     public static String timeToStrCompact(int time, int notSetValue) {
-        return timeStr(time, notSetValue, FormatType.COMPACT);
+        return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toCompactStr();
     }
 
     public static String timeToStrCompact(Calendar time) {
-        return timeStr(time, FormatType.COMPACT);
-    }
-
-    public static String durationToStr(Duration duration) {
-        return durationToStr((int)duration.toSeconds());
-    }
-
-    public static String durationToStr(int timeSeconds) {
-        return durationToStr(timeSeconds, NOT_SET);
-    }
-
-    public static String durationToStr(int timeSeconds, int notSetValue) {
-        return timeStr(timeSeconds, notSetValue, FormatType.DURATION);
-    }
-
-    /** Parse a sting on format {@code nHnMn.nS}. */
-    public static int parseDuration(String duration) {
-        Duration d = Duration.parse("PT" + duration);
-        return (int)d.toSeconds();
-    }
-
-    public static String msToSecondsStr(long timeMs) {
-        if(timeMs == 0) { return "0 seconds"; }
-        if(timeMs == 1000) { return "1 second"; }
-        if(timeMs < 100) { return String.format ("%.3f seconds",  timeMs/1000.0); }
-        if(timeMs < 995) { return String.format ("%.2f seconds",  timeMs/1000.0); }
-        if(timeMs < 9950) { return String.format ("%.1f seconds",  timeMs/1000.0); }
-        else { return String.format ("%.0f seconds",  timeMs/1000.0); }
+        return time == null ? "" : RelativeTime.from(time).toCompactStr();
     }
 
     public static String timeToStrLong(int time) {
-        return timeToStrLong(time, -1);
+        return RelativeTime.ofSeconds(time).toLongStr();
     }
 
     public static String timeToStrLong(int time, int notSetValue) {
-        return timeStr(time, notSetValue, FormatType.LONG);
+        return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toLongStr();
     }
 
     public static String timeToStrLong(Calendar time) {
-        return timeStr(time, FormatType.LONG);
-    }
-
-    public static String timeToStrShort(int time) {
-        return timeStr(time, NOT_SET, FormatType.SHORT);
-    }
-
-    public static String timeToStrShort(Calendar time) {
-        return timeStr(time, FormatType.SHORT);
+        return RelativeTime.from(time).toLongStr();
     }
 
     public static Calendar midnightOf(Calendar time) {
@@ -153,77 +166,21 @@ public class TimeUtils {
         return midnight;
     }
 
-
-    /* private methods */
-
-    private static String timeStr(int time, int notSetValue, FormatType formatType) {
-        if(time == notSetValue) {
-            return "";
-        }
-        if(USE_RAW_TIME) {
-            return Integer.toString(time);
-        }
-        boolean sign = time < 0;
-        time = Math.abs(time);
-
-        int sec = time % 60;
-        time =  time / 60;
-        int min = time % 60;
-        int hour = time / 60;
-
-        return timeStr(sign, hour, min, sec, formatType);
-    }
-
-    private static String timeStr(Calendar time, FormatType formatType) {
-        if(time == null) {
-            return "";
-        }
-        int sec = time.get(Calendar.SECOND);
-        int min = time.get(Calendar.MINUTE);
-        int hour = time.get(Calendar.HOUR_OF_DAY);
-
-        return timeStr(false, hour, min, sec, formatType);
-    }
-
-    private static String timeStr(
-            boolean sign, int hours, int min, int sec, FormatType formatType
-    ) {
-        switch (formatType) {
-            case LONG: return sign(sign, timeStrLong(hours, min, sec));
-            case SHORT: return sign(sign, timeStrShort(hours, min));
-            case DURATION: return sign(sign, timeStrDuration(hours, min, sec));
-            default: return sign(sign, timeStrCompact(hours, min, sec));
-        }
-    }
-
-    private static String sign(boolean sign , String value) {
-        return sign ? "-" + value : value;
-    }
-
-    private static String timeStrCompact(int hour, int min, int sec) {
-        return sec == 0
-                ? String.format("%d:%02d", hour, min)
-                : String.format("%d:%02d:%02d", hour, min, sec);
-    }
-
-    private static String timeStrLong(int hour, int min, int sec) {
-        return String.format("%02d:%02d:%02d", hour, min, sec);
-    }
-
-    private static String timeStrShort(int hour, int min) {
-        return String.format("%02d:%02d", hour, min);
-    }
-
-    /** Examples: "3d4h3m4s", "3m", "59s", "1h3s" */
-    private static String timeStrDuration(int hours, int min, int sec) {
-        int days = hours/24;
-        hours = hours % 24;
-        String buf = "";
-
-        if(days != 0) { buf += days + "d"; }
-        if(hours != 0) { buf += hours + "h"; }
-        if(min != 0) { buf += min + "m"; }
-        if(sec != 0) { buf += sec + "s"; }
-        return buf.isBlank() ? "0s" : buf;
+    /**
+     * This method take a date, a time in seconds and a zoneId and create a {@link ZonedDateTime}.
+     * <p>
+     * This method follow the GTFS specification for time: "The time is measured from
+     * 'noon minus 12h' of the service day (effectively midnight except for days on which
+     * daylight savings time changes occur." See https://developers.google.com/transit/gtfs/reference#field_types
+     * <p>
+     * Note! The itinerary uses the old Java Calendar, but we would like to migrate to the new java.time
+     * library; Hence this method is already changed. To convert into the legacy Calendar use
+     * {@link GregorianCalendar#from(ZonedDateTime)} method.
+     *
+     * @param date the "service" date
+     * @param seconds number of seconds since noon minus 12 hours (midnight).
+     */
+    public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {
+        return RelativeTime.ofSeconds(seconds).toZonedDateTime(date, zoneId);
     }
 }

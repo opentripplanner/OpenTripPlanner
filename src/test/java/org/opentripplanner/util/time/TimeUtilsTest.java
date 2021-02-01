@@ -2,24 +2,27 @@ package org.opentripplanner.util.time;
 
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.TimeZone;
 
+import static java.time.ZoneOffset.UTC;
 import static org.junit.Assert.assertEquals;
 
 public class TimeUtilsTest {
 
     private final static Calendar CAL = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    private final int T_09_31_00 = time(9, 31, 0);
-    private final int T_09_36_55 = time(9, 36, 55);
-    private final int T_13_33_57 = time(13, 33, 57);
-    private final int T_14_00_47 = time(14, 0, 47);
-    private final int T_15_37_00 = time(15, 37, 0);
-    private final int T_00_58_59 = time(0, 58, 59);
-    private final int T_00_05_51 = time(0, 5, 51);
-    private final int T_00_00_09 = time(0, 0, 9);
+    private final int T00_00_01 = time(0, 0, 1);
+    private final int T00_01_00 = time(0, 1, 0);
+    private final int T01_00_00 = time(1, 0, 0);
+    private final int T09_31_00 = time(9, 31, 0);
+    private final int T13_33_57 = time(13, 33, 57);
+    private final int T00_58_59 = time(0, 58, 59);
+    private final int T26_03_15 = time(26, 3, 15);
+
     private final int NOT_SET = 999_999;
 
     static {
@@ -29,99 +32,70 @@ public class TimeUtilsTest {
 
     @Test
     public void timeToStrCompact() {
-        assertEquals("9:31", TimeUtils.timeToStrCompact(T_09_31_00));
-        assertEquals("9:36:55", TimeUtils.timeToStrCompact(T_09_36_55));
-        assertEquals("13:33:57", TimeUtils.timeToStrCompact(T_13_33_57));
-        assertEquals("0:58:59", TimeUtils.timeToStrCompact(T_00_58_59));
-        assertEquals("0:05:51", TimeUtils.timeToStrCompact(T_00_05_51));
-        assertEquals("0:00:09", TimeUtils.timeToStrCompact(T_00_00_09));
-        assertEquals("13:33:57", TimeUtils.timeToStrCompact(T_13_33_57, NOT_SET));
+        assertEquals("0:00:01", TimeUtils.timeToStrCompact(T00_00_01));
+        assertEquals("0:01", TimeUtils.timeToStrCompact(T00_01_00));
+        assertEquals("1:00", TimeUtils.timeToStrCompact(T01_00_00));
+        assertEquals("23:59:59-1d", TimeUtils.timeToStrCompact(-T00_00_01));
+        assertEquals("23:59-1d", TimeUtils.timeToStrCompact(-T00_01_00));
+        assertEquals("23:00-1d", TimeUtils.timeToStrCompact(-T01_00_00));
+
+        assertEquals("9:31", TimeUtils.timeToStrCompact(T09_31_00));
+        assertEquals("13:33:57", TimeUtils.timeToStrCompact(T13_33_57));
+        assertEquals("0:58:59", TimeUtils.timeToStrCompact(T00_58_59));
+        assertEquals("13:33:57", TimeUtils.timeToStrCompact(T13_33_57, NOT_SET));
         assertEquals("", TimeUtils.timeToStrCompact(NOT_SET, NOT_SET));
         assertEquals("9:36:07", TimeUtils.timeToStrCompact(CAL));
-        assertEquals("-13:33:57", TimeUtils.timeToStrCompact(-T_13_33_57));
-        assertEquals("-0:00:09", TimeUtils.timeToStrCompact(-T_00_00_09));
+        assertEquals("10:26:03-1d", TimeUtils.timeToStrCompact(-T13_33_57));
     }
 
     @Test
     public void timeToStrLong() {
-        assertEquals("09:31:00", TimeUtils.timeToStrLong(T_09_31_00));
-        assertEquals("09:36:55", TimeUtils.timeToStrLong(T_09_36_55));
-        assertEquals("13:33:57", TimeUtils.timeToStrLong(T_13_33_57));
-        assertEquals("00:00:09", TimeUtils.timeToStrLong(T_00_00_09));
-        assertEquals("13:33:57", TimeUtils.timeToStrLong(T_13_33_57, NOT_SET));
+        assertEquals("00:00:01", TimeUtils.timeToStrLong(T00_00_01));
+        assertEquals("00:01:00", TimeUtils.timeToStrLong(T00_01_00));
+        assertEquals("01:00:00", TimeUtils.timeToStrLong(T01_00_00));
+        assertEquals("23:59:59-1d", TimeUtils.timeToStrLong(-T00_00_01));
+        assertEquals("23:59:00-1d", TimeUtils.timeToStrLong(-T00_01_00));
+        assertEquals("23:00:00-1d", TimeUtils.timeToStrLong(-T01_00_00));
+
+        assertEquals("13:33:57", TimeUtils.timeToStrLong(T13_33_57, NOT_SET));
         assertEquals("", TimeUtils.timeToStrLong(NOT_SET, NOT_SET));
         assertEquals("09:36:07", TimeUtils.timeToStrLong(CAL));
-        assertEquals("-13:33:57", TimeUtils.timeToStrLong(-T_13_33_57));
-        assertEquals("-00:00:09", TimeUtils.timeToStrLong(-T_00_00_09));
+        assertEquals("10:26:03-1d", TimeUtils.timeToStrLong(-T13_33_57));
     }
 
     @Test
-    public void timeToStrShort() {
-        assertEquals("09:31", TimeUtils.timeToStrShort(T_09_31_00));
-        assertEquals("09:36", TimeUtils.timeToStrShort(T_09_36_55));
-        assertEquals("13:33", TimeUtils.timeToStrShort(T_13_33_57));
-        assertEquals("00:00", TimeUtils.timeToStrShort(T_00_00_09));
-        assertEquals("09:36", TimeUtils.timeToStrShort(CAL));
-        assertEquals("-13:33", TimeUtils.timeToStrShort(-T_13_33_57));
-        assertEquals("-00:00", TimeUtils.timeToStrShort(-T_00_00_09));
-    }
+    public void time() {
+        // Midnight
+        assertEquals(0, TimeUtils.time("0"));
+        assertEquals(0, TimeUtils.time("0:0"));
+        assertEquals(0, TimeUtils.time("0:0:0"));
+        assertEquals(0, TimeUtils.time("0:0:0-0d"));
+        assertEquals(0, TimeUtils.time("0:0:0+0d"));
+        assertEquals(0, TimeUtils.time("-0:0:0-0d"));
 
-    @Test
-    public void durationToStr() {
-        assertEquals("9h36m55s", TimeUtils.durationToStr(T_09_36_55));
-        assertEquals("13h33m57s", TimeUtils.durationToStr(T_13_33_57));
-        assertEquals("9h31m", TimeUtils.durationToStr(T_09_31_00));
-        assertEquals("9s", TimeUtils.durationToStr(T_00_00_09));
-        assertEquals("14h47s", TimeUtils.durationToStr(T_14_00_47));
-        assertEquals("15h37m", TimeUtils.durationToStr(T_15_37_00));
-        assertEquals("-13h33m57s", TimeUtils.durationToStr(-T_13_33_57));
-        assertEquals("-9h31m", TimeUtils.durationToStr(-T_09_31_00));
-        assertEquals("-9s", TimeUtils.durationToStr(-T_00_00_09));
-        assertEquals("", TimeUtils.durationToStr(NOT_SET, NOT_SET));
-    }
+        // Test ONE digit for all 3 formats H, H:M, and H:M:S
+        assertEquals(time(3, 0,0), TimeUtils.time("3"));
+        assertEquals(time(3, 2, 0), TimeUtils.time("3:2"));
+        assertEquals(time(3, 2, 5), TimeUtils.time("3:2:5"));
+        assertEquals(time(-1, 3, 2, 5), TimeUtils.time("3:2:5-1d"));
+        assertEquals(time(1, 3, 2, 5), TimeUtils.time("3:2:5+1d"));
 
-    @Test
-    public void parseDuration() {
-        assertEquals(1, TimeUtils.parseDuration("1s"));
-        assertEquals(60, TimeUtils.parseDuration("1m"));
-        assertEquals(3600, TimeUtils.parseDuration("1h"));
-        assertEquals(3723, TimeUtils.parseDuration("1h2m3s"));
-    }
+        // Test TWO digit for all 3 formats HH, HH:MM, and HH:MM:SS
+        assertEquals(time(9, 0, 0), TimeUtils.time("09"));
+        assertEquals(time(9, 8, 0), TimeUtils.time("09:08"));
+        assertEquals(time(9, 8, 9), TimeUtils.time("09:08:09"));
 
-    @Test
-    public void timeMsToStrInSec() {
-        Locale defaultLocale = Locale.getDefault();
-        try {
-            Locale.setDefault(Locale.FRANCE);
-            assertEquals("0 seconds", TimeUtils.msToSecondsStr(0));
-            assertEquals("0,001 seconds", TimeUtils.msToSecondsStr(1));
-            assertEquals("0,099 seconds", TimeUtils.msToSecondsStr(99));
-            assertEquals("0,10 seconds", TimeUtils.msToSecondsStr(100));
-            assertEquals("0,99 seconds", TimeUtils.msToSecondsStr(994));
-            assertEquals("1,0 seconds", TimeUtils.msToSecondsStr(995));
-            assertEquals("1,0 seconds", TimeUtils.msToSecondsStr(999));
-            assertEquals("1 second", TimeUtils.msToSecondsStr(1000));
-            assertEquals("1,0 seconds", TimeUtils.msToSecondsStr(1001));
-            assertEquals("9,9 seconds", TimeUtils.msToSecondsStr(9_949));
-            assertEquals("10 seconds", TimeUtils.msToSecondsStr(9_950));
-            assertEquals("-0,456 seconds", TimeUtils.msToSecondsStr(-456));
-        }
-        finally {
-            Locale.setDefault(defaultLocale);
-        }
-    }
+        // Service time can roll-over into the next day
+        assertEquals(time(26, 0, 0), TimeUtils.time("26:00"));
+        assertEquals(time(26, 0, 0), TimeUtils.time("02:00+1d"));
+        assertEquals(time(-2, 2, 0, 0), TimeUtils.time("02:00-2d"));
 
-    @Test
-    public void parseTimeCompact() {
-        assertEquals(0, TimeUtils.parseTimeCompact("0"));
-        assertEquals(0, TimeUtils.parseTimeCompact("0:0"));
-        assertEquals(0, TimeUtils.parseTimeCompact("0:0:0"));
-        assertEquals(3 * 3600, TimeUtils.parseTimeCompact("3"));
-        assertEquals(3 * 3600 + 2 * 60, TimeUtils.parseTimeCompact("3:2"));
-        assertEquals(5 * 3600 + 2 * 60 + 3, TimeUtils.parseTimeCompact("5:2:3"));
-        assertEquals(9 * 3600, TimeUtils.parseTimeCompact("09"));
-        assertEquals(9 * 3600 + 8 * 60, TimeUtils.parseTimeCompact("09:08"));
-        assertEquals(9 * 3600 + 8 * 60 + 9, TimeUtils.parseTimeCompact("09:08:09"));
+        // We also support negative times
+        assertEquals(-1, TimeUtils.time("-00:00:01"));
+        assertEquals(-60, TimeUtils.time("-00:01:00"));
+        assertEquals(-3600, TimeUtils.time("-01:00:00"));
+        assertEquals(-time(23, 59, 3), TimeUtils.time("-23:59:03"));
+        assertEquals(-time(-2, 1, 2,3), TimeUtils.time("-1:02:03-2d"));
     }
 
     @Test
@@ -146,7 +120,62 @@ public class TimeUtilsTest {
         assertEquals(0, midnight.get(Calendar.MILLISECOND));
     }
 
+    @Test
+    public void toZonedDateTime() {
+        LocalDate date = LocalDate.of(2020, Month.JANUARY, 15);
+
+        assertEquals("2020-01-15T00:00Z", TimeUtils.zonedDateTime(date, 0, UTC).toString());
+        // One second
+        assertEquals("2020-01-15T00:00:01Z", TimeUtils.zonedDateTime(date, 1, UTC).toString());
+        assertEquals("2020-01-14T23:59:59Z", TimeUtils.zonedDateTime(date, -1, UTC).toString());
+        // One minute
+        assertEquals("2020-01-15T00:01Z", TimeUtils.zonedDateTime(date, 60, UTC).toString());
+        assertEquals("2020-01-14T23:59Z", TimeUtils.zonedDateTime(date, -60, UTC).toString());
+        // One hour
+        assertEquals("2020-01-15T01:00Z", TimeUtils.zonedDateTime(date, 3600, UTC).toString());
+        assertEquals("2020-01-14T23:00Z", TimeUtils.zonedDateTime(date, -3600, UTC).toString());
+
+        // 26h3m15s
+        assertEquals("2020-01-16T02:03:15Z", TimeUtils.zonedDateTime(date, T26_03_15, UTC).toString());
+        assertEquals("2020-01-13T21:56:45Z", TimeUtils.zonedDateTime(date, -T26_03_15, UTC).toString());
+    }
+
+    @Test
+    public void toZonedDateTimeDST() {
+        ZoneId CET = ZoneId.of("Europe/Oslo");
+        // test daylight-saving-time
+        LocalDate D2021_03_28 = LocalDate.of(2021, 3, 28);
+        LocalDate D2021_10_31 = LocalDate.of(2021, 10, 31);
+
+        // Given time 00:03:00
+        int T00_03 = time(0,3,0);
+
+        assertEquals(
+            "2021-03-27T23:03+01:00[Europe/Oslo]",
+            TimeUtils.zonedDateTime(D2021_03_28, T00_03, CET).toString()
+        );
+        assertEquals(
+            "2021-10-31T01:03+02:00[Europe/Oslo]",
+            TimeUtils.zonedDateTime(D2021_10_31, T00_03, CET).toString()
+        );
+
+        int T26_03 = time(26,3,0);
+        assertEquals(
+            "2021-03-29T01:03+02:00[Europe/Oslo]",
+            TimeUtils.zonedDateTime(D2021_03_28, T26_03, CET).toString()
+        );
+        assertEquals(
+            "2021-11-01T03:03+01:00[Europe/Oslo]",
+            TimeUtils.zonedDateTime(D2021_10_31, T26_03, CET).toString()
+        );
+
+    }
+
     private static int time(int hour, int min, int sec) {
         return 60 * (60 * hour + min) + sec;
+    }
+
+    private static int time(int days, int hour, int min, int sec) {
+        return  60 * (60 * (24 * days + hour) + min) + sec;
     }
 }

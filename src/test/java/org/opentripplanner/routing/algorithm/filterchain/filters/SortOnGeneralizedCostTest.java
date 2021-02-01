@@ -2,18 +2,15 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-public class SortOnGeneralizedCostTest {
+public class SortOnGeneralizedCostTest implements PlanTestConstants {
 
     @Test
     public void sortOnCostWorksWithOneOrEmptyList() {

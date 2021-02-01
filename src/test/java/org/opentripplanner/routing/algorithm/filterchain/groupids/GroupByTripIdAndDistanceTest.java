@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.groupids;
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
 import java.util.List;
 
@@ -10,25 +11,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_SPEED;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.D;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.WALK_SPEED;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.calculateTotalDistance;
 import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.getKeySetOfLegsByLimit;
 
-public class GroupByTripIdAndDistanceTest {
+public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
 
     @Test
     public void calculateTotalDistanceTest() {
         Itinerary i = newItinerary(A)
-            .bus(21, 1, 2, B)
-            .walk(2, C)
-            .bus(31, 5, 7, D)
+            .bus(21, T11_01, T11_02, B)
+            .walk(D2m, C)
+            .bus(31, T11_05, T11_07, D)
             .build();
 
         Leg l1 = i.legs.get(0);
@@ -51,11 +45,11 @@ public class GroupByTripIdAndDistanceTest {
     public void getKeySetOfLegsByLimitTest() {
         Itinerary i = newItinerary(A)
             // 5 min bus ride
-            .bus(11, 0, 5, B)
+            .bus(11, T11_00, T11_05, B)
             // 2 min buss ride
-            .bus(21, 10, 12, C)
+            .bus(21, T11_10, T11_12, C)
             // 3 min buss ride
-            .bus(31, 20, 23, D)
+            .bus(31, T11_20, T11_23, D)
             .build();
 
         Leg l1 = i.legs.get(0);
@@ -88,7 +82,7 @@ public class GroupByTripIdAndDistanceTest {
     @Test
     public void nonTransitShouldHaveAEmptyKey() {
         GroupByTripIdAndDistance shortTransit = new GroupByTripIdAndDistance(
-            newItinerary(A, 0).walk(10, A).build(),
+            newItinerary(A, T11_00).walk(D10m, A).build(),
             0.5
         );
         assertEquals(0, shortTransit.getKeySet().size());
@@ -98,7 +92,7 @@ public class GroupByTripIdAndDistanceTest {
     public void shortTransitShouldBeTreatedAsNonTransit() {
         GroupByTripIdAndDistance shortTransit = new GroupByTripIdAndDistance(
             // walk 30 minutes, bus 1 minute => walking account for more than 50% of the distance
-            newItinerary(A, 0).walk(10, A).bus(11, 32, 33, B).build(),
+            newItinerary(A, T11_00).walk(D10m, A).bus(11, T11_32, T11_33, B).build(),
             0.5
         );
         // Make sure transit have 1 leg in the key-set
@@ -108,12 +102,12 @@ public class GroupByTripIdAndDistanceTest {
     @Test
     public void mergeBasedOnKeySetSize() {
         GroupByTripIdAndDistance oneLeg = new GroupByTripIdAndDistance(
-            newItinerary(A).bus(11, 0, 30, D).build(),0.8
+            newItinerary(A).bus(11, T11_00, T11_30, D).build(),0.8
         );
         GroupByTripIdAndDistance twoLegs = new GroupByTripIdAndDistance(
             newItinerary(A)
-                .bus(11, 0, 10, B)
-                .bus(21, 20, 30, D)
+                .bus(11, T11_00, T11_10, B)
+                .bus(21, T11_20, T11_30, D)
                 .build(),
             0.8
         );
@@ -130,10 +124,10 @@ public class GroupByTripIdAndDistanceTest {
     @Test
     public void transitDoesNotMatchEmptyKeySet() {
         GroupByTripIdAndDistance transit = new GroupByTripIdAndDistance(
-            newItinerary(A).bus(11, 0, 5, B).build(),0.5
+            newItinerary(A).bus(11, T11_00, T11_05, B).build(),0.5
         );
         GroupByTripIdAndDistance nonTransit = new GroupByTripIdAndDistance(
-            newItinerary(A, 0).walk(5, B).build(),0.5
+            newItinerary(A, T11_00).walk(D5m, B).build(),0.5
         );
         // Make sure transit have 1 leg in the key-set
         assertEquals(1, transit.getKeySet().size());
@@ -145,10 +139,10 @@ public class GroupByTripIdAndDistanceTest {
     @Test
     public void twoNonTransitKeySetShouldNotMatch() {
         GroupByTripIdAndDistance nonTransitA = new GroupByTripIdAndDistance(
-            newItinerary(A, 0).walk(5, B).build(),0.5
+            newItinerary(A, T11_00).walk(D5m, B).build(),0.5
         );
         GroupByTripIdAndDistance nonTransitB = new GroupByTripIdAndDistance(
-            newItinerary(A, 0).walk(5, B).build(),0.5
+            newItinerary(A, T11_00).walk(D5m, B).build(),0.5
         );
         assertFalse(nonTransitA.match(nonTransitB));
         assertFalse(nonTransitB.match(nonTransitA));
@@ -158,22 +152,22 @@ public class GroupByTripIdAndDistanceTest {
     @Test
     public void matchDifferentTransitKeySet() {
         GroupByTripIdAndDistance g_11 = new GroupByTripIdAndDistance(
-            newItinerary(A).bus(11, 0, 5, E).build(),0.9
+            newItinerary(A).bus(11, T11_00, T11_05, E).build(),0.9
         );
         GroupByTripIdAndDistance g_21 = new GroupByTripIdAndDistance(
-            newItinerary(A).bus(21, 0, 5, E).build(),0.9
+            newItinerary(A).bus(21, T11_00, T11_05, E).build(),0.9
         );
         GroupByTripIdAndDistance g_11_21 = new GroupByTripIdAndDistance(
             newItinerary(A)
-                .bus(11, 0, 3, D)
-                .bus(21, 4, 6, E)
+                .bus(11, T11_00, T11_03, D)
+                .bus(21, T11_04, T11_06, E)
                 .build(),
             0.9
         );
         GroupByTripIdAndDistance g_31_11 = new GroupByTripIdAndDistance(
             newItinerary(A)
-                .bus(31, 0, 3, B)
-                .bus(11, 4, 6, E)
+                .bus(31, T11_01, T11_03, B)
+                .bus(11, T11_04, T11_06, E)
                 .build(),
             0.9
         );
@@ -196,11 +190,17 @@ public class GroupByTripIdAndDistanceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalRangeForPUpperBound() {
-        new GroupByTripIdAndDistance(newItinerary(A).bus(21, 1, 2, E).build(), 0.991);
+        new GroupByTripIdAndDistance(
+            newItinerary(A).bus(21, T11_01, T11_02, E).build(),
+            0.991
+        );
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalRangeForPLowerBound() {
-        new GroupByTripIdAndDistance(newItinerary(A).bus(21, 1, 2, E).build(), 0.499);
+        new GroupByTripIdAndDistance(
+            newItinerary(A).bus(21, T11_01, T11_02, E).build(),
+            0.499
+        );
     }
 }

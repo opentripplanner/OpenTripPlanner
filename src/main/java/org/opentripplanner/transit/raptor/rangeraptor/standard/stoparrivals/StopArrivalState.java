@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -134,14 +135,14 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
 
     @Override
     public String toString() {
-        return String.format("Arrival { time: %s, Transit: %s %s-%s, trip: %s, Transfer from: %s %s }",
+      return String.format("Arrival { time: %s, Transit: %s %s-%s, trip: %s, Transfer from: %s %s }",
                 TimeUtils.timeToStrCompact(bestArrivalTime, NOT_SET),
                 IntUtils.intToString(boardStop, NOT_SET),
                 TimeUtils.timeToStrCompact(boardTime, NOT_SET),
                 TimeUtils.timeToStrCompact(transitArrivalTime, NOT_SET),
                 trip == null ? "" : trip.pattern().debugInfo(),
                 IntUtils.intToString(transferFromStop, NOT_SET),
-                TimeUtils.durationToStr(accessOrTransferDuration, NOT_SET)
+          DurationUtils.durationToStr(accessOrTransferDuration, NOT_SET)
         );
     }
 }

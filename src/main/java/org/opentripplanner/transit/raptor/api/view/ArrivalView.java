@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.view;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
@@ -118,8 +119,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         if(arrivedByAccess()) {
             return String.format(
                 "Access { stop: %d, duration: %s, arrival-time: %s, cost: %d }",
-                stop(),
-                TimeUtils.durationToStr(accessPath().access().durationInSeconds()),
+                stop(), DurationUtils.durationToStr(accessPath().access().durationInSeconds()),
                 TimeUtils.timeToStrCompact(arrivalTime()),
                 cost()
             );
@@ -145,12 +145,12 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         }
         if(arrivedAtDestination()) {
             return String.format(
-                    "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s, cost: %d }",
-                    round(),
-                    previous().stop(),
-                    TimeUtils.durationToStr(egressPath().egress().durationInSeconds()),
-                    TimeUtils.timeToStrCompact(arrivalTime()),
-                    cost()
+                "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s, cost: %d }",
+                round(),
+                previous().stop(),
+                DurationUtils.durationToStr(egressPath().egress().durationInSeconds()),
+                TimeUtils.timeToStrCompact(arrivalTime()),
+                cost()
             );
         }
         throw new IllegalStateException("Unknown type of stop-arrival: " + getClass());

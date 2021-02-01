@@ -25,9 +25,7 @@ public class DateUtils implements DateConstants {
     /**
      * Returns a Date object based on input date and time parameters Defaults to today / now (when
      * date / time are null)
-     * 
-     * @param date
-     * @param time
+     *
      */
     static public Date toDate(String date, String time, TimeZone tz) {
         //LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
@@ -77,11 +75,6 @@ public class DateUtils implements DateConstants {
         return retVal;
     }
 
-    /**
-     * Returns H,M,S
-     * @param time
-     * @return
-     */
     private static int[] parseTime(String time) {
         int[] retVal = null;
 

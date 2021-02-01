@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.api.path;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -169,10 +170,10 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
             buf.sep().accessEgress(egressLeg.egress());
         }
 
-        return buf.toString() +
+      return buf.toString() +
                 " [" + TimeUtils.timeToStrLong(startTime) +
                 " " + TimeUtils.timeToStrLong(endTime) +
-                " " + TimeUtils.durationToStr(endTime-startTime) +
+                " " + DurationUtils.durationToStr(endTime - startTime) +
                 (generalizedCost == 0 ? "" : ", cost: " + generalizedCost) + "]";
     }
 

@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +120,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
             throw new DestinationNotReachedException();
         }
         if(LOG.isDebugEnabled()) {
-            String time = TimeUtils.msToSecondsStr(System.currentTimeMillis() - start);
+          String time = DurationUtils.msToSecondsStr(System.currentTimeMillis() - start);
             LOG.debug("RangeRaptor - {} heuristic search performed in {}.", name, time);
         }
     }

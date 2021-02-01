@@ -8,7 +8,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.util.TimeToStringConverter;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.text.ParseException;
 import java.util.BitSet;
@@ -43,7 +43,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
         }
 
         FeedScopedId routeId = new FeedScopedId(feedId, trip.getRouteId());
-        int time = TimeToStringConverter.parseHH_MM_SS(trip.getStartTime());
+        int time = TimeUtils.time(trip.getStartTime());
         ServiceDate date;
         try {
             date = ServiceDate.parseString(trip.getStartDate());

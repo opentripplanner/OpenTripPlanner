@@ -1,19 +1,16 @@
 package org.opentripplanner.model.base;
 
 import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,13 +33,10 @@ public class ToStringBuilder {
     private static final String FIELD_SEPARATOR = ", ";
     private static final String FIELD_VALUE_SEP = ": ";
     private static final String NULL_VALUE = "null";
-    private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
     private final StringBuilder sb = new StringBuilder();
+    private final NumberFormat numFormat = new NumberFormat();
 
-    private DecimalFormat integerFormat;
-    private DecimalFormat decimalFormat;
-    private DecimalFormat coordinateFormat;
     private SimpleDateFormat calendarTimeFormat;
     boolean first = true;
 
@@ -62,15 +56,15 @@ public class ToStringBuilder {
     /* General purpose formatters */
 
     public ToStringBuilder addNum(String name, Number num) {
-        return addIfNotNull(name, num, this::formatNumber);
+        return addIfNotNull(name, num, numFormat::formatNumber);
     }
 
     public ToStringBuilder addNum(String name, Number value, Number ignoreValue) {
-        return addIfNotIgnored(name, value, ignoreValue, this::formatNumber);
+        return addIfNotIgnored(name, value, ignoreValue, numFormat::formatNumber);
     }
 
     public ToStringBuilder addNum(String name, Number num, String unit) {
-        return addIfNotNull(name, num, n -> formatNumber(n) + unit);
+        return addIfNotNull(name, num, n -> numFormat.formatNumber(n, unit));
     }
 
     public ToStringBuilder addBool(String name, Boolean value) {
@@ -93,7 +87,7 @@ public class ToStringBuilder {
         return addIfNotNull(name, entity, e -> e.getId().toString());
     }
 
-    public <T> ToStringBuilder addInts(String name, int[] intArray) {
+    public ToStringBuilder addInts(String name, int[] intArray) {
         return addIfNotNull(name, intArray, Arrays::toString);
     }
 
@@ -121,7 +115,7 @@ public class ToStringBuilder {
 
     /** Add a Coordinate location, longitude or latitude */
     public ToStringBuilder addCoordinate(String name, Number num) {
-        return addIfNotNull(name, num, this::formatCoordinate);
+        return addIfNotNull(name, num, numFormat::formatCoordinate);
     }
 
     /**
@@ -147,7 +141,7 @@ public class ToStringBuilder {
                 name,
                 value,
                 a -> Arrays.stream(a)
-                        .mapToObj(TimeUtils::timeToStrShort)
+                        .mapToObj(TimeUtils::timeToStrCompact)
                         .collect(Collectors.joining(", ", "[", "]"))
         );
     }
@@ -158,15 +152,14 @@ public class ToStringBuilder {
      * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
      */
     public ToStringBuilder addDurationSec(String name, Integer durationSeconds) {
-        return addIfNotIgnored(name, durationSeconds, null, TimeUtils::durationToStr);
+        return addIfNotIgnored(name, durationSeconds, null, DurationUtils::durationToStr);
     }
 
     public ToStringBuilder addDuration(String name, Duration duration) {
         return addIfNotIgnored(
             name,
             duration,
-            null,
-            d -> TimeUtils.durationToStr((int)d.toSeconds())
+            null, d -> DurationUtils.durationToStr((int)d.toSeconds())
         );
     }
 
@@ -207,30 +200,5 @@ public class ToStringBuilder {
             calendarTimeFormat = new SimpleDateFormat("HH:mm:ss");
         }
         return calendarTimeFormat.format(time.getTime());
-    }
-
-    String formatCoordinate(Number value) {
-        if(coordinateFormat == null) {
-            coordinateFormat = new DecimalFormat("#0.0####", DECIMAL_SYMBOLS);
-        }
-        // This need to be null-safe, because one of the coordinates in
-        // #addCoordinate(String name, Number lat, Number lon) could be null.
-        return value == null ? "null" : coordinateFormat.format(value);
-    }
-
-    String formatNumber(Number value) {
-        if (value == null) { return NULL_VALUE; }
-
-        if(value instanceof Integer || value instanceof Long || value instanceof BigInteger) {
-            if(integerFormat == null) {
-                integerFormat = new DecimalFormat("#,##0", DECIMAL_SYMBOLS);
-            }
-            return integerFormat.format(value);
-        }
-
-        if(decimalFormat == null) {
-            decimalFormat = new DecimalFormat("#,##0.0##", DECIMAL_SYMBOLS);
-        }
-        return decimalFormat.format(value);
     }
 }

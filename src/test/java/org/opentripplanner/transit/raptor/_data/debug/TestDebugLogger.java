@@ -11,6 +11,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
@@ -101,7 +102,7 @@ public class TestDebugLogger implements DebugLogger {
         }
 
         Path<?> p = e.element();
-        System.err.println(
+      System.err.println(
             pathTableFormatter.printRow(
                 e.action().toString(),
                 p.numberOfTransfers(),
@@ -109,7 +110,7 @@ public class TestDebugLogger implements DebugLogger {
                 p.egressLeg().fromStop(),
                 TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
                 TimeUtils.timeToStrLong(p.egressLeg().toTime()),
-                TimeUtils.durationToStr(p.travelDurationInSeconds()),
+                DurationUtils.durationToStr(p.travelDurationInSeconds()),
                 numFormat.format(p.cost()),
                 details(e.action().toString(), e.reason(), e.element().toString())
             )
