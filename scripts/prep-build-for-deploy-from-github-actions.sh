@@ -1,5 +1,5 @@
 # get branch name of current branch for use in jar name
-export BRANCH=$GITHUB_HEAD_REF_SLUG
+export BRANCH = echo ${GITHUB_HEAD_REF_SLUG}
 # `git describe --tags --always HEAD` returns a string of the form v0.0.0-52-ge10d02d.
 # It assumes you have pushed a tag on a commit on github (e.g. a commit on the dev branch).
 # If for some reason git can't find a tag, fallback with --always to a commit sha.

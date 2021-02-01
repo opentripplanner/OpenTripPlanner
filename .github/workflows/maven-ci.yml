@@ -1,24 +1,5 @@
 name: OTP CI Build
 
-# TODO: Perhaps reinstate, but doesn't allow for build/test of any branch.
-# On [push, pull_request] causes double-builds when creating PRs.
-# But triggering on push only will miss pull requests from outside authors.
-# The push event's ref is the name of the pushed branch;
-# The pull_request event's branch name is the merge target branch.
-#on:
-#  push:
-#    branches:
-#      - master
-#      - dev-1.x
-#      - dev-2.x
-#      - ibi-dev
-#  pull_request:
-#    branches:
-#      - master
-#      - dev-1.x
-#      - dev-2.x
-#      - ibi-dev
-
 on: [push, pull_request]
 
 jobs:
@@ -27,12 +8,6 @@ jobs:
 
     env:
       JAVA_OPTS: -Xmx2g
-      # TODO Remove if not required.
-      OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
-      OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
-      GPG_KEY_NAME: ${{ secrets.GPG_KEY_NAME }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
       - uses: actions/checkout@v2.3.2
@@ -55,15 +30,13 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
       # Define AWS profile credentials for use by subsequent steps.
-      - name: Add profile credentials to ~/.aws/credentials
-        if: github.event_name == 'push'
-        run: ./scripts/add-aws-credentials.sh
+#      - name: Add profile credentials to ~/.aws/credentials
+#        if: github.event_name == 'push'
+#        run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
       - name: Build and Test
 #        TODO: Remove skip tests. Temporary change to allow testing of later steps.
         run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip -DskipTests
-#        TODO: Confirm if OSSRH/GPG secrets are required.
-#        run: mvn clean verify --settings maven-settings.xml --batch-mode --show-version --update-snapshots -Dgpg.skip
       # Only prepare deploy files on push events to avoid duplicate pushes to s3 when a commit is
       # pushed to a branch with an open pull request.
       - name: Prepare build files for deployment to s3
@@ -101,7 +74,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: 'target/mkdocs'
-      # TODO: Push notification ot Teams.
+      # TODO: Push notification to Teams.
 #      - name: Notify us of the build status on MS Teams
 #          notifications:
 #          email: false
