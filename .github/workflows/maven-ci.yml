@@ -71,12 +71,17 @@ jobs:
           SOURCE_DIR: 'target/mkdocs'
       # Push notification to Teams.
       - name: Notify us of the build status on MS Teams
-        uses: skitionek/notify-microsoft-teams@master
+#        uses: skitionek/notify-microsoft-teams@master
+#        if: always()
+#        with:
+#          # TODO Add webhook to GitHub secrets
+##          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+#          webhook_url: https://outlook.office.com/webhook/03fa4a79-572f-4c68-b756-e4e851d0215a@9093f1a3-8771-4fb7-8596-d51eeef18cda/TravisCI/0aec73ecb8eb4ad696ea
+#          needs: ${{ toJson(needs) }}
+#          job: ${{ toJson(job) }}
+#          steps: ${{ toJson(steps) }}
+        uses: toko-bifrost/ms-teams-deploy-card@master #  or "./" if in a local set-up
         if: always()
         with:
-          # TODO Add webhook to GitHub secrets
-#          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+          github-token: ${{ github.token }}
           webhook_url: https://outlook.office.com/webhook/03fa4a79-572f-4c68-b756-e4e851d0215a@9093f1a3-8771-4fb7-8596-d51eeef18cda/TravisCI/0aec73ecb8eb4ad696ea
-          needs: ${{ toJson(needs) }}
-          job: ${{ toJson(job) }}
-          steps: ${{ toJson(steps) }}
