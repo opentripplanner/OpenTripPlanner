@@ -77,4 +77,6 @@ jobs:
           # TODO Add webhook to GitHub secrets
 #          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
           webhook_url: https://outlook.office.com/webhook/03fa4a79-572f-4c68-b756-e4e851d0215a@9093f1a3-8771-4fb7-8596-d51eeef18cda/TravisCI/0aec73ecb8eb4ad696ea
-
+          needs: ${{ toJson(needs) }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
