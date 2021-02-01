@@ -24,7 +24,6 @@ jobs:
         id: cache
         with:
           path: ~/.m2
-          # TODO Fix error message 'Cache not found for input keys: maven-local-repo'
           key: maven-local-repo
       # So that the branch name can be reference via $GITHUB_HEAD_REF_SLUG.
       - name: Inject slug/short variables
@@ -70,8 +69,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: 'target/mkdocs'
-      # TODO: Push notification to Teams.
-#      - name: Notify us of the build status on MS Teams
-#          notifications:
-#          email: false
-#          webhooks: https://outlook.office.com/webhook/03fa4a79-572f-4c68-b756-e4e851d0215a@9093f1a3-8771-4fb7-8596-d51eeef18cda/TravisCI/0aec73ecb8eb4ad696ea27dd3c6a102d/286c079f-6085-4aa0-8f8d-e2a3e8d1f568
+      # Push notification to Teams.
+      - name: Notify us of the build status on MS Teams
+        uses: skitionek/notify-microsoft-teams@master
+        if: always()
+        with:
+          # TODO Add webhook to GitHub secrets
+#          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+          webhook_url: https://outlook.office.com/webhook/03fa4a79-572f-4c68-b756-e4e851d0215a@9093f1a3-8771-4fb7-8596-d51eeef18cda/TravisCI/0aec73ecb8eb4ad696ea
+
