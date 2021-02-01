@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-import static org.opentripplanner.transit.raptor.util.TimeUtils.durationToStr;
+import static org.opentripplanner.util.time.TimeUtils.durationToStr;
 
 
 /**

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.util;
 
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.Calendar;
 

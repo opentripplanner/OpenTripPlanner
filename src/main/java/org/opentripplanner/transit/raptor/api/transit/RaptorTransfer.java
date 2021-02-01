@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
-import static org.opentripplanner.transit.raptor.util.TimeUtils.durationToStr;
+import static org.opentripplanner.util.time.TimeUtils.durationToStr;
 
 /**
  * Encapsulate information about a access, transfer or egress path. We do not distinguish

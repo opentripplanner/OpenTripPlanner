@@ -13,7 +13,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 import org.opentripplanner.util.TableFormatter;
 
 import java.text.NumberFormat;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrCompact;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 import static org.opentripplanner.util.TableFormatter.Align.Center;
 import static org.opentripplanner.util.TableFormatter.Align.Left;
 import static org.opentripplanner.util.TableFormatter.Align.Right;

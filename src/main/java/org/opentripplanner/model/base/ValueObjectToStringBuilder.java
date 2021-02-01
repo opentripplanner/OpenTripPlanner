@@ -1,6 +1,6 @@
 package org.opentripplanner.model.base;
 
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;

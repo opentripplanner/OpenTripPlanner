@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor._data;
 
-import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.parseDuration;
+import static org.opentripplanner.util.time.TimeUtils.hm2time;
+import static org.opentripplanner.util.time.TimeUtils.parseDuration;
 
 public interface RaptorTestConstants {
 

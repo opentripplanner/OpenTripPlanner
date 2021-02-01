@@ -1,7 +1,7 @@
 package org.opentripplanner.model.base;
 
 import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;

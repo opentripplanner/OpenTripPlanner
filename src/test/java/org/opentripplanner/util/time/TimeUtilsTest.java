@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.util;
+package org.opentripplanner.util.time;
 
 import org.junit.Test;
 

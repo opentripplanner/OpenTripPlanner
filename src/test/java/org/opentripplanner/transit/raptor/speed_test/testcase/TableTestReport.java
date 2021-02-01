@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 import org.opentripplanner.util.TableFormatter;
 
 import java.util.Collection;

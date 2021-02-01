@@ -12,8 +12,8 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.parseDuration;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.parseTimeCompact;
+import static org.opentripplanner.util.time.TimeUtils.parseDuration;
+import static org.opentripplanner.util.time.TimeUtils.parseTimeCompact;
 
 public class AddMinSafeTransferCostFilterTest {
 

@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.api.view;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * The purpose of the stop-arrival-view is to provide a common interface for stop-arrivals for
