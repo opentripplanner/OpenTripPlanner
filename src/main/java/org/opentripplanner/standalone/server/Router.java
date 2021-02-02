@@ -64,6 +64,15 @@ public class Router {
         this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters());
 
     }
+
+    /**
+     * Additional constructor which allows to initialize the Router with extra request settings from settings.json
+     * data sourc and build the route based on the request parameters + extra data previously appended to the streetEdges
+     *
+     * @param graph graph
+     * @param routerConfig router configuration
+     * @param genericFileConfigurations map of request parameters to be applied to extraData of StreetEdge
+     */
     public Router(Graph graph, RouterConfig routerConfig, Map<RequestParameters, RequestParameters> genericFileConfigurations) {
         this(graph, routerConfig);
         this.genericFileConfigurations = genericFileConfigurations;

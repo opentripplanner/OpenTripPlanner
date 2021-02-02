@@ -2,7 +2,6 @@ package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
 import fi.metatavu.airquality.EdgeDataFromGenericFile;
-import fi.metatavu.airquality.configuration_parsing.ParameterType;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
@@ -41,13 +40,11 @@ import java.io.ObjectOutputStream;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * This represents a street segment.
- * 
+ *
  * @author novalis
- * 
  */
 public class StreetEdge extends Edge implements Cloneable {
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
@@ -56,19 +53,46 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The constant CLASS_STREET.
+     */
     /* TODO combine these with OSM highway= flags? */
     public static final int CLASS_STREET = 3;
+    /**
+     * The constant CLASS_CROSSING.
+     */
     public static final int CLASS_CROSSING = 4;
+    /**
+     * The constant CLASS_OTHERPATH.
+     */
     public static final int CLASS_OTHERPATH = 5;
+    /**
+     * The constant CLASS_OTHER_PLATFORM.
+     */
     public static final int CLASS_OTHER_PLATFORM = 8;
+    /**
+     * The constant CLASS_TRAIN_PLATFORM.
+     */
     public static final int CLASS_TRAIN_PLATFORM = 16;
+    /**
+     * The constant ANY_PLATFORM_MASK.
+     */
     public static final int ANY_PLATFORM_MASK = 24;
+    /**
+     * The constant CROSSING_CLASS_MASK.
+     */
     public static final int CROSSING_CLASS_MASK = 7; // ignore platform
+    /**
+     * The constant CLASS_LINK.
+     */
     public static final int CLASS_LINK = 32; // on/offramps; OSM calls them "links"
 
     private static final double GREENWAY_SAFETY_FACTOR = 0.1;
 
-    // TODO(flamholz): do something smarter with the car speed here.
+    /**
+     * The constant DEFAULT_CAR_SPEED.
+     */
+// TODO(flamholz): do something smarter with the car speed here.
     public static final float DEFAULT_CAR_SPEED = 11.2f;
 
     /** If you have more than 8 flags, increase flags to short or int */
@@ -103,7 +127,9 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private StreetTraversalPermission permission;
 
-    /** The OSM way ID from whence this came - needed to reference traffic data */
+    /**
+     * The OSM way ID from whence this came - needed to reference traffic data
+     */
     public long wayId;
 
     private int streetClass = CLASS_OTHERPATH;
@@ -123,15 +149,26 @@ public class StreetEdge extends Edge implements Cloneable {
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
 
-
+    /**
+     * Gets extra data added to the edge from the .nc data file according to the settings.json configuration
+     *
+     * @return the extra data
+     */
     public List<EdgeDataFromGenericFile> getExtraData() {
         return extraData;
     }
 
-    public void setExtraData(List<EdgeDataFromGenericFile> extraData) {
-        this.extraData = extraData;
-    }
-
+    /**
+     * Instantiates a new Street edge.
+     *
+     * @param v1         the v 1
+     * @param v2         the v 2
+     * @param geometry   the geometry
+     * @param name       the name
+     * @param length     the length
+     * @param permission the permission
+     * @param back       the back
+     */
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
                       StreetTraversalPermission permission, boolean back) {
@@ -173,7 +210,18 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
 
-    //For testing only
+    /**
+     * Instantiates a new Street edge.
+     *
+     * @param v1         the v 1
+     * @param v2         the v 2
+     * @param geometry   the geometry
+     * @param name       the name
+     * @param length     the length
+     * @param permission the permission
+     * @param back       the back
+     */
+//For testing only
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       String name, double length,
                       StreetTraversalPermission permission, boolean back) {
@@ -183,15 +231,16 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /**
      * Checks permissions of the street edge if specified modes are allowed to travel.
-     *
+     * <p>
      * Barriers aren't taken into account. So it can happen that canTraverse returns True.
      * But doTraverse returns false. Since there are barriers on a street.
-     *
+     * <p>
      * This is because this function is used also on street when searching for start/stop.
      * Those streets are then split. On splitted streets can be possible to drive with a CAR because
      * it is only blocked from one way.
-     * @param modes
-     * @return
+     *
+     * @param modes the modes
+     * @return boolean
      */
     public boolean canTraverse(TraverseModeSet modes) {
         return getPermission().allows(modes);
@@ -224,15 +273,16 @@ public class StreetEdge extends Edge implements Cloneable {
      * If it is it creates intersection of street edge permissions
      * and from/to barriers.
      * Then it checks if mode is allowed to traverse the edge.
-     *
+     * <p>
      * By default CAR isn't allowed to traverse barrier but foot and bicycle are.
      * This can be changed with different tags
-     *
+     * <p>
      * If start/end isn't bollard it just checks the street permissions.
-     *
+     * <p>
      * It is used in {@link #canTraverse(RoutingRequest, TraverseMode)}
-     * @param mode
-     * @return
+     *
+     * @param mode the mode
+     * @return boolean
      */
     public boolean canTraverseIncludingBarrier(TraverseMode mode) {
         StreetTraversalPermission permission = getPermission();
@@ -246,14 +296,29 @@ public class StreetEdge extends Edge implements Cloneable {
         return permission.allows(mode);
     }
 
+    /**
+     * Gets elevation profile.
+     *
+     * @return the elevation profile
+     */
     public PackedCoordinateSequence getElevationProfile() {
         return null;
     }
 
+    /**
+     * Is elevation flattened boolean.
+     *
+     * @return the boolean
+     */
     public boolean isElevationFlattened() {
         return false;
     }
 
+    /**
+     * Gets max slope.
+     *
+     * @return the max slope
+     */
     public float getMaxSlope() {
         return 0.0f;
     }
@@ -538,18 +603,15 @@ public class StreetEdge extends Edge implements Cloneable {
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
 
-        //if walking or biking and request includes the generic data parameters then calculate penalties
-        if (walkingOrBiking && options.genDataRequestParameters != null) {
+        if (walkingOrBiking && options.genericGridDataRequestParam != null) {
             double totalPenalty = 0d;
             Instant requestInstant = options.getDateTime().toInstant();
-            //go over each pair of params and count penalty based on tha pair
-            for (Map.Entry<RequestParameters, RequestParameters> thresholdPenaltyPair : options.genDataRequestParameters.entrySet()) {
+            for (Map.Entry<RequestParameters, RequestParameters> thresholdPenaltyPair : options.genericGridDataRequestParam.entrySet()) {
                 String indexVariableName = thresholdPenaltyPair.getKey().getVariable();
 
                 long dataStartTime = 0;
                 float[] genDataValuesForTime = new float[0];
 
-                //find the corresponding values to the variable from edge extra data
                 for (EdgeDataFromGenericFile edgeDataFile : extraData) {
                     Map<String, float[]> variableValues = edgeDataFile.getVariableValues();
                     if (variableValues.containsKey(indexVariableName)) {
@@ -559,7 +621,6 @@ public class StreetEdge extends Edge implements Cloneable {
                     }
                 }
 
-                //calculate penalty for the given parameters
                 Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
                 int dataQualityHour = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
                 if (dataQualityHour >= 0) {
@@ -578,7 +639,6 @@ public class StreetEdge extends Edge implements Cloneable {
             }
 
             s1.incrementWeight(totalPenalty);
-
         }
 
         return s1;
@@ -586,6 +646,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /**
      * Uses the formula from the penalty parameter and calculates the penalty based on that
+     *
      * @param formula penalty formula
      * @param value data
      * @param threshold threshold parameter value
@@ -593,13 +654,13 @@ public class StreetEdge extends Edge implements Cloneable {
      * @return penalty
      */
     private double calculatePenaltyFromParameters (String formula, float value, RequestParameters threshold, RequestParameters penalty){
-        Expression experssion = new ExpressionBuilder(formula)
+        Expression expression = new ExpressionBuilder(formula)
                 .variables("VALUE", "THRESHOLD", "PENALTY")
                 .build()
                 .setVariable("VALUE", value)
                 .setVariable("THRESHOLD", Double.parseDouble(threshold.getValue()))
                 .setVariable("PENALTY", Double.parseDouble(penalty.getValue()));
-        return experssion.evaluate();
+        return expression.evaluate();
     }
 
     private double calculateOverageWeight(double firstValue, double secondValue, double maxValue,
@@ -615,7 +676,6 @@ public class StreetEdge extends Edge implements Cloneable {
             overageValue = secondValue - firstValue;
         }
 
-        // apply overage and add penalty if necessary
         return (overageRate * overageValue) + (applyPenalty ? softPenalty : 0.0);
     }
 
@@ -626,12 +686,17 @@ public class StreetEdge extends Edge implements Cloneable {
     private double calculateCarSpeed(RoutingRequest options) {
         return getCarSpeed();
     }
-    
+
     /**
      * Calculate the speed appropriately given the RoutingRequest and traverseMode and the current wall clock time.
      * Note: this is not strictly symmetrical, because in a forward search we get the speed based on the
      * time we enter this edge, whereas in a reverse search we get the speed based on the time we exit
      * the edge.
+     *
+     * @param options      the options
+     * @param traverseMode the traverse mode
+     * @param timeMillis   the time millis
+     * @return the double
      */
     public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, long timeMillis) {
         if (traverseMode == null) {
@@ -656,6 +721,8 @@ public class StreetEdge extends Edge implements Cloneable {
     /**
      * This gets the effective length for bikes and wheelchairs, taking slopes into account. This
      * can be divided by the speed on a flat surface to get the duration.
+     *
+     * @return the effective bike distance
      */
     public double getEffectiveBikeDistance() {
         return getDistanceMeters();
@@ -664,6 +731,8 @@ public class StreetEdge extends Edge implements Cloneable {
     /**
      * This gets the effective work amount for bikes, taking the effort required to traverse the
      * slopes into account.
+     *
+     * @return the effective bike work cost
      */
     public double getEffectiveBikeWorkCost() {
         return getDistanceMeters();
@@ -674,10 +743,20 @@ public class StreetEdge extends Edge implements Cloneable {
         return getDistanceMeters();
     }
 
+    /**
+     * Sets bicycle safety factor.
+     *
+     * @param bicycleSafetyFactor the bicycle safety factor
+     */
     public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
         this.bicycleSafetyFactor = bicycleSafetyFactor;
     }
 
+    /**
+     * Gets bicycle safety factor.
+     *
+     * @return the bicycle safety factor
+     */
     public float getBicycleSafetyFactor() {
         return bicycleSafetyFactor;
     }
@@ -700,7 +779,15 @@ public class StreetEdge extends Edge implements Cloneable {
             throw new RuntimeException(e);
         }
     }
-    
+
+    /**
+     * Can turn onto boolean.
+     *
+     * @param e     the e
+     * @param state the state
+     * @param mode  the mode
+     * @return the boolean
+     */
     public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
         for (TurnRestriction turnRestriction : getTurnRestrictions(state.getOptions().rctx.graph)) {
             /* FIXME: This is wrong for trips that end in the middle of turnRestriction.to
@@ -728,11 +815,12 @@ public class StreetEdge extends Edge implements Cloneable {
     return this.name.toString();
   }
 
-  /**
-  * Gets non-localized I18NString (Used when splitting edges)
-  * @return non-localized Name
-  */
-  public I18NString getRawName() {
+    /**
+     * Gets non-localized I18NString (Used when splitting edges)
+     *
+     * @return non -localized Name
+     */
+    public I18NString getRawName() {
     return this.name;
   }
 
@@ -740,7 +828,12 @@ public class StreetEdge extends Edge implements Cloneable {
     return this.name.toString(locale);
   }
 
-  public void setName(I18NString name) {
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(I18NString name) {
     this.name = name;
   }
 
@@ -752,7 +845,12 @@ public class StreetEdge extends Edge implements Cloneable {
     this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), isBack() ? (LineString)geometry.reverse() : geometry, isBack());
   }
 
-  public void shareData(StreetEdge reversedEdge) {
+    /**
+     * Share data.
+     *
+     * @param reversedEdge the reversed edge
+     */
+    public void shareData(StreetEdge reversedEdge) {
       if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
           compactGeometry = reversedEdge.compactGeometry;
       } else {
@@ -760,39 +858,76 @@ public class StreetEdge extends Edge implements Cloneable {
       }
   }
 
-  public boolean isWheelchairAccessible() {
+    /**
+     * Is wheelchair accessible boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isWheelchairAccessible() {
     return BitSetUtils.get(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX);
   }
 
-  public void setWheelchairAccessible(boolean wheelchairAccessible) {
+    /**
+     * Sets wheelchair accessible.
+     *
+     * @param wheelchairAccessible the wheelchair accessible
+     */
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
         flags = BitSetUtils.set(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX, wheelchairAccessible);
   }
 
-  public StreetTraversalPermission getPermission() {
+    /**
+     * Gets permission.
+     *
+     * @return the permission
+     */
+    public StreetTraversalPermission getPermission() {
     return permission;
   }
 
-  public void setPermission(StreetTraversalPermission permission) {
+    /**
+     * Sets permission.
+     *
+     * @param permission the permission
+     */
+    public void setPermission(StreetTraversalPermission permission) {
     this.permission = permission;
   }
 
-  public int getStreetClass() {
+    /**
+     * Gets street class.
+     *
+     * @return the street class
+     */
+    public int getStreetClass() {
     return streetClass;
   }
 
-  public void setStreetClass(int streetClass) {
+    /**
+     * Sets street class.
+     *
+     * @param streetClass the street class
+     */
+    public void setStreetClass(int streetClass) {
     this.streetClass = streetClass;
   }
 
-  /**
-   * Marks that this edge is the reverse of the one defined in the source
-   * data. Does NOT mean fromv/tov are reversed.
-   */
-  public boolean isBack() {
+    /**
+     * Marks that this edge is the reverse of the one defined in the source
+     * data. Does NOT mean fromv/tov are reversed.
+     *
+     * @return the boolean
+     */
+    public boolean isBack() {
       return BitSetUtils.get(flags, BACK_FLAG_INDEX);
   }
 
-  public void setBack(boolean back) {
+    /**
+     * Sets back.
+     *
+     * @param back the back
+     */
+    public void setBack(boolean back) {
             flags = BitSetUtils.set(flags, BACK_FLAG_INDEX, back);
   }
 
@@ -800,7 +935,12 @@ public class StreetEdge extends Edge implements Cloneable {
             return BitSetUtils.get(flags, ROUNDABOUT_FLAG_INDEX);
   }
 
-  public void setRoundabout(boolean roundabout) {
+    /**
+     * Sets roundabout.
+     *
+     * @param roundabout the roundabout
+     */
+    public void setRoundabout(boolean roundabout) {
       flags = BitSetUtils.set(flags, ROUNDABOUT_FLAG_INDEX, roundabout);
   }
 
@@ -808,63 +948,117 @@ public class StreetEdge extends Edge implements Cloneable {
       return BitSetUtils.get(flags, HASBOGUSNAME_FLAG_INDEX);
   }
 
-  public void setHasBogusName(boolean hasBogusName) {
+    /**
+     * Sets has bogus name.
+     *
+     * @param hasBogusName the has bogus name
+     */
+    public void setHasBogusName(boolean hasBogusName) {
       flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
   }
 
-  public boolean isNoThruTraffic() {
+    /**
+     * Is no thru traffic boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isNoThruTraffic() {
             return BitSetUtils.get(flags, NOTHRUTRAFFIC_FLAG_INDEX);
   }
 
-  public void setNoThruTraffic(boolean noThruTraffic) {
+    /**
+     * Sets no thru traffic.
+     *
+     * @param noThruTraffic the no thru traffic
+     */
+    public void setNoThruTraffic(boolean noThruTraffic) {
       flags = BitSetUtils.set(flags, NOTHRUTRAFFIC_FLAG_INDEX, noThruTraffic);
   }
 
-  /**
-   * This street is a staircase
-   */
-  public boolean isStairs() {
+    /**
+     * This street is a staircase
+     *
+     * @return the boolean
+     */
+    public boolean isStairs() {
             return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
   }
 
-  public void setStairs(boolean stairs) {
+    /**
+     * Sets stairs.
+     *
+     * @param stairs the stairs
+     */
+    public void setStairs(boolean stairs) {
       flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
   }
 
-  public float getCarSpeed() {
+    /**
+     * Gets car speed.
+     *
+     * @return the car speed
+     */
+    public float getCarSpeed() {
     return carSpeed;
   }
 
-  public void setCarSpeed(float carSpeed) {
+    /**
+     * Sets car speed.
+     *
+     * @param carSpeed the car speed
+     */
+    public void setCarSpeed(float carSpeed) {
     this.carSpeed = carSpeed;
   }
 
-  public boolean isSlopeOverride() {
+    /**
+     * Is slope override boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isSlopeOverride() {
       return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
   }
 
-  public void setSlopeOverride(boolean slopeOverride) {
+    /**
+     * Sets slope override.
+     *
+     * @param slopeOverride the slope override
+     */
+    public void setSlopeOverride(boolean slopeOverride) {
       flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
   }
 
     /**
      * Return the azimuth of the first segment in this edge in integer degrees clockwise from South.
      * TODO change everything to clockwise from North
+     *
+     * @return the in angle
      */
-  public int getInAngle() {
+    public int getInAngle() {
     return (int) Math.round(this.inAngle * 180 / 128.0);
   }
 
-    /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
-  public int getOutAngle() {
+    /**
+     * Return the azimuth of the last segment in this edge in integer degrees clockwise from South.  @return the out angle
+     */
+    public int getOutAngle() {
     return (int) Math.round(this.outAngle * 180 / 128.0);
   }
 
+    /**
+     * Gets turn restrictions.
+     *
+     * @param graph the graph
+     * @return the turn restrictions
+     */
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);
     }
 
-    /** calculate the length of this street segement from its geometry */
+    /**
+     * calculate the length of this street segement from its geometry
+     */
     protected void calculateLengthFromGeometry () {
         double accumulatedMeters = 0;
 
@@ -877,7 +1071,12 @@ public class StreetEdge extends Edge implements Cloneable {
         length_mm = (int) (accumulatedMeters * 1000);
     }
 
-    /** Split this street edge and return the resulting street edges */
+    /**
+     * Split this street edge and return the resulting street edges  @param v the v
+     *
+     * @param destructive the destructive
+     * @return the p 2
+     */
     public P2<StreetEdge> split(SplitterVertex v, boolean destructive) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
@@ -955,6 +1154,8 @@ public class StreetEdge extends Edge implements Cloneable {
     /**
      * Get the starting OSM node ID of this edge. Note that this information is preserved when an
      * edge is split, so both edges will have the same starting and ending nodes.
+     *
+     * @return the start osm node id
      */
     public long getStartOsmNodeId () {
         if (fromv instanceof OsmVertex)
@@ -970,6 +1171,8 @@ public class StreetEdge extends Edge implements Cloneable {
     /**
      * Get the ending OSM node ID of this edge. Note that this information is preserved when an
      * edge is split, so both edges will have the same starting and ending nodes.
+     *
+     * @return the end osm node id
      */
     public long getEndOsmNodeId () {
         if (tov instanceof OsmVertex)

@@ -128,6 +128,11 @@ public class OtpDataStore {
         return sources.get(type).stream().filter(DataSource::exists).collect(Collectors.toList());
     }
 
+    /**
+     * Gets the optional settings.json file which manages the additional grid data
+     *
+     * @return DataSource dataSource of the settings.json file
+     */
     public DataSource getGenericDataSettings() {
         return genericDataSettings;
     }

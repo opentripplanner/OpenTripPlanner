@@ -238,16 +238,13 @@ public class GraphBuilder implements Runnable {
         if (hasSettings) {
             DataSource settingsSource = dataSources.getDataSettings();
             GenericFileConfiguration[] genericFileConfigurations = GenericFileConfigurationParser.parse(settingsSource);
-            //parse settings file
 
             for (GenericFileConfiguration configuration : genericFileConfigurations) {
-                //parse netcdf according to the settings file, use the link from the settings file
                 GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
                             configuration);
                 EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile);
                 graphBuilder.addModule(edgeUpdaterModule);
             }
-
         }
 
         return graphBuilder;

@@ -1,7 +1,5 @@
 package org.opentripplanner.api.common;
 
-import fi.metatavu.airquality.GenericFileConfigurationParser;
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
@@ -599,7 +597,7 @@ public abstract class RoutingResource {
      * Range/sanity check the query parameter fields and build a Request object from them.
      *
      * @throws ParameterException when there is a problem interpreting a query parameter
-     * @param requestParameters
+     * @param requestParameters incoming request parameters
      */
     protected RoutingRequest buildRequest(HashMap<String, String> requestParameters) throws ParameterException {
         Router router = otpServer.getRouter();
@@ -637,11 +635,9 @@ public abstract class RoutingResource {
             }
         }
 
-
-        //fill the map of generic parameters
         if (otpServer.getRouter().genericFileConfigurations != null) {
-            request.genDataRequestParameters = this.otpServer.getRouter().genericFileConfigurations;
-            for (Map.Entry<RequestParameters, RequestParameters> genParam : request.genDataRequestParameters.entrySet()) {
+            request.genericGridDataRequestParam = this.otpServer.getRouter().genericFileConfigurations;
+            for (Map.Entry<RequestParameters, RequestParameters> genParam : request.genericGridDataRequestParam.entrySet()) {
                 RequestParameters thresholdEmpty = genParam.getKey();
                 RequestParameters penaltyEmpty = genParam.getValue();
                 thresholdEmpty.setValue(requestParameters.get(thresholdEmpty.getName()));
