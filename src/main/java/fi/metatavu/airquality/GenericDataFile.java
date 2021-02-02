@@ -40,11 +40,18 @@ public class GenericDataFile{
         try {
             if (!file.exists()){
                 error = String.format("Missing data file from %s file", file.getAbsolutePath());
+                return;
             }
             NetcdfFile netcdfFile = readNetcdfFile(file);
 
             //read universal variables which always are present
             Variable time = netcdfFile.findVariable(genericFileConfiguration.getTimeVariable());
+
+            if (time == null) {
+                error = String.format("Missing time variable from %s file", file.getAbsolutePath());
+                return;
+            }
+
             Variable latitude = netcdfFile.findVariable(genericFileConfiguration.getLatitudeVariable());
             Variable longitude = netcdfFile.findVariable(genericFileConfiguration.getLongitudeVariable());
 
