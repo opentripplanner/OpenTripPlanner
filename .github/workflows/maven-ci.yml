@@ -68,7 +68,7 @@ jobs:
         with:
           args: --acl public-read
         env:
-          AWS_S3_BUCKET: otp-docs
+          AWS_S3_BUCKET: otp-docs.ibi-transit.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: 'target/mkdocs'
