@@ -30,8 +30,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v3.x
       # Build and test deployment.
       - name: Build and Test
-#        TODO: Remove skip tests. Temporary change to allow testing of later steps.
-        run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip -DskipTests
+        run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip
       # Only prepare deploy files on push events to avoid duplicate pushes to s3 when a commit is
       # pushed to a branch with an open pull request.
       - name: Prepare build files for deployment to s3
@@ -50,20 +49,16 @@ jobs:
           SOURCE_DIR: 'deploy'
       # Install mkdocs using pip for use by subsequent steps.
       - name: Install mkdocs
-#        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: |
            pip install mkdocs
       # Using mkdocs produce docs for deployment.
       - name: Prepare doc files for deployment to s3
-#        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
       # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
-      # TODO Fails with access denied to s3
       - name: Upload docs to IBI s3 buckets & cloudfront
-#        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read
