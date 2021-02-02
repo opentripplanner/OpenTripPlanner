@@ -19,7 +19,7 @@ public final class Trip extends TransitEntity {
 
     private String routeShortName;
 
-    private Integer directionId;
+    private Direction direction;
 
     private String blockId;
 
@@ -49,7 +49,7 @@ public final class Trip extends TransitEntity {
         this.tripShortName = obj.tripShortName;
         this.tripHeadsign = obj.tripHeadsign;
         this.routeShortName = obj.routeShortName;
-        this.directionId = obj.directionId;
+        this.direction = obj.direction;
         this.blockId = obj.blockId;
         this.shapeId = obj.shapeId;
         this.wheelchairAccessible = obj.wheelchairAccessible;
@@ -145,16 +145,16 @@ public final class Trip extends TransitEntity {
         this.routeShortName = routeShortName;
     }
 
-    public Integer getDirectionId() {
-        return directionId;
+    public Direction getDirection() {
+        return direction;
     }
 
     public String getDirectionIdAsString(String unknownValue) {
-        return directionId == null ? unknownValue : Integer.toString(directionId);
+        return direction == null ? unknownValue : Integer.toString(direction.gtfsCode);
     }
 
-    public void setDirectionId(Integer directionId) {
-        this.directionId = directionId;
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     public String getBlockId() {

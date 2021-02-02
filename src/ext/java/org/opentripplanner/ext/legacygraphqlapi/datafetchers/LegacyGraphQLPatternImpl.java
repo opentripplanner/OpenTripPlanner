@@ -39,7 +39,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
   @Override
   public DataFetcher<Integer> directionId() {
-    return environment -> getSource(environment).directionId;
+    return environment -> getSource(environment).direction.gtfsCode;
   }
 
   @Override

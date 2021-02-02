@@ -71,7 +71,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * The direction id for all trips in this pattern.
      * Use -1 for default direction id
      */
-    public int directionId = -1;
+    public Direction direction = Direction.UNKNOWN;
 
     /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS

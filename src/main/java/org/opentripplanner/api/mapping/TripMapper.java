@@ -42,7 +42,7 @@ public class TripMapper {
 
         // TODO OTP2 - All ids should be fully qualified including feed scope id.
         api.shapeId = shape == null ? null : shape.getId();
-        api.direction = domain.getDirectionId();
+        api.direction = domain.getDirection().gtfsCode;
 
         return api;
     }
