@@ -6,12 +6,13 @@ import org.opentripplanner.routing.api.request.StreetMode;
 
 /**
  * <p>
- * In OTP the street search and transit search is done as to separate searches, then the results
- * are merged and filtered to remove none optimal itineraries. But, when the client do NOT provide
- * a ´directMode´ OTP do not do the streetSearch and the removal of none optimal results do not
- * happen. In other words OTP is forced to return at least one itinerary with at least one transit
- * leg. So, instead of walking maybe 100 meters, the OTP suggest you need to walk to the closest
- * buss stop, take the bus on stop and walk back - with much more walking.
+ * In OTP the street search and transit search is done as to separate searches. The results is then
+ * merged and filtered to remove none optimal itineraries. But, when the client do NOT provide
+ * a ´directMode´, OTP do not do the streetSearch. And, the removal of none optimal results is not
+ * done, there is not street results to use to prune bad transit results with. In other words OTP
+ * is forced to return at least one itinerary with at least one transit leg. So, instead of walking
+ * maybe 100 meters, the OTP suggest you need to walk to the closest buss stop, take the bus one
+ * stop and walk back, oten with more walking than just those 100 meters.
  * <p>
  * <b>Let say OTP produces these internal results:</b>
  * <ul>
@@ -25,26 +26,26 @@ import org.opentripplanner.routing.api.request.StreetMode;
  *   <li>Request 2: {@code directMode:null, access/egressMode: WALK, transitModes:[TRANSIT] }, OTP returns [ Itinerary-2 ]</li>
  * </ul>
  * <p>
- * In this case Itinerary-1 is clearly better in all ways compared to Itinerary-2. Some OTP clients
- * run a separate searches for WALK-ALL-THE_WAY, BIKE-ALL-THE-WAY, and WALK+TRANSIT. In this case
- * it would be best for the client that Request 2 above just return an empty set, not the silly
- * Itinerary-2.
+ * In this case Itinerary-1 is clearly better than Itinerary-2. Some OTP clients run a separate
+ * searches for WALK-ALL-THE_WAY, BIKE-ALL-THE-WAY, and WALK+TRANSIT. In this case, it would be
+ * best for if Request 2 above return an empty set, not the silly Itinerary-2.
  * <p>
  * If no directMode is set, the responsibility of this class it to always filter away itineraries
- * with a generalized-cost that is higher than the WALK-ALL-THE-WAY. We achieve this to set the
+ * with a generalized-cost that is higher than the WALK-ALL-THE-WAY. We achieve this by setting the
  * directMode before searching. This trigger the direct street search, and later the result is
- * passed into the filter chain where none optimal results are removed. Last, this class remove
- * any results produced by the direct street search.
+ * passed into the filter chain where none optimal results are removed. Finally the street itinerary
+ * is removed and the request street mode rest to the original state.
  * <p>
  * <b>Why do we use generalized-cost, and not walk distance or a full pareto comparison?</b>
  * <p>
  * In general we assume that walking can be time-shifted; hence we can exclude arrival and
- * departure time from the comparison. The transit might have a higher cost and shorter travel time
- * than the walk-all-the-way itinerary, but this is theoretical and I have not managed to construct
- * a good transit alternative.
+ * departure time from the "pareto" comparison. The transit might have a higher cost and shorter
+ * travel time than the walk-all-the-way itinerary, but this is theoretical and I have not managed
+ * to construct a good transit alternative.
  * <p>
- * If we compared just on walking distance we would still get silly results. E.g. if the only stop
- * reachable within walking distance is a train station, we could get a itinerary like this:
+ * If we compare itineraries by walking distance(not cost), we would still get silly results. E.g.
+ * if the only stop reachable within walking distance is a train station, we could get a itinerary
+ * like this:
  * <p>
  * {@code Origin ~ Walk 50m ~ Stop 1a ~ Train 10:00 10:15 ~ Stop B ~ Train 10:20 10:35 ~ Stop 1d ~
  * Walk 50m ~ Destination }
