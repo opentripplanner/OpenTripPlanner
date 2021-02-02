@@ -21,12 +21,12 @@ public class TripTimeShort {
     private final int scheduledDeparture;
     private final int realtimeArrival;
     private final int realtimeDeparture;
-    private final boolean isRecordedStop;
+    private final boolean recordedStop;
     private final int arrivalDelay;
     private final int departureDelay;
     private final boolean timepoint;
     private final boolean realtime;
-    private final boolean isCancelledStop;
+    private final boolean cancelledStop;
     private final RealTimeState realtimeState;
     private final long serviceDay;
     private final FeedScopedId tripId;
@@ -48,16 +48,16 @@ public class TripTimeShort {
         scheduledDeparture = tt.getScheduledDepartureTime(i);
         timepoint          = tt.isTimepoint(i);
         realtime           = !tt.isScheduled();
-        isCancelledStop    = tt.isCancelledStop(i);
-        isRecordedStop     = tt.isRecordedStop(i);
+        cancelledStop = tt.isCancelledStop(i);
+        recordedStop = tt.isRecordedStop(i);
 
         if (isRealtime() && isCancelledStop()) {
             /*
              Trips/stops cancelled in realtime should not present "23:59:59, yesterday" as arrival-/departureTime
              Setting realtime arrival and departure to planned times
              */
-            realtimeArrival = getScheduledArrival();
-            realtimeDeparture = getScheduledDeparture();
+            realtimeArrival = tt.getScheduledArrivalTime(i);
+            realtimeDeparture = tt.getScheduledDepartureTime(i);
             arrivalDelay = 0;
             departureDelay = 0;
         } else {
@@ -138,14 +138,14 @@ public class TripTimeShort {
      * Returns the actual arrival time if available. Otherwise -1 is returned.
      */
     public int getActualArrival() {
-        return isRecordedStop ? realtimeArrival : UNDEFINED;
+        return recordedStop ? realtimeArrival : UNDEFINED;
     }
 
     /**
      * Returns the actual departure time if available. Otherwise -1 is returned.
      */
     public int getActualDeparture() {
-        return isRecordedStop ? realtimeDeparture : UNDEFINED;
+        return recordedStop ? realtimeDeparture : UNDEFINED;
     }
 
     public int getArrivalDelay() {
@@ -165,7 +165,7 @@ public class TripTimeShort {
     }
 
     public boolean isCancelledStop() {
-        return isCancelledStop;
+        return cancelledStop;
     }
 
     public RealTimeState getRealtimeState() {
