@@ -47,7 +47,8 @@ jobs:
       - name: Copy build files to the otp-repo bucket
         if: github.event_name == 'push'
         run: |
-          aws s3 cp --acl public-read "deploy" "otp-repo"
+          aws s3 cp ./deploy s3://otp-repo --acl public-read
+#          aws s3 cp --acl public-read "deploy" "otp-repo"
 #        uses: jakejarvis/s3-sync-action@master
 #        with:
 #          args: --acl public-read
@@ -72,7 +73,8 @@ jobs:
         if: github.event_name == 'push'
 #        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: |
-          aws s3 cp --acl public-read "target/mkdocs" "otp-docs.ibi-transit.com"
+          aws s3 cp ./target/mkdocs s3://otp-docs.ibi-transit.com --acl public-read
+#          aws s3 cp --acl public-read "target/mkdocs" "otp-docs.ibi-transit.com"
 #        uses: jakejarvis/s3-sync-action@master
 #        with:
 #          args: --acl public-read
