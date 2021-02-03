@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_PROFILE: default
+      AWS_REGION: us-east-1
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       MAVEN_OPTS: -Xmx2g
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
