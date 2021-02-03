@@ -19,6 +19,8 @@ import java.util.Map;
 
 /**
  * Generic data file which is read according to graphs/*settings.json settings
+ *
+ * @author Katja Danilova
  */
 public class GenericDataFile{
 
@@ -27,24 +29,26 @@ public class GenericDataFile{
     private ucar.ma2.Array timeArray;
     private ucar.ma2.Array latitudeArray;
     private Array longitudeArray;
-    /*
-    storage of the parsed data, where key = name of the peoperty, e.g. o2 and value is the
-    array of its data
-     */
-    Map<String, ArrayFloat.D4> netcdfData = new HashMap<>();
+    private Map<String, ArrayFloat.D4> netcdfDataForVariable;
 
+    /**
+     * Reads and parses the .nc file according to configuration into map of variable names and arrays of their
+     * values from the .nc file
+     *
+     * @param file input .nc data grid file
+     * @param genericFileConfiguration settings which describe the file variables selection
+     */
     public GenericDataFile(File file, GenericFileConfiguration genericFileConfiguration) {
         error = null;
 
-        //read the netcdf according to the settings in the provided configuration
         try {
             if (!file.exists()){
                 error = String.format("Missing data file from %s file", file.getAbsolutePath());
                 return;
             }
+
             NetcdfFile netcdfFile = readNetcdfFile(file);
 
-            //read universal variables which always are present
             Variable time = netcdfFile.findVariable(genericFileConfiguration.getTimeVariable());
 
             if (time == null) {
@@ -55,18 +59,14 @@ public class GenericDataFile{
             Variable latitude = netcdfFile.findVariable(genericFileConfiguration.getLatitudeVariable());
             Variable longitude = netcdfFile.findVariable(genericFileConfiguration.getLongitudeVariable());
 
-            //creating map of variables
             HashMap<IndexVariable, Variable> genVariables = new HashMap<>();
             for (IndexVariable indexVariable : genericFileConfiguration.getIndexVariables()){
                 genVariables.put(indexVariable, netcdfFile.findVariable(indexVariable.getVariable()));
-                //todo check if any vars from the conf are missing from the file?
-
+                //todo check if any vars from the configuration are missing from the file?
             }
-
 
             DateUnit dateUnit = new DateUnit(time.getUnitsString());
             Date dateOrigin = dateUnit.getDateOrigin();
-
 
             if (dateOrigin == null) {
                 error = String.format("Missing origin date from %s file", file.getAbsolutePath());
@@ -87,9 +87,10 @@ public class GenericDataFile{
             timeArray = time.read();
             latitudeArray = latitude.read();
             longitudeArray = longitude.read();
-            //read generic data into arrays
+
+            netcdfDataForVariable = new HashMap<>(genVariables.size());
             for (Map.Entry<IndexVariable, Variable> genVariable : genVariables.entrySet()){
-                netcdfData.put(genVariable.getKey().getName(), (ArrayFloat.D4) genVariable.getValue().read());
+                netcdfDataForVariable.put(genVariable.getKey().getName(), (ArrayFloat.D4) genVariable.getValue().read());
             }
         }
         catch (Exception e) {
@@ -97,11 +98,14 @@ public class GenericDataFile{
         }
     }
 
-
-    public Map<String, ArrayFloat.D4> getNetcdfData() {
-        return netcdfData;
+    /**
+     * Gets the map of variable names and arrays of corresponding data from .nc file
+     *
+     * @return map of variables names and corresponding grid data arrays
+     */
+    public Map<String, ArrayFloat.D4> getNetcdfDataForVariable() {
+        return netcdfDataForVariable;
     }
-
 
     /**
      * Returns whether the file was valid or not

@@ -117,6 +117,7 @@ public class OTPAppConstruction {
 
     /**
      * Return map of expected request parameters for the generic data
+     *
      * @return map of reques parameters, where key = threshold, value = penalty
      */
     public Map<RequestParameters, RequestParameters> genericFileParameters(){
@@ -127,6 +128,7 @@ public class OTPAppConstruction {
         Map<RequestParameters, RequestParameters> parametersMap = GenericFileConfigurationParser.parseConfParam(configurationsArray);
         return parametersMap;
     }
+
     /**
      * Create the top-level objects that represent the OTP server. There is one server and it
      * is created lazy at the first invocation of this method.

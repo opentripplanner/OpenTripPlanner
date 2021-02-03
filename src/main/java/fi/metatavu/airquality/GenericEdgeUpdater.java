@@ -1,6 +1,5 @@
 package fi.metatavu.airquality;
 
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -14,7 +13,9 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 /**
- * Class that updates the graph edges according to the data and configuration file provided
+ * Class that updates the graph edges according to the generic grid data and configuration file provided
+ *
+ * @author Simeon Platonov
  */
 public class GenericEdgeUpdater {
 
@@ -24,11 +25,17 @@ public class GenericEdgeUpdater {
     private final GenericDataFile dataFile;
     private final Collection<StreetEdge> streetEdges;
 
-    private final Map<String, ArrayFloat.D4> fileGenericData; //this data will update the street edges
+    private final Map<String, ArrayFloat.D4> fileGenericData;
 
     private int edgesUpdated;
     private final long dataStartTime;
 
+    /**
+     * Calculates the generic data start time and sets the earlier parsed map of generic data file
+     *
+     * @param dataFile map of generic grid data from .nc file
+     * @param streetEdges collection of all street edges to be updated
+     */
     public GenericEdgeUpdater(GenericDataFile dataFile, Collection<StreetEdge> streetEdges){
         super();
         this.dataFile = dataFile;
@@ -38,7 +45,7 @@ public class GenericEdgeUpdater {
         double startTimeHours = this.dataFile.getTimeArray().getDouble(0);
         this.dataStartTime = this.dataFile.getOriginDate().toInstant().plusSeconds((long) (startTimeHours * 3600)).toEpochMilli();
 
-        fileGenericData = dataFile.getNetcdfData();
+        fileGenericData = dataFile.getNetcdfDataForVariable();
         LOG.info(String.format("Street edges update starting from time stamp %d", this.dataStartTime));
     }
 
@@ -50,8 +57,9 @@ public class GenericEdgeUpdater {
     }
 
     /**
-     *  Updates the edge according to the generic variable descriptions
-     * @param streetEdge
+     * Updates the edge according to the generic variable data
+     *
+     * @param streetEdge street edge being updated with extra data
      */
     private void updateEdge(StreetEdge streetEdge) {
         Vertex fromVertex = streetEdge.getFromVertex();
@@ -59,7 +67,6 @@ public class GenericEdgeUpdater {
         Coordinate fromCoordinate = fromVertex.getCoordinate();
         Coordinate toCoordinate = toVertex.getCoordinate();
 
-        //calculate average generic values for each of the variables from configuration file
         HashMap<String, float[]> edgeGenericDataValues = new HashMap<>();
         for (Map.Entry<String, ArrayFloat.D4> variableValues : fileGenericData.entrySet()) {
             float[] averageDataValue = getAverageValue(fromCoordinate.x, fromCoordinate.y,
@@ -75,8 +82,8 @@ public class GenericEdgeUpdater {
         if (LOG.isInfoEnabled() && (edgesUpdated % REPORT_EVERY_N_EDGE) == 0) {
             LOG.info(String.format("%d / %d street edges updated", edgesUpdated, streetEdges.size()));
         }
-
     }
+
     /**
      * Returns average property sample data near given line.
      *
@@ -87,7 +94,6 @@ public class GenericEdgeUpdater {
      * @param toLongitude to longitude
      * @param toLatitude to latitude
      * @param propertyName propertyName
-     *
      * @return array of propertyName values samples in time
      */
     private float[] getAverageValue(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String propertyName) {
@@ -105,15 +111,14 @@ public class GenericEdgeUpdater {
     /**
      * Returns closest property value samples for given line
      *
-     * Each list cell represent an average of air quality index in time
+     * Each list cell represent an average of grid data in time
      *
      * @param fromLongitude from longitude
      * @param fromLatitude from latitude
      * @param toLongitude to longitude
      * @param toLatitude to latitude
      * @param propertyName propertyName
-     *
-     * @return closest air quality samples for given line
+     * @return closest grid data samples for given line
      */
     private List<float[]> getClosestSamples(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String propertyName) {
         List<float[]> result = new ArrayList<>();
@@ -129,17 +134,14 @@ public class GenericEdgeUpdater {
         return result;
     }
 
-
     /**
      * Returns closest a value of selected property for given point.
      *
      * Returned array represent value for selected property time
      *
-     *
      * @param samplePoint point
      * @param propertyName propertyName
-     *
-     * @return closest value for selected property for given point
+     * @return result closest value for selected property for given point
      */
     private float[] getClosestPropertyValue(Point2D samplePoint, String propertyName) {
         double lon = samplePoint.getX();
@@ -234,5 +236,4 @@ public class GenericEdgeUpdater {
         geodeticCalculator.setDirection(azimuth, amount);
         return geodeticCalculator.getDestinationGeographicPoint();
     }
-
 }

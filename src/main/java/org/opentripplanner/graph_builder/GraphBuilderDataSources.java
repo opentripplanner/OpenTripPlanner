@@ -107,6 +107,11 @@ public class GraphBuilderDataSources {
         return outputGraph;
     }
 
+    /**
+     * Gets the data source of settings.json file which manages the possibility to append generic data
+     *
+     * @return DataSource data source of settings.json
+     */
     public DataSource getDataSettings(){
         return store.getGenericDataSettings();
     }

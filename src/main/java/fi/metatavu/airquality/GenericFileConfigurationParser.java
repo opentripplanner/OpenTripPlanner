@@ -14,22 +14,30 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+/**
+ * This class parses the settings from settings.json data source and formats them based on use-case (input grid data
+ * parsing, request parameters)
+ *
+ * @author Katja Danilova
+ */
 public class GenericFileConfigurationParser {
 
 	/**
-	 * Parse settings.json data source, verify the contents and return the parsed GenericFileConfiguration[]
+	 * Parses settings.json data source, verifies the contents and returns the parsed GenericFileConfiguration[]
+	 *
 	 * @param dataSource dataSource from settings.json file
-	 * @return GenericFileConfiguration[]
+	 * @return GenericFileConfiguration[] json data parsed into GenericFileConfiguration[]
 	 */
 	public static GenericFileConfiguration[] parse(DataSource dataSource) {
 		if (dataSource.exists()) {
 			GenericFileConfiguration[] configurations = new Gson().fromJson(new InputStreamReader(dataSource.asInputStream()),
 							GenericFileConfiguration[].class);
-			//validate the configurations
 			for (GenericFileConfiguration configuration : configurations){
 				RequestParameters[] requestParametersList = configuration.getRequestParameters();
-				if (!areRequestParamValid(Arrays.asList(requestParametersList)))
+				if (!areRequestParamValid(Arrays.asList(requestParametersList))) {
 					throw new IllegalArgumentException("The settings file has incorrect request parameters");
+				}
+
 			}
 			return configurations;
 		}
@@ -37,9 +45,10 @@ public class GenericFileConfigurationParser {
 	}
 
 	/**
-	 * todo check if this is still needed?
-	 * @param requestParametersList
-	 * @return
+	 * Verifies that in the configuration there are exactly 2 corresponding request parameters per one variable name
+	 *
+	 * @param requestParametersList list of request parameters from json file
+	 * @return validity of the request parameters list
 	 */
 	public static boolean areRequestParamValid(List<RequestParameters> requestParametersList) {
 		AtomicBoolean res = new AtomicBoolean(true);
@@ -53,8 +62,9 @@ public class GenericFileConfigurationParser {
 	}
 
 	/**
-	 * Parses the generic file configuration into pairs of RequestParameters, where key = threshold parameter, value =
-	 * penalty parameter. These parameters will be filled during request and routing process
+	 * Parses the generic file configuration into pairs of RequestParameters, where key = threshold parameter,
+	 * value = penalty parameter. These parameters will be filled during request and routing process
+	 *
 	 * @param configurationsArray array of all settings from settings.json
 	 * @return map of request parameters
 	 */
@@ -66,7 +76,7 @@ public class GenericFileConfigurationParser {
 
 		for (GenericFileConfiguration genericFileConfiguration : configurationsArray){
 			RequestParameters[] requestParameters = genericFileConfiguration.getRequestParameters();
-			//for each parameter find its counterpart
+
 			Arrays.stream(requestParameters)
 							.collect(Collectors.groupingBy(RequestParameters::getVariable))
 							.forEach((k, v) -> {

@@ -4,17 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A helper class for air quality edge updater
+ * A helper class for generic grid data edge updater
+ *
+ * @author Katja Danilova
  */
 public class EdgeGenQuality {
 
-  private final Map<Integer, float[]> generticProperyValues;
+  private final Map<Integer, float[]> gridDataVariableValues;
 
   /**
    * Constructor
    */
   public EdgeGenQuality() {
-    generticProperyValues = new HashMap<>();
+    gridDataVariableValues = new HashMap<>();
   }
 
   /**
@@ -24,14 +26,14 @@ public class EdgeGenQuality {
    * @param propertyValue propertyValue
    */
   public void addPropertyValueSample(int time, float propertyValue) {
-    float[] existing = generticProperyValues.get(time);
+    float[] existing = gridDataVariableValues.get(time);
     if (existing == null) {
-      generticProperyValues.put(time, new float[] { propertyValue });
+      gridDataVariableValues.put(time, new float[] { propertyValue });
     } else {
       float[] updated = new float[existing.length + 1];
       System.arraycopy(existing, 0, updated, 0, existing.length);
       updated[existing.length] = propertyValue;
-      generticProperyValues.put(time, updated);
+      gridDataVariableValues.put(time, updated);
     }
   }
 
@@ -46,7 +48,7 @@ public class EdgeGenQuality {
   }
 
   /**
-   * Returns property value averages given times
+   * Returns property value averages for given times
    *
    * @param times times
    * @return pollutantValues
@@ -65,7 +67,7 @@ public class EdgeGenQuality {
    * Returns average for values
    *
    * @param values values
-   * @return average
+   * @return average values
    */
   private float getAverage(float[] values) {
     if (values == null) {
@@ -85,10 +87,10 @@ public class EdgeGenQuality {
    * Returns array of property indices in time
    *
    * @param time time
-   * @return array of property value
+   * @return array of property values
    */
   private float[] getPropertyValuesInTime(int time) {
-    return generticProperyValues.get(time);
+    return gridDataVariableValues.get(time);
   }
 
 }
