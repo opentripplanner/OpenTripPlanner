@@ -34,7 +34,7 @@ jobs:
       # Define AWS profile credentials for use by subsequent steps.
       - name: Add profile credentials to ~/.aws/credentials
         if: github.event_name == 'push'
-          run: ./scripts/add-aws-credentials.sh
+        run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
       - name: Build and Test
         run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip
