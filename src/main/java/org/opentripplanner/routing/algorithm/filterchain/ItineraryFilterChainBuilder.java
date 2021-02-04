@@ -9,6 +9,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDeparture
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
 
@@ -34,6 +35,7 @@ public class ItineraryFilterChainBuilder {
     private int maxNumberOfItineraries = NOT_SET;
     private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
     private double minSafeTransferTimeFactor;
+    private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
@@ -145,6 +147,16 @@ public class ItineraryFilterChainBuilder {
         return this;
     }
 
+    /**
+     * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by
+     * and remove-transit-with-higher-cost-than-best-on-street-only filters. This make sure that
+     * poor transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
+     */
+    public ItineraryFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
+        this.removeWalkAllTheWayResults = enable;
+        return this;
+    }
+
     public ItineraryFilter build() {
         List<ItineraryFilter> filters = new ArrayList<>();
 
@@ -188,6 +200,10 @@ public class ItineraryFilterChainBuilder {
         {
             if (removeTransitWithHigherCostThanBestOnStreetOnly) {
                 filters.add(new RemoveTransitIfStreetOnlyIsBetterFilter());
+            }
+
+            if(removeWalkAllTheWayResults) {
+                filters.add(new RemoveWalkOnlyFilter());
             }
 
             if (latestDepartureTimeLimit != null) {
