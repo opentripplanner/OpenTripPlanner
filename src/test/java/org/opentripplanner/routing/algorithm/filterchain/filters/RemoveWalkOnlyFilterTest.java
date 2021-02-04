@@ -2,7 +2,8 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 public class RemoveWalkOnlyFilterTest {
 
-  private static final int D5m = TimeUtils.parseDuration("5m");
+  private static final int D5m = DurationUtils.duration("5m");
 
   private static final int T10_10 = TimeUtils.hm2time(10,10);
   private static final int T10_20 = TimeUtils.hm2time(10,20);
