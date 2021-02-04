@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_PROFILE: default
       AWS_REGION: us-east-1
       MAVEN_OPTS: -Xmx2g
@@ -36,9 +38,6 @@ jobs:
       # Define AWS profile credentials for use by subsequent steps.
       - name: Add profile credentials to ~/.aws/credentials
         if: github.event_name == 'push'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
       - name: Build and Test
@@ -62,11 +61,15 @@ jobs:
       - name: Prepare doc files for deployment to s3
         if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
-      # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
+      # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront.
       - name: Upload docs to IBI s3 buckets & cloudfront
         if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: |
           aws s3 cp ./target/mkdocs s3://otp-docs.ibi-transit.com --recursive --acl public-read
+  # Separate job to avoid exposing AWS access keys.
+  notify:
+    runs-on: ubuntu-latest
+    steps:
       # Push notification to Teams.
       - name: Notify us of the build status on MS Teams
         # Release https://github.com/toko-bifrost/ms-teams-deploy-card/releases/tag/3.1.2 this matches
