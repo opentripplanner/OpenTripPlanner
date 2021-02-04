@@ -66,16 +66,12 @@ jobs:
         if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: |
           aws s3 cp ./target/mkdocs s3://otp-docs.ibi-transit.com --recursive --acl public-read
-  # Separate job to avoid exposing AWS access keys.
-  notify:
-    runs-on: ubuntu-latest
-    steps:
       # Push notification to Teams.
       - name: Notify us of the build status on MS Teams
         # Release https://github.com/toko-bifrost/ms-teams-deploy-card/releases/tag/3.1.2 this matches
         # the full length commit SHA below.
-#        uses: toko-bifrost/ms-teams-deploy-card@dcc94e4ce4088b1e6b6de5c9a3cda4ddcbe97d2e
-#        if: always()
-#        with:
-#          github-token: ${{ github.token }}
-#          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+  #        uses: toko-bifrost/ms-teams-deploy-card@dcc94e4ce4088b1e6b6de5c9a3cda4ddcbe97d2e
+  #        if: always()
+  #        with:
+  #          github-token: ${{ github.token }}
+  #          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
