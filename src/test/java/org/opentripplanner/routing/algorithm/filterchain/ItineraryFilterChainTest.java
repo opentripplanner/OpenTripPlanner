@@ -119,8 +119,8 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
         .withRemoveWalkAllTheWayResults(true)
         .build();
 
-    Itinerary walk = newItinerary(A, 6).walk(20, E).build();
-    Itinerary bus = newItinerary(A).bus(21, 6, 12, E).build();
+    Itinerary walk = newItinerary(A, T11_06).walk(D10m, E).build();
+    Itinerary bus = newItinerary(A).bus(21, T11_06, T11_12, E).build();
 
     assertEquals(toStr(List.of(bus)), toStr(chain.filter(List.of(walk, bus))));
   }
