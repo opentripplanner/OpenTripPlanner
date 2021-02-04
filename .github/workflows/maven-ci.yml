@@ -35,10 +35,10 @@ jobs:
         uses: rlespinasse/github-slug-action@v3.x
       # Define AWS profile credentials for use by subsequent steps.
       - name: Add profile credentials to ~/.aws/credentials
+        if: github.event_name == 'push'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        if: github.event_name == 'push'
         run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
       - name: Build and Test
