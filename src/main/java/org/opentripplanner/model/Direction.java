@@ -1,5 +1,8 @@
 package org.opentripplanner.model;
 
+/**
+ * The direction of travel for a TripPattern.
+ */
 public enum Direction {
   UNKNOWN(-1),
   OUTBOUND(0),
@@ -14,13 +17,13 @@ public enum Direction {
   public final int gtfsCode;
 
   public static Direction valueOfGtfsCode(int gtfsCode) {
-    // Because the enum constant share gtfsCode values, this mapping will depend on the order
-    // they are declared.
-    for (Direction value : values()) {
-      if (value.gtfsCode == gtfsCode) {
-        return value;
-      }
+    switch (gtfsCode) {
+      case 0:
+        return Direction.OUTBOUND;
+      case 1:
+        return Direction.INBOUND;
+      default:
+        return Direction.UNKNOWN;
     }
-    throw new IllegalArgumentException("Unknown GTFS direction type: " + gtfsCode);
   }
 }

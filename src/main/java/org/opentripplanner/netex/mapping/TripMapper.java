@@ -104,9 +104,7 @@ class TripMapper {
 
     private DirectionTypeEnumeration resolveDirectionType(ServiceJourney serviceJourney) {
         Route netexRoute = lookUpNetexRoute(serviceJourney);
-        if (serviceJourney.getDirectionType() != null) {
-            return serviceJourney.getDirectionType();
-        } else if (netexRoute != null && netexRoute.getDirectionType() != null) {
+        if (netexRoute != null && netexRoute.getDirectionType() != null) {
             return netexRoute.getDirectionType();
         } else {
             return null;

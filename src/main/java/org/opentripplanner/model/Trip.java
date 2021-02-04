@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import javax.validation.constraints.NotNull;
+
 public final class Trip extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
@@ -19,7 +21,8 @@ public final class Trip extends TransitEntity {
 
     private String routeShortName;
 
-    private Direction direction;
+    @NotNull
+    private Direction direction = Direction.UNKNOWN;
 
     private String blockId;
 
@@ -145,6 +148,10 @@ public final class Trip extends TransitEntity {
         this.routeShortName = routeShortName;
     }
 
+    // TODO Consider moving this to the TripPattern class once we have refactored the transit model
+    /**
+     * The direction for this Trip (and all other Trips in this TripPattern).
+     */
     public Direction getDirection() {
         return direction;
     }

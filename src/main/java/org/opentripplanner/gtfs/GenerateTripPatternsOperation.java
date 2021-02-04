@@ -150,13 +150,12 @@ public class GenerateTripPatternsOperation {
 
     private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, Direction direction) {
         for(TripPattern tripPattern : tripPatterns.get(stopPattern)) {
-            if(tripPattern.route.equals(route) && tripPattern.direction.equals(direction)) {
+            if(tripPattern.route.equals(route) && tripPattern.getDirection().equals(direction)) {
                 return tripPattern;
             }
         }
         FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction.gtfsCode);
         TripPattern tripPattern = new TripPattern(patternId, route, stopPattern);
-        tripPattern.direction = direction;
         tripPatterns.put(stopPattern, tripPattern);
         return tripPattern;
     }
