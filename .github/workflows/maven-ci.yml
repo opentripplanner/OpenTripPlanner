@@ -10,10 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_PROFILE: default
       AWS_REGION: us-east-1
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       MAVEN_OPTS: -Xmx2g
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
@@ -37,6 +35,9 @@ jobs:
         uses: rlespinasse/github-slug-action@v3.x
       # Define AWS profile credentials for use by subsequent steps.
       - name: Add profile credentials to ~/.aws/credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         if: github.event_name == 'push'
         run: ./scripts/add-aws-credentials.sh
       # Build and test deployment.
@@ -52,47 +53,26 @@ jobs:
         if: github.event_name == 'push'
         run: |
           aws s3 cp ./deploy s3://otp-repo --recursive --acl public-read
-#          aws s3 cp --acl public-read "deploy" "otp-repo"
-#        uses: jakejarvis/s3-sync-action@master
-#        with:
-#          args: --acl public-read
-#        env:
-#          AWS_S3_BUCKET: otp-repo
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          SOURCE_DIR: 'deploy'
       # Install mkdocs using pip for use by subsequent steps.
       - name: Install mkdocs
-        if: github.event_name == 'push'
-#        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
+        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: |
            pip install mkdocs
       # Using mkdocs produce docs for deployment.
       - name: Prepare doc files for deployment to s3
-        if: github.event_name == 'push'
-#        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
+        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
       # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
       - name: Upload docs to IBI s3 buckets & cloudfront
-        if: github.event_name == 'push'
-#        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
+        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev'
         run: |
           aws s3 cp ./target/mkdocs s3://otp-docs.ibi-transit.com --recursive --acl public-read
-#          aws s3 cp --acl public-read "target/mkdocs" "otp-docs.ibi-transit.com"
-#        uses: jakejarvis/s3-sync-action@master
-#        with:
-#          args: --acl public-read
-#        env:
-#          AWS_S3_BUCKET: otp-docs.ibi-transit.com
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          SOURCE_DIR: 'target/mkdocs'
       # Push notification to Teams.
-#      - name: Notify us of the build status on MS Teams
-#        uses: toko-bifrost/ms-teams-deploy-card@master #  or "./" if in a local set-up
+      - name: Notify us of the build status on MS Teams
+        # Release https://github.com/toko-bifrost/ms-teams-deploy-card/releases/tag/3.1.2 this matches
+        # the full length commit SHA below.
+#        uses: toko-bifrost/ms-teams-deploy-card@dcc94e4ce4088b1e6b6de5c9a3cda4ddcbe97d2e
 #        if: always()
 #        with:
 #          github-token: ${{ github.token }}
-#          # TODO Add webhook to GitHub secrets
-#          # webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
-#          webhook_url: https://outlook.office.com/webhook/03fa4a79-572f-4c68-b756-e4e851d0215a@9093f1a3-8771-4fb7-8596-d51eeef18cda/TravisCI/0aec73ecb8eb4ad696ea
+#          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
