@@ -2,21 +2,19 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 /**
  * Smoke test on the GroupBySimilarLegsFilter filter, all parts of the filter have their own
  * unit tests.
  */
-public class GroupBySimilarLegsFilterTest {
+public class GroupBySimilarLegsFilterTest implements PlanTestConstants {
 
   public static final SortOnGeneralizedCost SORT_ON_COST = new SortOnGeneralizedCost();
 

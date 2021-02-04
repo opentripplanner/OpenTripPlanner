@@ -20,7 +20,7 @@ import java.util.List;
 
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
+import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 
 /**

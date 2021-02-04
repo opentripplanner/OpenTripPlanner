@@ -1,7 +1,8 @@
 package org.opentripplanner.transit.raptor.api.path;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * A leg in a Raptor path. The legs are linked together from the first leg {@link AccessPathLeg},
@@ -131,9 +132,9 @@ public interface PathLeg<T extends RaptorTripSchedule> {
     }
 
     default String asString() {
-        return TimeUtils.timeToStrCompact(fromTime()) + "-" +
+      return TimeUtils.timeToStrCompact(fromTime()) + "-" +
                 TimeUtils.timeToStrCompact(toTime()) +
-                "(" + TimeUtils.durationToStr(duration()) + ")"
+                "(" + DurationUtils.durationToStr(duration()) + ")"
                 ;
     }
 }

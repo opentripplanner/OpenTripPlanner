@@ -6,18 +6,14 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
 
-public class LegTest {
+public class LegTest implements PlanTestConstants {
 
   private final Itinerary ITINERARY = TestItineraryBuilder
-      .newItinerary(A, 0)
-      .walk(2, B)
-      .bus(21, 5, 15, C)
-      .bicycle(20, 25, E)
+      .newItinerary(A, T11_00)
+      .walk(D2m, B)
+      .bus(21, T11_05, T11_15, C)
+      .bicycle(T11_16, T11_20, E)
       .build();
 
   private final Leg WALK_LEG = ITINERARY.firstLeg();
@@ -49,7 +45,7 @@ public class LegTest {
   public void getDuration() {
     assertEquals(120, WALK_LEG.getDuration());
     assertEquals(600, BUS_LEG.getDuration());
-    assertEquals(300, BICYCLE_LEG.getDuration());
+    assertEquals(240, BICYCLE_LEG.getDuration());
   }
 
   @Test

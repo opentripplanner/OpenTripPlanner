@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic;
 
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Heuristic data for a given stop.

@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
+import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 public class ReverseTransitCalculatorTest {
     private static final int TRIP_SEARCH_BINARY_SEARCH_THRESHOLD = 7;

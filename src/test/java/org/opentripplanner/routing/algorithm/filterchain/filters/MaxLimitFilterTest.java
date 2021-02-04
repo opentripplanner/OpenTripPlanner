@@ -2,16 +2,15 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-public class MaxLimitFilterTest {
+public class MaxLimitFilterTest implements PlanTestConstants {
   private final Itinerary i1 = newItinerary(A, 6).walk(1, B).build();
   private final Itinerary i2 = newItinerary(A).bicycle(6, 8, B).build();
   private final Itinerary i3 = newItinerary(A).bus(21,6, 8, B).build();

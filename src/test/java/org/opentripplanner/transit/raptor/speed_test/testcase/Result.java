@@ -1,7 +1,8 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -134,7 +135,7 @@ class Result implements Comparable<Result> {
     }
 
     public String durationAsStr() {
-        return TimeUtils.durationToStr(duration);
+      return DurationUtils.durationToStr(duration);
     }
 
     static <T> int compare(List<T> a, List<T> b, Comparator<T> comparator) {
