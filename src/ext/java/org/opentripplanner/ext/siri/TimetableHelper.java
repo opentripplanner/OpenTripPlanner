@@ -152,9 +152,6 @@ public class TimetableHelper {
                         }
                     }
 
-                    //Flag as recorded
-                    newTimes.setRecorded(callCounter, true);
-
                     if (recordedCall.isCancellation() != null) {
                         newTimes.setCancelledStop(callCounter, recordedCall.isCancellation());
                     }
@@ -166,6 +163,8 @@ public class TimetableHelper {
                     int realtimeArrivalTime = arrivalTime;
                     if (recordedCall.getActualArrivalTime() != null) {
                         realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getActualArrivalTime(), zoneId);
+                        //Flag as recorded
+                        newTimes.setRecorded(callCounter, true);
                     } else if (recordedCall.getExpectedArrivalTime() != null) {
                         realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getExpectedArrivalTime(), zoneId);
                     } else if (recordedCall.getAimedArrivalTime() != null) {
@@ -179,6 +178,8 @@ public class TimetableHelper {
                     int realtimeDepartureTime = departureTime;
                     if (recordedCall.getActualDepartureTime() != null) {
                         realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getActualDepartureTime(), zoneId);
+                        //Flag as recorded
+                        newTimes.setRecorded(callCounter, true);
                     } else if (recordedCall.getExpectedDepartureTime() != null) {
                         realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getExpectedDepartureTime(), zoneId);
                     } else if (recordedCall.getAimedDepartureTime() != null) {

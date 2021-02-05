@@ -41,9 +41,11 @@ public class TripTimeShortHelper {
          */
 
         if (leg.realTime) {
-            return tripTimes.stream().filter(tripTime -> tripTime.realtimeDeparture == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
+            return tripTimes.stream().filter(tripTime -> tripTime.getRealtimeDeparture() == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId,
+                tripTime.getStopId(), routingService)).findFirst().orElse(null);
         }
-        return tripTimes.stream().filter(tripTime -> tripTime.scheduledDeparture == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
+        return tripTimes.stream().filter(tripTime -> tripTime.getScheduledDeparture() == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId,
+            tripTime.getStopId(), routingService)).findFirst().orElse(null);
     }
 
     /**
@@ -70,9 +72,11 @@ public class TripTimeShortHelper {
         */
 
         if (leg.realTime) {
-            return tripTimes.stream().filter(tripTime -> tripTime.realtimeArrival == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
+            return tripTimes.stream().filter(tripTime -> tripTime.getRealtimeArrival() == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
+                tripTime.getStopId(), routingService)).findFirst().orElse(null);
         }
-        return tripTimes.stream().filter(tripTime -> tripTime.scheduledArrival == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
+        return tripTimes.stream().filter(tripTime -> tripTime.getScheduledArrival() == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
+            tripTime.getStopId(), routingService)).findFirst().orElse(null);
     }
 
 
@@ -104,16 +108,20 @@ public class TripTimeShortHelper {
         boolean boardingStopFound = false;
         for (TripTimeShort tripTime : tripTimes) {
 
-            long boardingTime = leg.realTime ? tripTime.realtimeDeparture : tripTime.scheduledDeparture;
+            long boardingTime = leg.realTime ? tripTime.getRealtimeDeparture()
+                : tripTime.getScheduledDeparture();
 
             if (!boardingStopFound) {
                 boardingStopFound = boardingTime == startTimeSeconds
-                    && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService);
+                    && matchesQuayOrSiblingQuay(leg.from.stopId,
+                    tripTime.getStopId(), routingService);
                 continue;
             }
 
-            long arrivalTime = leg.realTime ? tripTime.realtimeArrival : tripTime.scheduledArrival;
-            if (arrivalTime == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)) {
+            long arrivalTime = leg.realTime ? tripTime.getRealtimeArrival()
+                : tripTime.getScheduledArrival();
+            if (arrivalTime == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
+                tripTime.getStopId(), routingService)) {
                 break;
             }
 

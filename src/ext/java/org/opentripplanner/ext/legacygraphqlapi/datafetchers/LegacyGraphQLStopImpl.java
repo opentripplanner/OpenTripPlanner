@@ -339,7 +339,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       );
 
       return stream.flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
-          .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
+          .sorted(Comparator.comparing(t -> t.getServiceDay() + t.getRealtimeDeparture()))
           .limit(args.getLegacyGraphQLNumberOfDepartures())
           .collect(Collectors.toList());
     };
