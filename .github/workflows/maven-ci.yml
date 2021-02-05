@@ -10,10 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_PROFILE: default
-      AWS_REGION: us-east-1
       MAVEN_OPTS: -Xmx2g
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
@@ -39,6 +35,11 @@ jobs:
       - name: Add profile credentials to ~/.aws/credentials
         if: github.event_name == 'push'
         run: ./scripts/add-aws-credentials.sh
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_PROFILE: default
+          AWS_REGION: us-east-1
       # Build and test deployment.
       - name: Build and Test
         run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip
