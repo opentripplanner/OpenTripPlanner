@@ -64,12 +64,8 @@ public class QualifiedMode implements Serializable {
                 req.onlyTransitTrips = true;
             } else if (this.qualifiers.contains(Qualifier.HAIL)) {
                 req.useTransportationNetworkCompany = true;
-                req.driveTimeReluctance = 1.75;
-                req.driveDistanceReluctance = 0.2;
             } else if (this.qualifiers.contains(Qualifier.RENT)) {
                 req.allowCarRental = true;
-                req.driveTimeReluctance = 1.75;
-                req.driveDistanceReluctance = 0.2;
             } else {
                 req.kissAndRide = true;
                 // require transit to be used in Kiss & Ride, otherwise it'd just be a "Kiss" query

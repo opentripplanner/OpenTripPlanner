@@ -121,6 +121,23 @@ public abstract class RoutingResource {
     @QueryParam("waitReluctance")
     protected Double waitReluctance;
 
+    /**
+     * An additive weight for how bad each meter of driving is, compared to being in transit for equal distances. It is
+     * recommended to use this sparingly as larger values will incentivize driving paths that cut through neighborhoods.
+     * Ex: with a factor of 0.2, an edge that is ten meters in length would have 2 units of "weight" added to the overall
+     * weight of traversing the edge while driving.
+     */
+    @QueryParam("driveDistanceReluctance")
+    protected Double driveDistanceReluctance;
+
+    /**
+     * An additive weight for how bad each second of driving is, compared to being in transit for equal lengths of time.
+     * Ex: with a factor of 1.75, an edge that takes ten seconds to traverse while driving would have 17.5 units of
+     * "weight" added to the overall weight of traversing the edge.
+     */
+    @QueryParam("driveTimeReluctance")
+    protected Double driveTimeReluctance;
+
     /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
     @QueryParam("waitAtBeginningFactor")
     protected Double waitAtBeginningFactor;
@@ -687,6 +704,13 @@ public abstract class RoutingResource {
             modes.applyToRoutingRequest(request);
             request.setModes(request.modes);
         }
+
+        // Apply a per-request drive distance or time reluctance factor.
+        if (driveDistanceReluctance != null)
+            request.driveDistanceReluctance = driveDistanceReluctance;
+
+        if (driveTimeReluctance != null)
+            request.driveTimeReluctance = driveTimeReluctance;
 
         if (request.allowBikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.

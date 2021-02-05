@@ -629,11 +629,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useTransportationNetworkCompany;
 
     /*
-     * driving reluctances are used in TNC requests.
-     * It is set in org.opentripplanner.api.parameter.QualifiedMode.
-     * The driveTimeReluctance is used as a multiplier to add weight to a shortest path search in
-     *   org.opentripplanner.routing.edgetype.StreetEdge.
-     * It is set to -1 to indicate that driving reluctance should not be used in default car routing requests.
+     * Driving reluctances are used in car-only or multimodal requests with car + transit queries. These can be set in
+     * the router-config.json file or in an individual request. It is recommended to set these in individual routing
+     * requests to make sure requests with certain driving types use specific reluctance factors. For example, a P&R
+     * request might have different reluctance factors than a car rental request. Using the drive distance reluctance
+     * factor should be used sparingly as it can incentivize cutting through low-traffic neighborhoods.
+     * The time and distance reluctance factors add weight to a shortest path search in {@link StreetEdge#doTraverse}.
+     * These are set to -1 to indicate that driving reluctance should not be used in default car routing requests.
      */
     public double driveTimeReluctance = -1.0;
     public double driveDistanceReluctance = -1.0;
