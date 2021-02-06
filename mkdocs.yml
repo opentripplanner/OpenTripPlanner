@@ -49,4 +49,4 @@ pages:
     - Mapbox Vector Tiles API: 'sandbox/MapboxVectorTilesApi.md'
     - Mapbox Vector Tiles API: 'sandbox/InteractiveOtpMain.md'
     - Sandbox Extension Example: 'sandbox/Examples.md'
-    - Park and Ride API: 'sandbox/Examples.md'
+    - Park and Ride API: 'sandbox/ParkAndRideApi.md'
