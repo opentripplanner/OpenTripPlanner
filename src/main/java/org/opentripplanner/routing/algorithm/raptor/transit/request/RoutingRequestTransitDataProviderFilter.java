@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import lombok.RequiredArgsConstructor;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
@@ -9,15 +8,32 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
+import java.util.EnumSet;
 import java.util.Set;
 
-@RequiredArgsConstructor
 public class RoutingRequestTransitDataProviderFilter implements TransitDataProviderFilter {
 
   private final boolean requireBikesAllowed;
+
   private final boolean requireWheelchairAccessible;
+
   private final Set<TransitMode> transitModes;
+
   private final Set<FeedScopedId> bannedRoutes;
+
+  public RoutingRequestTransitDataProviderFilter(
+      boolean requireBikesAllowed,
+      boolean requireWheelchairAccessible,
+      Set<TransitMode> transitModes,
+      Set<FeedScopedId> bannedRoutes
+  ) {
+    this.requireBikesAllowed = requireBikesAllowed;
+    this.requireWheelchairAccessible = requireWheelchairAccessible;
+    this.transitModes = transitModes.isEmpty()
+        ? EnumSet.noneOf(TransitMode.class)
+        : EnumSet.copyOf(transitModes);
+    this.bannedRoutes = bannedRoutes;
+  }
 
   public RoutingRequestTransitDataProviderFilter(RoutingRequest request) {
     this(
@@ -29,12 +45,12 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   }
 
   @Override
-  public <T extends TripPatternForDate> boolean tripPatternPredicate(T tripPatternForDate) {
+  public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
     return routeIsNotBanned(tripPatternForDate) && transitModeIsAllowed(tripPatternForDate);
   }
 
   @Override
-  public <T extends TripTimes> boolean tripTimesPredicate(T tripTimes) {
+  public boolean tripTimesPredicate(TripTimes tripTimes) {
     if (requireBikesAllowed) {
       return BikeAccess.fromTrip(tripTimes.trip) == BikeAccess.ALLOWED;
     }
@@ -46,12 +62,12 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     return true;
   }
 
-  private <T extends TripPatternForDate> boolean routeIsNotBanned(T tripPatternForDate) {
+  private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
     FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().route.getId();
     return !bannedRoutes.contains(routeId);
   }
 
-  private <T extends TripPatternForDate> boolean transitModeIsAllowed(T tripPatternForDate) {
+  private boolean transitModeIsAllowed(TripPatternForDate tripPatternForDate) {
     TransitMode transitMode = tripPatternForDate.getTripPattern().getTransitMode();
     return transitModes.contains(transitMode);
   }

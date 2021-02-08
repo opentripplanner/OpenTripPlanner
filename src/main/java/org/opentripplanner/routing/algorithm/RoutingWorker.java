@@ -244,7 +244,8 @@ public class RoutingWorker {
     }
 
     private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
-            TransitLayer transitLayer) {
+        TransitLayer transitLayer
+    ) {
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDateTime().toInstant(),

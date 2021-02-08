@@ -111,17 +111,20 @@ public class TripPatternForDate {
     }
 
     public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
-        List<TripTimes> filteredTripTimes = Arrays.stream(tripTimes).filter(filter).collect(Collectors.toList());
+        List<TripTimes> filteredTripTimes = Arrays.stream(tripTimes)
+            .filter(filter)
+            .collect(Collectors.toList());
 
         if (tripTimes.length == filteredTripTimes.size()) {
             return this;
         }
 
         TripTimes[] filteredTripTimesArray = new TripTimes[filteredTripTimes.size()];
-        return new FilteredTripPatternForDate(
-                tripPattern,
-                filteredTripTimes.toArray(filteredTripTimesArray),
-                localDate);
+        return new TripPatternForDate(
+            tripPattern,
+            filteredTripTimes.toArray(filteredTripTimesArray),
+            localDate
+        );
     }
 
     @Override
@@ -130,12 +133,5 @@ public class TripPatternForDate {
                 "tripPattern=" + tripPattern +
                 ", localDate=" + localDate +
                 '}';
-    }
-
-    private static class FilteredTripPatternForDate extends TripPatternForDate {
-
-        public FilteredTripPatternForDate(TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate) {
-            super(tripPattern, tripTimes, localDate);
-        }
     }
 }

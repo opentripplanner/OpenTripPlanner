@@ -9,7 +9,6 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -30,30 +29,12 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         Set.of(TransitMode.BUS),
-        Collections.emptySet()
+        Set.of()
     );
 
     boolean valid = filter.tripPatternPredicate(tripPatternForDate);
 
     assertTrue(valid);
-  }
-
-  private TripPatternForDate createTestTripPatternForDate() {
-    Route route = new Route(TEST_ROUTE_ID);
-    route.setMode(TransitMode.BUS);
-
-    var stopTime = new StopTime();
-    stopTime.setStop(STOP_FOR_TEST);
-    StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    TripPattern pattern = new TripPattern(null, route, stopPattern);
-
-    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
-        new int[0], pattern
-    );
-
-    TripTimes tripTimes = Mockito.mock(TripTimes.class);
-
-    return new TripPatternForDate(tripPattern, new TripTimes[] {tripTimes}, LocalDate.now());
   }
 
   @Test
@@ -79,8 +60,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
         false,
-        Collections.emptySet(),
-        Collections.emptySet()
+        Set.of(),
+        Set.of()
     );
 
     boolean valid = filter.tripPatternPredicate(tripPatternForDate);
@@ -95,26 +76,13 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
         false,
-        Collections.emptySet(),
-        Collections.emptySet()
+        Set.of(),
+        Set.of()
     );
 
     boolean valid = filter.tripTimesPredicate(tripTimes);
 
     assertTrue(valid);
-  }
-
-  private TripTimes createTestTripTimes() {
-    Trip trip = new Trip(new FeedScopedId("TEST", "TRIP"));
-    trip.setBikesAllowed(2);
-
-    StopTime stopTime = new StopTime();
-    stopTime.setStop(STOP_FOR_TEST);
-    stopTime.setArrivalTime(60);
-    stopTime.setDepartureTime(60);
-    stopTime.setStopSequence(0);
-
-    return new TripTimes(trip, List.of(stopTime), new Deduplicator());
   }
 
   @Test
@@ -124,8 +92,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
         true,
         false,
-        Collections.emptySet(),
-        Collections.emptySet()
+        Set.of(),
+        Set.of()
     );
 
     boolean valid = filter.tripTimesPredicate(tripTimes);
@@ -140,8 +108,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
         true,
-        Collections.emptySet(),
-        Collections.emptySet()
+        Set.of(),
+        Set.of()
     );
 
     boolean valid = filter.tripTimesPredicate(tripTimes);
@@ -149,4 +117,34 @@ public class RoutingRequestTransitDataProviderFilterTest {
     assertFalse(valid);
   }
 
+  private TripPatternForDate createTestTripPatternForDate() {
+    Route route = new Route(TEST_ROUTE_ID);
+    route.setMode(TransitMode.BUS);
+
+    var stopTime = new StopTime();
+    stopTime.setStop(STOP_FOR_TEST);
+    StopPattern stopPattern = new StopPattern(List.of(stopTime));
+    TripPattern pattern = new TripPattern(null, route, stopPattern);
+
+    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
+        new int[0], pattern
+    );
+
+    TripTimes tripTimes = Mockito.mock(TripTimes.class);
+
+    return new TripPatternForDate(tripPattern, new TripTimes[] {tripTimes}, LocalDate.now());
+  }
+
+  private TripTimes createTestTripTimes() {
+    Trip trip = new Trip(new FeedScopedId("TEST", "TRIP"));
+    trip.setBikesAllowed(2);
+
+    StopTime stopTime = new StopTime();
+    stopTime.setStop(STOP_FOR_TEST);
+    stopTime.setArrivalTime(60);
+    stopTime.setDepartureTime(60);
+    stopTime.setStopSequence(0);
+
+    return new TripTimes(trip, List.of(stopTime), new Deduplicator());
+  }
 }

@@ -31,10 +31,10 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
@@ -366,7 +366,7 @@ public class SpeedTest {
                 false,
                 false,
                 request.getTransitModes(),
-                Collections.emptySet()
+                Set.of()
         );
 
         return new RaptorRoutingRequestTransitData(
