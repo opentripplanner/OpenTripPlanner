@@ -106,7 +106,7 @@ public class PathMapperTest {
         assertTime("startTime", ACCESS_START, path.startTime());
         assertTime("endTime", EGRESS_END, path.endTime());
         assertTime("duration", TRIP_DURATION, path.travelDurationInSeconds());
-        assertEquals(toOtpDomainCost(TOTAL_COST), path.cost());
+        assertEquals(toOtpDomainCost(TOTAL_COST), path.generalizedCost());
 
         assertEquals(BASIC_PATH_AS_STRING, path.toString());
     }

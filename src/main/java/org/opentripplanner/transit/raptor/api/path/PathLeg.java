@@ -5,6 +5,9 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * A leg in a Raptor path. The legs are linked together from the first leg {@link AccessPathLeg},
@@ -29,11 +32,26 @@ public interface PathLeg<T extends RaptorTripSchedule> {
      */
     int fromTime();
 
+    /**
+     * The stop place where the leg start/depart from.
+     * @throws IllegalArgumentException if leg does not start at a stop, like an access leg.
+     */
+    default int fromStop() {
+        throw new IllegalStateException("Leg does not start fro a stop: " + this);
+    }
 
     /**
      * The time when the leg end/arrive at the leg destination.
      */
     int toTime();
+
+    /**
+     * The stop where the leg end/arrive at the leg destination.
+     * @throws IllegalArgumentException if leg does not end at a stop, like an egress leg.
+     */
+    default int toStop() {
+        throw new IllegalStateException("Leg does not end at a stop: " + this);
+    }
 
     /**
      * Number of seconds to travel this leg. This does not include wait time.
@@ -152,5 +170,23 @@ public interface PathLeg<T extends RaptorTripSchedule> {
             leg = leg.nextLeg();
         }
         return null;
+    }
+
+    default Stream<PathLeg<T>> stream() {
+        return StreamSupport.stream(iterator().spliterator(), false);
+    }
+
+    default Iterable<PathLeg<T>> iterator() {
+        return () -> new Iterator<>() {
+            private PathLeg<T> currentLeg = PathLeg.this;
+            @Override public boolean hasNext() {
+                return currentLeg != null;
+            }
+            @Override public PathLeg<T> next() {
+                PathLeg<T> temp = currentLeg;
+                currentLeg = currentLeg.isEgressLeg() ? null : currentLeg.nextLeg();
+                return temp;
+            }
+        };
     }
 }

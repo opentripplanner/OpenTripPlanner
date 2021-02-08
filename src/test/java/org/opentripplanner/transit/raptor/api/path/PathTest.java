@@ -59,15 +59,12 @@ public class PathTest {
 
     @Test
     public void cost() {
-        assertEquals(toOtpDomainCost(TOTAL_COST), subject.cost());
+        assertEquals(toOtpDomainCost(TOTAL_COST), subject.generalizedCost());
     }
 
     @Test
     public void testToString() {
-        assertEquals(
-                BASIC_PATH_AS_STRING,
-                subject.toString()
-        );
+        assertEquals(BASIC_PATH_AS_STRING, subject.toString());
     }
 
     @Test

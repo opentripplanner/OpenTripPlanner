@@ -27,6 +27,7 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
     /**
      * The stop index where the leg start. Also called departure stop index.
      */
+    @Override
     public final int fromStop() {
         return fromStop;
     }
@@ -39,6 +40,7 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
     /**
      * The stop index where the leg end, also called arrival stop index.
      */
+    @Override
     public final int toStop(){
         return toStop;
     }

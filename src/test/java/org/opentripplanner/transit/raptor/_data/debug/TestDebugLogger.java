@@ -111,7 +111,7 @@ public class TestDebugLogger implements DebugLogger {
                 TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
                 TimeUtils.timeToStrLong(p.egressLeg().toTime()),
                 DurationUtils.durationToStr(p.travelDurationInSeconds()),
-                numFormat.format(p.cost()),
+                numFormat.format(p.generalizedCost()),
                 details(e.action().toString(), e.reason(), e.element().toString())
             )
         );

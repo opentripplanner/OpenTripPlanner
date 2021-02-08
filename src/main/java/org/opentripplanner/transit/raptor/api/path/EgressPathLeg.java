@@ -29,6 +29,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     /**
      * The stop index where the leg start, also called the leg departure stop index.
      */
+    @Override
     public final int fromStop() {
         return fromStop;
     }
@@ -58,7 +59,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     @Override
     public final TransitPathLeg<T> nextLeg() {
         throw new java.lang.UnsupportedOperationException(
-                "The egress leg is the last leg in a path. Use isEgressLeg() to identify las leg."
+                "The egress leg is the last leg in a path. Use isEgressLeg() to identify last leg."
         );
     }
 

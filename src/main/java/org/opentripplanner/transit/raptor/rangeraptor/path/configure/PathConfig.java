@@ -12,7 +12,7 @@ import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetC
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCost;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCostAndLatestDeparture;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCost;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCostAndLatestDepature;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCostAndLatestDeparture;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetable;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndCost;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndRelaxedCost;
@@ -67,7 +67,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
             return comparatorWithTimetable();
         }
         if(includeRelaxedCost && preferLateArrival) {
-            return comparatorWithRelaxedCostAndLatestDepature(relaxedCost);
+            return comparatorWithRelaxedCostAndLatestDeparture(relaxedCost);
         }
         if(includeRelaxedCost) {
             return comparatorWithRelaxedCost(relaxedCost);
