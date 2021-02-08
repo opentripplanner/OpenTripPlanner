@@ -3,6 +3,9 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.BookingMethod;
 import org.rutebanken.netex.model.BookingMethodEnumeration;
 
+/**
+ * Maps from NeTEx BookingMethodEnumeration into OTP BookingMethod.
+ */
 public class BookingMethodMapper {
 
   public static BookingMethod map(BookingMethodEnumeration bookingMethodEnumeration) {

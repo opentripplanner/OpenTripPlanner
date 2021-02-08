@@ -17,8 +17,13 @@ public class ContactInfo {
   private final String additionalDetails;
 
   public ContactInfo(
-      String contactPerson, String phoneNumber, String eMail, String faxNumber, String infoUrl,
-      String bookingUrl, String additionalDetails
+      String contactPerson,
+      String phoneNumber,
+      String eMail,
+      String faxNumber,
+      String infoUrl,
+      String bookingUrl,
+      String additionalDetails
   ) {
     this.contactPerson = contactPerson;
     this.phoneNumber = phoneNumber;

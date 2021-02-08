@@ -20,6 +20,15 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Maps booking info from NeTEx BookingArrangements, FlexibleServiceProperties, and FlexibleLine
+ * into OTP BookingInfo.
+ *
+ * The precedence is as follows:
+ * 1. BookingArrangements
+ * 2. FlexibleServiceProperties
+ * 3. FlexibleLine
+ */
 public class BookingInfoMapper {
 
   static BookingInfo map(
