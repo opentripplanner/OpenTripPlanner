@@ -25,7 +25,7 @@ public class CostCalculatorTest {
     @Test
     public void transitArrivalCost() {
         int fromStop = 0;
-        ArrivalView<TestTripSchedule> prev = new Access(0, 0, 2);
+        ArrivalView<TestTripSchedule> prev = new Access(0, 0, 2, 1000);
 
         assertEquals(1000, prev.cost());
 
@@ -49,7 +49,7 @@ public class CostCalculatorTest {
 
     @Test
     public void onTripRidingCost() {
-        ArrivalView<TestTripSchedule> prev = new Access(0, 0, 2);
+        ArrivalView<TestTripSchedule> prev = new Access(0, 0, 2, 1000);
 
         assertEquals(1000, prev.cost());
         assertEquals("Board cost", 500, subject.onTripRidingCost(prev, 0, 5));

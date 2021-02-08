@@ -7,15 +7,17 @@ import org.opentripplanner.util.time.TimeUtils;
 public class Egress {
     private final int arrivalTime;
     private final int durationInSeconds;
+    private final int cost;
     private final ArrivalView<TestTripSchedule> previous;
 
-    Egress(int departureTime, int arrivalTime, ArrivalView<TestTripSchedule> previous) {
+    Egress(int departureTime, int arrivalTime, int cost, ArrivalView<TestTripSchedule> previous) {
         this.arrivalTime = arrivalTime;
         this.durationInSeconds = Math.abs(arrivalTime - departureTime);
+        this.cost = cost;
         this.previous = previous;
     }
 
-    public int additionalCost(){ return 1000; }
+    public int additionalCost(){ return cost; }
     public int durationInSeconds() { return durationInSeconds; }
     public int arrivalTime() { return arrivalTime; }
     public ArrivalView<TestTripSchedule> previous() { return previous; }

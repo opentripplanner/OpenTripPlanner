@@ -49,15 +49,15 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
   public void setup() {
     data.add(
         route(
-            pattern("R1",  STOP_1, STOP_2, STOP_3)
+            pattern("R1", STOP_B, STOP_C, STOP_D)
         )
         .withTimetable(
             schedule("00:01, 00:03, 00:05")
         )
     );
     requestBuilder.searchParams()
-        .addAccessPaths(walk(STOP_1, D30s))
-        .addEgressPaths(walk(STOP_3, D20s))
+        .addAccessPaths(walk(STOP_B, D30s))
+        .addEgressPaths(walk(STOP_D, D20s))
         .earliestDepartureTime(T00_00)
         .latestArrivalTime(T00_10)
         .timetableEnabled(true);
@@ -75,7 +75,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
     var response = raptorService.route(request, data);
 
     assertEquals(
-        "Walk 30s ~ 1 ~ BUS R1 0:01 0:05 ~ 3 ~ Walk 20s [00:00:30 00:05:20 4m50s]",
+        "Walk 30s ~ 2 ~ BUS R1 0:01 0:05 ~ 4 ~ Walk 20s [00:00:30 00:05:20 4m50s]",
         pathsToString(response)
     );
   }
@@ -90,7 +90,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
     var response = raptorService.route(request, data);
 
     assertEquals(
-        "Walk 30s ~ 1 ~ BUS R1 0:01 0:05 ~ 3 ~ Walk 20s [00:00:30 00:05:20 4m50s]",
+        "Walk 30s ~ 2 ~ BUS R1 0:01 0:05 ~ 4 ~ Walk 20s [00:00:30 00:05:20 4m50s]",
         pathsToString(response)
     );
   }
@@ -104,7 +104,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
     var response = raptorService.route(request, data);
 
     assertEquals(
-        "Walk 30s ~ 1 ~ BUS R1 0:01 0:05 ~ 3 ~ Walk 20s [00:00:30 00:05:20 4m50s, cost: 1040]",
+        "Walk 30s ~ 2 ~ BUS R1 0:01 0:05 ~ 4 ~ Walk 20s [00:00:30 00:05:20 4m50s, cost: 1040]",
         pathsToString(response)
     );
   }

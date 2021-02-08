@@ -39,21 +39,21 @@ public class B11_FlexEgress implements RaptorTestConstants {
   @Before
   public void setup() {
     data.add(
-        route("R1", STOP_1, STOP_2, STOP_3, STOP_4, STOP_5)
+        route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
             .withTimetable(
                 schedule("0:10, 0:12, 0:14, 0:16, 0:18")
             )
     );
     requestBuilder.searchParams()
         .addAccessPaths(
-            walk(STOP_1, D1m)
+            walk(STOP_B, D1m)
         )
         // All egress paths are all pareto-optimal (McRaptor).
         .addEgressPaths(
-            flexAndWalk(STOP_2, D7m),     // best on combination of transfers and time
-            flex(STOP_3, D3m, 2),         // earliest arrival time
-            flexAndWalk(STOP_4, D2m1s, 2),  // lowest cost
-            walk(STOP_5, D10m)            // lowest num-of-transfers (0)
+            flexAndWalk(STOP_C, D7m),     // best on combination of transfers and time
+            flex(STOP_D, D3m, 2),         // earliest arrival time
+            flexAndWalk(STOP_E, D2m1s, 2),  // lowest cost
+            walk(STOP_F, D10m)            // lowest num-of-transfers (0)
         );
     requestBuilder.searchParams()
         .earliestDepartureTime(T00_00)
@@ -75,7 +75,7 @@ public class B11_FlexEgress implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 2tx [00:09:00 00:18:00 9m]",
+        "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2tx [00:09:00 00:18:00 9m]",
         pathsToString(response)
     );
   }
@@ -89,7 +89,7 @@ public class B11_FlexEgress implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 2tx [00:09:00 00:18:00 9m]",
+        "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2tx [00:09:00 00:18:00 9m]",
         pathsToString(response)
     );
   }
@@ -101,10 +101,10 @@ public class B11_FlexEgress implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:14 ~ 3 ~ Flex 3m 2tx [00:09:00 00:18:00 9m, cost: 1860]\n"
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Flex 2m1s 2tx [00:09:00 00:19:01 10m1s, cost: 1744]\n"
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:12 ~ 2 ~ Flex 7m 1tx [00:09:00 00:20:00 11m, cost: 2700]\n"
-            + "Walk 1m ~ 1 ~ BUS R1 0:10 0:18 ~ 5 ~ Walk 10m [00:09:00 00:28:00 19m, cost: 3720]",
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2tx [00:09:00 00:18:00 9m, cost: 1860]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Flex 2m1s 2tx [00:09:00 00:19:01 10m1s, cost: 1744]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:12 ~ 3 ~ Flex 7m 1tx [00:09:00 00:20:00 11m, cost: 2700]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 10m [00:09:00 00:28:00 19m, cost: 3720]",
         pathsToString(response)
     );
   }

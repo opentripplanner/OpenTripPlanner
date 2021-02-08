@@ -1,16 +1,21 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.A_START;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.E_END;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.ACCESS_START;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.BASIC_PATH_AS_STRING;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.EGRESS_END;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.TOTAL_COST;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.basicTripStops;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 
 public class PathTest {
@@ -19,62 +24,60 @@ public class PathTest {
 
     @Test
     public void startTime() {
-        Assert.assertEquals(A_START, subject.startTime());
+        assertEquals(ACCESS_START, subject.startTime());
     }
 
     @Test
     public void endTime() {
-        Assert.assertEquals(E_END, subject.endTime());
+        assertEquals(EGRESS_END, subject.endTime());
     }
 
     @Test
     public void totalTravelDurationInSeconds() {
-        Assert.assertEquals("2:00", TimeUtils.timeToStrCompact(subject.travelDurationInSeconds()));
+        assertEquals("2:00", timeToStrCompact(subject.travelDurationInSeconds()));
     }
 
     @Test
     public void numberOfTransfers() {
-        Assert.assertEquals(2, subject.numberOfTransfers());
+        assertEquals(2, subject.numberOfTransfers());
     }
 
     @Test
     public void accessLeg() {
-        Assert.assertNotNull(subject.accessLeg());
+        assertNotNull(subject.accessLeg());
     }
 
     @Test
     public void egressLeg() {
-        Assert.assertNotNull(subject.egressLeg());
+        assertNotNull(subject.egressLeg());
     }
 
     @Test
     public void listStops() {
-        Assert.assertEquals(BasicItineraryTestCase.basicTripStops(), subject.listStops());
+        assertEquals(basicTripStops(), subject.listStops());
     }
 
     @Test
     public void cost() {
-        Assert.assertEquals(60, subject.cost());
+        assertEquals(toOtpDomainCost(TOTAL_COST), subject.cost());
     }
 
     @Test
     public void testToString() {
-        Assert.assertEquals(
-                "Walk 3m ~ 1 ~ BUS T1 10:05 10:35 ~ 2 ~ Walk 3m ~ 3 ~ "
-                        + "BUS T2 11:00 11:23 ~ 4 ~ BUS T3 11:40 11:52 ~ 5 ~ Walk 7m "
-                        + "[10:00:00 12:00:00 2h, cost: 60]",
+        assertEquals(
+                BASIC_PATH_AS_STRING,
                 subject.toString()
         );
     }
 
     @Test
     public void equals() {
-        Assert.assertEquals(BasicItineraryTestCase.basicTripAsPath(), subject);
+        assertEquals(BasicItineraryTestCase.basicTripAsPath(), subject);
     }
 
     @Test
     public void testHashCode() {
-        Assert.assertEquals(BasicItineraryTestCase.basicTripAsPath().hashCode(), subject.hashCode());
+        assertEquals(BasicItineraryTestCase.basicTripAsPath().hashCode(), subject.hashCode());
     }
 
     @Test
@@ -88,6 +91,6 @@ public class PathTest {
 
         List<Path<?>> paths = List.of(p3, p2, p1, p0).stream().sorted().collect(Collectors.toList());
 
-        Assert.assertEquals(expected, paths);
+        assertEquals(expected, paths);
     }
 }
