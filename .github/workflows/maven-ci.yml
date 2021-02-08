@@ -38,8 +38,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_PROFILE: default
-          AWS_REGION: us-east-1
+          AWS_REGION: ${{ secrets.AWS_REGION }}
       # Build and test deployment.
       - name: Build and Test
         run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip
