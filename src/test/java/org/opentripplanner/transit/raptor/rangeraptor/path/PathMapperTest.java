@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.stoparrival.Egress;
-import org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData;
+import org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
@@ -10,8 +10,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.util.time.TimeUtils;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.basicTripByReverseSearch;
-import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.lifeCycle;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.basicTripByReverseSearch;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.lifeCycle;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class PathMapperTest {
@@ -19,7 +19,7 @@ public class PathMapperTest {
     @Test
     public void mapToPathForwardSearch() {
         // Given:
-        Egress egress = StopArrivalsTestData.basicTripByForwardSearch();
+        Egress egress = BasicItineraryTestCase.basicTripByForwardSearch();
         DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(
                 walk(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
@@ -27,9 +27,9 @@ public class PathMapperTest {
                 egress.additionalCost()
         );
 
-        WorkerLifeCycle lifeCycle = StopArrivalsTestData.lifeCycle();
+        WorkerLifeCycle lifeCycle = BasicItineraryTestCase.lifeCycle();
         PathMapper<TestTripSchedule> mapper = new ForwardPathMapper<>(
-            StopArrivalsTestData.slackProvider(),
+            BasicItineraryTestCase.slackProvider(),
             lifeCycle
         );
 
@@ -53,7 +53,7 @@ public class PathMapperTest {
         );
         WorkerLifeCycle lifeCycle = lifeCycle();
         PathMapper<TestTripSchedule> mapper = new ReversePathMapper<>(
-            StopArrivalsTestData.slackProvider(),
+            BasicItineraryTestCase.slackProvider(),
             lifeCycle
         );
 
@@ -91,9 +91,9 @@ public class PathMapperTest {
 
         // Assert some of the most important information
         assertEquals(2, path.numberOfTransfers());
-        assertTime("startTime", StopArrivalsTestData.A_START, path.startTime());
-        assertTime("endTime", StopArrivalsTestData.E_END, path.endTime());
-        assertTime("duration", StopArrivalsTestData.TRIP_DURATION, path.travelDurationInSeconds());
+        assertTime("startTime", BasicItineraryTestCase.A_START, path.startTime());
+        assertTime("endTime", BasicItineraryTestCase.E_END, path.endTime());
+        assertTime("duration", BasicItineraryTestCase.TRIP_DURATION, path.travelDurationInSeconds());
         assertEquals(60, path.cost());
 
         assertEquals(

@@ -44,7 +44,7 @@ import static org.opentripplanner.util.time.TimeUtils.hm2time;
  * </pre>
  * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 09:53 and ends at 12:00.
  */
-public class StopArrivalsTestData implements RaptorTestConstants {
+public class BasicItineraryTestCase implements RaptorTestConstants {
 
     // We use 2+1 minutes slack distributed by (in seconds):
     private static final int BOARD_SLACK = 120;

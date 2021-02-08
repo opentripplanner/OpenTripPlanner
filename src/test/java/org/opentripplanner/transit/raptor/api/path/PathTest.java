@@ -2,20 +2,20 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData;
+import org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.A_START;
-import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.E_END;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.A_START;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.E_END;
 
 
 public class PathTest {
 
-    private final Path<TestTripSchedule> subject = StopArrivalsTestData.basicTripAsPath();
+    private final Path<TestTripSchedule> subject = BasicItineraryTestCase.basicTripAsPath();
 
     @Test
     public void startTime() {
@@ -49,7 +49,7 @@ public class PathTest {
 
     @Test
     public void listStops() {
-        Assert.assertEquals(StopArrivalsTestData.basicTripStops(), subject.listStops());
+        Assert.assertEquals(BasicItineraryTestCase.basicTripStops(), subject.listStops());
     }
 
     @Test
@@ -69,12 +69,12 @@ public class PathTest {
 
     @Test
     public void equals() {
-        Assert.assertEquals(StopArrivalsTestData.basicTripAsPath(), subject);
+        Assert.assertEquals(BasicItineraryTestCase.basicTripAsPath(), subject);
     }
 
     @Test
     public void testHashCode() {
-        Assert.assertEquals(StopArrivalsTestData.basicTripAsPath().hashCode(), subject.hashCode());
+        Assert.assertEquals(BasicItineraryTestCase.basicTripAsPath().hashCode(), subject.hashCode());
     }
 
     @Test
