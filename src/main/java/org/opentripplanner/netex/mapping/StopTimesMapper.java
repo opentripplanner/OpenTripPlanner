@@ -7,17 +7,23 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
+import org.rutebanken.netex.model.Route;
+import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -53,8 +59,11 @@ class StopTimesMapper {
 
     private final ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef;
 
-    private String currentHeadSign;
+    private final ReadOnlyHierarchicalMap<String, Route> routeByid;
 
+    private final ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById;
+
+    private String currentHeadSign;
 
     StopTimesMapper(
             FeedScopedIdFactory idFactory,
@@ -62,7 +71,9 @@ class StopTimesMapper {
             EntityById<FlexStopLocation> flexStopLocationsById,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-            ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef
+            ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
+            ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
+            ReadOnlyHierarchicalMap<String, Route> routeById
     ) {
         this.idFactory = idFactory;
         this.destinationDisplayById = destinationDisplayById;
@@ -70,6 +81,8 @@ class StopTimesMapper {
         this.flexibleStopLocationsById = flexStopLocationsById;
         this.quayIdByStopPointRef = quayIdByStopPointRef;
         this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
+        this.flexibleLinesById = flexibleLinesById;
+        this.routeByid = routeById;
     }
 
     /**
@@ -79,7 +92,8 @@ class StopTimesMapper {
     MappedStopTimes mapToStopTimes(
             JourneyPattern journeyPattern,
             Trip trip,
-            List<TimetabledPassingTime> passingTimes
+            List<TimetabledPassingTime> passingTimes,
+            ServiceJourney serviceJourney
     ) {
         MappedStopTimes result = new MappedStopTimes();
 
@@ -90,6 +104,7 @@ class StopTimesMapper {
             String pointInJourneyPattern = currentPassingTime.getPointInJourneyPatternRef().getValue().getRef();
 
             StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
+
             StopLocation stop = lookUpStopLocation(stopPoint);
             if (stop == null) {
                 LOG.warn("Stop with id {} not found for StopPoint {} in JourneyPattern {}. "
@@ -107,6 +122,12 @@ class StopTimesMapper {
             if (stopTime == null) {
                 return null;
             }
+
+            stopTime.setBookingInfo(BookingInfoMapper.map(
+                stopPoint,
+                serviceJourney,
+                lookUpFlexibleLine(serviceJourney, journeyPattern)
+            ));
 
             result.add(currentPassingTime.getId(), stopTime);
         }
@@ -186,6 +207,8 @@ class StopTimesMapper {
         if (currentHeadSign != null) {
             stopTime.setStopHeadsign(currentHeadSign);
         }
+
+
 
         return stopTime;
     }
@@ -272,5 +295,22 @@ class StopTimesMapper {
                 stopTime.setFlexWindowEnd(arrivalTime);
             }
         }
+    }
+
+    private FlexibleLine lookUpFlexibleLine(ServiceJourney serviceJourney, JourneyPattern journeyPattern) {
+        if (serviceJourney == null) { return null; }
+        String lineRef = null;
+        // Check for direct connection to Line
+        JAXBElement<? extends LineRefStructure> lineRefStruct = serviceJourney.getLineRef();
+
+        if (lineRefStruct != null){
+            // Connect to Line referenced directly from ServiceJourney
+            lineRef = lineRefStruct.getValue().getRef();
+        } else if(serviceJourney.getJourneyPatternRef() != null){
+            // Connect to Line referenced through JourneyPattern->Route
+            String routeRef = journeyPattern.getRouteRef().getRef();
+            lineRef = routeByid.lookup(routeRef).getLineRef().getValue().getRef();
+        }
+        return flexibleLinesById.lookup(lineRef);
     }
 }
