@@ -97,7 +97,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   @Test
   public void multiCriteria() {
     // Add cost to result string
-    String expected = EXPECTED_RESULT.replace("]", ", cost: 1570]");
+    String expected = EXPECTED_RESULT.replace("]", ", cost: 1610]");
     var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
     var response = raptorService.route(request, data);
     assertEquals(expected, pathsToString(response));

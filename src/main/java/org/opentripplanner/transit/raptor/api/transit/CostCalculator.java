@@ -23,13 +23,15 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
 
     /**
      * Calculate the value when arriving by transit.
+     *
+     * @param firstRound Indicate if this is the first round (first transit).
      */
     int transitArrivalCost(
+        boolean firstRound,
         int fromStop,
         int waitTime,
         int transitTime,
-        int toStop,
-        T trip
+        int toStop
     );
 
     /**
@@ -50,4 +52,5 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
      * <em>real value</em> would be correct and a good choose.
      */
     int calculateMinCost(int minTravelTime, int minNumTransfers);
+
 }
