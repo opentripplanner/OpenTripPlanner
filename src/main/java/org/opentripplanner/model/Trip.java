@@ -152,6 +152,7 @@ public final class Trip extends TransitEntity {
     /**
      * The direction for this Trip (and all other Trips in this TripPattern).
      */
+    @NotNull
     public Direction getDirection() {
         return direction;
     }
@@ -161,7 +162,8 @@ public final class Trip extends TransitEntity {
     }
 
     public void setDirection(Direction direction) {
-        this.direction = direction;
+        // Enforce non-null
+        this.direction = direction != null ? direction : Direction.UNKNOWN;
     }
 
     public String getBlockId() {
