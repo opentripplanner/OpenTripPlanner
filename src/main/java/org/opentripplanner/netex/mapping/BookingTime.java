@@ -1,12 +1,13 @@
 package org.opentripplanner.netex.mapping;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 
 /**
  * Represents either an earliest or latest time a trip can be booked relative to the departure day
  * of the trip.
  */
-public class BookingTime {
+public class BookingTime implements Serializable {
   private final LocalTime time;
 
   private final int daysPrior;

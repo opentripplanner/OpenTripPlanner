@@ -1,6 +1,8 @@
 package org.opentripplanner.model;
 
-public class ContactInfo {
+import java.io.Serializable;
+
+public class ContactInfo implements Serializable {
 
   private final String contactPerson;
 

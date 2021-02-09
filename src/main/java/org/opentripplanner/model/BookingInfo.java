@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import org.opentripplanner.netex.mapping.BookingTime;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;
 
@@ -11,7 +12,7 @@ import java.util.EnumSet;
  *
  * // TODO Make the routing take into account booking time and booking notice.
  */
-public class BookingInfo {
+public class BookingInfo implements Serializable {
 
   private final ContactInfo contactInfo;
 
