@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import graphql.schema.GraphQLEnumType;
+import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
@@ -244,6 +245,15 @@ public class EnumTypes {
             .value("clockwise", 2)
             .value("anticlockwise", 3)
             .build();
+
+    public static GraphQLEnumType BOOKING_METHOD = GraphQLEnumType.newEnum()
+        .name("bookingMethodEnum")
+        .value("callDriver", BookingMethod.CALL_DRIVER)
+        .value("callOffice", BookingMethod.CALL_OFFICE)
+        .value("online", BookingMethod.ONLINE)
+        .value("phoneAtStop", BookingMethod.PHONE_AT_STOP)
+        .value("text", BookingMethod.TEXT_MESSAGE)
+        .build();
 
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {
         return type.getCoercing().serialize(value);
