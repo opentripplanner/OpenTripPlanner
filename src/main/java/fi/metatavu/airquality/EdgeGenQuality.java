@@ -1,6 +1,8 @@
 package fi.metatavu.airquality;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,9 +10,9 @@ import java.util.Map;
  *
  * @author Katja Danilova
  */
-public class EdgeGenQuality {
+public class EdgeGenQuality <E extends  Number> {
 
-  private final Map<Integer, float[]> gridDataVariableValues;
+  private final Map<Integer, List<E>> gridDataVariableValues;
 
   /**
    * Constructor
@@ -25,14 +27,14 @@ public class EdgeGenQuality {
    * @param time time
    * @param propertyValue propertyValue
    */
-  public void addPropertyValueSample(int time, float propertyValue) {
-    float[] existing = gridDataVariableValues.get(time);
+  public void addPropertyValueSample(int time, E propertyValue) {
+    List<E> existing = gridDataVariableValues.get(time);
     if (existing == null) {
-      gridDataVariableValues.put(time, new float[] { propertyValue });
+      gridDataVariableValues.put(time, List.of(propertyValue));
     } else {
-      float[] updated = new float[existing.length + 1];
-      System.arraycopy(existing, 0, updated, 0, existing.length);
-      updated[existing.length] = propertyValue;
+      List<E> updated = new ArrayList<>(existing.size() +1);
+      updated.addAll(existing);
+      updated.add(existing.size(), propertyValue);
       gridDataVariableValues.put(time, updated);
     }
   }
@@ -53,7 +55,7 @@ public class EdgeGenQuality {
    * @param times times
    * @return pollutantValues
    */
-  public float[] getPeroptyValuesAverages(int times) {
+  public float[] getPropertyValueAverage(int times) {
     float[] result = new float[times];
 
     for (int time = 0; time < times; time++) {
@@ -69,18 +71,58 @@ public class EdgeGenQuality {
    * @param values values
    * @return average values
    */
-  private float getAverage(float[] values) {
+  private float getAverage(List<E> values) {
     if (values == null) {
       return 0;
     }
 
-    float result = 0f;
+   return calculateAverage(values);
 
-    for (float value : values) {
-      result += value;
+  }
+
+  /**
+   * Calculates average float value for list of values
+   * @param values
+   * @return
+   */
+  private float calculateAverage(List<E> values) {
+    int len = values.size();
+    if (values.get(0) instanceof Integer) {
+      Integer total = 0;
+
+      for (E value : values){
+        total += (Integer) value;
+      }
+      return (float) total / len;
     }
+    else if (values.get(0) instanceof Float) {
+      float sum = 0f;
 
-    return result / values.length;
+      for (E value : values) {
+        sum += (Float) value;
+      }
+
+      return sum / len;
+    }
+    else if (values.get(0) instanceof Double) {
+      double sum = 0;
+
+      for (E value : values) {
+        sum += (double) value;
+      }
+      return (float) sum / len;
+    }
+    else  if (values.get(0) instanceof Long) {
+      Long total = 0L;
+
+      for (E value : values){
+        total += (Long) value;
+      }
+      return (float) total / len;
+    }
+    else {
+      throw new UnsupportedOperationException("Unrecognizable format of "+values.get(0));
+    }
   }
 
   /**
@@ -89,7 +131,7 @@ public class EdgeGenQuality {
    * @param time time
    * @return array of property values
    */
-  private float[] getPropertyValuesInTime(int time) {
+  private List<E> getPropertyValuesInTime(int time) {
     return gridDataVariableValues.get(time);
   }
 

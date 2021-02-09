@@ -5,8 +5,7 @@ package fi.metatavu.airquality.configuration_parsing;
  */
 public class IndexVariable {
     private String name;
-    public String variable;
-    private DataType dataType;
+    private String variable;
 
     /**
      * Gets name.
@@ -44,31 +43,5 @@ public class IndexVariable {
         this.variable = variable;
     }
 
-    /**
-     * Gets data type.
-     *
-     * @return the data type
-     */
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    /**
-     * Sets data type.
-     *
-     * @param dataType the data type
-     */
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
-
-}
-
-/**
- * Type of index variable
- */
-enum DataType {
-    DOUBLE,
-    INTEGER
 }
 

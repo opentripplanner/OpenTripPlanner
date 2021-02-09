@@ -6,8 +6,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ucar.ma2.Array;
-import ucar.ma2.ArrayFloat;
+import ucar.ma2.*;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -25,15 +24,13 @@ public class GenericEdgeUpdater {
     private final GenericDataFile dataFile;
     private final Collection<StreetEdge> streetEdges;
 
-    private final Map<String, ArrayFloat.D4> fileGenericData;
-
+    private final Map<String, Array> genericVariablesData;
     private int edgesUpdated;
     private final long dataStartTime;
 
     /**
      * Calculates the generic data start time and sets the earlier parsed map of generic data file
-     *
-     * @param dataFile map of generic grid data from .nc file
+     *  @param dataFile map of generic grid data from .nc file
      * @param streetEdges collection of all street edges to be updated
      */
     public GenericEdgeUpdater(GenericDataFile dataFile, Collection<StreetEdge> streetEdges){
@@ -45,7 +42,7 @@ public class GenericEdgeUpdater {
         double startTimeHours = this.dataFile.getTimeArray().getDouble(0);
         this.dataStartTime = this.dataFile.getOriginDate().toInstant().plusSeconds((long) (startTimeHours * 3600)).toEpochMilli();
 
-        fileGenericData = dataFile.getNetcdfDataForVariable();
+        genericVariablesData = dataFile.getNetcdfDataForVariable();
         LOG.info(String.format("Street edges update starting from time stamp %d", this.dataStartTime));
     }
 
@@ -68,7 +65,7 @@ public class GenericEdgeUpdater {
         Coordinate toCoordinate = toVertex.getCoordinate();
 
         HashMap<String, float[]> edgeGenericDataValues = new HashMap<>();
-        for (Map.Entry<String, ArrayFloat.D4> variableValues : fileGenericData.entrySet()) {
+        for (Map.Entry<String, Array> variableValues : genericVariablesData.entrySet()) {
             float[] averageDataValue = getAverageValue(fromCoordinate.x, fromCoordinate.y,
                     toCoordinate.x, toCoordinate.y, variableValues.getKey());
             edgeGenericDataValues.put(variableValues.getKey(), averageDataValue);
@@ -97,15 +94,16 @@ public class GenericEdgeUpdater {
      * @return array of propertyName values samples in time
      */
     private float[] getAverageValue(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String propertyName) {
-        EdgeGenQuality edgeGenQuality = new EdgeGenQuality();
+        EdgeGenQuality edgeGenQuality =  new EdgeGenQuality();
 
-        getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, propertyName).forEach(sample -> {
-            for (int time = 0; time < sample.length; time++) {
-                edgeGenQuality.addPropertyValueSample(time, sample[time]);
-            }
-        });
+        getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, propertyName)
+                .forEach(sample -> {
+                    for (int time = 0; time < sample.size(); time++) {
+                        edgeGenQuality.addPropertyValueSample(time, (Number) sample.get(time));
+                    }
+                });
 
-        return edgeGenQuality.getPeroptyValuesAverages((int) dataFile.getTimeArray().getSize());
+        return edgeGenQuality.getPropertyValueAverage((int) dataFile.getTimeArray().getSize());
     }
 
     /**
@@ -120,15 +118,16 @@ public class GenericEdgeUpdater {
      * @param propertyName propertyName
      * @return closest grid data samples for given line
      */
-    private List<float[]> getClosestSamples(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String propertyName) {
-        List<float[]> result = new ArrayList<>();
+    private <E> List<List<E>> getClosestSamples(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String propertyName) {
+        List<List<E>> result = new ArrayList<>();
         double azimuth = getAzimuth(fromLongitude, fromLatitude, toLongitude, toLatitude);
         double distance = getDistance(fromLongitude, fromLatitude, toLongitude, toLatitude);
         double spacing = 12d;
 
         for (int i = 0; i < distance / spacing; i++) {
             Point2D samplePoint = moveTo(fromLongitude, fromLatitude, azimuth, i * spacing);
-            result.add(getClosestPropertyValue(samplePoint, propertyName));
+            List<E> closestPropertyValue = getClosestPropertyValue(samplePoint, propertyName);
+            result.add(closestPropertyValue);
         }
 
         return result;
@@ -139,11 +138,12 @@ public class GenericEdgeUpdater {
      *
      * Returned array represent value for selected property time
      *
+     * originally it was float []
      * @param samplePoint point
      * @param propertyName propertyName
      * @return result closest value for selected property for given point
      */
-    private float[] getClosestPropertyValue(Point2D samplePoint, String propertyName) {
+    private <E> List<E> getClosestPropertyValue(Point2D samplePoint, String propertyName) {
         double lon = samplePoint.getX();
         double lat = samplePoint.getY();
 
@@ -151,12 +151,22 @@ public class GenericEdgeUpdater {
         int latIndex = getClosestIndex(dataFile.getLatitudeArray(), lat);
 
         int timeSize = (int) dataFile.getTimeArray().getSize();
-        float[] result = new float[timeSize];
+        List result = new ArrayList<>();
         int height = 0;
 
         for (int timeIndex = 0; timeIndex < timeSize; timeIndex++) {
-            result[timeIndex] = fileGenericData.get(propertyName).get(timeIndex, height, latIndex, lonIndex);
+            Array dataArray = genericVariablesData.get(propertyName);
 
+            if (dataArray instanceof ArrayInt.D4)
+                result.add(timeIndex, ((ArrayInt.D4) dataArray).get(timeIndex, height, latIndex, lonIndex));
+            else if (dataArray instanceof ArrayDouble.D4)
+                result.add(timeIndex, ((ArrayDouble.D4) dataArray).get(timeIndex, height, latIndex, lonIndex));
+            else if (dataArray instanceof ArrayFloat.D4)
+                result.add(timeIndex, ((ArrayFloat.D4) dataArray).get(timeIndex, height, latIndex, lonIndex));
+            else if (dataArray instanceof ArrayLong.D4)
+                result.add(timeIndex, ((ArrayLong.D4) dataArray).get(timeIndex, height, latIndex, lonIndex));
+            else
+                throw new IllegalArgumentException(String.format("Unsupported format of %s variable", propertyName));
         }
 
         return result;
