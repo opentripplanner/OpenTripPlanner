@@ -5,6 +5,7 @@ import fi.metatavu.airquality.EdgeDataFromGenericFile;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
+import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -654,13 +655,24 @@ public class StreetEdge extends Edge implements Cloneable {
      * @return penalty
      */
     private double calculatePenaltyFromParameters (String formula, float value, RequestParameters threshold, RequestParameters penalty){
-        Expression expression = new ExpressionBuilder(formula)
-                .variables("VALUE", "THRESHOLD", "PENALTY")
-                .build()
-                .setVariable("VALUE", value)
-                .setVariable("THRESHOLD", Double.parseDouble(threshold.getValue()))
-                .setVariable("PENALTY", Double.parseDouble(penalty.getValue()));
-        return expression.evaluate();
+        Map<String, Double> variables = new HashMap<>();
+        if (threshold != null && threshold.getValue() != null)
+            variables.put("THRESHOLD", Double.parseDouble(threshold.getValue()));
+        if (penalty != null && penalty.getValue() != null)
+            variables.put("PENALTY", Double.parseDouble(penalty.getValue()));
+        variables.put("VALUE", (double) value);
+
+        try {
+            Expression expression = new ExpressionBuilder(formula)
+                    .variables(variables.keySet().toArray(new String[variables.size()]))
+                    .build()
+                    .setVariables(variables);
+            return expression.evaluate();
+
+        }
+        catch (UnknownFunctionOrVariableException ex){
+            throw new IllegalArgumentException(String.format("Formula %s did not receive all the required parameters", formula));
+        }
     }
 
     private double calculateOverageWeight(double firstValue, double secondValue, double maxValue,
