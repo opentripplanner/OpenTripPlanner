@@ -133,7 +133,7 @@ public class BookingInfoMapper {
         otpLatestBookingTime,
         minimumBookingNotice,
         Duration.ZERO,
-        bookingNote != null ? bookingNote.toString() : null,
+        bookingNote != null ? bookingNote.getValue() : null,
         null,
         null
     );

@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StreetNote;
@@ -160,6 +161,8 @@ public class Leg {
    public String boardRule;
 
    public String alightRule;
+
+   public BookingInfo bookingInfo = null;
 
    public Boolean rentedBike;
 

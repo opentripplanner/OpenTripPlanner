@@ -175,6 +175,8 @@ public class RaptorPathToItineraryMapper {
         leg.walkSteps = new ArrayList<>();
         leg.generalizedCost = pathLeg.generalizedCost();
 
+        leg.bookingInfo = tripTimes.getBookingInfo(boardStopIndexInPattern);
+
         // TODO OTP2 - alightRule and boardRule needs mapping
         //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary
         //    (the old API response element, within TripPlan). Non-transit trips still use GraphPathToTripPlanConverter

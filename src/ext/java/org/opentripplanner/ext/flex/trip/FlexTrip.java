@@ -4,7 +4,9 @@ import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -43,4 +45,6 @@ public abstract class FlexTrip extends TransitEntity {
   public Trip getTrip() {
     return trip;
   }
+
+  public abstract BookingInfo getBookingInfo(int i);
 }

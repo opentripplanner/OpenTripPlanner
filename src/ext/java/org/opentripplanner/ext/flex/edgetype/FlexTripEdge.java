@@ -91,4 +91,8 @@ public class FlexTripEdge extends Edge {
   public Trip getTrip() {
     return trip.getTrip();
   }
+
+  public FlexTrip getFlexTrip() {
+    return trip;
+  }
 }
