@@ -157,7 +157,7 @@ public final class Trip extends TransitEntity {
         return direction;
     }
 
-    public String getDirectionIdAsString(String unknownValue) {
+    public String getGtfsDirectionIdAsString(String unknownValue) {
         return direction.equals(Direction.UNKNOWN)
             ? unknownValue
             : Integer.toString(direction.gtfsCode);
