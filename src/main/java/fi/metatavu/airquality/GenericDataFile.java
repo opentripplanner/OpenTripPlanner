@@ -4,6 +4,7 @@ import fi.metatavu.airquality.configuration_parsing.IndexVariable;
 import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
+import ucar.ma2.ArrayInt;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFiles;
 import ucar.nc2.Variable;
@@ -29,7 +30,7 @@ public class GenericDataFile{
     private ucar.ma2.Array timeArray;
     private ucar.ma2.Array latitudeArray;
     private Array longitudeArray;
-    private Map<String, ArrayFloat.D4> netcdfDataForVariable;
+    private Map<String, Array> netcdfDataForVariable;
 
     /**
      * Reads and parses the .nc file according to configuration into map of variable names and arrays of their
@@ -89,8 +90,8 @@ public class GenericDataFile{
             longitudeArray = longitude.read();
 
             netcdfDataForVariable = new HashMap<>(genVariables.size());
-            for (Map.Entry<IndexVariable, Variable> genVariable : genVariables.entrySet()){
-                netcdfDataForVariable.put(genVariable.getKey().getName(), (ArrayFloat.D4) genVariable.getValue().read());
+            for (Map.Entry<IndexVariable, Variable> genVariable : genVariables.entrySet()) {
+                netcdfDataForVariable.put(genVariable.getKey().getName(), genVariable.getValue().read());
             }
         }
         catch (Exception e) {
@@ -103,7 +104,7 @@ public class GenericDataFile{
      *
      * @return map of variables names and corresponding grid data arrays
      */
-    public Map<String, ArrayFloat.D4> getNetcdfDataForVariable() {
+    public Map<String, Array> getNetcdfDataForVariable() {
         return netcdfDataForVariable;
     }
 

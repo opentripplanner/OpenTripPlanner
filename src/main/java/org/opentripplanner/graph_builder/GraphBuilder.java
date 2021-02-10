@@ -238,12 +238,13 @@ public class GraphBuilder implements Runnable {
         if (hasSettings) {
             DataSource settingsSource = dataSources.getDataSettings();
             GenericFileConfiguration[] genericFileConfigurations = GenericFileConfigurationParser.parse(settingsSource);
-
-            for (GenericFileConfiguration configuration : genericFileConfigurations) {
-                GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
+            if (genericFileConfigurations != null) {
+                for (GenericFileConfiguration configuration : genericFileConfigurations) {
+                    GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
                             configuration);
-                EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile);
-                graphBuilder.addModule(edgeUpdaterModule);
+                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile);
+                    graphBuilder.addModule(edgeUpdaterModule);
+                }
             }
         }
 
