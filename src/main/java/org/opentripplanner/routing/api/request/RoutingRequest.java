@@ -238,10 +238,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Whether the trip must be wheelchair accessible.
-     * @deprecated TODO OTP2 Regression. This is not implemented in Raptor yet, but will work with
-     *                 a walk-only search.
      */
-    @Deprecated
     public boolean wheelchairAccessible = false;
 
     /**
