@@ -82,8 +82,9 @@ public class EdgeGenQuality <E extends  Number> {
 
   /**
    * Calculates average float value for list of values
-   * @param values
-   * @return
+   *
+   * @param values list of values
+   * @return average value for the list
    */
   private float calculateAverage(List<E> values) {
     int len = values.size();

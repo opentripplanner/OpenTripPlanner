@@ -656,15 +656,20 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     private double calculatePenaltyFromParameters (String formula, float value, RequestParameters threshold, RequestParameters penalty){
         Map<String, Double> variables = new HashMap<>();
-        if (threshold != null && threshold.getValue() != null)
+
+        if (threshold != null && threshold.getValue() != null) {
             variables.put("THRESHOLD", Double.parseDouble(threshold.getValue()));
-        if (penalty != null && penalty.getValue() != null)
+        }
+
+        if (penalty != null && penalty.getValue() != null) {
             variables.put("PENALTY", Double.parseDouble(penalty.getValue()));
+        }
+
         variables.put("VALUE", (double) value);
 
         try {
             Expression expression = new ExpressionBuilder(formula)
-                    .variables(variables.keySet().toArray(new String[variables.size()]))
+                    .variables(variables.keySet().toArray(new String[0]))
                     .build()
                     .setVariables(variables);
             return expression.evaluate();

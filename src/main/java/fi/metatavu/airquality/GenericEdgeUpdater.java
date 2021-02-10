@@ -30,7 +30,8 @@ public class GenericEdgeUpdater {
 
     /**
      * Calculates the generic data start time and sets the earlier parsed map of generic data file
-     *  @param dataFile map of generic grid data from .nc file
+     *
+     * @param dataFile map of generic grid data from .nc file
      * @param streetEdges collection of all street edges to be updated
      */
     public GenericEdgeUpdater(GenericDataFile dataFile, Collection<StreetEdge> streetEdges){
@@ -94,7 +95,7 @@ public class GenericEdgeUpdater {
      * @return array of propertyName values samples in time
      */
     private float[] getAverageValue(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude, String propertyName) {
-        EdgeGenQuality edgeGenQuality =  new EdgeGenQuality();
+        EdgeGenQuality<Number> edgeGenQuality =  new EdgeGenQuality<>();
 
         getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, propertyName)
                 .forEach(sample -> {
