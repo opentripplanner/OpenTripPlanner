@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import graphql.schema.GraphQLEnumType;
+import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
@@ -238,11 +239,11 @@ public class EnumTypes {
 
     public static GraphQLEnumType DIRECTION_TYPE = GraphQLEnumType.newEnum()
             .name("DirectionType")
-            .value("unknown",-1)
-            .value("outbound", 0)
-            .value("inbound", 1)
-            .value("clockwise", 2)
-            .value("anticlockwise", 3)
+            .value("unknown", Direction.UNKNOWN)
+            .value("outbound", Direction.OUTBOUND)
+            .value("inbound", Direction.INBOUND)
+            .value("clockwise", Direction.CLOCKWISE)
+            .value("anticlockwise", Direction.ANTICLOCKWISE)
             .build();
 
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {

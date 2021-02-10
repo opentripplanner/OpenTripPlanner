@@ -95,7 +95,7 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("directionType")
                     .type(EnumTypes.DIRECTION_TYPE)
-                    .dataFetcher(environment -> directionIdToInt(trip(environment).getDirectionId()))
+                    .dataFetcher(environment -> trip(environment).getDirection())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("wheelchairAccessible")
@@ -210,9 +210,5 @@ public class ServiceJourneyType {
 
   private static Trip trip(DataFetchingEnvironment environment) {
     return environment.getSource();
-  }
-
-  private static int directionIdToInt(Integer directionId) {
-    return directionId == null ? -1 : directionId;
   }
 }

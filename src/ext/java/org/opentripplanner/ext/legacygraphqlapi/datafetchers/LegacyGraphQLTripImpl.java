@@ -79,7 +79,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> directionId() {
-    return environment -> getSource(environment).getDirectionIdAsString(null);
+    return environment -> getSource(environment).getGtfsDirectionIdAsString(null);
   }
 
   @Override

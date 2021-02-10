@@ -80,7 +80,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
             this.servicesRunningForDate = routingService.getServicesRunningForDate(date);
         }
         for (TripPattern pattern : routingService.getPatternsForRoute().get(route)) {
-            if (pattern.directionId != direction) continue;
+            if (pattern.getDirection().gtfsCode != direction) continue;
             for (TripTimes times : pattern.scheduledTimetable.tripTimes) {
                 if (times.getScheduledDepartureTime(0) == startTime &&
                         servicesRunningForDate.get(times.serviceCode)) {
