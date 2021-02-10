@@ -1,10 +1,12 @@
 package org.opentripplanner.routing.trippattern;
 
 import com.google.common.collect.Maps;
+import org.opentripplanner.model.BookingInfo;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,6 +20,7 @@ public class Deduplicator implements Serializable {
     private final Map<String, String> canonicalStrings = Maps.newHashMap();
     private final Map<BitSet, BitSet> canonicalBitSets = Maps.newHashMap();
     private final Map<StringArray, StringArray> canonicalStringArrays = Maps.newHashMap();
+    private final Map<GenericArray<BookingInfo>, GenericArray<BookingInfo>> canonicalBookingInfoArrays = new HashMap<>();
 
     /** Free up any memory used by the deduplicator. */
     public void reset() {
@@ -25,6 +28,7 @@ public class Deduplicator implements Serializable {
         canonicalStrings.clear();
         canonicalBitSets.clear();
         canonicalStringArrays.clear();
+        canonicalBookingInfoArrays.clear();
     }
 
     /** Used to deduplicate time and stop sequence arrays. The same times may occur in many trips. */
@@ -69,6 +73,17 @@ public class Deduplicator implements Serializable {
         return canonical.array;
     }
 
+    public BookingInfo[] deduplicateBookingInfoArray(BookingInfo[] original) {
+        if (original == null) { return null; }
+        GenericArray<BookingInfo> canonical =
+            canonicalBookingInfoArrays.get(new GenericArray<>(original));
+        if (canonical == null) {
+            canonical = new GenericArray<>(original);
+            canonicalBookingInfoArrays.put(canonical, canonical);
+        }
+        return canonical.array;
+    }
+
     /** A wrapper for a primitive int array. This is insane but necessary in Java. */
     private class IntArray implements Serializable {
         private static final long serialVersionUID = 20140524L;
@@ -104,6 +119,25 @@ public class Deduplicator implements Serializable {
         public boolean equals (Object other) {
             if (other instanceof StringArray) {
                 return Arrays.equals(array, ((StringArray) other).array);
+            } else return false;
+        }
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(array);
+        }
+    }
+
+    /** A wrapper for a Generic array.*/
+    private static class GenericArray<T> implements Serializable {
+        private static final long serialVersionUID = 20140524L;
+        final T[] array;
+        GenericArray(T[] array) {
+            this.array = array;
+        }
+        @Override
+        public boolean equals (Object other) {
+            if (other instanceof GenericArray<?>) {
+                return Arrays.equals(array, ((GenericArray<?>) other).array);
             } else return false;
         }
         @Override
