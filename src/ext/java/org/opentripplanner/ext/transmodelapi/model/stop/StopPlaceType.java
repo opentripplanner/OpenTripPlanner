@@ -387,7 +387,7 @@ public class StopPlaceType {
   }
 
   private static String destinationDisplayPerLine(TripTimeShort t, RoutingService routingService) {
-    Trip trip = routingService.getTripForId().get(t.tripId);
-    return trip == null ? t.headsign : trip.getRoute().getId() + "|" + t.headsign;
+    Trip trip = routingService.getTripForId().get(t.getTripId());
+    return trip == null ? t.getHeadsign() : trip.getRoute().getId() + "|" + t.getHeadsign();
   }
 }

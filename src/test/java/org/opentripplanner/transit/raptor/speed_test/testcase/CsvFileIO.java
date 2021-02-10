@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import com.csvreader.CsvReader;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.io.File;
 import java.io.IOException;

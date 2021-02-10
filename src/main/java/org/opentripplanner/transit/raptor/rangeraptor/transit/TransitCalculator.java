@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
-import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
+import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
@@ -55,7 +55,6 @@ public interface TransitCalculator {
      */
     <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack);
 
-
     /**
      * Stop the search when the time exceeds the latest-acceptable-arrival-time.
      * In a reverse search this is the earliest acceptable departure time.
@@ -71,10 +70,10 @@ public interface TransitCalculator {
 
     /**
      * Return true is the first argument (subject) is the best time, and false if not. If both
-     * are equal false is retuned.
+     * are equal false is returned.
      * <p/>
      * In a normal forward search "best" is considered BEFORE in time, while AFTER in time
-     * is considered best in a reverse seach.
+     * is considered best in a reverse search.
      *
      * @return true is subject is better then the candidate; if not false.
      */

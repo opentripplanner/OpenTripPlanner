@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This class is used to find the board and alight time for a known trip, where you now the

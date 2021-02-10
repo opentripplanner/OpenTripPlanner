@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor._data.transit;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.

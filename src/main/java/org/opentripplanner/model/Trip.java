@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import javax.validation.constraints.NotNull;
+
 public final class Trip extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
@@ -19,7 +21,8 @@ public final class Trip extends TransitEntity {
 
     private String routeShortName;
 
-    private Integer directionId;
+    @NotNull
+    private Direction direction = Direction.UNKNOWN;
 
     private String blockId;
 
@@ -49,7 +52,7 @@ public final class Trip extends TransitEntity {
         this.tripShortName = obj.tripShortName;
         this.tripHeadsign = obj.tripHeadsign;
         this.routeShortName = obj.routeShortName;
-        this.directionId = obj.directionId;
+        this.direction = obj.direction;
         this.blockId = obj.blockId;
         this.shapeId = obj.shapeId;
         this.wheelchairAccessible = obj.wheelchairAccessible;
@@ -145,16 +148,24 @@ public final class Trip extends TransitEntity {
         this.routeShortName = routeShortName;
     }
 
-    public Integer getDirectionId() {
-        return directionId;
+    // TODO Consider moving this to the TripPattern class once we have refactored the transit model
+    /**
+     * The direction for this Trip (and all other Trips in this TripPattern).
+     */
+    @NotNull
+    public Direction getDirection() {
+        return direction;
     }
 
-    public String getDirectionIdAsString(String unknownValue) {
-        return directionId == null ? unknownValue : Integer.toString(directionId);
+    public String getGtfsDirectionIdAsString(String unknownValue) {
+        return direction.equals(Direction.UNKNOWN)
+            ? unknownValue
+            : Integer.toString(direction.gtfsCode);
     }
 
-    public void setDirectionId(Integer directionId) {
-        this.directionId = directionId;
+    public void setDirection(Direction direction) {
+        // Enforce non-null
+        this.direction = direction != null ? direction : Direction.UNKNOWN;
     }
 
     public String getBlockId() {

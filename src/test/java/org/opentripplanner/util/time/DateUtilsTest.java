@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.util.time;
 
 import org.junit.Test;
 
@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.util.DateUtils.secToHHMM;
+import static org.opentripplanner.util.time.DateUtils.secToHHMM;
 
 public class DateUtilsTest {
 

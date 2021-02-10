@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-import org.opentripplanner.util.TimeToStringConverter;
+import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
@@ -271,8 +271,8 @@ public final class StopTime implements Comparable<StopTime> {
 
     @Override
     public String toString() {
-        return "StopTime(seq=" + getStopSequence() + " stop=" + getStop().getId() + " trip="
-                + getTrip().getId() + " times=" + TimeToStringConverter.toHH_MM_SS(getArrivalTime())
-                + "-" + TimeToStringConverter.toHH_MM_SS(getDepartureTime()) + ")";
+      return "StopTime(seq=" + getStopSequence() + " stop=" + getStop().getId() + " trip="
+                + getTrip().getId() + " times=" + TimeUtils.timeToStrLong(getArrivalTime())
+                + "-" + TimeUtils.timeToStrLong(getDepartureTime()) + ")";
     }
 }

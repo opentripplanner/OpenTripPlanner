@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 public class AccessStopArrivalState<T extends RaptorTripSchedule> extends StopArrivalState<T> {
 

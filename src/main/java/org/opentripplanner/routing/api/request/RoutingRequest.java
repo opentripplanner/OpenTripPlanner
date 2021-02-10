@@ -22,7 +22,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.util.DateUtils;
+import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,10 +238,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Whether the trip must be wheelchair accessible.
-     * @deprecated TODO OTP2 Regression. This is not implemented in Raptor yet, but will work with
-     *                 a walk-only search.
      */
-    @Deprecated
     public boolean wheelchairAccessible = false;
 
     /**

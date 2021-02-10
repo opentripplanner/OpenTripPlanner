@@ -67,21 +67,8 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
         // for alighting when boarding
         if (onTripIndex != NOT_SET) {
             if (pattern.alightingPossibleAt(stopPositionInPattern)) {
-                // In the normal case the trip alightTime is used,
-                // but in reverse search the board-slack is added; hence the calculator
-                // delegation
-                final int alightTime = calculator.stopArrivalTime(
-                    onTrip,
-                    stopPositionInPattern,
-                    slackProvider.alightSlack()
-                );
-                state.transitToStop(
-                    stop,
-                    alightTime,
-                    onTripBoardStop,
-                    onTripBoardTime,
-                    onTrip
-                );
+                final int alightTime = alightTime(onTrip, stopPositionInPattern);
+                state.transitToStop(stop, alightTime, onTripBoardStop, onTripBoardTime, onTrip);
             }
         }
 
@@ -89,16 +76,15 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
         // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
         if (state.isStopReachedInPreviousRound(stop)) {
             if (pattern.boardingPossibleAt(stopPositionInPattern)) {
-
-                // Calculate the earliest possible board time, adding board slack (alight slack if in
-                // reverse). The slackProvider takes care of picking the correct board/alight slack.
+                // Add board-slack(forward-search) or alight-slack(reverse-search)
                 int earliestBoardTime = calculator.plusDuration(
                     state.bestTimePreviousRound(stop),
                     slackProvider.boardSlack()
                 );
 
                 // check if we can back up to an earlier trip due to this stop being reached earlier
-                boolean found = tripSearch.search(earliestBoardTime,
+                boolean found = tripSearch.search(
+                    earliestBoardTime,
                     stopPositionInPattern,
                     onTripIndex
                 );
@@ -111,5 +97,14 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
                 }
             }
         }
+    }
+
+    private int alightTime(final T trip, final int stopPositionInPattern) {
+        // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
+        return calculator.stopArrivalTime(
+            trip,
+            stopPositionInPattern,
+            slackProvider.alightSlack()
+        );
     }
 }

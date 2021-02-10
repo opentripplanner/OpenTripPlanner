@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.basicTripByReverseSearch;

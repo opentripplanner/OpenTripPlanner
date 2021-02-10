@@ -100,11 +100,11 @@ public class ValueObjectToStringBuilderTest {
                 subject().addServiceTime(35).toString()
         );
         assertEquals(
-                "26:50:45",
+                "02:50:45+1d",
                 subject().addServiceTime((26 * 60 + 50) * 60 + 45).toString()
         );
         assertEquals(
-                "-00:00:01",
+                "23:59:59-1d",
                 subject().addServiceTime(-1).toString()
         );
     }

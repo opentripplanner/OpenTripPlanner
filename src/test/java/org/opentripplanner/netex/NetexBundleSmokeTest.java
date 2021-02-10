@@ -136,7 +136,7 @@ public class NetexBundleSmokeTest {
     private void assertTripPatterns(Collection<TripPattern> patterns) {
         Map<FeedScopedId, TripPattern> map = patterns.stream().collect(Collectors.toMap(TripPattern::getId, s -> s));
         TripPattern p = map.get(fId("RUT:JourneyPattern:12-1"));
-        assertEquals("Jernbanetorget", p.getDirection());
+        assertEquals("Jernbanetorget", p.getTripHeadsign());
         assertEquals("RB", p.getFeedId());
         assertEquals("[<Stop RB:NSR:Quay:7203>, <Stop RB:NSR:Quay:8027>]", p.getStops().toString());
         assertEquals("[<Trip RB:RUT:ServiceJourney:12-101375-1000>]", p.getTrips().toString());

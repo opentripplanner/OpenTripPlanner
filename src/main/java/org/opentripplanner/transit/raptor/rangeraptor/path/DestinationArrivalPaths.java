@@ -61,7 +61,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     public void add(
         ArrivalView<T> egressStopArrival,
         RaptorTransfer egressPath,
-        int additionalCost
+        int aggregatedCost
     ) {
         int departureTime = transitCalculator.departureTime(
             egressPath,
@@ -83,7 +83,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         );
 
         int waitTimeInSeconds = Math.abs(departureTime - egressStopArrival.arrivalTime());
-        int cost = additionalCost == 0 ? 0 : additionalCost + costCalculator.waitCost(waitTimeInSeconds);
+
+        // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
+        // If the aggregatedCost exist(McRaptor), then the cost of waiting is added.
+        int cost = aggregatedCost == 0 ? 0 : aggregatedCost + costCalculator.waitCost(waitTimeInSeconds);
 
         DestinationArrival<T> destArrival = new DestinationArrival<>(
             egressPath,

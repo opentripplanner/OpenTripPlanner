@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;

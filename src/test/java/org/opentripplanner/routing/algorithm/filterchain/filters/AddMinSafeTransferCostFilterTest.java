@@ -2,33 +2,25 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.parseDuration;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.parseTimeCompact;
+import static org.opentripplanner.util.time.TimeUtils.time;
 
-public class AddMinSafeTransferCostFilterTest {
+public class AddMinSafeTransferCostFilterTest implements PlanTestConstants {
 
-  private static final int D2m = parseDuration("2m");
-  private static final int D24m = parseDuration("24m");
-  private static final int D40m = parseDuration("40m");
-
-  private static final int T10_00 = noonTime("10:00");
-  private static final int T15_00 = noonTime("15:00");
-  private static final int T15_01 = noonTime("15:01");
-  private static final int T15_10 = noonTime("15:10");
-  private static final int T16_00 = noonTime("16:00");
-  private static final int T16_11 = noonTime("16:11");
-  private static final int T16_30 = noonTime("16:30");
-  private static final int T23_00 = noonTime("23:00");
+  private static final int T10_00 = time("10:00");
+  private static final int T15_00 = time("15:00");
+  private static final int T15_01 = time("15:01");
+  private static final int T15_10 = time("15:10");
+  private static final int T16_00 = time("16:00");
+  private static final int T16_11 = time("16:11");
+  private static final int T16_30 = time("16:30");
+  private static final int T23_00 = time("23:00");
 
   /* Trip ids */
   private static final int R1 = 1;
@@ -58,8 +50,8 @@ public class AddMinSafeTransferCostFilterTest {
 
   @Test
   public void testTestSetUp() {
-    assertEquals(-120, T10_00);
-    assertEquals(180, T15_00);
+    assertEquals(10*3600, T10_00);
+    assertEquals(15*3600, T15_00);
   }
 
   @Test
@@ -100,13 +92,13 @@ public class AddMinSafeTransferCostFilterTest {
   @Test
   public void minSafeTransferTimeUpperBound() {
     assertEquals(D40m, subject.minSafeTransferTime(
-        List.of(newItinerary(A).rail(R1, T10_00, noonTime("20:00"), E).build())
+        List.of(newItinerary(A).rail(R1, T10_00, time("20:00"), E).build())
     ));
     assertEquals(D40m, subject.minSafeTransferTime(
-        List.of(newItinerary(A).rail(R1, T10_00, noonTime("20:01"), E).build())
+        List.of(newItinerary(A).rail(R1, T10_00, time("20:01"), E).build())
     ));
     assertEquals(D40m, subject.minSafeTransferTime(
-        List.of(newItinerary(A).rail(R1, T10_00, noonTime("22:00"), E).build())
+        List.of(newItinerary(A).rail(R1, T10_00, time("22:00"), E).build())
     ));
   }
 
@@ -116,10 +108,5 @@ public class AddMinSafeTransferCostFilterTest {
         "add-min-safe-transfer-cost-filter{minSafeTransferTimeFactor: 2.0}",
         subject.toString()
     );
-  }
-
-  /** Time relative to noon in minutes */
-  private static int noonTime(String time) {
-    return parseTimeCompact(time) / 60 - 12 * 60;
   }
 }

@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.util;
 
+import org.opentripplanner.util.time.TimeUtils;
+
 import java.util.Comparator;
 import java.util.function.IntFunction;
 

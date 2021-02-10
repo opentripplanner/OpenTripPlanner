@@ -211,30 +211,32 @@ public class OSMDatabase {
     public void addNode(OSMNode node) {
         if (node.isBikeRental()) {
             bikeRentalNodes.put(node.getId(), node);
-            return;
         }
         if (node.isBikeParking()) {
             bikeParkingNodes.put(node.getId(), node);
-            return;
         }
         if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
-                .isStop()))
+                .isStop())) {
             return;
+        }
 
-        if (nodesById.containsKey(node.getId()))
+        if (nodesById.containsKey(node.getId())) {
             return;
+        }
 
         nodesById.put(node.getId(), node);
 
-        if (nodesById.size() % 100000 == 0)
+        if (nodesById.size() % 100000 == 0) {
             LOG.debug("nodes=" + nodesById.size());
+        }
     }
 
     public void addWay(OSMWay way) {
         /* only add ways once */
         long wayId = way.getId();
-        if (waysById.containsKey(wayId) || areaWaysById.containsKey(wayId))
+        if (waysById.containsKey(wayId) || areaWaysById.containsKey(wayId)) {
             return;
+        }
 
         if (areaWayIds.contains(wayId)) {
             areaWaysById.put(wayId, way);
@@ -266,13 +268,15 @@ public class OSMDatabase {
 
         waysById.put(wayId, way);
 
-        if (waysById.size() % 10000 == 0)
+        if (waysById.size() % 10000 == 0) {
             LOG.debug("ways=" + waysById.size());
+        }
     }
 
     public void addRelation(OSMRelation relation) {
-        if (relationsById.containsKey(relation.getId()))
+        if (relationsById.containsKey(relation.getId())) {
             return;
+        }
 
         if (relation.isTag("type", "multipolygon")
                 && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide())) {
@@ -299,8 +303,9 @@ public class OSMDatabase {
 
         relationsById.put(relation.getId(), relation);
 
-        if (relationsById.size() % 100 == 0)
+        if (relationsById.size() % 100 == 0) {
             LOG.debug("relations=" + relationsById.size());
+        }
     }
 
     /**
@@ -412,8 +417,9 @@ public class OSMDatabase {
 
                 Envelope env = new Envelope(nA.lon, nB.lon, nA.lat, nB.lat);
                 List<RingSegment> ringSegments = spndx.query(env);
-                if (ringSegments.size() == 0)
+                if (ringSegments.size() == 0) {
                     continue;
+                }
                 LineString seg = GeometryUtils.makeLineString(nA.lon, nA.lat, nB.lon, nB.lat);
                 
                 for (RingSegment ringSegment : ringSegments) {
@@ -423,13 +429,15 @@ public class OSMDatabase {
                     if (ringSegment.nA.getId() == nA.getId()
                             || ringSegment.nA.getId() == nB.getId()
                             || ringSegment.nB.getId() == nA.getId()
-                            || ringSegment.nB.getId() == nB.getId())
+                            || ringSegment.nB.getId() == nB.getId()) {
                         continue;
+                    }
                     
                     // Skip if area and way are from "incompatible" levels
                     OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
-                    if (!wayLevel.equals(areaLevel))
+                    if (!wayLevel.equals(areaLevel)) {
                         continue;
+                    }
 
                     // Check for real intersection
                     LineString seg2 = GeometryUtils.makeLineString(ringSegment.nA.lon,
@@ -470,22 +478,27 @@ public class OSMDatabase {
                         	// This node is already a part of this ring (perhaps we inserted it previously). No need to connect again.
                         	// Note that this may not be a safe assumption to make in all cases; suppose a way were to cross exactly over a node *twice*,
                         	// we would only add it the first time.
-                        	continue;
+                        {
+                            continue;
+                        }
                         
-                        if (checkDistanceWithin(ringSegment.nA, nA, epsilon) || checkDistanceWithin(ringSegment.nB, nA, epsilon))
-                                LOG.info("Node {} in way {} is coincident but disconnected with area {}",
-                                    	nA.getId(), way.getId(), ringSegment.area.parent.getId());
+                        if (checkDistanceWithin(ringSegment.nA, nA, epsilon) || checkDistanceWithin(ringSegment.nB, nA, epsilon)) {
+                            LOG.info("Node {} in way {} is coincident but disconnected with area {}",
+                                    nA.getId(), way.getId(), ringSegment.area.parent.getId());
+                        }
                     }
                     else if (checkIntersectionDistance(p, nB, epsilon)) {
                     	// insert node B into the ring segment
                         splitNode = nB;
                         
-                        if (ringSegment.ring.nodes.contains(splitNode))
-                        	continue;
+                        if (ringSegment.ring.nodes.contains(splitNode)) {
+                            continue;
+                        }
                         
-                        if (checkDistanceWithin(ringSegment.nA, nB, epsilon) || checkDistanceWithin(ringSegment.nB, nB, epsilon))
+                        if (checkDistanceWithin(ringSegment.nA, nB, epsilon) || checkDistanceWithin(ringSegment.nB, nB, epsilon)) {
                             LOG.info("Node {} in way {} is coincident but disconnected with area {}",
                                 	nB.getId(), way.getId(), ringSegment.area.parent.getId());
+                        }
                     }
                     else if (checkIntersectionDistance(p, ringSegment.nA, epsilon)) {
                     	// insert node A into the road, if it's not already there
@@ -653,7 +666,9 @@ public class OSMDatabase {
             TLongIterator longIterator = way.getNodeRefs().iterator();
             while (longIterator.hasNext()) {
                 long nodeRef = longIterator.next();
-                if (!nodesById.containsKey(nodeRef)) continue AREA;
+                if (!nodesById.containsKey(nodeRef)) {
+                    continue AREA;
+                }
             }
             try {
                 newArea(new Area(way, Arrays.asList(way), Collections.emptyList(), nodesById));
@@ -943,24 +958,27 @@ public class OSMDatabase {
         for (OSMRelationMember member : relation.getMembers()) {
             if ("way".equals(member.getType()) && "platform".equals(member.getRole())
                     && areaWayIds.contains(member.getRef())) {
-                if (platformArea == null)
+                if (platformArea == null) {
                     platformArea = areaWaysById.get(member.getRef());
-                else
+                } else {
                     issueStore.add(new TooManyAreasInRelation(relation.getId()));
+                }
             } else if ("relation".equals(member.getType()) && "platform".equals(member.getRole())
                     && relationsById.containsKey(member.getRef())) {
-                if (platformArea == null)
+                if (platformArea == null) {
                     platformArea = relationsById.get(member.getRef());
-                else
+                } else {
                     issueStore.add(new TooManyAreasInRelation(relation.getId()));
+                }
             } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
                 platformsNodes.add(nodesById.get(member.getRef()));
             }
         }
-        if (platformArea != null && !platformsNodes.isEmpty())
+        if (platformArea != null && !platformsNodes.isEmpty()) {
             stopsInAreas.put(platformArea, platformsNodes);
-        else
+        } else {
             issueStore.add(new PublicTransportRelationSkipped(relation.getId()));
+        }
     }
 
     private String addUniqueName(String routes, String name) {

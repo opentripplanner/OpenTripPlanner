@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Arrays;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -106,6 +108,23 @@ public class TripPatternForDate {
         TripPatternForDate that = (TripPatternForDate) o;
 
         return tripPattern.equals(that.tripPattern) && localDate.equals(that.localDate);
+    }
+
+    public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
+        List<TripTimes> filteredTripTimes = Arrays.stream(tripTimes)
+            .filter(filter)
+            .collect(Collectors.toList());
+
+        if (tripTimes.length == filteredTripTimes.size()) {
+            return this;
+        }
+
+        TripTimes[] filteredTripTimesArray = new TripTimes[filteredTripTimes.size()];
+        return new TripPatternForDate(
+            tripPattern,
+            filteredTripTimes.toArray(filteredTripTimesArray),
+            localDate
+        );
     }
 
     @Override
