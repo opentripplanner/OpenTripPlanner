@@ -103,7 +103,10 @@ public class BookingInfoMapper {
         contactStructure.getFax(),
         null,
         contactStructure.getUrl(),
-        null
+        contactStructure.getFurtherDetails() != null
+            ? contactStructure.getFurtherDetails()
+            .getValue()
+            : null
     );
 
     EnumSet<BookingMethod> bookingMethods = bookingMethodEnum
