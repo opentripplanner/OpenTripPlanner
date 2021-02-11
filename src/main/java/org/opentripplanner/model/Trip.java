@@ -45,7 +45,7 @@ public final class Trip extends TransitEntity {
      *
      * This is planned, by default (e.g. GTFS and if not set explicit).
      */
-    private TripAlteration alteration = TripAlteration.planned;
+    private TripAlteration alteration = TripAlteration.PLANNED;
 
     public Trip(FeedScopedId id) {
         super(id);

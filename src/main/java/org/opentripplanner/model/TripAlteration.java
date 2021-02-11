@@ -1,12 +1,16 @@
 package org.opentripplanner.model;
 
+/**
+ * Alterations specified on a Trip in the planned data. This is in some ways equivalent with GTFS-RT
+ * scheduled relationship.
+ */
 public enum TripAlteration {
-  cancellation,
-  planned,
-  extraJourney,
-  replaced;
+  CANCELLATION,
+  PLANNED,
+  EXTRA_JOURNEY,
+  REPLACED;
 
   public boolean isCanceledOrReplaced() {
-    return this == cancellation || this == replaced;
+    return this == CANCELLATION || this == REPLACED;
   }
 }
