@@ -115,6 +115,10 @@ public class TripPatternForDate {
             .filter(filter)
             .collect(Collectors.toList());
 
+        if (filteredTripTimes.isEmpty()) {
+            return null;
+        }
+
         if (tripTimes.length == filteredTripTimes.size()) {
             return this;
         }

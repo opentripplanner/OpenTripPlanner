@@ -89,6 +89,13 @@ public class TripQuery {
             .build()
         )
         .argument(GraphQLArgument.newArgument()
+            .name("includePlannedCancellations")
+            .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
+            .type(Scalars.GraphQLBoolean)
+            .defaultValue(routing.request.includePlannedCancellations)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
             .name("locale")
             .description(
                 "The preferable language to use for text targeted the end user. Note! The data "

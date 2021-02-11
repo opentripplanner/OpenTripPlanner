@@ -579,6 +579,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean ignoreRealtimeUpdates = false;
 
     /**
+     * When true, trips cancelled in scheduled data are included in this search.
+     */
+    public boolean includePlannedCancellations = false;
+
+    /**
      * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
      * distance path service.
      *

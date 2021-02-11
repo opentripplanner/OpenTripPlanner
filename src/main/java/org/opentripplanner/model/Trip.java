@@ -40,6 +40,13 @@ public final class Trip extends TransitEntity {
     /** Custom extension for KCM to specify a fare per-trip */
     private String fareId;
 
+    /**
+     * Default alteration for a trip. // TODO Implement alterations for DSJ
+     *
+     * This is planned, by default (e.g. GTFS and if not set explicit).
+     */
+    private TripAlteration alteration = TripAlteration.PLANNED;
+
     public Trip(FeedScopedId id) {
         super(id);
     }
@@ -226,6 +233,16 @@ public final class Trip extends TransitEntity {
 
     public void setFareId(String fareId) {
         this.fareId = fareId;
+    }
+
+    public TripAlteration getTripAlteration() {
+        return alteration;
+    }
+
+    public void setAlteration(TripAlteration tripAlteration) {
+        if (tripAlteration != null) {
+            this.alteration = tripAlteration;
+        }
     }
 
     private boolean hasValue(String text) {

@@ -365,6 +365,7 @@ public class SpeedTest {
         TransitDataProviderFilter transitDataProviderFilter = new RoutingRequestTransitDataProviderFilter(
                 false,
                 false,
+                false,
                 request.getTransitModes(),
                 Set.of()
         );
