@@ -18,12 +18,24 @@ public class BookingInfo implements Serializable {
 
   private final EnumSet<BookingMethod> bookingMethods;
 
+  /**
+   * Cannot be set at the same time as minimumBookingNotice or maximumBookingNotice
+   */
   private final BookingTime earliestBookingTime;
 
+  /**
+   * Cannot be set at the same time as minimumBookingNotice or maximumBookingNotice
+   */
   private final BookingTime latestBookingTime;
 
+  /**
+   * Cannot be set at the same time as earliestBookingTime or latestBookingTime
+   */
   private final Duration minimumBookingNotice;
 
+  /**
+   * Cannot be set at the same time as earliestBookingTime or latestBookingTime
+   */
   private final Duration maximumBookingNotice;
 
   private final String message;
@@ -45,13 +57,28 @@ public class BookingInfo implements Serializable {
   ) {
     this.contactInfo = contactInfo;
     this.bookingMethods = bookingMethods;
-    this.earliestBookingTime = earliestBookingTime;
-    this.latestBookingTime = latestBookingTime;
-    this.minimumBookingNotice = minimumBookingNotice;
-    this.maximumBookingNotice = maximumBookingNotice;
     this.message = message;
     this.pickupMessage = pickupMessage;
     this.dropOffMessage = dropOffMessage;
+
+    // Ensure that earliestBookingTime/latestBookingTime is not set at the same time as
+    // minimumBookingNotice/maximumBookingNotice
+    if (earliestBookingTime != null || latestBookingTime != null) {
+      this.earliestBookingTime = earliestBookingTime;
+      this.latestBookingTime = latestBookingTime;
+      this.minimumBookingNotice = null;
+      this.maximumBookingNotice = null;
+    } else if (minimumBookingNotice != null || maximumBookingNotice != null) {
+      this.earliestBookingTime = null;
+      this.latestBookingTime = null;
+      this.minimumBookingNotice = minimumBookingNotice;
+      this.maximumBookingNotice = maximumBookingNotice;
+    } else {
+      this.earliestBookingTime = null;
+      this.latestBookingTime = null;
+      this.minimumBookingNotice = null;
+      this.maximumBookingNotice = null;
+    }
   }
 
   public ContactInfo getContactInfo() {
