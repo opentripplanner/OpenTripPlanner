@@ -99,9 +99,10 @@ public class TripPatternForDateMapper {
             return null;
         }
 
-        return new TripPatternForDate(newTripPatternForOld.get(oldTripPattern),
-                times.toArray(TripTimes[]::new),
-                ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
+        return new TripPatternForDate(
+            newTripPatternForOld.get(oldTripPattern),
+            times,
+            ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
         );
     }
 }

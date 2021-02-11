@@ -33,7 +33,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
     ZonedDateTime startOfTime = DateMapper.asStartOfService(second, ZoneId.of("Europe/London"));
 
-    TripTimes[] tripTimes = new TripTimes[] {createTripTimesForTest()};
+    List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 
     // Total available trip patterns
     TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1, null, null);

@@ -132,7 +132,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     TripTimes tripTimes = Mockito.mock(TripTimes.class);
 
-    return new TripPatternForDate(tripPattern, new TripTimes[] {tripTimes}, LocalDate.now());
+    return new TripPatternForDate(tripPattern, List.of(tripTimes), LocalDate.now());
   }
 
   private TripTimes createTestTripTimes() {
