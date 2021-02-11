@@ -20,6 +20,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private int earliestDepartureTime;
     private int latestArrivalTime;
     private int searchWindowInSeconds;
+    private boolean preferLateArrival;
     private int numberOfAdditionalTransfers;
     private int maxNumberOfTransfers;
     private double relaxCostAtDestination;
@@ -32,6 +33,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.earliestDepartureTime = defaults.earliestDepartureTime();
         this.latestArrivalTime = defaults.latestArrivalTime();
         this.searchWindowInSeconds = defaults.searchWindowInSeconds();
+        this.preferLateArrival = defaults.preferLateArrival();
         this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
         this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
@@ -75,6 +77,15 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.searchWindowInSeconds = searchWindow == null
                 ? SearchParams.NOT_SET
                 : (int)searchWindow.toSeconds();
+        return this;
+    }
+
+    public boolean preferLateArrival() {
+        return preferLateArrival;
+    }
+
+    public SearchParamsBuilder<T> preferLateArrival(boolean enable) {
+        this.preferLateArrival = enable;
         return this;
     }
 
@@ -148,4 +159,5 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     public SearchParams buildSearchParam() {
         return new SearchParams(this);
     }
+
 }

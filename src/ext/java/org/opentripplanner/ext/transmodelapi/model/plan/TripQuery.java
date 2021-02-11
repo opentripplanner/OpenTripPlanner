@@ -53,6 +53,37 @@ public class TripQuery {
             .build()
         )
         .argument(GraphQLArgument.newArgument()
+            .name("timetableView")
+            .description(
+                "Search for the best trip options within a time window. If `true` two "
+                + "TripPatterns are considered optimal if one is better on arrival time"
+                + "(earliest wins) and the other is better on departure time(latest wins)."
+                + "In combination with `arriveBy` this parameter cover the following 3 use "
+                + "cases:\n\n"
+                + "\n"
+                + "  - Traveler want to find the best alternative within a time window. Set "
+                + "    `timetableView=true` and `arriveBy=false`. This is the default, and if "
+                + "    the intention of the traveler is unknown it gives the best result, "
+                + "    because it includes the two next use-cases. This option also work well "
+                + "    with paging. Setting the `arriveBy=false`, covers the same use-case, but "
+                + "    the input time is interpreted as latest-arrival-time, and not "
+                + "    earliest-departure-time.\n"
+                + "\n"
+                + "  - Traveler want to find the best alternative with departure after a "
+                + "    specific time. For example: I am at the station now and want to get "
+                + "    home as quickly as possible. Set `timetableView=false` and "
+                + "    `arriveBy=false`. Do not support paging.\n"
+                + "\n"
+                + "  - Traveler want to find the best alternative with arrival before a"
+                + "    specific time. For example going to a meeting. Set `timetableView=true` "
+                + "    and `arriveBy=false`. Do not support paging.\n"
+                + "\n"
+                + "Default: `true`"
+            )
+            .type(Scalars.GraphQLBoolean)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
             .name("from")
             .description("The start location")
             .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
@@ -66,7 +97,10 @@ public class TripQuery {
         )
         .argument(GraphQLArgument.newArgument()
             .name("arriveBy")
-            .description("Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.")
+            .description(
+                "Whether the trip should depart at dateTime (false, the default), or arrive at "
+                + "dateTime. See `timetableView` for use-cases where this parameter is relevant."
+            )
             .type(Scalars.GraphQLBoolean)
             .defaultValue(routing.request.arriveBy)
             .build()
