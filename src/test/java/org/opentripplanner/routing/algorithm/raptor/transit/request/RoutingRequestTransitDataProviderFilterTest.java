@@ -156,10 +156,10 @@ public class RoutingRequestTransitDataProviderFilterTest {
   }
   @Test
   public void includePlannedCancellationsTest() {
-    TripTimes tripTimes1 = createTestTripTimes();
-    TripTimes tripTimes2 = createTestTripTimes();
-    tripTimes1.trip.setAlteration(TripAlteration.CANCELLATION);
-    tripTimes2.trip.setAlteration(TripAlteration.REPLACED);
+    TripTimes tripTimesWithCancellation = createTestTripTimes();
+    TripTimes tripTimesWithReplaced = createTestTripTimes();
+    tripTimesWithCancellation.trip.setAlteration(TripAlteration.CANCELLATION);
+    tripTimesWithReplaced.trip.setAlteration(TripAlteration.REPLACED);
 
     // Given
     var filter1 = new RoutingRequestTransitDataProviderFilter(
@@ -171,12 +171,12 @@ public class RoutingRequestTransitDataProviderFilterTest {
     );
 
     // When
-    boolean valid1 = filter1.tripTimesPredicate(tripTimes1);
+    boolean valid1 = filter1.tripTimesPredicate(tripTimesWithCancellation);
     // Then
     assertTrue(valid1);
 
     // When
-    boolean valid2 = filter1.tripTimesPredicate(tripTimes2);
+    boolean valid2 = filter1.tripTimesPredicate(tripTimesWithReplaced);
     // Then
     assertTrue(valid2);
 
@@ -190,12 +190,12 @@ public class RoutingRequestTransitDataProviderFilterTest {
     );
 
     // When
-    boolean valid3 = filter2.tripTimesPredicate(tripTimes1);
+    boolean valid3 = filter2.tripTimesPredicate(tripTimesWithCancellation);
     // Then
     assertFalse(valid3);
 
     // When
-    boolean valid4 = filter2.tripTimesPredicate(tripTimes2);
+    boolean valid4 = filter2.tripTimesPredicate(tripTimesWithReplaced);
     // Then
     assertFalse(valid4);
   }

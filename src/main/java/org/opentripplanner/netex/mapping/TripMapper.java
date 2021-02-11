@@ -93,7 +93,8 @@ class TripMapper {
         trip.setDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
 
         trip.setAlteration(
-            TripServiceAlterationMapper.mapAlteration(serviceJourney.getServiceAlteration()));
+            TripServiceAlterationMapper.mapAlteration(serviceJourney.getServiceAlteration())
+        );
 
         return trip;
     }
