@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -155,6 +156,7 @@ class RaptorRoutingRequestTransitDataCreator {
         .filter(filter::tripPatternPredicate)
         .filter(p -> firstDay || p.getStartOfRunningPeriod().toLocalDate().equals(date))
         .map(p -> p.newWithFilteredTripTimes(filter::tripTimesPredicate))
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 

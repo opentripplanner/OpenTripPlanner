@@ -2,7 +2,6 @@ package org.opentripplanner.netex.mapping.calendar;
 
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.mapping.support.ServiceAlterationFilter;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingDayRefStructure;
@@ -48,7 +47,7 @@ public class DatedServiceJourneyMapper {
 
       // TODO This currently skips mapping of any trips containing ServiceAlteration CANCELLATION
       //      or REPLACED. In the future we will want to import these and allow them to be routed
-      //      on if a parameter is set. Also done in TripMapper.
+      //      on if a parameter is set.
       if (!isRunning(dsj.getServiceAlteration())) continue;
 
       OperatingDay opDay = operatingDay(dsj, operatingDayById);

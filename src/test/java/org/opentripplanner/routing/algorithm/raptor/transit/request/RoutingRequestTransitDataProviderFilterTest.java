@@ -14,6 +14,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class RoutingRequestTransitDataProviderFilterTest {
 
@@ -26,6 +27,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
     var filter = new RoutingRequestTransitDataProviderFilter(
+        false,
         false,
         false,
         Set.of(TransitMode.BUS),
@@ -44,6 +46,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
         false,
+        false,
         Set.of(TransitMode.BUS),
         Set.of(TEST_ROUTE_ID)
     );
@@ -58,6 +61,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
     var filter = new RoutingRequestTransitDataProviderFilter(
+        false,
         false,
         false,
         Set.of(),
@@ -76,6 +80,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
         false,
+        false,
         Set.of(),
         Set.of()
     );
@@ -91,6 +96,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
         true,
+        false,
         false,
         Set.of(),
         Set.of()
@@ -108,6 +114,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
         true,
+        false,
         Set.of(),
         Set.of()
     );
@@ -146,5 +153,50 @@ public class RoutingRequestTransitDataProviderFilterTest {
     stopTime.setStopSequence(0);
 
     return new TripTimes(trip, List.of(stopTime), new Deduplicator());
+  }
+  @Test
+  public void includePlannedCancellationsTest() {
+    TripTimes tripTimesWithCancellation = createTestTripTimes();
+    TripTimes tripTimesWithReplaced = createTestTripTimes();
+    tripTimesWithCancellation.trip.setAlteration(TripAlteration.CANCELLATION);
+    tripTimesWithReplaced.trip.setAlteration(TripAlteration.REPLACED);
+
+    // Given
+    var filter1 = new RoutingRequestTransitDataProviderFilter(
+        false,
+        false,
+        true,
+        Set.of(),
+        Set.of()
+    );
+
+    // When
+    boolean valid1 = filter1.tripTimesPredicate(tripTimesWithCancellation);
+    // Then
+    assertTrue(valid1);
+
+    // When
+    boolean valid2 = filter1.tripTimesPredicate(tripTimesWithReplaced);
+    // Then
+    assertTrue(valid2);
+
+    // Given
+    var filter2 = new RoutingRequestTransitDataProviderFilter(
+        false,
+        false,
+        false,
+        Set.of(),
+        Set.of()
+    );
+
+    // When
+    boolean valid3 = filter2.tripTimesPredicate(tripTimesWithCancellation);
+    // Then
+    assertFalse(valid3);
+
+    // When
+    boolean valid4 = filter2.tripTimesPredicate(tripTimesWithReplaced);
+    // Then
+    assertFalse(valid4);
   }
 }
