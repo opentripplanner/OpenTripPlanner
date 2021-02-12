@@ -80,15 +80,28 @@ public class VertexLinker {
   }
 
   /**
-   * Link the given vertex into the graph (expand on that...) In OTP2 where the transit search can
-   * be quite fast, searching for a good linking point can be a significant fraction of response
-   * time. Hannes Junnila has reported >70% speedups in searches by making the search radius
-   * smaller. Therefore we use an expanding-envelope search, which is more efficient in dense
-   * areas.
+   * This method will provide the vertices in the street graph that are closest to the input vertex.
+   * This may involve splitting edges and creating new edges and vertices. It is then the caller's
+   * responsibility to link the input vertex to the returned vertices using the correct edge type.
    *
-   * @return // TODO what is returned
+   * @param vertex        Vertex to be linked into the street graph
+   * @param traverseMode  Only street edges allowing this mode will be linked
+   * @param direction     The direction of the new edges to be created
+   * @param destructive   Whether this should result in a permanent change of the street graph. This
+   *                      should only be used during graph building.
+   * @param tempEdges     When doing a non-destructive split, a DisposableEdgeCollection has to be
+   *                      provided in order to keep track of any temporary edges being created. It
+   *                      is the caller's responsibility to dispose of these edges when they are no
+   *                      longer needed.
+   *
+   * In OTP2 where the transit search can be quite fast, searching for a good linking point can be
+   * a significant fraction of response time. Hannes Junnila has reported >70% speedups in searches
+   * by making the search radius smaller. Therefore we use an expanding-envelope search, which is
+   * more efficient in dense areas.
+   *
+   * @return A set of street edges that can be linked to.
    */
-  public Set<StreetVertex> link(
+  public Set<StreetVertex> getOrCreateVerticesForLinking(
       Vertex vertex, TraverseMode traverseMode, LinkingDirection direction, boolean destructive, DisposableEdgeCollection tempEdges
   ) {
 

@@ -58,7 +58,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
   public void buildGraph(
       Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore
   ) {
-    // TODO Only create one instance
     VertexLinker linker = new VertexLinker(graph);
 
     if (graph.hasStreets) {
@@ -75,7 +74,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitStops(Graph graph, VertexLinker linker) {
     LOG.info("Linking transit stops to graph...");
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-      Set<StreetVertex> streetVertices = linker.link(
+      Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
           tStop,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
@@ -92,7 +91,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitEntrances(Graph graph, VertexLinker linker) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
-      Set<StreetVertex> streetVertices = linker.link(
+      Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
           tEntrance,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
@@ -110,7 +109,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info("Linking bike rental stations to graph...");
       // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
     for (BikeRentalStationVertex bikeRental : graph.getVerticesOfType(BikeRentalStationVertex.class)) {
-      Set<StreetVertex> streetVertices = linker.link(
+      Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
           bikeRental,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
@@ -128,7 +127,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info("Linking bike parks to graph...");
     // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
     for (BikeParkVertex bikePark : graph.getVerticesOfType(BikeParkVertex.class)) {
-      Set<StreetVertex> streetVertices = linker.link(
+      Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
           bikePark,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
