@@ -15,9 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
@@ -123,7 +125,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     int[] dropoffs;
 
-    BookingInfo[] bookingInfos;
+    List<BookingInfo> bookingInfos;
 
 
     /**
@@ -160,7 +162,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         timeShift = stopTimes.iterator().next().getArrivalTime();
         final int[] pickups   = new int[nStops];
         final int[] dropoffs   = new int[nStops];
-        final BookingInfo[] bookingInfos = new BookingInfo[nStops];
+        final List<BookingInfo> bookingInfos = new ArrayList<>();
         int s = 0;
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
@@ -170,7 +172,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
             pickups[s] = st.getPickupType();
             dropoffs[s] = st.getDropOffType();
-            bookingInfos[s] = st.getBookingInfo();
+            bookingInfos.add(st.getBookingInfo());
             s++;
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
@@ -179,7 +181,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
         this.pickups = deduplicator.deduplicateIntArray(pickups);
         this.dropoffs = deduplicator.deduplicateIntArray(dropoffs);
-        this.bookingInfos = deduplicator.deduplicateBookingInfoArray(bookingInfos);
+        this.bookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, bookingInfos);
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
         this.arrivalTimes = null;
@@ -366,7 +368,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     }
 
     public BookingInfo getBookingInfo(int stop) {
-        return bookingInfos[stop];
+        return bookingInfos.get(stop);
     }
 
     /**
