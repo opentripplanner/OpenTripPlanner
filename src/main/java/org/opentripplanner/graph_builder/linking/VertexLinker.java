@@ -102,7 +102,11 @@ public class VertexLinker {
    * @return A set of street edges that can be linked to.
    */
   public Set<StreetVertex> getOrCreateVerticesForLinking(
-      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction, boolean destructive, DisposableEdgeCollection tempEdges
+      Vertex vertex,
+      TraverseMode traverseMode,
+      LinkingDirection direction,
+      boolean destructive,
+      DisposableEdgeCollection tempEdges
   ) {
 
     if (!destructive && tempEdges == null) {
@@ -135,8 +139,12 @@ public class VertexLinker {
   }
 
   private Set<StreetVertex> linkToStreetEdges(
-      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction, boolean destructive,
-      int radiusMeters, DisposableEdgeCollection tempEdges
+      Vertex vertex,
+      TraverseMode traverseMode,
+      LinkingDirection direction,
+      boolean destructive,
+      int radiusMeters,
+      DisposableEdgeCollection tempEdges
   ) {
 
     final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(radiusMeters);
@@ -219,7 +227,14 @@ public class VertexLinker {
   }
 
   /** Split the edge if necessary return the closest vertex */
-  private StreetVertex link(Vertex vertex, StreetEdge edge, double xScale, boolean destructive, LinkingDirection direction, DisposableEdgeCollection tempEdges) {
+  private StreetVertex link(
+      Vertex vertex,
+      StreetEdge edge,
+      double xScale,
+      boolean destructive,
+      LinkingDirection direction,
+      DisposableEdgeCollection tempEdges
+  ) {
     // TODO: we've already built this line string, we should save it
     LineString orig = edge.getGeometry();
     LineString transformed = equirectangularProject(orig, xScale);
@@ -288,7 +303,11 @@ public class VertexLinker {
    * @return Splitter vertex with added new edges
    */
   private SplitterVertex split(
-      StreetEdge edge, LinearLocation ll, boolean destructive, boolean endVertex, DisposableEdgeCollection tempEdges
+      StreetEdge edge,
+      LinearLocation ll,
+      boolean destructive,
+      boolean endVertex,
+      DisposableEdgeCollection tempEdges
   ) {
     LineString geometry = edge.getGeometry();
 
