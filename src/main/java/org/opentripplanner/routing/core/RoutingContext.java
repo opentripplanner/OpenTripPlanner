@@ -56,7 +56,7 @@ public class RoutingContext implements Cloneable {
 
     public final Set<FeedScopedId> bannedRoutes;
 
-    private final DisposableEdgeCollection tempEdges;
+    private final Set<DisposableEdgeCollection> tempEdges;
     
     // The back edge associated with the origin - i.e. continuing a previous search.
     // NOTE: not final so that it can be modified post-construction for testing.
@@ -118,7 +118,7 @@ public class RoutingContext implements Cloneable {
     /**
      * Creates a PartialStreetEdge along the input StreetEdge iff its direction makes this possible.
      */
-    private void makePartialEdgeAlong(StreetEdge streetEdge, StreetVertex from, StreetVertex to) {
+    private void makePartialEdgeAlong(StreetEdge streetEdge, StreetVertex from, StreetVertex to, DisposableEdgeCollection tempEdges) {
         LineString parent = streetEdge.getGeometry();
         LineString head = GeometryUtils.getInteriorSegment(parent,
                 streetEdge.getFromVertex().getCoordinate(), from.getCoordinate());
@@ -134,7 +134,7 @@ public class RoutingContext implements Cloneable {
 
             //TODO: localize this
             String name = from.getLabel() + " to " + to.getLabel();
-            tempEdges.addEdge( new TemporaryPartialStreetEdge(streetEdge, from, to, partial, new NonLocalizedString(name), length));
+            tempEdges.addEdge(new TemporaryPartialStreetEdge(streetEdge, from, to, partial, new NonLocalizedString(name), length));
         }
     }
 
@@ -157,7 +157,7 @@ public class RoutingContext implements Cloneable {
         }
         this.opt = routingRequest;
         this.graph = graph;
-        this.tempEdges = new DisposableEdgeCollection(this.graph);
+        this.tempEdges = new HashSet<>();
 
         Set<Vertex> fromVertices;
         Set<Vertex> toVertices;
@@ -218,6 +218,9 @@ public class RoutingContext implements Cloneable {
      * them up along those edges so that we don't get odd circuitous routes for really short trips.
      */
     private void adjustForSameFromToEdge() {
+        DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
+        this.tempEdges.add(tempEdges);
+
         if (fromVertices != null && toVertices != null) {
             Set<StreetVertex> fromStreetVertices = new HashSet<>();
             for (Vertex from : fromVertices) {
@@ -267,7 +270,7 @@ public class RoutingContext implements Cloneable {
                         toStreetVertex
                     );
                     for (StreetEdge pse : overlap) {
-                        makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
+                        makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex, tempEdges);
                     }
                 }
             }
@@ -304,6 +307,6 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        this.tempEdges.disposeEdges();
+        this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
     }
 }

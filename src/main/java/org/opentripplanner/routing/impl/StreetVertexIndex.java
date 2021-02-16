@@ -188,7 +188,7 @@ public class StreetVertexIndex {
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
   public Set<Vertex> getVerticesForLocation(
-      GenericLocation location, RoutingRequest options, boolean endVertex, DisposableEdgeCollection tempEdges
+      GenericLocation location, RoutingRequest options, boolean endVertex, Set<DisposableEdgeCollection> tempEdges
   ) {
     // Check if Stop/StopCollection is found by FeedScopeId
     if (location.stopId != null) {
@@ -209,7 +209,7 @@ public class StreetVertexIndex {
   }
 
   private Vertex createVertexFromLocation(
-      GenericLocation location, RoutingRequest options, boolean endVertex, DisposableEdgeCollection tempEdges
+      GenericLocation location, RoutingRequest options, boolean endVertex, Set<DisposableEdgeCollection> tempEdges
   ) {
     if (endVertex) {
       LOG.debug("Finding end vertex for {}", location);
@@ -240,30 +240,26 @@ public class StreetVertexIndex {
 
     TraverseMode nonTransitMode = getTraverseModeForLinker(options, endVertex);
 
-    Set<StreetVertex> streetVertices = vertexLinker.getOrCreateVerticesForLinking(
+    tempEdges.add(vertexLinker.getOrCreateVerticesForLinking(
         temporaryStreetLocation,
         nonTransitMode,
         endVertex ? LinkingDirection.BACKWARD : LinkingDirection.FORWARD,
         false,
-        tempEdges
-    );
+        endVertex
+            ? (vertex, streetVertex) -> List.of(
+                new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation)vertex)
+              )
+            : (vertex, streetVertex) -> List.of(
+                new TemporaryFreeEdge((TemporaryStreetLocation)vertex, streetVertex)
+              )
+    ));
 
-    if (streetVertices.isEmpty()) {
+    if (temporaryStreetLocation.getIncoming().isEmpty()
+        && temporaryStreetLocation.getOutgoing().isEmpty()) {
       LOG.warn("Couldn't link {}", location);
     }
 
-    // Link all street vertices returned from linker to the origin/destination
-    for (StreetVertex streetVertex : streetVertices) {
-      temporaryStreetLocation.setWheelchairAccessible(true);
-      if (endVertex) {
-        LOG.debug("Linking end vertex to {} -> {}", streetVertex, temporaryStreetLocation);
-        new TemporaryFreeEdge(streetVertex, temporaryStreetLocation);
-      }
-      else {
-        LOG.debug("Linking end vertex to {} -> {}", temporaryStreetLocation, streetVertex);
-        new TemporaryFreeEdge(temporaryStreetLocation, streetVertex);
-      }
-    }
+    temporaryStreetLocation.setWheelchairAccessible(true);
 
     return temporaryStreetLocation;
   }
@@ -327,7 +323,7 @@ public class StreetVertexIndex {
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
   public Vertex getVertexForLocationForTest(
-      GenericLocation location, RoutingRequest options, boolean endVertex, DisposableEdgeCollection tempEdges
+      GenericLocation location, RoutingRequest options, boolean endVertex, Set<DisposableEdgeCollection> tempEdges
   ) {
     // Check if coordinate is provided and connect it to graph
     Coordinate coordinate = location.getCoordinate();

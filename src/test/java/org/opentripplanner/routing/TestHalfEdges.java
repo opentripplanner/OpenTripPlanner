@@ -421,7 +421,7 @@ public class TestHalfEdges {
     @Test
     public void testStreetLocationFinder() {
         StreetVertexIndex finder = new StreetVertexIndex(graph);
-        DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
+        Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
         // test that the local stop finder finds stops
         GenericLocation loc = new GenericLocation(40.01, -74.005000001);
         assertTrue(finder.getNearbyTransitStops(loc.getCoordinate(), 100).size() > 0);
@@ -465,7 +465,7 @@ public class TestHalfEdges {
             assertFalse(s.getBackEdge() == top);
         }
         walking.cleanup();
-        tempEdges.disposeEdges();
+        tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
     }
 
     @Test
