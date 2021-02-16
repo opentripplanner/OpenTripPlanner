@@ -1,33 +1,29 @@
-#### Summary
-This PR ...
+## PR Instructions
+When creating a pull request, please follow the format below. In each section, *replace* the guidance text with your own text. This "instructions" section and the guidance text should not be present in the submitted PR. These sections serve as a checklist - when you have replaced all of them with your own text, the PR is considered complete.
 
-#### Checklist
-- **Issue**: closes ?
-- **Unit tests**: ?
-- **Code style**: Yes 
-- **Documentation**: ? 
-- **Changelog**: Yes/no?
+### Summary
+Explain in one or two sentences what this PR achieves.
 
-<details>
-  <summary>Checklist notes</summary>
+### Issue
+Link to or create an [issue](https://github.com/opentripplanner/OpenTripPlanner/issues) that describes the relevant feature or bug. Add [GitHub keywords](https://help.github.com/articles/closing-issues-using-keywords/) to this PR's description (e.g., `closes #45`).
+You need not create an issue for small bugfixes and code cleanups, but do describe the problem clearly in the "summary" section above.
 
-#### Issue
- - Link to or create an [issue](https://github.com/opentripplanner/OpenTripPlanner/issues) that describes the relevant feature or bug. Add [GitHub keywords](https://help.github.com/articles/closing-issues-using-keywords/) to this PR's description (e.g., `closes #45`).
- - Clean code and small bugfixes do not need issues. 
+### Unit tests
+Write a few words on how the new code is tested. 
+- Were unit tests added/updated?
+- Was any manual verification done?
+- Any observations on changes to performance?
+- Was the code designed so it is unit testable?
+- Were any tests applied to the smallest appropriate unit?
+- Do all tests pass [the continuous integration service](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Developers-Guide.md#continuous-integration)?
 
-#### Unit tests
-  - Write a few words on how the new code is tested. Are unit tests added/updated, any manual verification done. Performance? 
-  - Design the code, so it is unit testable and test on the smallest appropriate unit. 
-  - Test must pass [the continuous integration service](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Developers-Guide.md#continuous-integration)?
-
-#### Code style
+### Code style
 Have you followed the [suggested code style](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Developers-Guide.md#code-style)? 
 
-#### Documentation
-- Have you added documentation in code(preferable JavaDoc) documenting design and the rationale behind the code. Document all none trivial public classes and methods.
-- New configuration option(s)? Update the [configuration documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md) tables and sections.
+### Documentation
+- Have you added documentation in code covering design and rationale behind the code?
+- Were all non-trivial public classes and methods documented with Javadoc?
+- Were any new configuration options added? If so were the tables in the [configuration documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md) updated?
 
-#### Changelog
-Add a bullet point to the [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Changelog.md) with description and link to the linked issue.
-
-</details>
+### Changelog
+Was a bullet point added to the [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Changelog.md) with description and link to the linked issue?
