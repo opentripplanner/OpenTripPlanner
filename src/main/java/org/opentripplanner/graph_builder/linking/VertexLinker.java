@@ -25,6 +25,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -101,24 +104,16 @@ public class VertexLinker {
    *
    * @return A set of street edges that can be linked to.
    */
-  public Set<StreetVertex> getOrCreateVerticesForLinking(
+  public DisposableEdgeCollection getOrCreateVerticesForLinking(
       Vertex vertex,
       TraverseMode traverseMode,
       LinkingDirection direction,
       boolean destructive,
-      DisposableEdgeCollection tempEdges
+      BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
+    DisposableEdgeCollection tempEdges = !destructive ? new DisposableEdgeCollection(graph) : null;
 
-    if (!destructive && tempEdges == null) {
-      throw new IllegalArgumentException(
-          "Supplying a DisposableEdgeCollection is required when doing non-destructive splitting");
-    }
-    if (destructive && tempEdges != null) {
-      throw new IllegalArgumentException(
-          "Supplying a DisposableEdgeCollection is not allowed when doing destructive splitting");
-    }
-
-    Set<StreetVertex> vertices = linkToStreetEdges(
+    Set<StreetVertex> streetVertices = linkToStreetEdges(
         vertex,
         traverseMode,
         direction,
@@ -126,8 +121,8 @@ public class VertexLinker {
         INITIAL_SEARCH_RADIUS_METERS,
         tempEdges
     );
-    if (vertices.isEmpty()) {
-      vertices = linkToStreetEdges(vertex,
+    if (streetVertices.isEmpty()) {
+      streetVertices = linkToStreetEdges(vertex,
           traverseMode,
           direction,
           destructive,
@@ -135,7 +130,17 @@ public class VertexLinker {
           tempEdges
       );
     }
-    return vertices;
+
+    for (StreetVertex streetVertex : streetVertices) {
+      List<Edge> edges = edgeFunction.apply(vertex, streetVertex);
+      if (tempEdges != null) {
+        for (Edge edge : edges) {
+          tempEdges.addEdge(edge);
+        }
+      }
+    }
+
+    return tempEdges;
   }
 
   private Set<StreetVertex> linkToStreetEdges(

@@ -544,8 +544,8 @@ public class SimpleStreetSplitter {
                 return;
         }
 
-        new StreetTransitLink(tstop, v, tstop.hasWheelchairEntrance());
-        new StreetTransitLink(v, tstop, tstop.hasWheelchairEntrance());
+        new StreetTransitLink(tstop, v);
+        new StreetTransitLink(v, tstop);
     }
 
     /**
@@ -561,8 +561,8 @@ public class SimpleStreetSplitter {
             if (e.getToVertex() == v) { return; }
         }
 
-        new TransitEntranceLink(entrance, v, entrance.isWheelchairEntrance());
-        new TransitEntranceLink(v, entrance, entrance.isWheelchairEntrance());
+        new TransitEntranceLink(entrance, v);
+        new TransitEntranceLink(v, entrance);
     }
 
     /** Make link edges for bike rental */

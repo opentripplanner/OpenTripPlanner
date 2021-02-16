@@ -8,7 +8,9 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.graph.DisposableEdgeCollection;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * Graph updater that dynamically sets availability information on bike parking lots.
@@ -101,7 +104,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         @Override
         public void run(Graph graph) {
             // Apply stations to graph
-            Set<BikePark> bikeParkSet = new HashSet<BikePark>();
+            Set<BikePark> bikeParkSet = new HashSet<>();
             /* Add any new park and update space available for existing parks */
             for (BikePark bikePark : bikeParks) {
                 bikeService.addBikePark(bikePark);
@@ -109,23 +112,23 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikeParkVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
-                    DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
-                    Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
+                    DisposableEdgeCollection tempEdges = linker.getOrCreateVerticesForLinking(
                         bikeParkVertex,
                         TraverseMode.WALK,
                         LinkingDirection.BOTH_WAYS,
                         false,
-                        tempEdges
+                        (vertex, streetVertex) -> List.of(
+                            new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),
+                            new StreetBikeParkLink(streetVertex, (BikeParkVertex) vertex)
+                        )
                     );
-                    if (streetVertices.isEmpty()) {
+
+                    if (bikeParkVertex.getOutgoing().isEmpty()) {
                         // the toString includes the text "Bike park"
                         LOG.info("Bike park {} unlinked", bikeParkVertex);
                     }
-                    for (StreetVertex v : streetVertices) {
-                        tempEdges.addEdge(new StreetBikeParkLink(bikeParkVertex, v));
-                        tempEdges.addEdge(new StreetBikeParkLink(v, bikeParkVertex));
-                    }
-                    tempEdges.addEdge(new BikeParkEdge(bikeParkVertex));
+
+                    new BikeParkEdge(bikeParkVertex);
                     verticesByPark.put(bikePark, bikeParkVertex);
                     tempEdgesByPark.put(bikePark, tempEdges);
                 } else {

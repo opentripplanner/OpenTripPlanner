@@ -12,7 +12,6 @@ import org.opentripplanner.routing.edgetype.TransitEntranceLink;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links various
@@ -74,34 +72,32 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitStops(Graph graph, VertexLinker linker) {
     LOG.info("Linking transit stops to graph...");
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-      Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
+      linker.getOrCreateVerticesForLinking(
           tStop,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
           true,
-          null
+          (vertex, streetVertex) -> List.of(
+              new StreetTransitLink((TransitStopVertex) vertex, streetVertex),
+              new StreetTransitLink(streetVertex, (TransitStopVertex) vertex)
+          )
       );
-      for (StreetVertex v : streetVertices) {
-        new StreetTransitLink(tStop, v, tStop.hasWheelchairEntrance());
-        new StreetTransitLink(v, tStop, tStop.hasWheelchairEntrance());
-      }
     }
   }
 
   private void linkTransitEntrances(Graph graph, VertexLinker linker) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
-      Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
+      linker.getOrCreateVerticesForLinking(
           tEntrance,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
           true,
-          null
+          (vertex, streetVertex) -> List.of(
+              new TransitEntranceLink((TransitEntranceVertex) vertex, streetVertex),
+              new TransitEntranceLink(streetVertex, (TransitEntranceVertex) vertex)
+          )
       );
-      for (StreetVertex v : streetVertices) {
-        new TransitEntranceLink(tEntrance, v, tEntrance.isWheelchairEntrance());
-        new TransitEntranceLink(v, tEntrance, tEntrance.isWheelchairEntrance());
-      }
     }
   }
 
@@ -109,17 +105,16 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info("Linking bike rental stations to graph...");
       // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
     for (BikeRentalStationVertex bikeRental : graph.getVerticesOfType(BikeRentalStationVertex.class)) {
-      Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
+      linker.getOrCreateVerticesForLinking(
           bikeRental,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
           true,
-          null
+          (vertex, streetVertex) -> List.of(
+              new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
+              new StreetBikeRentalLink(streetVertex, (BikeRentalStationVertex) vertex)
+          )
       );
-      for (StreetVertex v : streetVertices) {
-        new StreetBikeRentalLink(bikeRental, v);
-        new StreetBikeRentalLink(v, bikeRental);
-      }
     }
   }
 
@@ -127,18 +122,16 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info("Linking bike parks to graph...");
     // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
     for (BikeParkVertex bikePark : graph.getVerticesOfType(BikeParkVertex.class)) {
-      Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
+      linker.getOrCreateVerticesForLinking(
           bikePark,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
           true,
-          null
+          (vertex, streetVertex) -> List.of(
+              new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),
+              new StreetBikeParkLink(streetVertex, (BikeParkVertex) vertex)
+          )
       );
-      for (StreetVertex v : streetVertices) {
-        // Linkin Park
-        new StreetBikeParkLink(bikePark, v);
-        new StreetBikeParkLink(v, bikePark);
-      }
     }
   }
 

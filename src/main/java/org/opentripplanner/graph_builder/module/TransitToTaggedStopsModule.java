@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -75,8 +74,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             if(alreadyLinked) continue;
             // only connect transit stops that are not part of a pathway network
             if (!ts.hasPathways()) {
-                boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                if (!connectVertexToStop(ts, wheelchairAccessible)) {
+                if (!connectVertexToStop(ts)) {
                     LOG.debug("Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString());
 
                     // TODO OTP2 - Why is this commented out? Is it not a problem or is it to nosey?
@@ -86,7 +84,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         }
     }
 
-    private boolean connectVertexToStop(TransitStopVertex ts, boolean wheelchairAccessible) {
+    private boolean connectVertexToStop(TransitStopVertex ts) {
         String stopCode = ts.getStop().getCode();
         if (stopCode == null){
             return false;
@@ -105,8 +103,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
             // Only use stop codes for linking TODO: find better method to connect stops without stop code
             if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
-                new StreetTransitLink(ts, tsv, wheelchairAccessible);
-                new StreetTransitLink(tsv, ts, wheelchairAccessible);
+                new StreetTransitLink(ts, tsv);
+                new StreetTransitLink(tsv, ts);
                 LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
                 return true;
             }

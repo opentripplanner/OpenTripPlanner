@@ -7,9 +7,11 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -121,22 +123,19 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStationVertex bikeRentalVertex = verticesByStation.get(station);
                 if (bikeRentalVertex == null) {
                     bikeRentalVertex = new BikeRentalStationVertex(graph, station);
-                    DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
-                    Set<StreetVertex> streetVertices = linker.getOrCreateVerticesForLinking(
+                    DisposableEdgeCollection tempEdges = linker.getOrCreateVerticesForLinking(
                         bikeRentalVertex,
                         TraverseMode.WALK,
                         LinkingDirection.BOTH_WAYS,
                         false,
-                        tempEdges
+                        (vertex, streetVertex) -> List.of(
+                            new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
+                            new StreetBikeRentalLink(streetVertex, (BikeRentalStationVertex) vertex)
+                        )
                     );
-                    if (streetVertices.isEmpty()) {
+                    if (bikeRentalVertex.getOutgoing().isEmpty()) {
                         // the toString includes the text "Bike rental station"
                         LOG.info("BikeRentalStation {} is unlinked", bikeRentalVertex);
-                    }
-                    // Link bike rental vertex to street vertices returned by linker
-                    for (StreetVertex v : streetVertices) {
-                        tempEdges.addEdge(new StreetBikeRentalLink(bikeRentalVertex, v));
-                        tempEdges.addEdge(new StreetBikeRentalLink(v, bikeRentalVertex));
                     }
                     tempEdges.addEdge(new RentABikeOnEdge(bikeRentalVertex, bikeRentalVertex, station.networks));
                     if (station.allowDropoff) {
