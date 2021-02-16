@@ -3,11 +3,12 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
+import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -18,16 +19,17 @@ import java.util.stream.Collectors;
 public class TripPatternForDate {
 
     /**
-     * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules.
-     * Its TripSchedules remain unchanged.
+     * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules. Its
+     * TripSchedules remain unchanged.
      */
     private final TripPatternWithRaptorStopIndexes tripPattern;
 
     /**
-     * The filtered TripSchedules for only those trips in the TripPattern that are active on the given day.
-     * Invariant: this array should contain a subset of the TripSchedules in tripPattern.tripSchedules.
+     * The filtered TripSchedules for only those trips in the TripPattern that are active on the
+     * given day. Invariant: this array should contain a subset of the TripSchedules in
+     * tripPattern.tripSchedules.
      */
-    private final TripTimes[] tripTimes;
+    private final List<TripTimes> tripTimes;
 
     /** The date for which the filtering was performed. */
     private final LocalDate localDate;
@@ -43,25 +45,26 @@ public class TripPatternForDate {
     private final LocalDateTime endOfRunningPeriod;
 
     public TripPatternForDate(
-        TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate
+        TripPatternWithRaptorStopIndexes tripPattern,
+        List<TripTimes> tripTimes,
+        LocalDate localDate
     ) {
         this.tripPattern = tripPattern;
-        this.tripTimes = tripTimes;
+        this.tripTimes = new ArrayList<>(tripTimes);
         this.localDate = localDate;
 
         // These depend on the tripTimes array being sorted
         this.startOfRunningPeriod = DateMapper.asDateTime(
             localDate,
-            tripTimes[0].getDepartureTime(0)
+            tripTimes.get(0).getDepartureTime(0)
         );
+        var last = tripTimes.get(tripTimes.size()-1);
         this.endOfRunningPeriod = DateMapper.asDateTime(
-            localDate,
-            tripTimes[tripTimes.length - 1].getArrivalTime(
-                tripTimes[tripTimes.length - 1].getNumStops() - 1)
+            localDate, last.getArrivalTime(last.getNumStops() - 1)
         );
     }
 
-    public TripTimes[] tripTimes() {
+    public List<TripTimes> tripTimes() {
         return tripTimes;
     }
 
@@ -74,7 +77,7 @@ public class TripPatternForDate {
     }
 
     public TripTimes getTripTimes(int i) {
-        return tripTimes[i];
+        return tripTimes.get(i);
     }
 
     public LocalDate getLocalDate() {
@@ -82,7 +85,7 @@ public class TripPatternForDate {
     }
 
     public int numberOfTripSchedules() {
-        return tripTimes.length;
+        return tripTimes.size();
     }
 
     public LocalDateTime getStartOfRunningPeriod() {
@@ -91,7 +94,8 @@ public class TripPatternForDate {
 
     public List<LocalDate> getRunningPeriodDates() {
         // Add one day to ensure last day is included
-        return startOfRunningPeriod.toLocalDate()
+        return startOfRunningPeriod
+            .toLocalDate()
             .datesUntil(endOfRunningPeriod.toLocalDate().plusDays(1))
             .collect(Collectors.toList());
     }
@@ -107,26 +111,25 @@ public class TripPatternForDate {
             return false;
         TripPatternForDate that = (TripPatternForDate) o;
 
-        return tripPattern.equals(that.tripPattern) && localDate.equals(that.localDate);
+        return tripPattern.equals(that.tripPattern) &&
+            localDate.equals(that.localDate) &&
+            tripTimes.equals(that.tripTimes);
     }
 
+    @Nullable
     public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
-        List<TripTimes> filteredTripTimes = Arrays.stream(tripTimes)
+        List<TripTimes> filteredTripTimes = tripTimes
+            .stream()
             .filter(filter)
             .collect(Collectors.toList());
 
-        if (filteredTripTimes.isEmpty()) {
-            return null;
-        }
+        if (filteredTripTimes.isEmpty()) { return null; }
 
-        if (tripTimes.length == filteredTripTimes.size()) {
-            return this;
-        }
+        if (tripTimes.size() == filteredTripTimes.size()) { return this; }
 
-        TripTimes[] filteredTripTimesArray = new TripTimes[filteredTripTimes.size()];
         return new TripPatternForDate(
             tripPattern,
-            filteredTripTimes.toArray(filteredTripTimesArray),
+            filteredTripTimes,
             localDate
         );
     }
