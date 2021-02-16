@@ -1,12 +1,15 @@
 ## PR Instructions
-When creating a pull request, please follow the format below. In each section, *replace* the guidance text with your own text. This "instructions" section and the guidance text should not be present in the submitted PR. These sections serve as a checklist - when you have replaced all of them with your own text, the PR is considered complete.
+When creating a pull request, please follow the format below. For each section, *replace* the guidance text with your own text, keeping the section heading. If you have nothing to say in a particular section, you can completely delete the section including its heading to indicate that you have taken the requested steps. None of these instructions or the guidance text (non-heading text) should be present in the submitted PR. These sections serve as a checklist: when you have replaced or deleted all of them, the PR is considered complete.
 
 ### Summary
 Explain in one or two sentences what this PR achieves.
 
 ### Issue
-Link to or create an [issue](https://github.com/opentripplanner/OpenTripPlanner/issues) that describes the relevant feature or bug. Add [GitHub keywords](https://help.github.com/articles/closing-issues-using-keywords/) to this PR's description (e.g., `closes #45`).
+Link to or create an [issue](https://github.com/opentripplanner/OpenTripPlanner/issues) that describes the relevant feature or bug. 
 You need not create an issue for small bugfixes and code cleanups, but do describe the problem clearly in the "summary" section above.
+Add [GitHub keywords](https://help.github.com/articles/closing-issues-using-keywords/) to this PR's description, for example:
+
+`closes #45`
 
 ### Unit tests
 Write a few words on how the new code is tested. 
