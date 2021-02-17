@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.collect.ImmutableSet;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
@@ -141,9 +140,11 @@ public class ConfigLoader {
      * Load the router configuration file as a JsonNode three. An empty node is
      * returned if the given {@code configDir}  is {@code null} or config file is NOT found.
      * <p>
+     * This is public to allow loading configuration files from tests like the SpeedTest.
+     *
      * @see #loadJsonFile for more details.
      */
-    private JsonNode loadJsonByFilename(String filename) {
+    public JsonNode loadJsonByFilename(String filename) {
         // Use default parameters if no configDir is available.
         if (configDir == null) {
             if(jsonFallback != null) {
