@@ -98,6 +98,16 @@ public class ServiceJourneyType {
                     .dataFetcher(environment -> trip(environment).getDirection())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("serviceAlteration")
+                .deprecate(
+                    "The service journey alteration will be moved out of SJ and grouped "
+                    + "together with the SJ and date. In Netex this new type is called "
+                    + "DatedServiceJourney. We will create artificial DSJs for the old SJs."
+                )
+                .type(EnumTypes.SERVICE_ALTERATION_TYPE)
+                .dataFetcher(environment -> trip(environment).getTripAlteration())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("wheelchairAccessible")
                     .type(EnumTypes.WHEELCHAIR_BOARDING)
                     .description("Whether service journey is accessible with wheelchair.")
