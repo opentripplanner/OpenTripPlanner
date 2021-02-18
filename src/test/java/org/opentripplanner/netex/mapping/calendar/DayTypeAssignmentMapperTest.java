@@ -72,7 +72,8 @@ public class DayTypeAssignmentMapperTest {
         dayTypes,
         assignments,
         EMPTY_OPERATING_DAYS,
-        EMPTY_PERIODS
+        EMPTY_PERIODS,
+        null
     );
 
     // THEN - verify
@@ -104,7 +105,8 @@ public class DayTypeAssignmentMapperTest {
         dayTypes,
         assignments,
         EMPTY_OPERATING_DAYS,
-        EMPTY_PERIODS
+        EMPTY_PERIODS,
+        null
     );
 
     // THEN - verify
@@ -129,7 +131,8 @@ public class DayTypeAssignmentMapperTest {
         dayTypes,
         assignments,
         operatingDays,
-        EMPTY_PERIODS
+        EMPTY_PERIODS,
+        null
     );
 
     // THEN - verify
@@ -159,7 +162,8 @@ public class DayTypeAssignmentMapperTest {
         dayTypes,
         assignments,
         EMPTY_OPERATING_DAYS,
-        periods
+        periods,
+        null
     );
 
     // THEN - verify
@@ -192,7 +196,8 @@ public class DayTypeAssignmentMapperTest {
         dayTypes,
         assignments,
         operatingDays,
-        periods
+        periods,
+        null
     );
 
     // THEN - verify
