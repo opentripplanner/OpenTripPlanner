@@ -1,12 +1,12 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.RoutingRequestTransitDataProviderFilter;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.RoutingRequestTransitDataProviderFilter;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -29,6 +29,7 @@ import org.opentripplanner.util.OtpAppException;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.net.URI;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class SpeedTest {
     private SpeedTest(SpeedTestCmdLineOpts opts) {
         this.opts = opts;
         this.config = SpeedTestConfig.config(opts.rootDir());
-        this.graph = loadGraph(opts.rootDir());
+        this.graph = loadGraph(opts.rootDir(), config.graph);
         this.transitLayer = TransitLayerMapper.map(config.transitRoutingParams, graph);
         this.streetRouter = new EgressAccessRouter(graph, transitLayer);
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
@@ -105,8 +106,11 @@ public class SpeedTest {
         }
     }
 
-    private static Graph loadGraph(File rootDir) {
-        Graph graph = SerializedGraphObject.load(OtpDataStore.graphFile(rootDir));
+    private static Graph loadGraph(File baseDir, URI path) {
+        File file = path == null
+            ? OtpDataStore.graphFile(baseDir)
+            : path.isAbsolute() ? new File(path) : new File(baseDir, path.getPath());
+        Graph graph = SerializedGraphObject.load(file);
         if(graph == null) { throw new IllegalStateException(); }
         graph.index();
         return graph;

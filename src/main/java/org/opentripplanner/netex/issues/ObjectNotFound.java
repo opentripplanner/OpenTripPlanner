@@ -2,14 +2,14 @@ package org.opentripplanner.netex.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
 
-public class ObjecctNotFound implements DataImportIssue {
+public class ObjectNotFound implements DataImportIssue {
 
   private final String sourceType;
   private final String sourceId;
   private final String targetFieldName;
   private final String missingTargetId;
 
-  public ObjecctNotFound(
+  public ObjectNotFound(
       String sourceType,
       String sourceId,
       String targetFieldName,

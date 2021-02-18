@@ -4,13 +4,14 @@ import graphql.schema.GraphQLEnumType;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.alertpatch.StopCondition;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 
 import java.util.Arrays;
@@ -248,12 +249,21 @@ public class EnumTypes {
             .build();
 
     public static GraphQLEnumType BOOKING_METHOD = GraphQLEnumType.newEnum()
-        .name("bookingMethodEnum")
+        .name("BookingMethod")
         .value("callDriver", BookingMethod.CALL_DRIVER)
         .value("callOffice", BookingMethod.CALL_OFFICE)
         .value("online", BookingMethod.ONLINE)
         .value("phoneAtStop", BookingMethod.PHONE_AT_STOP)
         .value("text", BookingMethod.TEXT_MESSAGE)
+        .build();
+
+
+    public static GraphQLEnumType SERVICE_ALTERATION = GraphQLEnumType.newEnum()
+        .name("ServiceAlteration")
+        .value("cancellation", TripAlteration.CANCELLATION)
+        .value("replaced", TripAlteration.REPLACED)
+        .value("extraJourney", TripAlteration.EXTRA_JOURNEY)
+        .value("planned", TripAlteration.PLANNED)
         .build();
 
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {

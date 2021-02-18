@@ -1,8 +1,10 @@
 package org.opentripplanner.netex.mapping.calendar;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.issues.DayTypeScheduleIsEmpty;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
@@ -70,7 +72,8 @@ public class DayTypeAssignmentMapper {
         ReadOnlyHierarchicalMapById<DayType> dayTypes,
         ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> assignments,
         ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
-        ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods
+        ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods,
+        DataImportIssueStore issueStore
     ) {
         Map<String, Set<ServiceDate>> result = new HashMap<>();
 
@@ -80,7 +83,13 @@ public class DayTypeAssignmentMapper {
             for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
                 mapper.map(it);
             }
-            result.put(dayType.getId(), mapper.mergeAndMapDates());
+            Set<ServiceDate> dates = mapper.mergeAndMapDates();
+
+            if(dates.isEmpty()) {
+                issueStore.add(new DayTypeScheduleIsEmpty(dayType.getId()));
+            }
+
+            result.put(dayType.getId(), dates);
         }
         return result;
     }
