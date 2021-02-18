@@ -75,4 +75,4 @@ jobs:
         if: always()
         with:
           github-token: ${{ github.token }}
-          webhook-url: ${{ secrets.MSTEAMS_WEBHOOK }}
+          webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
