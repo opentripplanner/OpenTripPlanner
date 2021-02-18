@@ -67,11 +67,12 @@ jobs:
         run: |
           aws s3 cp ./target/mkdocs s3://otp-docs.ibi-transit.com --recursive --acl public-read
       # Push notification to Teams.
-#      - name: Notify us of the build status on MS Teams
+      - name: Notify us of the build status on MS Teams
         # Release https://github.com/toko-bifrost/ms-teams-deploy-card/releases/tag/3.1.2 this matches
-        # the full length commit SHA below.
-  #        uses: toko-bifrost/ms-teams-deploy-card@dcc94e4ce4088b1e6b6de5c9a3cda4ddcbe97d2e
-  #        if: always()
-  #        with:
-  #          github-token: ${{ github.token }}
-  #          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+        # the full length commit SHA below. This must not be changed without first reviewing the code of the newer
+        # version for potential security risks.
+        uses: toko-bifrost/ms-teams-deploy-card@dcc94e4ce4088b1e6b6de5c9a3cda4ddcbe97d2e
+        if: always()
+        with:
+          github-token: ${{ github.token }}
+          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
