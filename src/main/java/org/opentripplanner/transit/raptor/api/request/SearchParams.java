@@ -34,6 +34,7 @@ public class SearchParams {
     private final int earliestDepartureTime;
     private final int latestArrivalTime;
     private final int searchWindowInSeconds;
+    private final boolean preferLateArrival;
     private final int numberOfAdditionalTransfers;
     private final int maxNumberOfTransfers;
     private final double relaxCostAtDestination;
@@ -48,6 +49,7 @@ public class SearchParams {
         earliestDepartureTime = TIME_NOT_SET;
         latestArrivalTime = TIME_NOT_SET;
         searchWindowInSeconds = NOT_SET;
+        preferLateArrival = false;
         numberOfAdditionalTransfers = 5;
         maxNumberOfTransfers = NOT_SET;
         relaxCostAtDestination = NOT_SET;
@@ -60,6 +62,7 @@ public class SearchParams {
         this.earliestDepartureTime = builder.earliestDepartureTime();
         this.latestArrivalTime = builder.latestArrivalTime();
         this.searchWindowInSeconds = builder.searchWindowInSeconds();
+        this.preferLateArrival = builder.preferLateArrival();
         this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
         this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
@@ -133,6 +136,16 @@ public class SearchParams {
     }
     public boolean searchOneIterationOnly() {
         return searchWindowInSeconds == 0;
+    }
+
+
+    /**
+     * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is
+     * required if this parameter is set. This parameter is not allowed if the
+     * {@link #timetableEnabled} is enabled.
+     */
+    public boolean preferLateArrival() {
+        return preferLateArrival;
     }
 
     /**
@@ -223,6 +236,7 @@ public class SearchParams {
             .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
             .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
             .addDurationSec("searchWindow", searchWindowInSeconds)
+            .addBool("departAsLateAsPossible", preferLateArrival)
             .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
             .addColLimited("accessPaths", accessPaths, 5)
             .addColLimited("egressPaths", egressPaths, 5)
@@ -237,6 +251,7 @@ public class SearchParams {
         return earliestDepartureTime == that.earliestDepartureTime &&
                 latestArrivalTime == that.latestArrivalTime &&
                 searchWindowInSeconds == that.searchWindowInSeconds &&
+                preferLateArrival == that.preferLateArrival &&
                 numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
                 accessPaths.equals(that.accessPaths) &&
                 egressPaths.equals(that.egressPaths);
@@ -246,7 +261,7 @@ public class SearchParams {
     public int hashCode() {
         return Objects.hash(
                 earliestDepartureTime, latestArrivalTime, searchWindowInSeconds,
-                accessPaths, egressPaths, numberOfAdditionalTransfers
+            preferLateArrival, accessPaths, egressPaths, numberOfAdditionalTransfers
         );
     }
 
@@ -260,5 +275,13 @@ public class SearchParams {
         );
         assertProperty(!accessPaths.isEmpty(), "At least one 'accessPath' is required.");
         assertProperty(!egressPaths.isEmpty(), "At least one 'egressPath' is required.");
+        assertProperty(
+            !(preferLateArrival && latestArrivalTime == TIME_NOT_SET),
+            "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set."
+        );
+        assertProperty(
+            !(preferLateArrival && timetableEnabled),
+            "The 'departAsLateAsPossible' is not allowed together with 'timetableEnabled'."
+        );
     }
 }

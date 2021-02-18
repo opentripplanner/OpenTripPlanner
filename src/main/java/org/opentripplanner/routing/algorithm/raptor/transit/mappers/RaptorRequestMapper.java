@@ -52,9 +52,13 @@ public class RaptorRequestMapper {
         builder
                 .searchParams()
                 .searchWindow(request.searchWindow)
+                .timetableEnabled(request.timetableView)
                 .addAccessPaths(accessPaths)
-                .addEgressPaths(egressPaths)
-                .timetableEnabled(true);
+                .addEgressPaths(egressPaths);
+
+        if(!request.timetableView && request.arriveBy) {
+            builder.searchParams().preferLateArrival(true);
+        }
 
         builder.mcCostFactors()
                 .waitReluctanceFactor(request.waitReluctance);

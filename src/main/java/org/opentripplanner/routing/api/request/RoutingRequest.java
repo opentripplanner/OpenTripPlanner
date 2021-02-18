@@ -232,6 +232,37 @@ public class RoutingRequest implements Cloneable, Serializable {
     public Duration searchWindow;
 
     /**
+     * Search for the best trip options within a time window. If {@code true} two itineraries are
+     * considered optimal if one is better on arrival time(earliest wins) and the other is better
+     * on departure time(latest wins).
+     * <p>
+     * In combination with {@code arriveBy} this parameter cover the following 3 use cases:
+     * <ul>
+     *   <li>
+     *     The traveler want to find the best alternative within a time window. Set
+     *     {@code timetableView=true} and {@code arriveBy=false}. This is the default, and if the
+     *     intention of the traveler is unknown, this gives the best result. This use-case includes
+     *     all itineraries in the two next use-cases. This option also work well with paging.
+     *
+     *     Setting the {@code arriveBy=false}, covers the same use-case, but the input time is
+     *     interpreted as latest-arrival-time, and not earliest-departure-time.
+     *   </li>
+     *   <li>
+     *     The traveler want to find the best alternative with departure after a specific time.
+     *     For example: I am at the station now and want to get home as quickly as possible.
+     *     Set {@code timetableView=true} and {@code arriveBy=false}. Do not support paging.
+     *   </li>
+     *   <li>
+     *     Traveler want to find the best alternative with arrival before specific time. For
+     *     example going to a meeting. Set {@code timetableView=true} and {@code arriveBy=false}.
+     *     Do not support paging.
+     *   </li>
+     * </ul>
+     * Default: true
+     */
+    public boolean timetableView = true;
+
+    /**
      * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
      */
     public boolean arriveBy = false;
