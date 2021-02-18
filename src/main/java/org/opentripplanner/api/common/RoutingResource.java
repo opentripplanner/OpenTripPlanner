@@ -107,12 +107,12 @@ public abstract class RoutingResource {
      *   <li>
      *     Traveler want to find the best alternative with departure after a specific time.
      *     For example: I am at the station now and want to get home as quickly as possible.
-     *     Set {@code timetableView=true} and {@code arriveBy=false}. Do not support paging.
+     *     Set {@code timetableView=false} and {@code arriveBy=false}. Do not support paging.
      *   </li>
      *   <li>
      *     Traveler want to find the best alternative with arrival before specific time. For
      *     example going to a meeting. Do not support paging.
-     *     Set {@code timetableView=true} and {@code arriveBy=false}.
+     *     Set {@code timetableView=false} and {@code arriveBy=true}.
      *   </li>
      * </ul>
      * Default: true
