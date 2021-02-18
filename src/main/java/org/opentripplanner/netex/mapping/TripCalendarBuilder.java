@@ -6,7 +6,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
-import org.opentripplanner.netex.issues.ObjecctNotFound;
+import org.opentripplanner.netex.issues.ObjectNotFound;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.calendar.DatedServiceJourneyMapper;
 import org.opentripplanner.netex.mapping.calendar.DayTypeAssignmentMapper;
@@ -67,7 +67,8 @@ public class TripCalendarBuilder {
             dayTypeById,
             dayTypeAssignmentByDayTypeId,
             operatingDays,
-            operatingPeriodById
+            operatingPeriodById,
+            issueStore
         )
     );
   }
@@ -139,7 +140,7 @@ public class TripCalendarBuilder {
 
   private void reportSJDayTypeNotFound(ServiceJourney sj, String dayTypeRef) {
     issueStore.add(
-        new ObjecctNotFound(
+        new ObjectNotFound(
             "ServiceJourney", sj.getId(),
             "DayTypes", dayTypeRef
         )
