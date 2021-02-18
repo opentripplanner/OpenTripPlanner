@@ -129,6 +129,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
                 toStopArrival.stop(),
                 targetArrivalTime,
                 domainCost(fromStopArrival),
+                fromStopArrival.transferPath().transfer(),
                 mapToTransit(toStopArrival)
         );
     }

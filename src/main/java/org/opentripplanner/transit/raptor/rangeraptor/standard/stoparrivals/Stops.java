@@ -93,7 +93,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         int stop = transfer.stop();
         StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
 
-        state.transferToStop(fromStop, arrivalTime, transfer.durationInSeconds());
+        state.transferToStop(fromStop, arrivalTime, transfer);
     }
 
     void transitToStop(int stop, int time, int boardStop, int boardTime, T trip, boolean bestTime) {

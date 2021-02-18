@@ -92,6 +92,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
                 arrival.stop(),
                 arrival.arrivalTime(),
                 domainCost(arrival),
+                arrival.transferPath().transfer(),
                 nextLeg
         );
     }

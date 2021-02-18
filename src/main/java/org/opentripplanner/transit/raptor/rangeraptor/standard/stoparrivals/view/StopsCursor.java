@@ -52,7 +52,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      */
     public Transfer<T> rejectedTransfer(int round, int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
         StopArrivalState<T> arrival = new StopArrivalState<>();
-        arrival.transferToStop(fromStop, arrivalTime, transfer.durationInSeconds());
+        arrival.transferToStop(fromStop, arrivalTime, transfer);
         return new Transfer<>(round, toStop, arrival, this);
     }
 

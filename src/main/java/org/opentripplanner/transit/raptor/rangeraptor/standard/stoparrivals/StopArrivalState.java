@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.transit.raptor.util.IntUtils;
@@ -40,7 +41,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
 
     // Transfer (and access)
     private int transferFromStop = NOT_SET;
-    private int accessOrTransferDuration = NOT_SET;
+    private RaptorTransfer accessOrTransferPath = null;
 
     StopArrivalState(StopArrivalState<T> other) {
         this.bestArrivalTime = other.bestArrivalTime;
@@ -49,7 +50,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         this.boardTime = other.boardTime;
         this.boardStop = other.boardStop;
         this.transferFromStop = other.transferFromStop;
-        this.accessOrTransferDuration = other.accessOrTransferDuration;
+        this.accessOrTransferPath = other.accessOrTransferPath;
     }
 
     public StopArrivalState() { }
@@ -58,8 +59,12 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         return bestArrivalTime;
     }
 
+    public RaptorTransfer accessPath() {
+        return accessOrTransferPath;
+    }
+
     public final int accessDuration() {
-        return accessOrTransferDuration;
+        return accessOrTransferPath.durationInSeconds();
     }
 
     public final int transitTime() {
@@ -83,7 +88,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     }
 
     public final int transferDuration() {
-        return accessOrTransferDuration;
+        return accessOrTransferPath.durationInSeconds();
     }
 
     public boolean arrivedByAccess() {
@@ -98,9 +103,13 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         return transferFromStop != NOT_SET;
     }
 
-    void setAccessTime(int time, int accessDuration) {
+    public final RaptorTransfer transferPath() {
+        return accessOrTransferPath;
+    }
+
+    void setAccessTime(int time, RaptorTransfer accessPath) {
         this.bestArrivalTime = time;
-        this.accessOrTransferDuration = accessDuration;
+        this.accessOrTransferPath = accessPath;
     }
 
     final boolean reached() {
@@ -123,10 +132,10 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     /**
      * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
      */
-    public final void transferToStop(int fromStop, int arrivalTime, int transferTime) {
+    public final void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
         this.bestArrivalTime = arrivalTime;
         this.transferFromStop = fromStop;
-        this.accessOrTransferDuration = transferTime;
+        this.accessOrTransferPath = transferPath;
     }
 
     public AccessStopArrivalState<T> asAccessStopArrivalState() {
@@ -142,7 +151,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
                 TimeUtils.timeToStrCompact(transitArrivalTime, NOT_SET),
                 trip == null ? "" : trip.pattern().debugInfo(),
                 IntUtils.intToString(transferFromStop, NOT_SET),
-          DurationUtils.durationToStr(accessOrTransferDuration, NOT_SET)
+          accessOrTransferPath != null ? DurationUtils.durationToStr(accessOrTransferPath.durationInSeconds(), NOT_SET) : ""
         );
     }
 }
