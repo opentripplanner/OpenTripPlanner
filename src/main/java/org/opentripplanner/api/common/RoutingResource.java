@@ -124,16 +124,26 @@ public abstract class RoutingResource {
     /**
      * An additive weight for how bad each meter of driving is, compared to being in transit for equal distances. It is
      * recommended to use this sparingly as larger values will incentivize driving paths that cut through neighborhoods.
-     * Ex: with a factor of 0.2, an edge that is ten meters in length would have 2 units of "weight" added to the overall
-     * weight of traversing the edge while driving.
+     *
+     * Defaults to -1.0 which indicates that driving reluctance should not be used in car routing requests. Empirically,
+     * a value of 0.2 seems work OK.
+     *
+     * Ex: with a factor of 0.2, an edge that is ten meters in length would have 2 units of "weight" added to the
+     * overall weight of traversing the edge while driving. OTP's weight units are roughly equivalent to seconds.
      */
     @QueryParam("driveDistanceReluctance")
     protected Double driveDistanceReluctance;
 
     /**
      * An additive weight for how bad each second of driving is, compared to being in transit for equal lengths of time.
+     *
+     * Defaults to -1.0 which indicates that driving reluctance should not be used in car routing requests. Empirically,
+     * a value of 5.0 seems to work well in disincentivizing driving to some park and rides that may seem too close to
+     * the destination.
+     *
      * Ex: with a factor of 1.75, an edge that takes ten seconds to traverse while driving would have 17.5 units of
-     * "weight" added to the overall weight of traversing the edge.
+     * "weight" added to the overall weight of traversing the edge. OTP's weight units are roughly equivalent to
+     * seconds.
      */
     @QueryParam("driveTimeReluctance")
     protected Double driveTimeReluctance;

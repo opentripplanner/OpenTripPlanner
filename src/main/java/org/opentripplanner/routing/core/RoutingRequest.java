@@ -635,7 +635,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * request might have different reluctance factors than a car rental request. Using the drive distance reluctance
      * factor should be used sparingly as it can incentivize cutting through low-traffic neighborhoods.
      * The time and distance reluctance factors add weight to a shortest path search in {@link StreetEdge#doTraverse}.
-     * These are set to -1 to indicate that driving reluctance should not be used in default car routing requests.
+     * These are set to -1 to indicate that driving reluctance should not be used in car routing requests.
      */
     public double driveTimeReluctance = -1.0;
     public double driveDistanceReluctance = -1.0;
