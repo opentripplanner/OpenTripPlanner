@@ -11,7 +11,8 @@ public class TransferWithDuration implements RaptorTransfer {
 
     public TransferWithDuration(Transfer transfer, double walkSpeed) {
         this.transfer = transfer;
-        this.durationSeconds = (int) Math.round(transfer.getEffectiveWalkDistanceMeters() / walkSpeed);
+        this.durationSeconds = (int) Math.round(transfer.getEffectiveWalkDistanceMeters() / walkSpeed)
+            + transfer.getDistanceIndependentTime();
     }
 
     public Transfer transfer() {

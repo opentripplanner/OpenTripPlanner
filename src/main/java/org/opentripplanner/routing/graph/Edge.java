@@ -179,10 +179,25 @@ public abstract class Edge implements Serializable {
     }
 
     /**
-     * This gets the effective length for walking, taking slopes into account. This can be divided
-     * by the speed on a flat surface to get the duration.
+     * The distance to walk adjusted for elevation and obstacles. This is used together
+     * with the walking speed to find the actual walking transfer time. This plus
+     * {@link #getDistanceIndependentTime()} is used to calculate the actual-transfer-time
+     * given a walking speed.
+     * <p>
+     * Unit: meters. Default: 0.
      */
-    public double getEffectiveWalkDistance() {
+    public double getEffectiveWalkDistance(){
+        return 0;
+    }
+
+    /**
+     * This is the transfer time(duration) spent NOT moving like time in in elevators, escalators
+     * and waiting on read light when crossing a street. This is used together with
+     * {@link #getEffectiveWalkDistance()} to calculate the actual-transfer-time.
+     * <p>
+     * Unit: seconds. Default: 0.
+     */
+    public int getDistanceIndependentTime() {
         return 0;
     }
 

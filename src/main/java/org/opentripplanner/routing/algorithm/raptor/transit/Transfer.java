@@ -11,12 +11,16 @@ public class Transfer {
     private int toStop;
 
     private final int effectiveWalkDistanceMeters;
+    private final int distanceIndependentTime;
 
     private final List<Edge> edges;
 
-    public Transfer(int toStop, int effectiveWalkDistanceMeters, List<Edge> edges) {
+    public Transfer(
+        int toStop, int effectiveWalkDistanceMeters, int distanceIndependentTime, List<Edge> edges
+    ) {
         this.toStop = toStop;
         this.effectiveWalkDistanceMeters = effectiveWalkDistanceMeters;
+        this.distanceIndependentTime = distanceIndependentTime;
         this.edges = edges;
     }
 
@@ -43,6 +47,10 @@ public class Transfer {
      */
     public int getEffectiveWalkDistanceMeters() {
         return effectiveWalkDistanceMeters;
+    }
+
+    public int getDistanceIndependentTime() {
+        return distanceIndependentTime;
     }
 
     public int getDistanceMeters() {

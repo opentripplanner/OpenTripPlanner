@@ -31,8 +31,12 @@ class TransfersMapper {
                 double effectiveDistance = simpleTransfer.getEffectiveWalkDistance();
                 if (simpleTransfer.to instanceof Stop) {
                     int toStopIndex = stopIndex.indexByStop.get(simpleTransfer.to);
-                    Transfer transfer = new Transfer(toStopIndex, (int) effectiveDistance,
-                        simpleTransfer.getEdges());
+                    Transfer transfer = new Transfer(
+                        toStopIndex,
+                        (int) effectiveDistance,
+                        simpleTransfer.getDistanceIndependentTime(),
+                        simpleTransfer.getEdges()
+                    );
 
                     list.add(transfer);
                 }
