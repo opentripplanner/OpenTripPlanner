@@ -74,8 +74,7 @@ class ItineraryResultMapper {
                 itinerary.walkDistance.intValue(),
                 itinerary.startTime,
                 itinerary.endTime,
-                itinerary.details(),
-                skipCost
+                itinerary.details()
         );
 
         for (Leg it : itinerary.legs) {

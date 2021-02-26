@@ -160,8 +160,7 @@ public class CsvFileIO {
                     Integer.parseInt(csvReader.get("walkDistance")),
                     time2Int(csvReader.get("startTime")),
                     time2Int(csvReader.get("endTime")),
-                    csvReader.get("details"),
-                    skipCost
+                    csvReader.get("details")
             );
             r.modes.addAll(str2Col(csvReader.get("modes"), TraverseMode::valueOf));
             r.agencies.addAll(str2Col(csvReader.get("agencies")));
