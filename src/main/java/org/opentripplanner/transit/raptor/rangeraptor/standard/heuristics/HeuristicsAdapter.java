@@ -118,7 +118,7 @@ public class HeuristicsAdapter implements Heuristics {
     public String toString() {
         return ToStringBuilder.of(Heuristics.class)
             .addServiceTime("originDepartureTime(last iteration)", originDepartureTime, NOT_SET)
-            .addFieldIfTrue("resultsExist", aggregatedResultsCalculated)
+            .addBoolIfTrue("resultsExist", aggregatedResultsCalculated)
             .addDurationSec("minJourneyTravelDuration", minJourneyTravelDuration, NOT_SET)
             .addDurationSec("minJourneyNumOfTransfers", minJourneyNumOfTransfers, NOT_SET)
             .addServiceTime("earliestArrivalTime", earliestArrivalTime, NOT_SET)

@@ -1,0 +1,4 @@
+pathway_id,from_stop_id,to_stop_id,traversal_time,wheelchair_traversal_time,pathway_mode,is_bidirectional
+pathways_1_1,entrance_a,A,34,68,1,0
+pathways_1_2,A,entrance_a,34,68,1,0
+pathways_2,entrance_b,B,10,20,1,1
