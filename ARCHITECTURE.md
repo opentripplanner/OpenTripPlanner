@@ -36,8 +36,9 @@ Used to import GTFS transit data files.
 
 Used to import NeTEx transit data files.
 
+### Transit Routing
 
-### [Raptor transit routing](src/main/java/org/opentripplanner/transit/raptor/package.md)
+#### [Raptor transit routing](src/main/java/org/opentripplanner/transit/raptor/package.md)
 
 This is the OTP2 new transit routing engine implemented using the Raptor algorithm. It explains how
 Raptor works, the important concepts, and the design. It might be worth reading even if you are not
@@ -61,3 +62,7 @@ The performance of Raptor is important, and we care about every millisecond. All
 existing Raptor coded should be tested with the 
 [SpeedTest](src/test/java/org/opentripplanner/transit/raptor/speed_test/package.md) and 
 compared with an earlier version of the code to make sure the performance is NOT degraded. 
+
+#### [Transfer path optimization](src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
+Describe the transfer functionality, the design and implementation. The logic for finding the best
+transfer is distributed to the Raptor and the [OptimizeTransferService](src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/OptimizeTransferService.java).

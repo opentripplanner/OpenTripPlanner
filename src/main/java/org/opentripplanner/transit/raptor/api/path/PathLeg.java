@@ -1,13 +1,12 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
-
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * A leg in a Raptor path. The legs are linked together from the first leg {@link AccessPathLeg},
@@ -25,10 +24,11 @@ import java.util.stream.StreamSupport;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface PathLeg<T extends RaptorTripSchedule> {
+public interface  PathLeg<T extends RaptorTripSchedule> {
 
     /**
-     * The time when the leg start/depart from the leg origin.
+     * The time when the leg start/depart from the leg origin. For transit the time do
+     * NOT include boardSlack.
      */
     int fromTime();
 
@@ -41,7 +41,8 @@ public interface PathLeg<T extends RaptorTripSchedule> {
     }
 
     /**
-     * The time when the leg end/arrive at the leg destination.
+     * The time when the leg end/arrive at the leg destination. For transit the time do
+     * NOT include alight-slack.
      */
     int toTime();
 
@@ -59,7 +60,6 @@ public interface PathLeg<T extends RaptorTripSchedule> {
     default int duration() {
         return toTime() - fromTime();
     }
-
 
     /**
      * The computed generalized-cost for this path leg.
