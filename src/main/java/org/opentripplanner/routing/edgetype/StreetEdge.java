@@ -519,16 +519,6 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
         return options.getSpeed(traverseMode);
     }
 
-    @Override
-    public double weightLowerBound(RoutingRequest options) {
-        return timeLowerBound(options) * options.walkReluctance;
-    }
-
-    @Override
-    public double timeLowerBound(RoutingRequest options) {
-        return this.getDistanceMeters() / options.getStreetSpeedUpperBound();
-    }
-
     /**
      * This gets the effective length for bikes and wheelchairs, taking slopes into account. This
      * can be divided by the speed on a flat surface to get the duration.
