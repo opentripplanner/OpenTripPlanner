@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.GbfsResponse;
 import org.opentripplanner.util.NonLocalizedString;
@@ -240,12 +241,16 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         }
 
         @Override
-        public BikeRentalStation makeStation(JsonNode stationNode) {
+        public BikeRentalStation makeStation(JsonNode stationNode, Integer feedUpdateEpochSeconds) {
             BikeRentalStation brstation = new BikeRentalStation();
             brstation.id = stationNode.path("station_id").toString();
             brstation.x = stationNode.path("lon").asDouble();
             brstation.y = stationNode.path("lat").asDouble();
             brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
+            brstation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+                stationNode.path("last_reported").asLong(),
+                feedUpdateEpochSeconds
+            );
             brstation.isCarStation = routeAsCar;
             return brstation;
         }
@@ -258,11 +263,15 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         }
 
         @Override
-        public BikeRentalStation makeStation(JsonNode stationNode) {
+        public BikeRentalStation makeStation(JsonNode stationNode, Integer feedUpdateEpochSeconds) {
             BikeRentalStation brstation = new BikeRentalStation();
             brstation.id = stationNode.path("station_id").toString();
             brstation.bikesAvailable = stationNode.path("num_bikes_available").asInt();
             brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
+            brstation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+                stationNode.path("last_reported").asLong(),
+                feedUpdateEpochSeconds
+            );
             brstation.isCarStation = routeAsCar;
             return brstation;
         }
@@ -275,12 +284,16 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         }
 
         @Override
-        public BikeRentalStation makeStation(JsonNode stationNode) {
+        public BikeRentalStation makeStation(JsonNode stationNode, Integer feedUpdateEpochSeconds) {
             BikeRentalStation brstation = new BikeRentalStation();
             brstation.id = stationNode.path("bike_id").toString();
             brstation.name = new NonLocalizedString(stationNode.path("name").asText());
             brstation.x = stationNode.path("lon").asDouble();
             brstation.y = stationNode.path("lat").asDouble();
+            brstation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+                stationNode.path("last_reported").asLong(),
+                feedUpdateEpochSeconds
+            );
             brstation.bikesAvailable = 1;
             brstation.spacesAvailable = 0;
             brstation.allowDropoff = false;

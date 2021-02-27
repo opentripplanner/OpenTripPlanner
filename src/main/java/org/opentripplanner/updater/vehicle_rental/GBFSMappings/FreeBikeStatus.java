@@ -19,5 +19,7 @@ public class FreeBikeStatus extends BaseGtfsResponse {
         public Double lon;
         public Boolean is_reserved;
         public Boolean is_disabled;
+        /** This field is only available starting in GBFS 2.1-RC+ */
+        public Long last_reported;
     }
 }

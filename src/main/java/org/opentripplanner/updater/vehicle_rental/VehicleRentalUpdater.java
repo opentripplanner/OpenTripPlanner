@@ -12,19 +12,17 @@ import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.edgetype.RentAVehicleOffEdge;
 import org.opentripplanner.routing.edgetype.RentAVehicleOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalRegion;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +61,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     private VehicleRentalStationService service;
 
     private VehicleRentalDataSource source;
+
+    private int timeToLiveMinutes;
 
     private GraphUpdaterManager updaterManager;
 
@@ -111,6 +111,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up vehicle rental updater.");
         this.graph = graph;
         this.source = source;
+        this.timeToLiveMinutes = config.path("timeToLiveMinutes").asInt(Integer.MAX_VALUE);
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating vehicle rental updater running once only (non-polling): {}", source);
         } else {
@@ -158,8 +159,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             Set<VehicleRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
             LOG.info("Updating {} vehicle rental stations for network {}.", stations.size(), network);
-            /* add any new stations and update vehicle counts for existing stations */
+            /* add any new stations that have fresh-enough data and update vehicle counts for existing stations */
             for (VehicleRentalStation station : stations) {
+                if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
+                    // skip station as it does not have fresh-enough data
+                    continue;
+                }
                 service.addVehicleRentalStation(station);
                 stationSet.add(station);
                 VehicleRentalStationVertex vertex = verticesByStation.get(station);

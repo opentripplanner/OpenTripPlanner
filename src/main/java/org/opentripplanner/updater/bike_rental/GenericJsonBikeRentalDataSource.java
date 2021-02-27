@@ -111,6 +111,8 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(rentalString);
 
+        Integer feedUpdateEpochSeconds = rootNode.path("last_updated").asInt();
+
         if (!jsonParsePath.equals("")) {
             String delimiter = "/";
             String[] parseElement = jsonParsePath.split(delimiter);
@@ -129,7 +131,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
             if (node == null) {
                 continue;
             }
-            BikeRentalStation brstation = makeStation(node);
+            BikeRentalStation brstation = makeStation(node, feedUpdateEpochSeconds);
             if (brstation != null)
                 out.add(brstation);
         }
@@ -169,7 +171,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     	this.url = url;
     }
 
-    public abstract BikeRentalStation makeStation(JsonNode rentalStationNode);
+    public abstract BikeRentalStation makeStation(JsonNode rentalStationNode, Integer feedUpdateEpochSeconds);
 
     @Override
     public String toString() {

@@ -22,6 +22,7 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,8 @@ public class CarRentalUpdater extends PollingGraphUpdater {
     private CarRentalStationService service;
 
     private CarRentalDataSource source;
+
+    private int timeToLiveMinutes;
 
     private GraphUpdaterManager updaterManager;
 
@@ -100,6 +103,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up car rental updater.");
         this.graph = graph;
         this.source = source;
+        this.timeToLiveMinutes = config.path("timeToLiveMinutes").asInt(Integer.MAX_VALUE);
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating car rental updater running once only (non-polling): {}", source);
         } else {
@@ -148,8 +152,12 @@ public class CarRentalUpdater extends PollingGraphUpdater {
             Set<CarRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
             LOG.info("Updating {} rental car stations for network {}.", stations.size(), network);
-            /* add any new stations and update car counts for existing stations */
+            /* add any new stations that have fresh-enough data and update car counts for existing stations */
             for (CarRentalStation station : stations) {
+                if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
+                    // skip station as it does not have fresh-enough data
+                    continue;
+                }
                 service.addCarRentalStation(station);
                 stationSet.add(station);
                 CarRentalStationVertex vertex = verticesByStation.get(station);

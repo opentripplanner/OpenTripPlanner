@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalRegion;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.JsonConfigurable;
@@ -388,6 +389,12 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
             vehicleRentalStation.allowDropoff = station.num_docks_available > 0 &&
                 (station.is_installed == null || station.is_installed == 1) &&
                 (station.is_returning == null || station.is_returning == 1);
+
+            // set the last reported time
+            vehicleRentalStation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+                station.last_reported,
+                stationStatus.last_updated
+            );
         }
         stations.addAll(stationsByStationId.values());
         if (stations.size() > 0) {
@@ -417,6 +424,10 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
                 floatingVehicle.networks = Sets.newHashSet(networkName);
                 floatingVehicle.spacesAvailable = 0;
                 floatingVehicle.vehiclesAvailable = 1;
+                floatingVehicle.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+                    bike.last_reported,
+                    floatingBikes.last_updated
+                );
 
                 stations.add(floatingVehicle);
             }

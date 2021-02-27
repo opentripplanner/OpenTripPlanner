@@ -18,6 +18,7 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +57,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     private BikeRentalStationService service;
 
     private String network = "default";
+
+    private int timeToLiveMinutes;
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -118,6 +121,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up bike rental updater.");
         this.source = source;
         this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
+        this.timeToLiveMinutes = config.path("timeToLiveMinutes").asInt(Integer.MAX_VALUE);
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating bike-rental updater running once only (non-polling): {}", source);
         } else {
@@ -166,8 +170,12 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             Set<BikeRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
             LOG.info("Updating {} rental bike stations.", stations.size());
-            /* add any new stations and update bike counts for existing stations */
+            /* add any new stations that have fresh-enough data and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
+                if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
+                    // skip station as it does not have fresh-enough data
+                    continue;
+                }
                 if (station.networks == null) {
                     /* API did not provide a network list, use default */
                     station.networks = defaultNetworks;
