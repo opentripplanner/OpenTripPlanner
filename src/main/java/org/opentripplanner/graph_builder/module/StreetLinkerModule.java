@@ -59,20 +59,20 @@ public class StreetLinkerModule implements GraphBuilderModule {
     VertexLinker linker = graph.getLinker();
 
     if (graph.hasStreets) {
-      linkTransitStops(graph, linker);
-      linkTransitEntrances(graph, linker);
-      linkBikeRentals(graph, linker);
-      linkBikeParks(graph, linker);
+      linkTransitStops(graph);
+      linkTransitEntrances(graph);
+      linkBikeRentals(graph);
+      linkBikeParks(graph);
     }
 
     // Calculates convex hull of a graph which is shown in routerInfo API point
     graph.calculateConvexHull();
   }
 
-  private void linkTransitStops(Graph graph, VertexLinker linker) {
+  private void linkTransitStops(Graph graph) {
     LOG.info("Linking transit stops to graph...");
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-      linker.linkVertexPermanently(
+      graph.getLinker().linkVertexPermanently(
           tStop,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
@@ -84,10 +84,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
   }
 
-  private void linkTransitEntrances(Graph graph, VertexLinker linker) {
+  private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
-      linker.linkVertexPermanently(
+      graph.getLinker().linkVertexPermanently(
           tEntrance,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
@@ -99,11 +99,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
   }
 
-  private void linkBikeRentals(Graph graph, VertexLinker linker) {
+  private void linkBikeRentals(Graph graph) {
     LOG.info("Linking bike rental stations to graph...");
       // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
     for (BikeRentalStationVertex bikeRental : graph.getVerticesOfType(BikeRentalStationVertex.class)) {
-      linker.linkVertexPermanently(
+      graph.getLinker().linkVertexPermanently(
           bikeRental,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
@@ -115,11 +115,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
   }
 
-  private void linkBikeParks(Graph graph, VertexLinker linker) {
+  private void linkBikeParks(Graph graph) {
     LOG.info("Linking bike parks to graph...");
     // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
     for (BikeParkVertex bikePark : graph.getVerticesOfType(BikeParkVertex.class)) {
-      linker.linkVertexPermanently(
+      graph.getLinker().linkVertexPermanently(
           bikePark,
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
