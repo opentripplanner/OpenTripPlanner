@@ -110,7 +110,7 @@ public class FakeGraph {
         VertexLinker linker = new VertexLinker(graph);
 
         for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-            linker.permanentGetOrCreateVerticesForLinking(
+            linker.linkVertexPermanently(
                 tStop,
                 TraverseMode.WALK,
                 LinkingDirection.BOTH_WAYS,

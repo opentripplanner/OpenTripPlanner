@@ -67,7 +67,7 @@ class StreetSearch {
                     !fromOrigin
             );
 
-            linker.requestGetOrCreateVerticesForLinking(
+            linker.linkVertexForRequest(
                 vertex,
                 TraverseMode.WALK,
                 fromOrigin ? LinkingDirection.BACKWARD : LinkingDirection.FORWARD,

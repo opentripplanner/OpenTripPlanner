@@ -79,11 +79,11 @@ public class VertexLinker {
     this.graph = graph;
   }
 
-  public DisposableEdgeCollection permanentGetOrCreateVerticesForLinking(
+  public DisposableEdgeCollection linkVertexPermanently(
       Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    return getOrCreateVerticesForLinking(
+    return link(
         vertex,
         traverseMode,
         direction,
@@ -92,11 +92,11 @@ public class VertexLinker {
     );
   }
 
-  public DisposableEdgeCollection realTimeGetOrCreateVerticesForLinking(
+  public DisposableEdgeCollection linkVertexForRealTime(
       Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    return getOrCreateVerticesForLinking(
+    return link(
         vertex,
         traverseMode,
         direction,
@@ -105,11 +105,11 @@ public class VertexLinker {
     );
   }
 
-  public DisposableEdgeCollection requestGetOrCreateVerticesForLinking(
+  public DisposableEdgeCollection linkVertexForRequest(
       Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    return getOrCreateVerticesForLinking(
+    return link(
         vertex,
         traverseMode,
         direction,
@@ -136,7 +136,7 @@ public class VertexLinker {
    *
    * @return A set of street edges that can be linked to.
    */
-  private DisposableEdgeCollection getOrCreateVerticesForLinking(
+  private DisposableEdgeCollection link(
       Vertex vertex,
       TraverseMode traverseMode,
       LinkingDirection direction,
