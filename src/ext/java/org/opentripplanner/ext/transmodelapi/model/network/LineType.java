@@ -15,6 +15,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.util.OTPFeature;
 
 import java.util.Collection;
 import java.util.List;
@@ -130,13 +131,14 @@ public class LineType {
                           .distinct()
                           .collect(Collectors.toList());
 
-                      // Workaround since flex trips are not part of patterns yet
-                      result.addAll(GqlUtil.getRoutingService(environment).getFlexIndex().tripById
-                          .values()
-                          .stream()
-                          .filter(t -> t.getRoute().equals((Route) environment.getSource()))
-                          .collect(Collectors.toList()));
-
+                      if(OTPFeature.FlexRouting.isOn()) {
+                        // Workaround since flex trips are not part of patterns yet
+                        result.addAll(GqlUtil.getRoutingService(environment).getFlexIndex().tripById
+                            .values()
+                            .stream()
+                            .filter(t -> t.getRoute().equals((Route) environment.getSource()))
+                            .collect(Collectors.toList()));
+                      }
                       return result;
                     })
                     .build())
@@ -161,7 +163,7 @@ public class LineType {
                 .name("flexibleLineType")
                 .description("Type of flexible line, or null if line is not flexible.")
                 .type(Scalars.GraphQLString)
-                .dataFetcher(environment -> null)
+                .dataFetcher(environment -> ((Route) environment.getSource()).getFlexibleLineType())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bookingArrangements")

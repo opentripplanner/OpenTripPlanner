@@ -2,7 +2,8 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +38,7 @@ public class TestCase {
         this.description = description;
         this.fromPlace = new Place(origin, FEED_ID, fromPlace, fromLat, fromLon);
         this.toPlace = new Place(destination, FEED_ID, toPlace, toLat, toLon);
-        this.results = testCaseResults == null ? new TestCaseResults(id) : testCaseResults;
+        this.results = testCaseResults;
     }
 
     @Override
@@ -64,9 +65,9 @@ public class TestCase {
     }
 
     private String durationToString(int orgTime, int calcTime) {
-        return orgTime == NOT_SET && calcTime > 0
-            ? TimeUtils.durationToStr(calcTime) + "*"
-            : TimeUtils.durationToStr(orgTime);
+      return orgTime == NOT_SET && calcTime > 0
+            ? DurationUtils.durationToStr(calcTime) + "*"
+            : DurationUtils.durationToStr(orgTime);
     }
 
     /**

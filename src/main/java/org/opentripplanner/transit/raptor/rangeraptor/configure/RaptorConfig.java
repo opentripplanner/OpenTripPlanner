@@ -41,6 +41,10 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
         this.timers = new WorkerPerformanceTimersCache(isMultiThreaded());
     }
 
+    public static <T extends RaptorTripSchedule> RaptorConfig<T> defaultConfigForTest() {
+        return new RaptorConfig<>(new RaptorTuningParameters() {});
+    }
+
     public SearchContext<T> context(RaptorTransitDataProvider<T> transit, RaptorRequest<T> request) {
         return new SearchContext<>(request, tuningParameters, transit, timers.get(request));
     }
@@ -93,7 +97,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
                 workerState,
                 routingStrategy,
                 ctx.transit(),
-                ctx.accessLegs(),
+                ctx.accessPaths(),
                 ctx.roundProvider(),
                 ctx.calculator(),
                 ctx.createLifeCyclePublisher(),

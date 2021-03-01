@@ -33,7 +33,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
 
     // Debug
-    private final DebugRequestBuilder<T> debug;
+    private final DebugRequestBuilder debug;
 
     public RaptorRequestBuilder() {
         this(RaptorRequest.defaults());
@@ -50,7 +50,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
         this.optimizations.addAll(defaults.optimizations());
 
         // Debug
-        this.debug = new DebugRequestBuilder<>(defaults.debug());
+        this.debug = new DebugRequestBuilder(defaults.debug());
     }
 
     public SearchParamsBuilder<T> searchParams() {
@@ -106,7 +106,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
         return this.mcCost;
     }
 
-    public DebugRequestBuilder<T> debug() {
+    public DebugRequestBuilder debug() {
         return this.debug;
     }
 

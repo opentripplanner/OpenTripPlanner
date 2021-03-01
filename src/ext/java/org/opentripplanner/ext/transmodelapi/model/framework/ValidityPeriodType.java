@@ -22,7 +22,7 @@ public class ValidityPeriodType {
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("endTime")
                   .type(qglUtil.dateTimeScalar)
-                  .description("End of validity period")
+                  .description("End of validity period. Will return 'null' if validity is open-ended.")
                   .dataFetcher(environment -> {
                       Pair<Long, Long> period = environment.getSource();
                       return period != null ? period.getRight() : null;

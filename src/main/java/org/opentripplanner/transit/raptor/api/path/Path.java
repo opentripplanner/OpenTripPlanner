@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.api.path;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Objects;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Path<T extends RaptorTripSchedule> {
+public final class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private final int iterationDepartureTime;
     private final int startTime;
     private final int endTime;
@@ -106,14 +107,16 @@ public final class Path<T extends RaptorTripSchedule> {
     }
 
     /**
-     * The first leg of this journey - witch is linked to the next and so on.
+     * The first leg/path of this journey - witch is linked to the next and so on. The leg
+     * can contain sub-legs, for example: walk-flex-walk.
+     *
      */
     public final AccessPathLeg<T> accessLeg() {
         return accessLeg;
     }
 
     /**
-     * The last leg of this journey.
+     * The last leg of this journey. The leg can contain sub-legs, for example: walk-flex-walk.
      */
     public final EgressPathLeg<T> egressLeg() {
         return egressPathLeg;
@@ -142,35 +145,36 @@ public final class Path<T extends RaptorTripSchedule> {
     @Override
     public String toString() {
         PathStringBuilder buf = new PathStringBuilder();
-        PathLeg<T> leg = accessLeg.nextLeg();
+        if(accessLeg != null) {
+            buf.accessEgress(accessLeg.access());
+            PathLeg<T> leg = accessLeg.nextLeg();
 
-        buf.walk(accessLeg.duration());
-
-        while (!leg.isEgressLeg()) {
-            buf.sep();
-            if(leg.isTransitLeg()) {
-                TransitPathLeg<T> transitLeg = leg.asTransitLeg();
-                buf.stop(transitLeg.fromStop())
-                    .sep()
-                    .transit(
+            while (!leg.isEgressLeg()) {
+                buf.sep();
+                if (leg.isTransitLeg()) {
+                    TransitPathLeg<T> transitLeg = leg.asTransitLeg();
+                    buf.stop(transitLeg.fromStop()).sep().transit(
                         transitLeg.trip().pattern().debugInfo(),
                         transitLeg.fromTime(),
                         transitLeg.toTime()
                     );
+                }
+                // Transfer
+                else {
+                    buf.stop(leg.asTransferLeg().fromStop()).sep().walk(leg.duration());
+                }
+                leg = leg.nextLeg();
             }
-            // Transfer
-            else {
-                buf.stop(leg.asTransferLeg().fromStop()).sep().walk(leg.duration());
-            }
-            leg = leg.nextLeg();
+            EgressPathLeg<T> egressLeg = leg.asEgressLeg();
+            buf.sep().stop(egressLeg.fromStop());
+            buf.sep().accessEgress(egressLeg.egress());
         }
-        buf.sep().stop(leg.asEgressLeg().fromStop()).sep().walk(leg.duration());
 
-        return buf.toString() +
+      return buf.toString() +
                 " [" + TimeUtils.timeToStrLong(startTime) +
                 " " + TimeUtils.timeToStrLong(endTime) +
-                " " + TimeUtils.durationToStr(endTime-startTime) +
-                (generalizedCost <= 0 ? "" : ", cost: " + (int)generalizedCost) + "]";
+                " " + DurationUtils.durationToStr(endTime - startTime) +
+                (generalizedCost == 0 ? "" : ", cost: " + generalizedCost) + "]";
     }
 
     @Override
@@ -198,11 +202,33 @@ public final class Path<T extends RaptorTripSchedule> {
     private static <S extends RaptorTripSchedule> int countNumberOfTransfers(AccessPathLeg<S> accessLeg) {
         // Skip first transit
         PathLeg<S> leg = accessLeg.nextLeg().nextLeg();
-        int i = 0;
+        int i = accessLeg.access().numberOfRides();
         while (!leg.isEgressLeg()) {
             if(leg.isTransitLeg()) { ++i; }
             leg = leg.nextLeg();
         }
+        i += leg.asEgressLeg().egress().numberOfRides();
         return i;
+    }
+
+    /**
+     * Sort paths in order:
+     * <ol>
+     *   <li>Earliest arrival time first,
+     *   <li>Then latest departure time
+     *   <li>Then lowest cost
+     *   <li>Then lowest number of transfers
+     * </ol>
+     */
+    @Override
+    public int compareTo(Path<T> other) {
+        int c = endTime - other.endTime;
+        if(c != 0) { return c; }
+        c = other.startTime - startTime;
+        if(c != 0) { return c; }
+        c = generalizedCost - other.generalizedCost;
+        if(c != 0) { return c; }
+        c = numberOfTransfers - other.numberOfTransfers;
+        return c;
     }
 }

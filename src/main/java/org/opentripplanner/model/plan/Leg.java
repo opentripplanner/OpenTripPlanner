@@ -63,7 +63,7 @@ public class Leg {
    * not inherit from Trip, so that the information that the Trip is flexible would be lost when
    * creating this object.
    */
-  public Boolean flexibleTrip = false;
+  public boolean flexibleTrip = false;
 
    /**
     * Is this a frequency-based trip with non-strict departure times?
@@ -188,11 +188,23 @@ public class Leg {
     * Whether this leg is a transit leg or not.
     * @return Boolean true if the leg is a transit leg
     */
-   public Boolean isTransitLeg() {
+  public boolean isTransitLeg() {
        return mode.isTransit();
    }
 
-    public boolean isWalkingLeg() {
+
+  /**
+   * A scheduled leg is a leg riding a public scheduled transport including frequency based
+   * transport, or flex service. If the ride is not likely to wait for the passenger, even if the
+   * passenger call in and say hen is late, then this method should return {@code true}.
+   * <p>
+   * For example, this method can be used to add extra "cost" if the transfer time is tight.
+   */
+  public boolean isScheduled() {
+    return isTransitLeg() || flexibleTrip;
+  }
+
+  public boolean isWalkingLeg() {
         return mode.isWalking();
     }
 

@@ -70,7 +70,7 @@ public class JourneyWhiteListed {
         Collection<FeedScopedId> lineIds,
         RoutingService routingService
     ) {
-        Trip trip = routingService.getTripForId().get(tts.tripId);
+        Trip trip = routingService.getTripForId().get(tts.getTripId());
 
         if (trip == null || trip.getRoute() == null) {
             return true;

@@ -1,12 +1,15 @@
 package org.opentripplanner.transit.raptor.api.path;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * A leg in a path. The legs are linked together from the first leg {@link AccessPathLeg}, to the last leg
- * {@link EgressPathLeg}. There must be at least one {@link TransitPathLeg}. Transit legs can follow each
- * other or be connected by one {@link TransferPathLeg}.
+ * A leg in a Raptor path. The legs are linked together from the first leg {@link AccessPathLeg},
+ * to the last leg {@link EgressPathLeg}. There must be at least one {@link TransitPathLeg}.
+ * Transit legs can follow each* other or be connected by one {@link TransferPathLeg}. Note! Access
+ * and egress path legs may contain more than one "OTP leg", but inside raptor these are threaded
+ * as one leg; hence also just one leg returned by Raptor.
  * <p/>
  * This interface contain utility methods to _cast_ a leg into the concrete sub-type:
  * <pre>
@@ -125,13 +128,13 @@ public interface PathLeg<T extends RaptorTripSchedule> {
 
 
     default String asString(int toStop) {
-        return asString() + " -> Stop " + toStop;
+        return asString() + " ~ " + toStop;
     }
 
     default String asString() {
-        return TimeUtils.timeToStrCompact(fromTime()) + "-" +
+      return TimeUtils.timeToStrCompact(fromTime()) + "-" +
                 TimeUtils.timeToStrCompact(toTime()) +
-                "(" + TimeUtils.durationToStr(duration()) + ")"
+                "(" + DurationUtils.durationToStr(duration()) + ")"
                 ;
     }
 }

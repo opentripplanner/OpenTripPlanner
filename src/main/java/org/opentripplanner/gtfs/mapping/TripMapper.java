@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ class TripMapper {
         lhs.setTripShortName(rhs.getTripShortName());
         lhs.setTripHeadsign(rhs.getTripHeadsign());
         lhs.setRouteShortName(rhs.getRouteShortName());
-        lhs.setDirectionId(mapDirectionId(rhs));
+        lhs.setDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
         lhs.setBlockId(rhs.getBlockId());
         lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
         lhs.setWheelchairAccessible(rhs.getWheelchairAccessible());
@@ -51,16 +52,16 @@ class TripMapper {
     }
 
     @Nullable
-    private static Integer mapDirectionId(org.onebusaway.gtfs.model.Trip trip) {
+    private static int mapDirectionId(org.onebusaway.gtfs.model.Trip trip) {
         try {
             String directionId = trip.getDirectionId();
             if(directionId == null || directionId.isBlank()) {
-                return null;
+                return -1;
             }
             return Integer.parseInt(directionId);
         } catch (NumberFormatException e) {
             LOG.debug("Trip {} does not have direction id, defaults to -1", trip);
         }
-        return null;
+        return -1;
     }
 }

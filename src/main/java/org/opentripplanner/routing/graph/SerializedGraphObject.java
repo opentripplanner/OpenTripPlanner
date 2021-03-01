@@ -22,6 +22,8 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.kryo.BuildConfigSerializer;
 import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
+import org.opentripplanner.model.projectinfo.GraphFileHeader;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.util.OtpAppException;
@@ -40,6 +42,8 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collection;
+
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.
@@ -204,13 +208,16 @@ public class SerializedGraphObject implements Serializable {
         try(inputStream) {
             LOG.info("Reading graph from '{}'", sourceDescription);
             Input input = new Input(inputStream);
+
+            validateGraphSerializationId(
+                input.readBytes(GraphFileHeader.headerLength()),
+                sourceDescription
+            );
+
             Kryo kryo = makeKryo();
             SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
             Graph graph = serObj.graph;
             LOG.debug("Graph read.");
-            if (graph.graphVersionMismatch()) {
-                throw new RuntimeException("Graph version mismatch detected.");
-            }
             serObj.reconstructEdgeLists();
             LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
             return serObj;
@@ -232,6 +239,7 @@ public class SerializedGraphObject implements Serializable {
         outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
         Kryo kryo = makeKryo();
         Output output = new Output(outputStream);
+        output.write(OtpProjectInfo.projectInfo().graphFileHeaderInfo.header());
         kryo.writeClassAndObject(output, this);
         output.close();
         LOG.info("Graph written: {}", graphName);
@@ -251,4 +259,21 @@ public class SerializedGraphObject implements Serializable {
         );
     }
 
+    private static void validateGraphSerializationId(byte[] header, String sourceName) {
+        var expFileHeader = projectInfo().graphFileHeaderInfo;
+        var graphFileHeader = GraphFileHeader.parse(header);
+
+        if(!expFileHeader.equals(graphFileHeader)) {
+            if (!expFileHeader.equals(graphFileHeader)) {
+                throw new OtpAppException(
+                    "The graph file is incompatible with this version of OTP. "
+                        + "The OTP serialization version id '%s' do not match the id "
+                        + "'%s' in '%s' file-header.",
+                    expFileHeader.otpSerializationVersionId(),
+                    graphFileHeader.otpSerializationVersionId(),
+                    sourceName
+                );
+            }
+        }
+    }
 }

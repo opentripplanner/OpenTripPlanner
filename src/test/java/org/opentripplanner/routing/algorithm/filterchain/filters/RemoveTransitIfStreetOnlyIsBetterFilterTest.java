@@ -2,16 +2,15 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-public class RemoveTransitIfStreetOnlyIsBetterFilterTest {
+public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestConstants {
 
     @Test
     public void filterAwayNothingIfNoWalking() {

@@ -68,12 +68,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     public final Route route;
 
     /**
-     * The direction id for all trips in this pattern.
-     * Use -1 for default direction id
-     */
-    public int directionId = -1;
-
-    /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS
      * pick-up and drop-off types.
      */
@@ -352,6 +346,13 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         this.originalTripPattern = originalTripPattern;
     }
 
+    /**
+     * The direction for all the trips in this pattern.
+     */
+    public Direction getDirection() {
+        return trips.get(0).getDirection();
+    }
+
     boolean isCreatedByRealtimeUpdater() {
         return createdByRealtimeUpdater;
     }
@@ -555,7 +556,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         this.services = services;
     }
 
-    public String getDirection() {
+    public String getTripHeadsign() {
         return trips.get(0).getTripHeadsign();
     }
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 import org.opentripplanner.util.TableFormatter;
 
 import java.util.Collection;
@@ -38,24 +38,24 @@ public class TableTestReport {
 
     private static TableFormatter newTable() {
         return new TableFormatter(
-                        List.of(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
-                        List.of("STATUS", "TF", "Duration", "Cost",  "Start", "End", "Modes", "Agencies", "Routes", "Stops", "Legs")
-                );
+            List.of(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
+            List.of("STATUS", "TF", "Duration", "Cost",  "Start", "End", "Modes", "Agencies", "Routes", "Stops", "Legs")
+        );
     }
 
     private static void addTo(TableFormatter table, Result result) {
         table.addRow(
-                result.status.label,
-                result.transfers,
-                result.durationAsStr(),
-                result.cost,
-                TimeUtils.timeToStrLong(result.startTime),
-                TimeUtils.timeToStrLong(result.endTime),
-                toStr(result.modes),
-                toStr(result.agencies),
-                toStr(result.routes),
-                intsToStr(result.stops),
-                result.details
+            result.status.label,
+            result.transfers,
+            result.durationAsStr(),
+            result.cost,
+            TimeUtils.timeToStrLong(result.startTime),
+            TimeUtils.timeToStrLong(result.endTime),
+            toStr(result.modes),
+            toStr(result.agencies),
+            toStr(result.routes),
+            intsToStr(result.stops),
+            result.details
         );
     }
 

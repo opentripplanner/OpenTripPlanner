@@ -135,13 +135,14 @@ public class SiriAlertsUpdateHandler {
                 final long realStart = activePeriod.getStartTime() != null ? getEpochSecond(activePeriod.getStartTime()) : 0;
                 final long start = activePeriod.getStartTime() != null? realStart - earlyStart : 0;
 
-                final long realEnd = activePeriod.getEndTime() != null ? getEpochSecond(activePeriod.getEndTime()) : 0;
-                final long end = activePeriod.getEndTime() != null? realEnd  : 0;
+                final long realEnd = activePeriod.getEndTime() != null ? getEpochSecond(activePeriod.getEndTime()) : TimePeriod.OPEN_ENDED;
+                final long end = activePeriod.getEndTime() != null? realEnd  : TimePeriod.OPEN_ENDED;
+
                 periods.add(new TimePeriod(start, end));
             }
         } else {
             // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-            periods.add(new TimePeriod(0, Long.MAX_VALUE));
+            periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
         }
 
         alert.setTimePeriods(periods);
@@ -374,47 +375,58 @@ public class SiriAlertsUpdateHandler {
 
                         FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef);
 
-                        ServiceDate serviceDate = null;
-                        ZonedDateTime startOfService = null;
-                        if (dataFrameRef != null && dataFrameRef.getValue() != null) {
-                            startOfService = DateMapper.asStartOfService(
-                                LocalDate.parse(dataFrameRef.getValue()), graph.getTimeZone().toZoneId()
+                        if (tripId != null) {
+                            ServiceDate serviceDate = null;
+                            ZonedDateTime startOfService = null;
+                            if (dataFrameRef != null && dataFrameRef.getValue() != null) {
+                                startOfService = DateMapper.asStartOfService(LocalDate.parse(
+                                    dataFrameRef.getValue()), graph.getTimeZone().toZoneId());
+
+                                serviceDate = new ServiceDate(startOfService.getYear(),
+                                    startOfService.getMonthValue(),
+                                    startOfService.getDayOfMonth()
+                                );
+
+                            }
+                            final TimePeriod timePeriod = calculateTimePeriodForTrip(alert,
+                                tripId,
+                                serviceDate,
+                                startOfService,
+                                6 * 3600
                             );
 
-                            serviceDate = new ServiceDate(startOfService.getYear(), startOfService.getMonthValue(), startOfService.getDayOfMonth());
+                            //  A tripId for a given date may be reused for other dates not affected by this alert.
 
-                        }
-                        final TimePeriod timePeriod = calculateTimePeriodForTrip(alert,
-                            tripId,
-                            serviceDate,
-                            startOfService, 6 * 3600
-                        );
+                            // TODO: Make it possible to add time periods for trip selectors
+                            alert.setTimePeriods(Arrays.asList(timePeriod));
 
-                        //  A tripId for a given date may be reused for other dates not affected by this alert.
+                            if (!affectedStops.isEmpty()) {
+                                for (AffectedStopPointStructure affectedStop : affectedStops) {
+                                    FeedScopedId stop = siriFuzzyTripMatcher.getStop(affectedStop
+                                        .getStopPointRef()
+                                        .getValue());
+                                    if (stop == null) {
+                                        stop = new FeedScopedId(feedId,
+                                            affectedStop.getStopPointRef().getValue()
+                                        );
+                                    }
 
-                        // TODO: Make it possible to add time periods for trip selectors
-                        alert.setTimePeriods(Arrays.asList(timePeriod));
-
-                        if (!affectedStops.isEmpty()) {
-                            for (AffectedStopPointStructure affectedStop : affectedStops) {
-                                FeedScopedId stop = siriFuzzyTripMatcher.getStop(affectedStop.getStopPointRef().getValue());
-                                if (stop == null) {
-                                    stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
+                                    alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId));
                                 }
-
-                                alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId));
                             }
-                        } else {
-                            alert.addEntity(new EntitySelector.Trip(tripId));
+                            else {
+                                alert.addEntity(new EntitySelector.Trip(tripId));
+                            }
                         }
-
                     }
 
                     if (lineRef != null) {
 
                         Set<Route> affectedRoutes = siriFuzzyTripMatcher.getRoutes(lineRef);
-                        for (Route route : affectedRoutes) {
-                            alert.addEntity(new EntitySelector.Route(route.getId()));
+                        if (affectedRoutes != null) {
+                            for (Route route : affectedRoutes) {
+                                alert.addEntity(new EntitySelector.Route(route.getId()));
+                            }
                         }
                     }
                 }

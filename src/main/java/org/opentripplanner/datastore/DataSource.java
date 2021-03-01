@@ -120,8 +120,7 @@ public interface DataSource {
      * {@code [icon] [filename]  [path]  [date time]  [file size]}
      */
     default String detailedInfo() {
-        String dir = path().substring(0, path().length() - name().length() - 1);
-        String info = String.format("%s %s  %s", type().icon(), name(), dir);
+        String info = String.format("%s %s  %s", type().icon(), name(), directory());
         if (lastModified() > 0) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             info += "  " + sdf.format(lastModified());
@@ -130,5 +129,10 @@ public interface DataSource {
             info += "  " + LoggingUtil.fileSizeToString(size());
         }
         return info;
+    }
+
+    private String directory() {
+        int endIndex = path().length() - (name().length() + 1);
+        return endIndex <= 0 ? "" :  path().substring(0, endIndex);
     }
 }

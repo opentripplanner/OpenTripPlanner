@@ -72,6 +72,8 @@ New parameters:
  - `streetRoutingTimeout` Maximum time limit for street route queries. Replace the old `timeout`.
  - `transit` Transit tuning parameters, configure the raptor router. A set of parameters to tune 
              the Raptor transit router. 
+ - `itineraryFilters` Configure itinerary filters that may modify itineraries, sort them, and 
+                      filter away less preferable results.            
  
 These parameters are no longer supported:
 
@@ -234,3 +236,8 @@ The analyst API endpoints have been removed.
 ### Scripting
 
 The scripting API endpoint has been removed.
+
+### Updaters
+
+- Floating bikes have been disabled by default in the GbfsBikeRentalDataSource unless explicitly 
+turned on via OTPFeature.

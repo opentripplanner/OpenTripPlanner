@@ -15,6 +15,7 @@ import uk.org.siri.siri20.*;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -903,6 +904,57 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
     assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
+  }
+
+
+
+  @Test
+  public void testSiriSxWithOpenEndedValidity() {
+    init();
+
+    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+
+    final String situationNumber = "TST:SituationNumber:1234";
+    final String stopId0 = "stop0";
+
+    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
+        null,
+        null,
+        createAffectsStop(new ArrayList<>(), stopId0)
+    );
+
+    // Add period with start- and endtime
+    HalfOpenTimestampOutputRangeStructure period_1 = new HalfOpenTimestampOutputRangeStructure();
+    period_1.setStartTime(ZonedDateTime.parse("2020-01-01T10:00:00+01:00"));
+    period_1.setEndTime(ZonedDateTime.parse("2020-02-01T11:00:00+01:00"));
+    ptSituation.getValidityPeriods().add(period_1);
+
+
+    // Add period with start-, but NO endtime - i.e. open-ended
+    HalfOpenTimestampOutputRangeStructure period_2 = new HalfOpenTimestampOutputRangeStructure();
+    period_2.setStartTime(ZonedDateTime.parse("2020-02-02T10:00:00+01:00"));
+    period_2.setEndTime(null);
+    ptSituation.getValidityPeriods().add(period_2);
+
+    final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
+    alertsUpdateHandler.update(serviceDelivery);
+
+    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+
+    final FeedScopedId stopId = new FeedScopedId("FEED", stopId0);
+
+    Collection<TransitAlert> tripPatches = transitAlertService.getStopAlerts(stopId);
+
+    assertNotNull(tripPatches);
+    assertEquals(1, tripPatches.size());
+    TransitAlert transitAlert = tripPatches.iterator().next();
+    assertEquals(situationNumber, transitAlert.getId());
+
+    assertNotNull(transitAlert.getEffectiveStartDate());
+
+    assertEquals(period_1.getStartTime().toEpochSecond(), (transitAlert.getEffectiveStartDate().getTime()/1000));
+
+    assertNull(transitAlert.getEffectiveEndDate());
   }
 
   private AffectsScopeStructure createAffectsLineWithExternallyDefinedStopPoints(

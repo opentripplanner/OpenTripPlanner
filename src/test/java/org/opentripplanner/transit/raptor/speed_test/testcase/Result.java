@@ -1,7 +1,8 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,8 +37,9 @@ class Result implements Comparable<Result> {
     final List<String> routes = new ArrayList<>();
     final List<Integer> stops = new ArrayList<>();
     final String details;
+    final boolean skipCost;
 
-    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, Integer startTime, Integer endTime, String details) {
+    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, Integer startTime, Integer endTime, String details, boolean skipCost) {
         this.testCaseId = testCaseId;
         this.transfers = transfers;
         this.duration = duration;
@@ -47,6 +49,7 @@ class Result implements Comparable<Result> {
         this.endTime = endTime;
         this.details = details;
         this.stops.addAll(parseStops(details));
+        this.skipCost = skipCost;
     }
 
     void setStatus(TestStatus status) {
@@ -64,8 +67,10 @@ class Result implements Comparable<Result> {
         if(res != 0) { return res; }
 
         // Sort lowest cost first
-        res = -cost.compareTo(o.cost);
-        if(res != 0) { return res; }
+        if(skipCost) {
+            res = -cost.compareTo(o.cost);
+            if (res != 0) { return res; }
+        }
 
         // Sort based on route
         res = compare(routes, o.routes, String::compareTo);
@@ -84,9 +89,9 @@ class Result implements Comparable<Result> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Result result = (Result) o;
-        return Objects.equals(endTime, result.endTime) &&
+        return Objects.equals(startTime, result.startTime) &&
                 Objects.equals(endTime, result.endTime) &&
-                compareCost(cost, result.cost) &&
+                (skipCost || compareCost(cost, result.cost)) &&
                 compare(routes, result.routes, String::compareTo) == 0 &&
                 compare(stops, result.stops, Integer::compareTo) == 0;
     }
@@ -100,7 +105,7 @@ class Result implements Comparable<Result> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(startTime, endTime, cost, details);
+        return Objects.hash(startTime, endTime, skipCost ? 0 : cost, details);
     }
 
     /** Create a compact String representation of an itinerary. */
@@ -130,7 +135,7 @@ class Result implements Comparable<Result> {
     }
 
     public String durationAsStr() {
-        return TimeUtils.durationToStr(duration);
+      return DurationUtils.durationToStr(duration);
     }
 
     static <T> int compare(List<T> a, List<T> b, Comparator<T> comparator) {

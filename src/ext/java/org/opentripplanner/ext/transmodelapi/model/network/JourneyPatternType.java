@@ -42,7 +42,7 @@ public class JourneyPatternType {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("directionType")
             .type(EnumTypes.DIRECTION_TYPE)
-            .dataFetcher(environment -> ((TripPattern) environment.getSource()).directionId)
+            .dataFetcher(environment -> ((TripPattern) environment.getSource()).getDirection())
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("name")

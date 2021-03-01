@@ -100,6 +100,17 @@ public class PlannerResource extends RoutingResource {
         }
 
         /* Log this request if such logging is enabled. */
+        logRequest(grizzlyRequest, request, router, res);
+
+        return response;
+    }
+
+    private void logRequest(
+        Request grizzlyRequest,
+        RoutingRequest request,
+        Router router,
+        RoutingResponse res
+    ) {
         if (request != null && router != null && router.requestLogger != null) {
             StringBuilder sb = new StringBuilder();
             String clientIpAddress = grizzlyRequest.getRemoteAddr();
@@ -128,7 +139,5 @@ public class PlannerResource extends RoutingResource {
             }
             router.requestLogger.info(sb.toString());
         }
-
-        return response;
     }
 }

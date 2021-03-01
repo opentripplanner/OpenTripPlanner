@@ -31,17 +31,29 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
      * Setup egress arrivals with a callback witch is notified when a new transit egress arrival happens.
      */
     public void setupEgressStopStates(
-            Iterable<RaptorTransfer> egressLegs,
+            Iterable<RaptorTransfer> egressPaths,
             Consumer<EgressStopArrivalState<T>> transitArrivalCallback
     ) {
         for (int round = 1; round < stops.length; round++) {
-            for (RaptorTransfer leg : egressLegs) {
-                EgressStopArrivalState<T> state = new EgressStopArrivalState<>(
+            for (RaptorTransfer egressPath : egressPaths) {
+                if(stops[round][egressPath.stop()] == null) {
+                    EgressStopArrivalState<T> state = new EgressStopArrivalState<>(
                         round,
-                        leg,
+                        egressPath,
                         transitArrivalCallback
-                );
-                stops[round][leg.stop()] = state;
+                    );
+                    stops[round][egressPath.stop()] = state;
+                }
+                else {
+                    throw new IllegalStateException(""
+                        + "Currently Raptor do not support multiple access/egress paths to the "
+                        + "same stop. If this exception occurs and OTP was serving a normal "
+                        + "use-case, then this needs to be fixed. For example this needs to be "
+                        + "fixed if OTP should support more than on access/egress mode. "
+                        + "See issue #3300. Details: "
+                        + "State exist for stop: " + egressPath.stop() + ", round: " + round
+                    );
+                }
             }
         }
     }
@@ -65,8 +77,23 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         return unreachedMinNumberOfTransfers();
     }
 
-    void setAccess(int stop, int time, RaptorTransfer access) {
-        findOrCreateStopIndex(round(), stop).asAccessStopArrivalState().setAccess(time, access);
+    void setAccessTime(int time, RaptorTransfer access) {
+        final int stop = access.stop();
+        if (stops[round()][stop] == null) {
+            stops[round()][stop] = new AccessStopArrivalState<>(time, access);
+        } else {
+            stops[round()][stop] = new AccessStopArrivalState<>(time, access, stops[round()][stop]);
+        }
+    }
+
+    /**
+     * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
+     */
+    void transferToStop(int fromStop, RaptorTransfer transfer, int arrivalTime) {
+        int stop = transfer.stop();
+        StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
+
+        state.transferToStop(fromStop, arrivalTime, transfer);
     }
 
     void transitToStop(int stop, int time, int boardStop, int boardTime, T trip, boolean bestTime) {
@@ -79,16 +106,6 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         }
     }
 
-    /**
-     * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
-     */
-    void transferToStop(int fromStop, RaptorTransfer transferLeg, int arrivalTime) {
-        int stop = transferLeg.stop();
-        StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
-
-        state.transferToStop(fromStop, arrivalTime, transferLeg.durationInSeconds());
-    }
-
     int bestTimePreviousRound(int stop) {
         return get(round() - 1, stop).time();
     }
@@ -98,7 +115,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
 
     private StopArrivalState<T> findOrCreateStopIndex(final int round, final int stop) {
         if (stops[round][stop] == null) {
-            stops[round][stop] = round == 0 ? new AccessStopArrivalState<>() : new StopArrivalState<>();
+            stops[round][stop] = new StopArrivalState<>();
         }
         return get(round, stop);
     }

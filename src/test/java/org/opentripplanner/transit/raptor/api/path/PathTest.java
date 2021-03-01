@@ -2,16 +2,20 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.util.time.TimeUtils;
 
-import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.A_START;
-import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.E_END;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.A_START;
+import static org.opentripplanner.transit.raptor._data.stoparrival.StopArrivalsTestData.E_END;
+
 
 public class PathTest {
 
-    private final Path<TestRaptorTripSchedule> subject = StopArrivalsTestData.basicTripAsPath();
+    private final Path<TestTripSchedule> subject = StopArrivalsTestData.basicTripAsPath();
 
     @Test
     public void startTime() {
@@ -71,5 +75,19 @@ public class PathTest {
     @Test
     public void testHashCode() {
         Assert.assertEquals(StopArrivalsTestData.basicTripAsPath().hashCode(), subject.hashCode());
+    }
+
+    @Test
+    public void testCompareTo() {
+        var p0 = Path.dummyPath(0, 1, 10, 10, 10);
+        var p1 = Path.dummyPath(0, 6, 12, 9, 9);
+        var p2 = Path.dummyPath(0, 5, 12, 8, 7);
+        var p3 = Path.dummyPath(0, 5, 12, 7, 8);
+
+        List<Path<?>> expected = List.of(p0, p1, p2, p3);
+
+        List<Path<?>> paths = List.of(p3, p2, p1, p0).stream().sorted().collect(Collectors.toList());
+
+        Assert.assertEquals(expected, paths);
     }
 }

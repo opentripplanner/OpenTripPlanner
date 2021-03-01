@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import static org.opentripplanner.standalone.config.EnvironmentVariableReplacer.insertEnvironmentVariables;
 
@@ -30,6 +32,9 @@ public class ConfigLoader {
     private static final String OTP_CONFIG_FILENAME = "otp-config.json";
     private static final String BUILD_CONFIG_FILENAME = "build-config.json";
     private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
+
+    /** When echoing config files to logs, values for these keys will be hidden. */
+    private static final Set<String> REDACT_KEYS = Set.of("secretKey", "accessKey", "gsCredentials");
 
     private final ObjectMapper mapper = new ObjectMapper();
     @Nullable
@@ -135,9 +140,11 @@ public class ConfigLoader {
      * Load the router configuration file as a JsonNode three. An empty node is
      * returned if the given {@code configDir}  is {@code null} or config file is NOT found.
      * <p>
+     * This is public to allow loading configuration files from tests like the SpeedTest.
+     *
      * @see #loadJsonFile for more details.
      */
-    private JsonNode loadJsonByFilename(String filename) {
+    public JsonNode loadJsonByFilename(String filename) {
         // Use default parameters if no configDir is available.
         if (configDir == null) {
             if(jsonFallback != null) {
@@ -169,9 +176,8 @@ public class ConfigLoader {
                     new FileInputStream(file), StandardCharsets.UTF_8
             );
             JsonNode node = stringToJsonNode(configString, file.toString());
-
             LOG.info("Load JSON configuration file '{}'", file.getPath());
-            LOG.info("Summarizing '{}': {}", file.getPath(), node.toPrettyString());
+            LOG.info("Summarizing '{}': {}", file.getPath(), toRedactedString(node));
             return node;
         }
         catch (FileNotFoundException ex) {
@@ -215,6 +221,29 @@ public class ConfigLoader {
             throw new IllegalArgumentException(
                     configDir + " is not a readable configuration directory."
             );
+        }
+    }
+
+    /**
+     * Convert the JsonNode to a pretty-printed string with secrets hidden,
+     * operating on a protective copy of the node to avoid losing information.
+     */
+    private static String toRedactedString (JsonNode node) {
+        JsonNode redactedNode = node.deepCopy();
+        redactSecretsRecursive(redactedNode);
+        return redactedNode.toPrettyString();
+    }
+
+    /** Note that this method destructively modifies the node and its children in place. */
+    private static void redactSecretsRecursive(JsonNode node) {
+        if (node.isObject()) {
+            node.fields().forEachRemaining(entry -> {
+                if (entry.getValue().isObject()) {
+                    redactSecretsRecursive(entry.getValue());
+                } else if (REDACT_KEYS.contains(entry.getKey())) {
+                    entry.setValue(new TextNode("********"));
+                }
+            });
         }
     }
 

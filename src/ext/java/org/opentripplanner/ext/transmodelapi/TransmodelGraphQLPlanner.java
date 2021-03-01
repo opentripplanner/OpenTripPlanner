@@ -8,6 +8,7 @@ import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
+import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
@@ -26,14 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -105,9 +104,10 @@ public class TransmodelGraphQLPlanner {
 
         callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(new Date((long) millisSinceEpoch)), Date::new);
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
+        callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
-        callWith.argument("transitGeneralizedCostLimit", (DoubleFunction<Double> it) -> request.transitGeneralizedCostLimit = it);
+        callWith.argument("transitGeneralizedCostLimit", (DoubleFunction<Double> it) -> request.itineraryFilters.transitGeneralizedCostLimit = it);
         callWith.argument("maximumWalkDistance", request::setMaxWalkDistance);
 //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
         callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
@@ -168,7 +168,7 @@ public class TransmodelGraphQLPlanner {
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
         //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
         callWith.argument("allowBikeRental", (Boolean v) -> request.bikeRental = v);
-        callWith.argument("debugItineraryFilter", (Boolean v) -> request.debugItineraryFilter = v);
+        callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
 
         callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
 
@@ -207,6 +207,8 @@ public class TransmodelGraphQLPlanner {
             );
         }
 
+        ItineraryFiltersInputType.mapToRequest(environment, callWith, request.itineraryFilters);
+
         /*
         List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");
         if (transportSubmodeFilters != null) {
@@ -232,14 +234,9 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
         callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
-
-        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
-
-
+        callWith.argument("useBikeRentalAvailabilityInformation", (Boolean v) -> request.useBikeRentalAvailabilityInformation = v);
         callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
-        //callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
+        callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
         //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 
         return request;

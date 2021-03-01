@@ -319,14 +319,12 @@ public class DefaultRoutingRequestType {
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(env -> request.ignoreRealtimeUpdates)
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("includedPlannedCancellations")
                         .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> defaults.includePlannedCancellations)
+                        .dataFetcher(env -> request.includePlannedCancellations)
                         .build())
-                 */
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
                         .name("disableRemainingWeightHeuristic")
@@ -363,7 +361,7 @@ public class DefaultRoutingRequestType {
                         .newFieldDefinition()
                         .name("debugItineraryFilter")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.debugItineraryFilter)
+                        .dataFetcher(env -> request.itineraryFilters.debug)
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -400,12 +398,6 @@ public class DefaultRoutingRequestType {
                                 "Whether to apply the ellipsoid->geoid offset to all elevations in the response.")
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(env -> request.geoidElevation)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("transitGeneralizedCostLimit")
-                        .description("A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost.")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(env -> request.transitGeneralizedCostLimit)
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()

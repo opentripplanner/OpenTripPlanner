@@ -2,6 +2,7 @@ package org.opentripplanner.model.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -188,7 +189,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     private Trip createTrip(String id, FeedScopedId serviceId) {
         Trip trip = new Trip(new FeedScopedId(FEED_ID, id));
         trip.setServiceId(serviceId);
-        trip.setDirectionId(1);
+        trip.setDirection(Direction.valueOfGtfsCode(1));
         trip.setRoute(route);
         return trip;
     }

@@ -44,7 +44,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule> extends ParetoSetWithMa
      * new destination arrivals for each accepted egress stop arrival.
      */
     static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
-            Map.Entry<Integer, List<RaptorTransfer>> egressLegs,
+            Map.Entry<Integer, List<RaptorTransfer>> egressPaths,
             CostCalculator<T> costCalculator,
             DestinationArrivalPaths<T> destinationArrivals,
             DebugHandlerFactory<T> debugHandlerFactory
@@ -52,8 +52,8 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule> extends ParetoSetWithMa
         ParetoSetEventListener<ArrivalView<T>> listener;
         ParetoSetEventListener<ArrivalView<T>> debugListener;
 
-        listener = new CalculateTransferToDestination<>(egressLegs.getValue(), destinationArrivals, costCalculator);
-        debugListener = debugHandlerFactory.paretoSetStopArrivalListener(egressLegs.getKey());
+        listener = new CalculateTransferToDestination<>(egressPaths.getValue(), destinationArrivals, costCalculator);
+        debugListener = debugHandlerFactory.paretoSetStopArrivalListener(egressPaths.getKey());
 
         if(debugListener != null) {
             listener = new ParetoSetEventListenerComposite<>(debugListener, listener);

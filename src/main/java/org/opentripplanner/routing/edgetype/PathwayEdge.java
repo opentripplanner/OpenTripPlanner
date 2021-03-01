@@ -66,6 +66,20 @@ public class PathwayEdge extends Edge {
         return this.distance;
     }
 
+    @Override
+    public double getEffectiveWalkDistance() {
+        if (traversalTime > 0) {
+            return 0;
+        } else {
+            return distance;
+        }
+    }
+
+    @Override
+    public int getDistanceIndependentTime() {
+        return traversalTime;
+    }
+
     public TraverseMode getMode() {
        return TraverseMode.WALK;
     }
