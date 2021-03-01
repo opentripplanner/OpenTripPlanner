@@ -108,13 +108,12 @@ public class FakeGraph {
     /** link the stops in the graph */
     public static void link (Graph graph) {
         VertexLinker linker = new VertexLinker(graph);
-        
+
         for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-            linker.getOrCreateVerticesForLinking(
+            linker.permanentGetOrCreateVerticesForLinking(
                 tStop,
                 TraverseMode.WALK,
                 LinkingDirection.BOTH_WAYS,
-                true,
                 (vertex, streetVertex) -> List.of(
                     new StreetTransitLink((TransitStopVertex) vertex, streetVertex),
                     new StreetTransitLink(streetVertex, (TransitStopVertex) vertex)

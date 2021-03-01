@@ -7,13 +7,10 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -123,11 +120,10 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStationVertex bikeRentalVertex = verticesByStation.get(station);
                 if (bikeRentalVertex == null) {
                     bikeRentalVertex = new BikeRentalStationVertex(graph, station);
-                    DisposableEdgeCollection tempEdges = linker.getOrCreateVerticesForLinking(
+                    DisposableEdgeCollection tempEdges = linker.realTimeGetOrCreateVerticesForLinking(
                         bikeRentalVertex,
                         TraverseMode.WALK,
                         LinkingDirection.BOTH_WAYS,
-                        false,
                         (vertex, streetVertex) -> List.of(
                             new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
                             new StreetBikeRentalLink(streetVertex, (BikeRentalStationVertex) vertex)

@@ -8,11 +8,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.graph.DisposableEdgeCollection;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -26,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 /**
  * Graph updater that dynamically sets availability information on bike parking lots.
@@ -112,11 +108,10 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikeParkVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
-                    DisposableEdgeCollection tempEdges = linker.getOrCreateVerticesForLinking(
+                    DisposableEdgeCollection tempEdges = linker.realTimeGetOrCreateVerticesForLinking(
                         bikeParkVertex,
                         TraverseMode.WALK,
                         LinkingDirection.BOTH_WAYS,
-                        false,
                         (vertex, streetVertex) -> List.of(
                             new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),
                             new StreetBikeParkLink(streetVertex, (BikeParkVertex) vertex)

@@ -240,11 +240,10 @@ public class StreetVertexIndex {
 
     TraverseMode nonTransitMode = getTraverseModeForLinker(options, endVertex);
 
-    tempEdges.add(vertexLinker.getOrCreateVerticesForLinking(
+    tempEdges.add(vertexLinker.requestGetOrCreateVerticesForLinking(
         temporaryStreetLocation,
         nonTransitMode,
         endVertex ? LinkingDirection.BACKWARD : LinkingDirection.FORWARD,
-        false,
         endVertex
             ? (vertex, streetVertex) -> List.of(
                 new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation)vertex)

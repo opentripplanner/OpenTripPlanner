@@ -67,11 +67,10 @@ class StreetSearch {
                     !fromOrigin
             );
 
-            linker.getOrCreateVerticesForLinking(
+            linker.requestGetOrCreateVerticesForLinking(
                 vertex,
                 TraverseMode.WALK,
                 fromOrigin ? LinkingDirection.BACKWARD : LinkingDirection.FORWARD,
-                false,
                 fromOrigin
                     ? (v, streetVertex) -> List.of(
                     new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation)v)

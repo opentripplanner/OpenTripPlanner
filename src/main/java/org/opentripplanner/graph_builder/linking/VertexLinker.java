@@ -7,7 +7,6 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -53,7 +52,7 @@ public class VertexLinker {
    * created with the destructive parameter set to true). This is because these are the only edges
    * that we want to be discoverable when linking vertices.
    */
-  private final HashGridSpatialIndex<Edge> streetSpatialIndex = new HashGridSpatialIndex<>();
+  private final StreetSpatialIndex streetSpatialIndex = new StreetSpatialIndex();
 
   private final Graph graph;
 
@@ -75,9 +74,48 @@ public class VertexLinker {
    */
   public VertexLinker(Graph graph) {
     for (StreetEdge se : graph.getEdgesOfType(StreetEdge.class) ) {
-      streetSpatialIndex.insert(se.getGeometry(), se);
+      streetSpatialIndex.insert(se.getGeometry(), se, Scope.PERMANENT);
     }
     this.graph = graph;
+  }
+
+  public DisposableEdgeCollection permanentGetOrCreateVerticesForLinking(
+      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
+      BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+  ) {
+    return getOrCreateVerticesForLinking(
+        vertex,
+        traverseMode,
+        direction,
+        Scope.PERMANENT,
+        edgeFunction
+    );
+  }
+
+  public DisposableEdgeCollection realTimeGetOrCreateVerticesForLinking(
+      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
+      BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+  ) {
+    return getOrCreateVerticesForLinking(
+        vertex,
+        traverseMode,
+        direction,
+        Scope.REALTIME,
+        edgeFunction
+    );
+  }
+
+  public DisposableEdgeCollection requestGetOrCreateVerticesForLinking(
+      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
+      BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+  ) {
+    return getOrCreateVerticesForLinking(
+        vertex,
+        traverseMode,
+        direction,
+        Scope.REQUEST,
+        edgeFunction
+    );
   }
 
   /**
@@ -88,8 +126,7 @@ public class VertexLinker {
    * @param vertex        Vertex to be linked into the street graph
    * @param traverseMode  Only street edges allowing this mode will be linked
    * @param direction     The direction of the new edges to be created
-   * @param destructive   Whether this should result in a permanent change of the street graph. This
-   *                      should only be used during graph building.
+   * @param scope         The scope of the split
    * @param edgeFunction  How the provided vertex should be linked into the street graph
    *
    * In OTP2 where the transit search can be quite fast, searching for a good linking point can be
@@ -99,20 +136,22 @@ public class VertexLinker {
    *
    * @return A set of street edges that can be linked to.
    */
-  public DisposableEdgeCollection getOrCreateVerticesForLinking(
+  private DisposableEdgeCollection getOrCreateVerticesForLinking(
       Vertex vertex,
       TraverseMode traverseMode,
       LinkingDirection direction,
-      boolean destructive,
+      Scope scope,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    DisposableEdgeCollection tempEdges = !destructive ? new DisposableEdgeCollection(graph) : null;
+    DisposableEdgeCollection tempEdges = !scope.equals(Scope.PERMANENT)
+        ? new DisposableEdgeCollection(graph)
+        : null;
 
     Set<StreetVertex> streetVertices = linkToStreetEdges(
         vertex,
         traverseMode,
         direction,
-        destructive,
+        scope,
         INITIAL_SEARCH_RADIUS_METERS,
         tempEdges
     );
@@ -120,7 +159,7 @@ public class VertexLinker {
       streetVertices = linkToStreetEdges(vertex,
           traverseMode,
           direction,
-          destructive,
+          scope,
           MAX_SEARCH_RADIUS_METERS,
           tempEdges
       );
@@ -142,7 +181,7 @@ public class VertexLinker {
       Vertex vertex,
       TraverseMode traverseMode,
       LinkingDirection direction,
-      boolean destructive,
+      Scope scope,
       int radiusMeters,
       DisposableEdgeCollection tempEdges
   ) {
@@ -166,7 +205,7 @@ public class VertexLinker {
     // Only consider street edges traversable by the given mode and still present in the graph.
     // Calculate a distance to each of those edges, and keep only the ones within the search radius.
     List<DistanceTo<StreetEdge>> candidateEdges = streetSpatialIndex
-        .query(env)
+        .query(env, Scope.PERMANENT)
         .stream()
         .filter(StreetEdge.class::isInstance)
         .map(StreetEdge.class::cast)
@@ -198,7 +237,7 @@ public class VertexLinker {
     return candidateEdges
         .stream()
         .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
-        .map(ce -> link(vertex, ce.item, xscale, destructive, direction, tempEdges))
+        .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges))
         .collect(Collectors.toSet());
 
   }
@@ -231,7 +270,7 @@ public class VertexLinker {
       Vertex vertex,
       StreetEdge edge,
       double xScale,
-      boolean destructive,
+      Scope scope,
       LinkingDirection direction,
       DisposableEdgeCollection tempEdges
   ) {
@@ -262,7 +301,7 @@ public class VertexLinker {
 
     else {
       // split the edge, get the split vertex
-      SplitterVertex v0 = split(edge, ll, destructive, direction.equals(LinkingDirection.BACKWARD), tempEdges);
+      SplitterVertex v0 = split(edge, ll, scope, direction.equals(LinkingDirection.BACKWARD), tempEdges);
       return v0;
     }
   }
@@ -296,8 +335,7 @@ public class VertexLinker {
    *
    * @param edge           to be split
    * @param ll             fraction at which to split the edge
-   * @param destructive if true this is temporary split at origin/destinations search and only
-   *                       temporary edges vertices are created
+   * @param scope          the scope of the split
    * @param endVertex      if this is temporary edge this is true if this is end vertex otherwise it
    *                       doesn't matter
    * @return Splitter vertex with added new edges
@@ -305,7 +343,7 @@ public class VertexLinker {
   private SplitterVertex split(
       StreetEdge edge,
       LinearLocation ll,
-      boolean destructive,
+      Scope scope,
       boolean endVertex,
       DisposableEdgeCollection tempEdges
   ) {
@@ -317,7 +355,7 @@ public class VertexLinker {
     SplitterVertex v;
     String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
 
-    if (!destructive) {
+    if (!scope.equals(Scope.PERMANENT)) {
       TemporarySplitterVertex tsv = new TemporarySplitterVertex(uniqueSplitLabel,
           splitPoint.x,
           splitPoint.y,
@@ -333,12 +371,12 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    P2<StreetEdge> edges = edge.split(v, destructive, tempEdges);
+    P2<StreetEdge> edges = edge.split(v, scope.equals(Scope.PERMANENT), tempEdges);
 
-    if (destructive) {
+    if (scope.equals(Scope.PERMANENT)) {
       // update indices of new edges
-      streetSpatialIndex.insert(edges.first.getGeometry(), edges.first);
-      streetSpatialIndex.insert(edges.second.getGeometry(), edges.second);
+      streetSpatialIndex.insert(edges.first.getGeometry(), edges.first, Scope.PERMANENT);
+      streetSpatialIndex.insert(edges.second.getGeometry(), edges.second, Scope.PERMANENT);
 
       // remove original edge from the graph
       edge.getToVertex().removeIncoming(edge);
@@ -347,7 +385,7 @@ public class VertexLinker {
       // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
       // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
       // insert logic is not trivial and would require additional testing of the spatial index.
-      streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge);
+      streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, Scope.PERMANENT);
     }
 
     return v;
