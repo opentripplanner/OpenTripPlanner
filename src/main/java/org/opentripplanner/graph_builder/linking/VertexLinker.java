@@ -90,10 +90,7 @@ public class VertexLinker {
    * @param direction     The direction of the new edges to be created
    * @param destructive   Whether this should result in a permanent change of the street graph. This
    *                      should only be used during graph building.
-   * @param tempEdges     When doing a non-destructive split, a DisposableEdgeCollection has to be
-   *                      provided in order to keep track of any temporary edges being created. It
-   *                      is the caller's responsibility to dispose of these edges when they are no
-   *                      longer needed.
+   * @param edgeFunction  How the provided vertex should be linked into the street graph
    *
    * In OTP2 where the transit search can be quite fast, searching for a good linking point can be
    * a significant fraction of response time. Hannes Junnila has reported >70% speedups in searches
