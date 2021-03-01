@@ -48,9 +48,7 @@ public class VertexLinker {
   private static final Logger LOG = LoggerFactory.getLogger(VertexLinker.class);
 
   /**
-   * Spatial index of StreetEdges in the graph. Only permanent edges are added to this index (those
-   * created with the destructive parameter set to true). This is because these are the only edges
-   * that we want to be discoverable when linking vertices.
+   * Spatial index of StreetEdges in the graph.
    */
   private final StreetSpatialIndex streetSpatialIndex = new StreetSpatialIndex();
 
@@ -79,18 +77,18 @@ public class VertexLinker {
     this.graph = graph;
   }
 
-  public DisposableEdgeCollection linkVertexPermanently(
+  public void linkVertexPermanently(
       Vertex vertex,
       TraverseMode traverseMode,
       LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    return link(
-        vertex,
-        traverseMode,
-        direction,
-        Scope.PERMANENT,
-        edgeFunction
+    link(
+      vertex,
+      traverseMode,
+      direction,
+      Scope.PERMANENT,
+      edgeFunction
     );
   }
 
@@ -125,9 +123,8 @@ public class VertexLinker {
   }
 
   /**
-   * This method will provide the vertices in the street graph that are closest to the input vertex.
-   * This may involve splitting edges and creating new edges and vertices. It is then the caller's
-   * responsibility to link the input vertex to the returned vertices using the correct edge type.
+   * This method will link the provided vertex into the street graph. This may involve splitting an
+   * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
    *
    * @param vertex        Vertex to be linked into the street graph
    * @param traverseMode  Only street edges allowing this mode will be linked
@@ -140,7 +137,8 @@ public class VertexLinker {
    * by making the search radius smaller. Therefore we use an expanding-envelope search, which is
    * more efficient in dense areas.
    *
-   * @return A set of street edges that can be linked to.
+   * @return A DisposableEdgeCollection with edges created by this method. It is the caller's
+   * responsibility to call the dispose method on this object when the edges are no longer needed.
    */
   private DisposableEdgeCollection link(
       Vertex vertex,
