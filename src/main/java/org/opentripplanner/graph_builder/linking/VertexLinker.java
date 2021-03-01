@@ -80,7 +80,9 @@ public class VertexLinker {
   }
 
   public DisposableEdgeCollection linkVertexPermanently(
-      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
+      Vertex vertex,
+      TraverseMode traverseMode,
+      LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
     return link(
@@ -93,7 +95,9 @@ public class VertexLinker {
   }
 
   public DisposableEdgeCollection linkVertexForRealTime(
-      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
+      Vertex vertex,
+      TraverseMode traverseMode,
+      LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
     return link(
@@ -106,7 +110,9 @@ public class VertexLinker {
   }
 
   public DisposableEdgeCollection linkVertexForRequest(
-      Vertex vertex, TraverseMode traverseMode, LinkingDirection direction,
+      Vertex vertex,
+      TraverseMode traverseMode,
+      LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
     return link(
@@ -333,7 +339,7 @@ public class VertexLinker {
   /**
    * Split the street edge at the given fraction
    *
-   * @param edge           to be split
+   * @param originalEdge   to be split
    * @param ll             fraction at which to split the edge
    * @param scope          the scope of the split
    * @param endVertex      if this is temporary edge this is true if this is end vertex otherwise it
@@ -341,13 +347,13 @@ public class VertexLinker {
    * @return Splitter vertex with added new edges
    */
   private SplitterVertex split(
-      StreetEdge edge,
+      StreetEdge originalEdge,
       LinearLocation ll,
       Scope scope,
       boolean endVertex,
       DisposableEdgeCollection tempEdges
   ) {
-    LineString geometry = edge.getGeometry();
+    LineString geometry = originalEdge.getGeometry();
 
     // create the geometries
     Coordinate splitPoint = ll.getCoordinate(geometry);
@@ -359,34 +365,38 @@ public class VertexLinker {
       TemporarySplitterVertex tsv = new TemporarySplitterVertex(uniqueSplitLabel,
           splitPoint.x,
           splitPoint.y,
-          edge,
+          originalEdge,
           endVertex
       );
-      tsv.setWheelchairAccessible(edge.isWheelchairAccessible());
+      tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
     }
     else {
-      v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y, edge);
+      v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y, originalEdge);
     }
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    P2<StreetEdge> edges = edge.split(v, scope.equals(Scope.PERMANENT), tempEdges);
+    P2<StreetEdge> newEdges = originalEdge.split(v, scope.equals(Scope.PERMANENT), tempEdges);
 
     if (scope.equals(Scope.REALTIME) || scope.equals(Scope.PERMANENT)) {
       // update indices of new edges
-      streetSpatialIndex.insert(edges.first.getGeometry(), edges.first, scope);
-      streetSpatialIndex.insert(edges.second.getGeometry(), edges.second, scope);
+      if (newEdges.first != null) {
+        streetSpatialIndex.insert(newEdges.first.getGeometry(), newEdges.first, scope);
+      }
+      if (newEdges.second != null) {
+        streetSpatialIndex.insert(newEdges.second.getGeometry(), newEdges.second, scope);
+      }
 
       if (scope.equals(Scope.PERMANENT)) {
         // remove original edge from the graph
-        edge.getToVertex().removeIncoming(edge);
-        edge.getFromVertex().removeOutgoing(edge);
+        originalEdge.getToVertex().removeIncoming(originalEdge);
+        originalEdge.getFromVertex().removeOutgoing(originalEdge);
         // remove original edges from the spatial index
         // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
         // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
         // insert logic is not trivial and would require additional testing of the spatial index.
-        streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, scope);
+        streetSpatialIndex.remove(originalEdge.getGeometry().getEnvelopeInternal(), originalEdge, scope);
       }
     }
 

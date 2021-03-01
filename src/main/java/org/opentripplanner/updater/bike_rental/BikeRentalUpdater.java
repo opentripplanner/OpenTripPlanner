@@ -142,7 +142,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     }
                     verticesByStation.put(station, bikeRentalVertex);
                     tempEdgesByStation.put(station, tempEdges);
-                    System.out.println("Adding station " + station.id);
                 } else {
                     bikeRentalVertex.setBikesAvailable(station.bikesAvailable);
                     bikeRentalVertex.setSpacesAvailable(station.spacesAvailable);
@@ -162,7 +161,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 verticesByStation.remove(station);
                 tempEdgesByStation.get(station).disposeEdges();
                 tempEdgesByStation.remove(station);
-                System.out.println("Removing station " + station.id);
             }
         }
     }
