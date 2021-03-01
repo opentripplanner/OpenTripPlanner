@@ -373,19 +373,21 @@ public class VertexLinker {
     // existing vertices
     P2<StreetEdge> edges = edge.split(v, scope.equals(Scope.PERMANENT), tempEdges);
 
-    if (scope.equals(Scope.PERMANENT)) {
+    if (scope.equals(Scope.REALTIME) || scope.equals(Scope.PERMANENT)) {
       // update indices of new edges
-      streetSpatialIndex.insert(edges.first.getGeometry(), edges.first, Scope.PERMANENT);
-      streetSpatialIndex.insert(edges.second.getGeometry(), edges.second, Scope.PERMANENT);
+      streetSpatialIndex.insert(edges.first.getGeometry(), edges.first, scope);
+      streetSpatialIndex.insert(edges.second.getGeometry(), edges.second, scope);
 
-      // remove original edge from the graph
-      edge.getToVertex().removeIncoming(edge);
-      edge.getFromVertex().removeOutgoing(edge);
-      // remove original edges from the spatial index
-      // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
-      // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
-      // insert logic is not trivial and would require additional testing of the spatial index.
-      streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, Scope.PERMANENT);
+      if (scope.equals(Scope.PERMANENT)) {
+        // remove original edge from the graph
+        edge.getToVertex().removeIncoming(edge);
+        edge.getFromVertex().removeOutgoing(edge);
+        // remove original edges from the spatial index
+        // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
+        // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
+        // insert logic is not trivial and would require additional testing of the spatial index.
+        streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, scope);
+      }
     }
 
     return v;
