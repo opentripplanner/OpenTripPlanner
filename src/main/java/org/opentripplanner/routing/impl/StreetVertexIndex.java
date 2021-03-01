@@ -60,6 +60,9 @@ public class StreetVertexIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndex.class);
 
+  /**
+   * Should only be called by the graph.
+   */
   public StreetVertexIndex(Graph graph) {
     this.graph = graph;
     edgeTree = new HashGridSpatialIndex<>();

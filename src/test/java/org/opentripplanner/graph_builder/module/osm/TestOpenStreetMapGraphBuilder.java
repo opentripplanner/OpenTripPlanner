@@ -166,7 +166,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.setProvider(provider);
 
         loader.buildGraph(graph, extra);
-        new StreetVertexIndex(graph);
+        graph.getStreetIndex();
 
         Router router = new Router(graph, RouterConfig.DEFAULT);
         router.startup();

@@ -56,7 +56,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   public void buildGraph(
       Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore
   ) {
-    VertexLinker linker = new VertexLinker(graph);
+    VertexLinker linker = graph.getLinker();
 
     if (graph.hasStreets) {
       linkTransitStops(graph, linker);

@@ -23,6 +23,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -133,7 +134,7 @@ public class Graph implements Serializable {
 
     private transient CalendarService calendarService;
 
-    public transient StreetVertexIndex streetIndex;
+    private transient StreetVertexIndex streetIndex;
 
     public transient GraphIndex index;
 
@@ -632,6 +633,17 @@ public class Graph implements Serializable {
             }
         }
         return this.calendarService;
+    }
+
+    public StreetVertexIndex getStreetIndex() {
+        if (this.streetIndex == null) {
+            streetIndex = new StreetVertexIndex(this);
+        }
+        return this.streetIndex;
+    }
+
+    public VertexLinker getLinker() {
+        return getStreetIndex().getVertexLinker();
     }
 
     /**

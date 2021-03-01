@@ -56,7 +56,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     ) {
         LOG.info("Linking transit stops to tagged bus stops...");
 
-        index = new StreetVertexIndex(graph);
+        index = graph.getStreetIndex();
 
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<>();

@@ -420,7 +420,7 @@ public class TestHalfEdges {
 
     @Test
     public void testStreetLocationFinder() {
-        StreetVertexIndex finder = new StreetVertexIndex(graph);
+        StreetVertexIndex finder = graph.getStreetIndex();
         Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
         // test that the local stop finder finds stops
         GenericLocation loc = new GenericLocation(40.01, -74.005000001);

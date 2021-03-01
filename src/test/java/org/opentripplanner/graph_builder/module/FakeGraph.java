@@ -107,7 +107,7 @@ public class FakeGraph {
 
     /** link the stops in the graph */
     public static void link (Graph graph) {
-        VertexLinker linker = new VertexLinker(graph);
+        VertexLinker linker = graph.getLinker();
 
         for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
             linker.linkVertexPermanently(

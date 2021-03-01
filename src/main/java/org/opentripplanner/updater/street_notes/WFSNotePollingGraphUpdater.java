@@ -144,7 +144,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
 
             Geometry geom = (Geometry) feature.getDefaultGeometry();
             Geometry searchArea = geom.buffer(SEARCH_RADIUS_DEG);
-            Collection<Edge> edges = graph.streetIndex.getEdgesForEnvelope(searchArea.getEnvelopeInternal());
+            Collection<Edge> edges = graph.getStreetIndex().getEdgesForEnvelope(searchArea.getEnvelopeInternal());
             for(Edge edge: edges){
                 if (edge instanceof StreetEdge && !searchArea.disjoint(edge.getGeometry())) {
                     addNote(edge, streetNote, NOTE_MATCHER);

@@ -74,7 +74,7 @@ public class LinkStopToPlatformTest {
      */
     @Test
     public void testLinkStopWithoutExtraEdges() {
-        VertexLinker linker = new VertexLinker(graph);
+        VertexLinker linker = graph.getLinker();
 
         for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
             linker.linkVertexPermanently(

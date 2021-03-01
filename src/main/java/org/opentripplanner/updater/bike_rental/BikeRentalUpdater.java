@@ -72,7 +72,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
-        linker = graph.streetIndex.getVertexLinker();
+        linker = graph.getLinker();
         // Adding a bike rental station service needs a graph writer runnable
         service = graph.getService(BikeRentalStationService.class, true);
     }

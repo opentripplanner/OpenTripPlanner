@@ -107,13 +107,13 @@ public class RoutingContext implements Cloneable {
 
         if (findPlaces) {
             // normal mode, search for vertices based RoutingRequest and split streets
-            fromVertices = graph.streetIndex.getVerticesForLocation(
+            fromVertices = graph.getStreetIndex().getVerticesForLocation(
                 opt.from,
                 opt,
                 false,
                 tempEdges
             );
-            toVertices = graph.streetIndex.getVerticesForLocation(
+            toVertices = graph.getStreetIndex().getVerticesForLocation(
                 opt.to,
                 opt,
                 true,

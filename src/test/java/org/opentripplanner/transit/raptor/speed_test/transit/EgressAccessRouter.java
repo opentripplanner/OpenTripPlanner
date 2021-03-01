@@ -22,9 +22,7 @@ public class EgressAccessRouter {
     public EgressAccessRouter(Graph graph, TransitLayer transitLayer) {
         this.graph = graph;
         this.transitLayer = transitLayer;
-        this.linker = new VertexLinker(
-                graph
-        );
+        this.linker = graph.getLinker();
     }
 
     public void route(SpeedTestRequest request) {
