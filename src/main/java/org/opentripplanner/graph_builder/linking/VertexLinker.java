@@ -209,7 +209,7 @@ public class VertexLinker {
     // Only consider street edges traversable by the given mode and still present in the graph.
     // Calculate a distance to each of those edges, and keep only the ones within the search radius.
     List<DistanceTo<StreetEdge>> candidateEdges = streetSpatialIndex
-        .query(env, Scope.PERMANENT)
+        .query(env, scope)
         .stream()
         .filter(StreetEdge.class::isInstance)
         .map(StreetEdge.class::cast)
