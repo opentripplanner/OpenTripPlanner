@@ -314,7 +314,7 @@ public class VertexLinker {
       // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
       // edges that were missed by WalkableAreaBuilder
       // TODO Temporary code until we refactor the WalkableAreaBuilder (#3152)
-      if (scope.equals(Scope.PERMANENT) && this.addExtraEdgesToAreas) {
+      if (scope.equals(Scope.PERMANENT) && this.addExtraEdgesToAreas && edge instanceof AreaEdge) {
         AreaVisibilityAdjuster.linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
       }
 
