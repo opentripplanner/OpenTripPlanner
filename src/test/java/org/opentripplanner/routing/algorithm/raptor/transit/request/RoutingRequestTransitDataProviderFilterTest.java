@@ -12,9 +12,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class RoutingRequestTransitDataProviderFilterTest {
 
@@ -144,7 +144,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private TripTimes createTestTripTimes() {
     Trip trip = new Trip(new FeedScopedId("TEST", "TRIP"));
-    trip.setBikesAllowed(2);
+    trip.setBikesAllowed(BikeAccess.NOT_ALLOWED);
 
     StopTime stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
@@ -198,5 +198,25 @@ public class RoutingRequestTransitDataProviderFilterTest {
     boolean valid4 = filter2.tripTimesPredicate(tripTimesWithReplaced);
     // Then
     assertFalse(valid4);
+  }
+
+  @Test
+  public void testBikesAllowed() {
+    String FEED_ID = "F";
+    Trip trip = new Trip(new FeedScopedId(FEED_ID, "T1"));
+    Route route = new Route(new FeedScopedId(FEED_ID, "R1"));
+    trip.setRoute(route);
+
+    assertEquals(BikeAccess.UNKNOWN, RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip));
+    trip.setBikesAllowed(BikeAccess.ALLOWED);
+    assertEquals(BikeAccess.ALLOWED, RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip));
+    trip.setBikesAllowed(BikeAccess.NOT_ALLOWED);
+    assertEquals(BikeAccess.NOT_ALLOWED, RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip));
+    route.setBikesAllowed(BikeAccess.ALLOWED);
+    assertEquals(BikeAccess.NOT_ALLOWED, RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip));
+    trip.setBikesAllowed(BikeAccess.UNKNOWN);
+    assertEquals(BikeAccess.ALLOWED, RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip));
+    route.setBikesAllowed(BikeAccess.NOT_ALLOWED);
+    assertEquals(BikeAccess.NOT_ALLOWED, RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip));
   }
 }

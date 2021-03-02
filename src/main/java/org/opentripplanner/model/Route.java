@@ -27,12 +27,7 @@ public final class Route extends TransitEntity {
 
     private String textColor;
 
-    @Deprecated private int routeBikesAllowed = 0;
-
-    /**
-     * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-     */
-    private int bikesAllowed = 0;
+    private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
 
     private int sortOrder = MISSING_VALUE;
 
@@ -132,28 +127,11 @@ public final class Route extends TransitEntity {
         this.textColor = textColor;
     }
 
-    @Deprecated
-    public int getRouteBikesAllowed() {
-        return routeBikesAllowed;
-    }
-
-    @Deprecated
-    public void setRouteBikesAllowed(int routeBikesAllowed) {
-        this.routeBikesAllowed = routeBikesAllowed;
-    }
-
-    /**
-     * @return 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-     */
-    public int getBikesAllowed() {
+    public BikeAccess getBikesAllowed() {
         return bikesAllowed;
     }
 
-    /**
-     * @param bikesAllowed 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes
-     *          NOT allowed
-     */
-    public void setBikesAllowed(int bikesAllowed) {
+    public void setBikesAllowed(BikeAccess bikesAllowed) {
         this.bikesAllowed = bikesAllowed;
     }
 

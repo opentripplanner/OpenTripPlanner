@@ -23,7 +23,6 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcess
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -423,9 +422,9 @@ public class GtfsModule implements GraphBuilderModule {
 
     private static class EntityBikeability implements EntityHandler {
 
-        private Boolean defaultBikesAllowed;
+        private final boolean defaultBikesAllowed;
 
-        public EntityBikeability(Boolean defaultBikesAllowed) {
+        public EntityBikeability(boolean defaultBikesAllowed) {
             this.defaultBikesAllowed = defaultBikesAllowed;
         }
 
@@ -436,9 +435,16 @@ public class GtfsModule implements GraphBuilderModule {
             }
 
             Trip trip = (Trip) bean;
-            if (defaultBikesAllowed && BikeAccess.fromTrip(trip) == BikeAccess.UNKNOWN) {
-                BikeAccess.setForTrip(trip, BikeAccess.ALLOWED);
+            if (defaultBikesAllowed && bikesAllowedIsNotSet(trip)) {
+                trip.setBikesAllowed(1);
             }
+        }
+
+        public boolean bikesAllowedIsNotSet(Trip trip) {
+            return trip.getTripBikesAllowed() == 0
+                && trip.getBikesAllowed() == 0
+                && trip.getRoute().getRouteBikesAllowed() == 0
+                && trip.getRoute().getBikesAllowed() == 0;
         }
     }
 

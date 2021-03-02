@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -57,7 +58,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
     if (requireBikesAllowed) {
-      return BikeAccess.fromTrip(tripTimes.trip) == BikeAccess.ALLOWED;
+      return bikeAccessForTrip(tripTimes.trip) == BikeAccess.ALLOWED;
     }
 
     if (requireWheelchairAccessible) {
@@ -79,5 +80,13 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   private boolean transitModeIsAllowed(TripPatternForDate tripPatternForDate) {
     TransitMode transitMode = tripPatternForDate.getTripPattern().getTransitMode();
     return transitModes.contains(transitMode);
+  }
+
+  public static BikeAccess bikeAccessForTrip(Trip trip) {
+    if (trip.getBikesAllowed() != BikeAccess.UNKNOWN) {
+      return trip.getBikesAllowed();
+    }
+
+    return trip.getRoute().getBikesAllowed();
   }
 }
