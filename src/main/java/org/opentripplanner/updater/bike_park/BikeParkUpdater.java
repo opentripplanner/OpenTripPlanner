@@ -138,7 +138,6 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                     continue;
                 toRemove.add(bikePark);
                 bikeService.removeBikePark(bikePark);
-                // TODO: need to unsplit any streets that were split
             }
             for (BikePark bikePark : toRemove) {
                 // post-iteration removal to avoid concurrent modification
