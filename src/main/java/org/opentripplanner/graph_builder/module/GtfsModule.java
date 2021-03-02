@@ -229,9 +229,6 @@ public class GtfsModule implements GraphBuilderModule {
         if (LOG.isDebugEnabled())
             reader.addEntityHandler(counter);
 
-        if (gtfsBundle.getDefaultBikesAllowed())
-            reader.addEntityHandler(new EntityBikeability(true));
-
         for (Class<?> entityClass : reader.getEntityClasses()) {
             LOG.info("reading entities: " + entityClass.getName());
             reader.readEntities(entityClass);
@@ -418,34 +415,6 @@ public class GtfsModule implements GraphBuilderModule {
             return value;
         }
 
-    }
-
-    private static class EntityBikeability implements EntityHandler {
-
-        private final boolean defaultBikesAllowed;
-
-        public EntityBikeability(boolean defaultBikesAllowed) {
-            this.defaultBikesAllowed = defaultBikesAllowed;
-        }
-
-        @Override
-        public void handleEntity(Object bean) {
-            if (!(bean instanceof Trip)) {
-                return;
-            }
-
-            Trip trip = (Trip) bean;
-            if (defaultBikesAllowed && bikesAllowedIsNotSet(trip)) {
-                trip.setBikesAllowed(1);
-            }
-        }
-
-        public boolean bikesAllowedIsNotSet(Trip trip) {
-            return trip.getTripBikesAllowed() == 0
-                && trip.getBikesAllowed() == 0
-                && trip.getRoute().getRouteBikesAllowed() == 0
-                && trip.getRoute().getBikesAllowed() == 0;
-        }
     }
 
     @Override
