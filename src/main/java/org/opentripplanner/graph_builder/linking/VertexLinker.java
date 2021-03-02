@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -315,6 +316,11 @@ public class VertexLinker {
       // TODO Temporary code until we refactor the WalkableAreaBuilder (#3152)
       if (scope.equals(Scope.PERMANENT) && this.addExtraEdgesToAreas) {
         AreaVisibilityAdjuster.linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
+      }
+
+      // TODO Consider moving this code
+      if (OTPFeature.FlexRouting.isOn()) {
+        FlexLocationAdder.addFlexLocations(edge, v0, graph);
       }
 
       return v0;
