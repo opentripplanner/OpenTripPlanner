@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
@@ -56,6 +55,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
   public void buildGraph(
       Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore
   ) {
+    graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
+
     if (graph.hasStreets) {
       linkTransitStops(graph);
       linkTransitEntrances(graph);

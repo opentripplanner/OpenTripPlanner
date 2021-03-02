@@ -11,6 +11,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
@@ -65,6 +66,9 @@ public class VertexLinker {
   private static final int MAX_SEARCH_RADIUS_METERS = 1000;
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
+
+  // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
+  private Boolean addExtraEdgesToAreas = false;
 
   /**
    * Construct a new VertexLinker.
@@ -305,6 +309,14 @@ public class VertexLinker {
     else {
       // split the edge, get the split vertex
       SplitterVertex v0 = split(edge, ll, scope, direction.equals(LinkingDirection.BACKWARD), tempEdges);
+
+      // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
+      // edges that were missed by WalkableAreaBuilder
+      // TODO Temporary code until we refactor the WalkableAreaBuilder (#3152)
+      if (scope.equals(Scope.PERMANENT) && this.addExtraEdgesToAreas) {
+        AreaVisibilityAdjuster.linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
+      }
+
       return v0;
     }
   }
@@ -398,6 +410,11 @@ public class VertexLinker {
     }
 
     return v;
+  }
+
+  // TODO Temporary code until we refactor WalkableAreaBuilder (#3152)
+  public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
+    this.addExtraEdgesToAreas = addExtraEdgesToAreas;
   }
 
   private static class DistanceTo<T> {
