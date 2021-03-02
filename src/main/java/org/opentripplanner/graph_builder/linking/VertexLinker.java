@@ -210,7 +210,6 @@ public class VertexLinker {
     // Calculate a distance to each of those edges, and keep only the ones within the search radius.
     List<DistanceTo<StreetEdge>> candidateEdges = streetSpatialIndex
         .query(env, scope)
-        .stream()
         .filter(StreetEdge.class::isInstance)
         .map(StreetEdge.class::cast)
         .filter(e -> e.canTraverse(traverseModeSet) && edgeReachableFromGraph(e))

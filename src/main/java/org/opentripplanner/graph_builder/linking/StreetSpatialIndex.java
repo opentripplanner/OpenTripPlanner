@@ -49,17 +49,17 @@ public class StreetSpatialIndex {
     }
   }
 
-  public final List<Edge> query(Envelope envelope, Scope scope) {
+  public final Stream<Edge> query(Envelope envelope, Scope scope) {
     switch (scope) {
       case PERMANENT:
       case REALTIME:
-        return permanentIndex.query(envelope);
+        return permanentIndex.query(envelope).stream();
       case REQUEST:
         return Stream
             .concat(
                 permanentIndex.query(envelope).stream(),
                 realTimeIndex.query(envelope).stream()
-            ).collect(Collectors.toList());
+            );
       default:
         throw new IllegalArgumentException();
     }

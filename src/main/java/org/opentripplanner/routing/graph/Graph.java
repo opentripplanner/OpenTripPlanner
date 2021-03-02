@@ -610,7 +610,6 @@ public class Graph implements Serializable {
      * This used to be done in readObject methods upon deserialization, but stand-alone mode now
      * allows passing graphs from graphbuilder to server in memory, without a round trip through
      * serialization. 
-     * TODO: do we really need a factory for different street vertex indexes?
      */
     public void index () {
         LOG.info("Index graph...");
