@@ -793,7 +793,8 @@ public class StreetEdge extends Edge implements Cloneable {
         length_mm = (int) (accumulatedMeters * 1000);
     }
 
-    /** Split this street edge and return the resulting street edges */
+    /** Split this street edge and return the resulting street edges. After splitting, the original
+     * edge will be removed from the graph. */
     public P2<StreetEdge> splitDestructively(SplitterVertex v) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
@@ -854,7 +855,7 @@ public class StreetEdge extends Edge implements Cloneable {
         return new P2<>(e1, e2);
     }
 
-    /** Split this street edge and return the resulting street edges */
+    /** Split this street edge and return the resulting street edges. The original edge is kept. */
     public P2<StreetEdge> splitNonDestructively(SplitterVertex v, DisposableEdgeCollection tempEdges) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
