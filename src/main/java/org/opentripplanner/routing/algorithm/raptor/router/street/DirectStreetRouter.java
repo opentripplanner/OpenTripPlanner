@@ -29,13 +29,14 @@ public class DirectStreetRouter {
 
   public static List<Itinerary> route(Router router, RoutingRequest request) {
     request.setRoutingContext(router.graph);
+    RoutingRequest nonTransitRequest = null;
     try {
       if (request.modes.directMode == null) {
         return Collections.emptyList();
       }
       if(!streetDistanceIsReasonable(request)) { return Collections.emptyList(); }
 
-      RoutingRequest nonTransitRequest = request.getStreetSearchRequest(request.modes.directMode);
+      nonTransitRequest = request.getStreetSearchRequest(request.modes.directMode);
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(router);
@@ -48,6 +49,10 @@ public class DirectStreetRouter {
     }
     catch (PathNotFoundException e) {
       return Collections.emptyList();
+    } finally {
+      if (nonTransitRequest != null) {
+        nonTransitRequest.cleanup();
+      }
     }
   }
 

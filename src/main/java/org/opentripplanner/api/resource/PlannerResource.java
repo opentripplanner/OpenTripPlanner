@@ -97,6 +97,10 @@ public class PlannerResource extends RoutingResource {
             PlannerError error = new PlannerError();
             error.setMsg(Message.SYSTEM_ERROR);
             response.setError(error);
+        } finally {
+            if (request != null) {
+                request.cleanup();
+            }
         }
 
         /* Log this request if such logging is enabled. */
