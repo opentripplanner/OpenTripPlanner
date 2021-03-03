@@ -137,6 +137,16 @@ public class StopArrivalsTestData implements RaptorTestConstants {
      * here returned as a path.
      */
     public static Path<TestTripSchedule> basicTripAsPath() {
+        var transfer = new RaptorTransfer() {
+            @Override public int stop() {
+                return STOP_3;
+            }
+
+            @Override public int durationInSeconds() {
+                return W1_END - W1_START;
+            }
+        };
+
         PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
                 EGRESS, STOP_5, E_START, E_END, 1_000
         );
@@ -147,7 +157,7 @@ public class StopArrivalsTestData implements RaptorTestConstants {
             STOP_3, T2_START, STOP_4, T2_END, 1_000, TRIP_2, leg5
         );
         PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
-            STOP_2, W1_START, STOP_3, W1_END, 1_000, leg4.asTransitLeg()
+            STOP_2, W1_START, STOP_3, W1_END, 1_000, transfer, leg4.asTransitLeg()
         );
         TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
             STOP_1, T1_START, STOP_2, T1_END, 1_000, TRIP_1, leg3
