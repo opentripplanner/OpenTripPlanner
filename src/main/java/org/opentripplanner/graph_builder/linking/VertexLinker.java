@@ -315,7 +315,7 @@ public class VertexLinker {
 
     else {
       // split the edge, get the split vertex
-      SplitterVertex v0 = split(edge, ll, scope, direction.equals(LinkingDirection.BACKWARD), tempEdges);
+      SplitterVertex v0 = split(edge, ll, scope, direction.equals(LinkingDirection.OUTGOING), tempEdges);
 
       // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
       // edges that were missed by WalkableAreaBuilder

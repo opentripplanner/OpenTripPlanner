@@ -246,7 +246,7 @@ public class StreetVertexIndex {
     tempEdges.add(vertexLinker.linkVertexForRequest(
         temporaryStreetLocation,
         nonTransitMode,
-        endVertex ? LinkingDirection.BACKWARD : LinkingDirection.FORWARD,
+        endVertex ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
         endVertex
             ? (vertex, streetVertex) -> List.of(
                 new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation)vertex)

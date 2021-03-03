@@ -4,10 +4,10 @@ public enum LinkingDirection {
   /**
    * From the new vertex towards the main graph
    */
-  FORWARD,
+  INCOMING,
   /**
    * From the main graph towards the new vertex
    */
-  BACKWARD,
+  OUTGOING,
   BOTH_WAYS
 }
