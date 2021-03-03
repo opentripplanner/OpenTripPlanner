@@ -69,10 +69,6 @@ public class TransmodelGraphQLPlanner {
             PlannerError error = new PlannerError();
             error.setMsg(Message.SYSTEM_ERROR);
             response.messages.add(error.message);
-        } finally {
-            if (request != null) {
-                request.cleanup();
-            }
         }
         return response;
     }

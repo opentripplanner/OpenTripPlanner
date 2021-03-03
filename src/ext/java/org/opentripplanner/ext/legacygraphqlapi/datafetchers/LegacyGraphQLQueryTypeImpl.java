@@ -709,7 +709,6 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("disableRemainingWeightHeuristic", (Boolean v) -> request.disableRemainingWeightHeuristic = v);
 
       callWith.argument("locale", (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v));
-      // TODO Cleanup method on RoutingRequest must be called. Currently there is a memory leak here.
       return context.getRoutingService().route(request, context.getRouter());
     };
   }
