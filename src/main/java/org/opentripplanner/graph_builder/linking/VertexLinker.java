@@ -131,16 +131,16 @@ public class VertexLinker {
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
    *
+   * In OTP2 where the transit search can be quite fast, searching for a good linking point can be
+   * a significant fraction of response time. Hannes Junnila has reported >70% speedups in searches
+   * by making the search radius smaller. Therefore we use an expanding-envelope search, which is
+   * more efficient in dense areas.
+   *
    * @param vertex        Vertex to be linked into the street graph
    * @param traverseMode  Only street edges allowing this mode will be linked
    * @param direction     The direction of the new edges to be created
    * @param scope         The scope of the split
    * @param edgeFunction  How the provided vertex should be linked into the street graph
-   *
-   * In OTP2 where the transit search can be quite fast, searching for a good linking point can be
-   * a significant fraction of response time. Hannes Junnila has reported >70% speedups in searches
-   * by making the search radius smaller. Therefore we use an expanding-envelope search, which is
-   * more efficient in dense areas.
    *
    * @return A DisposableEdgeCollection with edges created by this method. It is the caller's
    * responsibility to call the dispose method on this object when the edges are no longer needed.
@@ -152,7 +152,7 @@ public class VertexLinker {
       Scope scope,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    DisposableEdgeCollection tempEdges = !scope.equals(Scope.PERMANENT)
+    DisposableEdgeCollection tempEdges = (scope != Scope.PERMANENT)
         ? new DisposableEdgeCollection(graph)
         : null;
 
@@ -212,7 +212,8 @@ public class VertexLinker {
     env.expandBy(radiusDeg / xscale, radiusDeg);
 
     final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary.metersToDegrees(
-        DUPLICATE_WAY_EPSILON_METERS);
+        DUPLICATE_WAY_EPSILON_METERS
+    );
 
     final TraverseModeSet traverseModeSet = new TraverseModeSet(traverseMode);
 
@@ -315,12 +316,12 @@ public class VertexLinker {
 
     else {
       // split the edge, get the split vertex
-      SplitterVertex v0 = split(edge, ll, scope, direction.equals(LinkingDirection.OUTGOING), tempEdges);
+      SplitterVertex v0 = split(edge, ll, scope, direction == LinkingDirection.OUTGOING, tempEdges);
 
       // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
       // edges that were missed by WalkableAreaBuilder
       // TODO Temporary code until we refactor the WalkableAreaBuilder (#3152)
-      if (scope.equals(Scope.PERMANENT) && this.addExtraEdgesToAreas && edge instanceof AreaEdge) {
+      if (scope == Scope.PERMANENT && this.addExtraEdgesToAreas && edge instanceof AreaEdge) {
         AreaVisibilityAdjuster.linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
       }
 
@@ -382,7 +383,7 @@ public class VertexLinker {
     SplitterVertex v;
     String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
 
-    if (!scope.equals(Scope.PERMANENT)) {
+    if (scope != Scope.PERMANENT) {
       TemporarySplitterVertex tsv = new TemporarySplitterVertex(uniqueSplitLabel,
           splitPoint.x,
           splitPoint.y,
@@ -398,9 +399,11 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    P2<StreetEdge> newEdges = originalEdge.split(v, scope.equals(Scope.PERMANENT), tempEdges);
+    P2<StreetEdge> newEdges = scope == Scope.PERMANENT
+        ? originalEdge.splitDestructively(v)
+        : originalEdge.splitNonDestructively(v, tempEdges);
 
-    if (scope.equals(Scope.REALTIME) || scope.equals(Scope.PERMANENT)) {
+    if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
       if (newEdges.first != null) {
         streetSpatialIndex.insert(newEdges.first.getGeometry(), newEdges.first, scope);
@@ -409,7 +412,7 @@ public class VertexLinker {
         streetSpatialIndex.insert(newEdges.second.getGeometry(), newEdges.second, scope);
       }
 
-      if (scope.equals(Scope.PERMANENT)) {
+      if (scope == Scope.PERMANENT) {
         // remove original edge from the graph
         originalEdge.getToVertex().removeIncoming(originalEdge);
         originalEdge.getFromVertex().removeOutgoing(originalEdge);

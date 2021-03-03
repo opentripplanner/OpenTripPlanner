@@ -19,13 +19,13 @@ import java.util.stream.Stream;
  * A request-scoped index is not needed, as we do not want request-scoped edges to be visible
  * when linking.
  */
-public class StreetSpatialIndex {
+class StreetSpatialIndex {
 
   private final HashGridSpatialIndex<Edge> permanentIndex = new HashGridSpatialIndex<>();
 
   private final HashGridSpatialIndex<Edge> realTimeIndex = new HashGridSpatialIndex<>();
 
-  public void insert(LineString lineString, Object obj, Scope scope) {
+  void insert(LineString lineString, Object obj, Scope scope) {
     switch (scope) {
       case PERMANENT:
         permanentIndex.insert(lineString, obj);
@@ -38,7 +38,7 @@ public class StreetSpatialIndex {
     }
   }
 
-  public boolean remove(Envelope envelope, final Object item, Scope scope) {
+   boolean remove(Envelope envelope, final Object item, Scope scope) {
     switch (scope) {
       case PERMANENT:
         return permanentIndex.remove(envelope, item);
@@ -49,7 +49,7 @@ public class StreetSpatialIndex {
     }
   }
 
-  public final Stream<Edge> query(Envelope envelope, Scope scope) {
+  final Stream<Edge> query(Envelope envelope, Scope scope) {
     switch (scope) {
       case PERMANENT:
       case REALTIME:

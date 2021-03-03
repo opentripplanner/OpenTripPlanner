@@ -1,5 +1,9 @@
 package org.opentripplanner.graph_builder.linking;
 
+/**
+ * Represents the direction of travel of the edges created when linking a vertex into the street
+ * graph
+ */
 public enum LinkingDirection {
   /**
    * From the new vertex towards the main graph

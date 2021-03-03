@@ -14,9 +14,9 @@ import java.util.HashSet;
 class FlexLocationAdder {
 
   static void addFlexLocations(StreetEdge edge, SplitterVertex v0, Graph graph) {
-    if (graph.index != null && edge
-        .getPermission()
-        .allows(StreetTraversalPermission.PEDESTRIAN_AND_CAR)) {
+    if (graph.index != null
+        && edge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN_AND_CAR)
+    ) {
       Point p = GeometryUtils.getGeometryFactory().createPoint(v0.getCoordinate());
       Envelope env = p.getEnvelopeInternal();
       for (FlexStopLocation location : graph.index.getFlexIndex().locationIndex.query(env)) {

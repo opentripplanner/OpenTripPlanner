@@ -20,9 +20,12 @@ import java.util.stream.Stream;
 
 public class SameEdgeAdjuster {
 
+  private SameEdgeAdjuster() {}
+
   /**
-   * If the from and to vertices are generated and lie along some of the same edges, we need to wire
-   * them up along those edges so that we don't get odd circuitous routes for really short trips.
+   * Utility class. If the from and to vertices are generated and lie along some of the same edges,
+   * we need to wire them up along those edges so that we don't get odd circuitous routes for
+   * really short trips.
    */
   public static DisposableEdgeCollection adjust(Vertex from, Vertex to, Graph graph) {
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
@@ -33,10 +36,13 @@ public class SameEdgeAdjuster {
 
       for (Edge outgoing : from.getOutgoing()) {
         Vertex toVertex = outgoing.getToVertex();
-        if (outgoing instanceof TemporaryFreeEdge && toVertex instanceof StreetVertex && toVertex
-            .getOutgoing()
-            .stream()
-            .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
+        if (outgoing instanceof TemporaryFreeEdge
+            && toVertex instanceof StreetVertex
+            && toVertex
+              .getOutgoing()
+              .stream()
+              .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)
+        ) {
           // The vertex is connected with an TemporaryFreeEdge connector to the
           // TemporaryPartialStreetEdge
           fromVertices.add((StreetVertex) toVertex);
@@ -50,10 +56,13 @@ public class SameEdgeAdjuster {
 
       for (Edge incoming : to.getIncoming()) {
         Vertex fromVertex = incoming.getFromVertex();
-        if (incoming instanceof TemporaryFreeEdge && fromVertex instanceof StreetVertex && fromVertex
-            .getIncoming()
-            .stream()
-            .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
+        if (incoming instanceof TemporaryFreeEdge
+            && fromVertex instanceof StreetVertex
+            && fromVertex
+              .getIncoming()
+              .stream()
+              .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)
+        ) {
           // The vertex is connected with an TemporaryFreeEdge connector to the
           // TemporaryPartialStreetEdge
           toVertices.add((StreetVertex) fromVertex);
@@ -111,11 +120,13 @@ public class SameEdgeAdjuster {
       StreetEdge streetEdge, StreetVertex from, StreetVertex to, DisposableEdgeCollection tempEdges
   ) {
     LineString parent = streetEdge.getGeometry();
-    LineString head = GeometryUtils.getInteriorSegment(parent,
+    LineString head = GeometryUtils.getInteriorSegment(
+        parent,
         streetEdge.getFromVertex().getCoordinate(),
         from.getCoordinate()
     );
-    LineString tail = GeometryUtils.getInteriorSegment(parent,
+    LineString tail = GeometryUtils.getInteriorSegment(
+        parent,
         to.getCoordinate(),
         streetEdge.getToVertex().getCoordinate()
     );

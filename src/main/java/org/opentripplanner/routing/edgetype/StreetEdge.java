@@ -794,79 +794,85 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     /** Split this street edge and return the resulting street edges */
-    public P2<StreetEdge> split(SplitterVertex v, boolean destructive, DisposableEdgeCollection tempEdges) {
+    public P2<StreetEdge> splitDestructively(SplitterVertex v) {
+        P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
+
+        StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
+        StreetEdge e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, 0, permission, this.isBack());
+
+        // copy the wayId to the split edges, so we can trace them back to their parent if need be
+        e1.wayId = this.wayId;
+        e2.wayId = this.wayId;
+
+        // figure the lengths, ensuring that they sum to the length of this edge
+        e1.calculateLengthFromGeometry();
+        e2.calculateLengthFromGeometry();
+
+        // we have this code implemented in both directions, because splits are fudged half a millimeter
+        // when the length of this is odd. We want to make sure the lengths of the split streets end up
+        // exactly the same as their backStreets so that if they are split again the error does not accumulate
+        // and so that the order in which they are split does not matter.
+        if (!isBack()) {
+            // cast before the divide so that the sum is promoted
+            double frac = (double) e1.length_mm / (e1.length_mm + e2.length_mm);
+            e1.length_mm = (int) (length_mm * frac);
+            e2.length_mm = length_mm - e1.length_mm;
+        }
+        else {
+            // cast before the divide so that the sum is promoted
+            double frac = (double) e2.length_mm / (e1.length_mm + e2.length_mm);
+            e2.length_mm = (int) (length_mm * frac);
+            e1.length_mm = length_mm - e2.length_mm;
+        }
+
+        // TODO: better handle this temporary fix to handle bad edge distance calculation
+        if (e1.length_mm < 0) {
+            LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.wayId, v.getLat(), v.getLon(), e1.length_mm);
+            e1.length_mm = 1;
+        }
+        if (e2.length_mm < 0) {
+            LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.wayId, v.getLat(), v.getLon(), e2.length_mm);
+            e2.length_mm = 1;
+        }
+
+        if (e1.length_mm < 0 || e2.length_mm < 0) {
+            e1.tov.removeIncoming(e1);
+            e1.fromv.removeOutgoing(e1);
+            e2.tov.removeIncoming(e2);
+            e2.fromv.removeOutgoing(e2);
+            throw new IllegalStateException("Split street is longer than original street!");
+        }
+
+        for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
+            e.setBicycleSafetyFactor(getBicycleSafetyFactor());
+            e.setHasBogusName(hasBogusName());
+            e.setStairs(isStairs());
+            e.setWheelchairAccessible(isWheelchairAccessible());
+            e.setBack(isBack());
+        }
+
+        return new P2<>(e1, e2);
+    }
+
+    /** Split this street edge and return the resulting street edges */
+    public P2<StreetEdge> splitNonDestructively(SplitterVertex v, DisposableEdgeCollection tempEdges) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = null;
         StreetEdge e2 = null;
 
-        if (destructive) {
-            e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
-            e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, 0, permission, this.isBack());
-
-            // copy the wayId to the split edges, so we can trace them back to their parent if need be
-            e1.wayId = this.wayId;
-            e2.wayId = this.wayId;
-
-            // figure the lengths, ensuring that they sum to the length of this edge
-            e1.calculateLengthFromGeometry();
-            e2.calculateLengthFromGeometry();
-
-            // we have this code implemented in both directions, because splits are fudged half a millimeter
-            // when the length of this is odd. We want to make sure the lengths of the split streets end up
-            // exactly the same as their backStreets so that if they are split again the error does not accumulate
-            // and so that the order in which they are split does not matter.
-            if (!isBack()) {
-                // cast before the divide so that the sum is promoted
-                double frac = (double) e1.length_mm / (e1.length_mm + e2.length_mm);
-                e1.length_mm = (int) (length_mm * frac);
-                e2.length_mm = length_mm - e1.length_mm;
-            }
-            else {
-                // cast before the divide so that the sum is promoted
-                double frac = (double) e2.length_mm / (e1.length_mm + e2.length_mm);
-                e2.length_mm = (int) (length_mm * frac);
-                e1.length_mm = length_mm - e2.length_mm;
-            }
-
-            // TODO: better handle this temporary fix to handle bad edge distance calculation
-            if (e1.length_mm < 0) {
-                LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.wayId, v.getLat(), v.getLon(), e1.length_mm);
-                e1.length_mm = 1;
-            }
-            if (e2.length_mm < 0) {
-                LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.wayId, v.getLat(), v.getLon(), e2.length_mm);
-                e2.length_mm = 1;
-            }
-
-            if (e1.length_mm < 0 || e2.length_mm < 0) {
-                e1.tov.removeIncoming(e1);
-                e1.fromv.removeOutgoing(e1);
-                e2.tov.removeIncoming(e2);
-                e2.fromv.removeOutgoing(e2);
-                throw new IllegalStateException("Split street is longer than original street!");
-            }
-
-            for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
-                e.setBicycleSafetyFactor(getBicycleSafetyFactor());
-                e.setHasBogusName(hasBogusName());
-                e.setStairs(isStairs());
-                e.setWheelchairAccessible(isWheelchairAccessible());
-                e.setBack(isBack());
-            }
+        if (((TemporarySplitterVertex) v).isEndVertex()) {
+            e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
+            e1.setNoThruTraffic(this.isNoThruTraffic());
+            e1.setStreetClass(this.getStreetClass());
+            tempEdges.addEdge(e1);
         } else {
-            if (((TemporarySplitterVertex) v).isEndVertex()) {
-                e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
-                e1.setNoThruTraffic(this.isNoThruTraffic());
-                e1.setStreetClass(this.getStreetClass());
-                tempEdges.addEdge(e1);
-            } else {
-                e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
-                e2.setNoThruTraffic(this.isNoThruTraffic());
-                e2.setStreetClass(this.getStreetClass());
-                tempEdges.addEdge(e2);
-            }
+            e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
+            e2.setNoThruTraffic(this.isNoThruTraffic());
+            e2.setStreetClass(this.getStreetClass());
+            tempEdges.addEdge(e2);
         }
+
         return new P2<>(e1, e2);
     }
 

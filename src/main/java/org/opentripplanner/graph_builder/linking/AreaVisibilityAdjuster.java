@@ -38,16 +38,19 @@ class AreaVisibilityAdjuster {
 
     for (Vertex vertex : vertices) {
       if (vertex instanceof StreetVertex && !vertex.equals(splitterVertex)) {
-        LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] {
-            splitterVertex.getCoordinate(),
-            vertex.getCoordinate()
+        LineString line = GEOMETRY_FACTORY.createLineString(
+            new Coordinate[] {
+              splitterVertex.getCoordinate(),
+              vertex.getCoordinate()
         });
-        double length = SphericalDistanceLibrary.distance(splitterVertex.getCoordinate(),
+        double length = SphericalDistanceLibrary.distance(
+            splitterVertex.getCoordinate(),
             vertex.getCoordinate()
         );
         I18NString name = new LocalizedString("", new OSMWithTags());
 
-        edgeFactory.createAreaEdge((IntersectionVertex) splitterVertex,
+        edgeFactory.createAreaEdge(
+            (IntersectionVertex) splitterVertex,
             (IntersectionVertex) vertex,
             line,
             name,
