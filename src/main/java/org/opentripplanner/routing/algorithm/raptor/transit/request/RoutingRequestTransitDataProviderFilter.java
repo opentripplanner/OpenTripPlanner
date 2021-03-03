@@ -46,7 +46,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
           GraphIndex graphIndex
   ) {
     this(
-        request.modes.directMode == StreetMode.BIKE,
+        request.modes.transferMode == StreetMode.BIKE,
         request.wheelchairAccessible,
         request.includePlannedCancellations,
         request.modes.transitModes,

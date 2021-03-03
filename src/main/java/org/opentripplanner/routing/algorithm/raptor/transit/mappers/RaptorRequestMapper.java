@@ -68,13 +68,13 @@ public class RaptorRequestMapper {
         builder.mcCostFactors()
                 .waitReluctanceFactor(request.waitReluctance);
 
-        if(request.modes.accessMode == StreetMode.WALK) {
+        if(request.modes.transferMode == StreetMode.WALK) {
             builder.mcCostFactors()
                     .walkReluctanceFactor(request.walkReluctance)
                     .boardCost(request.walkBoardCost)
                     .transferCost(request.transferCost);
         }
-        else if(request.modes.accessMode == StreetMode.BIKE) {
+        else if(request.modes.transferMode == StreetMode.BIKE) {
             builder.mcCostFactors()
                     .walkReluctanceFactor(request.walkReluctance)
                     .boardCost(request.bikeBoardCost);
