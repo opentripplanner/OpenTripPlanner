@@ -28,49 +28,52 @@ public class SameEdgeAdjuster {
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
     if (from == null || to == null) { return tempEdges; }
 
-    Set<StreetVertex> fromVertices = new HashSet<>();
+    try {
+      Set<StreetVertex> fromVertices = new HashSet<>();
 
-    for (Edge outgoing : from.getOutgoing()) {
-      Vertex toVertex = outgoing.getToVertex();
-      if (outgoing instanceof TemporaryFreeEdge && toVertex instanceof StreetVertex && toVertex
-          .getOutgoing()
-          .stream()
-          .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
-        // The vertex is connected with an TemporaryFreeEdge connector to the
-        // TemporaryPartialStreetEdge
-        fromVertices.add((StreetVertex) toVertex);
-      }
-      else if (outgoing instanceof TemporaryPartialStreetEdge && from instanceof StreetVertex) {
-        fromVertices.add((StreetVertex) from);
-      }
-    }
-
-    Set<StreetVertex> toVertices = new HashSet<>();
-
-    for (Edge incoming : to.getIncoming()) {
-      Vertex fromVertex = incoming.getFromVertex();
-      if (incoming instanceof TemporaryFreeEdge && fromVertex instanceof StreetVertex && fromVertex
-          .getIncoming()
-          .stream()
-          .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
-        // The vertex is connected with an TemporaryFreeEdge connector to the
-        // TemporaryPartialStreetEdge
-        toVertices.add((StreetVertex) fromVertex);
-      }
-      else if (incoming instanceof TemporaryPartialStreetEdge && to instanceof StreetVertex) {
-        toVertices.add((StreetVertex) to);
-      }
-    }
-
-    for (StreetVertex fromStreetVertex : fromVertices) {
-      for (StreetVertex toStreetVertex : toVertices) {
-        Set<StreetEdge> overlap = overlappingParentStreetEdges(fromStreetVertex,
-            toStreetVertex
-        );
-        for (StreetEdge pse : overlap) {
-          makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex, tempEdges);
+      for (Edge outgoing : from.getOutgoing()) {
+        Vertex toVertex = outgoing.getToVertex();
+        if (outgoing instanceof TemporaryFreeEdge && toVertex instanceof StreetVertex && toVertex
+            .getOutgoing()
+            .stream()
+            .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
+          // The vertex is connected with an TemporaryFreeEdge connector to the
+          // TemporaryPartialStreetEdge
+          fromVertices.add((StreetVertex) toVertex);
+        }
+        else if (outgoing instanceof TemporaryPartialStreetEdge && from instanceof StreetVertex) {
+          fromVertices.add((StreetVertex) from);
         }
       }
+
+      Set<StreetVertex> toVertices = new HashSet<>();
+
+      for (Edge incoming : to.getIncoming()) {
+        Vertex fromVertex = incoming.getFromVertex();
+        if (incoming instanceof TemporaryFreeEdge && fromVertex instanceof StreetVertex && fromVertex
+            .getIncoming()
+            .stream()
+            .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
+          // The vertex is connected with an TemporaryFreeEdge connector to the
+          // TemporaryPartialStreetEdge
+          toVertices.add((StreetVertex) fromVertex);
+        }
+        else if (incoming instanceof TemporaryPartialStreetEdge && to instanceof StreetVertex) {
+          toVertices.add((StreetVertex) to);
+        }
+      }
+
+      for (StreetVertex fromStreetVertex : fromVertices) {
+        for (StreetVertex toStreetVertex : toVertices) {
+          Set<StreetEdge> overlap = overlappingParentStreetEdges(fromStreetVertex, toStreetVertex);
+          for (StreetEdge pse : overlap) {
+            makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex, tempEdges);
+          }
+        }
+      }
+    } catch (Exception e) {
+      tempEdges.disposeEdges();
+      throw e;
     }
 
     return tempEdges;

@@ -156,31 +156,37 @@ public class VertexLinker {
         ? new DisposableEdgeCollection(graph)
         : null;
 
-    Set<StreetVertex> streetVertices = linkToStreetEdges(
-        vertex,
-        traverseMode,
-        direction,
-        scope,
-        INITIAL_SEARCH_RADIUS_METERS,
-        tempEdges
-    );
-    if (streetVertices.isEmpty()) {
-      streetVertices = linkToStreetEdges(vertex,
+    try {
+      Set<StreetVertex> streetVertices = linkToStreetEdges(vertex,
           traverseMode,
           direction,
           scope,
-          MAX_SEARCH_RADIUS_METERS,
+          INITIAL_SEARCH_RADIUS_METERS,
           tempEdges
       );
-    }
+      if (streetVertices.isEmpty()) {
+        streetVertices = linkToStreetEdges(vertex,
+            traverseMode,
+            direction,
+            scope,
+            MAX_SEARCH_RADIUS_METERS,
+            tempEdges
+        );
+      }
 
-    for (StreetVertex streetVertex : streetVertices) {
-      List<Edge> edges = edgeFunction.apply(vertex, streetVertex);
-      if (tempEdges != null) {
-        for (Edge edge : edges) {
-          tempEdges.addEdge(edge);
+      for (StreetVertex streetVertex : streetVertices) {
+        List<Edge> edges = edgeFunction.apply(vertex, streetVertex);
+        if (tempEdges != null) {
+          for (Edge edge : edges) {
+            tempEdges.addEdge(edge);
+          }
         }
       }
+    } catch (Exception e){
+      if (tempEdges != null) {
+        tempEdges.disposeEdges();
+      }
+      throw e;
     }
 
     return tempEdges;
