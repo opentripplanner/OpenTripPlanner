@@ -44,8 +44,7 @@ class TripMapper {
         lhs.setBlockId(rhs.getBlockId());
         lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
         lhs.setWheelchairAccessible(rhs.getWheelchairAccessible());
-        lhs.setTripBikesAllowed(rhs.getTripBikesAllowed());
-        lhs.setBikesAllowed(rhs.getBikesAllowed());
+        lhs.setBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
         lhs.setFareId(rhs.getFareId());
 
         return lhs;

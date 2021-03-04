@@ -1,26 +1,16 @@
 package org.opentripplanner.routing.trippattern;
 
 import org.junit.Test;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.SimpleConcreteVertex;
-import org.opentripplanner.routing.graph.Vertex;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class TripTimesTest {
     private static final FeedScopedId TRIP_ID = new FeedScopedId("agency", "testTripId");
@@ -57,29 +47,6 @@ public class TripTimesTest {
         }
 
         originalTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
-    }
-
-    @Test
-    public void testBikesAllowed() {
-        Graph graph = new Graph();
-        Trip trip = new Trip(TRIP_ID);
-        Route route = new Route(ROUTE_ID);
-        trip.setRoute(route);
-        List<StopTime> stopTimes = Arrays.asList(new StopTime(), new StopTime());
-        TripTimes s = new TripTimes(trip, stopTimes, new Deduplicator());
-
-        RoutingRequest request = new RoutingRequest(TraverseMode.BICYCLE);
-        Vertex v = new SimpleConcreteVertex(graph, "", 0.0, 0.0);
-        request.setRoutingContext(graph, v, v);
-        State s0 = new State(request);
-
-        assertFalse(s.tripAcceptable(s0, 0));
-
-        BikeAccess.setForTrip(trip, BikeAccess.ALLOWED);
-        assertTrue(s.tripAcceptable(s0, 0));
-
-        BikeAccess.setForTrip(trip, BikeAccess.NOT_ALLOWED);
-        assertFalse(s.tripAcceptable(s0, 0));
     }
 
     @Test

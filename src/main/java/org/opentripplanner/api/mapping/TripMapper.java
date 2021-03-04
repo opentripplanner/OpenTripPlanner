@@ -24,7 +24,7 @@ public class TripMapper {
         api.blockId = obj.getBlockId();
         api.shapeId = FeedScopedIdMapper.mapToApi(obj.getShapeId());
         api.wheelchairAccessible = obj.getWheelchairAccessible();
-        api.bikesAllowed = obj.getBikesAllowed();
+        api.bikesAllowed = BikeAccessMapper.mapToApi(obj.getBikesAllowed());
         api.fareId = obj.getFareId();
 
         return api;

@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.BikeAccess;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -36,8 +37,6 @@ public class TripMapperTest {
 
     private static final int WHEELCHAIR_ACCESSIBLE = 2;
 
-    private static final int TRIP_BIKES_ALLOWED = 2;
-
     private static final Trip TRIP = new Trip();
 
     static {
@@ -55,7 +54,6 @@ public class TripMapperTest {
         TRIP.setTripHeadsign(TRIP_HEADSIGN);
         TRIP.setTripShortName(TRIP_SHORT_NAME);
         TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE);
-        TRIP.setTripBikesAllowed(TRIP_BIKES_ALLOWED);
     }
 
     private TripMapper subject = new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)));
@@ -72,7 +70,6 @@ public class TripMapperTest {
         org.opentripplanner.model.Trip result = subject.map(TRIP);
 
         assertEquals("A:1", result.getId().toString());
-        assertEquals(BIKES_ALLOWED, result.getBikesAllowed());
         assertEquals(BLOCK_ID, result.getBlockId());
         assertEquals(DIRECTION_ID, result.getDirection().gtfsCode);
         assertEquals(FARE_ID, result.getFareId());
@@ -83,7 +80,7 @@ public class TripMapperTest {
         assertEquals(TRIP_HEADSIGN, result.getTripHeadsign());
         assertEquals(TRIP_SHORT_NAME, result.getTripShortName());
         assertEquals(WHEELCHAIR_ACCESSIBLE, result.getWheelchairAccessible());
-        assertEquals(TRIP_BIKES_ALLOWED, result.getTripBikesAllowed());
+        assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
     }
 
     @Test
@@ -94,7 +91,6 @@ public class TripMapperTest {
         org.opentripplanner.model.Trip result = subject.map(input);
 
         assertNotNull(result.getId());
-        assertEquals(0, result.getBikesAllowed());
         assertNull(result.getBlockId());
         assertNull(result.getFareId());
         assertNull(result.getRoute());
@@ -105,7 +101,7 @@ public class TripMapperTest {
         assertNull(result.getTripShortName());
         assertEquals(-1, result.getDirection().gtfsCode);
         assertEquals(0, result.getWheelchairAccessible());
-        assertEquals(0, result.getTripBikesAllowed());
+        assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
     }
 
     /** Mapping the same object twice, should return the the same instance. */
