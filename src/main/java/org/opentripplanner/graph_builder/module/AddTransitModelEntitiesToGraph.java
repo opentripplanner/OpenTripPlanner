@@ -248,13 +248,13 @@ public class AddTransitModelEntitiesToGraph {
         Vertex toVertex
     ) {
         StationElement fromStation = fromVertex.getStationElement();
-        String fromVertexLevelName = fromStation == null
+        String fromVertexLevelName = fromStation == null || fromStation.getLevelName() == null
             ? fromVertex.getName()
             : fromStation.getLevelName();
         Double fromVertexLevelIndex = fromStation == null ? null : fromStation.getLevelIndex();
 
         StationElement toStation = toVertex.getStationElement();
-        String toVertexLevelName = toStation == null
+        String toVertexLevelName = toStation == null || toStation.getLevelName() == null
             ? toVertex.getName()
             : toStation.getLevelName();
         Double toVertexLevelIndex = toStation == null ? null : toStation.getLevelIndex();
