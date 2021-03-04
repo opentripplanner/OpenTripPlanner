@@ -16,6 +16,7 @@ public class Model implements Serializable {
   private String dataSource = null;
   private boolean buildStreet = false;
   private boolean buildTransit = true;
+  private boolean debugLogging = true;
   private boolean saveGraph = false;
   private boolean serveGraph = true;
 
@@ -96,6 +97,14 @@ public class Model implements Serializable {
     this.serveGraph = serveGraph;
   }
 
+  public void setDebugLogging(boolean debugLogging) {
+    this.debugLogging = debugLogging;
+  }
+
+  public boolean isDebugLogging() {
+    return debugLogging;
+  }
+
   @Override
   public String toString() {
     return "("
@@ -104,6 +113,7 @@ public class Model implements Serializable {
         + (buildTransit ? ", buildTransit" : "")
         + (saveGraph ? ", saveGraph" : "")
         + (serveGraph ? ", serveGraph" : "")
+        + (debugLogging ? ", debugLogging" : "")
         + ')';
   }
 

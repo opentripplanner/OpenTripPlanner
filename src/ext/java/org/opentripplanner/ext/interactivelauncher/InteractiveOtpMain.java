@@ -1,7 +1,11 @@
 package org.opentripplanner.ext.interactivelauncher;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import org.opentripplanner.ext.interactivelauncher.views.MainView;
 import org.opentripplanner.standalone.OTPMain;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -30,7 +34,19 @@ public class InteractiveOtpMain {
 
   private void startOtp() {
     model.save();
+    enableDebugLogging(model.isDebugLogging());
+
     System.out.println("Start OTP: " + model);
     OTPMain.main(model.asOtpArgs());
+  }
+
+  private static void enableDebugLogging(boolean enable) {
+    if(!enable) { return; }
+    LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    for (Logger log : context.getLoggerList()) {
+      if(log.getName().contains("opentripplanner"))  {
+        log.setLevel(Level.DEBUG);
+      }
+    }
   }
 }

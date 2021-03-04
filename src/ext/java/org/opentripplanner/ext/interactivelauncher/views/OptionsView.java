@@ -14,6 +14,7 @@ class OptionsView {
   private final Box panel = Box.createVerticalBox();
   private final JCheckBox buildStreetGraphChk = new JCheckBox("Street graph", false);
   private final JCheckBox buildTransitGraphChk = new JCheckBox("Transit graph", false);
+  private final JCheckBox debugLoggingChk = new JCheckBox("Debug logging", false);
   private final JCheckBox saveGraphChk = new JCheckBox("Save graph", true);
   private final JCheckBox startOptServerChk = new JCheckBox("Serve graph", true);
 
@@ -32,6 +33,7 @@ class OptionsView {
     addSectionSpace(panel);
     addComp(saveGraphChk, panel);
     addComp(startOptServerChk, panel);
+    addComp(debugLoggingChk, panel);
     addSectionDoubleSpace(panel);
 
     initValues(model);
@@ -53,6 +55,7 @@ class OptionsView {
     buildTransitGraphChk.setSelected(model.isBuildTransit());
     saveGraphChk.setSelected(model.isSaveGraph());
     startOptServerChk.setSelected(model.isServeGraph());
+    debugLoggingChk.setSelected(model.isDebugLogging());
   }
 
   public void updateModel(Model model) {
@@ -60,6 +63,7 @@ class OptionsView {
     model.setBuildTransit(buildTransit());
     model.setSaveGraph(saveGraph());
     model.setServeGraph(startOptServer());
+    model.setDebugLogging(enableDebugLogging());
   }
 
   void initState() {
@@ -80,6 +84,10 @@ class OptionsView {
 
   private boolean startOptServer() {
     return startOptServerChk.isSelected();
+  }
+
+  private boolean enableDebugLogging() {
+    return debugLoggingChk.isSelected();
   }
 
   private void onBuildGraphChkChanged(ActionEvent e) {
