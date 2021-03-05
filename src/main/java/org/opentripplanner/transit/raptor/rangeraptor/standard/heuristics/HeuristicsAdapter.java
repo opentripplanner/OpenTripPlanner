@@ -29,6 +29,7 @@ public class HeuristicsAdapter implements Heuristics {
 
     private int minJourneyTravelDuration = NOT_SET;
     private int minJourneyNumOfTransfers = NOT_SET;
+    private int earliestArrivalTime = NOT_SET;
 
     public HeuristicsAdapter(
             BestTimes times,
@@ -100,6 +101,12 @@ public class HeuristicsAdapter implements Heuristics {
     }
 
     @Override
+    public int minWaitTimeForJourneysReachingDestination() {
+        calculateAggregatedResults();
+        return Math.abs(earliestArrivalTime - originDepartureTime) - minJourneyTravelDuration;
+    }
+
+    @Override
     public boolean destinationReached() {
         calculateAggregatedResults();
         return minJourneyNumOfTransfers != NOT_SET;
@@ -118,6 +125,9 @@ public class HeuristicsAdapter implements Heuristics {
 
                 int n = bestNumOfTransfers(it.stop());
                 minJourneyNumOfTransfers = Math.min(minJourneyNumOfTransfers, n);
+
+                int eat = times.time(it.stop()) + it.durationInSeconds();
+                earliestArrivalTime = Math.min(earliestArrivalTime, eat);
             }
         }
         aggregatedResultsCalculated = true;
