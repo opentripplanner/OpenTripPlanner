@@ -108,9 +108,9 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<String> bikesAllowed() {
     return environment -> {
       switch (getSource(environment).getBikesAllowed()) {
-        case 0: return "NO_INFORMATION";
-        case 1: return "POSSIBLE";
-        case 2: return "NOT_POSSIBLE";
+        case UNKNOWN: return "NO_INFORMATION";
+        case ALLOWED: return "POSSIBLE";
+        case NOT_ALLOWED: return "NOT_POSSIBLE";
         default: return null;
       }
     };

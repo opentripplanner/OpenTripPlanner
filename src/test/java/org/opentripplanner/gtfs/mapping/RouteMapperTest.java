@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.model.BikeAccess;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -35,13 +36,11 @@ public class RouteMapperTest {
 
     private static final String TEXT_COLOR = "red";
 
-    private static final int BIKES_ALLOWED = 2;
+    private static final int BIKES_ALLOWED = 1;
 
     private static final int SORT_ORDER = 1;
 
     private static final String BRANDING_URL = "www.url.me/brand";
-
-    private static final int ROUTE_BIKES_ALLOWED = 2;
 
     private static final Agency AGENCY = new Agency();
 
@@ -62,7 +61,6 @@ public class RouteMapperTest {
         ROUTE.setBikesAllowed(BIKES_ALLOWED);
         ROUTE.setSortOrder(SORT_ORDER);
         ROUTE.setBrandingUrl(BRANDING_URL);
-        ROUTE.setRouteBikesAllowed(ROUTE_BIKES_ALLOWED);
     }
 
     private final RouteMapper subject = new RouteMapper(new AgencyMapper(FEED_ID));
@@ -87,10 +85,9 @@ public class RouteMapperTest {
         assertEquals(URL, result.getUrl());
         assertEquals(COLOR, result.getColor());
         assertEquals(TEXT_COLOR, result.getTextColor());
-        assertEquals(BIKES_ALLOWED, result.getBikesAllowed());
+        assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
         assertEquals(SORT_ORDER, result.getSortOrder());
         assertEquals(BRANDING_URL, result.getBrandingUrl());
-        assertEquals(BIKES_ALLOWED, result.getRouteBikesAllowed());
     }
 
     @Test
@@ -109,10 +106,9 @@ public class RouteMapperTest {
         assertNull(result.getUrl());
         assertNull(result.getColor());
         assertNull(result.getTextColor());
-        assertEquals(0, result.getBikesAllowed());
+        assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
         assertFalse(result.isSortOrderSet());
         assertNull(result.getBrandingUrl());
-        assertEquals(0, result.getRouteBikesAllowed());
     }
 
     /**
