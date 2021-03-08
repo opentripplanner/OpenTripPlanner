@@ -30,12 +30,10 @@ public final class Trip extends TransitEntity {
 
     private int wheelchairAccessible = 0;
 
-    @Deprecated private int tripBikesAllowed = 0;
-
     /**
      * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
      */
-    private int bikesAllowed = 0;
+    private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
 
     /** Custom extension for KCM to specify a fare per-trip */
     private String fareId;
@@ -63,7 +61,6 @@ public final class Trip extends TransitEntity {
         this.blockId = obj.blockId;
         this.shapeId = obj.shapeId;
         this.wheelchairAccessible = obj.wheelchairAccessible;
-        this.tripBikesAllowed = obj.tripBikesAllowed;
         this.bikesAllowed = obj.bikesAllowed;
         this.fareId = obj.fareId;
     }
@@ -199,27 +196,11 @@ public final class Trip extends TransitEntity {
         return wheelchairAccessible;
     }
 
-    @Deprecated
-    public void setTripBikesAllowed(int tripBikesAllowed) {
-        this.tripBikesAllowed = tripBikesAllowed;
-    }
-
-    @Deprecated
-    public int getTripBikesAllowed() {
-        return tripBikesAllowed;
-    }
-
-    /**
-     * @return 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-     */
-    public int getBikesAllowed() {
+    public BikeAccess getBikesAllowed() {
         return bikesAllowed;
     }
 
-    /**
-     * @param bikesAllowed 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-     */
-    public void setBikesAllowed(int bikesAllowed) {
+    public void setBikesAllowed(BikeAccess bikesAllowed) {
         this.bikesAllowed = bikesAllowed;
     }
 

@@ -3,13 +3,8 @@ package org.opentripplanner.routing.trippattern;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.api.request.BannedStopSet;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -419,28 +414,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
                 return false;
             }
             prevDep = dep;
-        }
-        return true;
-    }
-
-    /**
-     * Once a trip has been found departing or arriving at an appropriate time, check whether that
-     * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility
-     * and transfers with minimum time or forbidden transfers.
-     */
-    public boolean tripAcceptable(final State state0, final int stopIndex) {
-        final RoutingRequest options = state0.getOptions();
-        final BannedStopSet banned = options.bannedTrips.get(trip.getId());
-        if (banned != null && banned.contains(stopIndex)) {
-            return false;
-        }
-        if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
-            return false;
-        }
-        // Establish whether we have a rented _or_ owned bicycle.
-        final boolean bicycle = state0.getNonTransitMode() == TraverseMode.BICYCLE;
-        if (bicycle && BikeAccess.fromTrip(trip) != BikeAccess.ALLOWED) {
-            return false;
         }
         return true;
     }

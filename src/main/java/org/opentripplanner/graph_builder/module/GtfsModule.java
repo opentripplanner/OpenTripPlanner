@@ -23,7 +23,6 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcess
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -230,9 +229,6 @@ public class GtfsModule implements GraphBuilderModule {
         if (LOG.isDebugEnabled())
             reader.addEntityHandler(counter);
 
-        if (gtfsBundle.getDefaultBikesAllowed())
-            reader.addEntityHandler(new EntityBikeability(true));
-
         for (Class<?> entityClass : reader.getEntityClasses()) {
             LOG.info("reading entities: " + entityClass.getName());
             reader.readEntities(entityClass);
@@ -419,27 +415,6 @@ public class GtfsModule implements GraphBuilderModule {
             return value;
         }
 
-    }
-
-    private static class EntityBikeability implements EntityHandler {
-
-        private Boolean defaultBikesAllowed;
-
-        public EntityBikeability(Boolean defaultBikesAllowed) {
-            this.defaultBikesAllowed = defaultBikesAllowed;
-        }
-
-        @Override
-        public void handleEntity(Object bean) {
-            if (!(bean instanceof Trip)) {
-                return;
-            }
-
-            Trip trip = (Trip) bean;
-            if (defaultBikesAllowed && BikeAccess.fromTrip(trip) == BikeAccess.UNKNOWN) {
-                BikeAccess.setForTrip(trip, BikeAccess.ALLOWED);
-            }
-        }
     }
 
     @Override

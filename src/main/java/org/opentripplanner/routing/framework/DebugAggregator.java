@@ -34,6 +34,12 @@ public class DebugAggregator {
   private long filteringTime;
   private long renderingTime;
 
+  private void log(String msg, long millis) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(String.format("%-30s: %5s ms", msg, millis));
+    }
+  }
+
   /**
    * Record the time when we first began calculating a path for this request. Note that timings will not
    * include network and server request queue overhead, which is what we want.
@@ -48,14 +54,14 @@ public class DebugAggregator {
   public void finishedPrecalculating() {
     finishedPrecalculating = System.currentTimeMillis();
     precalculationTime = finishedPrecalculating - startedCalculating;
-    LOG.debug("Routing initialization took {} ms", directStreetRouterTime);
+    log("┌  Routing initialization", directStreetRouterTime);
   }
 
   /** Record the time when we finished the direct street router search. */
   public void finishedDirectStreetRouter() {
     finishedDirectStreetRouter = System.currentTimeMillis();
     directStreetRouterTime = finishedDirectStreetRouter - finishedPrecalculating;
-    LOG.debug("Direct street routing took {} ms", directStreetRouterTime);
+    log("├  Direct street routing", directStreetRouterTime);
   }
 
   /**
@@ -64,7 +70,7 @@ public class DebugAggregator {
   public void finishedPatternFiltering() {
     finishedPatternFiltering = System.currentTimeMillis();
     tripPatternFilterTime = finishedPatternFiltering - finishedDirectStreetRouter;
-    LOG.debug("Filtering tripPatterns took {} ms", tripPatternFilterTime);
+    log("│┌ Filtering tripPatterns", tripPatternFilterTime);
   }
 
   /**
@@ -73,7 +79,7 @@ public class DebugAggregator {
   public void finishedAccessEgress() {
     finishedAccessEgress = System.currentTimeMillis();
     accessEgressTime = finishedAccessEgress - finishedPatternFiltering;
-    LOG.debug("Access/egress routing took {} ms", accessEgressTime);
+    log("│├ Access/egress routing", accessEgressTime);
   }
 
   /**
@@ -82,7 +88,7 @@ public class DebugAggregator {
   public void finishedRaptorSearch() {
     finishedRaptorSearch = System.currentTimeMillis();
     raptorSearchTime = finishedRaptorSearch - finishedAccessEgress;
-    LOG.debug("Main routing took {} ms", raptorSearchTime);
+    log("│├ Main routing", raptorSearchTime);
   }
 
   /**
@@ -90,28 +96,34 @@ public class DebugAggregator {
    */
   public void finishedItineraryCreation() {
     itineraryCreationTime = System.currentTimeMillis() - finishedRaptorSearch;
-    LOG.debug("Creating itineraries took {} ms", itineraryCreationTime);
+    log("│├ Creating itineraries", itineraryCreationTime);
   }
 
   /** Record the time when we finished the tranist router search */
   public void finishedTransitRouter() {
     finishedTransitRouter = System.currentTimeMillis();
     transitRouterTime = finishedTransitRouter - finishedDirectStreetRouter;
-    LOG.debug("Transit routing took total {} ms", transitRouterTime);
+
+    if (finishedPatternFiltering > 0) {
+      log("├┴ Transit routing total", transitRouterTime);
+    } else {
+      log("├─ Transit routing total", transitRouterTime);
+    }
   }
 
   /** Record the time when we finished filtering the paths for this request. */
   public void finishedFiltering() {
     finishedFiltering = System.currentTimeMillis();
     filteringTime = finishedFiltering - finishedTransitRouter;
-    LOG.debug("Filtering took {} ms", transitRouterTime);
+    log("├  Filtering itineraries", filteringTime);
   }
 
   /** Record the time when we finished converting the internal model to API classes */
   public DebugOutput finishedRendering() {
     finishedRendering = System.currentTimeMillis();
     renderingTime = finishedRendering - finishedFiltering;
-    LOG.debug("Converting model objects took {} ms", transitRouterTime);
+    log("├  Converting model objects", renderingTime);
+    log("┴  Request total", finishedRendering - startedCalculating);
     return getDebugOutput();
   }
 

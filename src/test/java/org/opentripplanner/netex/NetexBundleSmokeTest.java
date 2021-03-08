@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
@@ -155,7 +156,7 @@ public class NetexBundleSmokeTest {
         assertNotNull(t.getServiceId());
         assertEquals("Ruter", t.getOperator().getName());
         assertEquals("Ruter", t.getTripOperator().getName());
-        assertEquals(0, t.getBikesAllowed());
+        assertEquals(BikeAccess.UNKNOWN, t.getBikesAllowed());
         assertEquals(0, t.getWheelchairAccessible());
         assertEquals(4, trips.size());
     }
