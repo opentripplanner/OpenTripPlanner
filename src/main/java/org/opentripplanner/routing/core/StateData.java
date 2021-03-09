@@ -16,19 +16,17 @@ public class StateData implements Cloneable {
 
     // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 
-    protected boolean usingRentedBike;
-
     protected boolean carParked;
 
     protected boolean bikeParked;
 
-    protected boolean hasUsedRentedBike;
+    protected BikeRentalState bikeRentalState;
 
     protected CarPickupState carPickupState;
 
     protected RoutingRequest opt;
 
-    protected TraverseMode nonTransitMode;
+    protected TraverseMode currentMode;
 
     /**
      * The mode that was used to traverse the backEdge
@@ -45,13 +43,13 @@ public class StateData implements Cloneable {
     public StateData(RoutingRequest options) {
         TraverseModeSet modes = options.streetSubRequestModes;
         if (modes.getCar())
-            nonTransitMode = TraverseMode.CAR;
+            currentMode = TraverseMode.CAR;
         else if (modes.getWalk())
-            nonTransitMode = TraverseMode.WALK;
+            currentMode = TraverseMode.WALK;
         else if (modes.getBicycle())
-            nonTransitMode = TraverseMode.BICYCLE;
+            currentMode = TraverseMode.BICYCLE;
         else
-            nonTransitMode = null;
+            currentMode = null;
     }
 
     protected StateData clone() {

@@ -290,6 +290,13 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
+        if (leg.rentedBike) {
+            Set<String> bikeRentalNetworks = states[0].getBikeRentalNetworks();
+            if (bikeRentalNetworks != null) {
+                leg.addBikeRentalNetworks(states[0].getBikeRentalNetworks());
+            }
+        }
+
         addAlerts(graph, leg, states);
 
         if (flexEdge != null) {

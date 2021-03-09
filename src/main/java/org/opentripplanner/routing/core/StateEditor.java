@@ -208,17 +208,22 @@ public class StateEditor {
         child.walkDistance = walkDistance;
     }
 
-    public void beginVehicleRenting(TraverseMode vehicleMode) {
+    public void beginFloatingVehicleRenting(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = true;
-        child.stateData.hasUsedRentedBike = true;
-        child.stateData.nonTransitMode = vehicleMode;
+        child.stateData.bikeRentalState = BikeRentalState.RENTING_FLOATING;
+        child.stateData.currentMode = vehicleMode;
     }
 
-    public void doneVehicleRenting() {
+    public void beginVehicleRentingAtStation(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = false;
-        child.stateData.nonTransitMode = TraverseMode.WALK;
+        child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
+        child.stateData.currentMode = vehicleMode;
+    }
+
+    public void dropOffRentedVehicleAtStation() {
+        cloneStateDataAsNeeded();
+        child.stateData.bikeRentalState = BikeRentalState.HAVE_RENTED;
+        child.stateData.currentMode = TraverseMode.WALK;
     }
 
     /**
@@ -230,9 +235,9 @@ public class StateEditor {
         child.stateData.carParked = carParked;
         if (carParked) {
             // We do not handle mixed-mode P+BIKE...
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.currentMode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.CAR;
+            child.stateData.currentMode = TraverseMode.CAR;
         }
     }
 
@@ -240,9 +245,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeParked = bikeParked;
         if (bikeParked) {
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.currentMode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
+            child.stateData.currentMode = TraverseMode.BICYCLE;
         }
     }
 
@@ -263,17 +268,17 @@ public class StateEditor {
      */
     public void setFromState(State state) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = state.stateData.usingRentedBike;
+        child.stateData.bikeRentalState = state.stateData.bikeRentalState;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
     }
 
     public void setNonTransitOptionsFromState(State state){
         cloneStateDataAsNeeded();
-        child.stateData.nonTransitMode = state.getNonTransitMode();
+        child.stateData.currentMode = state.getNonTransitMode();
         child.stateData.carParked = state.isCarParked();
         child.stateData.bikeParked = state.isBikeParked();
-        child.stateData.usingRentedBike = state.isBikeRenting();
+        child.stateData.bikeRentalState = state.stateData.bikeRentalState;
     }
 
     public void setTaxiState(CarPickupState carPickupState) {
@@ -281,10 +286,10 @@ public class StateEditor {
         switch (carPickupState) {
             case WALK_TO_PICKUP:
             case WALK_FROM_DROP_OFF:
-                child.stateData.nonTransitMode = TraverseMode.WALK;
+                child.stateData.currentMode = TraverseMode.WALK;
                 break;
             case IN_CAR:
-                child.stateData.nonTransitMode = TraverseMode.CAR;
+                child.stateData.currentMode = TraverseMode.CAR;
                 break;
         }
     }

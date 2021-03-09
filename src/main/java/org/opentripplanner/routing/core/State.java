@@ -104,21 +104,21 @@ public class State implements Cloneable {
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
         this.stateData.startTime = startTime;
-        this.stateData.usingRentedBike = false;
+        this.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
         if (options.carPickup) {
             this.stateData.carPickupState = options.arriveBy
                 ? CarPickupState.WALK_FROM_DROP_OFF
                 : CarPickupState.WALK_TO_PICKUP;
-            this.stateData.nonTransitMode = TraverseMode.WALK;
+            this.stateData.currentMode = TraverseMode.WALK;
         }
         if (options.parkAndRide) {
             this.stateData.carParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
+            this.stateData.currentMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         } else if (options.bikeParkAndRide) {
             this.stateData.bikeParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
+            this.stateData.currentMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         }
         this.walkDistance = 0;
@@ -180,12 +180,26 @@ public class State implements Cloneable {
         return Math.abs(getTimeSeconds() - stateData.startTime);
     }
 
-    public boolean isBikeRenting() {
-        return stateData.usingRentedBike;
+    public boolean isCompatibleBikeRentalState(State state) {
+        return stateData.bikeRentalState ==   state.stateData.bikeRentalState;
     }
 
-    public boolean hasUsedRentedBike() {
-        return stateData.hasUsedRentedBike;
+    public boolean isBikeRentingFromStation() {
+        return stateData.bikeRentalState == BikeRentalState.RENTING_FROM_STATION;
+    }
+
+    public boolean isBikeRenting() {
+        return stateData.bikeRentalState == BikeRentalState.RENTING_FROM_STATION
+            || stateData.bikeRentalState == BikeRentalState.RENTING_FLOATING;
+    }
+
+    public boolean bikeRentalIsFinished() {
+        return stateData.bikeRentalState == BikeRentalState.HAVE_RENTED
+            || stateData.bikeRentalState == BikeRentalState.RENTING_FLOATING;
+    }
+
+    public boolean bikeRentalNotStarted() {
+        return stateData.bikeRentalState == BikeRentalState.BEFORE_RENTING;
     }
     
     public boolean isCarParked() {
@@ -210,7 +224,7 @@ public class State implements Cloneable {
         if (stateData.opt.arriveBy) {
             // Check that we are not renting a bike at the destination
             // Also check that a bike was rented if bikeRental is specified
-            bikeRentingOk = !isBikeRenting() && (!stateData.opt.bikeRental || hasUsedRentedBike());
+            bikeRentingOk = !stateData.opt.bikeRental || (bikeRentalNotStarted() || bikeRentalIsFinished());
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
             // Checks that taxi has actually been used
@@ -218,7 +232,7 @@ public class State implements Cloneable {
         } else {
             // Check that we are not renting a bike at the destination
             // Also check that a bike was rented if bikeRental is specified
-            bikeRentingOk = !isBikeRenting() && (!stateData.opt.bikeRental || hasUsedRentedBike());
+            bikeRentingOk = !stateData.opt.bikeRental || (bikeRentalNotStarted() || bikeRentalIsFinished());
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
             // Checks that taxi has actually been used
@@ -336,7 +350,7 @@ public class State implements Cloneable {
      *         to a rented bicycle.
      */
     public TraverseMode getNonTransitMode() {
-        return stateData.nonTransitMode;
+        return stateData.currentMode;
     }
     // TODO: There is no documentation about what this means. No one knows precisely.
     // Needs to be replaced with clearly defined fields.
@@ -346,7 +360,7 @@ public class State implements Cloneable {
         // It is distributed symmetrically over all preboard and prealight edges.
         State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone());
         // TODO Check if those two lines are needed:
-        newState.stateData.usingRentedBike = stateData.usingRentedBike;
+        newState.stateData.bikeRentalState = stateData.bikeRentalState;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
         newState.stateData.carPickupState = stateData.carPickupState;
@@ -451,9 +465,9 @@ public class State implements Cloneable {
             editor.setBackMode(orig.getBackMode());
 
             if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
-                editor.doneVehicleRenting();
+                editor.dropOffRentedVehicleAtStation();
             } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
-                editor.beginVehicleRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
+                editor.beginVehicleRentingAtStation(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
             }
             if (orig.isCarParked() != orig.getBackState().isCarParked())
                 editor.setCarParked(!orig.isCarParked());
