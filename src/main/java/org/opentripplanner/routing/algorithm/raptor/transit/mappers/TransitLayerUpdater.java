@@ -118,7 +118,7 @@ public class TransitLayerUpdater {
     // the tripPatternsByRunningPeriodDate accordingly
     for (LocalDate date : datesToBeUpdated) {
       tripPatternsRunningOnDateMapCache.computeIfAbsent(date,
-          p -> new HashSet<>(realtimeTransitLayer.getTripPatternsStartingOnDateCopy(date))
+          p -> new HashSet<>(realtimeTransitLayer.getTripPatternsRunningOnDateCopy(date))
       );
 
       Set<TripPatternForDate> patternsForDate = tripPatternsRunningOnDateMapCache.get(date);
