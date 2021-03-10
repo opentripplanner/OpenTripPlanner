@@ -1,19 +1,21 @@
 package org.opentripplanner.graph_builder.linking;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.geocoder.google.Geometry;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -127,6 +129,13 @@ public class VertexLinker {
     );
   }
 
+  public void removeEdgeFromIndex(Edge edge, Scope scope) {
+    // Edges without geometry will not have been added to the index in the first place
+    if (edge.getGeometry() != null) {
+      streetSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, scope);
+    }
+  }
+
   /**
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
@@ -153,7 +162,7 @@ public class VertexLinker {
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
     DisposableEdgeCollection tempEdges = (scope != Scope.PERMANENT)
-        ? new DisposableEdgeCollection(graph)
+        ? new DisposableEdgeCollection(graph, scope)
         : null;
 
     try {
@@ -420,7 +429,7 @@ public class VertexLinker {
         // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
         // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
         // insert logic is not trivial and would require additional testing of the spatial index.
-        streetSpatialIndex.remove(originalEdge.getGeometry().getEnvelopeInternal(), originalEdge, scope);
+        removeEdgeFromIndex(originalEdge, scope);
       }
     }
 

@@ -35,12 +35,14 @@ class StreetSpatialIndex {
     }
   }
 
-   boolean remove(Envelope envelope, final Object item, Scope scope) {
+  void remove(Envelope envelope, final Object item, Scope scope) {
     switch (scope) {
       case PERMANENT:
-        return permanentIndex.remove(envelope, item);
+        permanentIndex.remove(envelope, item);
+        return;
       case REALTIME:
-        return realTimeIndex.remove(envelope, item);
+        realTimeIndex.remove(envelope, item);
+        return;
       default:
         throw new IllegalArgumentException();
     }

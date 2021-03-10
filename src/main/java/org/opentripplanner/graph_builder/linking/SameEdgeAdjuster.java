@@ -6,7 +6,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.graph.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -28,7 +27,7 @@ public class SameEdgeAdjuster {
    * really short trips.
    */
   public static DisposableEdgeCollection adjust(Vertex from, Vertex to, Graph graph) {
-    DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
+    DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph, Scope.REQUEST);
     if (from == null || to == null) { return tempEdges; }
 
     try {

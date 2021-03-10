@@ -1,4 +1,8 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.graph_builder.linking;
+
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,10 +17,17 @@ public class DisposableEdgeCollection {
 
   private final Graph graph;
 
+  private final Scope scope;
+
   private final Set<Edge> edges = new HashSet<>();
 
   public DisposableEdgeCollection(Graph graph) {
+    this(graph, null);
+  }
+
+  public DisposableEdgeCollection(Graph graph, Scope scope) {
     this.graph = graph;
+    this.scope = scope;
   }
 
   public void addEdge(Edge edge) {
@@ -27,10 +38,15 @@ public class DisposableEdgeCollection {
    * Removes all the edges in this collection from the graph.
    */
   public void disposeEdges() {
+    if (scope == Scope.REALTIME) {
+      for (Edge e : edges) {
+        graph.getLinker().removeEdgeFromIndex(e, scope);
+      }
+    }
     Collection<Vertex> vertices = new ArrayList<>();
     for (Edge e : edges) {
-      vertices.add(e.fromv);
-      vertices.add(e.tov);
+      vertices.add(e.getFromVertex());
+      vertices.add(e.getToVertex());
       graph.removeEdge(e);
     }
     for (Vertex v : vertices) {
