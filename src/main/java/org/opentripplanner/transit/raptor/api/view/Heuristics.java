@@ -50,6 +50,19 @@ public interface Heuristics {
     int bestOverallJourneyNumOfTransfers();
 
     /**
+     * Return an estimate for the shortest possible wait-time needed across all journeys
+     * reaching the destination given the iteration-start-time. Note! This can NOT be
+     * used for destination pruning, because there most likely exist journeys with a
+     * lower wait-time. The access is NOT time-shift before computing this value.
+     *
+     * <p>This would be suitable for calculating a search-time-window, because it give an
+     * estimate for the expected wait-time. In a low frequency transit area the wait-time
+     * might be much larger then the {@link #bestOverallJourneyTravelDuration()}, and in these
+     * cases this gives a better starting point for the search-time-window calculation.
+     */
+    int minWaitTimeForJourneysReachingDestination();
+
+    /**
      * Return true if the destination is reached.
      */
     boolean destinationReached();

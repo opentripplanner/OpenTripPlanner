@@ -254,7 +254,10 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
     private void calculateDynamicSearchParametersFromHeuristics(Heuristics heuristics) {
         if(heuristics != null) {
             dynamicSearchParamsCalculator
-                    .withMinTripTime(heuristics.bestOverallJourneyTravelDuration())
+                    .withHeuristics(
+                        heuristics.bestOverallJourneyTravelDuration(),
+                        heuristics.minWaitTimeForJourneysReachingDestination()
+                    )
                     .calculate();
         }
     }
