@@ -105,17 +105,15 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                     prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
                 }
 
-                // TODO OTP2 - Some access paths can be time-shifted towards the board time and
-                //           - we need to account for this here, not in the calculator as done
-                //           - now. If we don´t do that the alight slack of the first transit is
-                //           - not added to the cost, giving the first transit path a lower cost
-                //           - than other transit paths.
-                final int boardWaitTime = boardTime - prevArrival.arrivalTime();
+
+                final int boardWaitTimeForCostCalculation = timeShiftingAllowed(prevArrival)
+                        ? slackProvider.boardSlack()
+                        : boardTime - prevArrival.arrivalTime();
 
                 final int relativeBoardCost = calculateOnTripRelativeCost(
                     prevArrival,
                     boardTime,
-                    boardWaitTime
+                    boardWaitTimeForCostCalculation
                 );
 
                 patternRides.add(
@@ -124,7 +122,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                         stopIndex,
                         stopPos,
                         boardTime,
-                        boardWaitTime,
+                        boardWaitTimeForCostCalculation,
                         relativeBoardCost,
                         trip,
                         tripSearch.getCandidateTripIndex()
@@ -152,5 +150,15 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         int boardWaitTime
     ) {
         return costCalculator.onTripRidingCost(prevArrival, boardWaitTime, boardTime);
+    }
+
+    /**
+     * Some access paths can be time-shifted towards the board time. This has to be taken into
+     * account when calculating the the correct wait-time. This can not be done in the calculator
+     * as done earlier. If we don´t do that the alight slack of the first transit is not added to
+     * the cost, giving the first transit path a lower cost than other transit paths.
+     */
+    private static boolean timeShiftingAllowed(AbstractStopArrival<?> arrival) {
+        return arrival.arrivedByAccess() && !arrival.accessPath().access().hasRides();
     }
 }

@@ -91,20 +91,23 @@ public final class TransitRoutingConfig
     private static class DynamicSearchWindowConfig
             implements DynamicSearchWindowCoefficients
     {
-        private final double minTripTimeCoefficient;
+        private final double minTransitTimeCoefficient;
+        private final double minWaitTimeCoefficient;
         private final int minWinTimeMinutes;
         private final int maxWinTimeMinutes;
         private final int stepMinutes;
 
         public DynamicSearchWindowConfig(NodeAdapter dsWin) {
             DynamicSearchWindowCoefficients dsWinDft = new DynamicSearchWindowCoefficients() {};
-            this.minTripTimeCoefficient = dsWin.asDouble("minTripTimeCoefficient", dsWinDft.minTripTimeCoefficient());
+            this.minTransitTimeCoefficient = dsWin.asDouble("minTransitTimeCoefficient", dsWinDft.minTransitTimeCoefficient());
+            this.minWaitTimeCoefficient = dsWin.asDouble("minWaitTimeCoefficient", dsWinDft.minWaitTimeCoefficient());
             this.minWinTimeMinutes = dsWin.asInt("minWinTimeMinutes",  dsWinDft.minWinTimeMinutes());
             this.maxWinTimeMinutes = dsWin.asInt("maxWinTimeMinutes",  dsWinDft.maxWinTimeMinutes());
             this.stepMinutes = dsWin.asInt("stepMinutes",  dsWinDft.stepMinutes());
         }
 
-        @Override public double minTripTimeCoefficient() { return minTripTimeCoefficient; }
+        @Override public double minTransitTimeCoefficient() { return minTransitTimeCoefficient; }
+        @Override public double minWaitTimeCoefficient() { return minWaitTimeCoefficient; }
         @Override public int minWinTimeMinutes() { return minWinTimeMinutes; }
         @Override public int maxWinTimeMinutes() { return maxWinTimeMinutes; }
         @Override public int stepMinutes() { return stepMinutes; }
