@@ -12,11 +12,11 @@ enum BikeRentalState {
   RENTING_FROM_STATION,
   /**
    * A floating bike or scooter is being rented. It will not need to be dropped off before
-   * terminating the search, as it can be dropped of at any street.
+   * terminating the search, as it can be dropped off at any street.
    */
   RENTING_FLOATING,
   /**
-   * After off dropping a bike or scooter, this state is entered.
+   * After dropping off a bike or scooter, this state is entered.
    */
   HAVE_RENTED
 }
