@@ -200,6 +200,7 @@ public class AddTransitModelEntitiesToGraph {
                     new PathwayEdge(
                         fromVertex,
                         toVertex,
+                        pathway.getId(),
                         pathway.getName(),
                         pathway.getTraversalTime(),
                         pathway.getLength(),
@@ -211,6 +212,7 @@ public class AddTransitModelEntitiesToGraph {
                         new PathwayEdge(
                             toVertex,
                             fromVertex,
+                            pathway.getId(),
                             pathway.getReversedName(),
                             pathway.getTraversalTime(),
                             pathway.getLength(),

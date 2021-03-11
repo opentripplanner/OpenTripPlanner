@@ -80,6 +80,9 @@ public class LegMapper {
             api.tripShortName = trip.getTripShortName();
             api.tripBlockId = trip.getBlockId();
         }
+        else if (domain.pathway) {
+            api.route = FeedScopedIdMapper.mapToApi(domain.edgeIdentifier);
+        }
         else {
             // TODO OTP2 - This should be set to the street name according to the JavaDoc
             api.route = "";
