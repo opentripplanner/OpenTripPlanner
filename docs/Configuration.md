@@ -795,7 +795,7 @@ Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.js
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
-`minTransitTimeCoefficient` | The coefficient to multiply with minimum travel time found using a heuristic search. This value is added to the `minWinTimeMinutes`. A value between `0.0` to `3.0` is expected to give ok results. | double | `0.5`
+`minTransitTimeCoefficient` | The coefficient to multiply with minimum transit time found using a heuristic search. This scaled value is added to the `minWinTimeMinutes`. A value between `0.0` to `3.0` is expected to give ok results. | double | `0.5`
 `minWaitTimeCoefficient` | The coefficient to multiply with a minimum wait time estimated based on the heuristic search. This will increase the search-window in low transit frequency areas. This value is added to the `minWinTimeMinutes`. A value between `0.0` to `1.0` is expected to give ok results. | double | `0.5`
 `minWinTimeMinutes` | The constant minimum number of minutes for a raptor search window. Use a value between 20-180 minutes in a normal deployment. | int | `40`
 `maxWinTimeMinutes` | Set an upper limit to the calculation of the dynamic search window to prevent exceptionable cases to cause very long search windows. Long search windows consumes a lot of resources and may take a long time. Use this parameter to tune the desired maximum search time. | int | `180` (3 hours)
