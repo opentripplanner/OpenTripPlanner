@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StreetNote;
@@ -22,7 +23,6 @@ import java.util.TimeZone;
 * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
 * particular vehicle (or on foot).
 */
-
 public class Leg {
 
   /**
@@ -30,36 +30,36 @@ public class Leg {
    */
   public final TraverseMode mode;
 
-
   private final Trip trip;
 
   /**
-    * The date and time this leg begins.
-    */
-   public Calendar startTime = null;
+   * The date and time this leg begins.
+   */
+  public Calendar startTime = null;
 
-   /**
-    * The date and time this leg ends.
-    */
-   public Calendar endTime = null;
+  /**
+   * The date and time this leg ends.
+   */
+  public Calendar endTime = null;
 
-   /**
-    * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
-    * "scheduled time of departure at boarding stop" = startTime - departureDelay
-    * Unit: seconds.
-    */
-   public int departureDelay = 0;
-   /**
-    * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg.
-    * "scheduled time of arrival at alighting stop" = endTime - arrivalDelay
-    * Unit: seconds.
-    */
-   public int arrivalDelay = 0;
+  /**
+   * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
+   * "scheduled time of departure at boarding stop" = startTime - departureDelay
+   * Unit: seconds.
+   */
+  public int departureDelay = 0;
 
-   /**
-    * Whether there is real-time data about this Leg
-    */
-   public Boolean realTime = false;
+  /**
+   * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg.
+   * "scheduled time of arrival at alighting stop" = endTime - arrivalDelay
+   * Unit: seconds.
+   */
+  public int arrivalDelay = 0;
+
+  /**
+   * Whether there is real-time data about this Leg
+   */
+  public Boolean realTime = false;
 
   /**
    * Whether this Leg describes a flexible trip. The reason we need this is that FlexTrip does
@@ -68,29 +68,34 @@ public class Leg {
    */
   public boolean flexibleTrip = false;
 
-   /**
-    * Is this a frequency-based trip with non-strict departure times?
-    */
-   public Boolean isNonExactFrequency = null;
+  /**
+   * Is this a frequency-based trip with non-strict departure times?
+   */
+  public Boolean isNonExactFrequency = null;
 
-   /**
-    * The best estimate of the time between two arriving vehicles. This is particularly important
-    * for non-strict frequency trips, but could become important for real-time trips, strict
-    * frequency trips, and scheduled trips with empirical headways.
-    */
-   public Integer headway = null;
+  /**
+   * The best estimate of the time between two arriving vehicles. This is particularly important
+   * for non-strict frequency trips, but could become important for real-time trips, strict
+   * frequency trips, and scheduled trips with empirical headways.
+   */
+  public Integer headway = null;
 
-   /**
-    * The distance traveled while traversing the leg in meters.
-    */
-   public Double distanceMeters = null;
+  /**
+   * The distance traveled while traversing the leg in meters.
+   */
+  public Double distanceMeters = null;
 
-   /**
-    * Is this leg a traversing pathways?
-    */
-   public Boolean pathway = false;
+  /**
+   * Is this leg a traversing pathways?
+   */
+  public Boolean pathway = false;
 
-   public int agencyTimeZoneOffset;
+  /**
+   * The GTFS pathway id
+   */
+  public FeedScopedId pathwayId;
+
+  public int agencyTimeZoneOffset;
 
    /**
     * For transit legs, the type of the route. Non transit -1
@@ -299,6 +304,7 @@ public class Leg {
                 .addNum("distance", distanceMeters, "m")
                 .addNum("cost", generalizedCost)
                 .addBool("pathway", pathway)
+                .addObj("gtfsPathwayId", pathwayId)
                 .addNum("agencyTimeZoneOffset", agencyTimeZoneOffset, 0)
                 .addNum("routeType", routeType)
                 .addEntityId("agencyId", getAgency())
