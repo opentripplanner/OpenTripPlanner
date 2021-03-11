@@ -27,7 +27,7 @@ public class Deduplicator implements Serializable {
     private final Map<Class<?>, Map<?, ?>> canonicalObjects = new HashMap<>();
     private final Map<Class<?>, Map<List<?>, List<?>>> canonicalLists = new HashMap<>();
 
-    private final Map<Class<?>, Integer> effectCounter = new HashMap<>();
+    private final Map<String, Integer> effectCounter = new HashMap<>();
 
     /** Free up any memory used by the deduplicator. */
     public void reset() {
@@ -61,7 +61,7 @@ public class Deduplicator implements Serializable {
             canonical = intArray;
             canonicalIntArrays.put(canonical, canonical);
         }
-        incrementEffectCounter(int[].class);
+        incrementEffectCounter(IntArray.class);
         return canonical.array;
     }
 
@@ -81,13 +81,16 @@ public class Deduplicator implements Serializable {
             canonical = new StringArray(original, true);
             canonicalStringArrays.put(canonical, canonical);
         }
-        incrementEffectCounter(String[].class);
+        incrementEffectCounter(StringArray.class);
         return canonical.array;
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
     public <T> T deduplicateObject(Class<T> cl, T original) {
+        if(String.class == cl) {
+            throw new IllegalArgumentException("Use #deduplicateString() instead.");
+        }
         if (original == null) { return null; }
         Map<T, T> objects = (Map<T, T>) canonicalObjects.computeIfAbsent(cl, c -> new HashMap<T, T>());
         T canonical = objects.putIfAbsent(original, original);
@@ -117,19 +120,8 @@ public class Deduplicator implements Serializable {
             canonicalLists.put(canonical, canonical);
         }
 
-        incrementEffectCounter(canonical.getClass());
+        incrementEffectCounter(listKey(clazz));
         return canonical;
-    }
-
-    private void incrementEffectCounter(Class<?> clazz) {
-        // Skip counting the first element, start at 0(zero)
-        effectCounter.compute(clazz, (k, v) -> v == null ? 0 : ++v);
-    }
-
-    private String sizeAndCount(int size, Class<?> clazz) {
-        // Skip counting the first element, start at 0(zero)
-        int count = effectCounter.getOrDefault(clazz, 0);
-        return size + "(" + count + ")";
     }
 
     /**
@@ -144,9 +136,35 @@ public class Deduplicator implements Serializable {
             .addObj("StringArray", sizeAndCount(canonicalStringArrays.size(), StringArray.class));
 
         canonicalObjects.forEach((k,v) -> builder.addObj(k.getSimpleName(), sizeAndCount(v.size(), k)));
-        canonicalLists.forEach((k,v) -> builder.addObj(k.getSimpleName(), sizeAndCount(v.size(), k)));
+        canonicalLists.forEach((k,v) -> builder.addObj("List<"+ k.getSimpleName() + ">", sizeAndCount(v.size(), listKey(k))));
 
         return builder.toString();
+    }
+
+
+    /* private members */
+
+    private static <T> String listKey(Class<T> elementType) {
+        return "List<" + elementType.getName() + ">";
+    }
+
+
+    private void incrementEffectCounter(Class<?> clazz) {
+        incrementEffectCounter(clazz.getName());
+    }
+
+    private String sizeAndCount(int size, Class<?> clazz) {
+        return sizeAndCount(size, clazz.getName());
+    }
+
+    private void incrementEffectCounter(String key) {
+        // Count the first element, start at 1
+        effectCounter.compute(key, (k, v) -> v == null ? 1 : ++v);
+    }
+
+    private String sizeAndCount(int size, String key) {
+        int count = effectCounter.getOrDefault(key, 0);
+        return size + "(" + count + ")";
     }
 
 
