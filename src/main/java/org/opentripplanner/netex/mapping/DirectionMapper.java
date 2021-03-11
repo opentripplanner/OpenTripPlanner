@@ -1,10 +1,10 @@
-package org.opentripplanner.netex;
+package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.Direction;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
 
-public class DirectionMapper {
-  public static Direction map(DirectionTypeEnumeration direction) {
+class DirectionMapper {
+  static Direction map(DirectionTypeEnumeration direction) {
     if (direction == null) { return Direction.UNKNOWN; }
     switch (direction) {
       case INBOUND:
