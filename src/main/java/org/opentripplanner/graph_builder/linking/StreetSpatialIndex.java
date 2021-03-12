@@ -29,6 +29,8 @@ import java.util.stream.Stream;
  * is so that the origin/destination coordinates of a search can connect directly to the edges
  * being split by a realtime update. This is so that we would not have to walk all the way to the
  * end of the edge then back again to where the realtime element was connected.
+ * 
+ * See #3351
  */
 class StreetSpatialIndex {
 
