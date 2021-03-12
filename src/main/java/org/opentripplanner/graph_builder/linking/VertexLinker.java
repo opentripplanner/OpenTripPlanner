@@ -325,7 +325,7 @@ public class VertexLinker {
 
     else {
       // split the edge, get the split vertex
-      SplitterVertex v0 = split(edge, ll, scope, direction == LinkingDirection.OUTGOING, tempEdges);
+      SplitterVertex v0 = split(edge, ll, scope, direction, tempEdges);
 
       // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
       // edges that were missed by WalkableAreaBuilder
@@ -381,7 +381,7 @@ public class VertexLinker {
       StreetEdge originalEdge,
       LinearLocation ll,
       Scope scope,
-      boolean endVertex,
+      LinkingDirection direction,
       DisposableEdgeCollection tempEdges
   ) {
     LineString geometry = originalEdge.getGeometry();
@@ -397,7 +397,7 @@ public class VertexLinker {
           splitPoint.x,
           splitPoint.y,
           originalEdge,
-          endVertex
+          direction == LinkingDirection.OUTGOING
       );
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
@@ -410,7 +410,7 @@ public class VertexLinker {
     // existing vertices
     P2<StreetEdge> newEdges = scope == Scope.PERMANENT
         ? originalEdge.splitDestructively(v)
-        : originalEdge.splitNonDestructively(v, tempEdges);
+        : originalEdge.splitNonDestructively(v, tempEdges, direction);
 
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges

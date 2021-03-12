@@ -11,6 +11,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.CarPickupState;
 import org.opentripplanner.routing.core.State;
@@ -856,18 +857,23 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     /** Split this street edge and return the resulting street edges. The original edge is kept. */
-    public P2<StreetEdge> splitNonDestructively(SplitterVertex v, DisposableEdgeCollection tempEdges) {
+    public P2<StreetEdge> splitNonDestructively(
+        SplitterVertex v,
+        DisposableEdgeCollection tempEdges,
+        LinkingDirection direction
+    ) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = null;
         StreetEdge e2 = null;
 
-        if (((TemporarySplitterVertex) v).isEndVertex()) {
+        if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
             e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
             e1.setNoThruTraffic(this.isNoThruTraffic());
             e1.setStreetClass(this.getStreetClass());
             tempEdges.addEdge(e1);
-        } else {
+        }
+        if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
             e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
             e2.setNoThruTraffic(this.isNoThruTraffic());
             e2.setStreetClass(this.getStreetClass());
