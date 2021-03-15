@@ -60,6 +60,7 @@ public class RoutingService {
             }
             throw e;
         }
+        request.cleanup();
         return response;
     }
 
