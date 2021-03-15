@@ -12,6 +12,23 @@
 This is a copy of HSL's GraphQL API used by the Digitransit project. The API is used to run OTP2
  together with the [digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
  
+
+The GraphQL endpoint is available at
+
+```
+http://localhost:8080/otp/routers/default/index/graphql
+```
+
+A complete example that fetches the list of all stops from OTP is:
+
+```
+curl --request POST \
+  --url http://localhost:8080/otp/routers/default/index/graphql \
+  --header 'Content-Type: application/json' \
+  --header 'OTPTimeout: 180000' \
+  --data '{"query":"query stops {\n  stops {\n    gtfsId\n    name\n  }\n}\n","operationName":"stops"}'
+```
+
 ### OTP2 Official GraphQL API (Not available) 
 We **plan** to make a new offical OTP2 API, replacing the REST API. The plan is to base the new API
 on this API and the [Legacy GraphQL Api](LegacyGraphQLApi.md). The new API will most likely have 2 
@@ -20,3 +37,11 @@ on this API and the [Legacy GraphQL Api](LegacyGraphQLApi.md). The new API will 
 ### Configuration
 To enable this you need to add the feature `SandboxAPILegacyGraphQLApi`.
  
+```
+// otp-config.json
+{
+  "otpFeatures" : {
+    "SandboxAPILegacyGraphQLApi": true
+  }
+}
+```
