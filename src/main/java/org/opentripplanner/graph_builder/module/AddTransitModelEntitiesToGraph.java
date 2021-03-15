@@ -47,12 +47,12 @@ public class AddTransitModelEntitiesToGraph {
     private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
 
 
-    private GtfsFeedId feedId;
+    private final GtfsFeedId feedId;
 
     private final OtpTransitService transitService;
 
     // Map of all station elements and their vertices in the graph
-    private Map<StationElement, Vertex> stationElementNodes = new HashMap<>();
+    private final Map<StationElement, Vertex> stationElementNodes = new HashMap<>();
 
     private final int subwayAccessTime;
 
