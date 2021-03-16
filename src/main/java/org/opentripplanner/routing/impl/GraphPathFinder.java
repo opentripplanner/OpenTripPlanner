@@ -188,16 +188,11 @@ public class GraphPathFinder {
             for (GraphPath path : newPaths) {
                 // path.dump();
                 List<FeedScopedId> tripIds = path.getTrips();
-                List<FeedScopedId> callAndRideTripIds = path.getCallAndRideTrips();
-                for (FeedScopedId tripId : tripIds) {
-                    if (!callAndRideTripIds.contains(tripId)) {
-                        options.banTrip(tripId);
-                    }
-                }
-                if (tripIds.isEmpty()) {
+                if (path.getTrips().isEmpty()) {
                     // This path does not use transit (is entirely on-street). Do not repeatedly find the same one.
                     options.onlyTransitTrips = true;
                 }
+                options.banTripsInPath(path);
                 // Call-and-Ride trips should not use regular trip-banning, since call-and-ride trips can beused in
                 // multiple ways (e.g. from origin to destination, or from origin to a transfer stop.) Instead,
                 // after an itinerary which uses call-and-ride is found, reduce the allowable call-and-ride duration
@@ -306,9 +301,7 @@ public class GraphPathFinder {
                             (options.arriveBy && joinedPath.states.getLast().getTimeInMillis() < options.dateTime * 1000)){
                         joinedPaths.add(joinedPath);
                         if(newPaths.size() > 1){
-                            for (FeedScopedId tripId : joinedPath.getTrips()) {
-                                options.banTrip(tripId);
-                            }
+                            options.banTripsInPath(joinedPath);
                         }
                     }
                 }

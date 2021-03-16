@@ -8,8 +8,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
@@ -21,6 +19,7 @@ import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -305,6 +305,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Do not use certain trips */
     public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
+
+    /** Do not use certain trip sequences */
+    public List<List<FeedScopedId>> bannedTripSequences = new LinkedList<>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
     public StopMatcher bannedStops = StopMatcher.emptyMatcher();
@@ -1550,8 +1553,18 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void banTrip(FeedScopedId trip) {
-        bannedTrips.put(trip, BannedStopSet.ALL);
+    /**
+     * Bans various tripID sequences as needed from a graphPath. The specific sequence of trip IDs found in the path
+     * won't be used in the graph path finding if the sequence of trips is detected in any order in another path. See
+     * {@link TripTimes#tripOrTripSequenceIsBanned(State, int)} for further details.
+     */
+    public void banTripsInPath(GraphPath path) {
+        List<FeedScopedId> tripIds = path.getTrips();
+        List<FeedScopedId> callAndRideTripIds = path.getCallAndRideTrips();
+        // ban a sequence of trips if none of the tripIds were call and ride trips
+        if (!tripIds.stream().anyMatch(tripId -> callAndRideTripIds.contains(tripId))) {
+            bannedTripSequences.add(tripIds);
+        }
     }
 
     public boolean routeIsBanned(Route route) {

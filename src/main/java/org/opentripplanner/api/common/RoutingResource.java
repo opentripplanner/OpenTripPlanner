@@ -908,9 +908,15 @@ public abstract class RoutingResource {
     }
 
     /**
-     * Take a string in the format agency:id or agency:id:1:2:3:4.
-     * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
-     * Convert to a Map from trip --> set of int.
+     * Create a banned trips map.
+     *
+     * @param banned A string with a multi-part format.
+     *               The first part consists of TRIP_ID,TRIP_ID (multiple trip IDs separated by commas)
+     *               The TRIP_ID has various IDs separated by colons. There must be at least two colon-separated values,
+     *               otherwise the TRIP_ID is skipped. The first value indicates teh agency ID string. The second value
+     *               indicates the trip ID string within the context of the agency. Any further values must be integers
+     *               representing stop sequences within the trip that are banned. If only the agency ID and trip ID are
+     *               provided, the all stops within the trip will be banned.
      */
     private HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
@@ -918,9 +924,13 @@ public abstract class RoutingResource {
         }
 
         HashMap<FeedScopedId, BannedStopSet> bannedTripMap = new HashMap<FeedScopedId, BannedStopSet>();
+        // split multiple trip IDs into single trip IDs
         String[] tripStrings = banned.split(",");
         for (String tripString : tripStrings) {
-            // TODO this apparently allows banning stops within a trip with integers. Why?
+            // split tripId into parts as follows:
+            // - position 0: agency ID
+            // - position 1: trip ID
+            // - position 2+: an integer representing the stop index within the trip
             String[] parts = tripString.split(":");
             if (parts.length < 2) continue; // throw exception?
             String agencyIdString = parts[0];
