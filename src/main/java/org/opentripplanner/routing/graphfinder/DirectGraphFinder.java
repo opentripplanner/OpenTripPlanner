@@ -25,7 +25,7 @@ public class DirectGraphFinder implements GraphFinder {
   private StreetVertexIndex streetIndex;
 
   public DirectGraphFinder(Graph graph) {
-    this.streetIndex = graph.streetIndex != null ? graph.streetIndex : new StreetVertexIndex(graph);
+    this.streetIndex = graph.getStreetIndex();
   }
 
   /**

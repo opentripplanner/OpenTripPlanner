@@ -1,9 +1,6 @@
 package org.opentripplanner.graph_builder.module.linking;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
-import gnu.trove.set.TIntSet;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -14,7 +11,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -23,9 +19,6 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,8 +54,8 @@ public class LinkingTest {
             SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s0);
             SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s1);
 
-            P2<StreetEdge> sp0 = s0.split(sv0, true);
-            P2<StreetEdge> sp1 = s1.split(sv1, true);
+            P2<StreetEdge> sp0 = s0.splitDestructively(sv0);
+            P2<StreetEdge> sp1 = s1.splitDestructively(sv1);
 
             // distances expressed internally in mm so this epsilon is plenty good enough to ensure that they
             // have the same values

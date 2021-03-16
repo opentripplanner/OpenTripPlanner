@@ -3,10 +3,13 @@ package org.opentripplanner.transit.raptor.speed_test.transit;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -32,7 +35,7 @@ class StreetSearch {
 
     private final TransitLayer transitLayer;
     private final Graph graph;
-    private final SimpleStreetSplitter splitter;
+    private final VertexLinker linker;
     private final NearbyStopFinder nearbyStopFinder;
     final TIntIntMap resultTimesSecByStopIndex = new TIntIntHashMap();
     final Map<Integer, NearbyStop> pathsByStopIndex = new HashMap<>();
@@ -40,12 +43,12 @@ class StreetSearch {
     StreetSearch(
             TransitLayer transitLayer,
             Graph graph,
-            SimpleStreetSplitter splitter,
+            VertexLinker splitter,
             NearbyStopFinder nearbyStopFinder
     ) {
         this.transitLayer = transitLayer;
         this.graph = graph;
-        this.splitter = splitter;
+        this.linker = splitter;
         this.nearbyStopFinder = nearbyStopFinder;
     }
 
@@ -63,7 +66,19 @@ class StreetSearch {
                     new NonLocalizedString(place.name),
                     !fromOrigin
             );
-            splitter.link(vertex);
+
+            linker.linkVertexForRequest(
+                vertex,
+                TraverseMode.WALK,
+                fromOrigin ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
+                fromOrigin
+                    ? (v, streetVertex) -> List.of(
+                    new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation)v)
+                )
+                    : (v, streetVertex) -> List.of(
+                        new TemporaryFreeEdge((TemporaryStreetLocation)v, streetVertex)
+                    )
+            );
         }
 
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(

@@ -24,20 +24,20 @@ public class TransitEntranceLink extends Edge {
     private static final long serialVersionUID = -3311099256178798981L;
     static final int TEL_TRAVERSE_COST = 1;
 
-    private boolean wheelchairAccessible;
+    private final boolean wheelchairAccessible;
 
-    private TransitEntranceVertex entranceVertex;
+    private final TransitEntranceVertex entranceVertex;
 
-    public TransitEntranceLink(StreetVertex fromv, TransitEntranceVertex tov, boolean wheelchairAccessible) {
+    public TransitEntranceLink(StreetVertex fromv, TransitEntranceVertex tov) {
         super(fromv, tov);
         entranceVertex = tov;
-        this.wheelchairAccessible = wheelchairAccessible;
+        this.wheelchairAccessible = tov.isWheelchairEntrance();
     }
 
-    public TransitEntranceLink(TransitEntranceVertex fromv, StreetVertex tov, boolean wheelchairAccessible) {
+    public TransitEntranceLink(TransitEntranceVertex fromv, StreetVertex tov) {
         super(fromv, tov);
         entranceVertex = fromv;
-        this.wheelchairAccessible = wheelchairAccessible;
+        this.wheelchairAccessible = fromv.isWheelchairEntrance();
     }
 
     public LineString getGeometry() {

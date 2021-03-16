@@ -14,6 +14,7 @@ import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -97,13 +98,13 @@ public class TemporaryPartialStreetEdgeTest {
     
     @Test
     public void testTraversalOfSubdividedEdge() {
+        DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
         Coordinate nearestPoint = new Coordinate(0.5, 2.0);
         List<StreetEdge> edges = new ArrayList<StreetEdge>();
         edges.add(e2);
-        TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocation(
-                graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true);
-        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocation(
-                graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false);
+        TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocationForTest("middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true, tempEdges);
+        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
+            "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false, tempEdges);
 
         RoutingRequest options = new RoutingRequest();
         options.setMode(TraverseMode.CAR);

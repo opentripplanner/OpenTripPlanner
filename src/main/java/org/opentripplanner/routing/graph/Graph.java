@@ -23,6 +23,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -133,7 +134,7 @@ public class Graph implements Serializable {
 
     private transient CalendarService calendarService;
 
-    public transient StreetVertexIndex streetIndex;
+    private transient StreetVertexIndex streetIndex;
 
     public transient GraphIndex index;
 
@@ -367,6 +368,15 @@ public class Graph implements Serializable {
         return this.vertices.values();
     }
 
+    public <T extends Vertex> List<T> getVerticesOfType(Class<T> cls) {
+        return this
+            .getVertices()
+            .stream()
+            .filter(cls::isInstance)
+            .map(cls::cast)
+            .collect(Collectors.toList());
+    }
+
     /**
      * Return all the edges in the graph. Derived from vertices on demand.
      */
@@ -376,6 +386,15 @@ public class Graph implements Serializable {
             edges.addAll(v.getOutgoing());
         }
         return edges;
+    }
+
+    public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
+        return this
+            .getEdges()
+            .stream()
+            .filter(cls::isInstance)
+            .map(cls::cast)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -428,8 +447,7 @@ public class Graph implements Serializable {
      * Return only the StreetEdges in the graph.
      */
     public Collection<StreetEdge> getStreetEdges() {
-        Collection<Edge> allEdges = this.getEdges();
-        return Lists.newArrayList(Iterables.filter(allEdges, StreetEdge.class));
+        return getEdgesOfType(StreetEdge.class);
     }
 
     public TransitLayer getTransitLayer() {
@@ -492,24 +510,10 @@ public class Graph implements Serializable {
         vertices.remove(vertex.getLabel());
     }
 
-    public void removeVertexAndEdges(Vertex vertex) {
-        if (!containsVertex(vertex)) {
-            throw new IllegalStateException("attempting to remove vertex that is not in graph.");
+    public void removeIfUnconnected(Vertex v) {
+        if (v.getDegreeIn() == 0 && v.getDegreeOut() == 0) {
+            remove(v);
         }
-
-        /*
-         * Note: We have to handle the removal of looping edges (for example RentABikeOn/OffEdge),
-         * we use a set to prevent having multiple times the same edge.
-         */
-        Set<Edge> edges = new HashSet<Edge>(vertex.getDegreeIn() + vertex.getDegreeOut());
-        edges.addAll(vertex.getIncoming());
-        edges.addAll(vertex.getOutgoing());
-
-        for (Edge edge : edges) {
-            removeEdge(edge);
-        }
-
-        this.remove(vertex);
     }
 
     public Envelope getExtent() {
@@ -606,7 +610,6 @@ public class Graph implements Serializable {
      * This used to be done in readObject methods upon deserialization, but stand-alone mode now
      * allows passing graphs from graphbuilder to server in memory, without a round trip through
      * serialization. 
-     * TODO: do we really need a factory for different street vertex indexes?
      */
     public void index () {
         LOG.info("Index graph...");
@@ -629,6 +632,17 @@ public class Graph implements Serializable {
             }
         }
         return this.calendarService;
+    }
+
+    public StreetVertexIndex getStreetIndex() {
+        if (this.streetIndex == null) {
+            streetIndex = new StreetVertexIndex(this);
+        }
+        return this.streetIndex;
+    }
+
+    public VertexLinker getLinker() {
+        return getStreetIndex().getVertexLinker();
     }
 
     /**
@@ -795,8 +809,8 @@ public class Graph implements Serializable {
             TDoubleList longitudes = new TDoubleLinkedList();
             Median median = new Median();
 
-            getVertices().stream()
-                .filter(v -> v instanceof TransitStopVertex)
+            getVerticesOfType(TransitStopVertex.class)
+                .stream()
                 .forEach(v -> {
                     latitudes.add(v.getLat());
                     longitudes.add(v.getLon());

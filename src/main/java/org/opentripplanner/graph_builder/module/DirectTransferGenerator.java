@@ -65,7 +65,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             LOG.info("Creating direct transfer edges between stops using straight line distance (not streets)...");
         }
 
-        Iterable<TransitStopVertex> stops = Iterables.filter(graph.getVertices(), TransitStopVertex.class);
+        Iterable<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
 
         ProgressTracker progress = ProgressTracker.track(
                 "Create transfer edges", 1000, Iterables.size(stops)

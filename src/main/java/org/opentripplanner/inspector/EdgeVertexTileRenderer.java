@@ -102,9 +102,9 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         // Grow a bit the envelope to prevent rendering glitches between tiles
         Envelope bboxWithMargins = context.expandPixels(lineWidth * 2.0, lineWidth * 2.0);
 
-        Collection<Vertex> vertices = context.graph.streetIndex
+        Collection<Vertex> vertices = context.graph.getStreetIndex()
                 .getVerticesForEnvelope(bboxWithMargins);
-        Collection<Edge> edges = context.graph.streetIndex.getEdgesForEnvelope(bboxWithMargins);
+        Collection<Edge> edges = context.graph.getStreetIndex().getEdgesForEnvelope(bboxWithMargins);
         Set<Edge> edgesSet = new HashSet<>(edges);
 
         /*

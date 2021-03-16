@@ -1,10 +1,13 @@
 package org.opentripplanner.updater.bike_park;
 
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -39,9 +42,11 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private final Map<BikePark, BikeParkVertex> verticesByPark = new HashMap<>();
 
+    private final Map<BikePark, DisposableEdgeCollection> tempEdgesByPark = new HashMap<>();
+
     private final BikeParkDataSource source;
 
-    private SimpleStreetSplitter linker;
+    private VertexLinker linker;
 
     private BikeRentalStationService bikeService;
 
@@ -61,7 +66,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
-        linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
+        linker = graph.getLinker();
         // Adding a bike park station service needs a graph writer runnable
         bikeService = graph.getService(BikeRentalStationService.class, true);
     }
@@ -95,7 +100,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         @Override
         public void run(Graph graph) {
             // Apply stations to graph
-            Set<BikePark> bikeParkSet = new HashSet<BikePark>();
+            Set<BikePark> bikeParkSet = new HashSet<>();
             /* Add any new park and update space available for existing parks */
             for (BikePark bikePark : bikeParks) {
                 bikeService.addBikePark(bikePark);
@@ -103,12 +108,24 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikeParkVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
-                    if (!linker.link(bikeParkVertex)) {
+                    DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
+                        bikeParkVertex,
+                        TraverseMode.WALK,
+                        LinkingDirection.BOTH_WAYS,
+                        (vertex, streetVertex) -> List.of(
+                            new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),
+                            new StreetBikeParkLink(streetVertex, (BikeParkVertex) vertex)
+                        )
+                    );
+
+                    if (bikeParkVertex.getOutgoing().isEmpty()) {
                         // the toString includes the text "Bike park"
                         LOG.info("Bike park {} unlinked", bikeParkVertex);
                     }
-                    verticesByPark.put(bikePark, bikeParkVertex);
+
                     new BikeParkEdge(bikeParkVertex);
+                    verticesByPark.put(bikePark, bikeParkVertex);
+                    tempEdgesByPark.put(bikePark, tempEdges);
                 } else {
                     bikeParkVertex.setSpacesAvailable(bikePark.spacesAvailable);
                 }
@@ -119,17 +136,14 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikePark bikePark = entry.getKey();
                 if (bikeParkSet.contains(bikePark))
                     continue;
-                BikeParkVertex vertex = entry.getValue();
-                if (graph.containsVertex(vertex)) {
-                    graph.removeVertexAndEdges(vertex);
-                }
                 toRemove.add(bikePark);
                 bikeService.removeBikePark(bikePark);
-                // TODO: need to unsplit any streets that were split
             }
             for (BikePark bikePark : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByPark.remove(bikePark);
+                tempEdgesByPark.get(bikePark).disposeEdges();
+                tempEdgesByPark.remove(bikePark);
             }
         }
     }

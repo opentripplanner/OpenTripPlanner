@@ -31,7 +31,6 @@ public class StateEditorTest {
         request.parkAndRide = true;
         Graph graph = new Graph();
         graph.index = new GraphIndex(graph);
-        graph.streetIndex = new StreetVertexIndex(graph);
         request.rctx = new RoutingContext(request, graph);
         State state = new State(request);
 

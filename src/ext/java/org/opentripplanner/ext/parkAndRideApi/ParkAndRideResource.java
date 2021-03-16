@@ -65,7 +65,7 @@ public class ParkAndRideResource {
 
             // Check if vertex is within maxTransitDistance of a stop (if specified)
             if (maxTransitDistance != null) {
-                List<TransitStopVertex> stops = router.graph.streetIndex.getNearbyTransitStops(
+                List<TransitStopVertex> stops = router.graph.getStreetIndex().getNearbyTransitStops(
                     new Coordinate(v.getX(), v.getY()), maxTransitDistance);
                 if (stops.isEmpty()) continue;
             }
