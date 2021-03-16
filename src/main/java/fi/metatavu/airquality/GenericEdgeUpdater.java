@@ -139,7 +139,6 @@ public class GenericEdgeUpdater {
      *
      * Returned array represent value for selected property time
      *
-     * originally it was float []
      * @param samplePoint point
      * @param propertyName propertyName
      * @return result closest value for selected property for given point
@@ -157,17 +156,27 @@ public class GenericEdgeUpdater {
 
         for (int timeIndex = 0; timeIndex < timeSize; timeIndex++) {
             Array dataArray = genericVariablesData.get(propertyName);
+            Index selectIndex = dataArray.getIndex();
 
-            if (dataArray instanceof ArrayInt.D4)
-                result.add(timeIndex, ((ArrayInt.D4) dataArray).get(timeIndex, height, latIndex, lonIndex));
-            else if (dataArray instanceof ArrayDouble.D4)
-                result.add(timeIndex, ((ArrayDouble.D4) dataArray).get(timeIndex, height, latIndex, lonIndex));
-            else if (dataArray instanceof ArrayFloat.D4)
-                result.add(timeIndex, ((ArrayFloat.D4) dataArray).get(timeIndex, height, latIndex, lonIndex));
-            else if (dataArray instanceof ArrayLong.D4)
-                result.add(timeIndex, ((ArrayLong.D4) dataArray).get(timeIndex, height, latIndex, lonIndex));
+            if (selectIndex.getRank() == 3) {
+                selectIndex.set(timeIndex, latIndex, lonIndex);
+            }
+            else if (selectIndex.getRank() == 4) {
+                selectIndex.set(timeIndex, height, latIndex, lonIndex);
+            }
+            else throw new IllegalArgumentException(String.format("Invalid data array shape for %s", propertyName));
+
+            Class dataArrayType = dataArray.getDataType().getPrimitiveClassType();
+            if (dataArrayType.equals(Integer.TYPE))
+                result.add(timeIndex, ((ArrayInt) dataArray).get(selectIndex));
+            else if (dataArrayType.equals(Double.TYPE))
+                result.add(timeIndex, ((ArrayDouble) dataArray).get(selectIndex));
+            else if (dataArrayType.equals(Float.TYPE))
+                result.add(timeIndex, ((ArrayFloat) dataArray).get(selectIndex));
+            else if (dataArrayType.equals(Long.TYPE))
+                result.add(timeIndex, ((ArrayLong) dataArray).get(selectIndex));
             else
-                throw new IllegalArgumentException(String.format("Unsupported format of %s variable", propertyName));
+                throw new IllegalArgumentException(String.format("Unsupported format %s of %s variable", dataArrayType, propertyName));
         }
 
         return result;
