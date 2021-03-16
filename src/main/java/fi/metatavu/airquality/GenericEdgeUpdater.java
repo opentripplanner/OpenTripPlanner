@@ -164,6 +164,7 @@ public class GenericEdgeUpdater {
             else if (selectIndex.getRank() == 4) {
                 selectIndex.set(timeIndex, height, latIndex, lonIndex);
             }
+            else throw new IllegalArgumentException(String.format("Invalid data array shape for %s", propertyName));
 
             Class dataArrayType = dataArray.getDataType().getPrimitiveClassType();
             if (dataArrayType.equals(Integer.TYPE))
