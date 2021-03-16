@@ -52,6 +52,8 @@ public final class StopTime implements Comparable<StopTime> {
     // Disabled by default
     private int flexContinuousDropOff = MISSING_VALUE;
 
+    private BookingInfo bookingInfo;
+
     public StopTime() { }
 
     public StopTime(StopTime st) {
@@ -253,6 +255,14 @@ public final class StopTime implements Comparable<StopTime> {
 
     public void setFlexContinuousDropOff(int flexContinuousDropOff) {
         this.flexContinuousDropOff = flexContinuousDropOff;
+    }
+
+    public BookingInfo getBookingInfo() {
+        return bookingInfo;
+    }
+
+    public void setBookingInfo(BookingInfo bookingInfo) {
+        this.bookingInfo = bookingInfo;
     }
 
     public int compareTo(StopTime o) {

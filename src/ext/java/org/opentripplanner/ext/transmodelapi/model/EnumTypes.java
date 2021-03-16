@@ -2,6 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model;
 
 import graphql.schema.GraphQLEnumType;
 import org.opentripplanner.model.Direction;
+import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.plan.AbsoluteDirection;
@@ -247,8 +248,17 @@ public class EnumTypes {
             .value("anticlockwise", Direction.ANTICLOCKWISE)
             .build();
 
+    public static GraphQLEnumType BOOKING_METHOD = GraphQLEnumType.newEnum()
+        .name("BookingMethod")
+        .value("callDriver", BookingMethod.CALL_DRIVER)
+        .value("callOffice", BookingMethod.CALL_OFFICE)
+        .value("online", BookingMethod.ONLINE)
+        .value("phoneAtStop", BookingMethod.PHONE_AT_STOP)
+        .value("text", BookingMethod.TEXT_MESSAGE)
+        .build();
 
-    public static GraphQLEnumType SERVICE_ALTERATION_TYPE = GraphQLEnumType.newEnum()
+
+    public static GraphQLEnumType SERVICE_ALTERATION = GraphQLEnumType.newEnum()
         .name("ServiceAlteration")
         .value("cancellation", TripAlteration.CANCELLATION)
         .value("replaced", TripAlteration.REPLACED)

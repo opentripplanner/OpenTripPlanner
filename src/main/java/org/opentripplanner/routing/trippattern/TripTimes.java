@@ -3,15 +3,18 @@ package org.opentripplanner.routing.trippattern;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
+import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
@@ -117,6 +120,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     int[] dropoffs;
 
+    List<BookingInfo> bookingInfos;
+
 
     /**
      * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits
@@ -152,6 +157,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         timeShift = stopTimes.iterator().next().getArrivalTime();
         final int[] pickups   = new int[nStops];
         final int[] dropoffs   = new int[nStops];
+        final List<BookingInfo> bookingInfos = new ArrayList<>();
         int s = 0;
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
@@ -161,6 +167,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
             pickups[s] = st.getPickupType();
             dropoffs[s] = st.getDropOffType();
+            bookingInfos.add(st.getBookingInfo());
             s++;
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
@@ -169,6 +176,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
         this.pickups = deduplicator.deduplicateIntArray(pickups);
         this.dropoffs = deduplicator.deduplicateIntArray(dropoffs);
+        this.bookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, bookingInfos);
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
         this.arrivalTimes = null;
@@ -352,6 +360,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             return -999;
         }
         return dropoffs[stop];
+    }
+
+    public BookingInfo getBookingInfo(int stop) {
+        return bookingInfos.get(stop);
     }
 
     /**

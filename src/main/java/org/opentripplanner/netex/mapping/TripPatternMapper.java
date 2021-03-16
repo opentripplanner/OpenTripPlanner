@@ -12,10 +12,12 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -72,6 +74,7 @@ class TripPatternMapper {
             ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, ServiceJourney> serviceJourneyById,
+            ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
             Map<String, FeedScopedId> serviceIds,
             Deduplicator deduplicator
     ) {
@@ -93,7 +96,9 @@ class TripPatternMapper {
             flexStopLocationsById,
             destinationDisplayById,
             quayIdByStopPointRef,
-            flexibleStopPlaceIdByStopPointRef
+            flexibleStopPlaceIdByStopPointRef,
+            flexibleLinesById,
+            routeById
         );
         this.deduplicator = deduplicator;
 
@@ -125,7 +130,8 @@ class TripPatternMapper {
             StopTimesMapper.MappedStopTimes stopTimes = stopTimesMapper.mapToStopTimes(
                     journeyPattern,
                     trip,
-                    serviceJourney.getPassingTimes().getTimetabledPassingTime()
+                    serviceJourney.getPassingTimes().getTimetabledPassingTime(),
+                    serviceJourney
             );
 
             // Unable to map StopTimes, problem logged by the mapper above

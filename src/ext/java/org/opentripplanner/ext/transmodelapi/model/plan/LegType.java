@@ -292,6 +292,7 @@ public class LegType {
             .newFieldDefinition()
             .name("bookingArrangements")
             .type(bookingArrangementType)
+            .dataFetcher(environment -> ((Leg) environment.getSource()).bookingInfo)
             .build())
         .build();
   }

@@ -104,7 +104,7 @@ public class ServiceJourneyType {
                     + "together with the SJ and date. In Netex this new type is called "
                     + "DatedServiceJourney. We will create artificial DSJs for the old SJs."
                 )
-                .type(EnumTypes.SERVICE_ALTERATION_TYPE)
+                .type(EnumTypes.SERVICE_ALTERATION)
                 .dataFetcher(environment -> trip(environment).getTripAlteration())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()

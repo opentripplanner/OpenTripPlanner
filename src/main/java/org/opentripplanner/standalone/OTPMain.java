@@ -143,6 +143,8 @@ public class OTPMain {
             // with using the embedded router config.
             new SerializedGraphObject(graph, app.config().buildConfig(), app.config().routerConfig())
                     .save(app.graphOutputDataSource());
+            // Log size info for the deduplicator
+            LOG.info("Memory optimized {}", graph.deduplicator.toString());
         }
 
         if(graph == null) {

@@ -6,6 +6,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
@@ -41,13 +42,16 @@ public class StopTimesMapperTest {
                 new EntityById<>(),
                 sample.getDestinationDisplayById(),
                 sample.getQuayIdByStopPointRef(),
+                new HierarchicalMap<>(),
+                new HierarchicalMapById<>(),
                 new HierarchicalMap<>()
         );
 
         StopTimesMapper.MappedStopTimes result = stopTimesMapper.mapToStopTimes(
                 sample.getJourneyPattern(),
                 TRIP,
-                sample.getTimetabledPassingTimes()
+                sample.getTimetabledPassingTimes(),
+                null
         );
 
         List<StopTime> stopTimes = result.stopTimes;

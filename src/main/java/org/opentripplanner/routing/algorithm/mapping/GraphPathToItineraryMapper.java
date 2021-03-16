@@ -135,8 +135,7 @@ public abstract class GraphPathToItineraryMapper {
             first = false;
         }
 
-        setLegPathwayFlag(legs, legsStates);
-        setRoute(legs, legsStates);
+        setPathwayInfo(legs, legsStates);
 
         Itinerary itinerary = new Itinerary(legs);
 
@@ -346,25 +345,14 @@ public abstract class GraphPathToItineraryMapper {
         }
     }
 
-    private static void setLegPathwayFlag(List<Leg> legs, State[][] legsStates) {
-        OUTER:
-        for (int i = 0; i < legsStates.length; i++) {
-            for (int j = 1; j < legsStates[i].length; j++) {
-                if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
-                    legs.get(i).pathway = true;
-                    break OUTER;
-                }
-            }
-        }
-    }
-
-    private static void setRoute(List<Leg> legs, State[][] legsStates) {
+    private static void setPathwayInfo(List<Leg> legs, State[][] legsStates) {
         OUTER:
         for (int i = 0; i < legsStates.length; i++) {
             for (int j = 1; j < legsStates[i].length; j++) {
                 if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
                     PathwayEdge pe = (PathwayEdge) legsStates[i][j].getBackEdge();
-                    legs.get(i).edgeIdentifier = pe.getId();
+                    legs.get(i).pathwayId = pe.getId();
+                    legs.get(i).pathway = true;
                     break OUTER;
                 }
             }

@@ -296,6 +296,7 @@ public class NetexMapper {
                 netexIndex.getFlexibleStopPlaceByStopPointRef(),
                 netexIndex.getDestinationDisplayById(),
                 netexIndex.getServiceJourneyById(),
+                netexIndex.getFlexibleLineById(),
                 serviceIds,
                 deduplicator
         );

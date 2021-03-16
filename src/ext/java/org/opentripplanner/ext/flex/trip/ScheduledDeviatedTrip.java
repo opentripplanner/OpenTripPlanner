@@ -5,6 +5,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
@@ -33,6 +34,8 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   private final ScheduledDeviatedStopTime[] stopTimes;
 
+  private final BookingInfo[] bookingInfos;
+
   public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof Stop);
     Predicate<StopTime> notContinuousStop = stopTime ->
@@ -50,9 +53,11 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
     int nStops = stopTimes.size();
     this.stopTimes = new ScheduledDeviatedStopTime[nStops];
+    this.bookingInfos = new BookingInfo[nStops];
 
     for (int i = 0; i < nStops; i++) {
       this.stopTimes[i] = new ScheduledDeviatedStopTime(stopTimes.get(i));
+      this.bookingInfos[i] = stopTimes.get(i).getBookingInfo();
     }
   }
 
@@ -126,6 +131,11 @@ public class ScheduledDeviatedTrip extends FlexTrip {
         .stream(stopTimes)
         .map(scheduledDeviatedStopTime -> scheduledDeviatedStopTime.stop)
         .collect(Collectors.toSet());
+  }
+
+  @Override
+  public BookingInfo getBookingInfo(int i) {
+    return bookingInfos[i];
   }
 
   private Collection<StopLocation> expandStops(StopLocation stop) {
