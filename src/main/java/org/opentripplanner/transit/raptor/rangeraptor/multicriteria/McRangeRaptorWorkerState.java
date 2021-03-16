@@ -132,8 +132,8 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
 
         if (exceedsTimeLimit(stopArrivalTime)) { return; }
 
-        // Calculate wait time before and after the transit path
-        final int waitTime = ride.boardWaitTime + alightSlack;
+        // Calculate wait time before and after the transit
+        final int waitTime = ride.boardWaitTimeForCostCalculation + alightSlack;
 
         final int costTransit = costCalculator.transitArrivalCost(
             ride.prevArrival,

@@ -56,7 +56,12 @@ public final class PatternRide<T extends RaptorTripSchedule> {
     public final int boardStopIndex;
     public final int boardPos;
     public final int boardTime;
-    public final int boardWaitTime;
+    /**
+     * This is the wait-time before the boarding witch should be accounted for in the cost
+     * calculation. If the access-leg can be time-shifted the actual wait time might be larger
+     * because the time-shifting is done after the raptor search is done.
+     */
+    public final int boardWaitTimeForCostCalculation;
     public final T trip;
 
     // Pareto vector
@@ -77,7 +82,7 @@ public final class PatternRide<T extends RaptorTripSchedule> {
         this.boardStopIndex = boardStopIndex;
         this.boardPos = boardPos;
         this.boardTime = boardTime;
-        this.boardWaitTime = boardWaitTime;
+        this.boardWaitTimeForCostCalculation = boardWaitTime;
         this.tripId = tripId;
         this.trip = trip;
         this.relativeCost = relativeCost;
@@ -120,7 +125,7 @@ public final class PatternRide<T extends RaptorTripSchedule> {
             .addNum("boardStop", boardStopIndex)
             .addNum("boardPos", boardPos)
             .addServiceTime("boardTime", boardTime , -1)
-            .addDurationSec("boardWaitTime", boardWaitTime)
+            .addDurationSec("boardWaitTime", boardWaitTimeForCostCalculation)
             .addObj("trip", trip)
             .addNum("relativeCost", relativeCost)
             .addNum("tripId", tripId)

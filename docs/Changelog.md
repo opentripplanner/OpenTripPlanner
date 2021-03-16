@@ -9,6 +9,7 @@
 - Remove poor transit results for short trips, when walking is better [#3331](https://github.com/opentripplanner/OpenTripPlanner/issues/3331)
 - A pathway's `traversal_time` is used when calculating the duration of transfers [#3357](https://github.com/opentripplanner/OpenTripPlanner/issues/3357).
 - GTFS Trips will by default not allow bikes if no explicit value is set [#3359](https://github.com/opentripplanner/OpenTripPlanner/issues/3359).
+- Improve the dynamic search window calculation. The configuration parameters `minTransitTimeCoefficient` and `minWaitTimeCoefficient` replace the old `minTripTimeCoefficient` parameter. [#3366](https://github.com/opentripplanner/OpenTripPlanner/issues/3366)   
 
 ## 2.0.0 (2020-11-27)
 
@@ -59,7 +60,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Fix: Problem building and loading the GTFS file in San Fransisco Bay Area [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
 - Fix: The `BusRouteStreetMatcher` and `TransitToTaggedStopsModule` graph builder modules are not run if the graph is build in two steps, and add progress tracker to BusRouteStreetMatcher. [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
 - Improvement: Insert project information like Maven version number into configuration files. [#3254](https://github.com/opentripplanner/OpenTripPlanner/pull/3254)   
-
+- Added pathway FeedScopedId as the route text to trip plan responses. [#3287](https://github.com/opentripplanner/OpenTripPlanner/issues/3287)
 
 
 ## Ported over from 1.4 and 1.5
