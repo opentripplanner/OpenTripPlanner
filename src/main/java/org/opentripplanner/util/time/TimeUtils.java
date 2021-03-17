@@ -12,8 +12,6 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.joda.time.DateTimeConstants.SECONDS_PER_DAY;
-
 
 /**
  * Time utility methods. See the unit test for examples on how to use this class.
@@ -91,7 +89,7 @@ public class TimeUtils {
         }
         int mm = tokens.length>1 ? Integer.parseInt(tokens[1]) : 0;
         int ss = tokens.length==3 ? Integer.parseInt(tokens[2]) : 0;
-        int seconds = LocalTime.of(hh, mm, ss).toSecondOfDay() + days * SECONDS_PER_DAY;
+        int seconds = LocalTime.of(hh, mm, ss).toSecondOfDay() + days * DateConstants.ONE_DAY_SECONDS;
         return negative ? -seconds : seconds;
     }
 

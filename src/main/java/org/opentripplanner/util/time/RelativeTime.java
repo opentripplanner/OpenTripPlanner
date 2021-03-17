@@ -8,8 +8,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 
-import static org.joda.time.DateTimeConstants.SECONDS_PER_DAY;
-
 
 /**
  * This class extend the Java {@link LocalTime} and with the ability
@@ -47,8 +45,8 @@ class RelativeTime {
    */
   static RelativeTime ofSeconds(int secondsPastMidnight) {
     boolean negative = secondsPastMidnight < 0;
-    int days = secondsPastMidnight / SECONDS_PER_DAY;
-    int secondsOfDay = secondsPastMidnight % SECONDS_PER_DAY;
+    int days = secondsPastMidnight / DateConstants.ONE_DAY_SECONDS;
+    int secondsOfDay = secondsPastMidnight % DateConstants.ONE_DAY_SECONDS;
 
     if(negative) {
       // The days and secondsOfDay are both negative numbers

@@ -388,13 +388,13 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.13</version>
+            <version>1.2.3</version>
         </dependency>
         <!-- Jersey uses java.util logging, redirect it to slf4j API (we use the Logback implementation) -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>1.7.6</version>
+            <version>1.7.30</version>
         </dependency>
 
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
@@ -624,12 +624,6 @@
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
             <version>1.0.7</version>
-        </dependency>
-        <!-- Joda Time is a widely used replacement for flaky Java time classes. -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.1</version>
         </dependency>
         <!-- FlexJSON deserializes JSON in Nominatim/Yahoo/Google geocoder modules. -->
         <!-- Could be done with Jackson JSON trees. -->
