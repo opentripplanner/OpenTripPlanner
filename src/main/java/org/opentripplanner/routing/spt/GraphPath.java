@@ -2,6 +2,10 @@ package org.opentripplanner.routing.spt;
 
 import java.util.LinkedList;
 
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -92,6 +96,14 @@ public class GraphPath {
         return (int) states.getLast().getElapsedTimeSeconds();
     }
 
+    /**
+     * Returns the total distance of all the edges in this path
+     * @return
+     */
+    public double getDistanceMeters() {
+        return edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    }
+
     public double getWeight() {
         return states.getLast().getWeight();
     }
@@ -102,6 +114,29 @@ public class GraphPath {
 
     public Vertex getEndVertex() {
         return states.getLast().getVertex();
+    }
+
+    /**
+     * Returns the geometry for the entire path
+     * @return
+     */
+    public LineString getGeometry() {
+        CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
+
+        for (Edge edge : edges) {
+            LineString geometry = edge.getGeometry();
+
+            if (geometry != null) {
+                if (coordinates.size() == 0) {
+                    coordinates.extend(geometry.getCoordinates());
+                }
+                else {
+                    coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplications
+                }
+            }
+        }
+
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
     public String toString() {

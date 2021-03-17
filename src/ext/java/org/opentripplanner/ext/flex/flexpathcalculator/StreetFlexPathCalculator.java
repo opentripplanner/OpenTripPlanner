@@ -1,10 +1,10 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
@@ -33,9 +33,9 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   @Override
   public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
     T2<Vertex, Vertex> key = new T2<>(fromv, tov);
-    FlexPath cacheValue = cache.get(key);
-    if (cacheValue != null) return cacheValue;
-
+    if (cache.containsKey(key)) {
+      return cache.get(key);
+    }
     RoutingRequest routingRequest = new RoutingRequest(TraverseMode.CAR);
     routingRequest.setNumItineraries(1);
 
@@ -44,16 +44,20 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     AStar search = new AStar();
     ShortestPathTree spt = search.getShortestPathTree(routingRequest);
 
+    if (spt.getPaths().isEmpty()) {
+      cache.put(key, null);
+      return null;
+    }
+
     GraphPath path = spt.getPaths().get(0);
 
-    if (path == null) { return null; }
-
-    int distance = (int) path.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    int distance = (int) path.getDistanceMeters();
     int duration = path.getDuration();
+    LineString geometry = path.getGeometry();
 
     routingRequest.cleanup();
 
-    FlexPath value = new FlexPath(distance, duration);
+    FlexPath value = new FlexPath(distance, duration, geometry);
     cache.put(key, value);
     return value;
   }

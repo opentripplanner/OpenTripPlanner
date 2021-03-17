@@ -71,10 +71,7 @@ public class FlexTripEdge extends Edge {
 
   @Override
   public LineString getGeometry() {
-    return GeometryUtils.makeLineString(new Coordinate[] {
-        fromv.getCoordinate(),
-        tov.getCoordinate()
-    });
+    return flexPath.geometry;
   }
 
   @Override
