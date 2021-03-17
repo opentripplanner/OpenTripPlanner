@@ -242,7 +242,7 @@ public class GraphBuilder implements Runnable {
                 for (GenericFileConfiguration configuration : genericFileConfigurations) {
                     GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()),
                             configuration);
-                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile);
+                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, configuration);
                     graphBuilder.addModule(edgeUpdaterModule);
                 }
             }

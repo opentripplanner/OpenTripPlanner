@@ -10,6 +10,7 @@ public class GenericFileConfiguration {
     private String latitudeVariable;
     private String longitudeVariable;
     private String timeVariable;
+    private TimeUnit timeFormat;
     private IndexVariable[] indexVariables;
     private RequestParameters[] requestParameters;
 
@@ -119,5 +120,23 @@ public class GenericFileConfiguration {
      */
     public void setRequestParameters(RequestParameters[] requestParameters) {
         this.requestParameters = requestParameters;
+    }
+
+    /**
+     * Gets time format
+     *
+     * @return the time format enum
+     */
+    public TimeUnit getTimeFormat() {
+        return timeFormat;
+    }
+
+    /**
+     * Sets time format
+     *
+     * @param timeFormat time format enum
+     */
+    public void setTimeFormat(TimeUnit timeFormat) {
+        this.timeFormat = timeFormat;
     }
 }

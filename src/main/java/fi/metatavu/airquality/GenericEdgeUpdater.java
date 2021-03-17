@@ -1,5 +1,7 @@
 package fi.metatavu.airquality;
 
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import fi.metatavu.airquality.configuration_parsing.TimeUnit;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import ucar.ma2.*;
 
 import java.awt.geom.Point2D;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -32,19 +35,52 @@ public class GenericEdgeUpdater {
      * Calculates the generic data start time and sets the earlier parsed map of generic data file
      *
      * @param dataFile map of generic grid data from .nc file
+     * @param fileConfiguration configuration for data file
      * @param streetEdges collection of all street edges to be updated
      */
-    public GenericEdgeUpdater(GenericDataFile dataFile, Collection<StreetEdge> streetEdges){
+    public GenericEdgeUpdater(GenericDataFile dataFile, GenericFileConfiguration fileConfiguration, Collection<StreetEdge> streetEdges){
         super();
         this.dataFile = dataFile;
         this.streetEdges = streetEdges;
 
         this.edgesUpdated = 0;
-        double startTimeHours = this.dataFile.getTimeArray().getDouble(0);
-        this.dataStartTime = this.dataFile.getOriginDate().toInstant().plusSeconds((long) (startTimeHours * 3600)).toEpochMilli();
 
+        this.dataStartTime = calculateDataStartTime(fileConfiguration);
         genericVariablesData = dataFile.getNetcdfDataForVariable();
-        LOG.info(String.format("Street edges update starting from time stamp %d", this.dataStartTime));
+        LOG.info(String.format("Street edges update from %s starting from time stamp %d", fileConfiguration.getFileName(), this.dataStartTime));
+    }
+
+    /**
+     * Returns ms from epoch for the first data point of the file
+     *
+     * @param configuration configuration
+     * @return epoch milliseconds
+     */
+    private long calculateDataStartTime(GenericFileConfiguration configuration) {
+        TimeUnit timeFormat = configuration.getTimeFormat();
+        Array timeArray = dataFile.getTimeArray();
+        Class dataType = timeArray.getDataType().getPrimitiveClassType();
+        Instant originInstant = this.dataFile.getOriginDate().toInstant();
+
+        if ((timeFormat == null || timeFormat == TimeUnit.SECONDS)
+            && dataType.equals(Integer.TYPE)) {
+            return originInstant.plusSeconds(timeArray.getInt(0)).toEpochMilli();
+        }
+        else if (timeFormat == TimeUnit.HOURS) {
+            long addSeconds = 0;
+            if  (dataType.equals(Double.TYPE)) {
+                addSeconds = (long) (timeArray.getDouble(0) * 3600);
+            }
+            else if (dataType.equals(Float.TYPE)) {
+                addSeconds = (long) (timeArray.getFloat(0) * 3600);
+            }
+
+            return originInstant.plusSeconds(addSeconds).toEpochMilli();
+        }
+        else if (timeFormat == TimeUnit.MS_EPOCH && dataType.equals(Long.TYPE)) {
+            return timeArray.getLong(0);
+        }
+        else throw new IllegalArgumentException("Invalid time format");
     }
 
     /**
