@@ -13,11 +13,10 @@ This is a copy of HSL's GraphQL API used by the Digitransit project. The API is 
  together with the [digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
  
 
-The GraphQL endpoint is available at
+The GraphQL endpoints are available at:
 
-```
-http://localhost:8080/otp/routers/default/index/graphql
-```
+- single query: `http://localhost:8080/otp/routers/default/index/graphql`
+- batch query: `http://localhost:8080/otp/routers/default/index/graphql/batch`
 
 A complete example that fetches the list of all stops from OTP is:
 
