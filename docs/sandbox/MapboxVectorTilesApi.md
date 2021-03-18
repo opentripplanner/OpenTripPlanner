@@ -13,7 +13,7 @@
 
 This API produces [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/), which are used by eg. [Digitransit-ui](https://github.com/HSLdevcom/digitransit-ui) to show information about public transit entities on the map.
 
-The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`, where `layers is a comma separated list of layer names from the configuration.
+The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`, where `layers` is a comma separated list of layer names from the configuration.
 
 ### Configuration
 To enable this you need to add the feature `SandboxAPIMapboxVectorTilesApi` in `otp-config.json`.
