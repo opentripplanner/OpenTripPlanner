@@ -83,6 +83,45 @@ public class Transfer {
         transferRoutingRequest.dateTime = 0;
         transferRoutingRequest.from = null;
         transferRoutingRequest.to = null;
+
+        // Some of the values are rounded to ease caching in RaptorRequestTransferCache
+        transferRoutingRequest.bikeTriangleSafetyFactor = roundTo(request.bikeTriangleSafetyFactor, 1);
+        transferRoutingRequest.bikeTriangleSlopeFactor = roundTo(request.bikeTriangleSlopeFactor, 1);
+        transferRoutingRequest.bikeTriangleTimeFactor = 1.0 - transferRoutingRequest.bikeTriangleSafetyFactor - transferRoutingRequest.bikeTriangleSlopeFactor;
+        transferRoutingRequest.bikeSwitchCost = roundTo100(request.bikeSwitchCost);
+        transferRoutingRequest.bikeSwitchTime = roundTo100(request.bikeSwitchTime);
+
+        transferRoutingRequest.wheelchairAccessible = request.wheelchairAccessible;
+        transferRoutingRequest.maxWheelchairSlope = request.maxWheelchairSlope;
+
+        transferRoutingRequest.walkSpeed = roundToHalf(request.walkSpeed);
+        transferRoutingRequest.bikeSpeed = roundToHalf(request.bikeSpeed);
+
+        transferRoutingRequest.walkReluctance = roundTo(request.walkReluctance, 1);
+        transferRoutingRequest.stairsReluctance = roundTo(request.stairsReluctance, 1);
+        transferRoutingRequest.turnReluctance = roundTo(request.turnReluctance, 1);
+
+        transferRoutingRequest.elevatorBoardCost = roundTo100(request.elevatorBoardCost);
+        transferRoutingRequest.elevatorBoardTime = roundTo100(request.elevatorBoardTime);
+        transferRoutingRequest.elevatorHopCost = roundTo100(request.elevatorHopCost);
+        transferRoutingRequest.elevatorHopTime = roundTo100(request.elevatorHopTime);
+
         return transferRoutingRequest;
+    }
+
+    private static double roundToHalf(double input) {
+        return ((int) (input * 2 + 0.5)) / 2.0;
+    }
+
+    private static double roundTo(double input, int decimals) {
+        return Math.round(input * Math.pow(10, decimals)) / Math.pow(10, decimals);
+    }
+
+    private static int roundTo100(int input) {
+        if (input > 0 && input < 100) {
+            return 100;
+        }
+
+        return ((input + 50) / 100) * 100;
     }
 }
