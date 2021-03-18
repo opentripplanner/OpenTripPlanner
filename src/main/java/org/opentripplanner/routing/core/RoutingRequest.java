@@ -1195,6 +1195,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedTripSequences = new LinkedList<>(bannedTripSequences);
             clone.bannedStops = bannedStops.clone();
             clone.bannedStopsHard = bannedStopsHard.clone();
             clone.whiteListedAgencies = (HashSet<String>) whiteListedAgencies.clone();

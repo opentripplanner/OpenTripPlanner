@@ -351,6 +351,7 @@ public class GraphPathFinder {
         reversedOptions.maxTransfers = 4;
         reversedOptions.longDistance = true;
         reversedOptions.bannedTrips = options.bannedTrips;
+        reversedOptions.bannedTripSequences = options.bannedTripSequences;
         return reversedOptions;
     }
 
