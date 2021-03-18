@@ -15,6 +15,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,8 +31,7 @@ import java.util.stream.Collectors;
  */
 public class StreetFlexPathCalculator implements FlexPathCalculator {
 
-  // This is a limit to the max length of a flex trip
-  private static final int SEARCH_RADIUS_METERS = 20_000;
+  private static final long MAX_FLEX_TRIP_DURATION_SECONDS = Duration.ofMinutes(30).toSeconds();
 
   private Graph graph;
   private Map<Vertex, ShortestPathTree> cache = new HashMap<>();
@@ -71,8 +71,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     Set<Vertex> fromVertices = getAllSplitterVerticesIncoming(fromv);
     RoutingRequest routingRequest = new RoutingRequest(TraverseMode.CAR);
     routingRequest.setRoutingContext(graph, fromVertices, null);
-    int driveTime = (int) (SEARCH_RADIUS_METERS / new RoutingRequest().carSpeed);
-    routingRequest.worstTime = routingRequest.dateTime + driveTime;
+    routingRequest.worstTime = routingRequest.dateTime + MAX_FLEX_TRIP_DURATION_SECONDS;
     routingRequest.disableRemainingWeightHeuristic = true;
     routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
     routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
