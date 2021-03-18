@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.trippattern;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
@@ -494,8 +495,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             return false;
         }
 
-        // compile list of trips seen so far in states
-        List<FeedScopedId> tripsInState = Arrays.asList(trip.getId());
+        // compile list of trips seen so far in states (use ArrayList constructor to ensure a mutable list is returned)
+        List<FeedScopedId> tripsInState = new ArrayList<>(Arrays.asList(trip.getId()));
         State tripFindingState = state0;
         Trip lastTrip = trip;
         while (tripFindingState != null) {
@@ -509,8 +510,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             tripFindingState = tripFindingState.getBackState();
         }
 
-        // reverse trips if finding for arrive-by search
-        if (options.arriveBy) {
+        // reverse trips if finding for depart-at search to make sure the list is in chronological order
+        if (!options.arriveBy) {
             Collections.reverse(tripsInState);
         }
 

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,8 +22,8 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -33,8 +32,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
-import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 import static org.mockito.Mockito.*;
@@ -100,10 +99,17 @@ public class TripTimesTest {
         assertFalse(s.tripAcceptable(s0, 0));
     }
 
+    /**
+     * Some tests for checking if a trip sequence should be banned. A lot of the state creation in here lacks full data
+     * representation and instead contains the minimum amount of data needed to test the
+     * {@link TripTimes#tripOrTripSequenceIsBanned(State, int)} method.
+     */
     @Test
     public void testTripOrTripSequenceIsBanned() {
         Graph graph = new Graph();
         String agencyId = "mock agency";
+
+        // make some generic trips for testing
         Trip tripA = new Trip();
         FeedScopedId tripAId = new FeedScopedId(agencyId, "A");
         tripA.setId(tripAId);
@@ -115,55 +121,127 @@ public class TripTimesTest {
         tripC.setId(tripCId);
         Route route = new Route();
         tripA.setRoute(route);
-        List<StopTime> stopTimes = Arrays.asList(new StopTime(), new StopTime());
-        TripTimes s = new TripTimes(tripA, stopTimes, new Deduplicator());
-        Vertex v = new SimpleConcreteVertex(graph, "", 0.0, 0.0);
+
+        // stop A
         Stop stopA = new Stop();
         FeedScopedId stopAId = new FeedScopedId(agencyId, "A");
         stopA.setId(stopAId);
         StopTime stopTime1 = new StopTime();
         stopTime1.setStop(stopA);
         TransitStop transitStopA = new TransitStop(graph, stopA);
-        TransitStopDepart departingStop = new TransitStopDepart(graph, stopA, transitStopA);
-        TripPattern tripPattern1 = new TripPattern(route, new StopPattern(Arrays.asList(stopTime1)));
-        tripPattern1.arriveVertices[0] = new PatternArriveVertex(graph, tripPattern1, 0);
-        TripPattern tripPattern2 = new TripPattern(route, new StopPattern(Arrays.asList(stopTime1)));
-        tripPattern2.departVertices[0] = new PatternDepartVertex(graph, tripPattern1, 0);
+        TransitStopDepart departingStopA = new TransitStopDepart(graph, stopA, transitStopA);
+        TransitStopArrive arrivingStopA = new TransitStopArrive(graph, stopA, transitStopA);
 
+        // stop B
+        Stop stopB = new Stop();
+        FeedScopedId stopBId = new FeedScopedId(agencyId, "B");
+        stopA.setId(stopBId);
+        StopTime stopTime2 = new StopTime();
+        stopTime2.setStop(stopB);
+
+        // pattern 1
+        TripPattern tripPattern1 = new TripPattern(route, new StopPattern(Arrays.asList(stopTime1, stopTime2)));
+        PatternDepartVertex patternDepartVertex1 = new PatternDepartVertex(graph, tripPattern1, 0);
+        tripPattern1.departVertices[0] = patternDepartVertex1;
+        PatternArriveVertex patternArriveVertex1 = new PatternArriveVertex(graph, tripPattern1, 0);
+        tripPattern1.arriveVertices[1] = patternArriveVertex1;
+
+        // pattern 2
+        TripPattern tripPattern2 = new TripPattern(route, new StopPattern(Arrays.asList(stopTime1, stopTime2)));
+        PatternDepartVertex patternDepartVertex2 = new PatternDepartVertex(graph, tripPattern2, 0);
+        tripPattern2.departVertices[0] = patternDepartVertex2;
+
+        // initialize request and first state as starting a departure from a transit stop
         RoutingRequest request = new RoutingRequest(TraverseMode.WALK);
-        request.setRoutingContext(graph, departingStop, v);
+        Vertex v = new SimpleConcreteVertex(graph, "", 0.0, 0.0);
+        request.setRoutingContext(graph, departingStopA, v);
         State s0 = new State(request);
-        StateEditor s1e = s0.edit(new TransitBoardAlight(
-            departingStop,
-            new PatternStopVertex(graph, "board tripA at stopA", tripPattern1, stopA),
-            0,
-            TraverseMode.BUS
-        ));
-        s1e.setTripTimes(new TripTimes(tripA, Arrays.asList(stopTime1), new Deduplicator()));
-        State s1 = s1e.makeState();
+
+        // make a generic StopTimes instance for testing
+        List<StopTime> stopTimes = Arrays.asList(new StopTime(), new StopTime());
 
         // trip should not be banned if there aren't any banned trips or trip sequences
-        assertFalse(s.tripOrTripSequenceIsBanned(s1, 0));
+        TripTimes tripTimesForTripA = new TripTimes(tripA, stopTimes, new Deduplicator());
+        assertFalse(tripTimesForTripA.tripOrTripSequenceIsBanned(s0, 0));
 
         // trip should be banned if exactly one of the trips is banned
         request.bannedTrips.put(tripAId, BannedStopSet.ALL);
-        assertTrue(s.tripOrTripSequenceIsBanned(s1, 0));
+        assertTrue(tripTimesForTripA.tripOrTripSequenceIsBanned(s0, 0));
 
-        // trip should not be banned if only part of a banned sequence exists
+        // trip should not be banned if only part of a banned sequence would exist
         request.bannedTrips.clear();
         request.bannedTripSequences.add(Arrays.asList(tripAId, tripBId));
-        assertFalse(s.tripOrTripSequenceIsBanned(s1, 0));
+        assertFalse(tripTimesForTripA.tripOrTripSequenceIsBanned(s0, 0));
 
-        // trip should not be banned for sequence with additional trip
-        // TODO make the following tests
-//        StateEditor s2e = s1.edit(new PatternInterlineDwell(tripPattern1, tripPattern2));
-//        s2e.setTripTimes(new TripTimes(tripC, Arrays.asList(stopTime1), new Deduplicator()));
-//        State s2 = s2e.makeState();
-//        assertFalse(s.tripOrTripSequenceIsBanned(s2, 0));
+        // board a pattern
+        StateEditor s1e = s0.edit(new TransitBoardAlight(
+            departingStopA,
+            patternDepartVertex1,
+            0,
+            TraverseMode.BUS
+        ));
+        // trip sequence after this is now just [tripA]
+        s1e.setTripTimes(new TripTimes(tripA, Arrays.asList(stopTime1), new Deduplicator()));
+        State s1 = s1e.makeState();
+
+        // trip should not be banned for sequence with additional trip not in banned sequence
+        TripTimes tripTimesForTripC = new TripTimes(tripC, stopTimes, new Deduplicator());
+        assertFalse(tripTimesForTripC.tripOrTripSequenceIsBanned(s1, 0));
 
         // trip should be banned if exact banned trip sequence occurs
+        TripTimes tripTimesForTripB = new TripTimes(tripB, stopTimes, new Deduplicator());
+        assertTrue(tripTimesForTripB.tripOrTripSequenceIsBanned(s1, 0));
 
         // trip should be banned in non-continuous sequence
+        // add to state, first add a pattern hop
+        StateEditor s2e = s1.edit(new PatternHop(patternDepartVertex1, patternArriveVertex1, stopA, stopB, 0));
+        State s2 = s2e.makeState();
+        // at this stop, the route changes to another route with tripC (as indicated by the PatternInterlineDwell edge)
+        StateEditor s3e = s2.edit(new PatternInterlineDwell(tripPattern1, tripPattern2));
+        // trip sequence after this is now [tripA -> tripC]
+        s3e.setTripTimes(new TripTimes(tripC, Arrays.asList(stopTime1), new Deduplicator()));
+        State s3 = s3e.makeState();
+        assertTrue(tripTimesForTripB.tripOrTripSequenceIsBanned(s3, 0));
+
+        // arriveBy tests
+        // initialize new arriveByRequest
+        RoutingRequest arriveByRequest = new RoutingRequest(TraverseMode.WALK);
+        arriveByRequest.setRoutingContext(graph, arrivingStopA, v);
+        arriveByRequest.setArriveBy(true);
+        State as0 = new State(arriveByRequest);
+        arriveByRequest.bannedTripSequences.add(Arrays.asList(tripAId, tripBId));
+
+        // trip should not be banned if only part of a banned sequence would exist
+        arriveByRequest.bannedTripSequences.add(Arrays.asList(tripAId, tripBId));
+        assertFalse(tripTimesForTripB.tripOrTripSequenceIsBanned(as0, 0));
+
+        // alight a pattern
+        StateEditor as1e = as0.edit(new TransitBoardAlight(
+            patternArriveVertex1,
+            arrivingStopA,
+            0,
+            TraverseMode.BUS
+        ));
+        // trip sequence after this is now just [tripB]
+        as1e.setTripTimes(new TripTimes(tripB, Arrays.asList(stopTime1), new Deduplicator()));
+        State as1 = as1e.makeState();
+
+        // trip should not be banned for sequence with additional trip not in banned sequence
+        assertFalse(tripTimesForTripC.tripOrTripSequenceIsBanned(as1, 0));
+
+        // trip should be banned if exact banned trip sequence occurs
+        assertTrue(tripTimesForTripA.tripOrTripSequenceIsBanned(as1, 0));
+
+        // trip should be banned in non-continuous sequence
+        // first add a pattern hop
+        StateEditor as2e = as1.edit(new PatternHop(patternDepartVertex2, patternArriveVertex1, stopA, stopB, 0));
+        State as2 = as2e.makeState();
+        // at this stop, the route changes to another route with tripB (as indicated by the PatternInterlineDwell edge)
+        StateEditor as3e = as2.edit(new PatternInterlineDwell(tripPattern1, tripPattern2));
+        // trip sequence after this is now [tripC -> tripB]
+        as3e.setTripTimes(new TripTimes(tripC, Arrays.asList(stopTime1), new Deduplicator()));
+        State as3 = as3e.makeState();
+        assertTrue(tripTimesForTripA.tripOrTripSequenceIsBanned(as3, 0));
     }
 
     @Test
