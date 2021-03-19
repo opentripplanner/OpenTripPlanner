@@ -85,7 +85,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   /**
    * In the case of routing from one SplitterVertex it is important to have all of them. Otherwise
    * the StreetEdge backtracking check will fail and we will only be able to travel in one direction
-   * from the split StreetEdge.
+   * from the split StreetEdge. If another solution is found for this problem, these methods may
+   * not be needed. (#3377)
    */
   private Set<Vertex> getAllSplitterVerticesIncoming(Vertex vertex) {
     if (vertex instanceof SplitterVertex) {
