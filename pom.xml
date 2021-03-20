@@ -59,15 +59,7 @@
                 <targetPath>client</targetPath>
                 <filtering>false</filtering>
             </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-            <testResource>
-                <directory>src/ext-test/resources</directory>
-            </testResource>
-            <testResource>
+            <resource>
                 <!-- Shell scripts to start up OTP, need to be filtered to insert the JAR file name. -->
                 <!-- These are treated as testResources rather than resources to keep them out of the JAR. -->
                 <!-- The staging repo will reject a JAR containing them as they use traversal paths (../..). -->
@@ -75,6 +67,14 @@
                 <filtering>true</filtering>
                 <!-- Copy the scripts up into the root of the repo, not /target/classes -->
                 <targetPath>../..</targetPath>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>src/ext-test/resources</directory>
             </testResource>
         </testResources>
         <pluginManagement>

@@ -1,0 +1,9 @@
+#!/bin/bash
+# Start the OTP interactive launcher witch let you select datasource and OTP arguments before
+# starting OTP standalone. The `otp-ui` creates a file in the current directory
+
+JAR_FILE="$(dirname $0)/target/${project.build.finalName}-shaded.jar"
+MAIN_CLASS=org.opentripplanner.ext.interactivelauncher.InteractiveOtpMain
+
+echo "Stat OTP Interactive User Interface"
+java -Xmx8G -cp ${JAR_FILE} ${MAIN_CLASS} "$@"
