@@ -29,8 +29,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
     }
 
     public RaptorResponse<T> route(RaptorRequest<T> request, RaptorTransitDataProvider<T> transitData) {
-        LOG.debug("Raptor request: {}", request);
-
+        LOG.debug("Original request: {}", request);
         if(request.isDynamicSearch()) {
             return new RangRaptorDynamicSearch<>(config, transitData, request).route();
         }
@@ -58,7 +57,9 @@ public class RaptorService<T extends RaptorTripSchedule> {
     /* private methods */
 
     private RaptorResponse<T> routeUsingStdWorker(RaptorTransitDataProvider<T> transitData, RaptorRequest<T> request) {
+        LOG.debug("Run query: {}", request);
         Collection<Path<T>> paths = config.createStdWorker(transitData, request).route();
+        LOG.debug("Result: {}", paths);
         return new RaptorResponse<>(paths, request, request);
     }
 }

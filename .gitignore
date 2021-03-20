@@ -29,6 +29,5 @@ node_modules/
 .venv/
 _site/
 /otp
-/otp-batch-analyst
 *.DS_Store
 graphs

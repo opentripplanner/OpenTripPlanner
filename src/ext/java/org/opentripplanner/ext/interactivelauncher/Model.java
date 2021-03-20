@@ -1,24 +1,39 @@
 package org.opentripplanner.ext.interactivelauncher;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.beans.Transient;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.slf4j.LoggerFactory;
 
 public class Model implements Serializable {
   private static final File MODEL_FILE = new File("interactive_otp_main.json");
+
+  private final Map<String, Boolean> debugLogging = new HashMap<>();
 
   private String rootDirectory = null;
   private String dataSource = null;
   private boolean buildStreet = false;
   private boolean buildTransit = true;
-  private boolean debugLogging = true;
   private boolean saveGraph = false;
   private boolean serveGraph = true;
+
+
+  public Model() {
+    LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    for (Logger log : context.getLoggerList()) {
+      if(log.getName().matches("org\\.opentripplanner\\..*"))  {
+        debugLogging.put(log.getName(), Boolean.FALSE);
+      }
+    }
+  }
 
   @SuppressWarnings("AccessOfSystemProperties")
   public String getRootDirectory() {
@@ -97,12 +112,12 @@ public class Model implements Serializable {
     this.serveGraph = serveGraph;
   }
 
-  public void setDebugLogging(boolean debugLogging) {
-    this.debugLogging = debugLogging;
+  public Map<String, Boolean> getDebugLogging() {
+    return debugLogging;
   }
 
-  public boolean isDebugLogging() {
-    return debugLogging;
+  public void setDebugLogging(Map<String, Boolean> map) {
+    debugLogging.putAll(map);
   }
 
   @Override
@@ -113,7 +128,6 @@ public class Model implements Serializable {
         + (buildTransit ? ", buildTransit" : "")
         + (saveGraph ? ", saveGraph" : "")
         + (serveGraph ? ", serveGraph" : "")
-        + (debugLogging ? ", debugLogging" : "")
         + ')';
   }
 
@@ -152,7 +166,11 @@ public class Model implements Serializable {
           : new Model();
     }
     catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
+      System.err.println(
+          "Unable to read the InteractiveOtpMain state cache. If the model changed this is "
+              + "expected, and it will work next time. Cause: " + e.getMessage()
+      );
+      return new Model();
     }
   }
 

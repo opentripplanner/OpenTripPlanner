@@ -1,18 +1,9 @@
 package org.opentripplanner.transit.raptor.service;
 
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder;
-import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.api.view.Worker;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-import org.opentripplanner.util.OtpAppException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
+import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -20,11 +11,20 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
-import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder;
+import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.view.Heuristics;
+import org.opentripplanner.transit.raptor.api.view.Worker;
+import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.util.OtpAppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -45,8 +45,8 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
     private final RaptorRequest<T> originalRequest;
     private final RaptorSearchWindowCalculator dynamicSearchParamsCalculator;
 
-    private HeuristicSearchTask<T> fwdHeuristics;
-    private HeuristicSearchTask<T> revHeuristics;
+    private final HeuristicSearchTask<T> fwdHeuristics;
+    private final HeuristicSearchTask<T> revHeuristics;
 
     public RangRaptorDynamicSearch(
             RaptorConfig<T> config,
@@ -68,12 +68,13 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
             enableHeuristicSearchBasedOnOptimizationsAndSearchParameters();
 
             // Run heuristics, if no destination is reached
-           runHeuristics();
+            runHeuristics();
 
-            RaptorRequest<T> mcRequest = originalRequest;
-            mcRequest = requestWithDynamicSearchParams(mcRequest);
+            // Set search-window and other dynamic calculated parameters
+            RaptorRequest<T> dynamicRequest = originalRequest;
+            dynamicRequest = requestWithDynamicSearchParams(dynamicRequest);
 
-            return createAndRunWorker(mcRequest);
+            return createAndRunDynamicRRWorker(dynamicRequest);
         }
         catch (DestinationNotReachedException e) {
             return new RaptorResponse<>(
@@ -116,9 +117,9 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
         fwdHeuristics.debugCompareResult(revHeuristics);
     }
 
-    private RaptorResponse<T> createAndRunWorker(RaptorRequest<T> mcRequest) {
+    private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> mcRequest) {
 
-        LOG.debug("Raptor request: " + mcRequest.toString());
+        LOG.debug("Main request: " + mcRequest.toString());
         Worker<T> worker;
 
         // Create worker
@@ -251,7 +252,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
         return builder.build();
     }
 
-    private void calculateDynamicSearchParametersFromHeuristics(Heuristics heuristics) {
+    private void calculateDynamicSearchParametersFromHeuristics(@Nullable Heuristics heuristics) {
         if(heuristics != null) {
             dynamicSearchParamsCalculator
                     .withHeuristics(
@@ -262,6 +263,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
         }
     }
 
+    @Nullable
     private Heuristics getDestinationHeuristics() {
         if (!originalRequest.useDestinationPruning()) { return null; }
         LOG.debug("RangeRaptor - Destination pruning enabled.");

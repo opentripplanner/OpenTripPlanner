@@ -27,7 +27,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.framework.DebugAggregator;
+import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
@@ -59,7 +59,7 @@ public class RoutingWorker {
     private final RaptorService<TripSchedule> raptorService;
 
     /** An object that accumulates profiling and debugging info for inclusion in the response. */
-    public final DebugAggregator debugAggregator = new DebugAggregator();
+    public final DebugTimingAggregator debugTimingAggregator = new DebugTimingAggregator();
 
     private final RoutingRequest request;
     private final FilterTransitWhenDirectModeIsEmpty emptyDirectModeHandler;
@@ -68,7 +68,7 @@ public class RoutingWorker {
     private Itinerary firstRemovedItinerary = null;
 
     public RoutingWorker(RaptorConfig<TripSchedule> config, RoutingRequest request) {
-        this.debugAggregator.startedCalculating();
+        this.debugTimingAggregator.startedCalculating();
         this.raptorService = new RaptorService<>(config);
         this.request = request;
         this.emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
@@ -82,7 +82,7 @@ public class RoutingWorker {
         // See {@link FilterTransitWhenDirectModeIsEmpty}
         request.modes.directMode = emptyDirectModeHandler.resolveDirectMode();
 
-        this.debugAggregator.finishedPrecalculating();
+        this.debugTimingAggregator.finishedPrecalculating();
 
         // Direct street routing
         try {
@@ -101,7 +101,7 @@ public class RoutingWorker {
             }
         }
 
-        this.debugAggregator.finishedDirectStreetRouter();
+        this.debugTimingAggregator.finishedDirectStreetRouter();
 
         // Transit routing
         try {
@@ -110,13 +110,13 @@ public class RoutingWorker {
             routingErrors.addAll(e.getRoutingErrors());
         }
 
-        this.debugAggregator.finishedTransitRouter();
+        this.debugTimingAggregator.finishedTransitRouter();
 
         // Filter itineraries
         itineraries = filterItineraries(itineraries);
         LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
 
-        this.debugAggregator.finishedFiltering();
+        this.debugTimingAggregator.finishedFiltering();
 
         // Restore original directMode.
         request.modes.directMode = emptyDirectModeHandler.originalDirectMode();
@@ -125,7 +125,7 @@ public class RoutingWorker {
             TripPlanMapper.mapTripPlan(request, itineraries),
             createTripSearchMetadata(),
             routingErrors,
-            debugAggregator
+            debugTimingAggregator
         );
     }
 
@@ -145,7 +145,7 @@ public class RoutingWorker {
 
         RaptorRoutingRequestTransitData requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
 
-        this.debugAggregator.finishedPatternFiltering();
+        this.debugTimingAggregator.finishedPatternFiltering();
 
         AccessEgressMapper accessEgressMapper = new AccessEgressMapper(transitLayer.getStopIndex());
         Collection<AccessEgress> accessList;
@@ -196,7 +196,7 @@ public class RoutingWorker {
 
         List<Itinerary> itineraries = new ArrayList<>();
 
-        this.debugAggregator.finishedAccessEgress();
+        this.debugTimingAggregator.finishedAccessEgress();
 
         // Prepare transit search
         RaptorRequest<TripSchedule> raptorRequest = RaptorRequestMapper.mapRequest(
@@ -213,8 +213,7 @@ public class RoutingWorker {
         );
 
         LOG.debug("Found {} transit itineraries", transitResponse.paths().size());
-        LOG.debug("Transit search params used: {}", transitResponse.requestUsed().searchParams());
-        this.debugAggregator.finishedRaptorSearch();
+        this.debugTimingAggregator.finishedRaptorSearch();
 
         // Create itineraries
 
@@ -248,7 +247,7 @@ public class RoutingWorker {
             filterOnLatestDepartureTime = Instant.ofEpochSecond(request.dateTime + searchWindowUsedInSeconds);
         }
 
-        this.debugAggregator.finishedItineraryCreation();
+        this.debugTimingAggregator.finishedItineraryCreation();
 
         return itineraries;
     }

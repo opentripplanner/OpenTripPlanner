@@ -1,5 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics;
 
+import java.util.Collection;
+import java.util.function.IntUnaryOperator;
+import java.util.stream.Collectors;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
@@ -7,9 +11,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTrans
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.IntUtils;
-
-import java.util.Collection;
-import java.util.function.IntUnaryOperator;
+import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
@@ -110,6 +112,27 @@ public class HeuristicsAdapter implements Heuristics {
     public boolean destinationReached() {
         calculateAggregatedResults();
         return minJourneyNumOfTransfers != NOT_SET;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(Heuristics.class)
+            .addServiceTime("originDepartureTime(last iteration)", originDepartureTime, NOT_SET)
+            .addFieldIfTrue("resultsExist", aggregatedResultsCalculated)
+            .addDurationSec("minJourneyTravelDuration", minJourneyTravelDuration, NOT_SET)
+            .addDurationSec("minJourneyNumOfTransfers", minJourneyNumOfTransfers, NOT_SET)
+            .addServiceTime("earliestArrivalTime", earliestArrivalTime, NOT_SET)
+            .addObj("times", times)
+            .addCollection(
+                "egress stops reached",
+                egressPaths.stream()
+                    .map(RaptorTransfer::stop)
+                    .filter(times::isStopReached)
+                    .map(s -> "[" + s + " " + TimeUtils.timeToStrCompact(times.time(s)) + "]")
+                    .collect(Collectors.toList()),
+                20
+            )
+            .toString();
     }
 
     /**

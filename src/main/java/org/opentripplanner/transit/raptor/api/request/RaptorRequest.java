@@ -144,12 +144,12 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     @Override
     public String toString() {
         return "RaptorRequest{" +
-                "searchParams=" + searchParams +
-                ", profile=" + profile +
+                "profile=" + profile +
                 ", searchForward=" + searchDirection +
                 ", optimizations=" + optimizations +
                 ", mcCostParams=" + mcCostParams +
                 ", debug=" + debug +
+                ", searchParams=" + searchParams +
                 '}';
     }
 
