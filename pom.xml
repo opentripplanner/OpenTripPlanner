@@ -625,12 +625,6 @@
             <artifactId>core</artifactId>
             <version>1.0.7</version>
         </dependency>
-        <!-- Joda Time is a widely used replacement for flaky Java time classes. -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.1</version>
-        </dependency>
         <!-- FlexJSON deserializes JSON in Nominatim/Yahoo/Google geocoder modules. -->
         <!-- Could be done with Jackson JSON trees. -->
         <dependency>
