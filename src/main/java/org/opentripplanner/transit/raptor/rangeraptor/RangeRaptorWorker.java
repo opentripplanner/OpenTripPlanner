@@ -1,5 +1,12 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
+import static java.util.stream.Collectors.groupingBy;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
@@ -16,14 +23,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardS
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-
-import static java.util.stream.Collectors.groupingBy;
 
 
 /**

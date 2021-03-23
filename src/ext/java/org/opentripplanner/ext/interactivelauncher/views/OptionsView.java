@@ -1,20 +1,24 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import org.opentripplanner.ext.interactivelauncher.Model;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import javax.swing.Box;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import org.opentripplanner.ext.interactivelauncher.Model;
 
 class OptionsView {
   private final Box panel = Box.createVerticalBox();
   private final JCheckBox buildStreetGraphChk = new JCheckBox("Street graph", false);
   private final JCheckBox buildTransitGraphChk = new JCheckBox("Transit graph", false);
-  private final JCheckBox debugLoggingChk = new JCheckBox("Debug logging", false);
+  private final List<JCheckBox> debugLoggingChks = new ArrayList<>();
   private final JCheckBox saveGraphChk = new JCheckBox("Save graph", true);
   private final JCheckBox startOptServerChk = new JCheckBox("Serve graph", true);
 
@@ -33,9 +37,10 @@ class OptionsView {
     addSectionSpace(panel);
     addComp(saveGraphChk, panel);
     addComp(startOptServerChk, panel);
-    addComp(debugLoggingChk, panel);
-    addSectionDoubleSpace(panel);
 
+    addDebugCheckBoxes(model);
+
+    addSectionDoubleSpace(panel);
     initValues(model);
   }
 
@@ -55,7 +60,6 @@ class OptionsView {
     buildTransitGraphChk.setSelected(model.isBuildTransit());
     saveGraphChk.setSelected(model.isSaveGraph());
     startOptServerChk.setSelected(model.isServeGraph());
-    debugLoggingChk.setSelected(model.isDebugLogging());
   }
 
   public void updateModel(Model model) {
@@ -63,11 +67,24 @@ class OptionsView {
     model.setBuildTransit(buildTransit());
     model.setSaveGraph(saveGraph());
     model.setServeGraph(startOptServer());
-    model.setDebugLogging(enableDebugLogging());
+    for (JCheckBox it : debugLoggingChks) {
+      model.getDebugLogging().put(it.getText(), it.isSelected());
+    }
   }
 
   void initState() {
     onBuildGraphChkChanged(null);
+  }
+
+  private void addDebugCheckBoxes(Model model) {
+    addSectionSpace(panel);
+    addComp(new JLabel("Debug logging"), panel);
+    addSectionSpace(panel);
+    for (Entry<String, Boolean> e : model.getDebugLogging().entrySet()) {
+      JCheckBox dbox =  new JCheckBox(e.getKey(), e.getValue());
+      debugLoggingChks.add(dbox);
+      addComp(dbox, panel);
+    }
   }
 
   private boolean buildStreet() {
@@ -84,10 +101,6 @@ class OptionsView {
 
   private boolean startOptServer() {
     return startOptServerChk.isSelected();
-  }
-
-  private boolean enableDebugLogging() {
-    return debugLoggingChk.isSelected();
   }
 
   private void onBuildGraphChkChanged(ActionEvent e) {

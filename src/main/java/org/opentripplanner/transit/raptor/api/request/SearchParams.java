@@ -1,13 +1,12 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
-import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 
 /**
@@ -236,10 +235,10 @@ public class SearchParams {
             .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
             .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
             .addDurationSec("searchWindow", searchWindowInSeconds)
-            .addBool("departAsLateAsPossible", preferLateArrival)
+            .addFieldIfTrue("departAsLateAsPossible", preferLateArrival)
             .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
-            .addColLimited("accessPaths", accessPaths, 5)
-            .addColLimited("egressPaths", egressPaths, 5)
+            .addCollection("accessPaths", accessPaths, 5)
+            .addCollection("egressPaths", egressPaths, 5)
             .toString();
     }
 

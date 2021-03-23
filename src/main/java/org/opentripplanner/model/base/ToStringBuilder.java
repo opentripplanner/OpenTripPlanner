@@ -1,5 +1,8 @@
 package org.opentripplanner.model.base;
 
+import static java.lang.Boolean.TRUE;
+
+import java.util.BitSet;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -71,6 +74,10 @@ public class ToStringBuilder {
         return addIfNotNull(name, value);
     }
 
+    public ToStringBuilder addFieldIfTrue(String name, Boolean value) {
+        return TRUE.equals(value) ? addFieldName(name) : this;
+    }
+
     public ToStringBuilder addStr(String name, String value) {
         return addIfNotNull(name, value, v -> "'" + v + "'");
     }
@@ -95,20 +102,36 @@ public class ToStringBuilder {
         return addIfNotNull(name, c);
     }
 
-    public ToStringBuilder addColLimited(String name, Collection<?> c, int limit) {
+    /** Add the collection, truncate the number of elements at given maxLimit. */
+    public ToStringBuilder addCollection(String name, Collection<?> c, int maxLimit) {
         if(c == null) { return this; }
-        if(c.size() > limit+1) {
+        if(c.size() > maxLimit+1) {
             String value = c.stream()
-                    .limit(limit)
+                    .limit(maxLimit)
                     .map(Object::toString)
                     .collect(Collectors.joining(", "));
             return addIt(
-                    name + "(" + limit + "/" + c.size() + ")",
+                    name + "(" + maxLimit + "/" + c.size() + ")",
                     "[" + value + ", ..]"
 
             );
         }
         return addIfNotNull(name, c);
+    }
+
+    /** Add the collection, truncate the number of elements at given maxLimit. */
+    public ToStringBuilder addIntArraySize(String name, int[] array, int notSet) {
+        if(array == null) { return this; }
+        return addIt(
+            name,
+            Arrays.stream(array).filter(t -> t != notSet).count() + "/" + array.length
+        );
+    }
+
+    /** Add the BitSet: name : {cardinality}/{logical size}/{size} */
+    public ToStringBuilder addBitSetSize(String name, BitSet bitSet) {
+        if(bitSet == null) { return this; }
+        return addIt(name, bitSet.cardinality() + "/" + bitSet.length());
     }
 
     /* Special purpose formatters */
@@ -136,13 +159,13 @@ public class ToStringBuilder {
     /**
      * Add times in seconds since midnight. Format:  hh:mm. {@code null} value is ignored.
      */
-    public <T> ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
+    public ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
         return addIfNotNull(
-                name,
-                value,
-                a -> Arrays.stream(a)
-                        .mapToObj(TimeUtils::timeToStrCompact)
-                        .collect(Collectors.joining(", ", "[", "]"))
+            name,
+            value,
+            a -> Arrays.stream(a)
+                .mapToObj(TimeUtils::timeToStrCompact)
+                .collect(Collectors.joining(" ", "[", "]"))
         );
     }
 
@@ -152,7 +175,16 @@ public class ToStringBuilder {
      * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
      */
     public ToStringBuilder addDurationSec(String name, Integer durationSeconds) {
-        return addIfNotIgnored(name, durationSeconds, null, DurationUtils::durationToStr);
+        return addDurationSec(name, durationSeconds, null);
+    }
+
+    /**
+     * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
+     * seconds) is only added if they are not zero {@code 0}. This is the same format as the
+     * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
+     */
+    public ToStringBuilder addDurationSec(String name, Integer durationSeconds, Integer ignoreValue) {
+        return addIfNotIgnored(name, durationSeconds, ignoreValue, DurationUtils::durationToStr);
     }
 
     public ToStringBuilder addDuration(String name, Duration duration) {
@@ -187,11 +219,17 @@ public class ToStringBuilder {
     }
 
     private ToStringBuilder addIt(String name, @NotNull String value) {
+        addFieldName(name);
+        sb.append(FIELD_VALUE_SEP);
+        sb.append(value);
+        return this;
+    }
+
+    private ToStringBuilder addFieldName(String name) {
         if (first) { first = false; }
         else { sb.append(FIELD_SEPARATOR); }
 
-        sb.append(name).append(FIELD_VALUE_SEP);
-        sb.append(value);
+        sb.append(name);
         return this;
     }
 

@@ -1,21 +1,28 @@
 package org.opentripplanner.model.base;
 
-import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Trip;
+import static org.junit.Assert.assertEquals;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.util.time.TimeUtils;
 
 public class ToStringBuilderTest {
+
+  @Test
+  public void addFieldIfTrue() {
+    assertEquals("ToStringBuilderTest{x}", subject().addFieldIfTrue("x", true).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addFieldIfTrue("x", false).toString());
+  }
 
   @Test
   public void addNum() {
@@ -29,10 +36,6 @@ public class ToStringBuilderTest {
     );
     assertEquals("ToStringBuilderTest{num: 3}", subject().addNum("num", 3).toString());
     assertEquals("ToStringBuilderTest{num: 3}", subject().addNum("num", 3L).toString());
-  }
-
-  private ToStringBuilder subject() {
-    return ToStringBuilder.of(ToStringBuilderTest.class);
   }
 
   @Test
@@ -115,11 +118,31 @@ public class ToStringBuilderTest {
   public void addCollectionWithLimit() {
     assertEquals(
         "ToStringBuilderTest{c: [1, 2, 3]}",
-        subject().addColLimited("c", List.of(1, 2, 3), 2).toString()
+        subject().addCollection("c", List.of(1, 2, 3), 2).toString()
     );
     assertEquals(
         "ToStringBuilderTest{c(2/4): [1, 2, ..]}",
-        subject().addColLimited("c", List.of(1, 2, 3, 4), 2).toString()
+        subject().addCollection("c", List.of(1, 2, 3, 4), 2).toString()
+    );
+  }
+
+  @Test
+  public void addIntArraySize() {
+    assertEquals(
+        "ToStringBuilderTest{c: 2/3}",
+        subject().addIntArraySize("c", new int[]{1, -1, 3}, -1).toString()
+    );
+  }
+
+  @Test
+  public void addBitSetSize() {
+    var bset = new BitSet(8);
+    bset.set(0, true);
+    bset.set(3, true);
+    bset.set(5, false);
+    assertEquals(
+        "ToStringBuilderTest{bitSet: 2/4}",
+        subject().addBitSetSize("bitSet", bset).toString()
     );
   }
 
@@ -135,12 +158,22 @@ public class ToStringBuilderTest {
   }
 
   @Test
-  public void addSecondsPastMidnight() {
+  public void addServiceTime() {
     // 02:30:04 in seconds is:
-    int seconds = 2 * 3600 + 30 * 60 + 4;
+    int seconds = TimeUtils.time("2:30:04");
     assertEquals(
         "ToStringBuilderTest{t: 2:30:04}",
         subject().addServiceTime("t", seconds, -1).toString()
+    );
+  }
+
+
+  @Test
+  public void addServiceTimeSchedule() {
+    int[] times = TimeUtils.times("10:10 12:03");
+    assertEquals(
+        "ToStringBuilderTest{t: [10:10 12:03]}",
+        subject().addServiceTimeSchedule("t", times).toString()
     );
   }
 
@@ -167,11 +200,18 @@ public class ToStringBuilderTest {
         "ToStringBuilderTest{d: 2m5s}",
         subject().addDuration("d", Duration.ofSeconds(125)).toString()
     );
+    assertEquals(
+        "ToStringBuilderTest{}",
+        subject().addDurationSec("d", 12, 12).toString()
+    );
 
   }
 
-  private enum AEnum { A }
+  private ToStringBuilder subject() {
+    return ToStringBuilder.of(ToStringBuilderTest.class);
+  }
 
+  private enum AEnum { A }
   private static class Foo {
     int a;
     String b;
@@ -193,7 +233,6 @@ public class ToStringBuilderTest {
       Foo foo = (Foo) o;
       return a == foo.a && Objects.equals(b, foo.b);
     }
-
     @Override
     public String toString() {
       return ToStringBuilder.of(Foo.class).addNum("a", a, 0).addStr("b", b).toString();
