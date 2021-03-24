@@ -408,8 +408,9 @@ public class GtfsModule implements GraphBuilderModule {
 
         private int incrementCount(Class<?> entityType) {
             Integer value = _count.get(entityType);
-            if (value == null)
+            if (value == null) {
                 value = 0;
+            }
             value++;
             _count.put(entityType, value);
             return value;

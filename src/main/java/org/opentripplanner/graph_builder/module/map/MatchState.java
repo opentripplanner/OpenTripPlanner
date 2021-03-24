@@ -62,10 +62,12 @@ public abstract class MatchState {
     protected List<Edge> getOutgoingMatchableEdges(Vertex vertex) {
         List<Edge> edges = new ArrayList<Edge>();
         for (Edge e : vertex.getOutgoing()) {
-            if (!(e instanceof StreetEdge))
+            if (!(e instanceof StreetEdge)) {
                 continue;
-            if (e.getGeometry() == null)
+            }
+            if (e.getGeometry() == null) {
                 continue;
+            }
             edges.add(e);
         }
         return edges;
@@ -95,8 +97,9 @@ public abstract class MatchState {
             double distance = SphericalDistanceLibrary.fastDistance(previousCoordinate, thisCoordinate);
             total += distance;
             previousCoordinate = thisCoordinate;
-            if (!it.hasNext())
+            if (!it.hasNext()) {
                 break;
+            }
             it.next();
             index = it.getLocation();
         }

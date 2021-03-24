@@ -21,8 +21,9 @@ public class BitSetDeserializer extends JsonDeserializer<BitSet> {
         int i = 0;
         JsonToken token;
         while (!JsonToken.END_ARRAY.equals(token = jsonParser.nextValue())) {
-            if (JsonToken.VALUE_TRUE.equals(token))
+            if (JsonToken.VALUE_TRUE.equals(token)) {
                 ret.set(i);
+            }
             i++;
         }
 

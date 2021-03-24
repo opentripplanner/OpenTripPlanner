@@ -91,7 +91,7 @@ public class SpeedTestCmdLineOpts {
     public int debugPathFromStopIndex() {
         List<String> stops = parseCSVList(DEBUG_PATH);
         for (int i = 0; i < stops.size(); ++i) {
-            if (stops.get(i).startsWith("*")) return i;
+            if (stops.get(i).startsWith("*")) { return i; }
         }
         return 0;
     }

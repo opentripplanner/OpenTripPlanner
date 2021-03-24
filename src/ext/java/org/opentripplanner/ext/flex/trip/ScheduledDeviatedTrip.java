@@ -69,7 +69,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
     int fromIndex = getFromIndex(access);
 
-    if (fromIndex == -1) return Stream.empty();
+    if (fromIndex == -1) { return Stream.empty(); }
 
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
@@ -91,7 +91,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
     int toIndex = getToIndex(egress);
 
-    if (toIndex == -1) return Stream.empty();
+    if (toIndex == -1) { return Stream.empty(); }
 
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 

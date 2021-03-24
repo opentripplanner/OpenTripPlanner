@@ -46,8 +46,9 @@ public class IntersectionTransitLink extends Edge {
         // speed in m/s, length in mm, so we get milliseconds
         s1.incrementTimeInMilliseconds((long) (length_mm / speed));
 
-        if (!cycling)
+        if (!cycling) {
             s1.incrementWalkDistance(length_mm / 1000d);
+        }
 
         return s1.makeState();
     }

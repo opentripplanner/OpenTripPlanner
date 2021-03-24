@@ -78,8 +78,9 @@ public class OSMWithTags {
      */
     public boolean isTagFalse(String tag) {
         tag = tag.toLowerCase();
-        if (tags == null)
+        if (tags == null) {
             return false;
+        }
 
         return isFalse(getTag(tag));
     }
@@ -89,8 +90,9 @@ public class OSMWithTags {
      */
     public boolean isTagTrue(String tag) {
         tag = tag.toLowerCase();
-        if (tags == null)
+        if (tags == null) {
             return false;
+        }
 
         return isTrue(getTag(tag));
     }
@@ -122,8 +124,9 @@ public class OSMWithTags {
      */
     public Boolean isTag(String tag, String value) {
         tag = tag.toLowerCase();
-        if (tags != null && tags.containsKey(tag) && value != null)
+        if (tags != null && tags.containsKey(tag) && value != null) {
             return value.equals(tags.get(tag));
+        }
 
         return false;
     }
@@ -133,21 +136,21 @@ public class OSMWithTags {
      * {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule}
      */
     public I18NString getAssumedName() {
-        if (tags.containsKey("name"))
+        if (tags.containsKey("name")) {
             return TranslatedString.getI18NString(TemplateLibrary.generateI18N("{name}", this));
-
-        if (tags.containsKey("otp:route_name"))
+        }
+        if (tags.containsKey("otp:route_name")) {
             return new NonLocalizedString(tags.get("otp:route_name"));
-
-        if (this.creativeName != null)
+        }
+        if (this.creativeName != null) {
             return this.creativeName;
-
-        if (tags.containsKey("otp:route_ref"))
+        }
+        if (tags.containsKey("otp:route_ref")) {
             return new NonLocalizedString(tags.get("otp:route_ref"));
-
-        if (tags.containsKey("ref"))
+        }
+        if (tags.containsKey("ref")) {
             return new NonLocalizedString(tags.get("ref"));
-
+        }
         return null;
     }
 
@@ -159,9 +162,8 @@ public class OSMWithTags {
                 out.put(k, entry.getValue());
             }
         }
+        if (out.isEmpty()) { return null; }
 
-        if (out.isEmpty())
-            return null;
         return out;
     }
 

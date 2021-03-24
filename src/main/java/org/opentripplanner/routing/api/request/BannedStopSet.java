@@ -8,8 +8,9 @@ public class BannedStopSet extends HashSet<Integer> {
     public static BannedStopSet ALL = new BannedStopSet();
     
     public boolean contains(Integer i) {
-        if (this == ALL) 
+        if (this == ALL) {
             return true;
+        }
         return super.contains(i);
     }
 }

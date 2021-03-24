@@ -39,8 +39,8 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> extends Intermed
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!super.equals(o)) return false;
+        if (this == o) { return true; }
+        if (!super.equals(o)) { return false; }
         TransitPathLeg<?> that = (TransitPathLeg<?>) o;
         return trip.equals(that.trip) && next.equals(that.next);
     }

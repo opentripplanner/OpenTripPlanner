@@ -194,7 +194,7 @@ public class GraphUpdaterManager {
      * More useful stuff should be added later.
      */
     public GraphUpdater getUpdater (int id) {
-        if (id >= updaterList.size()) return null;
+        if (id >= updaterList.size()) { return null; }
         return updaterList.get(id);
     }
 

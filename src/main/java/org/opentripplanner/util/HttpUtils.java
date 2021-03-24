@@ -35,8 +35,9 @@ public class HttpUtils {
         }
         HttpClient httpclient = getClient(timeout, timeout);
         HttpResponse response = httpclient.execute(httpget);
-        if(response.getStatusLine().getStatusCode() != 200)
+        if(response.getStatusLine().getStatusCode() != 200) {
             return null;
+        }
 
         HttpEntity entity = response.getEntity();
         if (entity == null) {

@@ -67,7 +67,7 @@ public class ParkAndRideResource {
             if (maxTransitDistance != null) {
                 List<TransitStopVertex> stops = router.graph.getStreetIndex().getNearbyTransitStops(
                     new Coordinate(v.getX(), v.getY()), maxTransitDistance);
-                if (stops.isEmpty()) continue;
+                if (stops.isEmpty()) { continue; }
             }
 
             prs.add(new ParkAndRideInfo((ParkAndRideVertex) v));

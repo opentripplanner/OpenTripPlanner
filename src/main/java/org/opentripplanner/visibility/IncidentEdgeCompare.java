@@ -43,11 +43,8 @@ class IncidentEdgeCompare implements Comparator<PolarEdge> {
         // Otherwise infeasible edges are given lower priority, so they
         // get pushed out the top of the priority_queue's (q2's)
         // heap.
-        else if (xing1.size() == 0 && xing2.size() > 0)
-            return -1;
-        else if (xing1.size() > 0 && xing2.size() == 0)
-            return 1;
-        else
-            return 0;
+        else if (xing1.size() == 0 && xing2.size() > 0) { return -1; }
+        else if (xing1.size() > 0 && xing2.size() == 0) { return 1; }
+        else { return 0; }
     }
 }

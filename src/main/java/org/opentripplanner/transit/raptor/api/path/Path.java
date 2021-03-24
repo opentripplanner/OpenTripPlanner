@@ -179,8 +179,8 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         Path<?> path = (Path<?>) o;
         return startTime == path.startTime &&
                 endTime == path.endTime &&

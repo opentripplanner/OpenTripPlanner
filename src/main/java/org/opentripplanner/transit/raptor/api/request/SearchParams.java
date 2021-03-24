@@ -244,8 +244,8 @@ public class SearchParams {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         SearchParams that = (SearchParams) o;
         return earliestDepartureTime == that.earliestDepartureTime &&
                 latestArrivalTime == that.latestArrivalTime &&

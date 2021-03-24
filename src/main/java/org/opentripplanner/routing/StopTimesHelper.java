@@ -117,7 +117,7 @@ public class StopTimesHelper {
         if (currStop == stop) {
           if(omitNonPickups && pattern.stopPattern.pickups[sidx] == StopPattern.PICKDROP_NONE) continue;
           for (TripTimes t : tt.tripTimes) {
-            if (!sd.serviceRunning(t.serviceCode)) continue;
+            if (!sd.serviceRunning(t.serviceCode)) { continue; }
             stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
           }
         }

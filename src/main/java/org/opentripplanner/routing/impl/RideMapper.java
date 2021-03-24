@@ -51,7 +51,7 @@ public class RideMapper {
             }
             if (onBoard) {
                 ride.zones.add(stop.getFirstZoneAsString());
-                if (stop == ride.lastStop) break;
+                if (stop == ride.lastStop) { break; }
             }
         }
         ride.agency = tripPattern.route.getAgency().getId();

@@ -86,8 +86,8 @@ class Result implements Comparable<Result> {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         Result result = (Result) o;
         return Objects.equals(startTime, result.startTime) &&
                 Objects.equals(endTime, result.endTime) &&

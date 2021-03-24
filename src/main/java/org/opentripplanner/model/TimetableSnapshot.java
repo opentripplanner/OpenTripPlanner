@@ -76,16 +76,14 @@ public class TimetableSnapshot {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
+            if (this == obj) { return true; }
+            if (obj == null) { return false; }
+            if (getClass() != obj.getClass()) {
                 return false;
-            if (getClass() != obj.getClass())
-                return false;
+            }
             TripIdAndServiceDate other = (TripIdAndServiceDate) obj;
-            boolean result = Objects.equals(this.tripId, other.tripId) &&
+            return Objects.equals(this.tripId, other.tripId) &&
                     Objects.equals(this.serviceDate, other.serviceDate);
-            return result;
         }
     }
 
@@ -263,7 +261,7 @@ public class TimetableSnapshot {
         }
         
         TimetableSnapshot ret = new TimetableSnapshot();
-        if (!force && !this.isDirty()) return null;
+        if (!force && !this.isDirty()) { return null; }
         for (Timetable tt : dirtyTimetables) {
             tt.finish(); // summarize, index, etc. the new timetables
         }
@@ -369,7 +367,7 @@ public class TimetableSnapshot {
     }
 
     public boolean isDirty() {
-        if (readOnly) return false;
+        if (readOnly) { return false; }
         return dirty;
     }
 

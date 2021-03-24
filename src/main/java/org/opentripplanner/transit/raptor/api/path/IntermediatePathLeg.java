@@ -55,8 +55,8 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         IntermediatePathLeg<?> that = (IntermediatePathLeg<?>) o;
         return fromStop == that.fromStop &&
                 fromTime == that.fromTime &&

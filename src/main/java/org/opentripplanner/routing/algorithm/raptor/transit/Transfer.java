@@ -26,7 +26,7 @@ public class Transfer {
 
     public List<Coordinate> getCoordinates() {
         List<Coordinate> coordinates = new ArrayList<>();
-        if (edges == null) return coordinates;
+        if (edges == null) { return coordinates; }
         for (Edge edge : edges) {
             if (edge.getGeometry() != null) {
                 coordinates.addAll((Arrays.asList(edge.getGeometry().getCoordinates())));

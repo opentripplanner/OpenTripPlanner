@@ -74,8 +74,8 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         EgressPathLeg<?> that = (EgressPathLeg<?>) o;
         return fromStop == that.fromStop &&
                 fromTime == that.fromTime &&

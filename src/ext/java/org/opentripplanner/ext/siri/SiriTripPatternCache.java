@@ -181,7 +181,7 @@ class StopPatternServiceDateKey {
 
     @Override
     public boolean equals(Object thatObject) {
-        if (!(thatObject instanceof StopPatternServiceDateKey)) return false;
+        if (!(thatObject instanceof StopPatternServiceDateKey)) { return false; }
         StopPatternServiceDateKey that = (StopPatternServiceDateKey) thatObject;
         return (this.stopPattern.equals(that.stopPattern) & this.serviceDate.equals(that.serviceDate));
     }
@@ -202,7 +202,7 @@ class TripServiceDateKey {
 
     @Override
     public boolean equals(Object thatObject) {
-        if (!(thatObject instanceof TripServiceDateKey)) return false;
+        if (!(thatObject instanceof TripServiceDateKey)) { return false; }
         TripServiceDateKey that = (TripServiceDateKey) thatObject;
         return (this.trip.equals(that.trip) & this.serviceDate.equals(that.serviceDate));
     }

@@ -153,7 +153,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Long> effectiveStartDate() {
     return environment -> {
       Date effectiveStartDate = getSource(environment).getEffectiveStartDate();
-      if (effectiveStartDate == null) return null;
+      if (effectiveStartDate == null) { return null; }
       return effectiveStartDate.getTime() / 1000;
     };
   }
@@ -162,7 +162,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Long> effectiveEndDate() {
     return environment -> {
       Date effectiveEndDate = getSource(environment).getEffectiveEndDate();
-      if (effectiveEndDate == null) return null;
+      if (effectiveEndDate == null) { return null; }
       return effectiveEndDate.getTime() / 1000;
     };
   }

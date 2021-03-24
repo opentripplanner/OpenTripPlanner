@@ -62,10 +62,12 @@ public final class CompactLineString {
      */
     public static byte[] compactLineString(double xa, double ya, double xb, double yb,
             LineString lineString, boolean reverse) {
-        if (lineString == null)
+        if (lineString == null) {
             return null;
-        if (lineString.getCoordinates().length == 2)
+        }
+        if (lineString.getCoordinates().length == 2) {
             return STRAIGHT_LINE_PACKED;
+        }
         double x0 = reverse ? xb : xa;
         double y0 = reverse ? yb : ya;
         double x1 = reverse ? xa : xb;
@@ -104,7 +106,7 @@ public final class CompactLineString {
      * 0-coordinates are added in order for the delta encoding to work correctly.
      */
     public static byte[] compactLineString(LineString lineString, boolean reverse) {
-        if (lineString == null) return null;
+        if (lineString == null) { return null; }
         lineString = GeometryUtils.addStartEndCoordinatesToLineString(
                 new Coordinate(0.0, 0.0),
                 lineString,
@@ -145,8 +147,9 @@ public final class CompactLineString {
         }
         c[c.length - 1] = new Coordinate(x1, y1);
         LineString out = geometryFactory.createLineString(c);
-        if (reverse)
+        if (reverse) {
             out = (LineString) out.reverse();
+        }
         return out;
     }
 

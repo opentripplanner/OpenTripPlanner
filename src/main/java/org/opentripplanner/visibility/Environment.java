@@ -63,17 +63,21 @@ public class Environment {
     }
 
     boolean is_in_standard_form() {
-        if (outer_boundary.is_in_standard_form() == false || outer_boundary.area() < 0)
+        if (outer_boundary.is_in_standard_form() == false || outer_boundary.area() < 0) {
             return false;
-        for (int i = 0; i < holes.size(); i++)
-            if (holes.get(i).is_in_standard_form() == false || holes.get(i).area() > 0)
+        }
+        for (int i = 0; i < holes.size(); i++) {
+            if (holes.get(i).is_in_standard_form() == false || holes.get(i).area() > 0) {
                 return false;
+            }
+        }
         return true;
     }
 
     public boolean is_valid(double epsilon) {
-        if (n() <= 2)
+        if (n() <= 2) {
             return false;
+        }
 
         // Check all Polygons are simple.
         if (!outer_boundary.is_simple(epsilon)) {
