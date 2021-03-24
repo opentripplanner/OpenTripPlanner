@@ -1,17 +1,17 @@
 package org.opentripplanner.routing.core;
 
-import java.io.Serializable;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.Serializable;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.transfer.TransferService;
 
 /**
  * SpecificTransfer class used by Transfer. Represents a specific transfer between two stops.
  * See the links described at TransferTable for more details about the specifications.
- * @see TransferTable
+ * @see TransferService
  */
 public class SpecificTransfer implements Serializable {
     

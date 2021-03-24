@@ -24,7 +24,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.Transfer;
-import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -356,9 +356,9 @@ public class AddTransitModelEntitiesToGraph {
 
     private void addTransfersToGraph(Graph graph) {
         Collection<Transfer> transfers = transitService.getAllTransfers();
-        TransferTable transferTable = graph.getTransferTable();
+        TransferService transferService = graph.getTransferTable();
         for (Transfer sourceTransfer : transfers) {
-            transferTable.addTransfer(sourceTransfer);
+            transferService.addTransfer(sourceTransfer);
         }
     }
 

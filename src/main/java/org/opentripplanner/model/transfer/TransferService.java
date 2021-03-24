@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.model.transfer;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.transfer.Transfer;
 
 // TODO OTP2 reimplement all special kinds of transfers
 
@@ -15,7 +14,7 @@ import org.opentripplanner.model.transfer.Transfer;
  * This class represents all transfer information in the graph. Transfers are grouped by
  * stop-to-stop pairs.
  */
-public class TransferTable implements Serializable {
+public class TransferService implements Serializable {
 
     /**
      * Table which contains transfers between two stops
