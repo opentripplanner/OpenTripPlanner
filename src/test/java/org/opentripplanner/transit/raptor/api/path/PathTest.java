@@ -1,26 +1,25 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_START;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_STRING;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.EGRESS_END;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.basicTripStops;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.ACCESS_START;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.BASIC_PATH_AS_STRING;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.EGRESS_END;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.TOTAL_COST;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicItineraryTestCase.basicTripStops;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
-import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
+import org.junit.Test;
+import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 
 
 public class PathTest {
 
-    private final Path<TestTripSchedule> subject = BasicItineraryTestCase.basicTripAsPath();
+    private final Path<TestTripSchedule> subject = BasicPathTestCase.basicTripAsPath();
 
     @Test
     public void startTime() {
@@ -69,12 +68,12 @@ public class PathTest {
 
     @Test
     public void equals() {
-        assertEquals(BasicItineraryTestCase.basicTripAsPath(), subject);
+        assertEquals(BasicPathTestCase.basicTripAsPath(), subject);
     }
 
     @Test
     public void testHashCode() {
-        assertEquals(BasicItineraryTestCase.basicTripAsPath().hashCode(), subject.hashCode());
+        assertEquals(BasicPathTestCase.basicTripAsPath().hashCode(), subject.hashCode());
     }
 
     @Test

@@ -1,5 +1,15 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.util.time.DurationUtils.durationToStr;
+import static org.opentripplanner.util.time.TimeUtils.time;
+
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
@@ -15,17 +25,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
-import static org.opentripplanner.util.time.DurationUtils.durationToStr;
-import static org.opentripplanner.util.time.TimeUtils.time;
 
 
 /**
@@ -47,7 +46,7 @@ import static org.opentripplanner.util.time.TimeUtils.time;
  * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and ends
  * at 12:00, total 2 hours.
  */
-public class BasicItineraryTestCase implements RaptorTestConstants {
+public class BasicPathTestCase implements RaptorTestConstants {
     public static final String BASIC_PATH_AS_STRING =
         "Walk 3m15s ~ 1"
         + " ~ BUS L11 10:04 10:35 ~ 2"
