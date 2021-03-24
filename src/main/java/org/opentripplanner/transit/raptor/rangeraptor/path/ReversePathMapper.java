@@ -148,8 +148,9 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
 
         if(egress.hasRides()) {
             targetFromTime += slackProvider.transferSlack();
-            targetFromTime = egress.earliestDepartureTime(targetFromTime);
         }
+
+        targetFromTime = egress.earliestDepartureTime(targetFromTime);
 
         int targetToTime = targetFromTime + egress.durationInSeconds();
 

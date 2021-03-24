@@ -104,8 +104,9 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         if(access.hasRides()) {
             targetToTime -= slackProvider.transferSlack();
-            targetToTime = access.latestArrivalTime(targetToTime);
         }
+
+        targetToTime = access.latestArrivalTime(targetToTime);
 
         int targetFromTime = targetToTime - access.durationInSeconds();
 
