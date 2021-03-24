@@ -9,7 +9,7 @@ package org.opentripplanner.model;
  * another one, if one of the journeys score better on the transfers, and they have the
  * same cost.
  */
-public enum TransferPriority {
+public enum StopTransferPriority {
     /**
      * Block transfers from/to this stop. In OTP this is not a definitive block,
      * just a huge penalty is added to the cost function.
