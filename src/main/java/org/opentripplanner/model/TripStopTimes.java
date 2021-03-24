@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class TripStopTimes {
     private static final List<StopTime> EMPTY_LIST = Collections.emptyList();
 
-    private Map<Trip, List<StopTime>> map = new HashMap<>();
+    private final Map<Trip, List<StopTime>> map = new HashMap<>();
 
     /**
      * Return a unmodifiable, nullsafe list of stop times for the given trip.

@@ -1,6 +1,17 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Sets;
+import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -23,6 +34,7 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcess
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
+import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -35,20 +47,6 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder;
 
 public class GtfsModule implements GraphBuilderModule {
 
@@ -125,11 +123,15 @@ public class GtfsModule implements GraphBuilderModule {
                     gtfsBundle.useCached = useCached;
                 }
 
-                OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(
-                        loadBundle(gtfsBundle),
+                GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
+                GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
                         gtfsBundle.getFeedId().getId(),
-                        issueStore
+                        issueStore,
+                        gtfsDao
                 );
+                mapper.mapStopTripAndRouteDatantoBuilder();
+
+                OtpTransitServiceBuilder builder =  mapper.getBuilder();
 
                 builder.limitServiceDays(transitPeriodLimit);
 

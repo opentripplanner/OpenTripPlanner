@@ -522,7 +522,7 @@ public class Graph implements Serializable {
         return env;
     }
 
-    public TransferService getTransferTable() {
+    public TransferService getTransferService() {
         return transferService;
     }
 

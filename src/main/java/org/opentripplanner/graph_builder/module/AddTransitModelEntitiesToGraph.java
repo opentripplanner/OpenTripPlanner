@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,8 +22,6 @@ import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.transfer.Transfer;
-import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -355,11 +352,9 @@ public class AddTransitModelEntitiesToGraph {
     }
 
     private void addTransfersToGraph(Graph graph) {
-        Collection<Transfer> transfers = transitService.getAllTransfers();
-        TransferService transferService = graph.getTransferTable();
-        for (Transfer sourceTransfer : transfers) {
-            transferService.addTransfer(sourceTransfer);
-        }
+        graph.getTransferService().addAll(
+            transitService.getAllTransfers()
+        );
     }
 
     private void addFlexTripsToGraph(Graph graph) {

@@ -35,7 +35,13 @@ public class TransferService implements Serializable {
         return table.values();
     }
 
-    public void addTransfer(Transfer transfer) {
+    public void addAll(Collection<Transfer> transfers) {
+        for (Transfer transfer : transfers) {
+            add(transfer);
+        }
+    }
+
+    void add(Transfer transfer) {
         table.put(new P2<>(transfer.getFromStop(), transfer.getToStop()), transfer);
     }
 }
