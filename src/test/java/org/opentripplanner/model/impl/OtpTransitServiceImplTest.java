@@ -1,5 +1,14 @@
 package org.opentripplanner.model.impl;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -15,18 +24,8 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import org.opentripplanner.model.transfer.Transfer;
 
 public class OtpTransitServiceImplTest {
     private static final String FEED_ID = "Z";

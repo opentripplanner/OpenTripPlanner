@@ -1,14 +1,13 @@
 package org.opentripplanner.routing.core;
 
-import java.io.Serializable;
-import java.util.Collection;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Transfer;
-import org.opentripplanner.model.Trip;
+import java.io.Serializable;
+import java.util.Collection;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.transfer.Transfer;
 
 // TODO OTP2 reimplement all special kinds of transfers
 
