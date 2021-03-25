@@ -3,6 +3,7 @@ package org.opentripplanner.updater.bike_rental;
 import java.util.HashSet;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,7 +27,7 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
         }
     }
 
-    public BikeRentalStation makeStation(JsonNode kioskNode) {
+    public BikeRentalStation makeStation(JsonNode kioskNode, Integer feedUpdateEpochSeconds) {
 
         if (!kioskNode.path("Status").asText().equals("Active")) {
             return null;
@@ -38,6 +39,10 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
         brstation.networks.add(this.networkName);
 
         brstation.id = kioskNode.path("Id").toString();
+        brstation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+            kioskNode.path("last_reported").asLong(),
+            feedUpdateEpochSeconds
+        );
         brstation.x = kioskNode.path("Location").path("Longitude").asDouble();
         brstation.y = kioskNode.path("Location").path("Latitude").asDouble();
         brstation.name =  new NonLocalizedString(kioskNode.path("Name").asText());

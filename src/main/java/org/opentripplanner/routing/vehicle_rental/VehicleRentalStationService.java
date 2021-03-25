@@ -13,10 +13,14 @@
 
 package org.opentripplanner.routing.vehicle_rental;
 
+import org.opentripplanner.updater.RentalUpdaterError;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +35,12 @@ public class VehicleRentalStationService implements Serializable {
     private Map<String, VehicleRentalRegion> vehicleRentalRegions = new HashMap<>();
 
     private Set<VehicleRentalStation> vehicleRentalStations = new HashSet<VehicleRentalStation>();
+
+    /* A map of vehicle network name to the latest errors encountered while fetching the feed */
+    private Map<String, List<RentalUpdaterError>> errorsByNetwork = new HashMap<>();
+
+    /* A map of vehicle network name to the latest system information data received while fetching the feed */
+    private Map<String, SystemInformation.SystemInformationData> systemInformationDataByNetwork = new HashMap<>();
 
     public Collection<VehicleRentalStation> getVehicleRentalStations() {
         return vehicleRentalStations;
@@ -52,5 +62,24 @@ public class VehicleRentalStationService implements Serializable {
     
     public void addVehicleRentalRegion(VehicleRentalRegion vehicleRentalRegion) {
         vehicleRentalRegions.put(vehicleRentalRegion.network, vehicleRentalRegion);
+    }
+
+    public Map<String, List<RentalUpdaterError>> getErrorsByNetwork() {
+        return errorsByNetwork;
+    }
+
+    public void setErrorsForNetwork(String network, List<RentalUpdaterError> errors) {
+        errorsByNetwork.put(network, errors);
+    }
+
+    public Map<String, SystemInformation.SystemInformationData> getSystemInformationDataByNetwork() {
+        return systemInformationDataByNetwork;
+    }
+
+    public void setSystemInformationDataForNetwork(
+        String network,
+        SystemInformation.SystemInformationData systemInformationData
+    ) {
+        systemInformationDataByNetwork.put(network, systemInformationData);
     }
 }

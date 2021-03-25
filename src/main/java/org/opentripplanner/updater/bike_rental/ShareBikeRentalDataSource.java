@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 	 */
 
 	@Override
-	public BikeRentalStation makeStation(JsonNode rentalStationNode) {
+	public BikeRentalStation makeStation(JsonNode rentalStationNode, Integer feedUpdateEpochSeconds) {
 
 		if(networkID == null) {
 			// Get SystemID url parameter as StationIDs are not globally unique for
@@ -90,6 +91,10 @@ public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
         brstation.networks.add(this.networkID);
 		
 		brstation.id = networkID+"_"+rentalStationNode.path("StationID").toString();
+		brstation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+			rentalStationNode.path("LastContactSeconds").asLong(),
+			feedUpdateEpochSeconds
+		);
 		brstation.x = rentalStationNode.path("Longitude").asDouble();
 		brstation.y = rentalStationNode.path("Latitude").asDouble();
 		brstation.name = new NonLocalizedString(rentalStationNode.path("StationName").asText("").trim());

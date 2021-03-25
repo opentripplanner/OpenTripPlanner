@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.HashSet;
@@ -25,7 +26,7 @@ public class SanFranciscoBayAreaBikeRentalDataSource extends GenericJsonBikeRent
         }
     }
 
-    public BikeRentalStation makeStation(JsonNode stationNode) {
+    public BikeRentalStation makeStation(JsonNode stationNode, Integer feedUpdateEpochSeconds) {
 
         if (!stationNode.path("statusValue").asText().equals("In Service")) {
             return null;
@@ -41,6 +42,10 @@ public class SanFranciscoBayAreaBikeRentalDataSource extends GenericJsonBikeRent
         brstation.networks.add(this.networkName);
 
         brstation.id = stationNode.path("id").toString();
+        brstation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+            stationNode.path("last_reported").asLong(),
+            feedUpdateEpochSeconds
+        );
         brstation.x = stationNode.path("longitude").asDouble();
         brstation.y = stationNode.path("latitude").asDouble();
         brstation.name =  new NonLocalizedString(stationNode.path("stationName").asText());

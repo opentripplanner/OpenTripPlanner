@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.bike_rental;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,12 +41,16 @@ public class JCDecauxBikeRentalDataSource extends GenericJsonBikeRentalDataSourc
      * ]
      * </pre>
      */
-    public BikeRentalStation makeStation(JsonNode node) {
+    public BikeRentalStation makeStation(JsonNode node, Integer feedUpdateEpochSeconds) {
         if (!node.path("status").asText().equals("OPEN")) {
             return null;
         }
         BikeRentalStation station = new BikeRentalStation();
         station.id = String.format("%d", node.path("number").asInt());
+        station.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+            node.path("last_update").asLong() / 1000,
+            feedUpdateEpochSeconds
+        );
         station.x = node.path("position").path("lng").asDouble();
         station.y = node.path("position").path("lat").asDouble();
         station.name = new NonLocalizedString(node.path("name").asText());

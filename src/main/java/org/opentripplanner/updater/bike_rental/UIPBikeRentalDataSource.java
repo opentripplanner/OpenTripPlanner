@@ -3,6 +3,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.ArrayList;
@@ -24,10 +25,14 @@ public class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
      *
      */
     @Override
-    public BikeRentalStation makeStation(JsonNode rentalStationNode) {
+    public BikeRentalStation makeStation(JsonNode rentalStationNode, Integer feedUpdateEpochSeconds) {
         BikeRentalStation brstation = new BikeRentalStation();
 
         brstation.id = rentalStationNode.path("id").toString();
+        brstation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+            rentalStationNode.path("last_reported").asLong(),
+            feedUpdateEpochSeconds
+        );
         brstation.name = new NonLocalizedString(rentalStationNode.path("title").asText("").trim());
         brstation.x = rentalStationNode.path("center").path("longitude").asDouble();
         brstation.y = rentalStationNode.path("center").path("latitude").asDouble();

@@ -14,6 +14,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.updater.bike_rental;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
      * }
      * </pre>
      */
-    public BikeRentalStation makeStation(JsonNode node) {
+    public BikeRentalStation makeStation(JsonNode node, Integer feedUpdateEpochSeconds) {
         BikeRentalStation station = new BikeRentalStation();
         station.id = node.path("name").asText().split("\\s", 2)[0];
         station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
@@ -70,6 +71,10 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
             station.bikesAvailable = node.path("avl_bikes").asInt();
             station.spacesAvailable = node.path("free_slots").asInt();
         }
+        station.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+            node.path("last_reported").asLong(),
+            feedUpdateEpochSeconds
+        );
         return station;
     }
 }

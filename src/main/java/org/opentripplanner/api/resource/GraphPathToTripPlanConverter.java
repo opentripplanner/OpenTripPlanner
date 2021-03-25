@@ -8,6 +8,7 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
+import org.opentripplanner.api.model.RentalInfo;
 import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
@@ -58,6 +59,7 @@ import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
@@ -66,15 +68,20 @@ import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.updater.RentalUpdaterError;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -180,6 +187,7 @@ public abstract class GraphPathToTripPlanConverter {
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
                 lastLeg.to.orig = plan.to.orig;
             }
+            addRentalInfo(plan, paths);
         }
         request.rctx.debugOutput.finishedRendering();
         return plan;
@@ -749,6 +757,37 @@ public abstract class GraphPathToTripPlanConverter {
                     itinerary.elevationLost -= change;
                 }
             }
+        }
+    }
+
+    /**
+     * Adds overall information about any vehicle rental systems that were used in any of the paths.
+     */
+    private static void addRentalInfo(TripPlan plan, List<GraphPath> paths) {
+        Graph graph = paths.get(0).states.get(0).getOptions().rctx.graph;
+        VehicleRentalStationService vehicleRentalStationService = graph.getService(VehicleRentalStationService.class);
+
+        if (vehicleRentalStationService != null) {
+            Set<String> vehicleRentalNetworks = new HashSet<>();
+            for (GraphPath path : paths) {
+                for (State state : path.states) {
+                    Set<String> stateNetworks = state.getVehicleRentalNetworks();
+                    if (stateNetworks != null) {
+                        vehicleRentalNetworks.addAll(stateNetworks);
+                    }
+                }
+            }
+
+            Map<String, RentalInfo> rentalInfo = new HashMap<>();
+            Map<String, List<RentalUpdaterError>> errorsByNetwork = vehicleRentalStationService.getErrorsByNetwork();
+            Map<String, SystemInformation.SystemInformationData> systemInformationDataByNetwrok = vehicleRentalStationService
+                .getSystemInformationDataByNetwork();
+            for (String vehicleRentalNetwork : vehicleRentalNetworks) {
+                rentalInfo.put(vehicleRentalNetwork, new RentalInfo(errorsByNetwork.get(vehicleRentalNetwork),
+                    systemInformationDataByNetwrok.get(vehicleRentalNetwork)
+                ));
+            }
+            plan.vehicleRentalInfo = rentalInfo;
         }
     }
 

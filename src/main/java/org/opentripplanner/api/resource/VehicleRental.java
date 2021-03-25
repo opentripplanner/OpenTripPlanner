@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -68,7 +69,7 @@ public class VehicleRental {
             envelope = new Envelope(-180,180,-90,90); 
         }
         Collection<VehicleRentalStation> stations = vehicleRentalService.getVehicleRentalStations();
-        List<VehicleRentalStation> out = new ArrayList<>();
+        List<VehicleRentalStation> out = new LinkedList<>();
         for (VehicleRentalStation station : stations) {
             if (envelope.contains(station.x, station.y) &&
                 (station.x != 0 && station.y != 0) &&
@@ -82,6 +83,9 @@ public class VehicleRental {
         }
         VehicleRentalStationList vehicleRentalStationList = new VehicleRentalStationList();
         vehicleRentalStationList.stations = out;
+        vehicleRentalStationList.errorsByNetwork = vehicleRentalService.getErrorsByNetwork();
+        vehicleRentalStationList.systemInformationDataByNetwork =
+            vehicleRentalService.getSystemInformationDataByNetwork();
         return vehicleRentalStationList;
     }
 
