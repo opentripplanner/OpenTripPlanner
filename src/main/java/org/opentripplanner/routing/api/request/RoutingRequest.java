@@ -823,14 +823,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    /**
-     * only allow traversal by the specified mode; don't allow walking bikes. This is used during contraction to reduce the number of possible paths.
-     */
-    public void freezeTraverseMode() {
-        bikeWalkingOptions = clone();
-        bikeWalkingOptions.bikeWalkingOptions = new RoutingRequest(new TraverseModeSet());
-    }
-
     /** Returns the model that computes the cost of intersection traversal. */
     public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
         return traversalCostModel;

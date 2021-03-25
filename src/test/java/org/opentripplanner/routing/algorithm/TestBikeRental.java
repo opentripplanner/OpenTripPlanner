@@ -53,7 +53,6 @@ public class TestBikeRental extends TestCase {
 
         // or biking + walking (assuming walking bikes is disallowed)
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.BICYCLE,TraverseMode.TRANSIT));
-        options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
 
@@ -77,7 +76,6 @@ public class TestBikeRental extends TestCase {
 
         // but we can't get off the bike at v3, so we still fail
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.BICYCLE,TraverseMode.TRANSIT));
-        options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
 
