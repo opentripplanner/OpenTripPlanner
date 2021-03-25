@@ -313,7 +313,9 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "CAR_PARK,WALK,TRANSIT"     : _tr('Park and Ride'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "CAR,WALK,TRANSIT"          : _tr('Kiss and Ride'),
+    "CAR_PICKUP,WALK,TRANSIT"   : _tr('Ride and Kiss (Car Pickup)'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    "CAR_DROPOFF,WALK,TRANSIT"   : _tr('Kiss and Ride (Car Dropoff)'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "BICYCLE_PARK,WALK,TRANSIT" : _tr('Bike and Ride'),
     //uncomment only if bike rental exists in a map
