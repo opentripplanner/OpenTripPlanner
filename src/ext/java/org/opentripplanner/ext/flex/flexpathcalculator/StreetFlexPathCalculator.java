@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * Note that it caches the whole ShortestPathTree the first time it encounters a new fromVertex.
  * Subsequents requests from the same fromVertex can fetch the path to the toVertex from the
- * existing ShortestPathTree. This one-to-many approach is need to make the performance acceptable.
+ * existing ShortestPathTree. This one-to-many approach is needed to make the performance acceptable.
  */
 public class StreetFlexPathCalculator implements FlexPathCalculator {
 
