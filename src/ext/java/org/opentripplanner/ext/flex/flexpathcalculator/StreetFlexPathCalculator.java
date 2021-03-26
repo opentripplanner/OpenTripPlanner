@@ -27,8 +27,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   private static final long MAX_FLEX_TRIP_DURATION_SECONDS = Duration.ofMinutes(30).toSeconds();
 
-  private Graph graph;
-  private Map<Vertex, ShortestPathTree> cache = new HashMap<>();
+  private final Graph graph;
+  private final Map<Vertex, ShortestPathTree> cache = new HashMap<>();
 
   public StreetFlexPathCalculator(Graph graph) {
     this.graph = graph;
