@@ -484,14 +484,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public boolean tripOrTripSequenceIsBanned(State state0, final int stopIndex) {
         final RoutingRequest options = state0.getOptions();
 
-        // check if an exact trip ID is banned
-        final BannedStopSet banned = options.bannedTrips.get(trip.getId());
-        if (banned != null && banned.contains(stopIndex)) {
+        // check if an exact trip ID or stop index within a stop pattern of trip is banned
+        final BannedStopSet bannedStopIndexesForTrip = options.bannedTrips.get(trip.getId());
+        if (bannedStopIndexesForTrip != null && bannedStopIndexesForTrip.contains(stopIndex)) {
             return true;
         }
 
         // check if a trip ID sequence is banned, but first return false if there are not banned sequences
-        if (options.bannedTripSequences.size() == 0) {
+        if (options.bannedTripSequences.isEmpty()) {
             return false;
         }
 
@@ -519,18 +519,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         // have additional trips included between a banned sequence. (ex: if trip A > trip B is banned, trip A >
         // Trip C > Trip B will be flagged as a banned sequence).
         for (List<FeedScopedId> bannedTripSequence : options.bannedTripSequences) {
-            int tripsInStateIdx = 0;
             int bannedSequenceIdx = 0;
-            while (tripsInStateIdx < tripsInState.size() && bannedSequenceIdx < bannedTripSequence.size()) {
-                if (tripsInState.get(tripsInStateIdx).equals(bannedTripSequence.get(bannedSequenceIdx))) {
-                    // trip ID matches, also advance index of banned sequence
+            for (FeedScopedId tripInState : tripsInState) {
+                if (tripInState.equals(bannedTripSequence.get(bannedSequenceIdx))) {
                     bannedSequenceIdx++;
+                    if (bannedSequenceIdx == bannedTripSequence.size()) {
+                        // A matching trip sequence has been found!
+                        return true;
+                    }
                 }
-                tripsInStateIdx++;
-            }
-            if (bannedSequenceIdx == bannedTripSequence.size()) {
-                // a matching trip sequence has been found!
-                return true;
             }
         }
 

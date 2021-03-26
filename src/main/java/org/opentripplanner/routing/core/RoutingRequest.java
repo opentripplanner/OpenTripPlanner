@@ -1559,11 +1559,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      * won't be used in the graph path finding if the sequence of trips is detected in any order in another path. See
      * {@link TripTimes#tripOrTripSequenceIsBanned(State, int)} for further details.
      */
-    public void banTripsInPath(GraphPath path) {
+    public void banTripSequencesInPath(GraphPath path) {
         List<FeedScopedId> tripIds = path.getTrips();
         List<FeedScopedId> callAndRideTripIds = path.getCallAndRideTrips();
         // ban a sequence of trips if none of the tripIds were call and ride trips
-        if (!tripIds.stream().anyMatch(tripId -> callAndRideTripIds.contains(tripId))) {
+        if (tripIds.stream().noneMatch(callAndRideTripIds::contains)) {
             bannedTripSequences.add(tripIds);
         }
     }
