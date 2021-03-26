@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public class StreetFlexPathCalculator implements FlexPathCalculator {
 
-  private static final long MAX_FLEX_TRIP_DURATION_SECONDS = Duration.ofMinutes(30).toSeconds();
+  private static final long MAX_FLEX_TRIP_DURATION_SECONDS = Duration.ofMinutes(45).toSeconds();
 
   private final Graph graph;
   private final Map<Vertex, ShortestPathTree> cache = new HashMap<>();
