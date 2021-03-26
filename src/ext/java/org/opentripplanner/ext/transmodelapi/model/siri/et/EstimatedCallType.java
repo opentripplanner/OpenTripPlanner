@@ -156,9 +156,7 @@ public class EstimatedCallType {
                         return ((TripTimeShort) environment.getSource()).getPickupType() != PICKDROP_NONE;
                     }
                   return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                        .get(GqlUtil.getRoutingService(environment).getTripForId().get((
-                            (TripTimeShort) environment.getSource()
-                        ).getTripId()))
+                        .get(((TripTimeShort) environment.getSource()).getTrip())
                         .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
                 })
                 .build())
@@ -171,39 +169,27 @@ public class EstimatedCallType {
                         //Realtime-updated
                         return ((TripTimeShort) environment.getSource()).getDropoffType() != PICKDROP_NONE;
                     }
-                  return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                        .get(GqlUtil.getRoutingService(environment).getTripForId().get((
-                            (TripTimeShort) environment.getSource()
-                        ).getTripId()))
-                        .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
-
+                    return GqlUtil.getRoutingService(environment).getPatternForTrip()
+                            .get(((TripTimeShort) environment.getSource()).getTrip())
+                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("requestStop")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether vehicle will only stop on request.")
-                    .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                              .get(GqlUtil.getRoutingService(environment).getTripForId().get((
-                                  (TripTimeShort) environment.getSource()
-                              ).getTripId()))
-                              .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) == PICKDROP_COORDINATE_WITH_DRIVER;
-                    })
+                    .dataFetcher(environment ->
+                        GqlUtil.getRoutingService(environment).getPatternForTrip()
+                            .get(((TripTimeShort) environment.getSource()).getTrip())
+                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) == PICKDROP_COORDINATE_WITH_DRIVER)
                     .build())
 
-            // TODO This checks both whether the Trip or the Stop is cancelled. Change after implementing DSJ
             .field(GraphQLFieldDefinition
                     .newFieldDefinition()
                     .name("cancellation")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether stop is cancelled.")
-                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isCancelledStop()
-                        || GqlUtil.getRoutingService(environment)
-                            .getTripForId()
-                            .get(((TripTimeShort) environment.getSource()).getTripId())
-                            .getTripAlteration()
-                            .isCanceledOrReplaced())
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isCanceledEffectively())
             .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("date")
@@ -214,10 +200,7 @@ public class EstimatedCallType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("serviceJourney")
                     .type(serviceJourneyType)
-                    .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getTripForId()
-                              .get(((TripTimeShort) environment.getSource()).getTripId());
-                    })
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).getTrip())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("destinationDisplay")
@@ -267,8 +250,8 @@ public class EstimatedCallType {
       TripTimeShort tripTimeShort,
       RoutingService routingService
   ) {
-    FeedScopedId tripId = tripTimeShort.getTripId();
-    Trip trip = routingService.getTripForId().get(tripId);
+    Trip trip = tripTimeShort.getTrip();
+    FeedScopedId tripId = trip.getId();
     FeedScopedId routeId = trip.getRoute().getId();
 
     FeedScopedId stopId = tripTimeShort.getStopId();

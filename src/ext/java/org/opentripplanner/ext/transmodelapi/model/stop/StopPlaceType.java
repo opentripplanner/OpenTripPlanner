@@ -276,8 +276,7 @@ public class StopPlaceType {
     tripTimesStream = JourneyWhiteListed.whiteListAuthoritiesAndOrLines(
         tripTimesStream,
         authorityIdsWhiteListed,
-        lineIdsWhiteListed,
-        routingService
+        lineIdsWhiteListed
     );
 
     if (!limitOnDestinationDisplay) {
@@ -286,8 +285,7 @@ public class StopPlaceType {
     // Group by line and destination display, limit departures per group and merge
     return tripTimesStream
         .collect(Collectors.groupingBy(t -> destinationDisplayPerLine(
-            ((TripTimeShort) t),
-            routingService
+            ((TripTimeShort) t)
         )))
         .values()
         .stream()
@@ -386,8 +384,8 @@ public class StopPlaceType {
     return false;
   }
 
-  private static String destinationDisplayPerLine(TripTimeShort t, RoutingService routingService) {
-    Trip trip = routingService.getTripForId().get(t.getTripId());
+  private static String destinationDisplayPerLine(TripTimeShort t) {
+    Trip trip = t.getTrip();
     return trip == null ? t.getHeadsign() : trip.getRoute().getId() + "|" + t.getHeadsign();
   }
 }
