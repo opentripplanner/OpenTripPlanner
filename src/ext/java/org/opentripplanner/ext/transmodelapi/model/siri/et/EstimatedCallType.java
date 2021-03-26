@@ -191,12 +191,20 @@ public class EstimatedCallType {
                               .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) == PICKDROP_COORDINATE_WITH_DRIVER;
                     })
                     .build())
-            .field(GraphQLFieldDefinition.newFieldDefinition()
+
+            // TODO This checks both whether the Trip or the Stop is cancelled. Change after implementing DSJ
+            .field(GraphQLFieldDefinition
+                    .newFieldDefinition()
                     .name("cancellation")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether stop is cancelled.")
-                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isCancelledStop())
-                    .build())
+                    .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isCancelledStop()
+                        || GqlUtil.getRoutingService(environment)
+                            .getTripForId()
+                            .get(((TripTimeShort) environment.getSource()).getTripId())
+                            .getTripAlteration()
+                            .isCanceledOrReplaced())
+            .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("date")
                     .type(gqlUtil.dateScalar)
