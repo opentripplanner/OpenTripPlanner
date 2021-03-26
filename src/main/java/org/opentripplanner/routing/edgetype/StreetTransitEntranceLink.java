@@ -7,13 +7,13 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
  * This represents the connection between a street vertex and a transit vertex belonging the street
  * network.
  */
-public class TransitEntranceLink extends StreetTransitEntityLink<TransitEntranceVertex> {
+public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEntranceVertex> {
 
-    public TransitEntranceLink(StreetVertex fromv, TransitEntranceVertex tov) {
+    public StreetTransitEntranceLink(StreetVertex fromv, TransitEntranceVertex tov) {
         super(fromv, tov, tov.isWheelchairEntrance());
     }
 
-    public TransitEntranceLink(TransitEntranceVertex fromv, StreetVertex tov) {
+    public StreetTransitEntranceLink(TransitEntranceVertex fromv, StreetVertex tov) {
         super(fromv, tov, fromv.isWheelchairEntrance());
     }
 
@@ -22,6 +22,6 @@ public class TransitEntranceLink extends StreetTransitEntityLink<TransitEntrance
     }
 
     public String toString() {
-        return "TransitEntranceLink(" + fromv + " -> " + tov + ")";
+        return "StreetTransitEntranceLink(" + fromv + " -> " + tov + ")";
     }
 }

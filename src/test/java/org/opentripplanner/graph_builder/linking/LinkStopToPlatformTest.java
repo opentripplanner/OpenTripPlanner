@@ -14,7 +14,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -82,8 +82,8 @@ public class LinkStopToPlatformTest {
                 TraverseMode.WALK,
                 LinkingDirection.BOTH_WAYS,
                 (vertex, streetVertex) -> List.of(
-                    new StreetTransitLink((TransitStopVertex) vertex, streetVertex),
-                    new StreetTransitLink(streetVertex, (TransitStopVertex) vertex)
+                    new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
+                    new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
                 )
             );
         }

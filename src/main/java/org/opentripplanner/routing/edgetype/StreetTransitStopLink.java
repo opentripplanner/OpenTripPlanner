@@ -8,13 +8,13 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  * where going from the street to the vehicle is immediate -- such as at a 
  * curbside bus stop.
  */
-public class StreetTransitLink extends StreetTransitEntityLink<TransitStopVertex> {
+public class StreetTransitStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 
-    public StreetTransitLink(StreetVertex fromv, TransitStopVertex tov) {
+    public StreetTransitStopLink(StreetVertex fromv, TransitStopVertex tov) {
     	super(fromv, tov, tov.hasWheelchairEntrance());
     }
 
-    public StreetTransitLink(TransitStopVertex fromv, StreetVertex tov) {
+    public StreetTransitStopLink(TransitStopVertex fromv, StreetVertex tov) {
         super(fromv, tov, fromv.hasWheelchairEntrance());
     }
 
@@ -23,6 +23,6 @@ public class StreetTransitLink extends StreetTransitEntityLink<TransitStopVertex
     }
 
     public String toString() {
-        return "StreetTransitLink(" + fromv + " -> " + tov + ")";
+        return "StreetTransitStopLink(" + fromv + " -> " + tov + ")";
     }
 }

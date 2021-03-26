@@ -9,7 +9,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -89,11 +89,11 @@ public class LinkingTest {
 
         // compare the linkages
         for (TransitStopVertex ts : Iterables.filter(g1.getVertices(), TransitStopVertex.class)) {
-            List<StreetTransitLink> stls1 = outgoingStls(ts);
+            List<StreetTransitStopLink> stls1 = outgoingStls(ts);
             assertTrue(stls1.size() >= 1);
 
             TransitStopVertex other = (TransitStopVertex) g2.getVertex(ts.getLabel());
-            List<StreetTransitLink> stls2 = outgoingStls(other);
+            List<StreetTransitStopLink> stls2 = outgoingStls(other);
 
             assertEquals("Unequal number of links from stop " + ts, stls1.size(), stls2.size());
 
@@ -107,10 +107,10 @@ public class LinkingTest {
         }
     }
 
-    private static List<StreetTransitLink> outgoingStls (final TransitStopVertex tsv) {
-        List<StreetTransitLink> stls = tsv.getOutgoing().stream()
-                .filter(StreetTransitLink.class::isInstance)
-                .map(StreetTransitLink.class::cast)
+    private static List<StreetTransitStopLink> outgoingStls (final TransitStopVertex tsv) {
+        List<StreetTransitStopLink> stls = tsv.getOutgoing().stream()
+                .filter(StreetTransitStopLink.class::isInstance)
+                .map(StreetTransitStopLink.class::cast)
                 .collect(Collectors.toList());
         stls.sort(Comparator.comparing(e -> e.getGeometry().getLength()));
         return stls;
