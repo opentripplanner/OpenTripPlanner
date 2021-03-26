@@ -24,8 +24,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.OTPFeature;
@@ -204,6 +206,15 @@ public class NearbyStopFinder {
             // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
             // the minimum walking distance
             State min = Collections.min(states, (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance));
+
+            // If the best state for this FlexStopLocation is a SplitterVertex, we want to get the
+            // TemporaryStreetLocation instead. This allows us to reach SplitterVertices in both
+            // directions when routing later.
+            if (min.getVertex() instanceof SplitterVertex && min
+                .getBackState()
+                .getVertex() instanceof TemporaryStreetLocation) {
+                min = min.getBackState();
+            }
 
             stopsFound.add(NearbyStop.nearbyStopForState(min, flexStopLocation));
         }

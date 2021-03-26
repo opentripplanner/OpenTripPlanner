@@ -5,21 +5,15 @@ import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -51,14 +45,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(fromv, shortestPathTree);
     }
 
-    GraphPath path = null;
-    for (Vertex v : getAllSplitterVerticesOutgoing(tov)) {
-      path = shortestPathTree.getPath(v, false);
-      if (path != null) break;
-    }
-    if (path == null) {
-      return null;
-    }
+    GraphPath path = shortestPathTree.getPath(tov, false);
+    if (path == null) { return null; }
 
     int distance = (int) path.getDistanceMeters();
     int duration = path.getDuration();
@@ -68,9 +56,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   }
 
   private ShortestPathTree routeToMany(Vertex fromv) {
-    Set<Vertex> fromVertices = getAllSplitterVerticesIncoming(fromv);
     RoutingRequest routingRequest = new RoutingRequest(TraverseMode.CAR);
-    routingRequest.setRoutingContext(graph, fromVertices, null);
+    routingRequest.setRoutingContext(graph, fromv, null);
     routingRequest.worstTime = routingRequest.dateTime + MAX_FLEX_TRIP_DURATION_SECONDS;
     routingRequest.disableRemainingWeightHeuristic = true;
     routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
@@ -80,49 +67,5 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     ShortestPathTree spt = search.getShortestPathTree(routingRequest);
     routingRequest.cleanup();
     return spt;
-  }
-
-  /**
-   * In the case of routing from one SplitterVertex it is important to have all of them. Otherwise
-   * the StreetEdge backtracking check will fail and we will only be able to travel in one direction
-   * from the split StreetEdge. If another solution is found for this problem, these methods may
-   * not be needed. (#3377)
-   */
-  private Set<Vertex> getAllSplitterVerticesIncoming(Vertex vertex) {
-    if (vertex instanceof SplitterVertex) {
-      TemporaryFreeEdge temporaryFreeEdge = (TemporaryFreeEdge) vertex
-          .getIncoming()
-          .iterator()
-          .next();
-      TemporaryStreetLocation temporaryStreetLocation =
-          (TemporaryStreetLocation) temporaryFreeEdge.getFromVertex();
-      return temporaryStreetLocation
-          .getOutgoing()
-          .stream()
-          .map(Edge::getToVertex)
-          .collect(Collectors.toSet());
-    }
-    else {
-      return Set.of(vertex);
-    }
-  }
-
-  private Set<Vertex> getAllSplitterVerticesOutgoing(Vertex vertex) {
-    if (vertex instanceof SplitterVertex) {
-      TemporaryFreeEdge temporaryFreeEdge = (TemporaryFreeEdge) vertex
-          .getOutgoing()
-          .iterator()
-          .next();
-      TemporaryStreetLocation temporaryStreetLocation =
-          (TemporaryStreetLocation) temporaryFreeEdge.getToVertex();
-      return temporaryStreetLocation
-          .getIncoming()
-          .stream()
-          .map(Edge::getToVertex)
-          .collect(Collectors.toSet());
-    }
-    else {
-      return Set.of(vertex);
-    }
   }
 }
