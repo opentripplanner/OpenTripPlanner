@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Thin wrapper around a {@link HeuristicSearch} to allow for some small additional features. This
- * is mostly to extracted some "glue" out of the {@link RangRaptorDynamicSearch} to make that
+ * is mostly to extracted some "glue" out of the {@link RangeRaptorDynamicSearch} to make that
  * simpler and let it focus on the main bossiness logic.
  * <p>
  * This class is not meant for reuse, create one task for each potential heuristic search. The task

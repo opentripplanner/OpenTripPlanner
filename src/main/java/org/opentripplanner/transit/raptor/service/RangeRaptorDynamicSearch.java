@@ -28,17 +28,17 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This search help the {@link org.opentripplanner.transit.raptor.RaptorService} to configure
+ * This search helps the {@link org.opentripplanner.transit.raptor.RaptorService} to configure
  * heuristics and set dynamic search parameters like EDT, LAT and raptor-search-window.
  * <p>
- * If possible the forward and revers heuristics will be run in parallel.
+ * If possible the forward and reverse heuristics will be run in parallel.
  * <p>
- * Depending on witch optimization is enabled and witch search parameters is set a forward and/or a
- * revers "singel-iteration" raptor search is performed and heuristics is collected. This is used
+ * Depending on which optimization is enabled and which search parameters are set a forward and/or a
+ * reverse "single-iteration" raptor search is performed and heuristics are collected. This is used
  * to configure the "main" multi-iteration RangeRaptor search.
  */
-public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
-    private static final Logger LOG = LoggerFactory.getLogger(RangRaptorDynamicSearch.class);
+public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
+    private static final Logger LOG = LoggerFactory.getLogger(RangeRaptorDynamicSearch.class);
 
     private final RaptorConfig<T> config;
     private final RaptorTransitDataProvider<T> transitData;
@@ -48,7 +48,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
     private final HeuristicSearchTask<T> fwdHeuristics;
     private final HeuristicSearchTask<T> revHeuristics;
 
-    public RangRaptorDynamicSearch(
+    public RangeRaptorDynamicSearch(
             RaptorConfig<T> config,
             RaptorTransitDataProvider<T> transitData,
             RaptorRequest<T> originalRequest
