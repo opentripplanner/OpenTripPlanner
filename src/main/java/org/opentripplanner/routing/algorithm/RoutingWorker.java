@@ -182,14 +182,13 @@ public class RoutingWorker {
         }
         // Regular egress routing
         else {
-            // Prepare access/egress transfers
-            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
+            Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
                 request,
                 request.modes.egressMode,
                 true,
                 2000
             );
-            egressList = accessEgressMapper.mapNearbyStops(accessStops, true);
+            egressList = accessEgressMapper.mapNearbyStops(egressStops, true);
         }
 
         verifyEgressAccess(accessList, egressList);
