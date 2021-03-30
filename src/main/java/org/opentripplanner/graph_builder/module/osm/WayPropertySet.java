@@ -230,10 +230,12 @@ public class WayPropertySet {
             }
         }
         
-        if (bestSpeed != null)
+        if (bestSpeed != null) {
             return bestSpeed;
-        else
+        }
+        else {
             return this.defaultSpeed;
+        }
     }
 
     public Set<T2<StreetNote, NoteMatcher>> getNoteForWay(OSMWithTags way) {
@@ -307,8 +309,9 @@ public class WayPropertySet {
     
     public Float getMetersSecondFromSpeed(String speed) {
         Matcher m = maxSpeedPattern.matcher(speed);
-        if (!m.matches())
+        if (!m.matches()) {
             return null;
+        }
         
         float originalUnits;
         try {

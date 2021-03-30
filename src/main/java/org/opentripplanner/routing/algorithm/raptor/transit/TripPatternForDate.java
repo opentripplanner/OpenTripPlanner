@@ -105,10 +105,12 @@ public class TripPatternForDate {
     }
 
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         TripPatternForDate that = (TripPatternForDate) o;
 
         return tripPattern.equals(that.tripPattern) &&

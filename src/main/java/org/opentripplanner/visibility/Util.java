@@ -15,8 +15,9 @@ public class Util {
     static Random rng = new Random();
 
     public static double uniform_random_sample(double lower_bound, double upper_bound) {
-        if (lower_bound == upper_bound)
+        if (lower_bound == upper_bound) {
             return lower_bound;
+        }
         double sample_point;
         double span = upper_bound - lower_bound;
         sample_point = lower_bound + span * rng.nextDouble();

@@ -334,10 +334,12 @@ public class AStar {
     }
 
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
-        if (opt.arriveBy)
+        if (opt.arriveBy) {
             return v.getTimeSeconds() < opt.worstTime;
-        else
+        }
+        else {
             return v.getTimeSeconds() > opt.worstTime;
+        }
     }
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {

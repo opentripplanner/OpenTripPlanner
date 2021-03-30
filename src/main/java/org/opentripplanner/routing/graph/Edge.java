@@ -253,8 +253,9 @@ public abstract class Edge implements Serializable {
 
         public boolean isValid(Vertex from, Vertex to) {
             for (int i = 0; i < classes.length; i += 2) {
-                if (classes[i].isInstance(from) && classes[i + 1].isInstance(to))
+                if (classes[i].isInstance(from) && classes[i + 1].isInstance(to)) {
                     return true;
+                }
             }
             return false;
         }

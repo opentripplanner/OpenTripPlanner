@@ -599,7 +599,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         sb.append(encoder.encode(stopPattern.semanticHash(murmur).asBytes()));
         if (trip != null) {
             TripTimes tripTimes = scheduledTimetable.getTripTimes(trip);
-            if (tripTimes == null) return null;
+            if (tripTimes == null) { return null; }
             sb.append(':');
             sb.append(encoder.encode(tripTimes.semanticHash(murmur).asBytes()));
         }

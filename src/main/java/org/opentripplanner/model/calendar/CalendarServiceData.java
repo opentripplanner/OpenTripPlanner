@@ -54,8 +54,9 @@ public class CalendarServiceData implements Serializable {
 
     public Set<FeedScopedId> getServiceIdsForDate(ServiceDate date) {
         Set<FeedScopedId> serviceIds = serviceIdsByDate.get(date);
-        if (serviceIds == null)
+        if (serviceIds == null) {
             serviceIds = new HashSet<>();
+        }
         return serviceIds;
     }
 

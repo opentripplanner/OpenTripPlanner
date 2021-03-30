@@ -115,8 +115,9 @@ public class DefaultFareServiceImpl implements FareService {
 
     protected static Money getMoney(Currency currency, float cost) {
         int fractionDigits = 2;
-        if (currency != null)
+        if (currency != null) {
             fractionDigits = currency.getDefaultFractionDigits();
+        }
         int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
         return new Money(new WrappedCurrency(currency), cents);
     }

@@ -11,10 +11,11 @@ public class Bus extends AbstractStopArrival implements TransitPathView<TestTrip
             int round,
             int stop,
             int arrivalTime,
+            int cost,
             TestTripSchedule trip,
             ArrivalView<TestTripSchedule> previous
     ) {
-        super(round, stop, arrivalTime, 1000, previous);
+        super(round, stop, arrivalTime, cost, previous);
         this.trip = trip;
     }
     @Override public boolean arrivedByTransit() { return true; }

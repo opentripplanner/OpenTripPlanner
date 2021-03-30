@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.issues;
+package org.opentripplanner.netex.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
 

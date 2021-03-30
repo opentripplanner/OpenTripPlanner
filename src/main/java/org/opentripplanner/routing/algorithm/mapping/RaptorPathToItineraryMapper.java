@@ -1,5 +1,12 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+import java.util.TimeZone;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
@@ -32,14 +39,6 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.util.PolylineEncoder;
-
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.TimeZone;
 
 /**
  * This maps the paths found by the Raptor search algorithm to the itinerary structure currently used by OTP. The paths,
@@ -108,7 +107,7 @@ public class RaptorPathToItineraryMapper {
         Itinerary itinerary = new Itinerary(legs);
 
         // Map general itinerary fields
-        itinerary.generalizedCost = path.cost();
+        itinerary.generalizedCost = path.generalizedCost();
         itinerary.nonTransitLimitExceeded = itinerary.nonTransitDistanceMeters > request.maxWalkDistance;
 
         return itinerary;
@@ -148,8 +147,12 @@ public class RaptorPathToItineraryMapper {
 
         // Find stop positions in pattern where this leg boards and alights.
         // We cannot assume every stop appears only once in a pattern, so we match times instead of stops.
-        int boardStopIndexInPattern = tripSchedule.findStopPosInPattern(pathLeg.fromStop(), pathLeg.fromTime(), true);
-        int alightStopIndexInPattern = tripSchedule.findStopPosInPattern(pathLeg.toStop(), pathLeg.toTime(), false);
+        int boardStopIndexInPattern = tripSchedule.findStopPosInPattern(
+            pathLeg.fromStop(), pathLeg.fromTime(), true
+        );
+        int alightStopIndexInPattern = tripSchedule.findStopPosInPattern(
+            pathLeg.toStop(), pathLeg.toTime(), false
+        );
 
         // Include real-time information in the Leg.
         if (!tripTimes.isScheduled()) {

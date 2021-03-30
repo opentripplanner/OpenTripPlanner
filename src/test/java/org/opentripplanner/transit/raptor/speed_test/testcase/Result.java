@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.CompositeComparator;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -8,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -19,12 +19,11 @@ import java.util.regex.Pattern;
  * This class is responsible for holding information about a test result - a single
  * itinerary. The result can be expected or actual, both represented by this class.
  */
-class Result implements Comparable<Result> {
+class Result {
     private static final Pattern STOPS_PATTERN = Pattern.compile(" ~ (\\d+) ~ ");
     /**
      * The status is not final; This allows to update the status when matching expected and actual results.
      */
-    TestStatus status = TestStatus.NA;
     final String testCaseId;
     final Integer transfers;
     final Integer duration;
@@ -37,9 +36,8 @@ class Result implements Comparable<Result> {
     final List<String> routes = new ArrayList<>();
     final List<Integer> stops = new ArrayList<>();
     final String details;
-    final boolean skipCost;
 
-    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, Integer startTime, Integer endTime, String details, boolean skipCost) {
+    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, Integer startTime, Integer endTime, String details) {
         this.testCaseId = testCaseId;
         this.transfers = transfers;
         this.duration = duration;
@@ -49,63 +47,25 @@ class Result implements Comparable<Result> {
         this.endTime = endTime;
         this.details = details;
         this.stops.addAll(parseStops(details));
-        this.skipCost = skipCost;
     }
 
-    void setStatus(TestStatus status) {
-        this.status = status;
+    public static Comparator<Result> comparator(boolean skipCost) {
+        return new CompositeComparator<>(
+            Comparator.comparing(r -> r.endTime),
+            Comparator.comparing(r -> -r.startTime),
+            compareCost(skipCost),
+            (r1, r2) -> compare(r1.routes, r2.routes, String::compareTo),
+            (r1, r2) -> compare(r1.stops, r2.stops, Integer::compareTo)
+        );
     }
 
-    @Override
-    public int compareTo(Result o) {
-        // Sort first arrival first
-        int res = endTime.compareTo(o.endTime);
-        if(res != 0) { return res; }
-
-        // Sort latest departure first
-        res = -startTime.compareTo(o.startTime);
-        if(res != 0) { return res; }
-
-        // Sort lowest cost first
-        if(skipCost) {
-            res = -cost.compareTo(o.cost);
-            if (res != 0) { return res; }
-        }
-
-        // Sort based on route
-        res = compare(routes, o.routes, String::compareTo);
-        if(res != 0) { return res; }
-
-        // Sort based on stops
-        res = compare(stops, o.stops, Integer::compareTo);
-        return res;
-    }
-
-    /**
-     * Compare if two results are the same.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Result result = (Result) o;
-        return Objects.equals(startTime, result.startTime) &&
-                Objects.equals(endTime, result.endTime) &&
-                (skipCost || compareCost(cost, result.cost)) &&
-                compare(routes, result.routes, String::compareTo) == 0 &&
-                compare(stops, result.stops, Integer::compareTo) == 0;
-    }
-
-    private boolean compareCost(Integer c1, Integer c2) {
-        // Ignore cost from comparison if not computed
-        if(c1 == null || c1 == 0) return true;
-        if(c2 == null || c2 == 0) return true;
-        return c1.equals(c2);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(startTime, endTime, skipCost ? 0 : cost, details);
+    private static Comparator<Result> compareCost(boolean skipCost) {
+        return (r1, r2) -> {
+            if(skipCost) { return 0; };
+            if(r1.cost == null || r1.cost.equals(0)) { return 0; }
+            if(r2.cost == null || r2.cost.equals(0)) { return 0; }
+            return -(r2.cost - r1.cost);
+        };
     }
 
     /** Create a compact String representation of an itinerary. */

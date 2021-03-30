@@ -1,10 +1,10 @@
 package org.opentripplanner.model;
 
 import com.google.common.collect.Multimap;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
-
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.model.transfer.Transfer;
 
 /**
  * Methods for accessing imported entities.

@@ -42,8 +42,9 @@ class Polyline {
         double running_max = 0;
         for (int i = 0; i < size() - 1; i++) {
             for (int j = i + 1; j < size(); j++) {
-                if (get(i).distance(get(j)) > running_max)
+                if (get(i).distance(get(j)) > running_max) {
                     running_max = get(i).distance(get(j));
+                }
             }
         }
         return running_max;

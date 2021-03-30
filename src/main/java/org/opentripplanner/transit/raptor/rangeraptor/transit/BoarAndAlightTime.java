@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Objects;
 
@@ -8,13 +9,30 @@ import java.util.Objects;
  * Board and alight time tuple value object.
  */
 public class BoarAndAlightTime {
+  private final RaptorTripSchedule trip;
+  private final int boardStopPos;
+  private final int alightStopPos;
 
-  public final int boardTime;
-  public final int alightTime;
+  public BoarAndAlightTime(RaptorTripSchedule trip, int boardStopPos, int alightStopPos) {
+    this.trip = trip;
+    this.boardStopPos = boardStopPos;
+    this.alightStopPos = alightStopPos;
+  }
 
-  BoarAndAlightTime(int boardTime, int alightTime) {
-    this.boardTime = boardTime;
-    this.alightTime = alightTime;
+  public int boardTime() {
+    return trip.departure(boardStopPos);
+  }
+
+  public int alightTime() {
+    return trip.arrival(alightStopPos);
+  }
+
+  public int boardStopPos() {
+    return boardStopPos;
+  }
+
+  public int alightStopPos() {
+    return alightStopPos;
   }
 
   @Override
@@ -22,9 +40,9 @@ public class BoarAndAlightTime {
     return ValueObjectToStringBuilder
         .of()
         .addLbl("(")
-        .addServiceTime(boardTime)
+        .addServiceTime(boardTime())
         .addLbl(", ")
-        .addServiceTime(alightTime)
+        .addServiceTime(alightTime())
         .addLbl(")")
         .toString();
   }
@@ -34,11 +52,11 @@ public class BoarAndAlightTime {
     if (this == o) { return true; }
     if (o == null || getClass() != o.getClass()) { return false; }
     BoarAndAlightTime that = (BoarAndAlightTime) o;
-    return boardTime == that.boardTime && alightTime == that.alightTime;
+    return boardStopPos == that.boardStopPos && alightStopPos == that.alightStopPos;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(boardTime, alightTime);
+    return Objects.hash(boardStopPos, alightStopPos);
   }
 }

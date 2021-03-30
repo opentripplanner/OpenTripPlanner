@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.model.transfer;
 
 public enum TransferType {
     /**

@@ -155,8 +155,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         RaptorRequest<?> that = (RaptorRequest<?>) o;
         return profile == that.profile &&
                 Objects.equals(searchParams, that.searchParams) &&

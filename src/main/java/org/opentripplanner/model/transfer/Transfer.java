@@ -1,10 +1,11 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.model;
+package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.model.Trip;
 
 public final class Transfer implements Serializable {
 

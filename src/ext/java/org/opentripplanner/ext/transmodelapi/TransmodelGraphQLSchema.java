@@ -1102,7 +1102,7 @@ public class TransmodelGraphQLSchema {
 //    }
 
     private List<FeedScopedId> toIdList(List<String> ids) {
-        if (ids == null) return Collections.emptyList();
+        if (ids == null) { return Collections.emptyList(); }
         return ids.stream().map(id -> TransitIdMapper.mapIDToDomain(id)).collect(Collectors.toList());
     }
 

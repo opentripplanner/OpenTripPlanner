@@ -64,8 +64,9 @@ public abstract class RentABikeAbstractEdge extends Edge {
         /*
          * To dropoff a bike, we need to have rented one.
          */
-        if (!s0.isBikeRenting() || !hasCompatibleNetworks(networks, s0.getBikeRentalNetworks()))
+        if (!s0.isBikeRenting() || !hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) {
             return null;
+        }
         BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
         if (options.useBikeRentalAvailabilityInformation && pickup.getSpacesAvailable() == 0) {
             return null;

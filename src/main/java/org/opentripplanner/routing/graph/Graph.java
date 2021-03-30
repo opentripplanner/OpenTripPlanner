@@ -1,16 +1,38 @@
 package org.opentripplanner.routing.graph;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -50,10 +72,10 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
+import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
@@ -68,30 +90,6 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
@@ -125,7 +123,7 @@ public class Graph implements Serializable {
 
     private final Map<Class<?>, Serializable> services = new HashMap<>();
 
-    private final TransferTable transferTable = new TransferTable();
+    private final TransferService transferService = new TransferService();
 
     private GraphBundle bundle;
 
@@ -524,8 +522,8 @@ public class Graph implements Serializable {
         return env;
     }
 
-    public TransferTable getTransferTable() {
-        return transferTable;
+    public TransferService getTransferService() {
+        return transferService;
     }
 
     // Infer the time period covered by the transit feed
@@ -910,7 +908,7 @@ public class Graph implements Serializable {
         BitSet services = new BitSet(calendarService.getServiceIds().size());
         for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
             int n = serviceCodes.get(serviceId);
-            if (n < 0) continue;
+            if (n < 0) { continue; }
             services.set(n);
         }
         return services;
