@@ -114,20 +114,26 @@ public class GenerateTripPatternsOperation {
             stopPattern, trip.getRoute(), direction
         );
 
-        // Create a TripTimes object for this list of stoptimes, which form one trip.
-        TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
-
         var frequencies = frequenciesForTrip.get(trip);
         // If trip was not frequency-based, add TripTimes directly to the TripPattern's scheduled
         // timetable.
         if(frequencies == null) {
+            // Create a TripTimes object for this list of stoptimes, which form one trip.
+            TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
             tripPattern.add(tripTimes);
             scheduledCount++;
         }
         // If trip is referenced by one or more lines in frequencies.txt, then expand the
         // trip-pattern with new TripTimes for each depature
         else {
+            // Create a TripTimes object for this list of stoptimes, which form one trip.
+            var tripTimesMap = new HashMap<Integer, TripTimes>();
+
             for (Frequency freq : frequencies) {
+                TripTimes tripTimes = tripTimesMap.computeIfAbsent(
+                    freq.isExactHeadway() ? 0: freq.getHeadwaySecs(),
+                    headway -> new TripTimes(trip, stopTimes(stopTimes, headway), deduplicator)
+                );
                 int timeShift = timeShiftForFrequencyBasedTrip(tripTimes, freq);
                 while (timeShift < freq.getEndTime()) {
                     tripPattern.add(new TripTimes(tripTimes, freq, timeShift));
@@ -180,5 +186,15 @@ public class GenerateTripPatternsOperation {
         String id = String.format("%s:%s:%02d", routeId.getId(), direction, counter);
 
         return new FeedScopedId(routeId.getFeedId(), id);
+    }
+
+    private static Collection<StopTime> stopTimes(Collection<StopTime> stopTimes, int timeShiftArrival) {
+        return timeShiftArrival == 0 ? stopTimes : stopTimes.stream()
+                .map(it -> {
+                    var st = new StopTime(it);
+                    st.setArrivalTime(it.getArrivalTime() + timeShiftArrival);
+                    return st;
+                })
+                .collect(Collectors.toList());
     }
 }
