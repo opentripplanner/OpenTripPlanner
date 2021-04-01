@@ -36,6 +36,10 @@ public class RentalUpdaterError {
          */
         ALL_FLOATING_VEHICLES,
         /**
+         * An error that made it impossible to parse region information.
+         */
+        ALL_REGIONS,
+        /**
          * An error that affects just an individual docking station
          */
         INDIVIDUAL_DOCKING_STATION,

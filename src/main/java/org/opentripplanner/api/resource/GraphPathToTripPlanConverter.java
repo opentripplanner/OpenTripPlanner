@@ -24,6 +24,8 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.car_rental.CarRentalStationService;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -761,34 +763,49 @@ public abstract class GraphPathToTripPlanConverter {
     }
 
     /**
-     * Adds overall information about any vehicle rental systems that were used in any of the paths.
+     * Adds overall information about all rental systems that might have been available for this particular request.
      */
     private static void addRentalInfo(TripPlan plan, List<GraphPath> paths) {
-        Graph graph = paths.get(0).states.get(0).getOptions().rctx.graph;
+        RoutingRequest options = paths.get(0).states.get(0).getOptions();
+        Graph graph = options.rctx.graph;
+        BikeRentalStationService bikeRentalStationService = graph.getService(BikeRentalStationService.class);
+        CarRentalStationService carRentalStationService = graph.getService(CarRentalStationService.class);
         VehicleRentalStationService vehicleRentalStationService = graph.getService(VehicleRentalStationService.class);
 
-        if (vehicleRentalStationService != null) {
-            Set<String> vehicleRentalNetworks = new HashSet<>();
-            for (GraphPath path : paths) {
-                for (State state : path.states) {
-                    Set<String> stateNetworks = state.getVehicleRentalNetworks();
-                    if (stateNetworks != null) {
-                        vehicleRentalNetworks.addAll(stateNetworks);
-                    }
-                }
-            }
-
-            Map<String, RentalInfo> rentalInfo = new HashMap<>();
-            Map<String, List<RentalUpdaterError>> errorsByNetwork = vehicleRentalStationService.getErrorsByNetwork();
-            Map<String, SystemInformation.SystemInformationData> systemInformationDataByNetwrok = vehicleRentalStationService
-                .getSystemInformationDataByNetwork();
-            for (String vehicleRentalNetwork : vehicleRentalNetworks) {
-                rentalInfo.put(vehicleRentalNetwork, new RentalInfo(errorsByNetwork.get(vehicleRentalNetwork),
-                    systemInformationDataByNetwrok.get(vehicleRentalNetwork)
-                ));
-            }
-            plan.vehicleRentalInfo = rentalInfo;
+        if (bikeRentalStationService != null && options.allowBikeRental) {
+            plan.bikeRentalInfo = makeRentalInfo(
+                bikeRentalStationService.getErrorsByNetwork(),
+                bikeRentalStationService.getSystemInformationDataByNetwork()
+            );
         }
+
+        if (carRentalStationService != null && options.allowCarRental) {
+            plan.carRentalInfo = makeRentalInfo(
+                carRentalStationService.getErrorsByNetwork(),
+                carRentalStationService.getSystemInformationDataByNetwork()
+            );
+        }
+
+        if (vehicleRentalStationService != null && options.allowVehicleRental) {
+            plan.vehicleRentalInfo = makeRentalInfo(
+                vehicleRentalStationService.getErrorsByNetwork(),
+                vehicleRentalStationService.getSystemInformationDataByNetwork()
+            );
+        }
+    }
+
+    private static Map<String, RentalInfo> makeRentalInfo(
+        Map<String, List<RentalUpdaterError>> errorsByNetwork,
+        Map<String, SystemInformation.SystemInformationData> systemInformationDataByNetwork
+    ) {
+        Map<String, RentalInfo> rentalInfo = new HashMap<>();
+        for (String network : errorsByNetwork.keySet()) {
+            rentalInfo.put(
+                network,
+                new RentalInfo(errorsByNetwork.get(network), systemInformationDataByNetwork.get(network))
+            );
+        }
+        return rentalInfo;
     }
 
     /**

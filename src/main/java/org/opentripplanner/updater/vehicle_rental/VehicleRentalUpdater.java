@@ -76,13 +76,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         source.update();
 
         // Create graph writer runnable to apply these stations and regions to the graph
-        updaterManager.execute(new VehicleRentalGraphWriterRunnable(
-            source.getErrors(),
-            source.getRegions(),
-            source.regionsUpdated(),
-            source.getStations(),
-            source.getSystemInformation()
-        ));
+        updaterManager.execute(new VehicleRentalGraphWriterRunnable(source));
     }
 
     @Override
@@ -137,18 +131,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         private final GeometryFactory geometryFactory = new GeometryFactory();
 
-        public VehicleRentalGraphWriterRunnable(
-            List<RentalUpdaterError> errors,
-            List<VehicleRentalRegion> regions,
-            boolean regionsUpdated,
-            List<VehicleRentalStation> stations,
-            SystemInformation.SystemInformationData systemInformationData
-        ) {
-            this.errors = errors;
-            this.regions = regions;
-            this.regionsUpdated = regionsUpdated;
-            this.stations = stations;
-            this.systemInformationData = systemInformationData;
+        public VehicleRentalGraphWriterRunnable(VehicleRentalDataSource source) {
+            errors = source.getErrors();
+            regions = source.getRegions();
+            regionsUpdated = source.regionsUpdated();
+            stations = source.getStations();
+            systemInformationData = source.getSystemInformation();
         }
 
         @Override

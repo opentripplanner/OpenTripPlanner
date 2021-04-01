@@ -179,7 +179,7 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
     }
 
     /**
-     * Adds an erorr message to the list of errors and also logs the error message.
+     * Adds an error message to the list of errors and also logs the error message.
      */
     private void addError(RentalUpdaterError.Severity severity, String message) {
         message = String.format("%s (feed: %s)", message, networkName);

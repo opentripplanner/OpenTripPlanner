@@ -7,6 +7,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.GbfsResponse;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -39,6 +40,9 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean routeAsCar;
 
+    // any errors that occured in the last update
+    private List<RentalUpdaterError> errors;
+
     public GbfsBikeRentalDataSource (String networkName) {
         stationInformationSource = new GbfsStationDataSource();
         stationStatusSource = new GbfsStationStatusDataSource();
@@ -57,6 +61,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     @Override
     public boolean update() {
+        errors = new LinkedList<>();
         updateUrls();
         // These first two GBFS files are required.
         boolean updatesFound = stationInformationSource.update();
@@ -65,6 +70,22 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         updatesFound |= floatingBikeSource.update();
         // Return true if ANY of the sub-updaters found any updates.
         return updatesFound;
+    }
+
+    /**
+     * Helper method for adding an error with a template String and associated values
+     */
+    private void addError(RentalUpdaterError.Severity severity, String template, Object... values) {
+        addError(severity, String.format(template, values));
+    }
+
+    /**
+     * Adds an error message to the list of errors and also logs the error message.
+     */
+    private void addError(RentalUpdaterError.Severity severity, String message) {
+        message = String.format("%s (feed: %s)", message, networkName);
+        errors.add(new RentalUpdaterError(severity, message));
+        LOG.error(String.format("[severity: %s] %s", severity, message));
     }
 
     /**
@@ -94,7 +115,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
             try {
                 gbfsResponse = mapper.readValue(rootData, GbfsResponse.class);
             } catch (IOException e) {
-                LOG.error("failed to deserialize gbfs.json response: {}", e);
+                addError(RentalUpdaterError.Severity.FEED_WIDE, "failed to deserialize gbfs.json response");
                 return;
             } finally {
                 try {
@@ -104,14 +125,19 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
                 }
             }
             if (gbfsResponse.data == null) {
-                LOG.error("failed to read gbfs.json, no data found");
+                addError(RentalUpdaterError.Severity.FEED_WIDE, "failed to read gbfs.json, no data found");
                 return;
             }
 
             // Get the GBFS feeds for the configured language.
             GbfsResponse.GbfsFeeds feeds = gbfsResponse.data.get(language);
             if (feeds == null) {
-                LOG.error("requested language ({}) not available in GBFS: {}", language, baseUrl);
+                addError(
+                    RentalUpdaterError.Severity.FEED_WIDE,
+                    "requested language (%s) not available in GBFS: %s",
+                    language,
+                    baseUrl
+                );
                 return;
             }
 
@@ -184,6 +210,10 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         return data;
     }
 
+    @Override public List<RentalUpdaterError> getErrors() {
+        return errors;
+    }
+
     @Override
     public List<BikeRentalStation> getStations() {
 
@@ -237,7 +267,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
     class GbfsStationDataSource extends GenericJsonBikeRentalDataSource {
 
         public GbfsStationDataSource () {
-            super("data/stations");
+            super(RentalUpdaterError.Severity.ALL_STATIONS, "data/stations");
         }
 
         @Override
@@ -259,7 +289,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
     class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource {
 
         public GbfsStationStatusDataSource () {
-            super("data/stations");
+            super(RentalUpdaterError.Severity.ALL_STATIONS, "data/stations");
         }
 
         @Override
@@ -280,7 +310,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
     class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
 
         public GbfsFloatingBikeDataSource () {
-            super("data/bikes");
+            super(RentalUpdaterError.Severity.ALL_FLOATING_VEHICLES, "data/bikes");
         }
 
         @Override

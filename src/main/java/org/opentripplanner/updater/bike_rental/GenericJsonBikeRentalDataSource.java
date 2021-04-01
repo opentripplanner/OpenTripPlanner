@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +28,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
+
+    private final RentalUpdaterError.Severity severityFailureType;
+
     private String url;
     private String headerName;
     private String headerValue;
 
     private String jsonParsePath;
+
+    // any errors that occured in the last update
+    protected List<RentalUpdaterError> errors;
 
     List<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
 
@@ -41,10 +49,8 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      *        Separate path levels with '/' For example "d/list"
      *
      */
-    public GenericJsonBikeRentalDataSource(String jsonPath) {
-        jsonParsePath = jsonPath;
-        headerName = "Default";
-        headerValue = null;
+    public GenericJsonBikeRentalDataSource(RentalUpdaterError.Severity severityFailureType, String jsonPath) {
+        this(severityFailureType, jsonPath, "Default", null);
     }
 
     /**
@@ -54,26 +60,34 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      * @param headerName header name
      * @param headerValue header value
      */
-    public GenericJsonBikeRentalDataSource(String jsonPath, String headerName, String headerValue) {
+    public GenericJsonBikeRentalDataSource(
+        RentalUpdaterError.Severity severityFailureType,
+        String jsonPath,
+        String headerName,
+        String headerValue
+    ) {
+        this.severityFailureType = severityFailureType;
         jsonParsePath = jsonPath;
         this.headerName = headerName;
         this.headerValue = headerValue;
     }
 
     /**
-     * Construct superclass where rental list is on the top level of JSON code
-     *
+     * Adds an error message to the list of errors and also logs the error message.
      */
-    public GenericJsonBikeRentalDataSource() {
-        jsonParsePath = "";
+    private void addError(String message) {
+        message = String.format("%s (url: %s)", message, url);
+        errors.add(new RentalUpdaterError(severityFailureType, message));
+        log.error(String.format("[severity: %s] %s", severityFailureType, message));
     }
 
     @Override
     public boolean update() {
+        errors = new LinkedList<>();
+
+        InputStream data = null;
         try {
-            InputStream data = null;
-        	
-        	URL url2 = new URL(url);
+            URL url2 = new URL(url);
         	
             String proto = url2.getProtocol();
             if (proto.equals("http") || proto.equals("https")) {
@@ -84,20 +98,26 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
             }
             // TODO handle optional GBFS files, where it's not warning-worthy that they don't exist.
             if (data == null) {
-                log.warn("Failed to get data from url " + url);
+                addError("Failed to get data from url " + url);
                 return false;
             }
             parseJSON(data);
-            data.close();
         } catch (IllegalArgumentException e) {
-            log.warn("Error parsing bike rental feed from " + url, e);
+            addError("Error parsing bike rental feed from " + url);
             return false;
         } catch (JsonProcessingException e) {
-            log.warn("Error parsing bike rental feed from " + url + "(bad JSON of some sort)", e);
+            addError("Error parsing bike rental feed from " + url + "(bad JSON of some sort)");
             return false;
         } catch (IOException e) {
-            log.warn("Error reading bike rental feed from " + url, e);
+            addError("Error reading bike rental feed from " + url);
             return false;
+        } finally {
+            try {
+                data.close();
+            } catch (IOException e) {
+                log.warn("An error occurred while closing data stream {}");
+                e.printStackTrace();
+            }
         }
         return true;
     }
@@ -122,7 +142,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
 
             if (rootNode.isMissingNode()) {
                 throw new IllegalArgumentException("Could not find jSON elements " + jsonParsePath);
-              }
+            }
         }
 
         for (int i = 0; i < rootNode.size(); i++) {
@@ -148,14 +168,17 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
             scanner = new java.util.Scanner(is).useDelimiter("\\A");
             result = scanner.hasNext() ? scanner.next() : "";
             scanner.close();
-        }
-        finally
-        {
+        } finally {
            if(scanner!=null)
                scanner.close();
         }
         return result;
         
+    }
+
+    @Override
+    public List<RentalUpdaterError> getErrors() {
+        return errors;
     }
 
     @Override

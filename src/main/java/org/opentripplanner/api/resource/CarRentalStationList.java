@@ -14,15 +14,17 @@
 package org.opentripplanner.api.resource;
 
 import org.opentripplanner.routing.car_rental.CarRentalStation;
+import org.opentripplanner.updater.RentalUpdaterError;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-@XmlRootElement(name="CarRentalStationList")
 public class CarRentalStationList {
-    @XmlElements(value = { @XmlElement(name="station") })
     public List<CarRentalStation> stations = new ArrayList<CarRentalStation>();
+
+    public Map<String, List<RentalUpdaterError>> errorsByNetwork;
+
+    public Map<String, SystemInformation.SystemInformationData> systemInformationDataByNetwork;
 }

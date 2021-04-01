@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.car_rental.CarFuelType;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 public class Car2GoCarRentalDataSource extends GenericCarRentalDataSource {
     private static final Logger LOG = LoggerFactory.getLogger(Car2GoCarRentalDataSource.class);
@@ -55,5 +57,4 @@ public class Car2GoCarRentalDataSource extends GenericCarRentalDataSource {
 
         return car2go;
     }
-
 }

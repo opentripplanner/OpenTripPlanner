@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.vehicle_rental.RentalStation;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.NonLocalizedString;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class JCDecauxBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
     public JCDecauxBikeRentalDataSource() {
-        super("");
+        super(RentalUpdaterError.Severity.ALL_STATIONS, "");
     }
 
     /**

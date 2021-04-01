@@ -26,8 +26,20 @@ public class TripPlan {
     public List<Itinerary> itinerary = new ArrayList<Itinerary>();
 
     /**
-     * Rental information about the networks used in the itinerary if applicable. This will be a map where keys are
-     * network names and the values are the information associated with that particular network.
+     * Rental information about the bike rental networks used in the itinerary if applicable. This will be a map
+     * where keys are network names and the values are the information associated with that particular network.
+     */
+    public Map<String, RentalInfo> bikeRentalInfo = null;
+
+    /**
+     * Rental information about the car rental networks used in the itinerary if applicable. This will be a map
+     * where keys are network names and the values are the information associated with that particular network.
+     */
+    public Map<String, RentalInfo> carRentalInfo = null;
+
+    /**
+     * Rental information about the vehicle rental networks used in the itinerary if applicable. This will be a map
+     * where keys are network names and the values are the information associated with that particular network.
      */
     public Map<String, RentalInfo> vehicleRentalInfo = null;
 

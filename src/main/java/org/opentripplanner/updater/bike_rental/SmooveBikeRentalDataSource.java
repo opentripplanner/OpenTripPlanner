@@ -15,6 +15,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.vehicle_rental.RentalStation;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
     public SmooveBikeRentalDataSource() {
-        super("result");
+        super(RentalUpdaterError.Severity.ALL_STATIONS, "result");
     }
 
     /**
@@ -61,7 +62,10 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
             station.x = Double.parseDouble(coordinates[1].trim());
         } catch (NumberFormatException e) {
             // E.g. coordinates is empty
-            log.warn("Error parsing bike rental station " + station.id, e);
+            errors.add(new RentalUpdaterError(
+                RentalUpdaterError.Severity.INDIVIDUAL_DOCKING_STATION,
+                "Error parsing bike rental station " + station.id
+            ));
             return null;
         }
         if (!node.path("operative").asText().equals("true")) {

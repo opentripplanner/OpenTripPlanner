@@ -3,6 +3,7 @@ package org.opentripplanner.updater.bike_rental;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.vehicle_rental.RentalStation;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.HashSet;
@@ -18,7 +19,7 @@ public class SanFranciscoBayAreaBikeRentalDataSource extends GenericJsonBikeRent
     private String networkName;
 
     public SanFranciscoBayAreaBikeRentalDataSource(String networkName) {
-        super("stationBeanList");
+        super(RentalUpdaterError.Severity.ALL_STATIONS, "stationBeanList");
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {

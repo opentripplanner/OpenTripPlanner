@@ -11,6 +11,7 @@ import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -18,6 +19,8 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.RentalUpdaterError;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,15 +144,9 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() throws Exception {
         LOG.debug("Updating bike rental stations from " + source);
-        if (!source.update()) {
-            LOG.debug("No updates");
-            return;
-        }
-        List<BikeRentalStation> stations = source.getStations();
+        source.update();
 
-        // Create graph writer runnable to apply these stations to the graph
-        BikeRentalGraphWriterRunnable graphWriterRunnable = new BikeRentalGraphWriterRunnable(stations);
-        updaterManager.execute(graphWriterRunnable);
+        updaterManager.execute(new BikeRentalGraphWriterRunnable(source));
     }
 
     @Override
@@ -157,53 +154,104 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     }
 
     private class BikeRentalGraphWriterRunnable implements GraphWriterRunnable {
+        private final List<RentalUpdaterError> errors;
+        private final List<BikeRentalStation> stations;
+        private final SystemInformation.SystemInformationData systemInformationData;
 
-        private List<BikeRentalStation> stations;
-
-        public BikeRentalGraphWriterRunnable(List<BikeRentalStation> stations) {
-            this.stations = stations;
+        public BikeRentalGraphWriterRunnable(BikeRentalDataSource source) {
+            errors = source.getErrors();
+            stations = source.getStations();
+            systemInformationData = null;
         }
 
 		@Override
         public void run(Graph graph) {
-            // Apply stations to graph
-            Set<BikeRentalStation> stationSet = new HashSet<>();
-            Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
-            LOG.info("Updating {} rental bike stations.", stations.size());
-            /* add any new stations that have fresh-enough data and update bike counts for existing stations */
-            for (BikeRentalStation station : stations) {
-                if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
-                    // skip station as it does not have fresh-enough data
-                    continue;
-                }
-                if (station.networks == null) {
-                    /* API did not provide a network list, use default */
-                    station.networks = defaultNetworks;
-                }
-                service.addBikeRentalStation(station);
-                stationSet.add(station);
-                BikeRentalStationVertex vertex = verticesByStation.get(station);
-                if (vertex == null) {
-                    vertex = new BikeRentalStationVertex(graph, station);
-                    if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
-                        // the toString includes the text "Bike rental station"
-                        LOG.warn("{} not near any streets; it will not be usable.", station);
-                    }
-                    verticesByStation.put(station, vertex);
-                    new RentABikeOnEdge(vertex, vertex, station.networks);
-                    if (station.allowDropoff)
-                        new RentABikeOffEdge(vertex, vertex, station.networks);
-                } else {
-                    vertex.setBikesAvailable(station.bikesAvailable);
-                    vertex.setSpacesAvailable(station.spacesAvailable);
+            service.setErrorsForNetwork(network, errors);
+            service.setSystemInformationDataForNetwork(network, systemInformationData);
+
+            // check if any critical errors occurred
+            boolean feedWideError = false;
+            boolean allStationsError = false;
+            boolean allFloatingVehiclesError = false;
+            for (RentalUpdaterError error : errors) {
+                switch (error.severity) {
+                case FEED_WIDE:
+                    feedWideError = true;
+                    break;
+                case ALL_STATIONS:
+                    allStationsError = true;
+                    break;
+                case ALL_FLOATING_VEHICLES:
+                    allFloatingVehiclesError = true;
+                    break;
                 }
             }
+
+            // Apply stations to graph
+            Set<BikeRentalStation> toRemove = new HashSet<>();
+            Set<BikeRentalStation> stationsInUpdate = new HashSet<>();
+            Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
+            LOG.info("Updating rental bike stations for network.", network);
+
+            // Apply stations to graph if a feed-wide error did not occur
+            if (!feedWideError) {
+                /* add any new stations that have fresh-enough data and update bike counts for existing stations */
+                for (BikeRentalStation station : stations) {
+                    if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
+                        // skip station as it does not have fresh-enough data
+                        continue;
+                    }
+                    if (station.networks == null) {
+                        /* API did not provide a network list, use default */
+                        station.networks = defaultNetworks;
+                    }
+                    service.addBikeRentalStation(station);
+                    stationsInUpdate.add(station);
+                    BikeRentalStationVertex vertex = verticesByStation.get(station);
+                    if (vertex == null) {
+                        vertex = new BikeRentalStationVertex(graph, station);
+                        if (!splitter.linkToClosestWalkableEdge(vertex, NON_DESTRUCTIVE_SPLIT, true)) {
+                            // the toString includes the text "Bike rental station"
+                            LOG.warn("{} not near any streets; it will not be usable.", station);
+                        }
+                        verticesByStation.put(station, vertex);
+                        new RentABikeOnEdge(vertex, vertex, station.networks);
+                        if (station.allowDropoff)
+                            new RentABikeOffEdge(vertex, vertex, station.networks);
+                    } else {
+                        vertex.setBikesAvailable(station.bikesAvailable);
+                        vertex.setSpacesAvailable(station.spacesAvailable);
+                    }
+                }
+            }
+
             /* remove existing stations that were not present in the update */
-            List<BikeRentalStation> toRemove = new ArrayList<BikeRentalStation>();
             for (Entry<BikeRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
                 BikeRentalStation station = entry.getKey();
-                if (stationSet.contains(station))
+                if (stationsInUpdate.contains(station)) {
+                    // station present in update, do not remove
                     continue;
+                }
+
+                // if there was an error with fetching stations, do not remove any stations that had a last reported
+                // time within the time to live threshold
+                if (
+                    allStationsError &&
+                        !station.isFloatingBike &&
+                        DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)
+                ) {
+                    continue;
+                }
+
+                // if there was an error with fetching floating bikes, do not remove any stations that had a last
+                // reported time within the time to live threshold
+                if (
+                    allFloatingVehiclesError &&
+                        station.isFloatingBike &&
+                        DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)
+                ) {
+                    continue;
+                }
 
                 splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(entry.getValue());
 
@@ -211,6 +259,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 toRemove.add(station);
                 service.removeBikeRentalStation(station);
             }
+
             for (BikeRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);

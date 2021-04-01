@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.vehicle_rental.RentalStation;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.NonLocalizedString;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,7 +20,7 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
     private String networkName;
 
     public BCycleBikeRentalDataSource(String apiKey, String networkName) {
-        super("", "ApiKey",apiKey);
+        super(RentalUpdaterError.Severity.ALL_STATIONS, "", "ApiKey",apiKey);
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {
