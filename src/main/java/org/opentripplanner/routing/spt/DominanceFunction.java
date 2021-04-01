@@ -2,10 +2,12 @@ package org.opentripplanner.routing.spt;
 
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
@@ -24,8 +26,8 @@ import java.util.Objects;
 public abstract class DominanceFunction implements Serializable {
     private static final long serialVersionUID = 1;
 
-    /** 
-     * Return true if the first state "defeats" the second state or at least ties with it in terms of suitability. 
+    /**
+     * Return true if the first state "defeats" the second state or at least ties with it in terms of suitability.
      * In the case that they are tied, we still want to return true so that an existing state will kick out a new one.
      * Provide this custom logic in subclasses. You would think this could be static, but in Java for some reason 
      * calling a static function will call the one on the declared type, not the runtime instance type. 
@@ -71,16 +73,14 @@ public abstract class DominanceFunction implements Serializable {
 
         // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
         if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
-            if (! a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {
-                return false;
-            }
+            return false;
         }
         
         // These two states are comparable (they are on the same "plane" or "copy" of the graph).
         return betterOrEqual(a, b);
-        
+
     }
-    
+
     /**
      * Create a new shortest path tree using this function, considering whether it allows co-dominant States.
      * MultiShortestPathTree is the general case -- it will work with both single- and multi-state functions.
