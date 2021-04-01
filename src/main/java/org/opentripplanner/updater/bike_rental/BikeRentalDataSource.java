@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.updater.RentalUpdaterError;
-import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
 
 /**
  * TODO clarify thread safety.

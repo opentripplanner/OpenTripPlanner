@@ -18,7 +18,6 @@ import org.opentripplanner.updater.vehicle_rental.GBFSMappings.GbfsResponse;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.StationInformation;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.StationStatus;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
-import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

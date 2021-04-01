@@ -1,7 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental.GBFSMappings;
 
-import java.util.List;
-
 /**
  * Response class for the system_information.json file.
  * See https://github.com/NABSA/gbfs/blob/v1.0/gbfs.md#system_informationjson
