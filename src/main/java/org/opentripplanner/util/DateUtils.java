@@ -284,7 +284,7 @@ public class DateUtils implements DateConstants {
     }
 
     /**
-     * Returns false if the given epochSeconds is more than ttlMinutes in the past.
+     * Returns false if the given epochSeconds is more than timeToLiveMinutes in the past.
      */
     public static boolean withinTimeToLive (Long epochSeconds, int timeToLiveMinutes) {
         return (System.currentTimeMillis() / 1000 - epochSeconds) / 60 < timeToLiveMinutes;

@@ -12,12 +12,12 @@ import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation
  */
 public interface BikeRentalDataSource {
     /**
-     * @return a List of all errors that occurred during the most recent update.
+     * @return a list of all errors that occurred during the most recent update.
      */
     List<RentalUpdaterError> getErrors();
 
     /**
-     * @return a List of all currently known bike rental stations. The updater will use this to update the Graph.
+     * @return a list of all currently known bike rental stations. The updater will use this to update the Graph.
      */
     List<BikeRentalStation> getStations();
 

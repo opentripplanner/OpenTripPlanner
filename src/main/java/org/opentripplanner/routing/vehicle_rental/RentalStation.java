@@ -37,16 +37,16 @@ public abstract class RentalStation {
     public Set<String> networks = null;
 
     /**
-     * The last time (in epoch seconds) that this rental station had updated information. This source of this
+     * The last time (in epoch seconds) that this rental station had updated information. The source of this
      * information varies according to the following fall-back methods:
-     *  - First try to use the value for a specific station or floating vehicle was updated according to the provider if
+     *  - First try to use the value of the last update time for a specific station or floating vehicle if the value is
      *  available in the feed. In the context of the GBFS this will be either the
      *  station_status#data#stations#station#last_reported or free_bike_status#data#bikes#bike#last_reported. Note that
      *  free_bike_status#data#bikes#bike#last_reported is available in feeds compliant with GBFS-2.1-RC+.
      *  - If per-station or per-vehicle information is not available, try to use the feed-wide last update time. In the
      *  context of the GBFS, this will be either the station_status#last_udated or free_bike_status#last_updated field.
-     *  - If feed-wide data on when the last report was, then use the current timestamp when the data was received by
-     *  OTP.
+     *  - If feed-wide data on the last reported timestamp is not available, then use the current timestamp when the
+     *  data was received by OTP.
      */
     @XmlAttribute
     @JsonSerialize

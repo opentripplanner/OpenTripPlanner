@@ -195,14 +195,14 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
             // Apply stations to graph if a feed-wide error did not occur
             if (!feedWideError) {
-                /* add any new stations that have fresh-enough data and update bike counts for existing stations */
+                // add any new stations that have fresh-enough data and update bike counts for existing stations
                 for (BikeRentalStation station : stations) {
                     if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
                         // skip station as it does not have fresh-enough data
                         continue;
                     }
                     if (station.networks == null) {
-                        /* API did not provide a network list, use default */
+                        // API did not provide a network list, use default
                         station.networks = defaultNetworks;
                     }
                     service.addBikeRentalStation(station);
@@ -225,7 +225,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 }
             }
 
-            /* remove existing stations that were not present in the update */
+            // remove existing stations that were not present in the update
             for (Entry<BikeRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
                 BikeRentalStation station = entry.getKey();
                 if (stationsInUpdate.contains(station)) {

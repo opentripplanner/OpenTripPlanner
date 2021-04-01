@@ -26,17 +26,17 @@ import java.util.List;
  */
 public interface VehicleRentalDataSource {
     /**
-     * @return a List of all errors that occurred during the most recent update.
+     * @return a list of all errors that occurred during the most recent update.
      */
     List<RentalUpdaterError> getErrors();
 
     /**
-     * @return a List of all currently known vehicle rental stations. The updater will use this to update the Graph.
+     * @return a list of all currently known vehicle rental stations. The updater will use this to update the Graph.
      */
     List<VehicleRentalStation> getStations();
 
     /**
-     * @return a List of all currently known vehicle rental regions. The updater will use this to update the Graph.
+     * @return a list of all currently known vehicle rental regions. The updater will use this to update the Graph.
      */
     List<VehicleRentalRegion> getRegions();
 

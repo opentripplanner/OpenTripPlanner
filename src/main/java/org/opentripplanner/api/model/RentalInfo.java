@@ -15,7 +15,7 @@ public class RentalInfo {
     public final List<RentalUpdaterError> errors;
 
     /**
-     * The system information about the vehicle rental company. This is take directly from the company's GBFS system
+     * The system information about the vehicle rental company. This is taken directly from the company's GBFS system
      * information data if it is available.
      */
     public final SystemInformation.SystemInformationData systemInformationData;

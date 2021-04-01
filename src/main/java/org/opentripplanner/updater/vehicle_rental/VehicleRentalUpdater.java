@@ -172,7 +172,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
             // Apply stations to graph if a feed-wide error did not occur
             if (!feedWideError) {
-                /* add any new stations that have fresh-enough data and update vehicle counts for existing stations */
+                // add any new stations that have fresh-enough data and update vehicle counts for existing stations
                 for (VehicleRentalStation station : stations) {
                     if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
                         // skip station as it does not have fresh-enough data
