@@ -281,16 +281,28 @@ public class OSMWithTags {
     }
 
     /**
-     * Returns true if through traffic is not allowed.
-     * 
+     * Returns true if through traffic for motor vehicles is not allowed.
+     *
      * @return
      */
-    public boolean isThroughTrafficExplicitlyDisallowed() {
-        var access = getTag("access");
-        var motorVehicle = getTag("motor_vehicle");
+    public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed() {
+        String motorVehicle = getTag("motor_vehicle");
+        return isGeneralNoThroughTraffic() || "destination".equals(motorVehicle);
+    }
+    public boolean isBicycleNoThroughTrafficExplicitlyDisallowed() {
+        String bicycle = getTag("bicycle");
+        return isGeneralNoThroughTraffic() || "destination".equals(bicycle);
+    }
+    /**
+     * Returns true if through traffic for bicycle is not allowed.
+     *
+     * @return
+     */
+    public boolean isGeneralNoThroughTraffic() {
+        String access = getTag("access");
+        String motorVehicle = getTag("motor_vehicle");
         return "destination".equals(access) || "private".equals(access)
                 || "customers".equals(access) || "delivery".equals(access)
-                || "forestry".equals(access) || "agricultural".equals(access)
                 || "destination".equals(motorVehicle);
     }
     

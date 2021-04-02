@@ -11,9 +11,9 @@ import java.util.Set;
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- * 
+ *
  * By virtue of being in the same package as States, it can modify their package private fields.
- * 
+ *
  * @author andrewbyrd
  */
 public class StateEditor {
@@ -166,7 +166,7 @@ public class StateEditor {
             return;
         }
         child.time += (traversingBackward ? -milliseconds : milliseconds);
-    }    
+    }
 
     public void incrementWalkDistance(double length) {
         if (length < 0) {
@@ -179,14 +179,17 @@ public class StateEditor {
 
     /* Basic Setters */
 
-    public void setEnteredNoThroughTrafficArea() {
-        child.stateData.enteredNoThroughTrafficArea = true;
+    public void setEnteredMotorVerhicleNoThroughTrafficArea() {
+        child.stateData.enteredMotorVehicleNoThroughTrafficArea = true;
     }
 
-    public void resetEnteredNoThroughTrafficArea() {
-        child.stateData.enteredNoThroughTrafficArea = false;
+    public void resetEnteredMotorVerhicleNoThroughTrafficArea() {
+        child.stateData.enteredMotorVehicleNoThroughTrafficArea = true;
     }
-    
+
+    public void setEnteredBicycleNoThroughTrafficArea() {
+        child.stateData.enteredBicycleNoThroughTrafficArea = true;
+    }
 
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
@@ -258,7 +261,7 @@ public class StateEditor {
     /**
      * Set non-incremental state values from an existing state.
      * Incremental values are not currently set.
-     * 
+     *
      * @param state
      */
     public void setFromState(State state) {
@@ -334,8 +337,11 @@ public class StateEditor {
         child.stateData.bikeRentalNetworks = networks;
     }
 
-    public boolean hasEnteredNoThroughTrafficArea() {
-        return child.hasEnteredNoThruTrafficArea();
+    public boolean hasEnteredMotorVehicleNoThroughTrafficArea() {
+        return child.hasEnteredMotorVehicleNoThruTrafficArea();
     }
 
+    public boolean hasEnteredBicycleNoThroughTrafficArea() {
+        return child.hasEnteredBicycleNoThruTrafficArea();
+    }
 }

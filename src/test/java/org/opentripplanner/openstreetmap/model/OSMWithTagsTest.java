@@ -110,22 +110,22 @@ public class OSMWithTagsTest {
     @Test
     public void testIsThroughTrafficExplicitlyDisallowed() {
         OSMWithTags o = new OSMWithTags();
-        assertFalse(o.isThroughTrafficExplicitlyDisallowed());
+        assertFalse(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
         
         o.addTag("access", "something");
-        assertFalse(o.isThroughTrafficExplicitlyDisallowed());
+        assertFalse(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
         
         o.addTag("access", "destination");
-        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
+        assertTrue(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
 
         o.addTag("access", "forestry");
-        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
-        
+        assertTrue(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
+
         o.addTag("access", "private");
-        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
+        assertTrue(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
 
         var way = new OSMWithTags();
         way.addTag("motor_vehicle", "destination");
-        assertTrue(way.isThroughTrafficExplicitlyDisallowed());
-    }   
+        assertTrue(way.isMotorVehicleThroughTrafficExplicitlyDisallowed());
+    }
 }
