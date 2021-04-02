@@ -289,6 +289,7 @@ public class OSMWithTags {
         String motorVehicle = getTag("motor_vehicle");
         return isGeneralNoThroughTraffic() || "destination".equals(motorVehicle);
     }
+
     public boolean isBicycleNoThroughTrafficExplicitlyDisallowed() {
         String bicycle = getTag("bicycle");
         return isGeneralNoThroughTraffic() || "destination".equals(bicycle);
@@ -300,10 +301,8 @@ public class OSMWithTags {
      */
     public boolean isGeneralNoThroughTraffic() {
         String access = getTag("access");
-        String motorVehicle = getTag("motor_vehicle");
         return "destination".equals(access) || "private".equals(access)
-                || "customers".equals(access) || "delivery".equals(access)
-                || "destination".equals(motorVehicle);
+                || "customers".equals(access) || "delivery".equals(access);
     }
     
     /**

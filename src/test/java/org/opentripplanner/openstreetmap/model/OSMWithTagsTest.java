@@ -108,7 +108,7 @@ public class OSMWithTagsTest {
     }
     
     @Test
-    public void testIsThroughTrafficExplicitlyDisallowed() {
+    public void isMotorThroughTrafficExplicitlyDisallowed() {
         OSMWithTags o = new OSMWithTags();
         assertFalse(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
         
@@ -118,14 +118,21 @@ public class OSMWithTagsTest {
         o.addTag("access", "destination");
         assertTrue(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
 
-        o.addTag("access", "forestry");
-        assertTrue(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
-
         o.addTag("access", "private");
         assertTrue(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
 
+        assertTrue(way("motor_vehicle", "destination").isMotorVehicleThroughTrafficExplicitlyDisallowed());
+    }
+
+    @Test
+    public void isBicycleNoThroughTrafficExplicitlyDisallowed() {
+        assertTrue(way("bicycle", "destination").isBicycleNoThroughTrafficExplicitlyDisallowed());
+        assertTrue(way("access", "destination").isBicycleNoThroughTrafficExplicitlyDisallowed());
+    }
+
+    public  OSMWithTags way(String key, String value) {
         var way = new OSMWithTags();
-        way.addTag("motor_vehicle", "destination");
-        assertTrue(way.isMotorVehicleThroughTrafficExplicitlyDisallowed());
+        way.addTag(key, value);
+        return way;
     }
 }

@@ -3,11 +3,12 @@ package org.opentripplanner.routing.street;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
+
+import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.Assert;
-import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -19,11 +20,12 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 
+
 public class CarRoutingTest {
 
     static long dateTime = Instant.now().toEpochMilli();
 
-    Graph herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    static Graph herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
 
     /**
      * The OTP algorithm tries hard to never visit the same node twice. This is generally a good
@@ -57,6 +59,41 @@ public class CarRoutingTest {
                 "ouqgH}mcu@gAE]U}BaA]Q}@]uAs@[SAm@Ee@AUEi@XEQkBQ?Bz@Dt@Dh@@TGBC@KBSHGx@"
         );
     }
+
+    @Test
+    public void shouldRespectNoThroughTraffic() {
+        var mozartStr = new GenericLocation(48.59521, 8.88391);
+        var fritzLeharStr = new GenericLocation(48.59460, 8.88291);
+
+        var polyline1 = computePolyline(herrenbergGraph, mozartStr, fritzLeharStr);
+        assertThatPolylinesAreEqual(polyline1, "_grgHkcfu@OjBC\\ARGjAKzAfBz@j@n@Rk@E}D");
+
+        var polyline2 = computePolyline(herrenbergGraph, fritzLeharStr, mozartStr);
+        assertThatPolylinesAreEqual(polyline2, "gcrgHc}eu@D|DSj@k@o@gB{@J{AFkA@SB]NkB");
+    }
+
+    /**
+     * Tests that that https://www.openstreetmap.org/way/35097400 is not taken due to
+     * motor_vehicle=destination.
+     */
+    @Test
+    public void shouldRespectMotorCarNoThru() {
+        var schiessmauer = new GenericLocation(48.59737, 8.86350);
+        var zeppelinStr = new GenericLocation(48.59972, 8.86239);
+
+        var polyline1 = computePolyline(herrenbergGraph, schiessmauer, zeppelinStr);
+        assertThatPolylinesAreEqual(
+                polyline1,
+                "otrgH{cbu@v@|D?bAElBEv@Cj@APGAY?YD]Fm@X_@Pw@d@eAn@k@VM@]He@Fo@Bi@??c@?Q@gD?Q?Q@mD?S"
+        );
+
+        var polyline2 = computePolyline(herrenbergGraph, zeppelinStr, schiessmauer);
+        assertThatPolylinesAreEqual(
+                polyline2,
+                "ccsgH{|au@?RAlD?P?PAfD?P?b@h@?n@Cd@G\\ILAj@WdAo@v@e@^Ql@Y\\GXEX?F@@QBk@Dw@DmB?cAw@}D"
+        );
+    }
+
     private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
         RoutingRequest request = new RoutingRequest();
         request.dateTime = dateTime;
@@ -72,38 +109,8 @@ public class CarRoutingTest {
 
         var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
         // make sure that we only get CAR legs
-        itineraries.forEach(i -> i.legs.forEach(l -> Assert.assertEquals(l.mode, TraverseMode.CAR)));
-        return itineraries.get(0).legs.get(0).legGeometry.getPoints();
-    }
-
-    @Test
-    public void shouldRespectNoThroughTraffic() {
-        var mozartStr = new GenericLocation(48.59521, 8.88391);
-        var fritzLeharStr = new GenericLocation(48.59460, 8.88291);
-
-        var polyline1 = computePolyline(herrenbergGraph, mozartStr, fritzLeharStr);
-        assertThatPolylinesAreEqual(polyline1, "_grgHkcfu@OjBC\\ARGjAKzAfBz@j@n@Rk@E}D");
-
-        var polyline2 = computePolyline(herrenbergGraph, fritzLeharStr, mozartStr);
-        assertThatPolylinesAreEqual(polyline2, "gcrgHc}eu@D|DSj@k@o@gB{@J{AFkA@SB]NkB");
-    }
-
-    /**
-     * Tests that that https://www.openstreetmap.org/way/35097400 is not taken due to motor_vehicle=destination.
-     */
-    @Test
-    public void shouldRespectMotorCarNoThru() {
-        var schiessmauer = new GenericLocation(48.59737, 8.86350);
-        var zeppelinStr = new GenericLocation(48.59972, 8.86239);
-
-        var polyline1 = computePolyline(herrenbergGraph, schiessmauer, zeppelinStr);
-        assertThatPolylinesAreEqual(polyline1, "otrgH{cbu@v@|D?bAElBEv@Cj@APGAY?YD]Fm@X_@Pw@d@eAn@k@VM@]He@Fo@Bi@??c@?Q@gD?Q?Q@mD?S");
-
-        var polyline2 = computePolyline(herrenbergGraph, zeppelinStr, schiessmauer);
-        assertThatPolylinesAreEqual(polyline2, "ccsgH{|au@?RAlD?P?PAfD?P?b@h@?n@Cd@G\\ILAj@WdAo@v@e@^Ql@Y\\GXEX?F@@QBk@Dw@DmB?cAw@}D");
         itineraries.forEach(
-                i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.CAR))
-        );
+                i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.CAR)));
         return itineraries.get(0).legs.get(0).legGeometry.getPoints();
     }
 }
