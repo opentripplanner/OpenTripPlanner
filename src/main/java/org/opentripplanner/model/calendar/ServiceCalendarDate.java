@@ -64,10 +64,12 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         ServiceCalendarDate that = (ServiceCalendarDate) o;
         return Objects.equals(serviceId, that.serviceId) && Objects.equals(date, that.date);
     }

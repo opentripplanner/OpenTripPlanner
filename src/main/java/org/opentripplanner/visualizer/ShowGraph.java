@@ -500,8 +500,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             return 0; // do not attempt to draw geometry-less edges
         Coordinate[] coords = e.getGeometry().getCoordinates();
         beginShape();
-        for (int i = 0; i < coords.length; i++)
+        for (int i = 0; i < coords.length; i++) {
             vertex((float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
+        }
         endShape();
         return coords.length; // should be used to count segments, not edges drawn
     }
@@ -792,8 +793,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		        drawEdge(e);
 		        drawOffset += 1;
 		        if (drawOffset % BLOCK_SIZE == 0) {
-		            if (millis() - startMillis > FRAME_TIME)
-		                return false;
+		            if (millis() - startMillis > FRAME_TIME) {
+                        return false;
+                    }
 		        }
 		    }
 		}
@@ -811,8 +813,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		        drawEdge(e);
 		        drawOffset += 1;
 		        if (drawOffset % BLOCK_SIZE == 0) {
-		            if (millis() - startMillis > FRAME_TIME)
-		                return false;
+		            if (millis() - startMillis > FRAME_TIME) {
+                        return false;
+                    }
 		        }
 		    }
 		}
@@ -832,8 +835,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		        drawEdge(visibleStreetEdges.get(drawOffset));
 		        drawOffset += 1;
 		        if (drawOffset % BLOCK_SIZE == 0) {
-		            if (millis() - startMillis > FRAME_TIME)
-		                return false;
+		            if (millis() - startMillis > FRAME_TIME) {
+                        return false;
+                    }
 		        }
 		    }
 		}

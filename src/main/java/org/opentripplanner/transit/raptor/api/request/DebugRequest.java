@@ -137,8 +137,8 @@ public class DebugRequest {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         DebugRequest that = (DebugRequest) o;
         return debugPathFromStopIndex == that.debugPathFromStopIndex &&
                 Objects.equals(stops, that.stops) &&

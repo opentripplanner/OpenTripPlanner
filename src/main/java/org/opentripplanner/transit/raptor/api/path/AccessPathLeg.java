@@ -37,6 +37,11 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
         this.next = next;
     }
 
+    /** Create new access leg with a different tail */
+    public AccessPathLeg(@Nonnull AccessPathLeg<T> o, @Nonnull PathLeg<T> next) {
+        this(o.access, o.toStop, o.fromTime, o.toTime, o.cost, next);
+    }
+
     @Override
     public int fromTime() {
         return fromTime;
@@ -45,6 +50,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     /**
      * The stop index where the leg end, also called arrival stop index.
      */
+    @Override
     public int toStop() {
         return toStop;
     }
@@ -75,8 +81,8 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         AccessPathLeg<?> that = (AccessPathLeg<?>) o;
         return fromTime == that.fromTime &&
                 toStop == that.toStop &&

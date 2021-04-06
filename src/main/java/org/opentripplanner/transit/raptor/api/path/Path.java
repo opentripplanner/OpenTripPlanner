@@ -1,13 +1,14 @@
 package org.opentripplanner.transit.raptor.api.path;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -23,17 +24,6 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
     private final int generalizedCost;
     private final AccessPathLeg<T> accessLeg;
     private final EgressPathLeg<T> egressPathLeg;
-
-
-    /**
-     * Create a "dummy" path without legs. Can be used to test if a path is pareto optimal without
-     * creating the hole path.
-     */
-    public static <T extends RaptorTripSchedule> Path<T> dummyPath(
-          int iteration, int startTime, int endTime, int numberOfTransfers, int cost
-    ) {
-        return new Path<>(iteration, startTime, endTime, numberOfTransfers, cost);
-    }
 
     /** @see #dummyPath(int, int, int, int, int) */
     private Path(
@@ -55,11 +45,21 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
     public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost) {
         this.iterationDepartureTime = iterationDepartureTime;
         this.startTime = accessLeg.fromTime();
-        this.numberOfTransfers = countNumberOfTransfers(accessLeg);
         this.generalizedCost = generalizedCost;
         this.accessLeg = accessLeg;
         this.egressPathLeg = findEgressLeg(accessLeg);
+        this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressPathLeg);
         this.endTime = egressPathLeg.toTime();
+    }
+
+    /**
+     * Create a "dummy" path without legs. Can be used to test if a path is pareto optimal without
+     * creating the hole path.
+     */
+    public static <T extends RaptorTripSchedule> Path<T> dummyPath(
+        int iteration, int startTime, int endTime, int numberOfTransfers, int cost
+    ) {
+        return new Path<>(iteration, startTime, endTime, numberOfTransfers, cost);
     }
 
     /**
@@ -102,7 +102,7 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
     /**
      * The total cost computed for this path. This is for debugging and filtering purposes.
      */
-    public int cost() {
+    public int generalizedCost() {
         return generalizedCost;
     }
 
@@ -126,20 +126,9 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
      * Utility method to list all visited stops.
      */
     public List<Integer> listStops() {
-        List<Integer> stops = new ArrayList<>();
-        PathLeg<?> leg = accessLeg.nextLeg();
-
-        while (!leg.isEgressLeg()) {
-            if (leg.isTransitLeg()) {
-                stops.add(leg.asTransitLeg().fromStop());
-            }
-            if (leg.isTransferLeg()) {
-                stops.add(leg.asTransferLeg().fromStop());
-            }
-            leg = leg.nextLeg();
-        }
-        stops.add(leg.asEgressLeg().fromStop());
-        return stops;
+        return accessLeg.nextLeg().stream()
+            .map(PathLeg::fromStop)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -147,9 +136,7 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
         PathStringBuilder buf = new PathStringBuilder();
         if(accessLeg != null) {
             buf.accessEgress(accessLeg.access());
-            PathLeg<T> leg = accessLeg.nextLeg();
-
-            while (!leg.isEgressLeg()) {
+            for (PathLeg<T> leg : accessLeg.nextLeg().iterator()) {
                 buf.sep();
                 if (leg.isTransitLeg()) {
                     TransitPathLeg<T> transitLeg = leg.asTransitLeg();
@@ -159,28 +146,42 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
                         transitLeg.toTime()
                     );
                 }
-                // Transfer
-                else {
+                else if (leg.isTransferLeg()) {
                     buf.stop(leg.asTransferLeg().fromStop()).sep().walk(leg.duration());
                 }
-                leg = leg.nextLeg();
+                // Egress
+                else {
+                    buf.stop(leg.fromStop()).sep().accessEgress(leg.asEgressLeg().egress());
+                }
             }
-            EgressPathLeg<T> egressLeg = leg.asEgressLeg();
-            buf.sep().stop(egressLeg.fromStop());
-            buf.sep().accessEgress(egressLeg.egress());
         }
-
-      return buf.toString() +
+        return buf.toString() +
                 " [" + TimeUtils.timeToStrLong(startTime) +
                 " " + TimeUtils.timeToStrLong(endTime) +
                 " " + DurationUtils.durationToStr(endTime - startTime) +
                 (generalizedCost == 0 ? "" : ", cost: " + generalizedCost) + "]";
     }
 
+    /** Return the duration of time spent onBoard - excluding slack. */
+    public int transitDuration() {
+        return legStream()
+            .filter(PathLeg::isTransitLeg)
+            .mapToInt(PathLeg::duration)
+            .sum();
+    }
+
+    public Stream<PathLeg<T>> legStream() {
+        return accessLeg.stream();
+    }
+
+    public Iterable<PathLeg<T>> legIterable() {
+        return accessLeg.iterator();
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         Path<?> path = (Path<?>) o;
         return startTime == path.startTime &&
                 endTime == path.endTime &&
@@ -191,24 +192,6 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
     @Override
     public int hashCode() {
         return Objects.hash(startTime, endTime, numberOfTransfers, accessLeg);
-    }
-
-
-    private static <S extends RaptorTripSchedule> EgressPathLeg<S> findEgressLeg(PathLeg<S> leg) {
-        while (!leg.isEgressLeg()) { leg = leg.nextLeg(); }
-        return (EgressPathLeg<S>) leg;
-    }
-
-    private static <S extends RaptorTripSchedule> int countNumberOfTransfers(AccessPathLeg<S> accessLeg) {
-        // Skip first transit
-        PathLeg<S> leg = accessLeg.nextLeg().nextLeg();
-        int i = accessLeg.access().numberOfRides();
-        while (!leg.isEgressLeg()) {
-            if(leg.isTransitLeg()) { ++i; }
-            leg = leg.nextLeg();
-        }
-        i += leg.asEgressLeg().egress().numberOfRides();
-        return i;
     }
 
     /**
@@ -230,5 +213,22 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
         if(c != 0) { return c; }
         c = numberOfTransfers - other.numberOfTransfers;
         return c;
+    }
+
+
+    /* private methods */
+
+    private static <S extends RaptorTripSchedule> EgressPathLeg<S> findEgressLeg(PathLeg<S> leg) {
+        return (EgressPathLeg<S>) leg.stream().reduce((a,b) -> b).orElseThrow();
+    }
+
+    private static <S extends RaptorTripSchedule> int countNumberOfTransfers(
+        AccessPathLeg<S> accessLeg, EgressPathLeg<S> egressPathLeg
+    ) {
+
+        return accessLeg.access().numberOfRides()
+            // Skip first transit
+            + (int)accessLeg.nextLeg().nextLeg().stream().filter(PathLeg::isTransitLeg).count()
+            + egressPathLeg.egress().numberOfRides();
     }
 }

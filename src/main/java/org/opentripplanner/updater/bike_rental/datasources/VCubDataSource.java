@@ -30,17 +30,20 @@ class VCubDataSource extends GenericXmlBikeRentalDataSource {
             brstation.x = Double.parseDouble(coordinates[1]);
             brstation.y = Double.parseDouble(coordinates[0]);
         }
-        if (brstation.x == 0 || brstation.y == 0)
+        if (brstation.x == 0 || brstation.y == 0) {
             return null;
+        }
         brstation.name = new NonLocalizedString(attributes.get("bm:NOM"));
         boolean connected = "CONNECTEE".equalsIgnoreCase(attributes.get("bm:ETAT"));
         brstation.realTimeData = connected;
         String nbPlaces = attributes.get("bm:NBPLACES");
-        if (nbPlaces != null)
+        if (nbPlaces != null) {
             brstation.spacesAvailable = Integer.parseInt(nbPlaces);
+        }
         String nbVelos = attributes.get("bm:NBVELOS");
-        if (nbVelos != null)
+        if (nbVelos != null) {
             brstation.bikesAvailable = Integer.parseInt(nbVelos);
+        }
         @SuppressWarnings("unused")
         String type = attributes.get("bm:TYPE");
         /*

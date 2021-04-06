@@ -20,6 +20,11 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> extends Intermed
         this.trip = trip;
     }
 
+    /** Create a builder to change board or alight stop place. */
+    public TransitPathLegBuilder<T> mutate() {
+        return new TransitPathLegBuilder<>(this);
+    }
+
     /**
      * The trip schedule info object passed into Raptor routing algorithm. 
      */
@@ -39,8 +44,8 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> extends Intermed
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!super.equals(o)) return false;
+        if (this == o) { return true; }
+        if (!super.equals(o)) { return false; }
         TransitPathLeg<?> that = (TransitPathLeg<?>) o;
         return trip.equals(that.trip) && next.equals(that.next);
     }

@@ -30,7 +30,7 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
     int departureTime = trip.earliestDepartureTime(Integer.MIN_VALUE, fromStopIndex, toStopIndex, 0);
     int arrivalTime = trip.latestArrivalTime(Integer.MAX_VALUE, fromStopIndex, toStopIndex, 0);
 
-    if (departureTime >= arrivalTime) return null;
+    if (departureTime >= arrivalTime) { return null; }
     return new FlexPath(distance, arrivalTime - departureTime, flexPath.geometry);
   }
 }

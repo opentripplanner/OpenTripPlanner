@@ -263,13 +263,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
     public int getArrivalTime(final int stop) {
-        if (arrivalTimes == null) return getScheduledArrivalTime(stop);
+        if (arrivalTimes == null) { return getScheduledArrivalTime(stop); }
         else return arrivalTimes[stop]; // updated times are not time shifted.
     }
 
     /** @return the amount of time in seconds that the vehicle waits at the stop. */
     public int getDepartureTime(final int stop) {
-        if (departureTimes == null) return getScheduledDepartureTime(stop);
+        if (departureTimes == null) { return getScheduledDepartureTime(stop); }
         else return departureTimes[stop]; // updated times are not time shifted.
     }
 
@@ -524,7 +524,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     * without updates for now (frequency trips don't have updates).
     */
     public TripTimes timeShift (final int stop, final int time, final boolean depart) {
-        if (arrivalTimes != null || departureTimes != null) return null;
+        if (arrivalTimes != null || departureTimes != null) { return null; }
         final TripTimes shifted = this.clone();
         // Adjust 0-based times to match desired stoptime.
         final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));

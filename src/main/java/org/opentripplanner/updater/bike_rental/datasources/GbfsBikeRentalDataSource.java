@@ -78,11 +78,15 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     private String getBaseUrl(String url) {
         String baseUrl = url;
-        if (baseUrl.endsWith("gbfs.json"))
+        if (baseUrl.endsWith("gbfs.json")) {
             baseUrl = baseUrl.substring(0, url.length() - "gbfs.json".length());
-        if (baseUrl.endsWith("gbfs"))
+        }
+        if (baseUrl.endsWith("gbfs")) {
             baseUrl = baseUrl.substring(0, url.length() - "gbfs".length());
-        if (!baseUrl.endsWith("/")) baseUrl += "/";
+        }
+        if (!baseUrl.endsWith("/")) {
+            baseUrl += "/";
+        }
         return baseUrl;
     }
 

@@ -2,11 +2,6 @@ package org.opentripplanner.geocoder;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.opentripplanner.geocoder.Geocoder;
-import org.opentripplanner.geocoder.GeocoderResult;
-import org.opentripplanner.geocoder.GeocoderResults;
-
 import org.locationtech.jts.geom.Envelope;
 
 /**
@@ -34,9 +29,12 @@ public class GeocoderGeoZoneCropper implements Geocoder {
         if (retval.getResults() != null) {
             List<GeocoderResult> results = new ArrayList<GeocoderResult>(retval.getCount());
             for (GeocoderResult result : retval.getResults()) {
-                if (result.getLat() > minLat && result.getLng() > minLon
-                        && result.getLat() < maxLat && result.getLng() < maxLon)
+                if (
+                        result.getLat() > minLat && result.getLng() > minLon
+                        && result.getLat() < maxLat && result.getLng() < maxLon
+                ) {
                     results.add(result);
+                }
             }
             retval.setResults(results);
         }

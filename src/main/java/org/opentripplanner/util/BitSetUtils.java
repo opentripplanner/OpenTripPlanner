@@ -31,10 +31,12 @@ public final class BitSetUtils {
     }
 
     public final static byte set(byte bitset, int index, boolean value) {
-        if (value)
+        if (value) {
             bitset |= (1 << index);
-        else
+        }
+        else {
             bitset &= ~(1 << index);
+        }
         return bitset;
     }
 
@@ -43,10 +45,12 @@ public final class BitSetUtils {
     }
 
     public final static short set(short bitset, int index, boolean value) {
-        if (value)
+        if (value) {
             bitset |= (1 << index);
-        else
+        }
+        else {
             bitset &= ~(1 << index);
+        }
         return bitset;
     }
 
@@ -55,10 +59,12 @@ public final class BitSetUtils {
     }
 
     public final static int set(int bitset, int index, boolean value) {
-        if (value)
+        if (value) {
             bitset |= (1 << index);
-        else
+        }
+        else {
             bitset &= ~(1 << index);
+        }
         return bitset;
     }
 
@@ -67,10 +73,12 @@ public final class BitSetUtils {
     }
 
     public final static long set(long bitset, int index, boolean value) {
-        if (value)
+        if (value) {
             bitset |= (1L << index);
-        else
+        }
+        else {
             bitset &= ~(1L << index);
+        }
         return bitset;
     }
 

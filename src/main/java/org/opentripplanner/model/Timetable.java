@@ -98,15 +98,15 @@ public class Timetable implements Serializable {
      */
     public boolean temporallyViable(ServiceDay sd, long searchTime, int bestWait, boolean boarding) {
         // Check whether any services are running at all on this pattern.
-        if ( ! sd.anyServiceRunning(this.pattern.services)) return false;
+        if ( ! sd.anyServiceRunning(this.pattern.services)) { return false; }
         // Make the search time relative to the given service day.
         searchTime = sd.secondsSinceMidnight(searchTime);
         // Check whether any trip can be boarded at all, given the search time
-        if (boarding ? (searchTime > this.maxTime) : (searchTime < this.minTime)) return false;
+        if (boarding ? (searchTime > this.maxTime) : (searchTime < this.minTime)) { return false; }
         // Check whether any trip can improve on the best time yet found
         if (bestWait >= 0) {
             long bestTime = boarding ? (searchTime + bestWait) : (searchTime - bestWait);
-            if (boarding ? (bestTime < this.minTime) : (bestTime > this.maxTime)) return false;
+            if (boarding ? (bestTime < this.minTime) : (bestTime > this.maxTime)) { return false; }
         }
         return true;
     }
@@ -160,7 +160,7 @@ public class Timetable implements Serializable {
         for (TripTimes tt : tripTimes) {
             // could replace linear search with indexing in stoptime updater, but not necessary
             // at this point since the updater thread is far from pegged.
-            if (tt.trip.getId().equals(tripId)) return ret;
+            if (tt.trip.getId().equals(tripId)) { return ret; }
             ret += 1;
         }
         return -1;
@@ -170,7 +170,7 @@ public class Timetable implements Serializable {
     public int getTripIndex(String tripId) {
         int ret = 0;
         for (TripTimes tt : tripTimes) {
-            if (tt.trip.getId().getId().equals(tripId)) return ret;
+            if (tt.trip.getId().getId().equals(tripId)) { return ret; }
             ret += 1;
         }
         return -1;
@@ -182,7 +182,7 @@ public class Timetable implements Serializable {
 
     public TripTimes getTripTimes(Trip trip) {
         for (TripTimes tt : tripTimes) {
-            if (tt.trip == trip) return tt;
+            if (tt.trip == trip) { return tt; }
         }
         return null;
     }

@@ -63,8 +63,9 @@ public class OSMFilter {
      * receiving a better score and pulling search endpoints away from real transit stops.
      */
     public static boolean isOsmEntityRoutable(OSMWithTags osmEntity) {
-        if (osmEntity.hasTag("highway"))
+        if (osmEntity.hasTag("highway")) {
             return true;
+        }
         if (osmEntity.isTag("public_transport", "platform")
                 || osmEntity.isTag("railway", "platform")) {
             return !("tourism".equals(osmEntity.getTag("usage")));
@@ -122,9 +123,9 @@ public class OSMFilter {
             permission = StreetTraversalPermission.NONE;
         }
 
-        if (permission == null)
+        if (permission == null) {
             return def;
-
+        }
         return permission;
     }
 

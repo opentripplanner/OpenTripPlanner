@@ -121,7 +121,7 @@ public abstract class Vertex implements Serializable, Cloneable {
         }
         Edge[] copy = new Edge[existing.length - nfound];
         for (int i = 0, j = 0; i < existing.length; i++) {
-            if (existing[i] != e) copy[j++] = existing[i];
+            if (existing[i] != e) { copy[j++] = existing[i]; }
         }
         return copy;
     }

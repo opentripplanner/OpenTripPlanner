@@ -39,6 +39,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
     private final CostCalculator<T> costCalculator;
     private final TransitCalculator transitCalculator;
+    private boolean firstRound;
 
     /**
      * create a RaptorState for a network with a particular number of stops, and a given maximum
@@ -62,6 +63,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         lifeCycle.onSetupIteration((ignore) -> setupIteration());
         lifeCycle.onTransitsForRoundComplete(this::transitsForRoundComplete);
         lifeCycle.onTransfersForRoundComplete(this::transfersForRoundComplete);
+        lifeCycle.onPrepareForNextRound(r -> firstRound = r == 1);
     }
 
     // The below methods are ordered after the sequence they naturally appear in the algorithm,
@@ -123,10 +125,10 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
      * Set the time at a transit stop iff it is optimal.
      */
     final void transitToStop(
-            final PatternRide<T> ride,
-            final int alightStop,
-            final int alightTime,
-            final int alightSlack
+        final PatternRide<T> ride,
+        final int alightStop,
+        final int alightTime,
+        final int alightSlack
     ) {
         final int stopArrivalTime = alightTime + alightSlack;
 
@@ -136,20 +138,20 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         final int waitTime = ride.boardWaitTimeForCostCalculation + alightSlack;
 
         final int costTransit = costCalculator.transitArrivalCost(
-            ride.prevArrival,
+            firstRound,
+            ride.prevArrival.stop(),
             waitTime,
             alightTime - ride.boardTime,
-            alightStop,
-            ride.trip
+            alightStop
         );
         arrivalsCache.add(
-                new TransitStopArrival<>(
-                        ride.prevArrival,
-                        alightStop,
-                        stopArrivalTime,
-                        costTransit,
-                        ride.trip
-                )
+            new TransitStopArrival<>(
+                ride.prevArrival,
+                alightStop,
+                stopArrivalTime,
+                costTransit,
+                ride.trip
+            )
         );
     }
 

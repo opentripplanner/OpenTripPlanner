@@ -111,7 +111,7 @@ public class TestDebugLogger implements DebugLogger {
                 TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
                 TimeUtils.timeToStrLong(p.egressLeg().toTime()),
                 DurationUtils.durationToStr(p.travelDurationInSeconds()),
-                numFormat.format(p.cost()),
+                numFormat.format(p.generalizedCost()),
                 details(e.action().toString(), e.reason(), e.element().toString())
             )
         );
@@ -199,12 +199,12 @@ public class TestDebugLogger implements DebugLogger {
             String tripInfo = a.transitPath().trip().pattern().debugInfo();
             if(a.arrivalTime() > a.previous().arrivalTime()) {
                 BoarAndAlightTime t = TripTimesSearch.findTripForwardSearch(a);
-                buf.transit(tripInfo, t.boardTime, t.alightTime);
+                buf.transit(tripInfo, t.boardTime(), t.alightTime());
             }
             // reverse search
             else {
                 BoarAndAlightTime t = TripTimesSearch.findTripReverseSearch(a);
-                buf.transit(tripInfo, t.alightTime, t.boardTime);
+                buf.transit(tripInfo, t.alightTime(), t.boardTime());
             }
         } else if(a.arrivedByTransfer()) {
             buf.walk(legDuration(a));

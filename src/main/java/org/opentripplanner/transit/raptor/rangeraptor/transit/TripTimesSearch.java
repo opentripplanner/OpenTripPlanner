@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 
+import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -72,6 +73,16 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         return new TripTimesSearch<>(trip, fromStop, toStop).findTripAfter(earliestBoardTime);
     }
 
+    /**
+     * Search for board- and alight-times for the trip matching the given stop-arrival
+     * when searching FORWARD. Hence, searching in the same direction as the trip travel
+     * direction.
+     */
+    public static <S extends RaptorTripSchedule> BoarAndAlightTime findTripTimes(TransitPathLeg<S> leg) {
+        return new TripTimesSearch<>(leg.trip(), leg.fromStop(), leg.toStop())
+            .findTripBefore(leg.toTime());
+    }
+
     private BoarAndAlightTime findTripAfter(int earliestDepartureTime) {
         RaptorTripPattern p = schedule.pattern();
         final int size = p.numberOfStopsInPattern();
@@ -98,7 +109,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
             );
         }
 
-        int departureTime = schedule.departure(i);
+        int boardStopPos = i;
 
         // Goto next stop, boarding and alighting can not happen on the same stop
         ++i;
@@ -115,10 +126,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
                 earliestDepartureTime
             );
         }
-
-        int arrivalTime = schedule.arrival(i);
-
-        return new BoarAndAlightTime(departureTime, arrivalTime);
+        return new BoarAndAlightTime(schedule, boardStopPos, i);
     }
 
     private BoarAndAlightTime findTripBefore(int latestArrivalTime) {
@@ -149,7 +157,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
             );
         }
 
-        int arrivalTime = schedule.arrival(i);
+        int alightStopPos = i;
 
         // Goto next stop, boarding and alighting can not happen on the same stop
         --i;
@@ -166,10 +174,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
                     latestArrivalTime
             );
         }
-
-        int departureTime = schedule.departure(i);
-
-        return new BoarAndAlightTime(departureTime, arrivalTime);
+        return new BoarAndAlightTime(schedule, i, alightStopPos);
     }
 
     private IllegalStateException noFoundException(String hint, String lbl, int time) {

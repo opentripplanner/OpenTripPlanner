@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import org.opentripplanner.model.TransferPriority;
+import org.opentripplanner.model.StopTransferPriority;
 
 public interface TransitTuningParameters {
   /**
@@ -17,7 +17,7 @@ public interface TransitTuningParameters {
    */
   TransitTuningParameters FOR_TEST = new TransitTuningParameters() {
     @Override public boolean enableStopTransferPriority() { return true; }
-    @Override public Integer stopTransferCost(TransferPriority key) {
+    @Override public Integer stopTransferCost(StopTransferPriority key) {
       switch (key) {
         case DISCOURAGED: return 3600;
         case ALLOWED:     return 60;
@@ -30,13 +30,13 @@ public interface TransitTuningParameters {
 
   /**
    * Return {@code true} to include a cost for each stop for boarding and alighting at the stop
-   * given the stop's {@link TransferPriority}.
+   * given the stop's {@link StopTransferPriority}.
    */
   boolean enableStopTransferPriority();
 
   /**
-   * The stop transfer cost for the given {@link TransferPriority}. The cost applied to
+   * The stop transfer cost for the given {@link StopTransferPriority}. The cost applied to
    * boarding and alighting all stops with the given priority.
    */
-  Integer stopTransferCost(TransferPriority key);
+  Integer stopTransferCost(StopTransferPriority key);
 }

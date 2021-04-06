@@ -70,8 +70,9 @@ public class StreetBikeParkLink extends Edge {
         // Disallow traversing two StreetBikeParkLinks in a row.
         // Prevents router using bike rental stations as shortcuts to get around
         // turn restrictions.
-        if (s0.getBackEdge() instanceof StreetBikeParkLink)
+        if (s0.getBackEdge() instanceof StreetBikeParkLink) {
             return null;
+        }
 
         StateEditor s1 = s0.edit(this);
         // Assume bike park are more-or-less on-street

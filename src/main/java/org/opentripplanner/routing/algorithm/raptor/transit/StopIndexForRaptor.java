@@ -1,14 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransferPriority;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTransferPriority;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 
 /**
  * This index is temporary to help creating a fixed list of stops (by index), a reverse map
@@ -72,7 +71,7 @@ public class StopIndexForRaptor {
         int[] stopVisitCosts = new int[stops.size()];
 
         for (int i=0; i<stops.size(); ++i) {
-            TransferPriority priority = stops.get(i).getCostPriority();
+            StopTransferPriority priority = stops.get(i).getPriority();
             int domainCost = tuningParams.stopTransferCost(priority);
             stopVisitCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
         }

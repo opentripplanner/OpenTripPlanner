@@ -20,7 +20,7 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
             .schedule()
             .times(TRIP_TIME)
             .build();
-    private static final TestRoute TIME_TABLE = TestRoute.route("R1", 0)
+    private static final TestRoute TIME_TABLE = TestRoute.route("R1", STOP_A)
         .withTimetable(TRIP_SCHEDULE);
 
     private TripScheduleSearch<TestTripSchedule> subject;
@@ -39,19 +39,19 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
         int earliestDepartureTime;
 
         earliestDepartureTime = TRIP_TIME;
-        assertTrue(subject.search(earliestDepartureTime, STOP_0));
+        assertTrue(subject.search(earliestDepartureTime, STOP_POS_0));
 
         earliestDepartureTime = TRIP_TIME - ITERATION_STEP + 1;
-        assertTrue(subject.search(earliestDepartureTime, STOP_0));
+        assertTrue(subject.search(earliestDepartureTime, STOP_POS_0));
 
         earliestDepartureTime = TRIP_TIME + 1;
-        assertFalse(subject.search(earliestDepartureTime, STOP_0));
+        assertFalse(subject.search(earliestDepartureTime, STOP_POS_0));
 
         earliestDepartureTime = TRIP_TIME - ITERATION_STEP;
-        assertFalse(subject.search(earliestDepartureTime, STOP_0));
+        assertFalse(subject.search(earliestDepartureTime, STOP_POS_0));
 
         earliestDepartureTime = TRIP_TIME;
-        assertFalse(subject.search(earliestDepartureTime, STOP_0, 0));
+        assertFalse(subject.search(earliestDepartureTime, STOP_POS_0, 0));
     }
 
     @Test
@@ -60,36 +60,36 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
         int limit;
 
         limit = TRIP_TIME;
-        assertTrue(subject.search(limit, STOP_0));
+        assertTrue(subject.search(limit, STOP_POS_0));
 
         limit = TRIP_TIME + ITERATION_STEP - 1;
-        assertTrue(subject.search(limit, STOP_0));
+        assertTrue(subject.search(limit, STOP_POS_0));
 
         limit = TRIP_TIME - 1;
-        assertFalse(subject.search(limit, STOP_0));
+        assertFalse(subject.search(limit, STOP_POS_0));
 
         limit = TRIP_TIME + ITERATION_STEP;
-        assertFalse(subject.search(limit, STOP_0));
+        assertFalse(subject.search(limit, STOP_POS_0));
     }
 
     @Test
     public void getCandidateTrip() {
         setup(FORWARD);
-        subject.search(TRIP_TIME, STOP_0);
+        subject.search(TRIP_TIME, STOP_POS_0);
         assertEquals(TRIP_SCHEDULE, subject.getCandidateTrip());
     }
 
     @Test
     public void getCandidateTripIndex() {
         setup(FORWARD);
-        subject.search(TRIP_TIME, STOP_0);
+        subject.search(TRIP_TIME, STOP_POS_0);
         assertEquals(0, subject.getCandidateTripIndex());
     }
 
     @Test
     public void getCandidateTripTime() {
         setup(FORWARD);
-        subject.search(TRIP_TIME, STOP_0);
+        subject.search(TRIP_TIME, STOP_POS_0);
         assertEquals(TRIP_TIME, subject.getCandidateTripTime());
     }
 }

@@ -4,7 +4,6 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.DirectionMapper;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
@@ -14,8 +13,6 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.opentripplanner.netex.mapping.support.ServiceAlterationFilter.*;
 
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;

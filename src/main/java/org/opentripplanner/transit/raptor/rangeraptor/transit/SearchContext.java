@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -70,8 +71,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.calculator = createCalculator(this.request, tuningParameters);
         this.costCalculator = createCostCalculator(
             transit.stopBoarAlightCost(),
-            request.multiCriteriaCostFactors(),
-            lifeCycle()
+            request.multiCriteriaCostFactors()
         );
         this.roundTracker = new RoundTracker(
             nRounds(),
@@ -234,16 +234,13 @@ public class SearchContext<T extends RaptorTripSchedule> {
                 : new ReversePathMapper<>(request.slackProvider(), lifeCycle);
     }
 
-    private static <S extends RaptorTripSchedule> CostCalculator<S> createCostCalculator(
-        int[] stopVisitCost, McCostParams f, WorkerLifeCycle lifeCycle
-    ) {
-        return new DefaultCostCalculator<>(
+    private CostCalculator<T> createCostCalculator(int[] stopVisitCost, McCostParams f) {
+        return new DefaultCostCalculator<T>(
                 stopVisitCost,
                 f.boardCost(),
                 f.transferCost(),
                 f.walkReluctanceFactor(),
-                f.waitReluctanceFactor(),
-                lifeCycle
+                f.waitReluctanceFactor()
         );
     }
 }

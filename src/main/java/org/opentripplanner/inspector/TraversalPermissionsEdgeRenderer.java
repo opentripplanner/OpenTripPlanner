@@ -91,12 +91,15 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
         float r = 0.2f;
         float g = 0.2f;
         float b = 0.2f;
-        if (permissions.allows(StreetTraversalPermission.PEDESTRIAN))
+        if (permissions.allows(StreetTraversalPermission.PEDESTRIAN)) {
             g += 0.5f;
-        if (permissions.allows(StreetTraversalPermission.BICYCLE))
+        }
+        if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
             b += 0.5f;
-        if (permissions.allows(StreetTraversalPermission.CAR))
+        }
+        if (permissions.allows(StreetTraversalPermission.CAR)) {
             r += 0.5f;
+        }
         // TODO CUSTOM_VEHICLE (?)
         return new Color(r, g, b);
     }

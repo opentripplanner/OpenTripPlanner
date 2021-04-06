@@ -71,7 +71,7 @@ public class ItineraryMapper {
         itinerary.walkDistance = 0.0;
         itinerary.transitTime = 0;
         itinerary.waitingTime = 0;
-        itinerary.weight = path.cost();
+        itinerary.weight = path.generalizedCost();
 
         int numberOfTransits = 0;
 
@@ -168,6 +168,7 @@ public class ItineraryMapper {
         return itinerary;
     }
 
+    @SuppressWarnings("ConstantConditions")
     private Place mapToPlace(int stopIndex) {
         return new Place(transitLayer.getStopByIndex(stopIndex), stopIndex);
     }
