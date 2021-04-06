@@ -20,7 +20,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -310,7 +310,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
 
         Vertex stop_d = graph.getVertex(feedId + ":D");
         Vertex split_d = null;
-        for (StreetTransitLink e : Iterables.filter(stop_d.getOutgoing(), StreetTransitLink.class)) {
+        for (StreetTransitStopLink e : Iterables.filter(stop_d.getOutgoing(), StreetTransitStopLink.class)) {
             split_d = e.getToVertex();
         }
         

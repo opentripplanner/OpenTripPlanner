@@ -4,7 +4,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -66,7 +66,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;
             for(Edge e:ts.getOutgoing()){
-                if(e instanceof StreetTransitLink) {
+                if(e instanceof StreetTransitStopLink) {
                     alreadyLinked = true;
                     break;
                 }
@@ -103,8 +103,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
             // Only use stop codes for linking TODO: find better method to connect stops without stop code
             if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
-                new StreetTransitLink(ts, tsv);
-                new StreetTransitLink(tsv, ts);
+                new StreetTransitStopLink(ts, tsv);
+                new StreetTransitStopLink(tsv, ts);
                 LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
                 return true;
             }
