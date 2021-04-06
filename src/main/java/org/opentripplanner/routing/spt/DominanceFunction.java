@@ -1,13 +1,10 @@
 package org.opentripplanner.routing.spt;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 
 /**
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
