@@ -176,6 +176,7 @@ public class NearbyStopFinder {
 
         List<NearbyStop> stopsFound = Lists.newArrayList();
 
+        // Only used if OTPFeature.FlexRouting.isOn()
         Multimap<FlexStopLocation, State> locationsMap = ArrayListMultimap.create();
 
         if (spt != null) {
@@ -200,23 +201,25 @@ public class NearbyStopFinder {
             }
         }
 
-        for (var locationStates : locationsMap.asMap().entrySet()) {
-            FlexStopLocation flexStopLocation = locationStates.getKey();
-            Collection<State> states = locationStates.getValue();
-            // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
-            // the minimum walking distance
-            State min = Collections.min(states, (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance));
+        if (OTPFeature.FlexRouting.isOn()) {
+            for (var locationStates : locationsMap.asMap().entrySet()) {
+                FlexStopLocation flexStopLocation = locationStates.getKey();
+                Collection<State> states = locationStates.getValue();
+                // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
+                // the minimum walking distance
+                State min = Collections.min(states,
+                    (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance)
+                );
 
-            // If the best state for this FlexStopLocation is a SplitterVertex, we want to get the
-            // TemporaryStreetLocation instead. This allows us to reach SplitterVertices in both
-            // directions when routing later.
-            if (min.getVertex() instanceof SplitterVertex && min
-                .getBackState()
-                .getVertex() instanceof TemporaryStreetLocation) {
-                min = min.getBackState();
+                // If the best state for this FlexStopLocation is a SplitterVertex, we want to get the
+                // TemporaryStreetLocation instead. This allows us to reach SplitterVertices in both
+                // directions when routing later.
+                if (min.getBackState().getVertex() instanceof TemporaryStreetLocation) {
+                    min = min.getBackState();
+                }
+
+                stopsFound.add(NearbyStop.nearbyStopForState(min, flexStopLocation));
             }
-
-            stopsFound.add(NearbyStop.nearbyStopForState(min, flexStopLocation));
         }
 
         /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
