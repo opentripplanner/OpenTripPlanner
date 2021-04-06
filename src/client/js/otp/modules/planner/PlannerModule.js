@@ -339,9 +339,9 @@ otp.modules.planner.PlannerModule =
                 time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
                 date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
-                mode: this.mode,
-                maxWalkDistance: this.maxWalkDistance
+                mode: this.mode
             };
+            if(this.mode !== "CAR") _.extend(queryParams, { maxWalkDistance: this.maxWalkDistance} );
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });
             if(this.preferredRoutes !== null) {

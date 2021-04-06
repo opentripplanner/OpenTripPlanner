@@ -4,6 +4,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -71,7 +72,10 @@ public class DirectStreetRouter {
 
   private static double calculateDistanceMaxLimit(RoutingRequest request) {
     double limit = request.maxWalkDistance * 2;
-    double maxLimit = request.streetSubRequestModes.getCar()
+    boolean isCarRequest = request.modes.directMode == StreetMode.CAR ||
+            request.modes.directMode == StreetMode.CAR_TO_PARK ||
+            request.streetSubRequestModes.getCar();
+    double maxLimit = isCarRequest
         ? MAX_CAR_DISTANCE_METERS
         : (request.streetSubRequestModes.getBicycle() ? MAX_BIKE_DISTANCE_METERS : MAX_WALK_DISTANCE_METERS);
 
