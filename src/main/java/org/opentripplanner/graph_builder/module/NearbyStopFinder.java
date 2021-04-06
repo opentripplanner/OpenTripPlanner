@@ -5,9 +5,7 @@ import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.MinMap;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
@@ -27,7 +25,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.OTPFeature;
@@ -50,12 +47,11 @@ import java.util.Set;
  */
 public class NearbyStopFinder {
 
-    private static Logger LOG = LoggerFactory.getLogger(NearbyStopFinder.class);
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private static final Logger LOG = LoggerFactory.getLogger(NearbyStopFinder.class);
 
     public  final boolean useStreets;
-    private Graph graph;
-    private double radiusMeters;
+    private final Graph graph;
+    private final double radiusMeters;
 
     /* Fields used when finding stops via the street network. */
     private AStar astar;
@@ -272,8 +268,8 @@ public class NearbyStopFinder {
             ? state.getVertex().getIncoming()
             : state.getVertex().getOutgoing();
 
-        return edges.stream()
-                .anyMatch(e -> e instanceof StreetEdge && ((StreetEdge) e)
-                .getPermission().allows(TraverseMode.CAR));
+        return edges.stream().anyMatch(e ->
+                e instanceof StreetEdge
+                && ((StreetEdge) e).getPermission().allows(TraverseMode.CAR));
     }
 }

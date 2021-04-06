@@ -2,7 +2,6 @@ package org.opentripplanner.routing.spt;
 
 import java.util.LinkedList;
 
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -131,7 +130,8 @@ public class GraphPath {
                     coordinates.extend(geometry.getCoordinates());
                 }
                 else {
-                    coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplications
+                    // Avoid duplications
+                    coordinates.extend(geometry.getCoordinates(), 1);
                 }
             }
         }
