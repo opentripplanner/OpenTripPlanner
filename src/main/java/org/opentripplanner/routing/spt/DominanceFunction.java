@@ -92,6 +92,8 @@ public abstract class DominanceFunction implements Serializable {
      *
      * Therefore, if we are close to the start or the end of a route we allow this.
      *
+     * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
+     *
      * The following variable determines how close you have to be to the start or the end point for it to be
      * considered "close enough for a loop".
      *
@@ -99,7 +101,7 @@ public abstract class DominanceFunction implements Serializable {
      * every visited vertex, the unit is the Euclidian distance of the current location and the start/end.
      *
      * Note: that it the Euclidian distance between two point converts to different amounts of meters
-     * depdending where on Earth the coordinates are. In Europe 0.005 is roughly 500 meters.
+     * depending where on Earth the coordinates are. In Europe 0.005 is roughly 500 meters.
      */
     private static final float MAX_ROUTE_LOOP_EUCLIDIAN_DISTANCE = 0.005f;
 
