@@ -7,7 +7,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  * bike safety settings tweaked, especially including tracktype's grade and preference of bicycle
  * networks.
  *
- * @author hbruch
  * @see WayPropertySetSource
  * @see DefaultWayPropertySetSource
  */
@@ -74,7 +73,7 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
         props.setProperties("maxspeed=90", StreetTraversalPermission.ALL, 3.0, 3.0, true);
         props.setProperties("maxspeed=100", StreetTraversalPermission.ALL, 5.0, 5.0, true);
 
-        /** tracktype */
+        /* tracktype */
         props.setProperties(
                 "tracktype=grade1", StreetTraversalPermission.ALL, 1.0, 1.0, true); // Solid
         props.setProperties(
@@ -90,10 +89,10 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
         props.setProperties(
                 "tracktype=grade5", StreetTraversalPermission.ALL, 1.5, 1.5, true); // Soft.
 
-        /** We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad \
+        /* We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad \
          *
          * This uses a newly added logical OR since you don't want to apply the safety multiplier more than once.
-         * */
+         */
         props.setProperties(
                 "lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.7, 0.7, true);
 
@@ -106,13 +105,6 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
 
         props.setProperties(
                 "highway=unclassified;cycleway=lane", StreetTraversalPermission.ALL, 0.87, 0.87);
-
-        /**
-         * Artifical bicycle bonus/malus for when you want to achieve a certain route, for example when planning
-         * diversions
-         */
-        props.setProperties("bicycle:bonus=yes", StreetTraversalPermission.ALL, 0.2, 0.2, true);
-        props.setProperties("bicycle:malus=yes", StreetTraversalPermission.ALL, 2.5, 2.5, true);
 
         // Read the rest from the default set
         new DefaultWayPropertySetSource().populateProperties(props);

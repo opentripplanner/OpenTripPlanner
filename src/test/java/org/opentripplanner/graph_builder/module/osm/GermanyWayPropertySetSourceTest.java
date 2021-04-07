@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -11,9 +10,9 @@ public class GermanyWayPropertySetSourceTest {
 
     static WayPropertySet wps = new WayPropertySet();
     static float epsilon = 0.01f;
-    static WayPropertySetSource source = new GermanyWayPropertySetSource();
 
     static {
+        var source = new GermanyWayPropertySetSource();
         source.populateProperties(wps);
     }
 
@@ -218,14 +217,10 @@ public class GermanyWayPropertySetSourceTest {
         var alzentalstr = new OSMWithTags();
         alzentalstr.addTag("highway", "residential");
         alzentalstr.addTag("lit", "yes");
+        alzentalstr.addTag("maxspeed", "30");
         alzentalstr.addTag("name", "Alzentalstraße");
         alzentalstr.addTag("surface", "asphalt");
-        assertEquals(1.38889, wps.getCarSpeedForWay(alzentalstr, false), epsilon);
-
-        // https://www.openstreetmap.org/way/10879847
-        var tuebingerStr = new OSMWithTags();
-        tuebingerStr.addTag("highway", "primary");
-        assertEquals(1.38889, wps.getCarSpeedForWay(tuebingerStr, false), epsilon);
+        assertEquals(8.33333969116211, wps.getCarSpeedForWay(alzentalstr, false), epsilon);
 
         var autobahn = new OSMWithTags();
         autobahn.addTag("highway", "motorway");
