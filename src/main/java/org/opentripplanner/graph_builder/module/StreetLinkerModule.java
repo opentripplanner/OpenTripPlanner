@@ -13,6 +13,7 @@ import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       linkTransitEntrances(graph);
       linkBikeRentals(graph);
       linkBikeParks(graph);
+      if (OTPFeature.FlexRouting.isOn()) { linkTransitStopsForFlex(graph); }
     }
 
     // Calculates convex hull of a graph which is shown in routerInfo API point
@@ -80,6 +82,27 @@ public class StreetLinkerModule implements GraphBuilderModule {
               new StreetTransitLink(streetVertex, (TransitStopVertex) vertex)
           )
       );
+    }
+  }
+
+  /**
+   * If regular stops are used for flex trips, they also need to be connected to car routable
+   * street edges.
+   */
+  private void linkTransitStopsForFlex(Graph graph) {
+    LOG.info("Linking flex transit stops to graph...");
+    for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
+      if (graph.getAllFlexStops().contains(tStop.getStop())) {
+        graph.getLinker().linkVertexPermanently(
+            tStop,
+            TraverseMode.CAR,
+            LinkingDirection.BOTH_WAYS,
+            (vertex, streetVertex) -> List.of(
+                new StreetTransitLink((TransitStopVertex) vertex, streetVertex),
+                new StreetTransitLink(streetVertex, (TransitStopVertex) vertex)
+              )
+          );
+      }
     }
   }
 
