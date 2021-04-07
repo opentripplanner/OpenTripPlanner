@@ -72,8 +72,9 @@ public class PolylineEncoder {
             plng = lnge5;
 
             encodedPoints.append(encodeSignedNumber(dlat)).append(encodeSignedNumber(dlng));
-            if (level >= 0)
+            if (level >= 0) {
                 encodedLevels.append(encodeNumber(level));
+            }
             count++;
         }
 

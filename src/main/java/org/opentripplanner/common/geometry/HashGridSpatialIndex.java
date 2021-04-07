@@ -1,26 +1,21 @@
 package org.opentripplanner.common.geometry;
 
 import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.procedure.TLongProcedure;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.ItemVisitor;
 import org.locationtech.jts.index.SpatialIndex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A spatial index using a 2D fast long hashtable (Trove lib).
@@ -175,10 +170,10 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
             // make a defensive copy as we're about to modify the coordinate
             coord = new Coordinate(coord);
 
-            if (coord.x > 180) coord.x = 180;
-            if (coord.x < -180) coord.x = -180;
-            if (coord.y > 90) coord.y = 90;
-            if (coord.y < -90) coord.y = -90;
+            if (coord.x > 180) { coord.x = 180; }
+            if (coord.x < -180) { coord.x = -180; }
+            if (coord.y > 90) { coord.y = 90; }
+            if (coord.y < -90) { coord.y = -90; }
         }
 
         return coord;

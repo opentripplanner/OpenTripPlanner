@@ -6,8 +6,8 @@ import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TransitEntranceLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
+import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -76,8 +76,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
-              new StreetTransitLink((TransitStopVertex) vertex, streetVertex),
-              new StreetTransitLink(streetVertex, (TransitStopVertex) vertex)
+              new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
+              new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
           )
       );
     }
@@ -91,8 +91,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
           TraverseMode.WALK,
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
-              new TransitEntranceLink((TransitEntranceVertex) vertex, streetVertex),
-              new TransitEntranceLink(streetVertex, (TransitEntranceVertex) vertex)
+              new StreetTransitEntranceLink((TransitEntranceVertex) vertex, streetVertex),
+              new StreetTransitEntranceLink(streetVertex, (TransitEntranceVertex) vertex)
           )
       );
     }

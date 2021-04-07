@@ -43,7 +43,7 @@ public class BikeRental {
         BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
         Locale locale;
         locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
-        if (bikeRentalService == null) return new BikeRentalStationList();
+        if (bikeRentalService == null) { return new BikeRentalStationList(); }
         Envelope envelope;
         if (lowerLeft != null) {
             envelope = getEnvelope(lowerLeft, upperRight);

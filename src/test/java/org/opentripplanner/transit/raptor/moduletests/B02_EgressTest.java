@@ -33,19 +33,19 @@ public class B02_EgressTest implements RaptorTestConstants {
   @Before
   public void setup() {
     data.add(
-        route("R1", STOP_1, STOP_2, STOP_3, STOP_4, STOP_5, STOP_6)
+        route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G)
             .withTimetable(
                 schedule("0:10, 0:12, 0:14, 0:16, 0:18, 0:20")
             )
     );
 
     requestBuilder.searchParams()
-        .addAccessPaths(walk(STOP_1, D20s))
+        .addAccessPaths(walk(STOP_B, D20s))
         .addEgressPaths(
-            walk(STOP_3, D7m),    // Not optimal
-            walk(STOP_4, D3m),    // Earliest arrival time: 0:16 + 3m = 0:19
-            walk(STOP_5, D2m),    // Best compromise of cost and time
-            walk(STOP_6, D1s)     // Lowest cost
+            walk(STOP_D, D7m),    // Not optimal
+            walk(STOP_E, D3m),    // Earliest arrival time: 0:16 + 3m = 0:19
+            walk(STOP_F, D2m),    // Best compromise of cost and time
+            walk(STOP_G, D1s)     // Lowest cost
         )
         .earliestDepartureTime(T00_00)
         .latestArrivalTime(T00_30)
@@ -63,7 +63,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     // expect: one path with the latest departure time.
     assertEquals(
-        "Walk 20s ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Walk 3m [00:09:40 00:19:00 9m20s]",
+        "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [00:09:40 00:19:00 9m20s]",
         PathUtils.pathsToString(response)
     );
   }
@@ -78,7 +78,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     // expect: one path with the latest departure time, same as found in the forward search.
     assertEquals(
-        "Walk 20s ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Walk 3m [00:09:40 00:19:00 9m20s]",
+        "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [00:09:40 00:19:00 9m20s]",
         PathUtils.pathsToString(response)
     );
   }
@@ -91,9 +91,9 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     // expect: All pareto optimal paths
     assertEquals(""
-            + "Walk 20s ~ 1 ~ BUS R1 0:10 0:16 ~ 4 ~ Walk 3m [00:09:40 00:19:00 9m20s, cost: 1760]\n"
-            + "Walk 20s ~ 1 ~ BUS R1 0:10 0:18 ~ 5 ~ Walk 2m [00:09:40 00:20:00 10m20s, cost: 1640]\n"
-            + "Walk 20s ~ 1 ~ BUS R1 0:10 0:20 ~ 6 ~ Walk 1s [00:09:40 00:20:01 10m21s, cost: 1284]",
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [00:09:40 00:19:00 9m20s, cost: 1760]\n"
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 2m [00:09:40 00:20:00 10m20s, cost: 1640]\n"
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:20 ~ 7 ~ Walk 1s [00:09:40 00:20:01 10m21s, cost: 1284]",
         PathUtils.pathsToString(response)
     );
   }

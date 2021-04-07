@@ -1,6 +1,11 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -11,6 +16,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.CarPickupState;
@@ -18,7 +24,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
@@ -26,18 +31,11 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * This represents a street segment.
@@ -321,7 +319,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** return a StateEditor rather than a State so that we can make parking/mode switch modifications for kiss-and-ride. */
     private StateEditor doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
-        if (traverseMode == null) return null;
+        if (traverseMode == null) { return null; }
         boolean walkingBike = options.walkingBike;
         boolean backWalkingBike = s0.isBackWalkingBike();
         TraverseMode backMode = s0.getBackMode();
@@ -888,14 +886,17 @@ public class StreetEdge extends Edge implements Cloneable {
      * edge is split, so both edges will have the same starting and ending nodes.
      */
     public long getStartOsmNodeId () {
-        if (fromv instanceof OsmVertex)
+        if (fromv instanceof OsmVertex) {
             return ((OsmVertex) fromv).nodeId;
+        }
         // get information from the splitter vertex so this edge gets the same traffic information it got before
         // it was split.
-        else if (fromv instanceof SplitterVertex)
+        else if (fromv instanceof SplitterVertex) {
             return ((SplitterVertex) fromv).previousNodeId;
-        else
+        }
+        else {
             return -1;
+        }
     }
 
     /**
@@ -903,13 +904,16 @@ public class StreetEdge extends Edge implements Cloneable {
      * edge is split, so both edges will have the same starting and ending nodes.
      */
     public long getEndOsmNodeId () {
-        if (tov instanceof OsmVertex)
+        if (tov instanceof OsmVertex) {
             return ((OsmVertex) tov).nodeId;
+        }
             // get information from the splitter vertex so this edge gets the same traffic information it got before
             // it was split.
-        else if (tov instanceof SplitterVertex)
+        else if (tov instanceof SplitterVertex) {
             return ((SplitterVertex) tov).nextNodeId;
-        else
+        }
+        else {
             return -1;
+        }
     }
 }

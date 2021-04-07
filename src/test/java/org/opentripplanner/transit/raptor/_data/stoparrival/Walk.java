@@ -13,9 +13,10 @@ class Walk extends AbstractStopArrival {
         int stop,
         int departureTime,
         int arrivalTime,
+        int cost,
         ArrivalView<TestTripSchedule> previous
     ) {
-        super(round, stop, arrivalTime, 1000, previous);
+        super(round, stop, arrivalTime, cost, previous);
         // In a reverse search we the arrival is before the departure
         this.transfer = new RaptorTransfer() {
             @Override public int stop() {

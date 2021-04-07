@@ -62,8 +62,9 @@ class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
         }
         BikeRentalStation brStation = new BikeRentalStation();
         brStation.name = new NonLocalizedString(attributes.get("name").trim());
-        if (namePrefix != null)
+        if (namePrefix != null) {
             brStation.name = new NonLocalizedString(namePrefix + brStation.name);
+        }
         String[] coords = attributes.get("Point").trim().split(",");
         brStation.x = Double.parseDouble(coords[0]);
         brStation.y = Double.parseDouble(coords[1]);

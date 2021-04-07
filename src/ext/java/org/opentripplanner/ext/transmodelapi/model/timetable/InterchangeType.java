@@ -4,7 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.transfer.Transfer;
 
 public class InterchangeType {
 

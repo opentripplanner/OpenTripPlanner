@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.service.HeuristicSearchTask;
-import org.opentripplanner.transit.raptor.service.RangRaptorDynamicSearch;
+import org.opentripplanner.transit.raptor.service.RangeRaptorDynamicSearch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
     public RaptorResponse<T> route(RaptorRequest<T> request, RaptorTransitDataProvider<T> transitData) {
         LOG.debug("Original request: {}", request);
         if(request.isDynamicSearch()) {
-            return new RangRaptorDynamicSearch<>(config, transitData, request).route();
+            return new RangeRaptorDynamicSearch<>(config, transitData, request).route();
         }
         return routeUsingStdWorker(transitData, request);
     }

@@ -36,8 +36,8 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
 
   /** The expected result is tha same for all tests */
   private static final String EXPECTED_RESULT
-      = "Flex 2m 1tx ~ 1 ~ "
-      + "BUS R1 0:04 0:06 ~ 2 ~ "
+      = "Flex 2m 1tx ~ 2 ~ "
+      + "BUS R1 0:04 0:06 ~ 3 ~ "
       + "Flex 2m 1tx "
       + "[00:00:30 00:09:10 8m40s]";
 
@@ -50,7 +50,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
 
     data.add(
         // Pattern arrive at stop 2 at 0:03:00
-        route(pattern("R1",  STOP_1, STOP_2))
+        route(pattern("R1", STOP_B, STOP_C))
             .withTimetable(
                 // First trip is too early: It takes 2m to get to the point of boarding:
                 // --> 00:00:00 + flex 30s + slack(1m + 30s) = 00:02:00
@@ -65,9 +65,9 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
     );
     requestBuilder.searchParams()
         // Start walking 1m before: 30s walk + 30s board-slack
-        .addAccessPaths(flexAndWalk(STOP_1, D2m))
+        .addAccessPaths(flexAndWalk(STOP_B, D2m))
         // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
-        .addEgressPaths(flex(STOP_2, D2m))
+        .addEgressPaths(flex(STOP_C, D2m))
         .earliestDepartureTime(T00_00)
         .latestArrivalTime(T00_10)
         // Only one iteration is needed - the access should be time-shifted

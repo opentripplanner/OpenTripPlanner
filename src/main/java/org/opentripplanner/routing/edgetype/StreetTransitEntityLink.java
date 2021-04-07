@@ -1,44 +1,47 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.model.Trip;
+import java.util.Locale;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.CarPickupState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
-
-/** 
- * This represents the connection between a street vertex and a transit vertex
- * where going from the street to the vehicle is immediate -- such as at a 
- * curbside bus stop.
+/**
+ * This represents the connection between a street vertex and a transit vertex.
  */
-public class StreetTransitLink extends Edge {
+public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge {
 
     private static final long serialVersionUID = -3311099256178798981L;
-    static final int STL_TRAVERSE_COST = 1;
+    static final int STEL_TRAVERSE_COST = 1;
+
+    private final T transitEntityVertex;
 
     private final boolean wheelchairAccessible;
 
-    private final TransitStopVertex stopVertex;
-
-    public StreetTransitLink(StreetVertex fromv, TransitStopVertex tov) {
+    public StreetTransitEntityLink(StreetVertex fromv, T tov, boolean wheelchairAccessible) {
     	super(fromv, tov);
-    	stopVertex = tov;
-        this.wheelchairAccessible = tov.hasWheelchairEntrance();
+    	this.transitEntityVertex = tov;
+        this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    public StreetTransitLink(TransitStopVertex fromv, StreetVertex tov) {
+    public StreetTransitEntityLink(T fromv, StreetVertex tov, boolean wheelchairAccessible) {
         super(fromv, tov);
-        stopVertex = fromv;
-        this.wheelchairAccessible = fromv.hasWheelchairEntrance();
+        this.transitEntityVertex = fromv;
+        this.wheelchairAccessible = wheelchairAccessible;
+    }
+
+    protected abstract int getStreetToStopTime();
+
+    protected T getTransitEntityVertex() {
+        return transitEntityVertex;
     }
 
     public String getDirection() {
@@ -55,13 +58,12 @@ public class StreetTransitLink extends Edge {
     }
 
     public String getName() {
-        return this.stopVertex.getStop().getName();
+        return this.transitEntityVertex.getName();
     }
 
-    @Override
     public String getName(Locale locale) {
         //TODO: localize
-        return this.getName();
+        return getName();
     }
 
     public State traverse(State s0) {
@@ -72,8 +74,9 @@ public class StreetTransitLink extends Edge {
         // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
         // if they are for the same stop.
         if (
-            s0.backEdge instanceof StreetTransitLink &&
-                ((StreetTransitLink) s0.backEdge).stopVertex == this.stopVertex
+            s0.backEdge instanceof StreetTransitEntityLink &&
+                ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex
+                    == this.transitEntityVertex
         ) {
             return null;
         }
@@ -82,6 +85,7 @@ public class StreetTransitLink extends Edge {
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
+
         if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
             // Forbid taking your own bike in the station if bike P+R activated.
             return null;
@@ -100,24 +104,24 @@ public class StreetTransitLink extends Edge {
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            if (req.carPickup && !s0.isCarParked()) {
-                s1.setCarParked(true);
+            if (req.carPickup && s0.getCarPickupState() == CarPickupState.IN_CAR) {
+                s1.setTaxiState(s0.getOptions().arriveBy ? CarPickupState.WALK_TO_PICKUP : CarPickupState.WALK_FROM_DROP_OFF);
             } else {
                 return null;
             }
         }
 
-        int streetToStopTime = stopVertex.hasPathways() ? 0 : stopVertex.getStreetToStopTime();
         // We do not increase the time here, so that searching from the stop coordinates instead of
         // the stop id catch transit departing at that exact search time.
+        int streetToStopTime = getStreetToStopTime();
         s1.incrementTimeInSeconds(streetToStopTime);
-        s1.incrementWeight(STL_TRAVERSE_COST + streetToStopTime);
+        s1.incrementWeight(STEL_TRAVERSE_COST + streetToStopTime);
         return s1.makeState();
     }
 
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(STL_TRAVERSE_COST);
+        s1.incrementWeight(STEL_TRAVERSE_COST);
         return s1.makeState();
     }
     

@@ -46,8 +46,9 @@ public final class CompactElevationProfile implements Serializable {
      * @return The compacted format
      */
     public static byte[] compactElevationProfileWithRegularSamples(CoordinateSequence elevation) {
-        if (elevation == null)
+        if (elevation == null) {
             return null;
+        }
         int oiy = 0;
         int[] coords = new int[elevation.size()];
         for (int i = 0; i < elevation.size(); i++) {
@@ -76,8 +77,9 @@ public final class CompactElevationProfile implements Serializable {
      * @return The elevation profile
      */
     public static PackedCoordinateSequence uncompactElevationProfileWithRegularSamples(byte[] packedCoords, double lengthM) {
-        if (packedCoords == null)
+        if (packedCoords == null) {
             return null;
+        }
         int[] coords = DlugoszVarLenIntPacker.unpack(packedCoords);
         int size = coords.length;
         Coordinate[] c = new Coordinate[size];

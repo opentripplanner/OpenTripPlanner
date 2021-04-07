@@ -23,9 +23,9 @@ public class RideMapper {
      * Convert transit legs in a Raptor Path into Rides, which are used by FareServices to calculate
      * fares. Adapted from from previously used method DefaultFareServiceImpl.createRides().
      */
-    public static List<Ride> ridesForRaptorPath(Path path, TransitLayer transitLayer) {
+    public static List<Ride> ridesForRaptorPath(Path<TripSchedule> path, TransitLayer transitLayer) {
         List<Ride> rides = new ArrayList<>();
-        for (PathLeg leg = path.accessLeg().nextLeg(); !leg.isEgressLeg(); leg = leg.nextLeg()) {
+        for (PathLeg<TripSchedule> leg = path.accessLeg().nextLeg(); !leg.isEgressLeg(); leg = leg.nextLeg()) {
             if (leg.isTransitLeg()) {
                 rides.add(rideForTransitPathLeg(leg.asTransitLeg(), transitLayer));
             }
@@ -33,7 +33,7 @@ public class RideMapper {
         return rides;
     }
 
-    public static Ride rideForTransitPathLeg(TransitPathLeg leg, TransitLayer transitLayer) {
+    public static Ride rideForTransitPathLeg(TransitPathLeg<TripSchedule> leg, TransitLayer transitLayer) {
         TransitPathLeg<TripSchedule> transitPathLeg = leg.asTransitLeg();
         TripSchedule tripSchedule = transitPathLeg.trip();
         Ride ride = new Ride();
@@ -51,7 +51,7 @@ public class RideMapper {
             }
             if (onBoard) {
                 ride.zones.add(stop.getFirstZoneAsString());
-                if (stop == ride.lastStop) break;
+                if (stop == ride.lastStop) { break; }
             }
         }
         ride.agency = tripPattern.route.getAgency().getId();

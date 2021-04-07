@@ -333,7 +333,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (!hasHeader()) {
         memoizedIsInitialized = 0;
@@ -376,7 +376,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -592,7 +592,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.FeedMessage other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.FeedMessage.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.FeedMessage.getDefaultInstance()) { return this; }
         if (other.hasHeader()) {
           mergeHeader(other.getHeader());
         }
@@ -1526,7 +1526,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (!hasGtfsRealtimeVersion()) {
         memoizedIsInitialized = 0;
@@ -1562,7 +1562,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -1759,7 +1759,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.FeedHeader other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.FeedHeader.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.FeedHeader.getDefaultInstance()) { return this; }
         if (other.hasGtfsRealtimeVersion()) {
           bitField0_ |= 0x00000001;
           gtfsRealtimeVersion_ = other.gtfsRealtimeVersion_;
@@ -2481,7 +2481,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (!hasId()) {
         memoizedIsInitialized = 0;
@@ -2541,7 +2541,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -2785,7 +2785,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.FeedEntity other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.FeedEntity.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.FeedEntity.getDefaultInstance()) { return this; }
         if (other.hasId()) {
           bitField0_ |= 0x00000001;
           id_ = other.id_;
@@ -4185,7 +4185,7 @@ public final class GtfsRealtime {
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
-        if (isInitialized != -1) return isInitialized == 1;
+        if (isInitialized != -1) { return isInitialized == 1; }
 
         if (!extensionsAreInitialized()) {
           memoizedIsInitialized = 0;
@@ -4217,7 +4217,7 @@ public final class GtfsRealtime {
       private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
         int size = memoizedSerializedSize;
-        if (size != -1) return size;
+        if (size != -1) { return size; }
 
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -4428,7 +4428,7 @@ public final class GtfsRealtime {
         }
 
         public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent other) {
-          if (other == com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent.getDefaultInstance()) return this;
+          if (other == com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent.getDefaultInstance()) { return this; }
           if (other.hasDelay()) {
             setDelay(other.getDelay());
           }
@@ -5173,7 +5173,7 @@ public final class GtfsRealtime {
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
-        if (isInitialized != -1) return isInitialized == 1;
+        if (isInitialized != -1) { return isInitialized == 1; }
 
         if (hasArrival()) {
           if (!getArrival().isInitialized()) {
@@ -5223,7 +5223,7 @@ public final class GtfsRealtime {
       private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
         int size = memoizedSerializedSize;
-        if (size != -1) return size;
+        if (size != -1) { return size; }
 
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -5460,7 +5460,7 @@ public final class GtfsRealtime {
         }
 
         public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate other) {
-          if (other == com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.getDefaultInstance()) return this;
+          if (other == com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.getDefaultInstance()) { return this; }
           if (other.hasStopSequence()) {
             setStopSequence(other.getStopSequence());
           }
@@ -6268,7 +6268,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (!hasTrip()) {
         memoizedIsInitialized = 0;
@@ -6326,7 +6326,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -6596,7 +6596,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.TripUpdate other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.TripUpdate.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.TripUpdate.getDefaultInstance()) { return this; }
         if (other.hasTrip()) {
           mergeTrip(other.getTrip());
         }
@@ -8960,7 +8960,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (hasTrip()) {
         if (!getTrip().isInitialized()) {
@@ -9028,7 +9028,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -9312,7 +9312,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.VehiclePosition other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.VehiclePosition.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.VehiclePosition.getDefaultInstance()) { return this; }
         if (other.hasTrip()) {
           mergeTrip(other.getTrip());
         }
@@ -11241,7 +11241,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       for (int i = 0; i < getActivePeriodCount(); i++) {
         if (!getActivePeriod(i).isInitialized()) {
@@ -11315,7 +11315,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       for (int i = 0; i < activePeriod_.size(); i++) {
@@ -11599,7 +11599,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.Alert other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.Alert.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.Alert.getDefaultInstance()) { return this; }
         if (activePeriodBuilder_ == null) {
           if (!other.activePeriod_.isEmpty()) {
             if (activePeriod_.isEmpty()) {
@@ -13157,7 +13157,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (!extensionsAreInitialized()) {
         memoizedIsInitialized = 0;
@@ -13186,7 +13186,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -13374,7 +13374,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.TimeRange other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.TimeRange.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.TimeRange.getDefaultInstance()) { return this; }
         if (other.hasStart()) {
           setStart(other.getStart());
         }
@@ -13898,7 +13898,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (!hasLatitude()) {
         memoizedIsInitialized = 0;
@@ -13944,7 +13944,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -14161,7 +14161,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.Position other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.Position.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.Position.getDefaultInstance()) { return this; }
         if (other.hasLatitude()) {
           setLatitude(other.getLatitude());
         }
@@ -15370,7 +15370,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (!extensionsAreInitialized()) {
         memoizedIsInitialized = 0;
@@ -15411,7 +15411,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -15646,7 +15646,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.TripDescriptor other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.TripDescriptor.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.TripDescriptor.getDefaultInstance()) { return this; }
         if (other.hasTripId()) {
           bitField0_ |= 0x00000001;
           tripId_ = other.tripId_;
@@ -16747,7 +16747,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (!extensionsAreInitialized()) {
         memoizedIsInitialized = 0;
@@ -16779,7 +16779,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -16976,7 +16976,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.VehicleDescriptor other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.VehicleDescriptor.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.VehicleDescriptor.getDefaultInstance()) { return this; }
         if (other.hasId()) {
           bitField0_ |= 0x00000001;
           id_ = other.id_;
@@ -17783,7 +17783,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       if (hasTrip()) {
         if (!getTrip().isInitialized()) {
@@ -17827,7 +17827,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -18053,7 +18053,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.EntitySelector other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.EntitySelector.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.EntitySelector.getDefaultInstance()) { return this; }
         if (other.hasAgencyId()) {
           bitField0_ |= 0x00000001;
           agencyId_ = other.agencyId_;
@@ -19005,7 +19005,7 @@ public final class GtfsRealtime {
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
-        if (isInitialized != -1) return isInitialized == 1;
+        if (isInitialized != -1) { return isInitialized == 1; }
 
         if (!hasText()) {
           memoizedIsInitialized = 0;
@@ -19038,7 +19038,7 @@ public final class GtfsRealtime {
       private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
         int size = memoizedSerializedSize;
-        if (size != -1) return size;
+        if (size != -1) { return size; }
 
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
@@ -19221,7 +19221,7 @@ public final class GtfsRealtime {
         }
 
         public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation other) {
-          if (other == com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation.getDefaultInstance()) return this;
+          if (other == com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation.getDefaultInstance()) { return this; }
           if (other.hasText()) {
             bitField0_ |= 0x00000001;
             text_ = other.text_;
@@ -19549,7 +19549,7 @@ public final class GtfsRealtime {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized != -1) { return isInitialized == 1; }
 
       for (int i = 0; i < getTranslationCount(); i++) {
         if (!getTranslation(i).isInitialized()) {
@@ -19581,7 +19581,7 @@ public final class GtfsRealtime {
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
-      if (size != -1) return size;
+      if (size != -1) { return size; }
 
       size = 0;
       for (int i = 0; i < translation_.size(); i++) {
@@ -19775,7 +19775,7 @@ public final class GtfsRealtime {
       }
 
       public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.TranslatedString other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.TranslatedString.getDefaultInstance()) return this;
+        if (other == com.google.transit.realtime.GtfsRealtime.TranslatedString.getDefaultInstance()) { return this; }
         if (translationBuilder_ == null) {
           if (!other.translation_.isEmpty()) {
             if (translation_.isEmpty()) {

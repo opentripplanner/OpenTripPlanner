@@ -34,7 +34,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
     T2<Vertex, Vertex> key = new T2<>(fromv, tov);
     FlexPath cacheValue = cache.get(key);
-    if (cacheValue != null) return cacheValue;
+    if (cacheValue != null) { return cacheValue; }
 
     RoutingRequest routingRequest = new RoutingRequest(TraverseMode.CAR);
     routingRequest.setNumItineraries(1);

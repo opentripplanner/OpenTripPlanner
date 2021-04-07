@@ -38,8 +38,8 @@ class Vector {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         Vector v = (Vector) o;
         return v1 == v.v1 && v2 == v.v2 && v3 == v.v3 && v4 == v.v4 && name.equals(v.name);
     }

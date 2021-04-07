@@ -262,10 +262,12 @@ public class State implements Cloneable {
     }
 
     private double getWalkDistanceDelta () {
-        if (backState != null)
+        if (backState != null) {
             return Math.abs(this.walkDistance - backState.walkDistance);
-        else
+        }
+        else {
             return 0.0;
+        }
     }
 
     public double getWeightDelta() {
@@ -328,8 +330,9 @@ public class State implements Cloneable {
      * @return
      */
     public State addToExistingResultChain(State existingResultChain) {
-        if (this.getNextResult() != null)
+        if (this.getNextResult() != null) {
             throw new IllegalStateException("this result already has a next result set");
+        }
         next = existingResultChain;
         return this;
     }
@@ -469,10 +472,12 @@ public class State implements Cloneable {
             } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
                 editor.beginVehicleRentingAtStation(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
             }
-            if (orig.isCarParked() != orig.getBackState().isCarParked())
+            if (orig.isCarParked() != orig.getBackState().isCarParked()) {
                 editor.setCarParked(!orig.isCarParked());
-            if (orig.isBikeParked() != orig.getBackState().isBikeParked())
+            }
+            if (orig.isBikeParked() != orig.getBackState().isBikeParked()) {
                 editor.setBikeParked(!orig.isBikeParked());
+            }
 
             ret = editor.makeState();
 

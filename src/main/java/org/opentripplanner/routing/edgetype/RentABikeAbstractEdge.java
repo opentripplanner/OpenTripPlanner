@@ -68,8 +68,9 @@ public abstract class RentABikeAbstractEdge extends Edge {
         /*
          * To dropoff a bike, we need to have rented one.
          */
-        if (!s0.isBikeRentingFromStation() || !hasCompatibleNetworks(networks, s0.getBikeRentalNetworks()))
+        if (!s0.isBikeRentingFromStation() || !hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) {
             return null;
+        }
         if (s0.backEdge instanceof RentABikeOnEdge) {
             return null;
         }
