@@ -102,8 +102,6 @@ public class StreetTransitLink extends Edge {
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
             if (req.carPickup && !s0.isCarParked()) {
                 s1.setCarParked(true);
-            } else {
-                return null;
             }
         }
 
