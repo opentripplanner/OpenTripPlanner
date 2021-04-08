@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_DRIVE;
+
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
@@ -543,5 +545,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
         props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
 
+    }
+
+    @Override
+    public DrivingDirection drivingDirection() {
+        return RIGHT_HAND_DRIVE;
     }
 }
