@@ -23,13 +23,23 @@ public abstract class AbstractIntersectionTraversalCostModel implements
     
     protected int maxLeftTurnAngle = 315;
 
-    /** Returns true if this angle represents a right turn. */
-    protected boolean isRightTurn(int turnAngle) {
+    /**
+     * Returns if this angle represents an easy turn were incoming traffic does not have to be crossed.
+     *
+     * In right hand driving countries, this is a right turn.
+     * In left hand driving countries this is a left turn.
+     * */
+    protected boolean isEasyTurn(int turnAngle) {
         return (turnAngle >= minRightTurnAngle && turnAngle < maxRightTurnAngle);
     }
 
-    /** Returns true if this angle represents a left turn. */
-    protected boolean isLeftTurn(int turnAngle) {
+    /**
+     * Returns if this angle represents a turn across incoming traffic.
+     *
+     * In right hand driving countries this is a left turn.
+     * In left hand driving countries this is a right turn.
+     * */
+    protected boolean isTurnAcrossTraffic(int turnAngle) {
         return (turnAngle >= minLeftTurnAngle && turnAngle < maxLeftTurnAngle);
     }
 

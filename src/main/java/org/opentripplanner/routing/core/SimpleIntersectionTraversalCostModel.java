@@ -34,10 +34,10 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     /** Expected time it takes to turn left without a stop light. */
     private Double expectedLeftNoLightTimeSec = 8.0;
 
-    private double cyclingRightTurnMultiplier = 5;
+    private double biycleEasyTurnMultiplier = 5;
 
-    /** Since doing a left turn on a bike is quite dangerous we add a cost for it**/
-    private double cyclingLeftTurnMultiplier = cyclingRightTurnMultiplier * 3;
+    /** Since doing a turn across traffic on a bike is quite dangerous we add a cost for it**/
+    private double bicycleTurnAcrossTrafficMultiplier = biycleEasyTurnMultiplier * 3;
 
     @Override
     public double computeTraversalCost(IntersectionVertex v, StreetEdge from, StreetEdge to, TraverseMode mode,
@@ -69,9 +69,9 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         int turnAngle = calculateTurnAngle(from, to, request);
         if (v.trafficLight) {
             // Use constants that apply when there are stop lights.
-            if (isRightTurn(turnAngle)) {
+            if (isEasyTurn(turnAngle)) {
                 turnCost = expectedRightAtLightTimeSec;
-            } else if (isLeftTurn(turnAngle)) {
+            } else if (isTurnAcrossTraffic(turnAngle)) {
                 turnCost = expectedLeftAtLightTimeSec;
             } else {
                 turnCost = expectedStraightAtLightTimeSec;
@@ -84,9 +84,9 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
             }
 
             // Use constants that apply when no stop lights.
-            if (isRightTurn(turnAngle)) {
+            if (isEasyTurn(turnAngle)) {
                 turnCost = expectedRightNoLightTimeSec;
-            } else if (isLeftTurn(turnAngle)) {
+            } else if (isTurnAcrossTraffic(turnAngle)) {
                 turnCost = expectedLeftNoLightTimeSec;
             } else {
                 turnCost = expectedStraightNoLightTimeSec;
@@ -101,10 +101,10 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         var turnAngle = calculateTurnAngle(from, to, request);
         final var baseCost = computeNonDrivingTraversalCost(v, from, to, fromSpeed, toSpeed);
 
-        if(isLeftTurn(turnAngle)) {
-            return baseCost * cyclingLeftTurnMultiplier;
-        } else if(isRightTurn(turnAngle)) {
-            return baseCost * cyclingRightTurnMultiplier;
+        if(isTurnAcrossTraffic(turnAngle)) {
+            return baseCost * bicycleTurnAcrossTrafficMultiplier;
+        } else if(isEasyTurn(turnAngle)) {
+            return baseCost * biycleEasyTurnMultiplier;
         } else {
             return baseCost;
         }
