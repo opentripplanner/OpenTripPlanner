@@ -1,0 +1,20 @@
+name: Build prod from release
+on:
+  push:
+    branches:
+      - otp2-prod
+  pull_request:
+    branches:
+      - otp2-prod
+jobs:
+  docker-push:
+    if: github.ref == 'refs/heads/otp2-prod'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build docker image from otp2-prod and push it
+        run: ./.github/workflows/scripts/build_and_push_prod.sh
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_AUTH: ${{ secrets.DOCKER_AUTH }}
