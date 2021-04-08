@@ -199,20 +199,9 @@ public class GermanyWayPropertySetSourceTest {
                 wps.getDataForWay(steps).getPermission(), StreetTraversalPermission.PEDESTRIAN);
     }
 
-    @Test
-    public void setCorrectCarSpeed() {
-        assertSpeed(1.3889, "5");
-        assertSpeed(1.3889, "5 kmh");
-        assertSpeed(1.3889, " 5 kmh ");
-        assertSpeed(1.3889, " 5 ");
-        assertSpeed(4.166669845581055, "15");
-        assertSpeed(4.305559158325195, "15.5");
-        assertSpeed(4.305559158325195, "15.5 kmh");
-        assertSpeed(4.305559158325195, "15.5 kph");
-        assertSpeed(4.305559158325195, "15.5 km/h");
-        assertSpeed(22.347200393676758, "50 mph");
-        assertSpeed(22.347200393676758, "50.0 mph");
 
+    @Test
+    public void testGermanAutobahnSpeed() {
         // https://www.openstreetmap.org/way/10879847
         var alzentalstr = new OSMWithTags();
         alzentalstr.addTag("highway", "residential");
@@ -228,7 +217,4 @@ public class GermanyWayPropertySetSourceTest {
         assertEquals(33.33000183105469, wps.getCarSpeedForWay(autobahn, false), epsilon);
     }
 
-    private void assertSpeed(double v, String s) {
-        assertEquals(v, wps.getMetersSecondFromSpeed(s), epsilon);
-    }
 }
