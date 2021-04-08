@@ -50,8 +50,7 @@ public class JourneyWhiteListed {
     public static Stream<TripTimeShort> whiteListAuthoritiesAndOrLines(
         Stream<TripTimeShort> stream,
         Collection<FeedScopedId> authorityIds,
-        Collection<FeedScopedId> lineIds,
-        RoutingService routingService
+        Collection<FeedScopedId> lineIds
     ) {
         if (CollectionUtils.isEmpty(authorityIds) && CollectionUtils.isEmpty(lineIds)) {
             return stream;
@@ -59,18 +58,16 @@ public class JourneyWhiteListed {
         return stream.filter(it -> isTripTimeShortAcceptable(
             it,
             authorityIds,
-            lineIds,
-            routingService
+            lineIds
         ));
     }
 
     private static boolean isTripTimeShortAcceptable(
         TripTimeShort tts,
         Collection<FeedScopedId> authorityIds,
-        Collection<FeedScopedId> lineIds,
-        RoutingService routingService
+        Collection<FeedScopedId> lineIds
     ) {
-        Trip trip = routingService.getTripForId().get(tts.getTripId());
+        Trip trip = tts.getTrip();
 
         if (trip == null || trip.getRoute() == null) {
             return true;
