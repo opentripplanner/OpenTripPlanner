@@ -21,7 +21,7 @@ public class BicycleNetworkRelationsTest {
         var issueStore = new DataImportIssueStore(false);
         var osmdb = new OSMDatabase(issueStore);
         var provider = new BinaryOpenStreetMapProvider(
-                new File("src/test/resources/ehningen-minimal.osm.pbf"), true);
+                new File("src/test/resources/germany/ehningen-minimal.osm.pbf"), true);
         provider.readOSM(osmdb);
         osmdb.postLoad();
 
