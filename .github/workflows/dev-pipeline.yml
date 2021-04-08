@@ -1,4 +1,4 @@
-name: Process master push or pr
+name: Process dev-2.x push or pr
 on:
   push:
     branches:

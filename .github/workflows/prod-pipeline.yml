@@ -1,4 +1,4 @@
-name: Build prod from release
+name: Build otp2-prod from release
 on:
   push:
     branches:

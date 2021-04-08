@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/hsldevcom/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/hsldevcom/OpenTripPlanner)
+[![Build](https://github.com/hsldevcom/opentripplanner/workflows/Process%20dev-2.x%20push%20or%20pr/badge.svg?branch=master)](https://github.com/HSLdevcom/opentripplanner/actions)
 
 ## Overview
 
