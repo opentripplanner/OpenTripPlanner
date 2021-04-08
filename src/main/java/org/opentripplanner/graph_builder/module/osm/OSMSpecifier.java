@@ -20,7 +20,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  *
  * For example if you specify "lcn=yes|rnc=yes|ncn=yes" then this will match if one of these tags matches.
  *
- * If you would add a 3 separate matches that would mean that a way that is tagged with all of them would receive
+ * If you would add 3 separate matches that would mean that a way that is tagged with all of them would receive
  * too high a safety value leading to undesired detours.
  */
 public class OSMSpecifier {
