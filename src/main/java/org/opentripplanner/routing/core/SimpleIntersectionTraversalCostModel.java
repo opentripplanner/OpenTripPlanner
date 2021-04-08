@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -34,10 +35,16 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     /** Expected time it takes to turn left without a stop light. */
     private Double expectedLeftNoLightTimeSec = 8.0;
 
-    private double biycleEasyTurnMultiplier = 5;
+    private double safeBicycleTurnModifier = 5;
 
-    /** Since doing a turn across traffic on a bike is quite dangerous we add a cost for it**/
-    private double bicycleTurnAcrossTrafficMultiplier = biycleEasyTurnMultiplier * 3;
+    /** Since doing a left turn on a bike is quite dangerous we add a cost for it**/
+    private double acrossTrafficBicyleTurnMultiplier = safeBicycleTurnModifier * 3;
+
+    private final DrivingDirection drivingDirection;
+
+    public SimpleIntersectionTraversalCostModel(DrivingDirection drivingDirection) {
+        this.drivingDirection = drivingDirection;
+    }
 
     @Override
     public double computeTraversalCost(IntersectionVertex v, StreetEdge from, StreetEdge to, TraverseMode mode,
@@ -105,8 +112,9 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
             return baseCost * bicycleTurnAcrossTrafficMultiplier;
         } else if(isEasyTurn(turnAngle)) {
             return baseCost * biycleEasyTurnMultiplier;
-        } else {
-            return baseCost;
+            } else {
+                return baseCost;
+            }
         }
     }
 }

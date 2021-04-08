@@ -11,6 +11,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -79,7 +80,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * The model that computes turn/traversal costs.
      * TODO: move this to the Router or the Graph if it doesn't clutter the code too much
      */
-    public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
+    public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel(
+            DrivingDirection.RIGHT_HAND_DRIVE);
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 

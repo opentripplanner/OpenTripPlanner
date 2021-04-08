@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -34,7 +33,7 @@ public class SimpleTraversalCostModelTest {
     @Before
     public void before() {
         graph = new Graph();
-        costModel = new SimpleIntersectionTraversalCostModel();
+        costModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.RIGHT_HAND_DRIVE);
         
         // Initialize the routing request.
         options = new RoutingRequest();
