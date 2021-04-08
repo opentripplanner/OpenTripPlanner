@@ -37,10 +37,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
   }
 
-  public Boolean getAddExtraEdgesToAreas() {
-    return addExtraEdgesToAreas;
-  }
-
   private Boolean addExtraEdgesToAreas = true;
 
   public List<String> provides() {
@@ -64,7 +60,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
       linkTransitEntrances(graph);
       linkBikeRentals(graph);
       linkBikeParks(graph);
-      if (OTPFeature.FlexRouting.isOn()) { linkTransitStopsForFlex(graph); }
     }
 
     // Calculates convex hull of a graph which is shown in routerInfo API point
@@ -74,36 +69,25 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitStops(Graph graph) {
     LOG.info("Linking transit stops to graph...");
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
+      TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
+
+      if (OTPFeature.FlexRouting.isOn()) {
+        // If regular stops are used for flex trips, they also need to be connected to car routable
+        // street edges.
+        if (graph.getAllFlexStops().contains(tStop.getStop())) {
+          modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
+        }
+      }
+
       graph.getLinker().linkVertexPermanently(
           tStop,
-          new TraverseModeSet(TraverseMode.WALK),
+          modes,
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
               new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
           )
       );
-    }
-  }
-
-  /**
-   * If regular stops are used for flex trips, they also need to be connected to car routable
-   * street edges.
-   */
-  private void linkTransitStopsForFlex(Graph graph) {
-    LOG.info("Linking flex transit stops to graph...");
-    for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-      if (graph.getAllFlexStops().contains(tStop.getStop())) {
-        graph.getLinker().linkVertexPermanently(
-            tStop,
-            new TraverseModeSet(TraverseMode.CAR),
-            LinkingDirection.BOTH_WAYS,
-            (vertex, streetVertex) -> List.of(
-                new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
-                new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
-              )
-          );
-      }
     }
   }
 
