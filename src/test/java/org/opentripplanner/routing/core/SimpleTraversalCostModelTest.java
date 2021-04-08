@@ -44,36 +44,48 @@ public class SimpleTraversalCostModelTest {
         options.carAccelerationSpeed  = (2.0);
         options.setStreetSubRequestModes(TraverseModeSet.allModes());
     }
-    
+
     @Test
     public void testCalculateTurnAngle() {
         // Graph for a fictional grid city with turn restrictions
         IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false);
         IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false);
-        
+
         StreetEdge e1 = edge(v1, v2, 1.0, false);
 
         // Edge has same first and last angle.
         assertEquals(90, e1.getInAngle());
         assertEquals(90, e1.getOutAngle());
-        
+
         // 2 new ones
         IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false);
-        
+
         // Second edge
         StreetEdge e2 = edge(v2, v3, 1.0, false);
 
         assertEquals(0, e2.getInAngle());
         assertEquals(0, e2.getOutAngle());
-        
+
         // Difference should be about 90.
         int diff = (e1.getOutAngle() - e2.getInAngle());
         assertEquals(90, diff);
+
+
+        // calculate the angle for driving on the right hand side
+
+        int rightHandDriveAngle = costModel.calculateTurnAngle(e1, e2, options);
+        assertEquals(270, rightHandDriveAngle);
+        assertTrue(costModel.isLeftTurn(rightHandDriveAngle));
+
+        // and on the left hand side
         
-        int turnAngle = costModel.calculateTurnAngle(e1, e2, options);
-        assertEquals(270, turnAngle);
+        var leftHandReq = options.clone();
+        leftHandReq.driveOnRight = false;
+        int leftHandDriveAngle = costModel.calculateTurnAngle(e1, e2, leftHandReq);
+        assertEquals(90, leftHandDriveAngle);
+        assertTrue(costModel.isRightTurn(leftHandDriveAngle));
     }
-    
+
     @Test
     public void testTurnDirectionChecking() {
         // 3 points on a roughly on line
