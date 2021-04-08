@@ -22,6 +22,8 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  *
  * If you would add 3 separate matches that would mean that a way that is tagged with all of them would receive
  * too high a safety value leading to undesired detours.
+ *
+ * Logical ORs make only sense in a mixin without wildcards and might lead to unintended results when using it outside of that.
  */
 public class OSMSpecifier {
 

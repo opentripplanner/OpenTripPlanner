@@ -50,8 +50,6 @@ public class WayPropertySet {
     /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
     public WayProperties defaultProperties;
 
-    public WayPropertySetSource base;
-
     public WayPropertySet() {
         /* sensible defaults */
         defaultProperties = new WayProperties();
