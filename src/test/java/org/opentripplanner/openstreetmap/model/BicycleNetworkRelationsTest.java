@@ -13,7 +13,7 @@ public class BicycleNetworkRelationsTest {
 
 
     /* The way https://www.openstreetmap.org/way/13876983 does not contain the tag lcn (local cycling network)
-     * but because it is part of a relation that _does_ the tag is copied from the relation to the way.
+     * but because it is part of a relation that _does_, the tag is copied from the relation to the way.
      * This test assert that this is really happening.
      */
     @Test
