@@ -320,6 +320,7 @@ public class StateEditor {
         child.stateData.carPickupState = state.stateData.carPickupState;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
+        child.stateData.backWalkingBike = state.stateData.backWalkingBike;
     }
 
     public void setNonTransitOptionsFromState(State state) {

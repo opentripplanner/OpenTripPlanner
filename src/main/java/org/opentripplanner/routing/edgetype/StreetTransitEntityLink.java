@@ -8,7 +8,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -86,23 +85,38 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
             return null;
         }
 
-        if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
-            // Forbid taking your own bike in the station if bike P+R activated.
-            return null;
-        }
-
-        // Do not check here whether any transit modes are selected. A check for the presence of
-        // transit modes will instead be done in the following PreBoard edge.
-        // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
-        if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            // For Kiss & Ride allow dropping of the passenger before entering the station
-            if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
-                dropOffAfterDriving(s0, s1);
-            } else if (s0.getCarPickupState() != null) {
+        switch (s0.getNonTransitMode()) {
+            case BICYCLE:
+                // Forbid taking your own bike in the station if bike P+R activated.
+                if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
+                    return null;
+                }
+                // Forbid taking a (station) rental bike in the station. This allows taking along
+                // floating bikes.
+                else if (s0.isBikeRentingFromStation() && !(s0.mayKeepRentedBicycleAtDestination() && s0.getOptions().allowKeepingRentedBicycleAtDestination)) {
+                    return null;
+                }
+                // Allow taking an owned bike in the station
+                break;
+            case CAR:
+                // For Kiss & Ride allow dropping of the passenger before entering the station
+                if (s0.getCarPickupState() != null) {
+                    if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
+                        dropOffAfterDriving(s0, s1);
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                // If Kiss & Ride (Taxi) mode is not enabled allow car traversal so that the Stop
+                // may be reached by car
+                break;
+        case WALK:
+                break;
+            default:
                 return null;
-            }
         }
 
         if (s0.isBikeRentingFromStation()
@@ -113,7 +127,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
 
         s1.setBackMode(null);
 
-        // We do not increase the time here, so that searching from the stop coordinates instead of
+        // streetToStopTime may be zero so that searching from the stop coordinates instead of
         // the stop id catch transit departing at that exact search time.
         int streetToStopTime = getStreetToStopTime();
         s1.incrementTimeInSeconds(streetToStopTime);
@@ -144,6 +158,4 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
     public String toString() {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
-
-
 }
