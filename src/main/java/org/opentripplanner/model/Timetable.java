@@ -5,7 +5,6 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
 
 
@@ -35,7 +33,7 @@ import java.util.TimeZone;
 public class Timetable implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Timetable.class);
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     /**
      * A circular reference between TripPatterns and their scheduled (non-updated) timetables.
@@ -100,15 +98,15 @@ public class Timetable implements Serializable {
      */
     public boolean temporallyViable(ServiceDay sd, long searchTime, int bestWait, boolean boarding) {
         // Check whether any services are running at all on this pattern.
-        if ( ! sd.anyServiceRunning(this.pattern.services)) return false;
+        if ( ! sd.anyServiceRunning(this.pattern.services)) { return false; }
         // Make the search time relative to the given service day.
         searchTime = sd.secondsSinceMidnight(searchTime);
         // Check whether any trip can be boarded at all, given the search time
-        if (boarding ? (searchTime > this.maxTime) : (searchTime < this.minTime)) return false;
+        if (boarding ? (searchTime > this.maxTime) : (searchTime < this.minTime)) { return false; }
         // Check whether any trip can improve on the best time yet found
         if (bestWait >= 0) {
             long bestTime = boarding ? (searchTime + bestWait) : (searchTime - bestWait);
-            if (boarding ? (bestTime < this.minTime) : (bestTime > this.maxTime)) return false;
+            if (boarding ? (bestTime < this.minTime) : (bestTime > this.maxTime)) { return false; }
         }
         return true;
     }
@@ -162,7 +160,7 @@ public class Timetable implements Serializable {
         for (TripTimes tt : tripTimes) {
             // could replace linear search with indexing in stoptime updater, but not necessary
             // at this point since the updater thread is far from pegged.
-            if (tt.trip.getId().equals(tripId)) return ret;
+            if (tt.trip.getId().equals(tripId)) { return ret; }
             ret += 1;
         }
         return -1;
@@ -172,7 +170,7 @@ public class Timetable implements Serializable {
     public int getTripIndex(String tripId) {
         int ret = 0;
         for (TripTimes tt : tripTimes) {
-            if (tt.trip.getId().getId().equals(tripId)) return ret;
+            if (tt.trip.getId().getId().equals(tripId)) { return ret; }
             ret += 1;
         }
         return -1;
@@ -184,7 +182,7 @@ public class Timetable implements Serializable {
 
     public TripTimes getTripTimes(Trip trip) {
         for (TripTimes tt : tripTimes) {
-            if (tt.trip == trip) return tt;
+            if (tt.trip == trip) { return tt; }
         }
         return null;
     }
@@ -265,6 +263,8 @@ public class Timetable implements Serializable {
             int numStops = newTimes.getNumStops();
             Integer delay = null;
 
+            final long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
+
             for (int i = 0; i < numStops; i++) {
                 boolean match = false;
                 if (update != null) {
@@ -289,8 +289,6 @@ public class Timetable implements Serializable {
                         newTimes.updateDepartureDelay(i, 0);
                         delay = 0;
                     } else {
-                        long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
-
                         if (update.hasArrival()) {
                             StopTimeEvent arrival = update.getArrival();
                             if (arrival.hasDelay()) {

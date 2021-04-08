@@ -2,19 +2,22 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 public class AccessStopArrivalState<T extends RaptorTripSchedule> extends StopArrivalState<T> {
 
-  private RaptorTransfer access;
-
-  public RaptorTransfer access() {
-    return access;
+  public AccessStopArrivalState(int time, RaptorTransfer accessPath) {
+    setAccessTime(time, accessPath);
   }
 
-  void setAccess(int time, RaptorTransfer access) {
-    super.setAccessTime(time, access.durationInSeconds());
-    this.access = access;
+  public AccessStopArrivalState(int time, RaptorTransfer accessPath, StopArrivalState<T> other) {
+    super(other);
+    setAccessTime(time, accessPath);
+  }
+
+  @Override
+  public final boolean arrivedByAccess() {
+    return true;
   }
 
   @Override

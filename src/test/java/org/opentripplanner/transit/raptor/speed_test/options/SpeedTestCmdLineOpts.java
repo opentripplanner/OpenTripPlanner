@@ -25,6 +25,7 @@ public class SpeedTestCmdLineOpts {
     private static final String SAMPLE_TEST_N_TIMES = "n";
     private static final String NUM_OF_ADD_TRANSFERS = "t";
     private static final String COMPARE_HEURISTICS = "q";
+    private static final String SKIP_COST = "0";
     private static final String DEBUG = "D";
     private static final String DEBUG_REQUEST = "R";
     private static final String DEBUG_STOPS = "S";
@@ -90,7 +91,7 @@ public class SpeedTestCmdLineOpts {
     public int debugPathFromStopIndex() {
         List<String> stops = parseCSVList(DEBUG_PATH);
         for (int i = 0; i < stops.size(); ++i) {
-            if (stops.get(i).startsWith("*")) return i;
+            if (stops.get(i).startsWith("*")) { return i; }
         }
         return 0;
     }
@@ -121,6 +122,10 @@ public class SpeedTestCmdLineOpts {
         return cmd.hasOption(COMPARE_HEURISTICS);
     }
 
+    public boolean skipCost() {
+        return cmd.hasOption(SKIP_COST);
+    }
+
     public List<String> testCaseIds() {
         return parseCSVList(TEST_CASES);
     }
@@ -143,6 +148,7 @@ public class SpeedTestCmdLineOpts {
         options.addOption(NUM_OF_ITINERARIES, "numOfItineraries", true, "Number of itineraries to return.");
         options.addOption(COMPARE_HEURISTICS, "compare", false, "Compare heuristics for the listed profiles. The 1st profile is compared with 2..n listed profiles.");
 
+        options.addOption(SKIP_COST, "skipCost", false, "Skip cost when comparing results.");
         // Debug options
         options.addOption(DEBUG, "debug", false, "Enable debug info.");
         options.addOption(DEBUG_STOPS, "debugStops", true, "A coma separated list of stops to debug.");

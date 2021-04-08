@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.filters.AddMinSafeTransferCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupBySimilarLegsFilter;
@@ -8,6 +9,8 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDeparture
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
 
 import java.time.Instant;
@@ -31,9 +34,12 @@ public class ItineraryFilterChainBuilder {
     private boolean debug = false;
     private int maxNumberOfItineraries = NOT_SET;
     private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
+    private double minSafeTransferTimeFactor;
+    private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
+
 
     /**
      * @param arriveBy Used to set the correct sort order. This si the same flag as the
@@ -55,36 +61,27 @@ public class ItineraryFilterChainBuilder {
     }
 
     /**
-     * Group itineraries by the main legs and keeping approximately the given total number of
-     * itineraries. The itineraries are grouped by the legs that account for more then 'p' % for the
-     * total distance.
-     * <p/>
-     * If the time-table-view is enabled, the result may contain similar itineraries where only the
-     * first and/or last legs are different. This can happen by walking to/from another stop,
-     * saving time, but getting a higher generalized-cost; Or, by taking a short ride.
-     * Use {@code groupByP} in the range {@code 0.80-0.90} and {@code approximateMinLimit=1} will
-     * remove these itineraries an keep only the itineraries with the lowest generalized-cost.
+     * If the transfer-time for an itinerary is less than the min-safe-transfer-time-limit, then
+     * the difference is multiplied with this factor and added to the itinerary generalized-cost.
      * <p>
-     * When this filter is enabled, itineraries are grouped by the "main" transit legs. Short legs
-     * are skipped. Than for each group of itineraries the itinerary with the lowest generalized-cost
-     * is kept. All other itineraries are dropped.
-     * <p>
-     * A good way to allow for some variation is to include several entries, relaxing the min-limit,
-     * while tightening the group-by-p criteria. For example:
-     * <pre>
-     * groupByP | minLimit | Description
-     *   0.90   |    1     | Keep 1 itinerary where 90% of the legs are the same
-     *   0.80   |    2     | Keep 2 itineraries where 80% of the legs are the same
-     *   0.68   |    3     | Keep 3 itineraries where 68% of the legs are the same
-     * </pre>
-     * Normally, we want some variation, so a good value to use for this parameter is the combined
-     * cost of board- and alight-cost including indirect cost from board- and alight-slack.
+     * Default is off {@code 0.0}.
      */
-    public ItineraryFilterChainBuilder addGroupBySimilarity(double groupByP, int approximateMinLimit) {
-        this.groupBySimilarity.add(new GroupBySimilarity(groupByP, approximateMinLimit));
+    public ItineraryFilterChainBuilder withMinSafeTransferTimeFactor(double minSafeTransferTimeFactor) {
+        this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
         return this;
     }
 
+    /**
+     * Group itineraries by the main legs and keeping approximately the given total number of
+     * itineraries. The itineraries are grouped by the legs that account for more then 'p' % for the
+     * total distance.
+     *
+     * @see GroupBySimilarity for more details.
+     */
+    public ItineraryFilterChainBuilder addGroupBySimilarity(GroupBySimilarity groupBySimilarity) {
+        this.groupBySimilarity.add(groupBySimilarity);
+        return this;
+    }
 
     /**
      * This function is used to compute a max-limit for generalized-cost. The limit
@@ -150,8 +147,22 @@ public class ItineraryFilterChainBuilder {
         return this;
     }
 
+    /**
+     * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by
+     * and remove-transit-with-higher-cost-than-best-on-street-only filters. This make sure that
+     * poor transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
+     */
+    public ItineraryFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
+        this.removeWalkAllTheWayResults = enable;
+        return this;
+    }
+
     public ItineraryFilter build() {
         List<ItineraryFilter> filters = new ArrayList<>();
+
+        if(minSafeTransferTimeFactor > 0.01) {
+            filters.add(new AddMinSafeTransferCostFilter(minSafeTransferTimeFactor));
+        }
 
         // Sort list on {@code groupByP} in ascending order to keep as many of the elements in the
         // groups where the grouping parameter is relaxed as possible.
@@ -162,26 +173,19 @@ public class ItineraryFilterChainBuilder {
                 .collect(Collectors.toList());
 
             for (GroupBySimilarity it : groupBy) {
-                filters.add(new GroupBySimilarLegsFilter(it.groupByP, it.approximateMinLimit));
+                filters.add(
+                    new GroupBySimilarLegsFilter(
+                        it.groupByP,
+                        it.approximateMinLimit,
+                        new SortOnGeneralizedCost()
+                    )
+                );
             }
         }
 
         // Filter transit itineraries on generalized-cost
         if(transitGeneralizedCostLimit != null) {
             filters.add(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit));
-        }
-
-        // Remove itineraries if max limit is set
-        if (maxNumberOfItineraries > 0) {
-            // Sort first to make sure we keep the most relevant itineraries
-            filters.add(new OtpDefaultSortOrder(arriveBy));
-            filters.add(
-                new MaxLimitFilter(
-                    "number-of-itineraries-filter",
-                    maxNumberOfItineraries,
-                    maxLimitReachedSubscriber
-                )
-            );
         }
 
         // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
@@ -198,14 +202,30 @@ public class ItineraryFilterChainBuilder {
                 filters.add(new RemoveTransitIfStreetOnlyIsBetterFilter());
             }
 
+            if(removeWalkAllTheWayResults) {
+                filters.add(new RemoveWalkOnlyFilter());
+            }
+
             if (latestDepartureTimeLimit != null) {
                 filters.add(new LatestDepartureTimeFilter(latestDepartureTimeLimit));
             }
         }
 
+        // Remove itineraries if max limit is set
+        if (maxNumberOfItineraries > 0) {
+            filters.add(new OtpDefaultSortOrder(arriveBy));
+            filters.add(
+                new MaxLimitFilter(
+                    "number-of-itineraries-filter",
+                    maxNumberOfItineraries,
+                    maxLimitReachedSubscriber
+                )
+            );
+        }
+
         // Do the final itineraries sort
         filters.add(new OtpDefaultSortOrder(arriveBy));
-
+        
         if(debug) {
             filters = addDebugWrappers(filters);
         }

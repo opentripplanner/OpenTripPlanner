@@ -1,6 +1,9 @@
 package org.opentripplanner.transit.raptor.util;
 
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.Calendar;
 
@@ -34,41 +37,55 @@ public class PathStringBuilder {
         return append("Walk ").duration(duration);
     }
 
+    public PathStringBuilder flex(int duration, int nRides) {
+        // The 'tx' is short for eXtra Transfers added by the flex access/egress.
+        return append("Flex ").duration(duration).space().append(nRides).append("tx");
+    }
+
+    public PathStringBuilder accessEgress(RaptorTransfer leg) {
+        if(leg.hasRides()) {
+            return flex(leg.durationInSeconds(), leg.numberOfRides());
+        }
+        return walk(leg.durationInSeconds());
+    }
+
     public PathStringBuilder transit(String description, int fromTime, int toTime) {
-        return append(description).append(" ").time(fromTime, toTime);
+        return append(description).space().time(fromTime, toTime);
     }
 
     public PathStringBuilder transit(TraverseMode mode, String trip, Calendar fromTime, Calendar toTime) {
-        return append(mode.name()).append(" ").append(trip).append(" ").time(fromTime, toTime);
+        return append(mode.name()).space().append(trip).space().time(fromTime, toTime);
     }
 
     public PathStringBuilder other(TraverseMode mode, Calendar fromTime, Calendar toTime) {
-        return append(mode.name()).append(" ").append(" ").time(fromTime, toTime);
+        return append(mode.name()).space().time(fromTime, toTime);
     }
-
 
     @Override
     public String toString() {
         return buf.toString();
     }
 
-
     /* private helpers */
 
+    private PathStringBuilder space() {
+        return append(" ");
+    }
+
     private PathStringBuilder duration(int duration) {
-        String durationStr = TimeUtils.durationToStr(duration);
+      String durationStr = DurationUtils.durationToStr(duration);
         return append(padDuration ? String.format("%5s", durationStr) : durationStr);
     }
 
     private PathStringBuilder time(int from, int to) {
         return append(TimeUtils.timeToStrCompact(from))
-                .append(" ")
+                .space()
                 .append(TimeUtils.timeToStrCompact(to));
     }
 
     private PathStringBuilder time(Calendar from, Calendar to) {
         return append(TimeUtils.timeToStrCompact(from))
-            .append(" ")
+            .space()
             .append(TimeUtils.timeToStrCompact(to));
     }
 

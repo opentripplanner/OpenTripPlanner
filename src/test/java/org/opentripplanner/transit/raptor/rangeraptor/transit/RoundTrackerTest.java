@@ -24,14 +24,15 @@ public class RoundTrackerTest {
         assertEquals(0, subject.round());
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(1, subject.round());
+        assertEquals(0, subject.round());
+        assertEquals(1, subject.nextRound());
 
         roundComplete.accept(false);
         // Verify the round counter is still correct in the "round complete" phase.
         assertEquals(1, subject.round());
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(2, subject.round());
+        assertEquals(2, subject.nextRound());
 
         assertFalse(subject.hasMoreRounds());
 
@@ -39,7 +40,7 @@ public class RoundTrackerTest {
         setupIteration.accept(ANY);
         assertEquals(0, subject.round());
         assertTrue(subject.hasMoreRounds());
-        assertEquals(1, subject.round());
+        assertEquals(1, subject.nextRound());
     }
 
     @Test
@@ -50,16 +51,17 @@ public class RoundTrackerTest {
         assertEquals(0, subject.round());
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(1, subject.round());
+        assertEquals(0, subject.round());
+        assertEquals(1, subject.nextRound());
 
         // Destination reached in round 1
         roundComplete.accept(true);
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(2, subject.round());
+        assertEquals(2, subject.nextRound());
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(3, subject.round());
+        assertEquals(3, subject.nextRound());
 
         assertFalse(subject.hasMoreRounds());
     }

@@ -3,7 +3,7 @@
 # This static documentation is built and served by Readthedocs
 # at opentripplanner.readthedocs.org
 
-site_name: OpenTripPlanner
+site_name: OpenTripPlanner 2
 site_url: http://docs.opentripplanner.org
 repo_url: http://github.com/opentripplanner/OpenTripPlanner
 docs_dir: docs
@@ -20,20 +20,33 @@ pages:
     - History: 'History.md'
     - Deployments: 'Deployments.md'
     - Changelog: 'Changelog.md'
+    - Comparing OTP2 to OTP1: 'Version-Comparison.md'
+    - OTP2 migration guide: 'OTP2-MigrationGuide.md'
     - Visual Identity: 'Visual-Identity.md'
-- Tutorials:
-    - OTP2 Basic Tutorial: 'Basic-Tutorial.md'
-    - OTP2 Netex and SIRI: 'Netex-Norway.md'
-    - Intermediate Tutorial: 'Intermediate-Tutorial.md'
-    - External Tutorials: 'External-Tutorials.md'
-- 'Usage Guide':
-    - 'Getting OTP': 'Getting-OTP.md'
+- 'Usage':
+    - Basic Tutorial: 'Basic-Tutorial.md'
+    - Getting OTP: 'Getting-OTP.md'
     - Configuration: 'Configuration.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
+    - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
-    - Architecture: 'Architecture.md'
+    - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
     - Localization: 'Localization.md'
     - Bibliography: 'Bibliography.md'
+    - Codestyle: 'Codestyle.md'
+    - Sandbox development: 'SandboxExtension.md'
+- Sandbox:
+    - Health API: 'sandbox/HealthAPI.md'
+    - Direct transfer analyzer: 'sandbox/transferanalyzer.md'
+    - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
+    - HSL Legacy GraphQL API: 'sandbox/LegacyGraphQLApi.md'
+    - Transmodel(NeTEx) GrpahQL API: 'sandbox/TransmodelApi.md'
+    - SIRI Updater: 'sandbox/SiriUpdator.md'
+    - Bike Rental Service Directory API support: 'sandbox/BikeRentalServiceDirectory.md'
+    - Mapbox Vector Tiles API: 'sandbox/MapboxVectorTilesApi.md'
+    - Interactive OTP Launcher: 'sandbox/InteractiveOtpMain.md'
+    - Sandbox Extension Example: 'sandbox/Examples.md'
+    - Park and Ride API: 'sandbox/ParkAndRideApi.md'

@@ -25,9 +25,12 @@ public enum OTPFeature {
     GoogleCloudStorage(false),
     SandboxAPITransmodelApi(false),
     SandboxAPILegacyGraphQLApi(false),
+    SandboxAPIMapboxVectorTilesApi(false),
     SandboxExampleAPIGraphStatistics(false),
+    SandboxAPIParkAndRideApi(false),
     TransferAnalyzer(false),
-    FlexRouting(false);
+    FlexRouting(false),
+    FloatingBike(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 

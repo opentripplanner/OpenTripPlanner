@@ -1,12 +1,9 @@
 package org.opentripplanner.model.base;
 
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
-import java.math.BigInteger;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.Duration;
-import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -29,15 +26,9 @@ import java.util.function.Function;
 public class ValueObjectToStringBuilder {
     private static final String FIELD_SEPARATOR = " ";
 
-    private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(
-            Locale.US
-    );
-
     private final StringBuilder sb = new StringBuilder();
+    private final NumberFormat numFormat = new NumberFormat();
 
-    private DecimalFormat coordinateFormat;
-    private DecimalFormat integerFormat;
-    private DecimalFormat decimalFormat;
     boolean skipSep = true;
 
     /** Use factory method: {@link #of()}. */
@@ -54,11 +45,11 @@ public class ValueObjectToStringBuilder {
     /* General purpose formatters */
 
     public ValueObjectToStringBuilder addNum(Number num) {
-        return addIt(num, it -> formatNumber(num));
+        return addIt(num, numFormat::formatNumber);
     }
 
     public ValueObjectToStringBuilder addNum(Number num, String unit) {
-        return addIt(num, it -> formatNumber(it) + unit);
+        return addIt(num, it -> numFormat.formatNumber(it, unit));
     }
 
     public ValueObjectToStringBuilder addBool(Boolean value, String ifTrue, String ifFalse) {
@@ -98,7 +89,10 @@ public class ValueObjectToStringBuilder {
      * exactly equals.
      */
     public ValueObjectToStringBuilder addCoordinate(Number lat, Number lon) {
-        return addIt("(" + formatCoordinate(lat) + ", " + formatCoordinate(lon) + ")");
+        return addIt(
+            "(" + numFormat.formatCoordinate(lat) + ", "
+                + numFormat.formatCoordinate(lon) + ")"
+        );
     }
 
     /**
@@ -122,7 +116,7 @@ public class ValueObjectToStringBuilder {
      * {@link Duration#toString()}, but without the 'PT' prefix.
      */
     public ValueObjectToStringBuilder addDuration(Integer durationSeconds) {
-        return addIt(durationSeconds, TimeUtils::durationToStr);
+        return addIt(durationSeconds, DurationUtils::durationToStr);
     }
 
     @Override
@@ -142,30 +136,5 @@ public class ValueObjectToStringBuilder {
         else { sb.append(FIELD_SEPARATOR); }
         sb.append(value == null ? "null" : mapToString.apply(value));
         return this;
-    }
-
-    String formatCoordinate(Number value) {
-        if(coordinateFormat == null) {
-            coordinateFormat = new DecimalFormat("0.0####", DECIMAL_SYMBOLS);
-        }
-        // This need to be null-safe, because one of the coordinates in
-        // #addCoordinate(String name, Number lat, Number lon) could be null.
-        return value == null ? "null" : coordinateFormat.format(value);
-    }
-
-    String formatNumber(Number value) {
-        if (value == null) { return "null"; }
-
-        if(value instanceof Integer || value instanceof Long || value instanceof BigInteger) {
-            if(integerFormat == null) {
-                integerFormat = new DecimalFormat("#,##0", DECIMAL_SYMBOLS);
-            }
-            return integerFormat.format(value);
-        }
-
-        if(decimalFormat == null) {
-            decimalFormat = new DecimalFormat("#,##0.0##", DECIMAL_SYMBOLS);
-        }
-        return decimalFormat.format(value);
     }
 }

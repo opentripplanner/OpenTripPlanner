@@ -166,7 +166,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.setProvider(provider);
 
         loader.buildGraph(graph, extra);
-        new StreetVertexIndex(graph);
+        graph.getStreetIndex();
 
         Router router = new Router(graph, RouterConfig.DEFAULT);
         router.startup();
@@ -305,7 +305,6 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         LocalizedString localizedString = new LocalizedString("corner",
                 new String[]{"first", "second"});
 
-        assertEquals("corner of first and second", localizedString.toString());
         assertEquals("Kreuzung first mit second",
                 localizedString.toString(new Locale("de")));
     }

@@ -2,12 +2,8 @@ package org.opentripplanner.routing.trippattern;
 
 import static org.opentripplanner.routing.trippattern.TripTimes.formatSeconds;
 
-import org.opentripplanner.model.Frequency;
-import org.opentripplanner.common.MavenVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
+import org.opentripplanner.model.Frequency;
 
 /**
  * Uses a TripTimes to represent multiple trips following the same template at regular intervals.
@@ -15,8 +11,7 @@ import java.io.Serializable;
  */
 public class FrequencyEntry implements Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FrequencyEntry.class);
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     public final int startTime; // sec after midnight
     public final int endTime;   // sec after midnight
@@ -60,17 +55,17 @@ public class FrequencyEntry implements Serializable {
         int stopOffset = tripTimes.getDepartureTime(stop) - tripTimes.getDepartureTime(0);
         int beg = startTime + stopOffset; // First time a vehicle passes by this stop.
         int end = endTime + stopOffset; // Latest a vehicle can pass by this stop.
-        if (time > end) return -1;
+        if (time > end) { return -1; }
         if (exactTimes) {
             for (int dep = beg; dep < end; dep += headway) {
-                if (dep >= time) return dep;
+                if (dep >= time) { return dep; }
             }
         } else {
             int dep = time + headway;
             // TODO it might work better to step forward until in range
             // this would work better for time window edges.
-            if (dep < beg) return beg; // not quite right
-            if (dep < end) return dep;
+            if (dep < beg) { return beg; } // not quite right
+            if (dep < end) { return dep; }
         }
         return -1;
     }
@@ -84,14 +79,14 @@ public class FrequencyEntry implements Serializable {
             // we can't start from end in case end - beg is not a multiple of headway
             int arr;
             for (arr = beg + headway; arr < end; arr += headway) {
-                if (arr > t) return arr - headway;
+                if (arr > t) { return arr - headway; }
             }
             // if t > end, return last valid arrival time
             return arr - headway;
         } else {
             int dep = t - headway;
-            if (dep > end) return end; // not quite right
-            if (dep > beg) return dep;
+            if (dep > end) { return end; } // not quite right
+            if (dep > beg) { return dep; }
         }
         return -1;
     }

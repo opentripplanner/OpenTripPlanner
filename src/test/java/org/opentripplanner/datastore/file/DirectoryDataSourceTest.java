@@ -73,8 +73,9 @@ public class DirectoryDataSourceTest {
         assertEquals("[]", toString(subject.content()));
 
         // Write something to a file in the directory
-        IOUtils.write("Go, go, go!", subject.entry(child.getName()).asOutputStream(), UTF_8);
-
+        try (var outputStream = subject.entry(child.getName()).asOutputStream()) {
+            IOUtils.write("Go, go, go!", outputStream, UTF_8);
+        }
 
         // Verify the subject directory is created and still is writable
         assertTrue(subject.exists());

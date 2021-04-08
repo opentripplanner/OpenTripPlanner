@@ -194,7 +194,7 @@ public class GraphUpdaterManager {
      * More useful stuff should be added later.
      */
     public GraphUpdater getUpdater (int id) {
-        if (id >= updaterList.size()) return null;
+        if (id >= updaterList.size()) { return null; }
         return updaterList.get(id);
     }
 
@@ -206,7 +206,7 @@ public class GraphUpdaterManager {
         Collection<String> waitingUpdaters = new ArrayList<>();
         for (GraphUpdater updater : graph.updaterManager.getUpdaterList()) {
             if (!(updater).isPrimed()) {
-                waitingUpdaters.add(updater.getName());
+                waitingUpdaters.add(updater.getConfigRef());
             }
         }
         return waitingUpdaters;

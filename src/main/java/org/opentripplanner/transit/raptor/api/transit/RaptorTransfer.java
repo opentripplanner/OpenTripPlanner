@@ -1,27 +1,30 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
+import org.opentripplanner.util.time.DurationUtils;
+
 /**
- * Encapsulate information about a access, transfer or egress leg. We do not distinguish
- * between the access (origin to first stop), transfer (stop to stop) or egress (last stop to destination),
- * to Raptor - all these are the same thing.
+ * Encapsulate information about a access, transfer or egress path. We do not distinguish
+ * between the access (origin to first stop), transfer (stop to stop) or egress (last stop to
+ * destination), to Raptor - all these are the same thing.
  */
 public interface RaptorTransfer {
 
     /**
      * <ul>
-     *     <li>Access: The first stop in the journey, where the access leg just arrived at.
-     *     <li>Transit: Stop index where the leg arrive at.
-     *     <li>Egress: Last stop before destination, hence not the arrival point, but the departure stop.
+     *     <li>Access: The first stop in the journey, where the access path just arrived at.
+     *     <li>Transit: Stop index where the path arrive at.
+     *     <li>Egress: Last stop before destination, hence not the arrival point, but the departure
+     *     stop.
      * </ul>
-     * The journey origin, destination and transit leg board stop must be part of the context; hence not
-     * a member attribute of this type.
+     * The journey origin, destination and transit path board stop must be part of the context;
+     * hence not a member attribute of this type.
      */
     int stop();
 
     /**
-     * The time duration to walk or travel the leg in seconds. This is not the entire duration from the journey origin,
-     * but just:
+     * The time duration to walk or travel the path in seconds. This is not the entire duration
+     * from the journey origin, but just:
      * <ul>
      *     <li>Access: journey origin to first stop.
      *     <li>Transit: stop to stop.
@@ -36,8 +39,8 @@ public interface RaptorTransfer {
     // hours, not for regular access/transfer/egress.
 
     /**
-     * Returns the earliest possible departure time for the leg. Used Eg. in flex routing and TNC
-     * when the access leg can't start immediately, but have to wait for a vehicle arriving. Also
+     * Returns the earliest possible departure time for the path. Used Eg. in flex routing and TNC
+     * when the access path can't start immediately, but have to wait for a vehicle arriving. Also
      * DRT systems or bike shares can have operation time limitations.
      *
      * Returns -1 if transfer is not possible after the requested departure time
@@ -47,7 +50,7 @@ public interface RaptorTransfer {
     };
 
     /**
-     * Returns the latest possible arrival time for the leg. Used in DRT systems or bike shares
+     * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
      * where they can have operation time limitations.
      *
      * Returns -1 if transfer is not possible before the requested arrival time
@@ -56,7 +59,7 @@ public interface RaptorTransfer {
         return requestedArrivalTime;
     };
 
-    /* ACCESS/TRANSFER/EGRESS CONTAINING MULTIPLE LEGS */
+    /* ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS */
     // The methods below should be only overridden when a RaptorTransfer contains information about
     // public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
     // include flexible transit service and TNC. They should not be used for regular
@@ -64,19 +67,40 @@ public interface RaptorTransfer {
 
     /**
      * Some services involving multiple legs are not handled by the RAPTOR algorithm and need to be
-     * inserted into the algorithm at a specific place of the algorithm, and to be accounted for,
-     * in order to get the number of transfers correct, witch is part of the criteria used to keep
-     * optimal result.
+     * inserted into the algorithm at a specific place of the algorithm. The number-of-rides must
+     * be accounted for in order to get the number of transfers correct. The number-of-transfers is
+     * part of the criteria used to keep an optimal result.
+     * <p>
+     * Note! The number returned should include all "rides" in the access leg resulting in an extra
+     * transfer, including boarding the first Raptor scheduled trip. There is no need to account for
+     * riding your own bicycle or scooter, and a rental bike is debatable. The guideline is that if
+     * there is a transfer involved that is equivalent to the "human cost" to a normal transit
+     * transfer, then it should be counted. If not, you should account for it using the cost
+     * function instead.
+     * <p>
+     * Examples/guidelines:
+     * <p>
+     * <pre>
+     * Access/egress  | num-of-rides | Description
+     *     walk       |      0       | Plain walking leg
+     *  bicycle+walk  |      0       | Use bicycle to get to stop
+     * rental-bicycle |      0       | Picking up the bike and returning it is is best
+     *                |              | accounted using time and cost penalties, not transfers.
+     *     taxi       |     0/1      | Currently 0 in OTP(car), but this is definitely discussable.
+     *     flex       |      1       | Waking leg followed by a flex transit leg
+     * walk-flex-walk |      1       | Waking , then flex transit and then walking again
+     *   flex-flex    |      2       | Two flex transit legs after each other
+     * </pre>
+     * {@code flex} is used as a placeholder for any type of on-board public service.
      *
-     * Examples:
-     *  1 - One walking leg
-     *  2 - Waking leg followed by a transit leg
-     *  3 - Waking leg followed by a transit leg and a walking leg
-     *
-     * @return the number legs for the transfer, generated outside the RAPTOR algorithm.
+     * @return the number transfers including thefirst boarding in the RAPTOR algorithm.
      */
-    default int numberOfLegs() {
-        return 1;
+    default int numberOfRides() {
+        return 0;
+    }
+
+    default boolean hasRides() {
+        return numberOfRides() > 0;
     }
 
     /**
@@ -91,5 +115,13 @@ public interface RaptorTransfer {
      */
     default boolean stopReachedOnBoard() {
         return false;
+    }
+
+    /** Call this from toString */
+    default String asString() {
+      String duration = DurationUtils.durationToStr(durationInSeconds());
+        return hasRides()
+            ? String.format("Flex %s %dtx ~ %d", duration, numberOfRides(), stop())
+            : String.format("Walk %s ~ %d", duration, stop());
     }
 }

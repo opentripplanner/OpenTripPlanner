@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.api.path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
+import javax.annotation.Nonnull;
 import java.util.Objects;
 
 /**
@@ -16,15 +17,29 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     private final int fromTime;
     private final int toStop;
     private final int toTime;
+    private final int cost;
     private final PathLeg<T> next;
 
 
-    public AccessPathLeg(RaptorTransfer access, int toStop, int fromTime, int toTime, PathLeg<T> next) {
+    public AccessPathLeg(
+        @Nonnull RaptorTransfer access,
+        int toStop,
+        int fromTime,
+        int toTime,
+        int cost,
+        @Nonnull PathLeg<T> next
+    ) {
         this.access = access;
         this.fromTime = fromTime;
         this.toStop = toStop;
         this.toTime = toTime;
+        this.cost = cost;
         this.next = next;
+    }
+
+    /** Create new access leg with a different tail */
+    public AccessPathLeg(@Nonnull AccessPathLeg<T> o, @Nonnull PathLeg<T> next) {
+        this(o.access, o.toStop, o.fromTime, o.toTime, o.cost, next);
     }
 
     @Override
@@ -35,6 +50,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     /**
      * The stop index where the leg end, also called arrival stop index.
      */
+    @Override
     public int toStop() {
         return toStop;
     }
@@ -42,6 +58,11 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     @Override
     public int toTime() {
         return toTime;
+    }
+
+    @Override
+    public int generalizedCost() {
+        return cost;
     }
 
     public RaptorTransfer access() {
@@ -60,8 +81,8 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         AccessPathLeg<?> that = (AccessPathLeg<?>) o;
         return fromTime == that.fromTime &&
                 toStop == that.toStop &&

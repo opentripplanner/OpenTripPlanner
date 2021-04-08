@@ -13,12 +13,16 @@ import java.util.function.Consumer;
  */
 public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends StopArrivalState<T> {
     private final int round;
-    private final RaptorTransfer egressLeg;
+    private final RaptorTransfer egressPath;
     private final Consumer<EgressStopArrivalState<T>> transitCallback;
 
-    EgressStopArrivalState(int round, RaptorTransfer egressLeg, Consumer<EgressStopArrivalState<T>> transitCallback) {
+    EgressStopArrivalState(
+        int round,
+        RaptorTransfer egressPath,
+        Consumer<EgressStopArrivalState<T>> transitCallback
+    ) {
         this.round = round;
-        this.egressLeg = egressLeg;
+        this.egressPath = egressPath;
         this.transitCallback = transitCallback;
     }
 
@@ -27,12 +31,12 @@ public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends 
     }
 
     public int stop() {
-        return egressLeg.stop();
+        return egressPath.stop();
     }
 
 
-    public final RaptorTransfer egressLeg() {
-        return egressLeg;
+    public final RaptorTransfer egressPath() {
+        return egressPath;
     }
 
     @Override

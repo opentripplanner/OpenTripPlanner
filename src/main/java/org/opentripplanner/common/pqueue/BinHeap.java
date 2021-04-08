@@ -122,8 +122,9 @@ public class BinHeap<T> {
         T      minElem  = elem[1];
         T      lastElem = elem[size];
         double lastPrio = prio[size];
-        if (size <= 0) 
+        if (size <= 0) {
             return null;
+        }
     	size -= 1;
         for (i=1; i*2 <= size; i=child) {
             child = i*2;

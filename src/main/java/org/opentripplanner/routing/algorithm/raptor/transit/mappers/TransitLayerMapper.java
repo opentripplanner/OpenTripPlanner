@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
+import com.google.common.collect.ArrayListMultimap;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -17,12 +18,12 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransfersMapper.mapTransfers;
@@ -85,9 +86,9 @@ public class TransitLayerMapper {
     ) {
         Collection<TripPattern> allTripPatterns = graph.tripPatternForId.values();
 
-        final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld =
-            mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
+        final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
 
+        newTripPatternForOld = mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
 
         TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
             graph.index.getServiceCodesRunningForDate(),
@@ -96,19 +97,14 @@ public class TransitLayerMapper {
 
         Set<ServiceDate> allServiceDates = graph.index.getServiceCodesRunningForDate().keySet();
 
-        // The return value of this entire process.
-        ConcurrentHashMap<LocalDate, List<TripPatternForDate>> result = new ConcurrentHashMap<>();
-
+        List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 
         // THIS CODE RUNS IN PARALLEL
         allServiceDates
             .parallelStream()
             .forEach(serviceDate -> {
-                // Create LocalDate equivalent to the OTP/GTFS ServiceDate object, serving as the key of
-                // the return Map.
-                LocalDate localDate = ServiceCalendarMapper.localDateFromServiceDate(serviceDate);
-
-                // Create a List to hold the values for one entry in the return Map.
+                // Create a List to hold the values for this iteration. The results are then added
+                // to the common synchronized list at the end.
                 List<TripPatternForDate> values = new ArrayList<>();
 
                 // This nested loop could be quite inefficient.
@@ -124,12 +120,15 @@ public class TransitLayerMapper {
                     }
                 }
                 if (!values.isEmpty()) {
-                    result.put(localDate, values);
+                    tripPatternForDates.addAll(values);
                 }
             });
         // END PARALLEL CODE
 
-        return new HashMap<>(result);
+        HashMap<LocalDate, List<TripPatternForDate>> result =
+            keyByRunningPeriodDates(tripPatternForDates);
+
+        return result;
     }
 
     // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
@@ -138,5 +137,30 @@ public class TransitLayerMapper {
         return timetable.tripTimes.stream()
                 .sorted(Comparator.comparing(t -> t.getArrivalTime(0)))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a map of TripPatternsForDate objects by their active dates.
+     */
+    private HashMap<LocalDate, List<TripPatternForDate>> keyByRunningPeriodDates(
+        List<TripPatternForDate> tripPatternForDates
+    ) {
+        // Create multimap by running period dates
+        ArrayListMultimap<LocalDate, TripPatternForDate> multiMap = ArrayListMultimap.create();
+        for (TripPatternForDate tripPatternForDate : tripPatternForDates) {
+            for (LocalDate date : tripPatternForDate.getRunningPeriodDates()) {
+                multiMap.put(date, tripPatternForDate);
+            }
+        }
+
+        // Convert to Map<LocalDate, List<TripPatternForDate>>
+        HashMap<LocalDate, List<TripPatternForDate>> result = new HashMap<>();
+        for (Map.Entry<LocalDate, Collection<TripPatternForDate>> entry : multiMap
+            .asMap()
+            .entrySet()) {
+            result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+
+        return result;
     }
 }

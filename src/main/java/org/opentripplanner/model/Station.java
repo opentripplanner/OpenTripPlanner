@@ -10,12 +10,10 @@ import java.util.TimeZone;
  * bus terminal, or a bus station (with a bus stop at each side of the road). Equivalent to GTFS
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
-public class Station extends TransitEntity<FeedScopedId> implements StopCollection {
+public class Station extends TransitEntity implements StopCollection {
 
   private static final long serialVersionUID = 1L;
-  public static final TransferPriority DEFAULT_COST_PRIORITY = TransferPriority.ALLOWED;
-
-  private final FeedScopedId id;
+  public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 
   private final String name;
 
@@ -25,7 +23,7 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
 
   private final WgsCoordinate coordinate;
 
-  private final TransferPriority costPriority;
+  private final StopTransferPriority priority;
 
   /**
    * URL to a web page containing information about this particular station
@@ -44,16 +42,16 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
       String description,
       String url,
       TimeZone timezone,
-      TransferPriority costPriority
+      StopTransferPriority priority
   ) {
-    this.id = id;
+    super(id);
     this.name = name;
     this.coordinate = coordinate;
     this.code = code;
     this.description = description;
     this.url = url;
     this.timezone = timezone;
-    this.costPriority = costPriority == null ? DEFAULT_COST_PRIORITY : costPriority;
+    this.priority = priority == null ? DEFAULT_PRIORITY : priority;
   }
 
   public void addChildStop(Stop stop) {
@@ -62,18 +60,7 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
 
   @Override
   public String toString() {
-    return "<Station " + this.id + ">";
-  }
-
-  @Override
-  public FeedScopedId getId() {
-    return id;
-  }
-
-  /** @throws UnsupportedOperationException */
-  @Override
-  public final void setId(FeedScopedId id) {
-    super.setId(id);
+    return "<Station " + getId() + ">";
   }
 
   public String getName() {
@@ -104,11 +91,11 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
    * adding adjusting the cost for all board-/alight- events in the routing search.
    * <p/>
    * To not interfere with request parameters this must be implemented in a neutral way. This mean
-   * that the {@link TransferPriority#ALLOWED} (witch is default) should a nett-effect of
+   * that the {@link StopTransferPriority#ALLOWED} (witch is default) should a nett-effect of
    * adding 0 - zero cost.
    */
-  public TransferPriority getCostPriority() {
-    return costPriority;
+  public StopTransferPriority getPriority() {
+    return priority;
   }
 
   public TimeZone getTimezone() {

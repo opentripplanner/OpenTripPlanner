@@ -25,7 +25,7 @@ public class DirectGraphFinder implements GraphFinder {
   private StreetVertexIndex streetIndex;
 
   public DirectGraphFinder(Graph graph) {
-    this.streetIndex = graph.streetIndex != null ? graph.streetIndex : new StreetVertexIndex(graph);
+    this.streetIndex = graph.getStreetIndex();
   }
 
   /**
@@ -33,14 +33,14 @@ public class DirectGraphFinder implements GraphFinder {
    * If the origin vertex is a StopVertex, the result will include it.
    */
   @Override
-  public List<StopAtDistance> findClosestStops(double lat, double lon, double radiusMeters) {
-    List<StopAtDistance> stopsFound = Lists.newArrayList();
+  public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
+    List<NearbyStop> stopsFound = Lists.newArrayList();
     Coordinate coordinate = new Coordinate(lon, lat);
     for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
       double distance = SphericalDistanceLibrary.distance(coordinate, it.getCoordinate());
       if (distance < radiusMeters) {
         Coordinate coordinates[] = new Coordinate[] {coordinate, it.getCoordinate()};
-        StopAtDistance sd = new StopAtDistance(
+        NearbyStop sd = new NearbyStop(
             it,
             distance,
             null,

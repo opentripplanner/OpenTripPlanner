@@ -1,9 +1,8 @@
 package org.opentripplanner.api.resource;
 
 import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.analyst.core.SlippyTile;
-import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.common.geometry.WebMercatorTile;
+import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.inspector.TileRenderer;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -45,7 +44,7 @@ import java.io.ByteArrayOutputStream;
  * 
  */
 @Path("/routers/{ignoreRouterId}/inspector")
-public class GraphInspectorTileResource extends RoutingResource {
+public class GraphInspectorTileResource {
 
     @Context
     private OTPServer otpServer;
@@ -77,11 +76,11 @@ public class GraphInspectorTileResource extends RoutingResource {
     public Response tileGet() throws Exception {
 
         // Re-use analyst
-        Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
-        TileRequest tileRequest = new TileRequest(env, 256, 256);
+        Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
+        MapTile mapTile = new MapTile(env, 256, 256);
 
         Router router = otpServer.getRouter();
-        BufferedImage image = router.tileRendererManager.renderTile(tileRequest, layer);
+        BufferedImage image = router.tileRendererManager.renderTile(mapTile, layer);
 
         MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(image.getWidth() * image.getHeight() / 4);

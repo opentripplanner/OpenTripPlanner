@@ -5,6 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -32,8 +33,9 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final ParetoSet<Path<T>> paths;
     private final TransitCalculator transitCalculator;
     private final CostCalculator<T> costCalculator;
+    private final SlackProvider slackProvider;
     private final PathMapper<T> pathMapper;
-    private final DebugHandler<ArrivalView<T>> debugHandler;
+    private final DebugHandler<ArrivalView<?>> debugHandler;
     private boolean reachedCurrentRound = false;
     private int iterationDepartureTime = -1;
 
@@ -41,33 +43,56 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
             ParetoComparator<Path<T>> paretoComparator,
             TransitCalculator transitCalculator,
             CostCalculator<T> costCalculator,
+            SlackProvider slackProvider,
             PathMapper<T> pathMapper,
             DebugHandlerFactory<T> debugHandlerFactory,
             WorkerLifeCycle lifeCycle
     ) {
-        this.costCalculator = costCalculator;
         this.paths = new ParetoSet<>(paretoComparator, debugHandlerFactory.paretoSetDebugPathListener());
-        this.debugHandler = debugHandlerFactory.debugStopArrival();
         this.transitCalculator = transitCalculator;
+        this.costCalculator = costCalculator;
+        this.slackProvider = slackProvider;
         this.pathMapper = pathMapper;
+        this.debugHandler = debugHandlerFactory.debugStopArrival();
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
 
-    public void add(ArrivalView<T> egressStopArrival, RaptorTransfer egressLeg, int additionalCost) {
-        int departureTime = transitCalculator.departureTime(egressLeg, egressStopArrival.arrivalTime());
+    public void add(
+        ArrivalView<T> egressStopArrival,
+        RaptorTransfer egressPath,
+        int aggregatedCost
+    ) {
+        int departureTime = transitCalculator.departureTime(
+            egressPath,
+            egressStopArrival.arrivalTime()
+        );
 
         if (departureTime == -1) { return; }
 
-        int arrivalTime = transitCalculator.plusDuration(departureTime, egressLeg.durationInSeconds());
+        if(egressPath.hasRides()) {
+            departureTime = transitCalculator.plusDuration(
+                departureTime,
+                slackProvider.accessEgressWithRidesTransferSlack()
+            );
+        }
+
+        int arrivalTime = transitCalculator.plusDuration(
+            departureTime,
+            egressPath.durationInSeconds()
+        );
 
         int waitTimeInSeconds = Math.abs(departureTime - egressStopArrival.arrivalTime());
 
+        // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
+        // If the aggregatedCost exist(McRaptor), then the cost of waiting is added.
+        int cost = aggregatedCost == 0 ? 0 : aggregatedCost + costCalculator.waitCost(waitTimeInSeconds);
+
         DestinationArrival<T> destArrival = new DestinationArrival<>(
-            egressLeg,
+            egressPath,
             egressStopArrival,
             arrivalTime,
-            additionalCost + costCalculator.waitCost(waitTimeInSeconds)
+            cost
         );
 
         if (transitCalculator.exceedsTimeLimit(arrivalTime)) {

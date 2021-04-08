@@ -39,6 +39,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
     private final CostCalculator<T> costCalculator;
     private final TransitCalculator transitCalculator;
+    private boolean firstRound;
 
     /**
      * create a RaptorState for a network with a particular number of stops, and a given maximum
@@ -62,28 +63,11 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         lifeCycle.onSetupIteration((ignore) -> setupIteration());
         lifeCycle.onTransitsForRoundComplete(this::transitsForRoundComplete);
         lifeCycle.onTransfersForRoundComplete(this::transfersForRoundComplete);
+        lifeCycle.onPrepareForNextRound(r -> firstRound = r == 1);
     }
 
     // The below methods are ordered after the sequence they naturally appear in the algorithm,
     // also private life-cycle callbacks are listed here (not in the private method section).
-
-    // This method is private, but is part of Worker life cycle
-    private void setupIteration() {
-        arrivalsCache.clear();
-        // clear all touched stops to avoid constant rexploration
-        stops.clearTouchedStopsAndSetStopMarkers();
-    }
-
-    @Override
-    public void setInitialTimeForIteration(RaptorTransfer accessLeg, int departureTime) {
-        addStopArrival(
-                new AccessStopArrival<>(
-                        departureTime,
-                        costCalculator.walkCost(accessLeg.durationInSeconds()),
-                        accessLeg
-                )
-        );
-    }
 
     @Override
     public boolean isNewRoundAvailable() {
@@ -100,41 +84,18 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         return stops.stopsTouchedIterator();
     }
 
-    Iterable<? extends AbstractStopArrival<T>> listStopArrivalsPreviousRound(int stop) {
-        return stops.listArrivalsAfterMarker(stop);
+    @Override
+    public boolean isDestinationReachedInCurrentRound() {
+        return paths.isReachedCurrentRound();
     }
 
-    /**
-     * Set the time at a transit stop iff it is optimal.
-     */
-    final void transitToStop(
-            final PatternRide<T> ride,
-            final int alightStop,
-            final int alightTime,
-            final int alightSlack
-    ) {
-        final int stopArrivalTime = alightTime + alightSlack;
-
-        if (exceedsTimeLimit(stopArrivalTime)) { return; }
-
-        // Calculate wait time before and after the transit leg
-        final int waitTime = ride.boardWaitTime + alightSlack;
-
-        final int costTransitLeg = costCalculator.transitArrivalCost(
-            ride.prevArrival,
-            waitTime,
-            alightTime - ride.boardTime,
-            alightStop,
-            ride.trip
-        );
-        arrivalsCache.add(
-                new TransitStopArrival<>(
-                        ride.prevArrival,
-                        alightStop,
-                        stopArrivalTime,
-                        costTransitLeg,
-                        ride.trip
-                )
+    @Override
+    public void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
+        addStopArrival(
+            new AccessStopArrival<>(
+                departureTime,
+                costCalculator.walkCost(accessPath.durationInSeconds()), accessPath
+            )
         );
     }
 
@@ -150,31 +111,70 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         }
     }
 
-    // This method is private, but is part of Worker life cycle
-    private void transitsForRoundComplete() {
-        stops.clearTouchedStopsAndSetStopMarkers();
-        commitCachedArrivals();
-    }
-
-    // This method is private, but is part of Worker life cycle
-    private void transfersForRoundComplete() {
-        commitCachedArrivals();
-    }
-
     @Override
     public Collection<Path<T>> extractPaths() {
         stops.debugStateInfo();
         return paths.listPaths();
     }
 
-    @Override
-    public boolean isDestinationReachedInCurrentRound() {
-        return paths.isReachedCurrentRound();
+    Iterable<? extends AbstractStopArrival<T>> listStopArrivalsPreviousRound(int stop) {
+        return stops.listArrivalsAfterMarker(stop);
+    }
+
+    /**
+     * Set the time at a transit stop iff it is optimal.
+     */
+    final void transitToStop(
+        final PatternRide<T> ride,
+        final int alightStop,
+        final int alightTime,
+        final int alightSlack
+    ) {
+        final int stopArrivalTime = alightTime + alightSlack;
+
+        if (exceedsTimeLimit(stopArrivalTime)) { return; }
+
+        // Calculate wait time before and after the transit
+        final int waitTime = ride.boardWaitTimeForCostCalculation + alightSlack;
+
+        final int costTransit = costCalculator.transitArrivalCost(
+            firstRound,
+            ride.prevArrival.stop(),
+            waitTime,
+            alightTime - ride.boardTime,
+            alightStop
+        );
+        arrivalsCache.add(
+            new TransitStopArrival<>(
+                ride.prevArrival,
+                alightStop,
+                stopArrivalTime,
+                costTransit,
+                ride.trip
+            )
+        );
     }
 
 
     /* private methods */
 
+    /** This method is part of the Worker life cycle */
+    private void setupIteration() {
+        arrivalsCache.clear();
+        // clear all touched stops to avoid constant re-exploration
+        stops.clearTouchedStopsAndSetStopMarkers();
+    }
+
+    /** This method is part of Worker life cycle */
+    private void transitsForRoundComplete() {
+        stops.clearTouchedStopsAndSetStopMarkers();
+        commitCachedArrivals();
+    }
+
+    /** This method is part of Worker life cycle */
+    private void transfersForRoundComplete() {
+        commitCachedArrivals();
+    }
 
     private void transferToStop(Iterable<? extends AbstractStopArrival<T>> fromArrivals, RaptorTransfer transfer) {
         final int transferTimeInSeconds = transfer.durationInSeconds();

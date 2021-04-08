@@ -3,8 +3,12 @@ package org.opentripplanner.routing.bike_rental;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.bike_park.BikePark;
 
 public class BikeRentalStationService implements Serializable {
@@ -40,5 +44,24 @@ public class BikeRentalStationService implements Serializable {
 
     public void removeBikePark(BikePark bikePark) {
         bikeParks.remove(bikePark);
+    }
+
+    /**
+     * Gets all the bike rental stations inside the envelope. This is currently done by iterating
+     * over a set, but we could use a spatial index if the number of bike rental stations is high
+     * enough for performance to be a concern.
+     */
+    public List<BikeRentalStation> getBikeRentalStationForEnvelope(
+        double minLon, double minLat, double maxLon, double maxLat
+    ) {
+        Envelope envelope = new Envelope(
+            new Coordinate(minLon, minLat),
+            new Coordinate(maxLon, maxLat)
+        );
+
+        return bikeRentalStations
+            .stream()
+            .filter(b -> envelope.contains(new Coordinate(b.x, b.y)))
+            .collect(Collectors.toList());
     }
 }

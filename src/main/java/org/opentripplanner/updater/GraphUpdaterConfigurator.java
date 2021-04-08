@@ -1,28 +1,28 @@
 package org.opentripplanner.updater;
 
 import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
-import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
-import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
+import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.SiriETUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
+import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
+import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
+import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
+import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
+import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +44,16 @@ public abstract class GraphUpdaterConfigurator {
 
     public static void setupGraph(
         Graph graph,
-        UpdaterParameters updaterParameters
+        UpdatersParameters updatersParameters
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
         updaters.addAll(
-            createUpdatersFromConfig(updaterParameters)
+            createUpdatersFromConfig(updatersParameters)
         );
         updaters.addAll(
             fetchBikeRentalServicesFromOnlineDirectory(
-                updaterParameters.bikeRentalServiceDirectoryUrl()
+                updatersParameters.bikeRentalServiceDirectoryUrl()
             )
         );
 
@@ -84,7 +84,7 @@ public abstract class GraphUpdaterConfigurator {
             try {
                 updater.setup(graph);
             } catch (Exception e) {
-                LOG.warn("Failed to setup updater {}", updater.getName());
+                LOG.warn("Failed to setup updater {}", updater.getConfigRef());
             }
         }
     }
@@ -104,7 +104,7 @@ public abstract class GraphUpdaterConfigurator {
      * @return a list of GraphUpdaters created from the configuration
      */
     private static List<GraphUpdater> createUpdatersFromConfig(
-        UpdaterParameters config
+        UpdatersParameters config
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
@@ -120,6 +120,9 @@ public abstract class GraphUpdaterConfigurator {
         for (SiriETUpdaterParameters configItem : config.getSiriETUpdaterParameters()) {
             updaters.add(new SiriETUpdater(configItem));
         }
+        for (SiriETGooglePubsubUpdaterParameters configItem : config.getSiriETGooglePubsubUpdaterParameters()) {
+            updaters.add(new SiriETGooglePubsubUpdater(configItem));
+        }
         for (SiriSXUpdaterParameters configItem : config.getSiriSXUpdaterParameters()) {
             updaters.add(new SiriSXUpdater(configItem));
         }
@@ -132,14 +135,8 @@ public abstract class GraphUpdaterConfigurator {
         for (MqttGtfsRealtimeUpdaterParameters configItem : config.getMqttGtfsRealtimeUpdaterParameters()) {
             updaters.add(new MqttGtfsRealtimeUpdater(configItem));
         }
-        for (PollingGraphUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
+        for (BikeParkUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
             updaters.add(new BikeParkUpdater(configItem));
-        }
-        for (PollingGraphUpdaterParameters configItem : config.getExampleGraphUpdaterParameters()) {
-            updaters.add(new ExampleGraphUpdater(configItem));
-        }
-        for (PollingGraphUpdaterParameters configItem : config.getExamplePollingGraphUpdaterParameters()) {
-            updaters.add(new ExamplePollingGraphUpdater(configItem));
         }
         for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
             updaters.add(new WinkkiPollingGraphUpdater(configItem));

@@ -12,7 +12,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
-import org.opentripplanner.ext.transmodelapi.model.route.JourneyWhiteListed;
+import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
@@ -39,6 +39,7 @@ import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SU
 
 public class StopPlaceType {
   public static final String NAME = "StopPlace";
+  public static final GraphQLOutputType REF = new GraphQLTypeReference(NAME);
 
   public static GraphQLObjectType create(
       GraphQLInterfaceType placeInterface,
@@ -255,7 +256,8 @@ public class StopPlaceType {
         startTimeSeconds,
         timeRage,
         departuresPerTripPattern,
-        omitNonBoarding
+        omitNonBoarding,
+        false
     );
 
     // TODO OTP2 - Applying filters here is not correct - the `departuresPerTripPattern` is used
@@ -274,8 +276,7 @@ public class StopPlaceType {
     tripTimesStream = JourneyWhiteListed.whiteListAuthoritiesAndOrLines(
         tripTimesStream,
         authorityIdsWhiteListed,
-        lineIdsWhiteListed,
-        routingService
+        lineIdsWhiteListed
     );
 
     if (!limitOnDestinationDisplay) {
@@ -284,8 +285,7 @@ public class StopPlaceType {
     // Group by line and destination display, limit departures per group and merge
     return tripTimesStream
         .collect(Collectors.groupingBy(t -> destinationDisplayPerLine(
-            ((TripTimeShort) t),
-            routingService
+            ((TripTimeShort) t)
         )))
         .values()
         .stream()
@@ -384,8 +384,8 @@ public class StopPlaceType {
     return false;
   }
 
-  private static String destinationDisplayPerLine(TripTimeShort t, RoutingService routingService) {
-    Trip trip = routingService.getTripForId().get(t.tripId);
-    return trip == null ? t.headsign : trip.getRoute().getId() + "|" + t.headsign;
+  private static String destinationDisplayPerLine(TripTimeShort t) {
+    Trip trip = t.getTrip();
+    return trip == null ? t.getHeadsign() : trip.getRoute().getId() + "|" + t.getHeadsign();
   }
 }

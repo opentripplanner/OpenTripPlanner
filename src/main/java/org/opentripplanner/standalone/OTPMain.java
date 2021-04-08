@@ -2,7 +2,6 @@ package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -16,6 +15,9 @@ import org.opentripplanner.util.ThrowableUtils;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up
@@ -28,13 +30,25 @@ public class OTPMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
 
+    static {
+
+        // Disable HSQLDB reconfiguration of Java Unified Logging (j.u.l)
+        //noinspection AccessOfSystemProperties
+        System.setProperty("hsqldb.reconfig_logging", "false");
+
+        // Remove existing handlers attached to the j.u.l root logger
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        // Bridge j.u.l (used by Jersey) to the SLF4J root logger, so all logging goes through the same API
+        SLF4JBridgeHandler.install();
+    }
+
     /**
      * ENTRY POINT: This is the main method that is called when running otp.jar from the command line.
      */
     public static void main(String[] args) {
         try {
-            OtpStartupInfo.logInfo();
             CommandLineParameters params = parseAndValidateCmdLine(args);
+            OtpStartupInfo.logInfo();
             startOTPServer(params);
         }
         catch (OtpAppException ae) {
@@ -59,18 +73,21 @@ public class OTPMain {
             // parsed commands, since there will be three separate objects.
             JCommander jc = JCommander.newBuilder().addObject(params).args(args).build();
             if (params.version) {
-                System.out.println(MavenVersion.VERSION.getLongVersionString());
+                System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
+                System.exit(0);
+            }
+            if (params.serializationVersionId) {
+                System.out.println(projectInfo().getOtpSerializationVersionId());
                 System.exit(0);
             }
             if (params.help) {
-                System.out.println(MavenVersion.VERSION.getShortVersionString());
+                System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
                 jc.setProgramName("java -Xmx4G -jar otp.jar");
                 jc.usage();
                 System.exit(0);
             }
             params.inferAndValidate();
         } catch (ParameterException pex) {
-            System.out.println(MavenVersion.VERSION.getShortVersionString());
             LOG.error("Parameter error: {}", pex.getMessage());
             System.exit(1);
         }
@@ -126,6 +143,8 @@ public class OTPMain {
             // with using the embedded router config.
             new SerializedGraphObject(graph, app.config().buildConfig(), app.config().routerConfig())
                     .save(app.graphOutputDataSource());
+            // Log size info for the deduplicator
+            LOG.info("Memory optimized {}", graph.deduplicator.toString());
         }
 
         if(graph == null) {
@@ -140,6 +159,9 @@ public class OTPMain {
 
         // Index graph for travel search
         graph.index();
+
+        // publishing the config version info make it available to the APIs
+        app.setOtpConfigVersionsOnServerInfo();
 
         Router router = new Router(graph, app.config().routerConfig());
         router.startup();

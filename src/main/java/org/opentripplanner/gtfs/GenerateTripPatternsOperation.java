@@ -7,6 +7,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
+import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
@@ -22,7 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,7 +34,7 @@ import java.util.Set;
 public class GenerateTripPatternsOperation {
     private static final Logger LOG = LoggerFactory.getLogger(GenerateTripPatternsOperation.class);
 
-    private static final int UNKNOWN_DIRECTION_ID = -1;
+    private final Map<String, Integer> tripPatternIdCounters = new HashMap<>();
 
     private final OtpTransitServiceBuilder transitDaoBuilder;
     private final DataImportIssueStore issueStore;
@@ -109,7 +112,6 @@ public class GenerateTripPatternsOperation {
             return; // Invalid trip, skip it, it will break later
         }
 
-        int directionId = getDirectionId(trip);
         Collection<StopTime> stopTimes = transitDaoBuilder.getStopTimesSortedByTrip().get(trip);
 
         // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
@@ -121,8 +123,10 @@ public class GenerateTripPatternsOperation {
         // Get the existing TripPattern for this filtered StopPattern, or create one.
         StopPattern stopPattern = new StopPattern(stopTimes);
 
-        TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(),
-                directionId);
+        Direction direction = trip.getDirection();
+        TripPattern tripPattern = findOrCreateTripPattern(
+            stopPattern, trip.getRoute(), direction
+        );
 
         // Create a TripTimes object for this list of stoptimes, which form one trip.
         TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
@@ -144,28 +148,35 @@ public class GenerateTripPatternsOperation {
         }
     }
 
-    /**
-     * Try to get the direction id for the trip, set to UNKNOWN if not found
-     */
-    private int getDirectionId(Trip trip) {
-        try {
-            return Integer.parseInt(trip.getDirectionId());
-        } catch (NumberFormatException e) {
-            LOG.debug("Trip {} does not have direction id, defaults to -1", trip);
-        }
-        return UNKNOWN_DIRECTION_ID;
-    }
-
-    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, int directionId) {
+    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, Direction direction) {
         for(TripPattern tripPattern : tripPatterns.get(stopPattern)) {
-            if(tripPattern.route.equals(route) && tripPattern.directionId == directionId) {
+            if(tripPattern.route.equals(route) && tripPattern.getDirection().equals(direction)) {
                 return tripPattern;
             }
         }
-
-        TripPattern tripPattern = new TripPattern(route, stopPattern);
-        tripPattern.directionId = directionId;
+        FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction.gtfsCode);
+        TripPattern tripPattern = new TripPattern(patternId, route, stopPattern);
         tripPatterns.put(stopPattern, tripPattern);
         return tripPattern;
+    }
+
+    /**
+     * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route
+     * id, the direction and an integer. This only works if the Collection of TripPattern includes
+     * every TripPattern for the agency.
+     */
+    private FeedScopedId generateUniqueIdForTripPattern(Route route, int directionId) {
+        FeedScopedId routeId = route.getId();
+        String direction = directionId != -1 ? String.valueOf(directionId) : "";
+        String key = routeId.getId() + ":" + direction;
+
+        // Add 1 to counter and update it
+        int counter = tripPatternIdCounters.getOrDefault(key, 0) + 1;
+        tripPatternIdCounters.put(key, counter);
+
+        // OBA library uses underscore as separator, we're moving toward colon.
+        String id = String.format("%s:%s:%02d", routeId.getId(), direction, counter);
+
+        return new FeedScopedId(routeId.getFeedId(), id);
     }
 }

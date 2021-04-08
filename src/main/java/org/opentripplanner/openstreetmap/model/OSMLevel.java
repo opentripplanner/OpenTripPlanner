@@ -187,10 +187,8 @@ public class OSMLevel implements Comparable<OSMLevel> {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null)
-            return false;
-        if (!(other instanceof OSMLevel))
-            return false;
+        if (other == null) { return false; }
+        if (!(other instanceof OSMLevel)) { return false; }
         return this.floorNumber == ((OSMLevel)other).floorNumber;
     }
 

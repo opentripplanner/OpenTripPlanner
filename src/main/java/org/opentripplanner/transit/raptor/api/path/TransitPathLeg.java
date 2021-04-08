@@ -14,10 +14,15 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> extends Intermed
     private final PathLeg<T> next;
     private final T trip;
 
-    public TransitPathLeg(int fromStop, int fromTime, int toStop, int toTime, T trip, PathLeg<T> next) {
-        super(fromStop, fromTime, toStop, toTime);
+    public TransitPathLeg(int fromStop, int fromTime, int toStop, int toTime, int cost, T trip, PathLeg<T> next) {
+        super(fromStop, fromTime, toStop, toTime, cost);
         this.next = next;
         this.trip = trip;
+    }
+
+    /** Create a builder to change board or alight stop place. */
+    public TransitPathLegBuilder<T> mutate() {
+        return new TransitPathLegBuilder<>(this);
     }
 
     /**
@@ -39,8 +44,8 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> extends Intermed
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!super.equals(o)) return false;
+        if (this == o) { return true; }
+        if (!super.equals(o)) { return false; }
         TransitPathLeg<?> that = (TransitPathLeg<?>) o;
         return trip.equals(that.trip) && next.equals(that.next);
     }

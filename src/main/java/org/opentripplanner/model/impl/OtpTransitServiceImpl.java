@@ -3,6 +3,12 @@ package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
@@ -11,9 +17,9 @@ import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
@@ -24,19 +30,12 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.transfer.Transfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A in-memory implementation of {@link OtpTransitService}. It's super fast for most
@@ -51,7 +50,7 @@ import java.util.Map;
  */
 class OtpTransitServiceImpl implements OtpTransitService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OtpTransitService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceImpl.class);
 
     private final Collection<Agency> agencies;
 
@@ -67,7 +66,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<MultiModalStation> multiModalStations;
 
-    private final ImmutableListMultimap<TransitEntity<?>, Notice> noticeAssignments;
+    private final ImmutableListMultimap<TransitEntity, Notice> noticeAssignments;
 
     private final Collection<Pathway> pathways;
 
@@ -126,6 +125,13 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
         this.trips = immutableList(builder.getTripsById().values());
         this.flexTrips = immutableList(builder.getFlexTripsById().values());
+
+        if(!builder.getFrequencies().isEmpty()) {
+            LOG.error(
+                "OTP2 do not support GTFS Trip Frequencies. "
+                + "See https://github.com/opentripplanner/OpenTripPlanner/issues/3243."
+            );
+        }
     }
 
     @Override
@@ -163,7 +169,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
      * for ids, since some entities have String, while other have FeedScopeId ids.
      */
     @Override
-    public Multimap<TransitEntity<?>, Notice> getNoticeAssignments() {
+    public Multimap<TransitEntity, Notice> getNoticeAssignments() {
         return noticeAssignments;
     }
 

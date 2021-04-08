@@ -33,7 +33,7 @@ public class FeedScopedIdMapper {
         return arg.getFeedId() + SEPARATOR + arg.getId();
     }
 
-    public static String mapIdToApi(TransitEntity<FeedScopedId> entity) {
+    public static String mapIdToApi(TransitEntity entity) {
         return entity == null ? null : mapToApi(entity.getId());
     }
 }

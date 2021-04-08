@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.EgressLegView;
+import org.opentripplanner.transit.raptor.api.view.EgressPathView;
 
 
 /**
@@ -54,7 +54,7 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
 
     @Override
     public int round() {
-        return numberOfTransfers + egress.numberOfLegs();
+        return 1 + numberOfTransfers + egress.numberOfRides();
     }
 
     @Override
@@ -78,7 +78,7 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
     }
 
     @Override
-    public EgressLegView egressLeg() {
+    public EgressPathView egressPath() {
         return () -> egress;
     }
 

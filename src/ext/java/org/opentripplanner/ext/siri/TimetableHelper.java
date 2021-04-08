@@ -6,6 +6,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -24,8 +25,8 @@ import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
 
 import javax.xml.datatype.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +51,6 @@ public class TimetableHelper {
      *
      * @param journey  SIRI-ET EstimatedVehicleJourney
      * @param timeZone time zone of trip update
-     * @param tripId
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -77,11 +77,13 @@ public class TimetableHelper {
         EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
         EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
 
-        if (journeyEstimatedCalls == null) {
-            return null;
+        List<EstimatedCall> estimatedCalls;
+        if (journeyEstimatedCalls != null) {
+            estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
+        } else {
+            estimatedCalls = new ArrayList<>();
         }
 
-        List<EstimatedCall> estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
             recordedCalls = journeyRecordedCalls.getRecordedCalls();
@@ -103,6 +105,8 @@ public class TimetableHelper {
 
         //Populate missing data from existing TripTimes
         newTimes.serviceCode = oldTimes.serviceCode;
+
+        ZoneId zoneId = graph.getTimeZone().toZoneId();
 
         int callCounter = 0;
         ZonedDateTime departureDate = null;
@@ -148,9 +152,6 @@ public class TimetableHelper {
                         }
                     }
 
-                    //Flag as recorded
-                    newTimes.setRecorded(callCounter, true);
-
                     if (recordedCall.isCancellation() != null) {
                         newTimes.setCancelledStop(callCounter, recordedCall.isCancellation());
                     }
@@ -161,11 +162,13 @@ public class TimetableHelper {
                     int arrivalTime = newTimes.getArrivalTime(callCounter);
                     int realtimeArrivalTime = arrivalTime;
                     if (recordedCall.getActualArrivalTime() != null) {
-                        realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getActualArrivalTime());
+                        realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getActualArrivalTime(), zoneId);
+                        //Flag as recorded
+                        newTimes.setRecorded(callCounter, true);
                     } else if (recordedCall.getExpectedArrivalTime() != null) {
-                        realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getExpectedArrivalTime());
+                        realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getExpectedArrivalTime(), zoneId);
                     } else if (recordedCall.getAimedArrivalTime() != null) {
-                        realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getAimedArrivalTime());
+                        realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getAimedArrivalTime(), zoneId);
                     }
                     int arrivalDelay = realtimeArrivalTime - arrivalTime;
                     newTimes.updateArrivalDelay(callCounter, arrivalDelay);
@@ -174,11 +177,13 @@ public class TimetableHelper {
                     int departureTime = newTimes.getDepartureTime(callCounter);
                     int realtimeDepartureTime = departureTime;
                     if (recordedCall.getActualDepartureTime() != null) {
-                        realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getActualDepartureTime());
+                        realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getActualDepartureTime(), zoneId);
+                        //Flag as recorded
+                        newTimes.setRecorded(callCounter, true);
                     } else if (recordedCall.getExpectedDepartureTime() != null) {
-                        realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getExpectedDepartureTime());
+                        realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getExpectedDepartureTime(), zoneId);
                     } else if (recordedCall.getAimedDepartureTime() != null) {
-                        realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, recordedCall.getAimedDepartureTime());
+                        realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getAimedDepartureTime(), zoneId);
                     }
                     if (realtimeDepartureTime < realtimeArrivalTime) {
                         realtimeDepartureTime = realtimeArrivalTime;
@@ -243,17 +248,17 @@ public class TimetableHelper {
                         int arrivalTime = newTimes.getArrivalTime(callCounter);
                         int realtimeArrivalTime = -1;
                         if (estimatedCall.getExpectedArrivalTime() != null) {
-                            realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, estimatedCall.getExpectedArrivalTime());
+                            realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, estimatedCall.getExpectedArrivalTime(), zoneId);
                         } else if (estimatedCall.getAimedArrivalTime() != null) {
-                            realtimeArrivalTime = calculateSecondsSinceMidnight(departureDate, estimatedCall.getAimedArrivalTime());
+                            realtimeArrivalTime = DateMapper.secondsSinceStartOfService(departureDate, estimatedCall.getAimedArrivalTime(), zoneId);
                         }
 
                         int departureTime = newTimes.getDepartureTime(callCounter);
                         int realtimeDepartureTime = departureTime;
                         if (estimatedCall.getExpectedDepartureTime() != null) {
-                            realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, estimatedCall.getExpectedDepartureTime());
+                            realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, estimatedCall.getExpectedDepartureTime(), zoneId);
                         } else if (estimatedCall.getAimedDepartureTime() != null) {
-                            realtimeDepartureTime = calculateSecondsSinceMidnight(departureDate, estimatedCall.getAimedDepartureTime());
+                            realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, estimatedCall.getAimedDepartureTime(), zoneId);
                         }
 
                         if (realtimeArrivalTime == -1) {
@@ -339,7 +344,6 @@ public class TimetableHelper {
      * Calculate new stoppattern based on single stop cancellations
      *
      * @param journey    SIRI-ET EstimatedVehicleJourney
-     * @param routingService
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -352,11 +356,12 @@ public class TimetableHelper {
         EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
         EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
 
-        if (journeyEstimatedCalls == null) {
-            return null;
+        List<EstimatedCall> estimatedCalls;
+        if (journeyEstimatedCalls != null) {
+            estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
+        } else {
+            estimatedCalls = new ArrayList<>();
         }
-
-        List<EstimatedCall> estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
 
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
@@ -368,6 +373,9 @@ public class TimetableHelper {
         //Get all scheduled stops
         Stop[] stops = timetable.pattern.stopPattern.stops;
 
+        // Keeping track of visited stop-objects to allow multiple visits to a stop.
+        List<Object> alreadyVisited = new ArrayList<>();
+
         List<Stop> modifiedStops = new ArrayList<>();
 
         for (int i = 0; i < stops.length; i++) {
@@ -377,6 +385,9 @@ public class TimetableHelper {
             if (i < recordedCalls.size()) {
                 for (RecordedCall recordedCall : recordedCalls) {
 
+                    if (alreadyVisited.contains(recordedCall)) {
+                        continue;
+                    }
                     //Current stop is being updated
                     boolean stopsMatchById = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
@@ -392,12 +403,16 @@ public class TimetableHelper {
                     if (stopsMatchById) {
                         foundMatch = true;
                         modifiedStops.add(stop);
+                        alreadyVisited.add(recordedCall);
                         break;
                     }
                 }
             } else {
                 for (EstimatedCall estimatedCall : estimatedCalls) {
 
+                    if (alreadyVisited.contains(estimatedCall)) {
+                        continue;
+                    }
                     //Current stop is being updated
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
@@ -413,6 +428,7 @@ public class TimetableHelper {
                     if (stopsMatchById) {
                         foundMatch = true;
                         modifiedStops.add(stop);
+                        alreadyVisited.add(estimatedCall);
                         break;
                     }
                 }
@@ -430,10 +446,7 @@ public class TimetableHelper {
      * Apply the SIRI ET to the appropriate TripTimes from this Timetable.
      * Calculate new stoppattern based on single stop cancellations
      *
-     * @param oldTimes
      * @param journey    SIRI-ET EstimatedVehicleJourney
-     * @param trip
-     * @param routingService
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -545,20 +558,6 @@ public class TimetableHelper {
         return modifiedStops;
     }
 
-    private static int calculateSecondsSinceMidnight(ZonedDateTime departureDate, ZonedDateTime dateTime) {
-
-        int daysBetween = 0;
-        if (departureDate.getDayOfMonth() != dateTime.getDayOfMonth()) {
-            ZonedDateTime midnightOnDepartureDate = departureDate.withHour(0).withMinute(0).withSecond(0);
-            ZonedDateTime midnightOnCurrentStop = dateTime.withHour(0).withMinute(0).withSecond(0);
-            daysBetween = (int) ChronoUnit.DAYS.between(midnightOnDepartureDate, midnightOnCurrentStop);
-        }
-        // If first departure was 'yesterday' - add 24h
-        int daysSinceDeparture = daysBetween * (24 * 60 * 60);
-
-        return dateTime.toLocalTime().toSecondOfDay() + daysSinceDeparture;
-    }
-
     /**
      * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
      * must not be modified directly because they may be shared with the underlying
@@ -570,7 +569,6 @@ public class TimetableHelper {
      *
      * @param activity SIRI-VM VehicleActivity
      * @param timeZone time zone of trip update
-     * @param tripId
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong

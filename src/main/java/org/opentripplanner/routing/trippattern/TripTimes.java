@@ -3,21 +3,18 @@ package org.opentripplanner.routing.trippattern;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
@@ -28,7 +25,7 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
  */
 public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
 
     /**
@@ -93,21 +90,21 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      *
      * Non-final to allow updates.
      */
-    boolean[] isRecordedStop;
+    boolean[] recordedStops;
 
     /**
      * TODO OTP2 - This needs redesign and a bit more analyzes
      *
      * Flag tho indicate cancellations on each stop. Non-final to allow updates.
      */
-    boolean[] isCancelledStop;
+    boolean[] cancelledStops;
 
     /**
      * TODO OTP2 - This needs redesign and a bit more analyzes
      *
      * Flag tho indicate inaccurate predictions on each stop. Non-final to allow updates, transient for backwards graph-compatibility.
      */
-    boolean[] isPredictionInaccurate;
+    boolean[] predictionInaccurateOnStops;
 
     /**
      * TODO OTP2 - This needs redesign and a bit more analyzes
@@ -122,6 +119,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * Flag tho indicate cancellations on each stop. Non-final to allow updates.
      */
     int[] dropoffs;
+
+    List<BookingInfo> bookingInfos;
 
 
     /**
@@ -158,6 +157,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         timeShift = stopTimes.iterator().next().getArrivalTime();
         final int[] pickups   = new int[nStops];
         final int[] dropoffs   = new int[nStops];
+        final List<BookingInfo> bookingInfos = new ArrayList<>();
         int s = 0;
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
@@ -167,6 +167,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
             pickups[s] = st.getPickupType();
             dropoffs[s] = st.getDropOffType();
+            bookingInfos.add(st.getBookingInfo());
             s++;
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
@@ -175,11 +176,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
         this.pickups = deduplicator.deduplicateIntArray(pickups);
         this.dropoffs = deduplicator.deduplicateIntArray(dropoffs);
+        this.bookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, bookingInfos);
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
         this.arrivalTimes = null;
         this.departureTimes = null;
-        this.isRecordedStop = null;
+        this.recordedStops = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
@@ -198,6 +200,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.timepoints = object.timepoints;
         this.pickups = object.pickups;
         this.dropoffs = object.dropoffs;
+        this.bookingInfos = object.bookingInfos;
     }
 
     /**
@@ -261,13 +264,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
     public int getArrivalTime(final int stop) {
-        if (arrivalTimes == null) return getScheduledArrivalTime(stop);
+        if (arrivalTimes == null) { return getScheduledArrivalTime(stop); }
         else return arrivalTimes[stop]; // updated times are not time shifted.
     }
 
     /** @return the amount of time in seconds that the vehicle waits at the stop. */
     public int getDepartureTime(final int stop) {
-        if (departureTimes == null) return getScheduledDepartureTime(stop);
+        if (departureTimes == null) { return getScheduledDepartureTime(stop); }
         else return departureTimes[stop]; // updated times are not time shifted.
     }
 
@@ -295,43 +298,43 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     public void setRecorded(int stop, boolean recorded) {
         checkCreateTimesArrays();
-        isRecordedStop[stop] = recorded;
+        recordedStops[stop] = recorded;
     }
 
     // TODO OTP2 - Unused, but will be used by Transmodel API
     public boolean isRecordedStop(int stop) {
-        if (isRecordedStop == null) {
+        if (recordedStops == null) {
             return false;
         }
-        return isRecordedStop[stop];
+        return recordedStops[stop];
     }
 
     //Is single stop cancelled
     public void setCancelledStop(int stop, boolean isCancelled) {
         checkCreateTimesArrays();
-        isCancelledStop[stop] = isCancelled;
+        cancelledStops[stop] = isCancelled;
     }
 
     // TODO OTP2 - Unused, but will be used by Transmodel API
     public boolean isCancelledStop(int stop) {
-        if (isCancelledStop == null) {
+        if (cancelledStops == null) {
             return false;
         }
-        return isCancelledStop[stop];
+        return cancelledStops[stop];
     }
 
     //Is prediction for single stop inaccurate
     public void setPredictionInaccurate(int stop, boolean predictionInaccurate) {
         checkCreateTimesArrays();
-        isPredictionInaccurate[stop] = predictionInaccurate;
+        predictionInaccurateOnStops[stop] = predictionInaccurate;
     }
 
     // TODO OTP2 - Unused, but will be used by Transmodel API
     public boolean isPredictionInaccurate(int stop) {
-        if (isPredictionInaccurate == null) {
+        if (predictionInaccurateOnStops == null) {
             return false;
         }
-        return isPredictionInaccurate[stop];
+        return predictionInaccurateOnStops[stop];
     }
 
     public void setPickupType(int stop, int pickupType) {
@@ -358,6 +361,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             return -999;
         }
         return dropoffs[stop];
+    }
+
+    public BookingInfo getBookingInfo(int stop) {
+        return bookingInfos.get(stop);
     }
 
     /**
@@ -424,28 +431,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return true;
     }
 
-    /**
-     * Once a trip has been found departing or arriving at an appropriate time, check whether that
-     * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility
-     * and transfers with minimum time or forbidden transfers.
-     */
-    public boolean tripAcceptable(final State state0, final int stopIndex) {
-        final RoutingRequest options = state0.getOptions();
-        final BannedStopSet banned = options.bannedTrips.get(trip.getId());
-        if (banned != null && banned.contains(stopIndex)) {
-            return false;
-        }
-        if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
-            return false;
-        }
-        // Establish whether we have a rented _or_ owned bicycle.
-        final boolean bicycle = state0.getNonTransitMode() == TraverseMode.BICYCLE;
-        if (bicycle && BikeAccess.fromTrip(trip) != BikeAccess.ALLOWED) {
-            return false;
-        }
-        return true;
-    }
-
     /** Cancel this entire trip */
     public void cancel() {
         arrivalTimes = new int[getNumStops()];
@@ -464,8 +449,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     public void cancelAllStops() {
         // Flag all stops as cancelled
-        isCancelledStop = new boolean[getNumStops()];
-        Arrays.fill(isCancelledStop, true);
+        cancelledStops = new boolean[getNumStops()];
+        Arrays.fill(cancelledStops, true);
     }
 
     public void updateDepartureTime(final int stop, final int time) {
@@ -496,15 +481,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         if (arrivalTimes == null) {
             arrivalTimes = Arrays.copyOf(scheduledArrivalTimes, scheduledArrivalTimes.length);
             departureTimes = Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length);
-            isRecordedStop = new boolean[arrivalTimes.length];
-            isCancelledStop = new boolean[arrivalTimes.length];
-            isPredictionInaccurate = new boolean[arrivalTimes.length];
+            recordedStops = new boolean[arrivalTimes.length];
+            cancelledStops = new boolean[arrivalTimes.length];
+            predictionInaccurateOnStops = new boolean[arrivalTimes.length];
             for (int i = 0; i < arrivalTimes.length; i++) {
                 arrivalTimes[i] += timeShift;
                 departureTimes[i] += timeShift;
-                isRecordedStop[i] = false;
-                isCancelledStop[i] = false;
-                isPredictionInaccurate[i] = false;
+                recordedStops[i] = false;
+                cancelledStops[i] = false;
+                predictionInaccurateOnStops[i] = false;
             }
 
             // Update the real-time state
@@ -540,7 +525,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     * without updates for now (frequency trips don't have updates).
     */
     public TripTimes timeShift (final int stop, final int time, final boolean depart) {
-        if (arrivalTimes != null || departureTimes != null) return null;
+        if (arrivalTimes != null || departureTimes != null) { return null; }
         final TripTimes shifted = this.clone();
         // Adjust 0-based times to match desired stoptime.
         final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));

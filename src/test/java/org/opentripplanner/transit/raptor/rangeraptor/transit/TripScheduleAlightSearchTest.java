@@ -1,25 +1,30 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRoute;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestRoute;
+import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
-public class TripScheduleAlightSearchTest {
+
+public class TripScheduleAlightSearchTest implements RaptorTestConstants {
 
     /*
      * To test alight search we need a trip pattern, we will create
      * a trip pattern with 4 trips and 2 stops. This will cover most
      * of the simple cases:
      *
-     * Trip:  |  A   |  B   |  C   |  D
-     * Stop 1 | 1000 | 2000 | 1900 | 2100
-     * Stop 2 | 1500 | 2500 | 2600 | 2400
+     * Trip:  |  A   |  B   |  C
+     * Stop 1 | 1000 | 2000 | 1900
+     * Stop 2 | 1500 | 2500 | 2600
      *
      * Note:
      * - All times are alight times, we do not care about the board times in this test.
@@ -43,33 +48,23 @@ public class TripScheduleAlightSearchTest {
     /** A time after all other times */
     private static final int TIME_LATE = 9999;
 
-    /* Stop position in pattern */
-    private static final int STOP_1 = 0;
-    private static final int STOP_2 = 1;
+    private final TestTripPattern pattern = pattern("R1", STOP_A, STOP_B);
 
-    private static final int TRIP_A_INDEX = 0;
-    private static final int TRIP_B_INDEX = 1;
-    private static final int TRIP_C_INDEX = 2;
+    private RaptorRoute<TestTripSchedule> route = TestRoute
+        .route(pattern)
+        .withTimetable(
+            // Trips in service
+            schedule().arrivals(TIME_A1, TIME_A2),
+            schedule().arrivals(TIME_B1, TIME_B2),
+            schedule().arrivals(TIME_C1, TIME_C2)
+        );
 
-    // Trips in service
-    private TestRaptorTripSchedule tripA = TestRaptorTripSchedule
-            .create("T-A")
-            .withAlightTimes(TIME_A1, TIME_A2)
-            .build();
-    private TestRaptorTripSchedule tripB = TestRaptorTripSchedule
-            .create("T-B")
-            .withAlightTimes(TIME_B1, TIME_B2)
-            .build();
-    private TestRaptorTripSchedule tripC = TestRaptorTripSchedule
-            .create("T-C")
-            .withAlightTimes(TIME_C1, TIME_C2)
-            .build();
-
-    // Trip pattern with trip A and B.
-    private RaptorRoute<TestRaptorTripSchedule> route = new TestRoute(tripA, tripB, tripC);
+    private final TestTripSchedule tripA = route.timetable().getTripSchedule(LINE_11);
+    private final TestTripSchedule tripB = route.timetable().getTripSchedule(LINE_21);
+    private final TestTripSchedule tripC = route.timetable().getTripSchedule(LINE_31);
 
     // The service under test - the subject
-    private TripScheduleAlightSearch<TestRaptorTripSchedule> subject = new TripScheduleAlightSearch<>(
+    private TripScheduleAlightSearch<TestTripSchedule> subject = new TripScheduleAlightSearch<>(
             TRIPS_BINARY_SEARCH_THRESHOLD, route.timetable()
     );
 
@@ -80,37 +75,37 @@ public class TripScheduleAlightSearchTest {
         // Then:
         //   No trips are expected as a result
         // Stop 1:
-        searchForTrip(TIME_A1 - 1, STOP_1).assertNoTripFound();
+        searchForTrip(TIME_A1 - 1, STOP_POS_0).assertNoTripFound();
 
         // Stop 2:
-        searchForTrip(TIME_A2 - 1, STOP_2).assertNoTripFound();
+        searchForTrip(TIME_A2 - 1, STOP_POS_1).assertNoTripFound();
     }
 
     @Test
     public void alightLastTripForAVeryLateTime() {
-        searchForTrip(TIME_LATE, STOP_1)
+        searchForTrip(TIME_LATE, STOP_POS_0)
                 .assertTripFound()
-                .withIndex(TRIP_C_INDEX)
+                .withIndex(LINE_31)
                 .withAlightTime(TIME_C1);
 
-        searchForTrip(TIME_LATE, STOP_2)
+        searchForTrip(TIME_LATE, STOP_POS_1)
                 .assertTripFound()
-                .withIndex(TRIP_C_INDEX)
+                .withIndex(LINE_31)
                 .withAlightTime(TIME_C2);
     }
 
     @Test
     public void findLastTripWithTheMinimumPossibleSlack() {
         // B matches B
-        searchForTrip(TIME_B1, STOP_1)
+        searchForTrip(TIME_B1, STOP_POS_0)
                 .assertTripFound()
-                .withIndex(TRIP_B_INDEX)
+                .withIndex(LINE_21)
                 .withAlightTime(TIME_B1);
 
         // One second minus, give the previous trip
-        searchForTrip(TIME_B1-1, STOP_1)
+        searchForTrip(TIME_B1-1, STOP_POS_0)
                 .assertTripFound()
-                .withIndex(TRIP_A_INDEX)
+                .withIndex(LINE_11)
                 .withAlightTime(TIME_A1);
     }
 
@@ -119,7 +114,7 @@ public class TripScheduleAlightSearchTest {
         // The TripScheduleAlightSearch should handle an empty pattern without failing
         // and return no result found (false)
         withTrips(Collections.emptyList());
-        searchForTrip(TIME_LATE, STOP_1)
+        searchForTrip(TIME_LATE, STOP_POS_0)
                 .assertNoTripFound();
     }
 
@@ -129,13 +124,13 @@ public class TripScheduleAlightSearchTest {
         withTrips(tripA, tripB);
 
         // Then we expect to find trip B when 'tripIndexLowerBound' is A´s index
-        searchForTrip(TIME_LATE, STOP_1, TRIP_A_INDEX)
+        searchForTrip(TIME_LATE, STOP_POS_0, LINE_11)
                 .assertTripFound()
                 .withAlightTime(TIME_B1)
-                .withIndex(TRIP_B_INDEX);
+                .withIndex(LINE_21);
 
         // An then no trip if 'tripIndexLowerBound' equals the last trip index (B´s index)
-        searchForTrip(TIME_LATE, STOP_1, TRIP_B_INDEX)
+        searchForTrip(TIME_LATE, STOP_POS_0, LINE_21)
                 .assertNoTripFound();
     }
 
@@ -149,19 +144,17 @@ public class TripScheduleAlightSearchTest {
         final int N = 7 * n + 3;
         final int dT = 1000;
 
-        List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
+        List<TestTripSchedule> tripSchedules = new ArrayList<>();
         int arrivalTime = firstArrivalTime;
 
         for (int i = 0; i < N; ++i, arrivalTime += dT) {
-            tripSchedules.add(
-                    TestRaptorTripSchedule.create("T-" + i+1).withAlightTimes(arrivalTime).build()
-            );
+            tripSchedules.add(schedule().arrivals(arrivalTime).build());
         }
-        useTripPattern(new TestRoute(tripSchedules));
 
+        withTrips(tripSchedules);
 
         // Search for a trip that alight before the first trip, expect no trip in return
-        searchForTrip(firstArrivalTime - 1, STOP_1)
+        searchForTrip(firstArrivalTime - 1, STOP_POS_0)
                 .assertNoTripFound();
 
         for (int i = 0; i < N; ++i) {
@@ -169,18 +162,18 @@ public class TripScheduleAlightSearchTest {
             int okSearchTime = tripAlightTime;
 
             // Search and find trip 'i'
-            searchForTrip(okSearchTime, STOP_1)
+            searchForTrip(okSearchTime, STOP_POS_0)
                     .assertTripFound()
                     .withAlightTime(tripAlightTime)
                     .withIndex(i);
 
             // Search and find trip 'i' using the previous trip index
-            searchForTrip(okSearchTime, STOP_1, i-1)
+            searchForTrip(okSearchTime, STOP_POS_0, i-1)
                     .assertTripFound()
                     .withIndex(i);
 
             // Search with a time and index that together exclude trip 'i'
-            searchForTrip(tripAlightTime, STOP_1, i)
+            searchForTrip(tripAlightTime, STOP_POS_0, i)
                     .assertNoTripFound();
         }
     }
@@ -193,7 +186,7 @@ public class TripScheduleAlightSearchTest {
     @Test
     public void assertTripIsFoundEvenIfItIsBeforeTheBinarySearchUpperAndLowerBound() {
         // Given a pattern with N + 1 trip schedules
-        List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
+        List<TestTripSchedule> tripSchedules = new ArrayList<>();
 
         // Where the first trip is in service
         tripSchedules.add(tripA);
@@ -202,39 +195,39 @@ public class TripScheduleAlightSearchTest {
         // And where the N next trips are NOT in service, but with acceptable boarding times
         addNTimes(tripSchedules, tripC, TRIPS_BINARY_SEARCH_THRESHOLD);
 
-        useTripPattern(new TestRoute(tripSchedules));
+        withTrips(tripSchedules);
 
         // Then we expect to find A for both stop 1 and 2
         // Stop 1
-        searchForTrip(TIME_A1, STOP_1)
+        searchForTrip(TIME_A1, STOP_POS_0)
                 .assertTripFound()
                 .withIndex(indexA)
                 .withAlightTime(TIME_A1);
 
         // Stop 2
-        searchForTrip(TIME_A2, STOP_2)
+        searchForTrip(TIME_A2, STOP_POS_1)
                 .assertTripFound()
                 .withIndex(indexA)
                 .withAlightTime(TIME_A2);
     }
 
-    private void withTrips(TestRaptorTripSchedule... schedules) {
-        useTripPattern(new TestRoute(schedules));
+    private void withTrips(TestTripSchedule... schedules) {
+        useRoute(TestRoute.route(pattern).withTimetable(schedules));
     }
 
-    private void withTrips(List<TestRaptorTripSchedule> schedules) {
-        useTripPattern(new TestRoute(schedules));
+    private void withTrips(List<TestTripSchedule> schedules) {
+        withTrips(schedules.toArray(TestTripSchedule[]::new));
     }
 
-    private void useTripPattern(TestRoute pattern) {
-        this.route = pattern;
+    private void useRoute(TestRoute route) {
+        this.route = route;
         this.subject = new TripScheduleAlightSearch<>(
                 TRIPS_BINARY_SEARCH_THRESHOLD,
                 this.route.timetable()
         );
     }
 
-    private static void addNTimes(List<TestRaptorTripSchedule> trips, TestRaptorTripSchedule tripS, int n) {
+    private static void addNTimes(List<TestTripSchedule> trips, TestTripSchedule tripS, int n) {
         for (int i = 0; i < n; i++) {
             trips.add(tripS);
         }

@@ -50,8 +50,18 @@ public class RoutingService {
 
     // TODO We should probably not have the Router as a parameter here
     public RoutingResponse route(RoutingRequest request, Router router) {
-        RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
-        return worker.route(router);
+        RoutingResponse response = null;
+        try {
+            RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
+            response = worker.route(router);
+        } catch (Exception e) {
+            if (request != null) {
+                request.cleanup();
+            }
+            throw e;
+        }
+        request.cleanup();
+        return response;
     }
 
     /**
@@ -63,14 +73,15 @@ public class RoutingService {
      * <p>
      * TODO: Add frequency based trips
      *
-     * @param stop               Stop object to perform the search for
-     * @param startTime          Start time for the search. Seconds from UNIX epoch
-     * @param timeRange          Searches forward for timeRange seconds from startTime
-     * @param numberOfDepartures Number of departures to fetch per pattern
-     * @param omitNonPickups     If true, do not include vehicles that will not pick up passengers.
+     * @param stop                  Stop object to perform the search for
+     * @param startTime             Start time for the search. Seconds from UNIX epoch
+     * @param timeRange             Searches forward for timeRange seconds from startTime
+     * @param numberOfDepartures    Number of departures to fetch per pattern
+     * @param omitNonPickups        If true, do not include vehicles that will not pick up passengers.
+     * @param includeCancelledTrips If true, cancelled trips will also be included in result.
      */
     public List<StopTimesInPattern> stopTimesForStop(
-            Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
+            Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups, boolean includeCancelledTrips
     ) {
         return StopTimesHelper.stopTimesForStop(
                 this,
@@ -79,7 +90,8 @@ public class RoutingService {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups
+                omitNonPickups,
+                includeCancelledTrips
         );
     }
 

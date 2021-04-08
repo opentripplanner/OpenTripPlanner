@@ -37,14 +37,15 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     }
 
     @Override
-    public final void setAccess(final int stop, final int arrivalTime, RaptorTransfer access) {
-        delegate.setAccess(stop, arrivalTime, access);
-        debug.acceptAccess(stop);
+    public final void setAccessTime(int arrivalTime, RaptorTransfer access) {
+        delegate.setAccessTime(arrivalTime, access);
+        debug.acceptAccess(access.stop());
     }
 
     @Override
-    public final Collection<Path<T>> extractPaths() {
-        return delegate.extractPaths();
+    public void rejectAccessTime(int arrivalTime, RaptorTransfer access) {
+        debug.rejectAccessPath(access, arrivalTime);
+        delegate.rejectAccessTime(arrivalTime, access);
     }
 
     @Override
@@ -67,16 +68,21 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     }
 
     @Override
-    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
+    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
         debug.dropOldStateAndAcceptNewState(
-                transferLeg.stop(),
-                () -> delegate.setNewBestTransferTime(fromStop, arrivalTime, transferLeg)
+                transfer.stop(),
+                () -> delegate.setNewBestTransferTime(fromStop, arrivalTime, transfer)
         );
     }
 
     @Override
-    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
-        debug.rejectTransfer(fromStop, transferLeg, transferLeg.stop(), arrivalTime);
-        delegate.rejectNewBestTransferTime(fromStop, arrivalTime, transferLeg);
+    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
+        debug.rejectTransfer(fromStop, transfer, transfer.stop(), arrivalTime);
+        delegate.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
+    }
+
+    @Override
+    public final Collection<Path<T>> extractPaths() {
+        return delegate.extractPaths();
     }
 }

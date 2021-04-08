@@ -1,14 +1,12 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 
 /**
@@ -35,13 +33,13 @@ public class SearchParams {
     private final int earliestDepartureTime;
     private final int latestArrivalTime;
     private final int searchWindowInSeconds;
-    private final int boardSlackInSeconds;
+    private final boolean preferLateArrival;
     private final int numberOfAdditionalTransfers;
     private final int maxNumberOfTransfers;
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
-    private final Collection<RaptorTransfer> accessLegs;
-    private final Collection<RaptorTransfer> egressLegs;
+    private final Collection<RaptorTransfer> accessPaths;
+    private final Collection<RaptorTransfer> egressPaths;
 
     /**
      * Default values is defined in the default constructor.
@@ -50,26 +48,26 @@ public class SearchParams {
         earliestDepartureTime = TIME_NOT_SET;
         latestArrivalTime = TIME_NOT_SET;
         searchWindowInSeconds = NOT_SET;
-        boardSlackInSeconds = 60;
+        preferLateArrival = false;
         numberOfAdditionalTransfers = 5;
         maxNumberOfTransfers = NOT_SET;
         relaxCostAtDestination = NOT_SET;
         timetableEnabled = false;
-        accessLegs = Collections.emptyList();
-        egressLegs = Collections.emptyList();
+        accessPaths = List.of();
+        egressPaths = List.of();
     }
 
     SearchParams(SearchParamsBuilder<?> builder) {
         this.earliestDepartureTime = builder.earliestDepartureTime();
         this.latestArrivalTime = builder.latestArrivalTime();
         this.searchWindowInSeconds = builder.searchWindowInSeconds();
-        this.boardSlackInSeconds = builder.boardSlackInSeconds();
+        this.preferLateArrival = builder.preferLateArrival();
         this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
         this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
-        this.accessLegs = java.util.List.copyOf(builder.accessLegs());
-        this.egressLegs = java.util.List.copyOf(builder.egressLegs());
+        this.accessPaths = List.copyOf(builder.accessPaths());
+        this.egressPaths = List.copyOf(builder.egressPaths());
     }
 
     static SearchParams defaults() {
@@ -139,14 +137,14 @@ public class SearchParams {
         return searchWindowInSeconds == 0;
     }
 
+
     /**
-     * The minimum wait time for transit boarding to account for schedule variation.
-     * This is added between transits, between transfer and transit, and between access "walk" and transit.
-     * <p/>
-     * The default value is 60.
+     * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is
+     * required if this parameter is set. This parameter is not allowed if the
+     * {@link #timetableEnabled} is enabled.
      */
-    public int boardSlackInSeconds() {
-        return boardSlackInSeconds;
+    public boolean preferLateArrival() {
+        return preferLateArrival;
     }
 
     /**
@@ -211,58 +209,58 @@ public class SearchParams {
     }
 
     /**
-     * Times to access each transit stop using the street network in seconds.
+     * List of access paths from the origin to all transit stops using the street network.
      * <p/>
-     * Required, at least one access leg must exist.
+     * Required, at least one access path must exist.
      */
-    public Collection<RaptorTransfer> accessLegs() {
-        return accessLegs;
+    public Collection<RaptorTransfer> accessPaths() {
+        return accessPaths;
     }
 
     /**
-     * List of all possible egress stops and time to reach destination in seconds.
+     * List of all possible egress paths to reach the destination using the street network.
      * <p>
-     * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress leg
-     * start, NOT the destination - think of it as a reversed leg.
+     * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path
+     * start, NOT the destination - think of it as a reversed path.
      * <p/>
-     * Required, at least one egress leg must exist.
+     * Required, at least one egress path must exist.
      */
-    public Collection<RaptorTransfer> egressLegs() {
-        return egressLegs;
+    public Collection<RaptorTransfer> egressPaths() {
+        return egressPaths;
     }
 
     @Override
     public String toString() {
-        return "SearchParams{" +
-                "earliestDepartureTime=" + TimeUtils.timeToStrCompact(earliestDepartureTime, TIME_NOT_SET) +
-                ", latestArrivalTime=" + TimeUtils.timeToStrCompact(latestArrivalTime, TIME_NOT_SET) +
-                ", searchWindowInSeconds=" + TimeUtils.timeToStrCompact(searchWindowInSeconds, NOT_SET) +
-                ", boardSlackInSeconds=" + boardSlackInSeconds +
-                ", numberOfAdditionalTransfers=" + numberOfAdditionalTransfers +
-                ", accessLegs(max 5)=" + accessLegs.stream().limit(5).collect(Collectors.toList()) +
-                ", egressLegs(max 5)=" + egressLegs.stream().limit(5).collect(Collectors.toList()) +
-                '}';
+        return ToStringBuilder.of(SearchParams.class)
+            .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
+            .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
+            .addDurationSec("searchWindow", searchWindowInSeconds)
+            .addFieldIfTrue("departAsLateAsPossible", preferLateArrival)
+            .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+            .addCollection("accessPaths", accessPaths, 5)
+            .addCollection("egressPaths", egressPaths, 5)
+            .toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         SearchParams that = (SearchParams) o;
         return earliestDepartureTime == that.earliestDepartureTime &&
                 latestArrivalTime == that.latestArrivalTime &&
                 searchWindowInSeconds == that.searchWindowInSeconds &&
-                boardSlackInSeconds == that.boardSlackInSeconds &&
+                preferLateArrival == that.preferLateArrival &&
                 numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
-                accessLegs.equals(that.accessLegs) &&
-                egressLegs.equals(that.egressLegs);
+                accessPaths.equals(that.accessPaths) &&
+                egressPaths.equals(that.egressPaths);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                earliestDepartureTime, latestArrivalTime, searchWindowInSeconds, accessLegs,
-                egressLegs, boardSlackInSeconds, numberOfAdditionalTransfers
+                earliestDepartureTime, latestArrivalTime, searchWindowInSeconds,
+            preferLateArrival, accessPaths, egressPaths, numberOfAdditionalTransfers
         );
     }
 
@@ -274,7 +272,15 @@ public class SearchParams {
                 earliestDepartureTime != TIME_NOT_SET || latestArrivalTime != TIME_NOT_SET,
                 "'earliestDepartureTime' or 'latestArrivalTime' is required."
         );
-        assertProperty(!accessLegs.isEmpty(), "At least one 'accessLegs' is required.");
-        assertProperty(!egressLegs.isEmpty(), "At least one 'egressLegs' is required.");
+        assertProperty(!accessPaths.isEmpty(), "At least one 'accessPath' is required.");
+        assertProperty(!egressPaths.isEmpty(), "At least one 'egressPath' is required.");
+        assertProperty(
+            !(preferLateArrival && latestArrivalTime == TIME_NOT_SET),
+            "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set."
+        );
+        assertProperty(
+            !(preferLateArrival && timetableEnabled),
+            "The 'departAsLateAsPossible' is not allowed together with 'timetableEnabled'."
+        );
     }
 }

@@ -14,17 +14,20 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
     private final int fromTime;
     private final int toStop;
     private final int toTime;
+    private final int cost;
 
-    IntermediatePathLeg(int fromStop, int fromTime, int toStop, int toTime) {
+    IntermediatePathLeg(int fromStop, int fromTime, int toStop, int toTime, int cost) {
         this.fromStop = fromStop;
         this.fromTime = fromTime;
         this.toStop = toStop;
         this.toTime = toTime;
+        this.cost = cost;
     }
 
     /**
      * The stop index where the leg start. Also called departure stop index.
      */
+    @Override
     public final int fromStop() {
         return fromStop;
     }
@@ -37,6 +40,7 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
     /**
      * The stop index where the leg end, also called arrival stop index.
      */
+    @Override
     public final int toStop(){
         return toStop;
     }
@@ -47,9 +51,14 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
     }
 
     @Override
+    public int generalizedCost() {
+        return cost;
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         IntermediatePathLeg<?> that = (IntermediatePathLeg<?>) o;
         return fromStop == that.fromStop &&
                 fromTime == that.fromTime &&

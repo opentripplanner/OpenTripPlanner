@@ -125,10 +125,12 @@ public final class ServiceCalendar implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         ServiceCalendar that = (ServiceCalendar) o;
         return monday == that.monday && tuesday == that.tuesday && wednesday == that.wednesday
                 && thursday == that.thursday && friday == that.friday && saturday == that.saturday

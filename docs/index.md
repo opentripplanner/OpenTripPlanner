@@ -1,39 +1,37 @@
 ![OTP Logo](images/otp-logo.svg)
-# OpenTripPlanner
+# OpenTripPlanner 2
 
-## *OTP2* IS WORK IN PROGRESS. 
-THE DOCUMENTATION MAY NOT BE UPDATED. WE TRY TO DOCUMENT THINGS ALONG THE WAY, BUT KEEPING ALL OF IT UP TO DATE IS TIME CONSUMING. WE PLAN TO GO OVER THE DOCUMENTATION BEFORE THE RC(RELEASE CANDIDATE) IS MADE.
+**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, focusing on travel by scheduled public transportation in combination with bicycling, walking, and mobility services including bike share and ride hailing. Its server component runs on any platform with a Java virtual machine (including Linux, Mac, and Windows). It exposes REST and GraphQL APIs that can be accessed by various clients including open source Javascript components and native mobile applications. It builds its representation of the transportation network from open data in open standard file formats (primarily GTFS and OpenStreetMap). It applies real-time updates and alerts with immediate visibility to clients, finding itineraries that account for disruptions and service changes. OTP is released under the [LGPL license](https://opensource.org/licenses/LGPL-3.0). As of 2020, the codebase has been in active development for over ten years, and is relied upon by transportation authorities and travel planning applications in [deployments](Deployments.md) around the world.
 
-_This documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**www.opentripplanner.org**](http://www.opentripplanner.org)_
-
-**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL license](https://opensource.org/licenses/LGPL-3.0). The code is under active development with a variety of [deployments](Deployments) around the world.
-
-If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
-
-## Versions of this documentation
- - [OTP Master](http://docs.opentripplanner.org/en/latest) - Latest release
- - [OTP dev-1.x](http://docs.opentripplanner.org/en/dev-1.x) - OTP 1 development branch 
- - [OTP dev-2.x](http://docs.opentripplanner.org/en/dev-2.x) - OTP 2 development branch
+You are currently reading the documentation for **OpenTripPlanner 2**, the second major version of OTP.
 
 
-## External Technical Documentation
+# Versions of this documentation
 
-Some technical documentation is generated automatically from the OTP source code and available from other locations.
-The Javadoc describes OTP's Java classes and their methods for software developers who call or change this code directly.
-The Web Service API documents describe the endpoints OTP exposes via its HTTP interface.
-It is generated automatically by [Enunciate](http://enunciate.codehaus.org/) from comments in the source code,
-so may be incomplete or overly verbose in places.
-These documents are organized into folders for different release versions of OTP.
+Several versions of this documentation are built and published automatically for different branches of OTP. Each of these has a different stable URL, and you may switch between these versions using the selector in the lower right of the published documentation.
 
- * [OTP Javadoc](http://dev.opentripplanner.org/javadoc/)
- * [OTP web service API documentation](http://dev.opentripplanner.org/apidoc/)
+ - [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.0 (the git master branch)
+ - [v1.5.0](http://docs.opentripplanner.org/en/v1.5.0) - Stable 1.x release
+ - [dev-2.x](http://docs.opentripplanner.org/en/dev-2.x) - OTP 2 active development
+ - [dev-1.x](http://docs.opentripplanner.org/en/dev-1.x) - OTP 1 active development 
 
-## Contact Info
+# Audience
+
+The end users of OTP are the millions of people who rely on it to help plan their daily travel, often without even knowing they are using OTP. As an infrastructure component, installation and configuration of OTP tends to be somewhat technical and essentially invisible to those end users. This documentation is indended for people who wish to perform such deployments of OTP without necessarily diving into the internal details of the software.
+
+For members of the OTP community interested in software development, additional documentation detailing algorithms, data structures etc. is available as markdown files within the source code packages. It can be read in your IDE or when browsing the source tree on Github. For example, `https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/transit/raptor/README.md`. 
+ 
+# Quick Start
+We encourage you to read the introductory sections of this documentation to familiarize yourself with OpenTripPlanner use cases and configuration. But if you want to get started right away running your own OTP instance, the best place to start is the [Basic Tutorial](Basic-Tutorial.md) page.
+
+# Contact Info
 
 Send questions and comments to the [user mailing list](http://groups.google.com/group/opentripplanner-users).
 Discuss internal development details on the [dev mailing list](http://groups.google.com/group/opentripplanner-dev).
 File bug reports via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). Note that the issue tracker is not intended for support questions or discussions. Please post them to one of the mailing lists instead.
 
-## Financial Support
+# Financial and In-Kind Support
 
-OpenTripPlanner is a member project of Software Freedom Conservancy, a 501(c)(3) organization incorporated in New York, and donations made to it are fully tax-deductible to the extent permitted by law. Donations can be made by credit card, wire transfer or paper check. Please contact <accounting@sfconservancy.org> for instructions. Be sure to note in the email what country the wire transfer will initiate from and what currency it will be in.
+OpenTripPlanner is a member project of Software Freedom Conservancy, a 501(c)(3) organization incorporated in New York, and donations made to it are fully tax-deductible to the extent permitted by law. Donations can be made by credit card, wire transfer or paper check. Please contact <accounting@sfconservancy.org> for instructions.
+
+OTP development is primarily carried out by full-time software engineers employed by transportation authorities and consultancies. Even with funding, it can be difficult to engage staff who have the specialized skill set required. Therefore, one of the best ways to support OTP is to allocate software development staff at your organization with transportation domain knowledge to participate in weekly development meetings and contribute to this effort. This also builds connections between organizations favoring open source collaboration.

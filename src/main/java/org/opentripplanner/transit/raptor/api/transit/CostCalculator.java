@@ -18,19 +18,20 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
      * @param prevStopArrival The previous stop arrival
      * @param waitTime        The time waiting before boarding at the board stop
      * @param boardTime       The time of boarding
-     * @param trip            The trip borded
      */
-    int onTripRidingCost(ArrivalView<T> prevStopArrival, int waitTime, int boardTime, T trip);
+    int onTripRidingCost(ArrivalView<T> prevStopArrival, int waitTime, int boardTime);
 
     /**
      * Calculate the value when arriving by transit.
+     *
+     * @param firstRound Indicate if this is the first round (first transit).
      */
     int transitArrivalCost(
-        ArrivalView<T> previousArrival,
+        boolean firstRound,
+        int fromStop,
         int waitTime,
         int transitTime,
-        int toStop,
-        T trip
+        int toStop
     );
 
     /**
@@ -39,7 +40,7 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
     int walkCost(int walkTimeInSeconds);
 
     /**
-     * Calculate the value, when waiting between the last transit and egress legs
+     * Calculate the value, when waiting between the last transit and egress paths
      */
     int waitCost(int waitTimeInSeconds);
 
@@ -51,4 +52,5 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
      * <em>real value</em> would be correct and a good choose.
      */
     int calculateMinCost(int minTravelTime, int minNumTransfers);
+
 }

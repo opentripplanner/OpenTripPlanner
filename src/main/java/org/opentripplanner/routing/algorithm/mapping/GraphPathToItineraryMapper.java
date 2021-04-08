@@ -8,6 +8,8 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.flex.FlexLegMapper;
+import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StreetNote;
@@ -39,6 +41,7 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Stream;
 
 // TODO OTP2 There is still a lot of transit-related logic here that should be removed. We also need
 //      to decide where real-time updates should be applied to the itinerary.
@@ -131,7 +135,7 @@ public abstract class GraphPathToItineraryMapper {
             first = false;
         }
 
-        setLegPathwayFlag(legs, legsStates);
+        setPathwayInfo(legs, legsStates);
 
         Itinerary itinerary = new Itinerary(legs);
 
@@ -237,7 +241,26 @@ public abstract class GraphPathToItineraryMapper {
      * @return The generated leg
      */
     private static Leg generateLeg(Graph graph, State[] states, Locale requestedLocale) {
-        Leg leg = new Leg(resolveMode(states));
+        Leg leg = null;
+        FlexTripEdge flexEdge = null;
+
+        if (OTPFeature.FlexRouting.isOn()) {
+            flexEdge = (FlexTripEdge) Stream
+                .of(states)
+                .skip(1)
+                .map(state -> state.backEdge)
+                .filter(edge -> edge instanceof FlexTripEdge)
+                .findFirst()
+                .orElse(null);
+            if (flexEdge != null) {
+                leg = new Leg(flexEdge.getTrip());
+                leg.flexibleTrip = true;
+            }
+        }
+
+        if (leg == null) {
+            leg = new Leg(resolveMode(states));
+        }
 
         Edge[] edges = new Edge[states.length - 1];
 
@@ -268,6 +291,10 @@ public abstract class GraphPathToItineraryMapper {
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
         addAlerts(graph, leg, states);
+
+        if (flexEdge != null) {
+            FlexLegMapper.fixFlexTripLeg(leg, flexEdge);
+        }
 
         return leg;
     }
@@ -318,11 +345,13 @@ public abstract class GraphPathToItineraryMapper {
         }
     }
 
-    private static void setLegPathwayFlag(List<Leg> legs, State[][] legsStates) {
+    private static void setPathwayInfo(List<Leg> legs, State[][] legsStates) {
         OUTER:
         for (int i = 0; i < legsStates.length; i++) {
             for (int j = 1; j < legsStates[i].length; j++) {
                 if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
+                    PathwayEdge pe = (PathwayEdge) legsStates[i][j].getBackEdge();
+                    legs.get(i).pathwayId = pe.getId();
                     legs.get(i).pathway = true;
                     break OUTER;
                 }
@@ -439,7 +468,7 @@ public abstract class GraphPathToItineraryMapper {
         if (vertex instanceof TransitStopVertex) {
             place.stopId = stop.getId();
             place.stopCode = stop.getCode();
-            place.platformCode = stop.getCode();
+            place.platformCode = stop.getPlatformCode();
             place.zoneId = stop.getFirstZoneAsString();
             place.vertexType = VertexType.TRANSIT;
         } else if(vertex instanceof BikeRentalStationVertex) {

@@ -29,7 +29,6 @@
 
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info" />
   <logger name="org.opentripplanner" level="info" />
-  <logger name="org.opentripplanner.analyst" level="info" />
   <logger name="org.opentripplanner.routing" level="info" />
   <logger name="org.opentripplanner.routing.impl.RetryingPathServiceImpl" level="info" />
   <logger name="org.opentripplanner.routing.algorithm.GenericAStar" level="info" />
@@ -37,6 +36,10 @@
   <logger name="org.opentripplanner.routing.vertextype.IntersectionVertex" level="info" />
   <!-- Avoid printing debug messages when walk limits are exceeded -->
   <logger name="org.opentripplanner.routing.edgetype.PlainStreetEdge" level="info" />
+
+  <!-- Raptor request debug logging - Turn on/off: debug/info -->
+  <logger name="org.opentripplanner.transit.raptor.RaptorService" level="info" />
+
   <!-- Avoid printing info messages about calendars when building graph -->
   <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />
   <!-- Avoid printing ugly warning message when unable to create websocket connection -->

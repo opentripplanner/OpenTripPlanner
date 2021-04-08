@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -21,7 +20,7 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 public class BikeParkVertex extends Vertex {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     private int spacesAvailable;
 

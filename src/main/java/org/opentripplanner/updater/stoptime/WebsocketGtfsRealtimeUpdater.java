@@ -25,8 +25,6 @@ import java.util.concurrent.ExecutionException;
  * callback is registered which handles incoming GTFS-RT messages as they stream in by placing a
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
  *
- * Usage example ('websocket' name is an example) in the file 'Graph.properties':
- *
  * <pre>
  * websocket.type = websocket-gtfs-rt-updater
  * websocket.defaultAgencyId = agency
@@ -62,10 +60,13 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
      */
     private final int reconnectPeriodSec;
 
-    public WebsocketGtfsRealtimeUpdater(Parameters parameters) {
-        url = parameters.getUrl();
-        feedId = parameters.getFeedId();
-        reconnectPeriodSec = parameters.getReconnectPeriodSec();
+    private final String configRef;
+
+    public WebsocketGtfsRealtimeUpdater(WebsocketGtfsRealtimeUpdaterParameters parameters) {
+        this.configRef = parameters.getConfigRef();
+        this.url = parameters.getUrl();
+        this.feedId = parameters.getFeedId();
+        this.reconnectPeriodSec = parameters.getReconnectPeriodSec();
     }
 
     @Override
@@ -179,13 +180,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public String getName() {
-        return "WebsocketGtfsRealtimeUpdater";
+    public String getConfigRef() {
+        return configRef;
     }
 
-    public interface Parameters {
-        String getUrl();
-        String getFeedId();
-        int getReconnectPeriodSec();
-    }
 }

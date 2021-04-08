@@ -1,11 +1,12 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.RoutingRequestTransitDataProviderFilter;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -28,13 +29,16 @@ import org.opentripplanner.util.OtpAppException;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.net.URI;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * Test response times for a large batch of origin/destination points.
@@ -73,7 +77,7 @@ public class SpeedTest {
     private SpeedTest(SpeedTestCmdLineOpts opts) {
         this.opts = opts;
         this.config = SpeedTestConfig.config(opts.rootDir());
-        this.graph = loadGraph(opts.rootDir());
+        this.graph = loadGraph(opts.rootDir(), config.graph);
         this.transitLayer = TransitLayerMapper.map(config.transitRoutingParams, graph);
         this.streetRouter = new EgressAccessRouter(graph, transitLayer);
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
@@ -102,8 +106,11 @@ public class SpeedTest {
         }
     }
 
-    private static Graph loadGraph(File rootDir) {
-        Graph graph = SerializedGraphObject.load(OtpDataStore.graphFile(rootDir));
+    private static Graph loadGraph(File baseDir, URI path) {
+        File file = path == null
+            ? OtpDataStore.graphFile(baseDir)
+            : path.isAbsolute() ? new File(path) : new File(baseDir, path.getPath());
+        Graph graph = SerializedGraphObject.load(file);
         if(graph == null) { throw new IllegalStateException(); }
         graph.index();
         return graph;
@@ -123,13 +130,13 @@ public class SpeedTest {
         printProfileStatistics();
 
         service.shutdown();
-        System.err.println("\nSpeedTest done! " + MavenVersion.VERSION.getShortVersionString());
+        System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
     }
 
     private void runSingleTest(int sample, int nSamples) throws Exception {
         System.err.println("Run a single test sample (all test cases once)");
 
-        CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
+        CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME, opts.skipCost());
         List<TestCase> testCases = tcIO.readTestCasesFromFile();
         List<TripPlan> tripPlans = new ArrayList<>();
 
@@ -359,13 +366,19 @@ public class SpeedTest {
     }
 
     private RaptorTransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
+        TransitDataProviderFilter transitDataProviderFilter = new RoutingRequestTransitDataProviderFilter(
+                false,
+                false,
+                false,
+                request.getTransitModes(),
+                Set.of()
+        );
+
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),
                 1,
-                1,
-                request.getTransitModes(),
-                Collections.emptySet(),
+                transitDataProviderFilter,
                 request.getWalkSpeedMeterPrSecond()
         );
     }

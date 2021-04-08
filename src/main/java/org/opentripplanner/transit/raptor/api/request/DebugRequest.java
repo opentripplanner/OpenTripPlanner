@@ -5,6 +5,7 @@ import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,23 +41,22 @@ import java.util.function.Consumer;
  * This is very effect if you expect a trip and don´t get it. Most likely you will get a
  * REJECT or DROP event for your trip in return. You will also get a list of tips dominating
  * the particular trip.
- *
- * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DebugRequest<T extends RaptorTripSchedule> {
+public class DebugRequest {
 
     /**
      * Return a debug request with defaults values.
      */
-    static <T extends RaptorTripSchedule> DebugRequest<T> defaults() {
-        return new DebugRequest<>();
+    static <T extends RaptorTripSchedule> DebugRequest defaults() {
+        return new DebugRequest();
     }
 
     private final List<Integer> stops;
     private final List<Integer> path;
     private final int debugPathFromStopIndex;
-    private final Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener;
-    private final Consumer<DebugEvent<Path<T>>> pathFilteringListener;
+    private final Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
+    private final Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener;
+    private final Consumer<DebugEvent<Path<?>>> pathFilteringListener;
     private final DebugLogger logger;
 
     private DebugRequest() {
@@ -64,15 +64,17 @@ public class DebugRequest<T extends RaptorTripSchedule> {
         path = Collections.emptyList();
         debugPathFromStopIndex = 0;
         stopArrivalListener = null;
+        patternRideDebugListener = null;
         pathFilteringListener = null;
         logger = (topic, message) -> {};
     }
 
-    DebugRequest(DebugRequestBuilder<T> builder) {
+    DebugRequest(DebugRequestBuilder builder) {
         this.stops = Collections.unmodifiableList(builder.stops());
         this.path = Collections.unmodifiableList(builder.path());
         this.debugPathFromStopIndex = builder.debugPathFromStopIndex();
         this.stopArrivalListener = builder.stopArrivalListener();
+        this.patternRideDebugListener = builder.patternRideDebugListener();
         this.pathFilteringListener = builder.pathFilteringListener();
         this.logger = builder.logger();
     }
@@ -101,23 +103,18 @@ public class DebugRequest<T extends RaptorTripSchedule> {
         return debugPathFromStopIndex;
     }
 
-    /**
-     * Stop arrival debug event listener
-     */
-    public Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener() {
+    public Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener() {
         return stopArrivalListener;
     }
 
-    /**
-     * Path debug event listener
-     */
-    public Consumer<DebugEvent<Path<T>>> pathFilteringListener() {
+    public Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener() {
+        return patternRideDebugListener;
+    }
+
+    public Consumer<DebugEvent<Path<?>>> pathFilteringListener() {
         return pathFilteringListener;
     }
 
-    /**
-     * Path debug event listener
-     */
     public DebugLogger logger() {
         return logger;
     }
@@ -140,9 +137,9 @@ public class DebugRequest<T extends RaptorTripSchedule> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DebugRequest<?> that = (DebugRequest<?>) o;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        DebugRequest that = (DebugRequest) o;
         return debugPathFromStopIndex == that.debugPathFromStopIndex &&
                 Objects.equals(stops, that.stops) &&
                 Objects.equals(path, that.path);
@@ -152,6 +149,4 @@ public class DebugRequest<T extends RaptorTripSchedule> {
     public int hashCode() {
         return Objects.hash(stops, path, debugPathFromStopIndex);
     }
-
-
 }

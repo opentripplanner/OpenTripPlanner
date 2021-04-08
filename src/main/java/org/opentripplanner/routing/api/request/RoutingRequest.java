@@ -3,7 +3,6 @@ package org.opentripplanner.routing.api.request;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -23,10 +22,11 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.util.DateUtils;
+import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -42,7 +42,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.function.DoubleFunction;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
@@ -64,7 +63,7 @@ import java.util.function.DoubleFunction;
  */
 public class RoutingRequest implements Cloneable, Serializable {
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
@@ -233,16 +232,44 @@ public class RoutingRequest implements Cloneable, Serializable {
     public Duration searchWindow;
 
     /**
+     * Search for the best trip options within a time window. If {@code true} two itineraries are
+     * considered optimal if one is better on arrival time(earliest wins) and the other is better
+     * on departure time(latest wins).
+     * <p>
+     * In combination with {@code arriveBy} this parameter cover the following 3 use cases:
+     * <ul>
+     *   <li>
+     *     The traveler want to find the best alternative within a time window. Set
+     *     {@code timetableView=true} and {@code arriveBy=false}. This is the default, and if the
+     *     intention of the traveler is unknown, this gives the best result. This use-case includes
+     *     all itineraries in the two next use-cases. This option also work well with paging.
+     *
+     *     Setting the {@code arriveBy=false}, covers the same use-case, but the input time is
+     *     interpreted as latest-arrival-time, and not earliest-departure-time.
+     *   </li>
+     *   <li>
+     *     The traveler want to find the best alternative with departure after a specific time.
+     *     For example: I am at the station now and want to get home as quickly as possible.
+     *     Set {@code timetableView=true} and {@code arriveBy=false}. Do not support paging.
+     *   </li>
+     *   <li>
+     *     Traveler want to find the best alternative with arrival before specific time. For
+     *     example going to a meeting. Set {@code timetableView=true} and {@code arriveBy=false}.
+     *     Do not support paging.
+     *   </li>
+     * </ul>
+     * Default: true
+     */
+    public boolean timetableView = true;
+
+    /**
      * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
      */
     public boolean arriveBy = false;
 
     /**
      * Whether the trip must be wheelchair accessible.
-     * @deprecated TODO OTP2 Regression. This is not implemented in Raptor yet, but will work with
-     *                 a walk-only search.
      */
-    @Deprecated
     public boolean wheelchairAccessible = false;
 
     /**
@@ -277,7 +304,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * An extra penalty added on transfers (i.e. all boardings except the first one).
      * Not to be confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a
      * vehicle with and without a bicycle. The boardCosts are used to model the 'usual' perceived
-     * cost of using a transit vehicle, and the transferPenalty is used when a user requests even
+     * cost of using a transit vehicle, and the transferCost is used when a user requests even
      * less transfers. In the latter case, we don't actually optimize for fewest transfers, as this
      * can lead to absurd results. Consider a trip in New York from Grand Army
      * Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to
@@ -286,12 +313,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they
      * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6.
      * If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-     *                       old functionality the same way, but we will try to map this parameter
-     *                       so it does work similar as before.
      */
-    @Deprecated
     public int transferCost = 0;
 
     /**
@@ -388,20 +410,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Deprecated
     public double waitAtBeginningFactor = 0.4;
 
-    /** This prevents unnecessary transfers by adding a cost for boarding a vehicle.
-     *
-     * @Deprecated TODO OTP2 - Regression. Could be implemented as a part of itinerary-filtering
-     *                          after a Raptor search.
-     * */
-    @Deprecated
+    /**
+     * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
+     * addition to the cost of the transfer(walking) and waiting-time. It is also in addition to
+     * the {@link #transferCost}.
+     */
     public int walkBoardCost = 60 * 10;
 
-    /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.
-     *
-     * @Deprecated TODO OTP2 - Regression. Could be implemented as a part of itinerary-filtering
-     *                          after a Raptor search.
-     * */
-    @Deprecated
+    /**
+     * Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.
+     * This is in addition to the cost of the transfer(biking) and waiting-time. It is also in
+     * addition to the {@link #transferCost}.
+     */
     public int bikeBoardCost = 60 * 10;
 
     /**
@@ -533,23 +553,6 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public Map<TraverseMode, Integer> alightSlackForMode = new HashMap<>();
 
-
-    /**
-     * A relative maximum limit for the generalized cost for transit itineraries. The limit is a
-     * linear function of the minimum generalized-cost. The minimum cost is lowest cost from the
-     * set of all returned transit itineraries. The function is used to calculate a max-limit. The
-     * max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost
-     * higher than the max-limit is dropped from the result set. None transit itineraries is
-     * excluded from the filter.
-     * <ul>
-     * <li>To set a filter to be 1 hours plus 2 times the lowest cost use:
-     * {@code 3600 + 2.0 x}
-     * <li>To set an absolute value(3000) use: {@code 3000 + 0x}
-     * </ul>
-     * The default is {@code null} - no filter is applied.
-     */
-    public DoubleFunction<Double> transitGeneralizedCostLimit = null;
-
     /**
      * Ideally maxTransfers should be set in the router config, not here. Instead the client should
      * be able to pass in a parameter for the max number of additional/extra transfers relative to
@@ -605,6 +608,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      * When true, realtime updates are ignored during this search.
      */
     public boolean ignoreRealtimeUpdates = false;
+
+    /**
+     * When true, trips cancelled in scheduled data are included in this search.
+     */
+    public boolean includePlannedCancellations = false;
 
     /**
      * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
@@ -689,26 +697,24 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String pathComparator = null;
 
 
-    /**
-     * Switch on to return all itineraries and mark filtered itineraries as deleted.
-     */
-    public boolean debugItineraryFilter = false;
+    @Nonnull
+    public ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
 
     /**
-     * Keep ONE itinerary for each group with at least this part of the legs in common.
-     * Default value is 0.85 (85%), use a value less than 0.50 to turn off.
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder#addGroupBySimilarity(double, int)
+     * The numbers of days before the search date to consider when filtering trips for this search.
+     * This is set to 1 to account for trips starting yesterday and crossing midnight so that they
+     * can be boarded today. If there are trips that last multiple days, this will need to be
+     * increased.
      */
-    public Double groupBySimilarityKeepOne = 0.85;
+    public int additionalSearchDaysBeforeToday = 1;
 
     /**
-     * Keep {@link #numItineraries} itineraries for each group with at least this part of the legs
-     * in common.
-     * Default value is 0.68 (68%), use a value less than 0.50 to turn off.
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder#addGroupBySimilarity(double, int)
+     * The number of days after the search date to consider when filtering trips for this search.
+     * This is set to 1 to account for searches today having a search window that crosses midnight
+     * and would also need to board trips starting tomorrow. If a search window that lasts more than
+     * a day is used, this will need to be increased.
      */
-    public Double groupBySimilarityKeepNumOfItineraries = 0.68;
-
+    public int additionalSearchDaysAfterToday = 2;
 
     /* CONSTRUCTORS */
 
@@ -1179,11 +1185,9 @@ public class RoutingRequest implements Cloneable, Serializable {
      *               (Constructors with side effects on their parameters are a bad design).
      */
     public void setRoutingContext(Graph graph, Edge fromBackEdge, Vertex from, Vertex to) {
-        // normally you would want to tear down the routing context...
-        // but this method is mostly used in tests, and teardown interferes with testHalfEdges
-        // FIXME here, or in test, and/or in other places like TSP that use this method
-        // if (rctx != null)
-        // this.rctx.destroy();
+        if (rctx != null) {
+            this.rctx.destroy();
+        }
         this.rctx = new RoutingContext(this, graph, from, to);
         this.rctx.originBackEdge = fromBackEdge;
     }
@@ -1200,8 +1204,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         // normally you would want to tear down the routing context...
         // but this method is mostly used in tests, and teardown interferes with testHalfEdges
         // FIXME here, or in test, and/or in other places like TSP that use this method
-        // if (rctx != null)
-        // this.rctx.destroy();
+        if (rctx != null)
+            this.rctx.destroy();
         this.rctx = new RoutingContext(this, graph, from, to);
         this.rctx.originBackEdge = fromBackEdge;
     }
@@ -1251,10 +1255,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** @return The highest speed for all possible road-modes. */
     public double getStreetSpeedUpperBound() {
         // Assume carSpeed > bikeSpeed > walkSpeed
-        if (streetSubRequestModes.getCar())
+        if (streetSubRequestModes.getCar()) {
             return carSpeed;
-        if (streetSubRequestModes.getBicycle())
+        }
+        if (streetSubRequestModes.getBicycle()) {
             return bikeSpeed;
+        }
         return walkSpeed;
     }
 

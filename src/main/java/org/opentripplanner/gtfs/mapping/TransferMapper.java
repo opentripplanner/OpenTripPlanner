@@ -1,15 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Transfer;
-import org.opentripplanner.model.TransferType;
-import org.opentripplanner.model.Trip;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.TransferType;
 
 /** Responsible for mapping GTFS Transfer into the OTP model. */
 class TransferMapper {

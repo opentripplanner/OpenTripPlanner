@@ -1,5 +1,14 @@
 package org.opentripplanner.model.impl;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -15,18 +24,8 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import org.opentripplanner.model.transfer.Transfer;
 
 public class OtpTransitServiceImplTest {
     private static final String FEED_ID = "Z";
@@ -36,20 +35,17 @@ public class OtpTransitServiceImplTest {
     // The subject is used as read only; hence static is ok
     private static OtpTransitService subject;
 
-    private static Agency agency;
 
     @BeforeClass
     public static void setup() throws IOException {
         GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
         OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
 
-        agency = first(builder.getAgenciesById().values());
-
         // Supplement test data with at least one entity in all collections
         FareRule rule = createFareRule();
         builder.getFareAttributes().add(rule.getFare());
         builder.getFareRules().add(rule);
-        builder.getFeedInfos().add(new FeedInfo());
+        builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
         subject = builder.build();
     }
@@ -88,7 +84,7 @@ public class OtpTransitServiceImplTest {
         Collection<FeedInfo> feedInfos = subject.getAllFeedInfos();
 
         assertEquals(1, feedInfos.size());
-        assertEquals("<FeedInfo 1>", first(feedInfos).toString());
+        assertEquals("<FeedInfo Z>", first(feedInfos).toString());
     }
 
     @Test
@@ -178,8 +174,7 @@ public class OtpTransitServiceImplTest {
     }
 
     private static FareRule createFareRule() {
-        FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedScopedId(FEED_ID, "FA"));
+        FareAttribute fa = new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
         FareRule rule = new FareRule();
         rule.setOriginId("Zone A");
         rule.setContainsId("Zone B");

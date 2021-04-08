@@ -20,6 +20,7 @@ type Agency implements Node {
 
     """ID of the time zone which this agency operates on"""
     timezone: String!
+
     lang: String
 
     """Phone number which customers can use to contact this agency"""
@@ -666,6 +667,9 @@ type Itinerary {
     """Duration of the trip on this itinerary, in seconds."""
     duration: Long
 
+    """Generalized cost of the itinerary. Used for debugging search results."""
+    generalizedCost: Int
+
     """How much time is spent waiting for transit to arrive, in seconds."""
     waitingTime: Long
 
@@ -727,6 +731,9 @@ type Leg {
 
     """The leg's duration in seconds"""
     duration: Float
+
+    """Generalized cost of the leg. Used for debugging search results."""
+    generalizedCost: Int
 
     """The leg's geometry."""
     legGeometry: Geometry
@@ -840,6 +847,9 @@ enum Mode {
 
     """FERRY"""
     FERRY
+
+    """Enables flexible transit for access and egress legs"""
+    FLEXIBLE
 
     """FUNICULAR"""
     FUNICULAR
@@ -1143,6 +1153,9 @@ enum Qualifier {
 
     """The user can be picked up by someone else riding a vehicle"""
     PICKUP
+
+    """The user can be dropped off by someone else riding a vehicle"""
+    DROPOFF
 }
 
 type QueryType {

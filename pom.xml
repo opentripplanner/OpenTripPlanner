@@ -5,10 +5,9 @@
     <name>OpenTripPlanner</name>
     <description>The OpenTripPlanner multimodal journey planning system</description>
     <url>http://opentripplanner.org</url>
-
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -18,66 +17,12 @@
         </license>
     </licenses>
 
-    <!-- Developer entries are provided only for Steering Committee members.
-       For other contributors, see https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors -->
-    <developers>
-        <developer>
-            <name>Andrew Byrd</name>
-            <email>andrew@fastmail.net</email>
-            <organization>Conveyal</organization>
-            <organizationUrl>http://conveyal.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>David Emory</name>
-            <email>david.emory@gmail.com</email>
-            <organization>Conveyal</organization>
-            <organizationUrl>http://conveyal.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Matt Conway</name>
-            <email>matt@indicatrix.org</email>
-            <organization>Conveyal</organization>
-            <organizationUrl>http://conveyal.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>David Novalis Turner</name>
-            <email>novalis@novalis.org</email>
-            <organization>Ex-OpenPlans</organization>
-            <organizationUrl>http://openplans.org/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Laurent Grégoire</name>
-            <email>laurent.gregoire@protonmail.ch</email>
-            <organization>Mecatran</organization>
-            <organizationUrl>http://www.mecatran.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Frank Purcell</name>
-            <email>fxpurcell@gmail.com</email>
-            <organization>Portland TriMet</organization>
-            <organizationUrl>https://trimet.org/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Tuukka Hastrup</name>
-            <email>tuukka.hastrup@hsl.fi</email>
-            <organization>Helsingin Seudun Liikenne</organization>
-            <organizationUrl>https://www.hsl.fi/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Jasper Hartong</name>
-            <email>jasper@calendar42.com</email>
-            <organization>Calendar42</organization>
-            <organizationUrl>http://site.calendar42.com/</organizationUrl>
-        </developer>
-    </developers>
-
     <scm>
-        <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
         <url>http://github.com/opentripplanner/OpenTripPlanner</url>
     </scm>
 
     <properties>
+        <otp.serialization.version.id>6</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>21.2</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
@@ -88,16 +33,18 @@
     </properties>
 
     <distributionManagement>
-        <!-- We are using Sonatype Nexus Staging instead of Maven Release plugin.
-             Only a snapshot repo should be configured. Releases are done from that snapshot staging repo. -->
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
+        <repository>
+            <id>github</id>
+            <name>OpenTripPlanner Maven Repository on Github Packages</name>
+            <url>https://maven.pkg.github.com/opentripplanner/OpenTripPlanner/</url>
+        </repository>
     </distributionManagement>
 
     <build>
-        <!-- Filtering will perform substitution on maven-version.properties, see git commit id plugin below. -->
+        <!--
+        Filtering will perform substitution on otp-project-info.properties,
+        see git commit id plugin below.
+        -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -112,15 +59,7 @@
                 <targetPath>client</targetPath>
                 <filtering>false</filtering>
             </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-            <testResource>
-                <directory>src/ext-test/resources</directory>
-            </testResource>
-            <testResource>
+            <resource>
                 <!-- Shell scripts to start up OTP, need to be filtered to insert the JAR file name. -->
                 <!-- These are treated as testResources rather than resources to keep them out of the JAR. -->
                 <!-- The staging repo will reject a JAR containing them as they use traversal paths (../..). -->
@@ -128,6 +67,14 @@
                 <filtering>true</filtering>
                 <!-- Copy the scripts up into the root of the repo, not /target/classes -->
                 <targetPath>../..</targetPath>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>src/ext-test/resources</directory>
             </testResource>
         </testResources>
         <pluginManagement>
@@ -190,27 +137,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
                             <!-- For Java 11 Modules, specify a module name. Do not create module-info.java until all
                                  our dependencies specify a module name. -->
                             <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
+                            <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
                         </manifestEntries>
                     </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
             <plugin>
@@ -229,29 +165,6 @@
                 <configuration>
                     <docsDir>${project.build.directory}/site/enunciate</docsDir>
                 </configuration>
-            </plugin>
-            <plugin>
-                <!-- This plugin must be configured both here (for attach-javadoc during release)
-                and in "reports" (for site generation), preferably with identical version numbers. -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <!-- Turn off strict Javadoc checking -->
-                    <doclint>none</doclint>
-                    <!-- Sidestep strange error "class file for javax.media.jai.PropertySourceImpl not found" -->
-                    <excludePackageNames>org.opentripplanner.graph_builder.module.ned:*</excludePackageNames>
-                </configuration>
-                <executions>
-                    <!-- Compress Javadoc into JAR and include that JAR when deploying.
-                         Required for deployments to Maven Central. -->
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -301,21 +214,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <!-- We sign in the verify phase, which means it will happen for install and deploy but not package. -->
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
@@ -359,7 +257,6 @@
                     <verbose>false</verbose>
                     <includeOnlyProperties>
                         <!-- Including each property used reduce the plugin execution time. -->
-                        <includeOnlyProperty>project.version</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.id</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.id.describe</includeOnlyProperty>
                         <includeOnlyProperty>git.commit.time</includeOnlyProperty>
@@ -446,48 +343,6 @@
         </plugins>
     </build>
 
-    <reporting>
-        <!--
-        Reporting plugin versions cannot be managed with entries in <build><plugins><pluginmanagement>
-        but would need a separate <reporting><plugins><pluginmanagement> section.
-        -->
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <!-- empty: disable project-info reports -->
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <!-- This plugin must be configured both here (for site generation) and in "build"
-                (for attach-javadoc during release), preferably with identical version numbers. -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <!-- Turn off strict Javadoc checking -->
-                    <doclint>none</doclint>
-                    <!-- Sidestep strange error "class file for javax.media.jai.PropertySourceImpl not found" -->
-                    <excludePackageNames>org.opentripplanner.graph_builder.module.ned:*</excludePackageNames>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <!-- enable only aggregate-level javadoc generation -->
-                            <report>aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
-
     <repositories>
         <!-- Hack to force maven to check central first. Maven central is inherited from the superpom,
           but ends up at the end of the list. Though most of the time the artifact is in central,
@@ -515,6 +370,19 @@
         </repository>
     </repositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- This make sure all google libraries are using compatible versions. -->
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>14.4.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
@@ -527,11 +395,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-storage</artifactId>
-            <version>1.101.0</version>
         </dependency>
 
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
@@ -616,7 +479,7 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-java-model</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.11</version>
         </dependency>
 
         <!-- SIRI -->
@@ -624,6 +487,13 @@
             <groupId>org.entur</groupId>
             <artifactId>siri-java-model</artifactId>
             <version>0.12</version>
+        </dependency>
+
+        <!-- XML <-> protobuf-mapper for SIRI-->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>siri-protobuf-mapper</artifactId>
+            <version>0.6</version>
         </dependency>
 
         <!--
@@ -641,7 +511,7 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2</version>
         </dependency>
 
         <!-- TESTING -->
@@ -695,6 +565,29 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!--
+          Google library imports
+          The version is imported using google libraries-bom, see dep.management
+        -->
+
+        <!-- Google Cloud Storage - as OTP DataSource -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+        </dependency>
+
+        <!-- Google Cloud Pubsub for SIRI-updater-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+        </dependency>
+
+        <!-- Google Protocol Buffers compact binary serialization format -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+
         <!-- Asynchronous Websocket-capable client, for message-driven incremental GTFS-RT -->
         <!-- AsyncHttpClient Websockets need a newer version of Grizzly than Jersey does. -->
         <dependency>
@@ -731,20 +624,6 @@
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
             <version>1.0.7</version>
-        </dependency>
-        <!-- Google Protocol Buffers compact binary serialization format -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>3.11.4</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Joda Time is a widely used replacement for flaky Java time classes. -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.1</version>
         </dependency>
         <!-- FlexJSON deserializes JSON in Nominatim/Yahoo/Google geocoder modules. -->
         <!-- Could be done with Jackson JSON trees. -->
@@ -808,6 +687,11 @@
             <groupId>org.eclipse.paho</groupId>
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
             <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.wdtinc</groupId>
+            <artifactId>mapbox-vector-tile</artifactId>
+            <version>3.1.0</version>
         </dependency>
     </dependencies>
 </project>

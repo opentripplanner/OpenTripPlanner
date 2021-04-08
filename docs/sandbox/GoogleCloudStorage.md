@@ -8,11 +8,12 @@
 ## Changelog
 
 ### OTP 2.0
-- Initial implementation of Google Cloud Storage
+- Initial implementation to access Google Cloud Storage (read and write). (December 2019)
 
 ## Documentation
-To enable this turn on `OTPFeature`. Each artifact to load or save to the cloud must be 
-configured in build-config.json. See `StorageParameters` on how to configure artifacts.
+To enable this turn on the feature `GoogleCloudStorage`. OTP can load or store artifacts from one or more Google Cloud Storge locations. Each artifact must be configured in the _build-config.json_: See [`StorageConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java) on how to configure artifacts.
+
+
 
 Example (build-config.json):
 ```json

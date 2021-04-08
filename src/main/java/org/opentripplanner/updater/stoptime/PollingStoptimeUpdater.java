@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Update OTP stop time tables from some (realtime) source
  *
- * Usage example ('rt' name is an example) in file 'Graph.properties':
+ * Usage example:
  *
  * <pre>
  * rt.type = stop-time-updater
@@ -65,26 +65,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      */
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    public PollingStoptimeUpdater(Parameters parameters) {
+    public PollingStoptimeUpdater(PollingStoptimeUpdaterParameters parameters) {
         super(parameters);
         // Create update streamer from preferences
-        feedId = parameters.getFeedId();
-        String sourceType = parameters.getSourceConfig().getType();
-        if (sourceType != null) {
-            if (sourceType.equals("gtfs-http")) {
-                updateSource = new GtfsRealtimeHttpTripUpdateSource(parameters);
-            } else if (sourceType.equals("gtfs-file")) {
-                updateSource = new GtfsRealtimeFileTripUpdateSource(
-                    (GtfsRealtimeFileTripUpdateSource.GtfsRealtimeFileTripUpdateSourceParameters) parameters
-                );
-            }
-        }
-
-        // Configure update source
-        if (updateSource == null) {
-            throw new IllegalArgumentException(
-                    "Unknown update streamer source type: " + sourceType);
-        }
+        this.feedId = parameters.getFeedId();
+        this.updateSource = createSource(parameters);
 
         // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...
         int logFrequency = parameters.getLogFrequency();
@@ -158,11 +143,16 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         return "Streaming stoptime updater with update source = " + s;
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getFeedId();
-        int getLogFrequency();
-        int getMaxSnapshotFrequencyMs();
-        boolean purgeExpiredData();
-        boolean fuzzyTripMatching();
+
+    private static TripUpdateSource createSource(PollingStoptimeUpdaterParameters parameters) {
+        switch (parameters.getSourceType()) {
+            case GTFS_RT_HTTP:
+                return new GtfsRealtimeHttpTripUpdateSource(parameters.httpSourceParameters());
+            case GTFS_RT_FILE:
+                return new GtfsRealtimeFileTripUpdateSource(parameters.fileSourceParameters());
+        }
+        throw new IllegalArgumentException(
+            "Unknown update streamer source type: " + parameters.getSourceType()
+        );
     }
 }

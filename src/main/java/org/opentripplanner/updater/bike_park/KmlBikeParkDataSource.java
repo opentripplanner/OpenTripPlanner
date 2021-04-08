@@ -1,13 +1,12 @@
 package org.opentripplanner.updater.bike_park;
 
-import java.util.List;
-import java.util.Locale;
-
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Load bike park from a KML placemarks. Use name as bike park name and point coordinates. Rely on:
@@ -19,13 +18,13 @@ import org.slf4j.LoggerFactory;
  * @author laurent
  * @author GoAbout
  */
-public class KmlBikeParkDataSource implements BikeParkDataSource {
+class KmlBikeParkDataSource implements BikeParkDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(KmlBikeParkDataSource.class);
 
-    private String url;
+    private final String url;
 
-    private String namePrefix = null;
+    private final String namePrefix;
 
     private final boolean zip;
 
@@ -34,6 +33,10 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
     private List<BikePark> bikeParks;
 
     public KmlBikeParkDataSource(Parameters config) {
+        this.url = config.getUrl();
+        this.namePrefix = config.getNamePrefix();
+        this.zip = config.zip();
+
         xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader
                 .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']|//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Folder']/*[local-name()='Placemark']");
@@ -48,8 +51,9 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
                 return null;
             }
             bikePark.name = attributes.get("name").trim();
-            if (namePrefix != null)
+            if (namePrefix != null) {
                 bikePark.name = namePrefix + bikePark.name;
+            }
             String[] coords = attributes.get("Point").trim().split(",");
             bikePark.x = Double.parseDouble(coords[0]);
             bikePark.y = Double.parseDouble(coords[1]);
@@ -58,9 +62,6 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
                     bikePark.name.replace(" ", "_"), bikePark.x, bikePark.y);
             return bikePark;
         });
-        url = config.getUrl();
-        namePrefix = config.getNamePrefix();
-        zip = config.zip();
     }
 
     /**
@@ -91,9 +92,8 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
         return getClass().getName() + "(" + url + ")";
     }
 
-    public void setUrl (String url) {this.url = url;}
-
-    public interface Parameters extends UpdaterDataSourceParameters {
+    public interface Parameters {
+        String getUrl();
         String getNamePrefix();
         boolean zip();
     }

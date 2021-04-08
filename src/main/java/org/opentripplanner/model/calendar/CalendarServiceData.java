@@ -2,6 +2,8 @@
 package org.opentripplanner.model.calendar;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -17,12 +19,14 @@ import java.util.stream.Collectors;
 public class CalendarServiceData implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final String CAL_SERVICE_FEED_ID = "CSID";
+    private static final Logger LOG = LoggerFactory.getLogger(CalendarServiceData.class);
 
-    private Map<FeedScopedId, TimeZone> timeZonesByAgencyId = new HashMap<>();
+    private final Map<FeedScopedId, TimeZone> timeZonesByAgencyId = new HashMap<>();
 
-    private Map<FeedScopedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
+    private final Map<FeedScopedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
 
-    private Map<ServiceDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
+    private final Map<ServiceDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
 
     /**
      * @return the time zone for the specified agencyId, or null if the agency was
@@ -50,8 +54,9 @@ public class CalendarServiceData implements Serializable {
 
     public Set<FeedScopedId> getServiceIdsForDate(ServiceDate date) {
         Set<FeedScopedId> serviceIds = serviceIdsByDate.get(date);
-        if (serviceIds == null)
+        if (serviceIds == null) {
             serviceIds = new HashSet<>();
+        }
         return serviceIds;
     }
 
@@ -59,6 +64,23 @@ public class CalendarServiceData implements Serializable {
         List<ServiceDate> serviceDates = sortedImmutableList(dates);
         serviceDatesByServiceId.put(serviceId, serviceDates);
         addDatesToServiceIdsByDate(serviceId, serviceDates);
+    }
+
+    /**
+     * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+     *           - this when doing the issue #3030.
+     */
+    public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+        FeedScopedId serviceId = new FeedScopedId(CAL_SERVICE_FEED_ID, serviceDate.asCompactString());
+        if(serviceDatesByServiceId.containsKey(serviceId)) {
+            return serviceId;
+        }
+        serviceDatesByServiceId.put(serviceId, List.of(serviceDate));
+        serviceIdsByDate.computeIfAbsent(serviceDate, d -> new HashSet<>()).add(serviceId);
+
+        LOG.info("Adding serviceId {} to CalendarService", serviceId);
+
+        return serviceId;
     }
 
     public void add(CalendarServiceData other) {

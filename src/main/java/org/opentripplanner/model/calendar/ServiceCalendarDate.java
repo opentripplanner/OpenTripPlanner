@@ -42,6 +42,14 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
         this.exceptionType =  exceptionType;
     }
 
+    /**
+     * Create a service calendar date on the given date with the given id. The 'exceptionType'
+     * is set to 'EXCEPTION_TYPE_ADD'.
+     */
+    public static ServiceCalendarDate create(FeedScopedId serviceId, ServiceDate date) {
+        return new ServiceCalendarDate(serviceId, date, EXCEPTION_TYPE_ADD);
+    }
+
     public FeedScopedId getServiceId() {
         return serviceId;
     }
@@ -56,10 +64,12 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         ServiceCalendarDate that = (ServiceCalendarDate) o;
         return Objects.equals(serviceId, that.serviceId) && Objects.equals(date, that.date);
     }

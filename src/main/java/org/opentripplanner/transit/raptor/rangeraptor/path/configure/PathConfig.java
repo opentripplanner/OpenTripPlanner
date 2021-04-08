@@ -8,8 +8,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandard;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandardAndLatestDepature;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCost;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCostAndLatestDeparture;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCost;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCostAndLatestDeparture;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetable;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndCost;
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndRelaxedCost;
@@ -40,6 +43,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
                 paretoComparator(includeCost),
                 ctx.calculator(),
                 ctx.costCalculator(),
+                ctx.slackProvider(),
                 ctx.pathMapper(),
                 ctx.debugFactory(),
                 ctx.lifeCycle()
@@ -50,6 +54,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
         double relaxedCost = ctx.searchParams().relaxCostAtDestination();
         boolean includeRelaxedCost = includeCost && relaxedCost > 0.0;
         boolean includeTimetable = ctx.searchParams().timetableEnabled();
+        boolean preferLateArrival = ctx.searchParams().preferLateArrival();
 
 
         if(includeTimetable && includeRelaxedCost) {
@@ -61,11 +66,20 @@ public class PathConfig<T extends RaptorTripSchedule> {
         if(includeTimetable) {
             return comparatorWithTimetable();
         }
+        if(includeRelaxedCost && preferLateArrival) {
+            return comparatorWithRelaxedCostAndLatestDeparture(relaxedCost);
+        }
         if(includeRelaxedCost) {
             return comparatorWithRelaxedCost(relaxedCost);
         }
+        if(includeCost && preferLateArrival) {
+            return comparatorWithCostAndLatestDeparture();
+        }
         if(includeCost) {
             return comparatorWithCost();
+        }
+        if(preferLateArrival) {
+            return comparatorStandardAndLatestDepature();
         }
         return comparatorStandard();
     }

@@ -64,8 +64,9 @@ public class RouteMatcher implements Cloneable, Serializable {
      * @throws IllegalArgumentException If the string representation is invalid.
      */
     public static RouteMatcher parse(String routeSpecList) {
-        if (routeSpecList == null)
+        if (routeSpecList == null) {
             return emptyMatcher();
+        }
         RouteMatcher retval = new RouteMatcher();
         int n = 0;
         for (String element : routeSpecList.split(",")) {
@@ -103,22 +104,22 @@ public class RouteMatcher implements Cloneable, Serializable {
                 throw new IllegalArgumentException("Wrong route spec format: " + element);
             }
         }
-        if (n == 0)
+        if (n == 0) {
             return emptyMatcher();
+        }
         return retval;
     }
 
     public boolean matches(Route route) {
-        if (this == EMPTY_MATCHER)
-            return false;
-        if (agencyAndRouteIds.contains(route.getId()))
-            return true;
-        String routeName = route.getName().replace("_", " ");
-        if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getFeedId(),
-                routeName)))
-            return true;
-        if (routeNames.contains(routeName))
-            return true;
+        if (this == EMPTY_MATCHER) { return false; }
+        if (agencyAndRouteIds.contains(route.getId())) { return true; }
+        if (route.getName() != null) {
+            String routeName = route.getName().replace("_", " ");
+            if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getFeedId(),
+                routeName
+            ))) { return true; }
+            if (routeNames.contains(routeName)) { return true; }
+        }
         return false;
     }
 
@@ -155,10 +156,12 @@ public class RouteMatcher implements Cloneable, Serializable {
 
     @Override
     public boolean equals(Object another) {
-        if (another == null || !(another instanceof RouteMatcher))
+        if (another == null || !(another instanceof RouteMatcher)) {
             return false;
-        if (another == this)
+        }
+        if (another == this) {
             return true;
+        }
         RouteMatcher anotherMatcher = (RouteMatcher) another;
         return agencyAndRouteIds.equals(anotherMatcher.agencyAndRouteIds)
                 && agencyIdAndRouteNames.equals(anotherMatcher.agencyIdAndRouteNames)

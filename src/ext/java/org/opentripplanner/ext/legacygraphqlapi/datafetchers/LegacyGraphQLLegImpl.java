@@ -51,6 +51,11 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
+  public DataFetcher<Integer> generalizedCost() {
+    return environment -> getSource(environment).generalizedCost;
+  }
+
+  @Override
   public DataFetcher<EncodedPolylineBean> legGeometry() {
     return environment -> getSource(environment).legGeometry;
   }
@@ -121,7 +126,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<Iterable<Object>> intermediateStops() {
     return environment -> {
       List<StopArrival> intermediateStops = getSource(environment).intermediateStops;
-      if (intermediateStops == null) return null;
+      if (intermediateStops == null) { return null; }
       RoutingService routingService = getRoutingService(environment);
       return intermediateStops.stream()
           .map(intermediateStop -> intermediateStop.place)
@@ -151,7 +156,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      if (getSource(environment).boardRule == null) return "SCHEDULED";
+      if (getSource(environment).boardRule == null) { return "SCHEDULED"; }
       switch (getSource(environment).boardRule) {
         case "impossible": return "NONE";
         case "mustPhone": return "CALL_AGENCY";
@@ -164,7 +169,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      if (getSource(environment).alightRule == null) return "SCHEDULED";
+      if (getSource(environment).alightRule == null) { return "SCHEDULED"; }
       switch (getSource(environment).alightRule) {
         case "impossible": return "NONE";
         case "mustPhone": return "CALL_AGENCY";

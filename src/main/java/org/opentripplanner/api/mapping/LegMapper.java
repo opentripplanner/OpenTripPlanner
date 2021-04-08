@@ -53,6 +53,7 @@ public class LegMapper {
         api.isNonExactFrequency = domain.isNonExactFrequency;
         api.headway = domain.headway;
         api.distance = domain.distanceMeters;
+        api.generalizedCost = domain.generalizedCost;
         api.pathway = domain.pathway;
         api.mode = TraverseModeMapper.mapToApi(domain.mode);
         api.agencyTimeZoneOffset = domain.agencyTimeZoneOffset;
@@ -78,6 +79,9 @@ public class LegMapper {
             api.tripId = FeedScopedIdMapper.mapToApi(trip.getId());
             api.tripShortName = trip.getTripShortName();
             api.tripBlockId = trip.getBlockId();
+        }
+        else if (domain.pathway) {
+            api.route = FeedScopedIdMapper.mapToApi(domain.pathwayId);
         }
         else {
             // TODO OTP2 - This should be set to the street name according to the JavaDoc

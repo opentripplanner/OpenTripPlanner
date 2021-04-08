@@ -35,24 +35,31 @@ class ShapeSegmentKey {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ShapeSegmentKey other = (ShapeSegmentKey) obj;
         if (Double.doubleToLongBits(shapeDistanceFrom) != Double
-                .doubleToLongBits(other.shapeDistanceFrom))
+                .doubleToLongBits(other.shapeDistanceFrom)) {
             return false;
+        }
         if (Double.doubleToLongBits(shapeDistanceTo) != Double
-                .doubleToLongBits(other.shapeDistanceTo))
+                .doubleToLongBits(other.shapeDistanceTo)) {
             return false;
+        }
         if (shapeId == null) {
-            if (other.shapeId != null)
+            if (other.shapeId != null) {
                 return false;
-        } else if (!shapeId.equals(other.shapeId))
+            }
+        } else if (!shapeId.equals(other.shapeId)) {
             return false;
+        }
         return true;
     }
 

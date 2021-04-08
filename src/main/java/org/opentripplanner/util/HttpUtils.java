@@ -28,21 +28,26 @@ public class HttpUtils {
         return getData(URI.create(uri));
     }
 
-    public static InputStream getData(URI uri, String requestHeaderName, String requestHeaderValue) throws IOException {
+    public static InputStream getData(URI uri, String requestHeaderName, String requestHeaderValue, long timeout) throws IOException {
         HttpGet httpget = new HttpGet(uri);
         if (requestHeaderValue != null) {
             httpget.addHeader(requestHeaderName, requestHeaderValue);
         }
-        HttpClient httpclient = getClient();
+        HttpClient httpclient = getClient(timeout, timeout);
         HttpResponse response = httpclient.execute(httpget);
-        if(response.getStatusLine().getStatusCode() != 200)
+        if(response.getStatusLine().getStatusCode() != 200) {
             return null;
+        }
 
         HttpEntity entity = response.getEntity();
         if (entity == null) {
             return null;
         }
         return entity.getContent();
+    }
+
+    public static InputStream getData(URI uri, String requestHeaderName, String requestHeaderValue) throws IOException {
+        return getData(uri, requestHeaderName, requestHeaderValue, TIMEOUT_CONNECTION);
     }
 
     public static void testUrl(String url) throws IOException {
@@ -62,9 +67,13 @@ public class HttpUtils {
     }
     
     private static HttpClient getClient() {
+        return getClient(TIMEOUT_CONNECTION, TIMEOUT_SOCKET);
+    }
+
+    private static HttpClient getClient(long timeoutConnection, long timeoutSocket) {
         return HttpClientBuilder.create()
-                .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(TIMEOUT_SOCKET).build())
-                .setConnectionTimeToLive(TIMEOUT_CONNECTION, TimeUnit.MILLISECONDS)
+                .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout((int)timeoutSocket).build())
+                .setConnectionTimeToLive(timeoutConnection, TimeUnit.MILLISECONDS)
                 .build();
     }
 }

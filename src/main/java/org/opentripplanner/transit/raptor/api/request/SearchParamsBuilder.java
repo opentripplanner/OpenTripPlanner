@@ -1,10 +1,11 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -19,26 +20,26 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private int earliestDepartureTime;
     private int latestArrivalTime;
     private int searchWindowInSeconds;
-    private int boardSlackInSeconds;
+    private boolean preferLateArrival;
     private int numberOfAdditionalTransfers;
     private int maxNumberOfTransfers;
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
-    private final Collection<RaptorTransfer> accessLegs = new ArrayList<>();
-    private final Collection<RaptorTransfer> egressLegs = new ArrayList<>();
+    private final Collection<RaptorTransfer> accessPaths = new ArrayList<>();
+    private final Collection<RaptorTransfer> egressPaths = new ArrayList<>();
 
     public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
         this.parent = parent;
         this.earliestDepartureTime = defaults.earliestDepartureTime();
         this.latestArrivalTime = defaults.latestArrivalTime();
         this.searchWindowInSeconds = defaults.searchWindowInSeconds();
-        this.boardSlackInSeconds = defaults.boardSlackInSeconds();
+        this.preferLateArrival = defaults.preferLateArrival();
         this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
         this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
         this.timetableEnabled = defaults.timetableEnabled();
-        this.accessLegs.addAll(defaults.accessLegs());
-        this.egressLegs.addAll(defaults.egressLegs());
+        this.accessPaths.addAll(defaults.accessPaths());
+        this.egressPaths.addAll(defaults.egressPaths());
     }
 
     public int earliestDepartureTime() {
@@ -79,12 +80,12 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public int boardSlackInSeconds() {
-        return boardSlackInSeconds;
+    public boolean preferLateArrival() {
+        return preferLateArrival;
     }
 
-    public SearchParamsBuilder<T> boardSlackInSeconds(int boardSlackInSeconds) {
-        this.boardSlackInSeconds = boardSlackInSeconds;
+    public SearchParamsBuilder<T> preferLateArrival(boolean enable) {
+        this.preferLateArrival = enable;
         return this;
     }
 
@@ -124,36 +125,30 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public Collection<RaptorTransfer> accessLegs() {
-        return accessLegs;
+    public Collection<RaptorTransfer> accessPaths() {
+        return accessPaths;
     }
 
-    public SearchParamsBuilder<T> addAccessStop(RaptorTransfer accessLeg) {
-        this.accessLegs.add(accessLeg);
+    public SearchParamsBuilder<T> addAccessPaths(Collection<? extends RaptorTransfer> accessPaths) {
+        this.accessPaths.addAll(accessPaths);
         return this;
     }
 
-    public SearchParamsBuilder<T> addAccessStops(Iterable<RaptorTransfer> accessLegs) {
-        for (RaptorTransfer it : accessLegs) {
-            addAccessStop(it);
-        }
+    public SearchParamsBuilder<T> addAccessPaths(RaptorTransfer ... accessPaths) {
+        return addAccessPaths(Arrays.asList(accessPaths));
+    }
+
+    public Collection<RaptorTransfer> egressPaths() {
+        return egressPaths;
+    }
+
+    public SearchParamsBuilder<T> addEgressPaths(Collection<? extends RaptorTransfer> egressPaths) {
+        this.egressPaths.addAll(egressPaths);
         return this;
     }
 
-    public Collection<RaptorTransfer> egressLegs() {
-        return egressLegs;
-    }
-
-    public SearchParamsBuilder<T> addEgressStop(RaptorTransfer egressLeg) {
-        this.egressLegs.add(egressLeg);
-        return this;
-    }
-
-    public SearchParamsBuilder<T> addEgressStops(Iterable<RaptorTransfer> egressLegs) {
-        for (RaptorTransfer it : egressLegs) {
-            addEgressStop(it);
-        }
-        return this;
+    public SearchParamsBuilder<T> addEgressPaths(RaptorTransfer ... egressPaths) {
+        return addEgressPaths(Arrays.asList(egressPaths));
     }
 
     public RaptorRequest<T> build() {
@@ -164,4 +159,5 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     public SearchParams buildSearchParam() {
         return new SearchParams(this);
     }
+
 }

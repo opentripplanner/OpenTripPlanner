@@ -3,14 +3,17 @@ package org.opentripplanner.transit.raptor.speed_test.transit;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.NonLocalizedString;
@@ -32,20 +35,20 @@ class StreetSearch {
 
     private final TransitLayer transitLayer;
     private final Graph graph;
-    private final SimpleStreetSplitter splitter;
+    private final VertexLinker linker;
     private final NearbyStopFinder nearbyStopFinder;
     final TIntIntMap resultTimesSecByStopIndex = new TIntIntHashMap();
-    final Map<Integer, StopAtDistance> pathsByStopIndex = new HashMap<>();
+    final Map<Integer, NearbyStop> pathsByStopIndex = new HashMap<>();
 
     StreetSearch(
             TransitLayer transitLayer,
             Graph graph,
-            SimpleStreetSplitter splitter,
+            VertexLinker splitter,
             NearbyStopFinder nearbyStopFinder
     ) {
         this.transitLayer = transitLayer;
         this.graph = graph;
-        this.splitter = splitter;
+        this.linker = splitter;
         this.nearbyStopFinder = nearbyStopFinder;
     }
 
@@ -63,24 +66,36 @@ class StreetSearch {
                     new NonLocalizedString(place.name),
                     !fromOrigin
             );
-            splitter.link(vertex);
+
+            linker.linkVertexForRequest(
+                vertex,
+                TraverseMode.WALK,
+                fromOrigin ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
+                fromOrigin
+                    ? (v, streetVertex) -> List.of(
+                    new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation)v)
+                )
+                    : (v, streetVertex) -> List.of(
+                        new TemporaryFreeEdge((TemporaryStreetLocation)v, streetVertex)
+                    )
+            );
         }
 
-        List<StopAtDistance> stopAtDistanceList = nearbyStopFinder.findNearbyStopsViaStreets(
+        List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
                 Set.of(vertex), !fromOrigin, true
         );
 
-        if(stopAtDistanceList.isEmpty()) {
+        if(nearbyStopList.isEmpty()) {
             throw new RuntimeException("No stops found nearby: " + place);
         }
 
-        for (StopAtDistance stopAtDistance : stopAtDistanceList) {
-            if (!(stopAtDistance.stop instanceof Stop)) continue;
-            int stopIndex = transitLayer.getIndexByStop((Stop) stopAtDistance.stop);
-            int accessTimeSec = (int)stopAtDistance.edges.stream().map(Edge::getDistanceMeters)
+        for (NearbyStop nearbyStop : nearbyStopList) {
+            if (!(nearbyStop.stop instanceof Stop)) continue;
+            int stopIndex = transitLayer.getIndexByStop((Stop) nearbyStop.stop);
+            int accessTimeSec = (int) nearbyStop.edges.stream().map(Edge::getDistanceMeters)
                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
             resultTimesSecByStopIndex.put(stopIndex, accessTimeSec);
-            pathsByStopIndex.put(stopIndex, stopAtDistance);
+            pathsByStopIndex.put(stopIndex, nearbyStop);
         }
 
         LOG.debug("Found {} {} stops", resultTimesSecByStopIndex.size(), fromOrigin ?  "access" : "egress");

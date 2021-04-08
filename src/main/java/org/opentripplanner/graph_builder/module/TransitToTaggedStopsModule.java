@@ -1,11 +1,10 @@
 package org.opentripplanner.graph_builder.module;
 
-import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -57,18 +56,17 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     ) {
         LOG.info("Linking transit stops to tagged bus stops...");
 
-        index = new StreetVertexIndex(graph);
+        index = graph.getStreetIndex();
 
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<>();
-        vertices.addAll(graph.getVertices());
 
-        for (TransitStopVertex ts : Iterables.filter(vertices, TransitStopVertex.class)) {
+        for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;
             for(Edge e:ts.getOutgoing()){
-                if(e instanceof StreetTransitLink) {
+                if(e instanceof StreetTransitStopLink) {
                     alreadyLinked = true;
                     break;
                 }
@@ -76,8 +74,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             if(alreadyLinked) continue;
             // only connect transit stops that are not part of a pathway network
             if (!ts.hasPathways()) {
-                boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                if (!connectVertexToStop(ts, wheelchairAccessible)) {
+                if (!connectVertexToStop(ts)) {
                     LOG.debug("Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString());
 
                     // TODO OTP2 - Why is this commented out? Is it not a problem or is it to nosey?
@@ -87,7 +84,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         }
     }
 
-    private boolean connectVertexToStop(TransitStopVertex ts, boolean wheelchairAccessible) {
+    private boolean connectVertexToStop(TransitStopVertex ts) {
         String stopCode = ts.getStop().getCode();
         if (stopCode == null){
             return false;
@@ -106,8 +103,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
             // Only use stop codes for linking TODO: find better method to connect stops without stop code
             if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
-                new StreetTransitLink(ts, tsv, wheelchairAccessible);
-                new StreetTransitLink(tsv, ts, wheelchairAccessible);
+                new StreetTransitStopLink(ts, tsv);
+                new StreetTransitStopLink(tsv, ts);
                 LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
                 return true;
             }

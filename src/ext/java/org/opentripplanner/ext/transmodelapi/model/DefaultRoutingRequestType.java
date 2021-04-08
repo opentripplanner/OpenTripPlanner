@@ -319,14 +319,12 @@ public class DefaultRoutingRequestType {
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(env -> request.ignoreRealtimeUpdates)
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("includedPlannedCancellations")
                         .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> defaults.includePlannedCancellations)
+                        .dataFetcher(env -> request.includePlannedCancellations)
                         .build())
-                 */
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
                         .name("disableRemainingWeightHeuristic")
@@ -363,7 +361,7 @@ public class DefaultRoutingRequestType {
                         .newFieldDefinition()
                         .name("debugItineraryFilter")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.debugItineraryFilter)
+                        .dataFetcher(env -> request.itineraryFilters.debug)
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()

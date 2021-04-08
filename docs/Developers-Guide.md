@@ -1,6 +1,6 @@
 # Developers Guide
 
-## Setup OTP
+## Quick setup
 _A Quick guide to setting up the OpenTripPlanner project._
 
 You need Git, Maven and Java(JDK) and an IDE installed on your computer. You IDE might have JDK and 
@@ -55,7 +55,7 @@ There are several ways to get involved:
 
  * Join the [developer mailing list](http://groups.google.com/group/opentripplanner-dev)
 
- * Fix typos and improve the documentation on the wiki or within the `/docs` directory of the project (details below).
+ * Fix typos and improve the documentation within the `/docs` directory of the project (details below).
 
  * [File a bug or new feature request](http://github.com/openplans/OpenTripPlanner/issues/new).
 
@@ -85,22 +85,20 @@ Many other expressions exist to close issues via commit messages. See [the GitHu
 ### Code Comments
 
 As a matter of [policy](http://github.com/opentripplanner/OpenTripPlanner/issues/93), all new 
-methods, classes, and fields should include comments explaining what they are for and any other 
-pertinent information. For Java code, the comments should use the [JavaDoc conventions]
-(http://java.sun.com/j2se/javadoc/writingdoccomments). It is best to provide comments that not only 
-explain *what* you did but also *why you did it* while providing some context. Please avoid 
-including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as `@param` annotations 
-with no description.
+methods, classes, and fields should include comments explaining what they are for and any other
+pertinent information. For Java code, the comments should use the 
+[JavaDoc conventions](http://java.sun.com/j2se/javadoc/writingdoccomments). It is best to provide
+comments that not only explain *what* you did but also *why you did it* while providing some
+context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
+`@param` annotations with no description.
+
 
 ### Documentation
 
-Most documentation should be included directly in the OpenTripPlanner repository rather than the 
-GitHub wiki. This allows version control to be applied to documentation as well as program source 
-code.All pull requests that change how OTP is used or configured should include changes to the
-documentation alongside code modifications. Pages that help organize development teams or serve as
-scratchpads can still go [on the wiki](https://github.com/opentripplanner/OpenTripPlanner/wiki), but
-all documentation that would be of interest to people configuring or using OTP belong [in the repo]
-(https://github.com/opentripplanner/OpenTripPlanner/tree/master/docs).
+OTP documentation is included directly in the OpenTripPlanner repository. 
+This allows version control to be applied to documentation as well as program source code.
+All pull requests that change how OTP is used or configured should include changes to the
+documentation alongside code modifications. 
 
 The documentation files are in Markdown format and are in the `/docs` directory under the root of 
 the project. On every push to the master branch the documentation will be rebuilt and deployed as 
@@ -115,6 +113,15 @@ In short:
 $ pip install mkdocs
 $ mkdocs serve
 ```
+
+The OTP REST API documentation is available online in the format of:
+
+http://dev.opentripplanner.org/apidoc/x.x.x/index.html
+
+For example, for v2.0.0:
+
+http://dev.opentripplanner.org/apidoc/2.0.0/index.html
+
 
 ### Debug layers
 
@@ -155,46 +162,6 @@ cc.setNoCache(true);
 Please use only ISO 8601 date format (YYYY-MM-DD) in documentation, comments, and throughout the 
 project. This avoids the ambiguity that can result from differing local interpretations of date 
 formats like 02/01/12.
-
-
-### Project proposals and decision making
-
-_TODO OTP2 - This section is out of date._
-> We don't really use this process anymore. We should probably update this to talk about the 
-> mailing list, issues, pull requests and reviews. (@abyrd)
-
-Decisions are made by the OpenTripPlanner community and the through a proposal and informal voting process 
-on the [project mailing list](http://groups.google.com/group/opentripplanner-dev).
-
-While we do vote on proposals, we don't vote in a strict democratic sense, but rather as a way to 
-easily register opinions, foster discussion, and move toward consensus. When responding to a 
-proposal, we use the following system:
-
- * +1 - *I support this*
-
- * +0 - *I don't have a strong opinion, but I'm not opposed*
-
- * -0 - *I'm against this, but I don't have a good alternative / I'm not willing to do the work on the alternative / I won't block*
-
- * -1 - *Blocking no* (note: in general and when appropriate, this requires the blocker to propose something else that he/she would help put the time into doing)
-
-A proposal does *not* need to be a formal or lengthy document; it can and should be a 
-straightforward recommendation of what you want to do, ideally with a brief explanation for why it's
-a good idea. 
-
-Proposals are just messages sent to the list and can be as simple as *"I think we should do X 
-because of Y and Z. Deadline for response is 2015-10-29. Assuming I've heard no blocking votes by 
-then, I'll go ahead."* Note that you should make sure to include a **deadline** by which you will go
-ahead and do what you're proposing if you don't hear any blocking responses. In general, you should 
-leave at least 72 hours for people to respond. This is not a hard-and-fast rule and you should use 
-your best judgement in determining how far in the future the deadline should be depending on the 
-magnitude of the proposal and how much it will affect the overall project and the rest of the 
-community.
-
-Of course you may always fork the [OTP repo on GitHub]
-(https://github.com/opentripplanner/OpenTripPlanner/) and submit your changes as a pull request, or
-develop and share whatever features you like on your fork even if they are not included in mainline 
-OTP.
 
 
 ## Code style
@@ -246,6 +213,7 @@ performed off the master branch, and are tagged with git annotated tags.
     * You can also use the `package` goal instead of the `install` goal to avoid signing if you don't have the GPG certificate installed.
     * All tests should pass
     * This build will also create Enunciate API docs and Javadoc with the correct non-snapshot version number
+    * The 'site' goal may cause a failing Javadoc build. In that case you can manually build only the Enunciate docs with `mvn enunciate:docs`
 * Deploy the documentation to AWS S3
     * You have to do this right after the test release build to ensure the right version number in the docs
     * You will need AWSCLI tools (`sudo pip install -U awscli`)
@@ -314,20 +282,3 @@ When performing a local test build, if you do `mvn clean install site` it will t
 If you do not have the certificate installed, you can instead to `mvn clean package site` to bypass signing, but this 
 provides less certainty that everything is set up correctly for the CI-driven final release.
 
-### Documentation Build and Hosting
-
-Three kinds of documentation are built for OTP, all based on information present in the OTP repo itself.
-
-The REST API docs are built by Enunciate from the OTP REST interface. My sense is that this auto-generated
-documentation has become harder to read and less useful over time, perhaps because of incorrect handling of REST 
-parameters inherited from superclasses. 
-
-The Javadoc is built from Javadoc comments in the source code itself.
-
-The main OTP user documentation is built from Markdown files in the `/docs` directory of the repo. 
-
-The REST API docs and Javadoc are built by Maven, then uploaded manually to AWS S3, from which they are served as a web
-page at dev.opentripplanner.org. The main OTP user documentation is built by Readthedocs and served at docs.opentripplanner.org.
-
-Upload to the S3 bucket `dev.opentripplanner.org` requires AWS IAM credentials that can be created by Conveyal (which 
-owns the `dev.opentripplanner.org` bucket).

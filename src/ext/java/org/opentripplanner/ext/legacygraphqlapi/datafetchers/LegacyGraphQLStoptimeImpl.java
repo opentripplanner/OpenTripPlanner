@@ -12,58 +12,58 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   @Override
   public DataFetcher<Object> stop() {
-    return environment -> getRoutingService(environment).getStopForId(getSource(environment).stopId);
+    return environment -> getRoutingService(environment).getStopForId(getSource(environment).getStopId());
   }
 
   @Override
   public DataFetcher<Integer> scheduledArrival() {
-    return environment -> getSource(environment).scheduledArrival;
+    return environment -> getSource(environment).getScheduledArrival();
   }
 
   @Override
   public DataFetcher<Integer> realtimeArrival() {
-    return environment -> getSource(environment).realtimeArrival;
+    return environment -> getSource(environment).getRealtimeArrival();
   }
 
   @Override
   public DataFetcher<Integer> arrivalDelay() {
-    return environment -> getSource(environment).arrivalDelay;
+    return environment -> getSource(environment).getArrivalDelay();
   }
 
   @Override
   public DataFetcher<Integer> scheduledDeparture() {
-    return environment -> getSource(environment).scheduledDeparture;
+    return environment -> getSource(environment).getScheduledDeparture();
   }
 
   @Override
   public DataFetcher<Integer> realtimeDeparture() {
-    return environment -> getSource(environment).realtimeDeparture;
+    return environment -> getSource(environment).getRealtimeDeparture();
   }
 
   @Override
   public DataFetcher<Integer> departureDelay() {
-    return environment -> getSource(environment).departureDelay;
+    return environment -> getSource(environment).getDepartureDelay();
   }
 
   @Override
   public DataFetcher<Boolean> timepoint() {
-    return environment -> getSource(environment).timepoint;
+    return environment -> getSource(environment).isTimepoint();
   }
 
   @Override
   public DataFetcher<Boolean> realtime() {
-    return environment -> getSource(environment).realtime;
+    return environment -> getSource(environment).isRealtime();
   }
 
   @Override
   public DataFetcher<String> realtimeState() {
-    return environment -> getSource(environment).realtimeState.name();
+    return environment -> getSource(environment).getRealtimeState().name();
   }
 
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      switch (getSource(environment).pickupType) {
+      switch (getSource(environment).getPickupType()) {
         case 0: return "SCHEDULED";
         case 1: return "NONE";
         case 2: return "CALL_AGENCY";
@@ -76,7 +76,7 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      switch (getSource(environment).dropoffType) {
+      switch (getSource(environment).getDropoffType()) {
         case 0: return "SCHEDULED";
         case 1: return "NONE";
         case 2: return "CALL_AGENCY";
@@ -88,17 +88,17 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   @Override
   public DataFetcher<Long> serviceDay() {
-    return environment -> getSource(environment).serviceDay;
+    return environment -> getSource(environment).getServiceDay();
   }
 
   @Override
   public DataFetcher<Trip> trip() {
-    return environment -> getRoutingService(environment).getTripForId().get(getSource(environment).tripId);
+    return environment -> getSource(environment).getTrip();
   }
 
   @Override
   public DataFetcher<String> headsign() {
-    return environment -> getSource(environment).headsign;
+    return environment -> getSource(environment).getHeadsign();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

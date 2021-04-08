@@ -563,13 +563,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         if (route == null) {
             // Create new Route
-            route = new Route();
             // Use route id of trip descriptor if available
-            if (tripUpdate.getTrip().hasRouteId()) {
-                route.setId(new FeedScopedId(feedId, tripUpdate.getTrip().getRouteId()));
-            } else {
-                route.setId(new FeedScopedId(feedId, tripId));
-            }
+            FeedScopedId id = tripUpdate.getTrip().hasRouteId()
+                ? new FeedScopedId(feedId, tripUpdate.getTrip().getRouteId())
+                : new FeedScopedId(feedId, tripId);
+
+            route = new Route(id);
             // Create dummy agency for added trips
             Agency dummyAgency = new Agency(
                 new FeedScopedId(feedId, "Dummy"),
@@ -587,9 +586,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Create new Trip
 
-        final Trip trip = new Trip();
         // TODO: which Agency ID to use? Currently use feed id.
-        trip.setId(new FeedScopedId(feedId, tripUpdate.getTrip().getTripId()));
+        final Trip trip = new Trip(new FeedScopedId(feedId, tripUpdate.getTrip().getTripId()));
         trip.setRoute(route);
 
         // Find service ID running on this service date
@@ -922,9 +920,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     private boolean purgeExpiredData() {
         final ServiceDate today = new ServiceDate();
+        // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
         final ServiceDate previously = today.previous().previous(); // Just to be safe...
 
-        if(lastPurgeDate != null && lastPurgeDate.compareTo(previously) > 0) {
+        // Purge data only if we have changed date
+        if(lastPurgeDate != null && lastPurgeDate.compareTo(previously) >= 0) {
             return false;
         }
 

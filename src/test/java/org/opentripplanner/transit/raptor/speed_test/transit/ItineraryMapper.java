@@ -5,7 +5,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -61,8 +61,8 @@ public class ItineraryMapper {
 
     private Itinerary createItinerary(
             Path<TripSchedule> path,
-            StopAtDistance accessPath,
-            StopAtDistance egressPath
+            NearbyStop accessPath,
+            NearbyStop egressPath
     ) {
         if (path == null) {  return null; }
 
@@ -71,7 +71,7 @@ public class ItineraryMapper {
         itinerary.walkDistance = 0.0;
         itinerary.transitTime = 0;
         itinerary.waitingTime = 0;
-        itinerary.weight = path.cost();
+        itinerary.weight = path.generalizedCost();
 
         int numberOfTransits = 0;
 
@@ -168,6 +168,7 @@ public class ItineraryMapper {
         return itinerary;
     }
 
+    @SuppressWarnings("ConstantConditions")
     private Place mapToPlace(int stopIndex) {
         return new Place(transitLayer.getStopByIndex(stopIndex), stopIndex);
     }

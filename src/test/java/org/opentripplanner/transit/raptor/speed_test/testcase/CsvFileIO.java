@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import com.csvreader.CsvReader;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,12 +30,14 @@ public class CsvFileIO {
     private final File testCasesFile;
     private final File expectedResultsFile;
     private final File expectedResultsOutputFile;
+    private final boolean skipCost;
 
 
-    public CsvFileIO(File dir, String testSetName) {
+    public CsvFileIO(File dir, String testSetName, boolean skipCost) {
         testCasesFile = new File(dir, testSetName + ".csv");
         expectedResultsFile = new File(dir, testSetName + "-expected-results.csv");
         expectedResultsOutputFile = new File(dir, testSetName + "-results.csv");
+        this.skipCost = skipCost;
     }
 
     /**
@@ -55,6 +57,11 @@ public class CsvFileIO {
                 continue;
             }
             String id = csvReader.get("testCaseId");
+            TestCaseResults testCaseResults = expectedResults.get(id);
+            if(testCaseResults == null) {
+                testCaseResults = new TestCaseResults(id, skipCost);
+            }
+
             TestCase tc = new TestCase(
                     id,
                     TimeUtils.parseHHMM(csvReader.get("departure"), TestCase.NOT_SET),
@@ -69,7 +76,7 @@ public class CsvFileIO {
                     csvReader.get("toPlace"),
                     Double.parseDouble(csvReader.get("toLat")),
                     Double.parseDouble(csvReader.get("toLon")),
-                    expectedResults.get(id)
+                    testCaseResults
             );
             testCases.add(tc);
         }
@@ -136,7 +143,9 @@ public class CsvFileIO {
         while (csvReader.readRecord()) {
             if (isCommentOrEmpty(csvReader.getRawRecord())) { continue; }
             Result expRes = readExpectedResult(csvReader);
-            results.computeIfAbsent(expRes.testCaseId, TestCaseResults::new).addExpectedResult(expRes);
+            results
+                .computeIfAbsent(expRes.testCaseId, id -> new TestCaseResults(id, skipCost))
+                .addExpectedResult(expRes);
         }
         return results;
     }

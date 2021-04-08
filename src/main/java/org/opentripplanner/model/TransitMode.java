@@ -10,9 +10,5 @@ public enum TransitMode {
   AIRPLANE,
   CABLE_CAR,
   GONDOLA,
-  FUNICULAR,
-  /**
-   * Not yet supported.
-   */
-  FLEXIBLE
+  FUNICULAR
 }

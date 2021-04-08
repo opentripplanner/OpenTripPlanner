@@ -13,6 +13,10 @@ import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapServiceDate;
 class FeedInfoMapper {
     private Map<org.onebusaway.gtfs.model.FeedInfo, FeedInfo> mappedFeedInfos = new HashMap<>();
 
+    private final String feedId;
+
+    FeedInfoMapper(String feedId) {this.feedId = feedId;}
+
     Collection<FeedInfo> map(Collection<org.onebusaway.gtfs.model.FeedInfo> feedInfos) {
         return feedInfos == null ? null : MapUtils.mapToList(feedInfos, this::map);
     }
@@ -23,16 +27,14 @@ class FeedInfoMapper {
     }
 
     private FeedInfo doMap(org.onebusaway.gtfs.model.FeedInfo rhs) {
-        FeedInfo lhs = new FeedInfo();
-
-        lhs.setId(rhs.getId());
-        lhs.setPublisherName(rhs.getPublisherName());
-        lhs.setPublisherUrl(rhs.getPublisherUrl());
-        lhs.setLang(rhs.getLang());
-        lhs.setStartDate(mapServiceDate(rhs.getStartDate()));
-        lhs.setEndDate(mapServiceDate(rhs.getEndDate()));
-        lhs.setVersion(rhs.getVersion());
-
-        return lhs;
+        return new FeedInfo(
+            feedId,
+            rhs.getPublisherName(),
+            rhs.getPublisherUrl(),
+            rhs.getLang(),
+            mapServiceDate(rhs.getStartDate()),
+            mapServiceDate(rhs.getEndDate()),
+            rhs.getVersion()
+        );
     }
 }

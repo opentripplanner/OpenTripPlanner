@@ -34,6 +34,9 @@ public class TransitAlert implements Serializable {
     //null means unknown
     public String severity;
 
+    //null means unknown
+    public int priority;
+
     private List<TimePeriod> timePeriods = new ArrayList<>();
 
     private String feedId;
@@ -65,7 +68,7 @@ public class TransitAlert implements Serializable {
     public boolean displayDuring(long startTimeSeconds, long endTimeSeconds) {
         for (TimePeriod timePeriod : timePeriods) {
             if (endTimeSeconds >= timePeriod.startTime) {
-                if (startTimeSeconds < timePeriod.endTime) {
+                if (timePeriod.endTime == 0 || startTimeSeconds < timePeriod.endTime) {
                     return true;
                 }
             }
@@ -97,6 +100,11 @@ public class TransitAlert implements Serializable {
         this.feedId = feedId;
     }
 
+    /**
+     * Finds the first validity startTime from all timePeriods for this alert.
+     *
+     * @return First endDate for this Alert
+     */
     public Date getEffectiveStartDate() {
         return timePeriods
             .stream()
@@ -106,12 +114,19 @@ public class TransitAlert implements Serializable {
             .orElse(null);
     }
 
+    /**
+     * Finds the last validity endTime from all timePeriods for this alert.
+     * Returns <code>null</code> if the validity is open-ended
+     *
+     * @return Last endDate for this Alert, <code>null</code> if open-ended
+     */
     public Date getEffectiveEndDate() {
         return timePeriods
             .stream()
             .map(timePeriod -> timePeriod.endTime)
             .max(Comparator.naturalOrder())
-            .map(startTime -> new Date(startTime * 1000))
+            .filter(endTime -> endTime < TimePeriod.OPEN_ENDED) //If open-ended, null should be returned
+            .map(endTime -> new Date(endTime * 1000))
             .orElse(null);
     }
 

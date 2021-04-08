@@ -8,8 +8,9 @@ public interface RaptorSlackProvider {
 
     /**
      * Return a default implementation witch can be used in unit-tests.
+     * Unit: seconds.
      */
-    static RaptorSlackProvider defaults(int transferSlack, int boardSlack, int alightSlack) {
+    static RaptorSlackProvider defaultSlackProvider(int transferSlack, int boardSlack, int alightSlack) {
         return new RaptorSlackProvider() {
             @Override public int transferSlack() { return transferSlack; }
             @Override public int boardSlack(RaptorTripPattern pattern) { return boardSlack; }

@@ -16,7 +16,6 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -29,17 +28,17 @@ import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -121,7 +120,7 @@ public class LegacyGraphQLQueryTypeImpl
           Stop stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
 
           // TODO: Add geometry
-          return new StopAtDistance(stop, Integer.parseInt(parts[0]), null, null, null);
+          return new NearbyStop(stop, Integer.parseInt(parts[0]), 0, null, null, null);
         }
         case "TicketType":
           return null; //TODO
@@ -134,10 +133,8 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<FeedInfo>> feeds() {
-    return environment -> getRoutingService(environment)
-        .getFeedInfoForId()
-        .values();
+  public DataFetcher<Iterable<String>> feeds() {
+    return environment -> getRoutingService(environment).getFeedIds();
   }
 
   @Override
@@ -194,13 +191,16 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsByBboxArgs(environment.getArguments());
 
+      Envelope envelope = new Envelope(
+          new Coordinate(args.getLegacyGraphQLMinLon(), args.getLegacyGraphQLMinLat()),
+          new Coordinate(args.getLegacyGraphQLMaxLon(), args.getLegacyGraphQLMaxLat())
+      );
+
       Stream<Stop> stopStream = getRoutingService(environment)
           .getStopSpatialIndex()
-          .query(new Envelope(
-              new Coordinate(args.getLegacyGraphQLMinLon(), args.getLegacyGraphQLMinLat()),
-              new Coordinate(args.getLegacyGraphQLMaxLon(), args.getLegacyGraphQLMaxLat())
-          ))
+          .query(envelope)
           .stream()
+          .filter(transitStopVertex -> envelope.contains(transitStopVertex.getCoordinate()))
           .map(TransitStopVertex::getStop);
 
       if (args.getLegacyGraphQLFeeds() != null) {
@@ -213,11 +213,11 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Connection<StopAtDistance>> stopsByRadius() {
+  public DataFetcher<Connection<NearbyStop>> stopsByRadius() {
     return environment -> {
       LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsByRadiusArgs args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsByRadiusArgs(environment.getArguments());
 
-      List<StopAtDistance> stops;
+      List<NearbyStop> stops;
       try {
         stops = getRoutingService(environment).findClosestStops(
             args.getLegacyGraphQLLat(),

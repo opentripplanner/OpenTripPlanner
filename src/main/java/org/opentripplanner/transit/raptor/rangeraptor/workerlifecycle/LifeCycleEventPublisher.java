@@ -23,6 +23,7 @@ public class LifeCycleEventPublisher {
         this.transfersForRoundCompleteListeners = subscriptions.transfersForRoundCompleteListeners.toArray(new Runnable[0]);
         this.roundCompleteListeners = subscriptions.roundCompleteListeners.toArray(new Consumer[0]);
         this.iterationCompleteListeners = subscriptions.iterationCompleteListeners.toArray(new Runnable[0]);
+        subscriptions.close();
     }
 
     /* Lifecycle methods invoked by the Range Raptor Worker */

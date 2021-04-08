@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class StopTimesMapperTest {
@@ -67,19 +68,19 @@ public class StopTimesMapperTest {
         STOP_TIME.setTrip(TRIP);
     }
 
-    private StopTimeMapper subject = new StopTimeMapper(
+    private final StopTimeMapper subject = new StopTimeMapper(
             new StopMapper(), new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)))
     );
 
     @Test
-    public void testMapCollection() throws Exception {
+    public void testMapCollection() {
         assertNull(null, subject.map((Collection<StopTime>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(STOP_TIME)).size());
     }
 
     @Test
-    public void testMap() throws Exception {
+    public void testMap() {
         org.opentripplanner.model.StopTime result = subject.map(STOP_TIME);
 
         assertEquals(ARRIVAL_TIME, result.getArrivalTime());
@@ -97,7 +98,7 @@ public class StopTimesMapperTest {
     }
 
     @Test
-    public void testMapWithNulls() throws Exception {
+    public void testMapWithNulls() {
         org.opentripplanner.model.StopTime result = subject.map(new StopTime());
 
         assertFalse(result.isArrivalTimeSet());
@@ -115,10 +116,10 @@ public class StopTimesMapperTest {
 
     /** Mapping the same object twice, should return the the same instance. */
     @Test
-    public void testMapCache() throws Exception {
+    public void testMapCache() {
         org.opentripplanner.model.StopTime result1 = subject.map(STOP_TIME);
         org.opentripplanner.model.StopTime result2 = subject.map(STOP_TIME);
 
-        assertTrue(result1 == result2);
+        assertSame(result1, result2);
     }
 }

@@ -1,18 +1,17 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
+import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 public class ForwardTransitCalculatorTest {
     private static final int TRIP_SEARCH_BINARY_SEARCH_THRESHOLD = 7;
 
-    private int boardSlackInSeconds = 30;
     private int earliestDepartureTime = hm2time(8, 0);
     private int searchWindowSizeInSeconds = 2 * 60 * 60;
     private int latestAcceptableArrivalTime = hm2time(16, 0);
@@ -87,7 +86,7 @@ public class ForwardTransitCalculatorTest {
 
     @Test
     public void latestArrivalTime() {
-        TestRaptorTripSchedule s = TestRaptorTripSchedule.create("T").withAlightTimes(500).build();
+        TestTripSchedule s = TestTripSchedule.schedule().arrivals(500).build();
         assertEquals(500, create().stopArrivalTime(s, 0, 0));
     }
 

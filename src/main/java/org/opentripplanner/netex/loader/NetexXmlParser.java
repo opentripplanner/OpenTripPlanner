@@ -9,18 +9,18 @@ import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 
 /** Simple wrapper to perform typesafe xml parsing and simple error handling. */
-class NetexXmlParser {
+public class NetexXmlParser {
     /** used to parse the XML. */
     private final Unmarshaller unmarshaller;
 
-    NetexXmlParser() {
+    public NetexXmlParser() {
         this.unmarshaller = createUnmarshaller();
     }
 
     /**
      * Parse an input stream and return the root document type for the given xml file (stream).
      */
-    PublicationDeliveryStructure parseXmlDoc(InputStream stream) throws JAXBException {
+    public PublicationDeliveryStructure parseXmlDoc(InputStream stream) throws JAXBException {
         JAXBElement<PublicationDeliveryStructure> root;
 
         //noinspection unchecked

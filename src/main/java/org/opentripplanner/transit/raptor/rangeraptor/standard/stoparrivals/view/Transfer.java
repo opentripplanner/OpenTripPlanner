@@ -1,13 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.TransferLegView;
+import org.opentripplanner.transit.raptor.api.view.TransferPathView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 
 final class Transfer<T extends RaptorTripSchedule>
     extends StopArrivalViewAdapter<T>
-    implements TransferLegView
+    implements TransferPathView
 {
     private final StopArrivalState<T> arrival;
     private final StopsCursor<T> cursor;
@@ -29,13 +30,18 @@ final class Transfer<T extends RaptorTripSchedule>
     }
 
     @Override
-    public TransferLegView transferLeg() {
+    public TransferPathView transferPath() {
         return this;
     }
 
     @Override
     public int durationInSeconds() {
         return arrival.transferDuration();
+    }
+
+    @Override
+    public RaptorTransfer transfer() {
+        return arrival.transferPath();
     }
 
     @Override

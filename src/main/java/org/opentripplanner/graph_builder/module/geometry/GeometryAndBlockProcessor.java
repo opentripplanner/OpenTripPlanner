@@ -125,11 +125,6 @@ public class GeometryAndBlockProcessor {
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
-        /* Generate unique short IDs for all the TableTripPatterns. */
-        if (!TripPattern.idsAreUniqueAndNotNull(tripPatterns)) {
-            TripPattern.generateUniqueIds(tripPatterns);
-        }
-
         /* Generate unique human-readable names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns, issueStore);
 
@@ -483,8 +478,9 @@ public class GeometryAndBlockProcessor {
 
         ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
         LineString geometry = geometriesByShapeSegmentKey.get(key);
-        if (geometry != null)
+        if (geometry != null) {
             return geometry;
+        }
 
         double[] distances = getDistanceForShapeId(shapeId);
 
@@ -618,8 +614,9 @@ public class GeometryAndBlockProcessor {
 
         LineString geometry = geometriesByShapeId.get(shapeId);
 
-        if (geometry != null)
+        if (geometry != null) {
             return geometry;
+        }
 
         List<ShapePoint> points = getUniqueShapePointsForShapeId(shapeId);
         if (points.size() < 2) {
@@ -660,12 +657,15 @@ public class GeometryAndBlockProcessor {
 
     private LinearLocation getSegmentFraction(double[] distances, double distance) {
         int index = Arrays.binarySearch(distances, distance);
-        if (index < 0)
+        if (index < 0) {
             index = -(index + 1);
-        if (index == 0)
+        }
+        if (index == 0) {
             return new LinearLocation(0, 0.0);
-        if (index == distances.length)
+        }
+        if (index == distances.length) {
             return new LinearLocation(distances.length, 0.0);
+        }
 
         double prevDistance = distances[index - 1];
         if (prevDistance == distances[index]) {

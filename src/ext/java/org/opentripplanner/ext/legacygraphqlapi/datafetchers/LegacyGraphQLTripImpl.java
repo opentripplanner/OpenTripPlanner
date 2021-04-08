@@ -79,7 +79,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> directionId() {
-    return environment -> getSource(environment).getDirectionId();
+    return environment -> getSource(environment).getGtfsDirectionIdAsString(null);
   }
 
   @Override
@@ -108,9 +108,9 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<String> bikesAllowed() {
     return environment -> {
       switch (getSource(environment).getBikesAllowed()) {
-        case 0: return "NO_INFORMATION";
-        case 1: return "POSSIBLE";
-        case 2: return "NOT_POSSIBLE";
+        case UNKNOWN: return "NO_INFORMATION";
+        case ALLOWED: return "POSSIBLE";
+        case NOT_ALLOWED: return "NOT_POSSIBLE";
         default: return null;
       }
     };
@@ -118,36 +118,34 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<TripPattern> pattern() {
-    return environment -> getRoutingService(environment)
-        .getPatternForTrip()
-        .get(getSource(environment));
+    return this::getTripPattern;
   }
 
   @Override
   public DataFetcher<Iterable<Object>> stops() {
-    return environment -> getRoutingService(environment)
-        .getPatternForTrip().get(getSource(environment))
-        .getStops().stream()
-        .map(Object.class::cast)
-        .collect(Collectors.toList());
+    return environment -> {
+      TripPattern tripPattern = getTripPattern(environment);
+      if (tripPattern == null) { return List.of(); }
+      return List.copyOf(tripPattern.getStops());
+    };
   }
 
   @Override
   public DataFetcher<String> semanticHash() {
-    return environment -> getRoutingService(environment)
-        .getPatternForTrip()
-        .get(getSource(environment))
-        .semanticHashString(getSource(environment));
+    return environment -> {
+      TripPattern tripPattern = getTripPattern(environment);
+      if (tripPattern == null) { return null; }
+      return tripPattern.semanticHashString(getSource(environment));
+    };
   }
 
   @Override
   public DataFetcher<Iterable<TripTimeShort>> stoptimes() {
-    return environment -> TripTimeShort.fromTripTimes(
-        getRoutingService(environment)
-            .getPatternForTrip()
-            .get(getSource(environment))
-            .scheduledTimetable,
-        getSource(environment));
+    return environment -> {
+      TripPattern tripPattern = getTripPattern(environment);
+      if (tripPattern == null) { return List.of(); }
+      return TripTimeShort.fromTripTimes(tripPattern.scheduledTimetable, getSource(environment));
+    };
   }
 
   @Override
@@ -155,13 +153,11 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment -> {
       try {
         RoutingService routingService = getRoutingService(environment);
-        Trip trip = getSource(environment);
-        Timetable timetable = getRoutingService(environment)
-            .getPatternForTrip()
-            .get(trip)
-            .scheduledTimetable;
+        TripPattern tripPattern = getTripPattern(environment);
+        if (tripPattern == null) { return null; }
+        Timetable timetable = tripPattern.scheduledTimetable;
 
-        TripTimes triptimes = timetable.getTripTimes(trip);
+        TripTimes triptimes = timetable.getTripTimes(getSource(environment));
         ServiceDay serviceDate = null;
 
         var args = new LegacyGraphQLTypes.LegacyGraphQLTripDepartureStoptimeArgs(environment.getArguments());
@@ -170,7 +166,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
             routingService.getServiceCodes(),
             ServiceDate.parseString(args.getLegacyGraphQLServiceDate()),
             routingService.getCalendarService(),
-            ((Trip) environment.getSource()).getRoute().getAgency().getId()
+            getSource(environment).getRoute().getAgency().getId()
         );
 
         Stop stop = timetable.pattern.getStop(0);
@@ -188,13 +184,11 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment -> {
       try {
         RoutingService routingService = getRoutingService(environment);
-        Trip trip = getSource(environment);
-        Timetable timetable = getRoutingService(environment)
-            .getPatternForTrip()
-            .get(trip)
-            .scheduledTimetable;
+        TripPattern tripPattern = getTripPattern(environment);
+        if (tripPattern == null) { return null; }
+        Timetable timetable = tripPattern.scheduledTimetable;
 
-        TripTimes triptimes = timetable.getTripTimes(trip);
+        TripTimes triptimes = timetable.getTripTimes(getSource(environment));
         ServiceDay serviceDate = null;
 
         var args = new LegacyGraphQLTypes.LegacyGraphQLTripArrivalStoptimeArgs(environment.getArguments());
@@ -203,7 +197,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               routingService.getServiceCodes(),
               ServiceDate.parseString(args.getLegacyGraphQLServiceDate()),
               routingService.getCalendarService(),
-              trip.getRoute().getAgency().getId()
+              getSource(environment).getRoute().getAgency().getId()
           );
 
         Stop stop = timetable.pattern.getStop(triptimes.getNumStops() - 1);
@@ -222,6 +216,9 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
       try {
         RoutingService routingService = getRoutingService(environment);
         Trip trip = getSource(environment);
+        TripPattern tripPattern = getTripPattern(environment);
+        if (tripPattern == null) { return List.of(); }
+
         var args = new LegacyGraphQLTypes.LegacyGraphQLTripStoptimesForDateArgs(environment.getArguments());
 
 
@@ -236,7 +233,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         );
 
         //TODO: Pass serviceDate
-        Timetable timetable = routingService.getTimetableForTripPattern(routingService.getPatternForTrip().get(trip));
+        Timetable timetable = routingService.getTimetableForTripPattern(tripPattern);
         return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
       } catch (ParseException e) {
         return null; // Invalid date format
@@ -247,9 +244,10 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Iterable<Iterable<Double>>> geometry() {
     return environment -> {
-      LineString geometry = getRoutingService(environment).getPatternForTrip()
-          .get(getSource(environment))
-          .getGeometry();
+      TripPattern tripPattern = getTripPattern(environment);
+      if (tripPattern == null) { return null; }
+
+      LineString geometry = tripPattern.getGeometry();
       if (geometry == null) {
         return null;
       }
@@ -262,12 +260,10 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<EncodedPolylineBean> tripGeometry() {
     return environment -> {
-      LineString geometry = getRoutingService(environment).getPatternForTrip()
-          .get(getSource(environment))
-          .getGeometry();
-      if (geometry == null) {
-        return null;
-      }
+      TripPattern tripPattern = getTripPattern(environment);
+      if (tripPattern == null) { return null; }
+      LineString geometry = tripPattern.getGeometry();
+      if (geometry == null) { return null; }
       return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
     };
   }
@@ -276,6 +272,10 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> List.of();
+  }
+
+  private TripPattern getTripPattern(DataFetchingEnvironment environment) {
+    return getRoutingService(environment).getPatternForTrip().get(environment.getSource());
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

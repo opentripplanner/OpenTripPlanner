@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -16,6 +17,8 @@ import java.util.Locale;
  */
 public class PathwayEdge extends Edge {
 
+    private static final long serialVersionUID = -3311099256178798982L;
+
     private int traversalTime;
     private double distance;
     private int steps;
@@ -23,6 +26,7 @@ public class PathwayEdge extends Edge {
     private String name = "pathway";
 
     private boolean wheelchairAccessible = true;
+    private FeedScopedId id;
 
     public PathwayEdge(Vertex fromv, Vertex tov, String name) {
         super(fromv, tov);
@@ -32,6 +36,7 @@ public class PathwayEdge extends Edge {
     public PathwayEdge(
         Vertex fromv,
         Vertex tov,
+        FeedScopedId id,
         String name,
         int traversalTime,
         double distance,
@@ -40,6 +45,7 @@ public class PathwayEdge extends Edge {
         boolean wheelchairAccessible
     ) {
         super(fromv, tov);
+        this.id = id;
         this.traversalTime = traversalTime;
         this.distance = distance;
         this.steps = steps;
@@ -52,14 +58,26 @@ public class PathwayEdge extends Edge {
         }
     }
 
-    private static final long serialVersionUID = -3311099256178798982L;
-
     public String getDirection() {
         return null;
     }
 
     public double getDistanceMeters() {
         return this.distance;
+    }
+
+    @Override
+    public double getEffectiveWalkDistance() {
+        if (traversalTime > 0) {
+            return 0;
+        } else {
+            return distance;
+        }
+    }
+
+    @Override
+    public int getDistanceIndependentTime() {
+        return traversalTime;
     }
 
     public TraverseMode getMode() {
@@ -85,6 +103,8 @@ public class PathwayEdge extends Edge {
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
         this.wheelchairAccessible = wheelchairAccessible;
     }
+
+    public FeedScopedId getId( ){ return id; }
 
     public State traverse(State s0) {
         /* TODO: Consider mode, so that passing through multiple fare gates is not possible */

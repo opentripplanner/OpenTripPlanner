@@ -8,22 +8,30 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TripTimeShortHelper {
 
+    /** Utility class with private constructor to prevent instantiation. */
+    private TripTimeShortHelper() { }
+
     /**
      * Find trip time short for the from place in transit leg, or null.
      */
-    public TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
+    @Nullable
+    public static TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
+        if (leg.flexibleTrip) { return null; }
 
         ServiceDate serviceDate = leg.serviceDate;
         List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
-        /* TODO OTP2
+        /* TODO OTP2 This method is only used for EstimatedCalls for from place. We have to decide
+                     if EstimatedCalls are applicable to flex trips, and if that is the case, add
+                     the necessary mappings.
         if (leg.isFlexible()) {
             TripTimeShort tripTimeShort = tripTimes.get(leg.from.stopSequence);
             tripTimeShort.scheduledDeparture = (int) startTimeSeconds;
@@ -33,22 +41,28 @@ public class TripTimeShortHelper {
          */
 
         if (leg.realTime) {
-            return tripTimes.stream().filter(tripTime -> tripTime.realtimeDeparture == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
+            return tripTimes.stream().filter(tripTime -> tripTime.getRealtimeDeparture() == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId,
+                tripTime.getStopId(), routingService)).findFirst().orElse(null);
         }
-        return tripTimes.stream().filter(tripTime -> tripTime.scheduledDeparture == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
+        return tripTimes.stream().filter(tripTime -> tripTime.getScheduledDeparture() == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId,
+            tripTime.getStopId(), routingService)).findFirst().orElse(null);
     }
 
     /**
      * Find trip time short for the to place in transit leg, or null.
      */
-    public TripTimeShort getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
+    @Nullable
+    public static TripTimeShort getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
+        if (leg.flexibleTrip) { return null; }
 
         ServiceDate serviceDate = leg.serviceDate;
         List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long endTimeSeconds = (leg.endTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
-        /* TODO OTP2
+        /* TODO OTP2 This method is only used for EstimatedCalls for to place. We have to decide
+                     if EstimatedCalls are applicable to flex trips, and if that is the case, add
+                     the necessary mappings.
         if (leg.isFlexible()) {
             TripTimeShort tripTimeShort = tripTimes.get(leg.to.stopSequence);
             tripTimeShort.scheduledArrival = (int) endTimeSeconds;
@@ -58,17 +72,20 @@ public class TripTimeShortHelper {
         */
 
         if (leg.realTime) {
-            return tripTimes.stream().filter(tripTime -> tripTime.realtimeArrival == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
+            return tripTimes.stream().filter(tripTime -> tripTime.getRealtimeArrival() == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
+                tripTime.getStopId(), routingService)).findFirst().orElse(null);
         }
-        return tripTimes.stream().filter(tripTime -> tripTime.scheduledArrival == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
+        return tripTimes.stream().filter(tripTime -> tripTime.getScheduledArrival() == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
+            tripTime.getStopId(), routingService)).findFirst().orElse(null);
     }
 
 
     /**
      * Find trip time shorts for all stops for the full trip of a leg.
      */
-    public List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
+    public static List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
+        if (leg.flexibleTrip) { return List.of(); }
 
         ServiceDate serviceDate = leg.serviceDate;
         return routingService.getTripTimesShort(leg.getTrip(), serviceDate);
@@ -77,8 +94,9 @@ public class TripTimeShortHelper {
     /**
      * Find trip time shorts for all intermediate stops for a leg.
      */
-    public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
+    public static List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
+        if (leg.flexibleTrip) { return List.of(); }
 
         ServiceDate serviceDate = leg.serviceDate;
 
@@ -90,16 +108,20 @@ public class TripTimeShortHelper {
         boolean boardingStopFound = false;
         for (TripTimeShort tripTime : tripTimes) {
 
-            long boardingTime = leg.realTime ? tripTime.realtimeDeparture : tripTime.scheduledDeparture;
+            long boardingTime = leg.realTime ? tripTime.getRealtimeDeparture()
+                : tripTime.getScheduledDeparture();
 
             if (!boardingStopFound) {
                 boardingStopFound = boardingTime == startTimeSeconds
-                    && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService);
+                    && matchesQuayOrSiblingQuay(leg.from.stopId,
+                    tripTime.getStopId(), routingService);
                 continue;
             }
 
-            long arrivalTime = leg.realTime ? tripTime.realtimeArrival : tripTime.scheduledArrival;
-            if (arrivalTime == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)) {
+            long arrivalTime = leg.realTime ? tripTime.getRealtimeArrival()
+                : tripTime.getScheduledArrival();
+            if (arrivalTime == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
+                tripTime.getStopId(), routingService)) {
                 break;
             }
 
@@ -109,7 +131,10 @@ public class TripTimeShortHelper {
         return filteredTripTimes;
     }
 
-    private boolean matchesQuayOrSiblingQuay(FeedScopedId quayId, FeedScopedId candidate, RoutingService routingService) {
+
+    /* private methods */
+
+    private static boolean matchesQuayOrSiblingQuay(FeedScopedId quayId, FeedScopedId candidate, RoutingService routingService) {
         boolean foundMatch = quayId.equals(candidate);
         if (!foundMatch) {
             //Check parentStops

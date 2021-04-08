@@ -29,8 +29,6 @@ public class GtfsBundle {
 
     private CsvInputSource csvInputSource;
 
-    private Boolean defaultBikesAllowed = true;
-
     private boolean transfersTxtDefinesStationPaths = false;
 
     /** 
@@ -120,20 +118,6 @@ public class GtfsBundle {
 
     public void setFeedId(GtfsFeedId feedId) {
         this.feedId = feedId;
-    }
-
-    /**
-     * When a trip doesn't contain any bicycle accessibility information, should taking a bike
-     * along a transit trip be permitted?
-     * A trip doesn't contain bicycle accessibility information if both route_short_name and
-     * trip_short_name contain missing/0 values.
-     */
-    public Boolean getDefaultBikesAllowed() {
-        return defaultBikesAllowed;
-    }
-
-    public void setDefaultBikesAllowed(Boolean defaultBikesAllowed) {
-        this.defaultBikesAllowed = defaultBikesAllowed;
     }
 
     /**

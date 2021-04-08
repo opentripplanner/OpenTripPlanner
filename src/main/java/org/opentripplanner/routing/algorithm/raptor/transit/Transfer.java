@@ -11,17 +11,22 @@ public class Transfer {
     private int toStop;
 
     private final int effectiveWalkDistanceMeters;
+    private final int distanceIndependentTime;
 
     private final List<Edge> edges;
 
-    public Transfer(int toStop, int effectiveWalkDistanceMeters, List<Edge> edges) {
+    public Transfer(
+        int toStop, int effectiveWalkDistanceMeters, int distanceIndependentTime, List<Edge> edges
+    ) {
         this.toStop = toStop;
         this.effectiveWalkDistanceMeters = effectiveWalkDistanceMeters;
+        this.distanceIndependentTime = distanceIndependentTime;
         this.edges = edges;
     }
 
     public List<Coordinate> getCoordinates() {
         List<Coordinate> coordinates = new ArrayList<>();
+        if (edges == null) { return coordinates; }
         for (Edge edge : edges) {
             if (edge.getGeometry() != null) {
                 coordinates.addAll((Arrays.asList(edge.getGeometry().getCoordinates())));
@@ -44,8 +49,14 @@ public class Transfer {
         return effectiveWalkDistanceMeters;
     }
 
+    public int getDistanceIndependentTime() {
+        return distanceIndependentTime;
+    }
+
     public int getDistanceMeters() {
-        return (int)edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+        return edges != null
+            ? (int) edges.stream().mapToDouble(Edge::getDistanceMeters).sum()
+            : effectiveWalkDistanceMeters;
     }
 
     public List<Edge> getEdges() {

@@ -2,9 +2,9 @@
 
 ## Pre-built JARs
 
-OpenTripPlanner is distributed as a single stand-alone runnable JAR file. These JARs are deployed to the Sonatype OSSRH Maven repository, and release versions are synced to the Maven Central repository. Most people will want to go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the directory for the highest version number, and download the file whose name ends with `.shaded.jar`.
+OpenTripPlanner is distributed as a single stand-alone runnable JAR file. These JARs are deployed to the Sonatype OSSRH Maven repository, and release versions are synced to the Maven Central repository. Most people will want to go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the directory for the highest version number, and download the file whose name ends with `shaded.jar`.
 
-We use the [Travis continuous integration system](https://travis-ci.org/opentripplanner/OpenTripPlanner) to build OTP every time a change is made. You can find the JARs resulting from those builds in the [OSSRH staging repository](https://oss.sonatype.org/content/repositories/staging/org/opentripplanner/otp/). A directory named `x.y.z-SNAPSHOT` contain JARs for builds leading up to (preceding) the `x.y.z` release. Files within `SNAPSHOT` directories are named using the date and time that the build occurred.
+We use the [Github Actions CI system](https://github.com/opentripplanner/OpenTripPlanner/actions) to build OTP every time a change is made. You can find the JARs resulting from those builds in the [Github Packages repositor](https://github.com/opentripplanner/OpenTripPlanner/packages/562174).
 
 ## Building from Source
 
@@ -68,7 +68,7 @@ For example, you could do the following:
 
 ```bash
 cd OpenTripPlanner
-git checkout v1.4.0
+git checkout v2.0.0
 git clean -df
 mvn clean package -DskipTests
 ```
@@ -88,7 +88,7 @@ performs tests, and can then deploy the final "artifact" (the runnable JAR file)
 can be automatically included in other Java projects.
 
 This repository is machine-readable (by Maven or other build systems) and also provides human readable directory listings via HTTP. You can fetch an OTP JAR from this repository by constructing the proper URL for the release
-you want. For example, release 1.1.0 will be found at `https://repo1.maven.org/maven2/org/opentripplanner/otp/1.1.0/otp-1.1.0-shaded.jar`.
+you want. For example, release 2.0.0 will be found at `https://repo1.maven.org/maven2/org/opentripplanner/otp/2.0.0/otp-2.0.0-shaded.jar`.
 
 To make use of OTP in another Maven project, you must specify it as a dependency in that project's `pom.xml`:
 
@@ -96,7 +96,7 @@ To make use of OTP in another Maven project, you must specify it as a dependency
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>1.2.0</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -116,6 +116,6 @@ After each successful build, the [Travis continuous integration system](https://
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>2.1.0-SNAPSHOT</version>
 </dependency>
 ```

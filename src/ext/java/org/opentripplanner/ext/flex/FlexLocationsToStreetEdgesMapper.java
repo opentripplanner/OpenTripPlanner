@@ -9,11 +9,16 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.ProgressTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
+
+  private static final Logger LOG = LoggerFactory.getLogger(FlexLocationsToStreetEdgesMapper.class);
 
   @Override
   public void buildGraph(
@@ -23,8 +28,12 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
       return;
     }
 
-    StreetVertexIndex streetIndex = new StreetVertexIndex(graph);
+    StreetVertexIndex streetIndex = graph.getStreetIndex();
 
+    ProgressTracker progress = ProgressTracker.track("Add flex locations to street vertices", 1, graph.locationsById.size());
+
+    LOG.info(progress.startMessage());
+    // TODO: Make this into a parallel stream, first calculate vertices per location and then add them.
     for (FlexStopLocation flexStopLocation : graph.locationsById.values()) {
       for (Vertex vertx : streetIndex.getVerticesForEnvelope(flexStopLocation
           .getGeometry()
@@ -48,7 +57,10 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
 
         streetVertex.flexStopLocations.add(flexStopLocation);
       }
+      // Keep lambda! A method-ref would cause incorrect class and line number to be logged
+      progress.step(m -> LOG.info(m));
     }
+    LOG.info(progress.completeMessage());
   }
 
   @Override

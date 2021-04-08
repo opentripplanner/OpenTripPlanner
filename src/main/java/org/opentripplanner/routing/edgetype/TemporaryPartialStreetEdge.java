@@ -34,10 +34,6 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
         this.parentEdge = parentEdge;
         setCarSpeed(parentEdge.getCarSpeed());
         setElevationProfileUsingParents();
-
-        // Assert that the edge is going in the right direction [only possible if vertex is temporary]
-        assertEdgeIsNotDirectedAwayFromTemporaryEndVertex(v1);
-        assertEdgeIsDirectedTowardsTemporaryEndVertex(v2);
     }
 
     /**
@@ -54,10 +50,6 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
         // No length is known, so we use the provided geometry to estimate it
         calculateLengthFromGeometry();
         setElevationProfileUsingParents();
-
-        // Assert that the edge is going in the right direction [only possible if vertex is temporary]
-        assertEdgeIsNotDirectedAwayFromTemporaryEndVertex(v1);
-        assertEdgeIsDirectedTowardsTemporaryEndVertex(v2);
     }
 
     /**

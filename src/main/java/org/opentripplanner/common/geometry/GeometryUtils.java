@@ -106,9 +106,9 @@ public class GeometryUtils {
         CoordinateSequence sequence = gf.getCoordinateSequenceFactory().create(coordinates);
         LineString total = new LineString(sequence, gf);
 
-        if (coordinates.length < 2) return new P2<LineString>(empty, empty);
-        if (fraction <= 0) return new P2<LineString>(empty, total);
-        if (fraction >= 1) return new P2<LineString>(total, empty);
+        if (coordinates.length < 2) { return new P2<>(empty, empty); }
+        if (fraction <= 0) { return new P2<>(empty, total); }
+        if (fraction >= 1) { return new P2<>(total, empty); }
 
         double totalDistance = total.getLength();
         double requestedDistance = totalDistance * fraction;
@@ -146,13 +146,16 @@ public class GeometryUtils {
         double dy = y1 - y0;
         double len2 = dx * dx + dy * dy;
         // this fixes a (reported) divide by zero bug in JTS when line segment has 0 length
-        if (len2 == 0)
+        if (len2 == 0) {
             return 0;
+        }
         double r = ( (xp - x0) * xscale * dx + (yp - y0) * dy ) / len2;
-        if (r < 0.0)
+        if (r < 0.0) {
             return 0.0;
-        else if (r > 1.0)
+        }
+        else if (r > 1.0) {
             return 1.0;
+        }
         return r;
     }
 

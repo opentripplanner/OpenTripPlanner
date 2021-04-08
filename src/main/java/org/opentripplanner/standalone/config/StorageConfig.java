@@ -17,7 +17,9 @@ import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_OSM_PATTE
  * <p>
  * Local file access is supported. Use the following URI format:
  * <pre>
- *     file:/a/b/c/filename.ext
+ *     file:/a/b/c/filename.ext                    -- Absolute URI
+ *     ../street/streetGraph.obj                   -- Relative URI (to OTP base path)
+ *     graph-${otp.serialization.version.id}.obj   -- Relative path with property substitution
  * </pre>
  * Google Cloud Storage(GCS) access is supported. Use the following URI format:
  * <pre>
@@ -40,8 +42,8 @@ import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_OSM_PATTE
  * In the example above, the Google cloud service credentials file resolved using an environment
  * variable. The OSM and GTFS data is streamed from Google Cloud Storage, the elevation data is
  * fetched from the local file system and the build report is stored in the cloud. All other
- * artifacts like the loaded graph, saved graph and NeTEx files are loaded and written from/to the local
- * base directory - it they exist.
+ * artifacts like the loaded graph, saved graph and NeTEx files are loaded and written from/to the
+ * local base directory - it they exist.
  */
 public class StorageConfig {
 

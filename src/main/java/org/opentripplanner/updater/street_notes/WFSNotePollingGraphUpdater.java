@@ -77,10 +77,9 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
 
     /**
-     * Here the updater can be configured using the properties in the file 'Graph.properties'.
-     * The property frequencySec is already read and used by the abstract base class.
+     * The property 'frequencySec' is already read and used by the abstract base class.
      */
-    public WFSNotePollingGraphUpdater(Parameters config) {
+    public WFSNotePollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config) {
         super(config);
         try {
             url = new URL(config.getUrl());
@@ -145,7 +144,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
 
             Geometry geom = (Geometry) feature.getDefaultGeometry();
             Geometry searchArea = geom.buffer(SEARCH_RADIUS_DEG);
-            Collection<Edge> edges = graph.streetIndex.getEdgesForEnvelope(searchArea.getEnvelopeInternal());
+            Collection<Edge> edges = graph.getStreetIndex().getEdgesForEnvelope(searchArea.getEnvelopeInternal());
             for(Edge edge: edges){
                 if (edge instanceof StreetEdge && !searchArea.disjoint(edge.getGeometry())) {
                     addNote(edge, streetNote, NOTE_MATCHER);
@@ -196,7 +195,4 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         return ret;
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getFeatureType();
-    }
 }

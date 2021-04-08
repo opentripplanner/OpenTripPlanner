@@ -1,26 +1,13 @@
-<!-- This file provides passwords and key details to the Maven plugins that sign our artifacts 
-     and deploy them to the OSSRH repository. The secret information is passed in with 
-     Travis CI secure environment variables in .travis.yml. -->
+<!-- This file provides credentials and other details to the Maven plugins that deploy our artifacts.
+     These are provided with Github repo secrets (and secrets.GITHUB_TOKEN is provided automatically).
+     Those secrets are copied to environment variables by the CI Action. -->
 <settings>
   <servers>
     <server>
-      <id>ossrh</id>
-      <username>${env.OSSRH_JIRA_USERNAME}</username>
-      <password>${env.OSSRH_JIRA_PASSWORD}</password>
+      <id>github</id>
+      <username>NONE</username>
+      <password>${env.GITHUB_TOKEN}</password>
     </server>
   </servers>
-  <profiles>
-    <profile>
-      <id>ossrh</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <gpg.executable>gpg</gpg.executable>
-        <gpg.keyname>${env.GPG_KEY_NAME}</gpg.keyname>
-        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
-      </properties>
-    </profile>
-  </profiles>
 </settings>
 

@@ -20,16 +20,16 @@ import java.util.List;
 public class CalculateTransferToDestination<T extends RaptorTripSchedule>
         implements ParetoSetEventListener<ArrivalView<T>> {
 
-    private final List<RaptorTransfer> egressLegs;
+    private final List<RaptorTransfer> egressPaths;
     private final DestinationArrivalPaths<T> destinationArrivals;
     private final CostCalculator<T> costCalculator;
 
     CalculateTransferToDestination(
-            List<RaptorTransfer> egressLegs,
+            List<RaptorTransfer> egressPaths,
             DestinationArrivalPaths<T> destinationArrivals,
             CostCalculator<T> costCalculator
     ) {
-        this.egressLegs = egressLegs;
+        this.egressPaths = egressPaths;
         this.destinationArrivals = destinationArrivals;
         this.costCalculator = costCalculator;
     }
@@ -45,21 +45,21 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
     public void notifyElementAccepted(ArrivalView<T> newElement) {
         if(newElement instanceof TransitStopArrival) {
             TransitStopArrival<T> transitStopArrival = (TransitStopArrival<T>) newElement;
-            for (RaptorTransfer egressLeg : egressLegs) {
+            for (RaptorTransfer egress : egressPaths) {
                 destinationArrivals.add(
                     transitStopArrival,
-                    egressLeg,
-                    costCalculator.walkCost(egressLeg.durationInSeconds())
+                    egress,
+                    costCalculator.walkCost(egress.durationInSeconds())
                 );
             }
         } else if (newElement instanceof TransferStopArrival) {
-            for (RaptorTransfer egressLeg : egressLegs) {
-                if (egressLeg.stopReachedOnBoard()) {
+            for (RaptorTransfer egress : egressPaths) {
+                if (egress.stopReachedOnBoard()) {
                     TransferStopArrival<T> transferStopArrival = (TransferStopArrival<T>) newElement;
                     destinationArrivals.add(
                         transferStopArrival,
-                        egressLeg,
-                        costCalculator.walkCost(egressLeg.durationInSeconds())
+                        egress,
+                        costCalculator.walkCost(egress.durationInSeconds())
                     );
                 }
             }

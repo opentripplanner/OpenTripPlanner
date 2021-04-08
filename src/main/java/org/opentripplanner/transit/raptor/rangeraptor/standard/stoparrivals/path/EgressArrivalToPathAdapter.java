@@ -10,7 +10,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Egre
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
@@ -29,7 +29,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     private final DestinationArrivalPaths<T> paths;
     private final TransitCalculator calculator;
     private final StopsCursor<T> cursor;
-    private final DebugHandler<ArrivalView<T>> debugHandler;
+    private final DebugHandler<ArrivalView<?>> debugHandler;
 
     private boolean newElementSet;
     private EgressStopArrivalState<T> bestEgressStopArrival = null;
@@ -48,8 +48,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
         this.cursor = cursor;
         lifeCycle.onSetupIteration((ignore) -> setupIteration());
         lifeCycle.onRoundComplete((ignore) -> roundComplete());
-
-        debugHandler = debugHandlerFactory.debugStopArrival();
+        this.debugHandler = debugHandlerFactory.debugStopArrival();
     }
 
     public void add(EgressStopArrivalState<T> egressStopArrival) {
@@ -85,7 +84,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     }
 
     private int destinationArrivalTime(EgressStopArrivalState<T> arrival) {
-        return calculator.plusDuration(arrival.transitTime(), arrival.egressLeg().durationInSeconds());
+        return calculator.plusDuration(arrival.transitTime(), arrival.egressPath().durationInSeconds());
     }
 
     @Override
@@ -94,6 +93,6 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     }
 
     private void addToPath(final EgressStopArrivalState<T> it) {
-        paths.add(cursor.transit(it.round(), it.stop()), it.egressLeg(), 0);
+        paths.add(cursor.transit(it.round(), it.stop()), it.egressPath(), 0);
     }
 }

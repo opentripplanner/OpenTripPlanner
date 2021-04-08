@@ -1,15 +1,10 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 public class RoutingRequestMapper {
 
@@ -45,14 +40,11 @@ public class RoutingRequestMapper {
         request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
         request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
         request.boardSlackForMode = c.asEnumMap("boardSlackForMode", TraverseMode.class, NodeAdapter::asInt);
-        request.debugItineraryFilter = c.asBoolean("debugItineraryFilter", dft.debugItineraryFilter);
         request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
         request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
         request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
         request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
-        request.debugItineraryFilter = c.asBoolean("debugItineraryFilter", dft.debugItineraryFilter);
-        request.groupBySimilarityKeepOne = c.asDouble("groupBySimilarityKeepOne", dft.groupBySimilarityKeepOne);
-        request.groupBySimilarityKeepNumOfItineraries = c.asDouble("groupBySimilarityKeepNumOfItineraries", dft.groupBySimilarityKeepNumOfItineraries);
+        request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"));
         request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
         request.disableRemainingWeightHeuristic = c.asBoolean("disableRemainingWeightHeuristic", dft.disableRemainingWeightHeuristic);
         request.driveOnRight = c.asBoolean("driveOnRight", dft.driveOnRight);
@@ -71,8 +63,7 @@ public class RoutingRequestMapper {
         request.maxWalkDistance = c.asDouble("maxWalkDistance", dft.maxWalkDistance);
         request.maxWeight = c.asDouble("maxWeight", dft.maxWeight);
         request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
-        request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, new HashSet<>(
-            Arrays.asList(TransitMode.values()))); // TODO Map default modes from config
+        request.modes = RequestModes.defaultRequestModes; // TODO Map default modes from config
         request.nonpreferredTransferCost = c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
         request.numItineraries = c.asInt("numItineraries", dft.numItineraries);
         request.onlyTransitTrips = c.asBoolean("onlyTransitTrips", dft.onlyTransitTrips);
@@ -85,7 +76,6 @@ public class RoutingRequestMapper {
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
         request.transferCost = c.asInt("transferPenalty", dft.transferCost);
         request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
-        request.transitGeneralizedCostLimit = c.asLinearFunction("transitGeneralizedCostLimit", dft.transitGeneralizedCostLimit);
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useBikeRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useBikeRentalAvailabilityInformation);
         request.useRequestedDateTimeInMaxHours = c.asBoolean("useRequestedDateTimeInMaxHours", dft.useRequestedDateTimeInMaxHours);

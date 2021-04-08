@@ -1,19 +1,19 @@
 package org.opentripplanner.model.base;
 
+import static java.lang.Boolean.TRUE;
+
+import java.util.BitSet;
 import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,13 +34,12 @@ import java.util.stream.Collectors;
  */
 public class ToStringBuilder {
     private static final String FIELD_SEPARATOR = ", ";
-    private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
+    private static final String FIELD_VALUE_SEP = ": ";
+    private static final String NULL_VALUE = "null";
 
     private final StringBuilder sb = new StringBuilder();
+    private final NumberFormat numFormat = new NumberFormat();
 
-    private DecimalFormat integerFormat;
-    private DecimalFormat decimalFormat;
-    private DecimalFormat coordinateFormat;
     private SimpleDateFormat calendarTimeFormat;
     boolean first = true;
 
@@ -60,19 +59,23 @@ public class ToStringBuilder {
     /* General purpose formatters */
 
     public ToStringBuilder addNum(String name, Number num) {
-        return addIfNotNull(name, num, this::formatNumber);
+        return addIfNotNull(name, num, numFormat::formatNumber);
     }
 
     public ToStringBuilder addNum(String name, Number value, Number ignoreValue) {
-        return addIfNotIgnored(name, value, ignoreValue, this::formatNumber);
+        return addIfNotIgnored(name, value, ignoreValue, numFormat::formatNumber);
     }
 
     public ToStringBuilder addNum(String name, Number num, String unit) {
-        return addIfNotNull(name, num, n -> formatNumber(n) + unit);
+        return addIfNotNull(name, num, n -> numFormat.formatNumber(n, unit));
     }
 
     public ToStringBuilder addBool(String name, Boolean value) {
         return addIfNotNull(name, value);
+    }
+
+    public ToStringBuilder addFieldIfTrue(String name, Boolean value) {
+        return TRUE.equals(value) ? addFieldName(name) : this;
     }
 
     public ToStringBuilder addStr(String name, String value) {
@@ -87,11 +90,11 @@ public class ToStringBuilder {
         return addIfNotNull(name, obj);
     }
 
-    public ToStringBuilder addEntityId(String name, TransitEntity<?> entity) {
+    public ToStringBuilder addEntityId(String name, TransitEntity entity) {
         return addIfNotNull(name, entity, e -> e.getId().toString());
     }
 
-    public <T> ToStringBuilder addInts(String name, int[] intArray) {
+    public ToStringBuilder addInts(String name, int[] intArray) {
         return addIfNotNull(name, intArray, Arrays::toString);
     }
 
@@ -99,15 +102,16 @@ public class ToStringBuilder {
         return addIfNotNull(name, c);
     }
 
-    public ToStringBuilder addColLimited(String name, Collection<?> c, int limit) {
+    /** Add the collection, truncate the number of elements at given maxLimit. */
+    public ToStringBuilder addCollection(String name, Collection<?> c, int maxLimit) {
         if(c == null) { return this; }
-        if(c.size() > limit+1) {
+        if(c.size() > maxLimit+1) {
             String value = c.stream()
-                    .limit(limit)
+                    .limit(maxLimit)
                     .map(Object::toString)
                     .collect(Collectors.joining(", "));
             return addIt(
-                    name + "(" + limit + "/" + c.size() + ")",
+                    name + "(" + maxLimit + "/" + c.size() + ")",
                     "[" + value + ", ..]"
 
             );
@@ -115,11 +119,26 @@ public class ToStringBuilder {
         return addIfNotNull(name, c);
     }
 
+    /** Add the collection, truncate the number of elements at given maxLimit. */
+    public ToStringBuilder addIntArraySize(String name, int[] array, int notSet) {
+        if(array == null) { return this; }
+        return addIt(
+            name,
+            Arrays.stream(array).filter(t -> t != notSet).count() + "/" + array.length
+        );
+    }
+
+    /** Add the BitSet: name : {cardinality}/{logical size}/{size} */
+    public ToStringBuilder addBitSetSize(String name, BitSet bitSet) {
+        if(bitSet == null) { return this; }
+        return addIt(name, bitSet.cardinality() + "/" + bitSet.length());
+    }
+
     /* Special purpose formatters */
 
     /** Add a Coordinate location, longitude or latitude */
     public ToStringBuilder addCoordinate(String name, Number num) {
-        return addIfNotNull(name, num, this::formatCoordinate);
+        return addIfNotNull(name, num, numFormat::formatCoordinate);
     }
 
     /**
@@ -140,13 +159,13 @@ public class ToStringBuilder {
     /**
      * Add times in seconds since midnight. Format:  hh:mm. {@code null} value is ignored.
      */
-    public <T> ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
+    public ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
         return addIfNotNull(
-                name,
-                value,
-                a -> Arrays.stream(a)
-                        .mapToObj(TimeUtils::timeToStrShort)
-                        .collect(Collectors.joining(", ", "[", "]"))
+            name,
+            value,
+            a -> Arrays.stream(a)
+                .mapToObj(TimeUtils::timeToStrCompact)
+                .collect(Collectors.joining(" ", "[", "]"))
         );
     }
 
@@ -155,16 +174,24 @@ public class ToStringBuilder {
      * seconds) is only added if they are not zero {@code 0}. This is the same format as the
      * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
      */
-    public ToStringBuilder addDuration(String name, Integer durationSeconds) {
-        return addIfNotIgnored(name, durationSeconds, null, TimeUtils::durationToStr);
+    public ToStringBuilder addDurationSec(String name, Integer durationSeconds) {
+        return addDurationSec(name, durationSeconds, null);
+    }
+
+    /**
+     * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
+     * seconds) is only added if they are not zero {@code 0}. This is the same format as the
+     * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
+     */
+    public ToStringBuilder addDurationSec(String name, Integer durationSeconds, Integer ignoreValue) {
+        return addIfNotIgnored(name, durationSeconds, ignoreValue, DurationUtils::durationToStr);
     }
 
     public ToStringBuilder addDuration(String name, Duration duration) {
         return addIfNotIgnored(
             name,
             duration,
-            null,
-            d -> TimeUtils.durationToStr((int)d.toSeconds())
+            null, d -> DurationUtils.durationToStr((int)d.toSeconds())
         );
     }
 
@@ -187,16 +214,22 @@ public class ToStringBuilder {
     private <T> ToStringBuilder addIfNotIgnored(String name, T value, T ignoreValue, Function<T, String> mapToString) {
         if(value == ignoreValue) { return this; }
         if(ignoreValue != null && ignoreValue.equals(value)) { return this; }
-        if(value == null) { return addIt(name, "null"); }
+        if(value == null) { return addIt(name, NULL_VALUE); }
         return addIt(name, mapToString.apply(value));
     }
 
     private ToStringBuilder addIt(String name, @NotNull String value) {
+        addFieldName(name);
+        sb.append(FIELD_VALUE_SEP);
+        sb.append(value);
+        return this;
+    }
+
+    private ToStringBuilder addFieldName(String name) {
         if (first) { first = false; }
         else { sb.append(FIELD_SEPARATOR); }
 
-        sb.append(name).append(": ");
-        sb.append(value);
+        sb.append(name);
         return this;
     }
 
@@ -205,30 +238,5 @@ public class ToStringBuilder {
             calendarTimeFormat = new SimpleDateFormat("HH:mm:ss");
         }
         return calendarTimeFormat.format(time.getTime());
-    }
-
-    String formatCoordinate(Number value) {
-        if(coordinateFormat == null) {
-            coordinateFormat = new DecimalFormat("#0.0####", DECIMAL_SYMBOLS);
-        }
-        // This need to be null-safe, because one of the coordinates in
-        // #addCoordinate(String name, Number lat, Number lon) could be null.
-        return value == null ? "null" : coordinateFormat.format(value);
-    }
-
-    String formatNumber(Number value) {
-        if (value == null) { return "null"; }
-
-        if(value instanceof Integer || value instanceof Long || value instanceof BigInteger) {
-            if(integerFormat == null) {
-                integerFormat = new DecimalFormat("#,##0", DECIMAL_SYMBOLS);
-            }
-            return integerFormat.format(value);
-        }
-
-        if(decimalFormat == null) {
-            decimalFormat = new DecimalFormat("#,##0.0##", DECIMAL_SYMBOLS);
-        }
-        return decimalFormat.format(value);
     }
 }

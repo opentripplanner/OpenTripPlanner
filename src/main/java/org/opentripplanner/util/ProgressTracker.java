@@ -1,6 +1,7 @@
 package org.opentripplanner.util;
 
 import org.opentripplanner.common.LoggingUtil;
+import org.opentripplanner.util.time.DurationUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,8 +10,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-
-import static org.opentripplanner.transit.raptor.util.TimeUtils.durationToStr;
 
 
 /**
@@ -232,9 +231,9 @@ public class ProgressTracker {
         Duration totalTime = Duration.between(startTime, Instant.now());
         // Add 1 millisecond to prevent / by zero.
         String stepsPerSecond = toStr(Math.round(1000d * ii / (totalTime.toMillis()+1)));
-        return String.format(
+      return String.format(
                 "%s progress tracking complete. %s done in %s (%s pr second). ",
-                actionName, toStr(ii), durationToStr(totalTime), stepsPerSecond
+                actionName, toStr(ii), DurationUtils.durationToStr(totalTime), stepsPerSecond
         );
     }
 

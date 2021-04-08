@@ -1,14 +1,18 @@
 package org.opentripplanner.graph_builder.module;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
@@ -16,10 +20,8 @@ import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -37,22 +39,16 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 public class AddTransitModelEntitiesToGraph {
     private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
 
 
-    private GtfsFeedId feedId;
+    private final GtfsFeedId feedId;
 
     private final OtpTransitService transitService;
 
     // Map of all station elements and their vertices in the graph
-    private Map<StationElement, Vertex> stationElementNodes = new HashMap<>();
+    private final Map<StationElement, Vertex> stationElementNodes = new HashMap<>();
 
     private final int subwayAccessTime;
 
@@ -200,6 +196,7 @@ public class AddTransitModelEntitiesToGraph {
                     new PathwayEdge(
                         fromVertex,
                         toVertex,
+                        pathway.getId(),
                         pathway.getName(),
                         pathway.getTraversalTime(),
                         pathway.getLength(),
@@ -211,6 +208,7 @@ public class AddTransitModelEntitiesToGraph {
                         new PathwayEdge(
                             toVertex,
                             fromVertex,
+                            pathway.getId(),
                             pathway.getReversedName(),
                             pathway.getTraversalTime(),
                             pathway.getLength(),
@@ -248,13 +246,13 @@ public class AddTransitModelEntitiesToGraph {
         Vertex toVertex
     ) {
         StationElement fromStation = fromVertex.getStationElement();
-        String fromVertexLevelName = fromStation == null
+        String fromVertexLevelName = fromStation == null || fromStation.getLevelName() == null
             ? fromVertex.getName()
             : fromStation.getLevelName();
         Double fromVertexLevelIndex = fromStation == null ? null : fromStation.getLevelIndex();
 
         StationElement toStation = toVertex.getStationElement();
-        String toVertexLevelName = toStation == null
+        String toVertexLevelName = toStation == null || toStation.getLevelName() == null
             ? toVertex.getName()
             : toStation.getLevelName();
         Double toVertexLevelIndex = toStation == null ? null : toStation.getLevelIndex();
@@ -354,11 +352,9 @@ public class AddTransitModelEntitiesToGraph {
     }
 
     private void addTransfersToGraph(Graph graph) {
-        Collection<Transfer> transfers = transitService.getAllTransfers();
-        TransferTable transferTable = graph.getTransferTable();
-        for (Transfer sourceTransfer : transfers) {
-            transferTable.addTransfer(sourceTransfer);
-        }
+        graph.getTransferService().addAll(
+            transitService.getAllTransfers()
+        );
     }
 
     private void addFlexTripsToGraph(Graph graph) {

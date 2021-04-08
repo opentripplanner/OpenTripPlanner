@@ -24,20 +24,20 @@ public class T2<E1, E2> implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof T2)) return false;
+        if (!(object instanceof T2)) { return false; }
 
-        T2 other = (T2) object;
+        var other = (T2) object;
 
         if (first == null) {
-            if (other.first != null) return false;
+            if (other.first != null) { return false; }
         } else {
-            if (!first.equals(other.first)) return false;
+            if (!first.equals(other.first)) { return false; }
         }
 
         if (second == null) {
-            if (other.second != null) return false;
+            if (other.second != null) { return false; }
         } else {
-            if (!second.equals(other.second)) return false;
+            if (!second.equals(other.second)) { return false; }
         }
 
         return true;

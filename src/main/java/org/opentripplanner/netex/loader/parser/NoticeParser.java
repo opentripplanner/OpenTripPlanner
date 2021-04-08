@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.netex.loader.NetexImportDataIndex;
+import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.DataManagedObjectStructure;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
@@ -57,7 +57,7 @@ class NoticeParser {
         }
     }
 
-    void setResultOnIndex(NetexImportDataIndex index) {
+    void setResultOnIndex(NetexEntityIndex index) {
         // update entities
         index.noticeById.addAll(notices);
         index.noticeAssignmentById.addAll(noticeAssignments);

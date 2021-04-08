@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 class ItineraryResultMapper {
     private static final Map<String, String> AGENCY_NAMES_SHORT = new HashMap<>();
 
+    private final boolean skipCost;
+    private final String testCaseId;
+
     static {
         AGENCY_NAMES_SHORT.put("Agder flyekspress", "AgderFly");
         AGENCY_NAMES_SHORT.put("Agder Kollektivtrafikk as", "Agder");
@@ -52,11 +55,17 @@ class ItineraryResultMapper {
         AGENCY_NAMES_SHORT.put("Østfold fylkeskommune", "Øst");
     }
 
-    static Collection<Result> map(final String testCaseId, Collection<Itinerary> itineraries) {
-        return itineraries.stream().map(it -> map(testCaseId, it)).collect(Collectors.toList());
+    private ItineraryResultMapper(boolean skipCost, String testCaseId) {
+        this.skipCost = skipCost;
+        this.testCaseId = testCaseId;
     }
 
-    private static Result map(String testCaseId, Itinerary itinerary) {
+    static Collection<Result> map(final String testCaseId, Collection<Itinerary> itineraries, boolean skipCost) {
+        var mapper = new ItineraryResultMapper(skipCost, testCaseId);
+        return itineraries.stream().map(mapper::map).collect(Collectors.toList());
+    }
+
+    private Result map(Itinerary itinerary) {
         Result result = new Result(
                 testCaseId,
                 itinerary.transfers,

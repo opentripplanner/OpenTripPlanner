@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Update OTP stop time tables from some (realtime) source
  *
- * Usage example ('rt' name is an example) in file 'Graph.properties':
+ * Usage example:
  *
  * <pre>
  * rt.type = stop-time-updater
@@ -75,13 +75,12 @@ public class SiriVMUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    public SiriVMUpdater(Parameters config) {
+    public SiriVMUpdater(SiriVMUpdaterParameters config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
 
-        updateSource = new SiriVMHttpTripUpdateSource( (SiriVMHttpTripUpdateSource.Parameters)
-            config.getSourceConfig().getUpdaterSourceParameters());
+        updateSource = new SiriVMHttpTripUpdateSource(config.sourceParameters());
 
         int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
@@ -168,12 +167,4 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         return "Polling SIRI VM updater with update source = " + s;
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getFeedId();
-        int getLogFrequency();
-        int getMaxSnapshotFrequencyMs();
-        boolean purgeExpiredData();
-        boolean fuzzyTripMatching();
-        boolean blockReadinessUntilInitialized();
-    }
 }

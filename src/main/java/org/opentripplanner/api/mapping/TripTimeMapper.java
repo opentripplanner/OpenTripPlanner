@@ -21,20 +21,20 @@ public class TripTimeMapper {
 
         ApiTripTimeShort api = new ApiTripTimeShort();
 
-        api.stopId             = FeedScopedIdMapper.mapToApi(domain.stopId);
-        api.stopIndex          = domain.stopIndex;
-        api.stopCount          = domain.stopCount;
-        api.scheduledArrival   = domain.scheduledArrival;
-        api.scheduledDeparture = domain.scheduledDeparture;
-        api.realtimeArrival    = domain.realtimeArrival;
-        api.realtimeDeparture  = domain.realtimeDeparture;
-        api.arrivalDelay       = domain.arrivalDelay;
-        api.departureDelay     = domain.departureDelay;
-        api.timepoint          = domain.timepoint;
-        api.realtime           = domain.realtime;
-        api.realtimeState      = ApiRealTimeState.RealTimeState(domain.realtimeState);
-        api.blockId            = domain.blockId;
-        api.headsign           = domain.headsign;
+        api.stopId             = FeedScopedIdMapper.mapToApi(domain.getStopId());
+        api.stopIndex          = domain.getStopIndex();
+        api.stopCount          = domain.getStopCount();
+        api.scheduledArrival   = domain.getScheduledArrival();
+        api.scheduledDeparture = domain.getScheduledDeparture();
+        api.realtimeArrival    = domain.getRealtimeArrival();
+        api.realtimeDeparture  = domain.getRealtimeDeparture();
+        api.arrivalDelay       = domain.getArrivalDelay();
+        api.departureDelay     = domain.getDepartureDelay();
+        api.timepoint          = domain.isTimepoint();
+        api.realtime           = domain.isRealtime();
+        api.realtimeState      = ApiRealTimeState.RealTimeState(domain.getRealtimeState());
+        api.blockId            = domain.getBlockId();
+        api.headsign           = domain.getHeadsign();
 
         return api;
     }

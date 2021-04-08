@@ -18,7 +18,7 @@ import java.net.URI;
 /**
  * GTFS-RT alerts updater
  *
- * Usage example ('myalert' name is an example) in file 'Graph.properties':
+ * Usage example:
  *
  * <pre>
  * myalert.type = real-time-alerts
@@ -54,14 +54,9 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public GtfsRealtimeAlertsUpdater(Parameters config) {
+    public GtfsRealtimeAlertsUpdater(GtfsRealtimeAlertsUpdaterParameters config) {
         super(config);
-
-        String url = config.getUrl();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-        this.url = url;
+        this.url = config.getUrl();
         this.earlyStart = config.getEarlyStartSec();
         this.feedId = config.getFeedId();
         this.fuzzyTripMatching = config.fuzzyTripMatching();
@@ -125,9 +120,4 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         return "GtfsRealtimeUpdater(" + url + ")";
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        int getEarlyStartSec();
-        String getFeedId();
-        boolean fuzzyTripMatching();
-    }
 }

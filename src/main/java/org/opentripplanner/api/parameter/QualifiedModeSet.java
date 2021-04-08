@@ -114,12 +114,35 @@ public class QualifiedModeSet implements Serializable {
                         egressMode = StreetMode.WALK;
                         directMode = StreetMode.CAR_TO_PARK;
                     }
+                    else if (qMode.qualifiers.contains(Qualifier.PICKUP)) {
+                        accessMode = StreetMode.WALK;
+                        egressMode = StreetMode.CAR_PICKUP;
+                        directMode = StreetMode.CAR;
+                    }
+                    else if (qMode.qualifiers.contains(Qualifier.DROPOFF)) {
+                        accessMode = StreetMode.CAR_PICKUP;
+                        egressMode = StreetMode.WALK;
+                        directMode = StreetMode.CAR;
+                    }
                     else {
                         accessMode = StreetMode.WALK;
                         egressMode = StreetMode.WALK;
                         directMode = StreetMode.CAR;
                     }
                     break;
+            }
+        }
+
+        // These modes are set last in order to take precedence over other modes
+        for (QualifiedMode qMode : qModes) {
+            if (qMode.mode.equals(ApiRequestMode.FLEX)) {
+                if (qMode.qualifiers.contains(Qualifier.ACCESS)) {
+                    accessMode = StreetMode.FLEXIBLE;
+                } else if (qMode.qualifiers.contains(Qualifier.EGRESS)) {
+                    egressMode = StreetMode.FLEXIBLE;
+                } else if (qMode.qualifiers.contains(Qualifier.DIRECT)) {
+                    directMode = StreetMode.FLEXIBLE;
+                }
             }
         }
 

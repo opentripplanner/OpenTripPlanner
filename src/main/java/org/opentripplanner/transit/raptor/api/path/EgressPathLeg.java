@@ -16,17 +16,20 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     private final int fromStop;
     private final int fromTime;
     private final int toTime;
+    private final int cost;
 
-    public EgressPathLeg(RaptorTransfer egress, int fromStop, int fromTime, int toTime) {
+    public EgressPathLeg(RaptorTransfer egress, int fromStop, int fromTime, int toTime, int cost) {
         this.egress = egress;
         this.fromStop = fromStop;
         this.fromTime = fromTime;
         this.toTime = toTime;
+        this.cost = cost;
     }
 
     /**
      * The stop index where the leg start, also called the leg departure stop index.
      */
+    @Override
     public final int fromStop() {
         return fromStop;
     }
@@ -41,6 +44,11 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
         return toTime;
     }
 
+    @Override
+    public int generalizedCost() {
+        return cost;
+    }
+
     public RaptorTransfer egress() {
         return egress;
     }
@@ -51,7 +59,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     @Override
     public final TransitPathLeg<T> nextLeg() {
         throw new java.lang.UnsupportedOperationException(
-                "The egress leg is the last leg in a path. Use isEgressLeg() to identify las leg."
+                "The egress leg is the last leg in a path. Use isEgressLeg() to identify last leg."
         );
     }
 
@@ -67,8 +75,8 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         EgressPathLeg<?> that = (EgressPathLeg<?>) o;
         return fromStop == that.fromStop &&
                 fromTime == that.fromTime &&

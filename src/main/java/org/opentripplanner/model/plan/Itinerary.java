@@ -68,8 +68,10 @@ public class Itinerary {
      * If a generalized cost is used in the routing algorithm, this should be the total
      * cost computed by the algorithm. This is relevant for anyone who want to debug an search
      * and tuning the system. The unit should be equivalent to the cost of "one second of transit".
+     * <p>
+     * -1 indicate that the cost is not set/computed.
      */
-    public int generalizedCost = 0;
+    public int generalizedCost = -1;
 
     /**
      * This itinerary has a greater slope than the user requested (but there are no possible
@@ -134,6 +136,21 @@ public class Itinerary {
      */
     public Calendar endTime() {
         return lastLeg().endTime;
+    }
+
+    /**
+     * Reflects the departureDelay on the first Leg
+     * Unit: seconds.
+     */
+    public int departureDelay() {
+        return firstLeg().departureDelay;
+    }
+    /**
+     * Reflects the arrivalDelay on the last Leg
+     * Unit: seconds.
+     */
+    public int arrivalDelay() {
+        return lastLeg().arrivalDelay;
     }
 
 
@@ -236,11 +253,11 @@ public class Itinerary {
                 .addCalTime("start", firstLeg().startTime)
                 .addCalTime("end", lastLeg().endTime)
                 .addNum("nTransfers", nTransfers, -1)
-                .addDuration("duration", durationSeconds)
+                .addDurationSec("duration", durationSeconds)
                 .addNum("generalizedCost", generalizedCost)
-                .addDuration("nonTransitTime", nonTransitTimeSeconds)
-                .addDuration("transitTime", transitTimeSeconds)
-                .addDuration("waitingTime", waitingTimeSeconds)
+                .addDurationSec("nonTransitTime", nonTransitTimeSeconds)
+                .addDurationSec("transitTime", transitTimeSeconds)
+                .addDurationSec("waitingTime", waitingTimeSeconds)
                 .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
                 .addBool("nonTransitLimitExceeded", nonTransitLimitExceeded)
                 .addBool("tooSloped", tooSloped)
@@ -285,7 +302,7 @@ public class Itinerary {
                 buf.walk((int)leg.getDuration());
             }
             else if(leg.isTransitLeg()) {
-              buf.transit(leg.mode, leg.getTrip().getId().getId(), leg.startTime, leg.endTime);
+              buf.transit(leg.mode, leg.getTrip().logInfo(), leg.startTime, leg.endTime);
             }
             else {
                 buf.other(leg.mode, leg.startTime, leg.endTime);

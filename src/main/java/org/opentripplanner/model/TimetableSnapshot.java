@@ -1,9 +1,8 @@
 package org.opentripplanner.model;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -77,16 +76,14 @@ public class TimetableSnapshot {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
+            if (this == obj) { return true; }
+            if (obj == null) { return false; }
+            if (getClass() != obj.getClass()) {
                 return false;
-            if (getClass() != obj.getClass())
-                return false;
+            }
             TripIdAndServiceDate other = (TripIdAndServiceDate) obj;
-            boolean result = Objects.equals(this.tripId, other.tripId) &&
+            return Objects.equals(this.tripId, other.tripId) &&
                     Objects.equals(this.serviceDate, other.serviceDate);
-            return result;
         }
     }
 
@@ -121,9 +118,11 @@ public class TimetableSnapshot {
      * stop. This has to be kept in order for them to be included in the stop times api call on a
      * specific stop.
      *
+     * This is a SetMultimap, so that each pattern can only be added once.
+     *
      * TODO Find a generic way to keep all realtime indexes.
      */
-    private Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
+    private SetMultimap<Stop, TripPattern> patternsForStop = HashMultimap.create();
     
     /**
      * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it shouldn't
@@ -262,7 +261,7 @@ public class TimetableSnapshot {
         }
         
         TimetableSnapshot ret = new TimetableSnapshot();
-        if (!force && !this.isDirty()) return null;
+        if (!force && !this.isDirty()) { return null; }
         for (Timetable tt : dirtyTimetables) {
             tt.finish(); // summarize, index, etc. the new timetables
         }
@@ -368,7 +367,7 @@ public class TimetableSnapshot {
     }
 
     public boolean isDirty() {
-        if (readOnly) return false;
+        if (readOnly) { return false; }
         return dirty;
     }
 
@@ -386,9 +385,14 @@ public class TimetableSnapshot {
         return timetables.keySet();
     }
 
+    /**
+     * Add the patterns to the stop index, only if they come from a modified pattern
+     */
     private void addPatternToIndex(TripPattern tripPattern) {
-        for (Stop stop: tripPattern.getStops()) {
-            patternsForStop.put(stop, tripPattern);
+        if (tripPattern.isCreatedByRealtimeUpdater()) {
+            for (Stop stop: tripPattern.getStops()) {
+                patternsForStop.put(stop, tripPattern);
+            }
         }
     }
 
@@ -396,7 +400,7 @@ public class TimetableSnapshot {
         return patternsForStop.get(stop);
     }
 
-    public void setPatternsForStop(Multimap<Stop, TripPattern> patternsForStop) {
+    public void setPatternsForStop(SetMultimap<Stop, TripPattern> patternsForStop) {
         this.patternsForStop = patternsForStop;
     }
 }

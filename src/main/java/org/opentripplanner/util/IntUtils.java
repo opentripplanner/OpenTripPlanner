@@ -70,10 +70,12 @@ public class IntUtils {
         int retVal = 0;
 
         Integer n = getIntegerFromString(input);
-        if (n != null)
+        if (n != null) {
             retVal = n.intValue();
-        else if (input != null)
+        }
+        else if (input != null) {
             retVal = input.hashCode();
+        }
 
         return retVal;
     }
@@ -93,8 +95,9 @@ public class IntUtils {
 
     public static Integer getIntegerFromString(String input, Integer def) {
         Integer retVal = getIntegerFromString(input);
-        if (retVal == null)
+        if (retVal == null) {
             retVal = def;
+        }
 
         return retVal;
     }
@@ -119,8 +122,9 @@ public class IntUtils {
      * @return
      */
     public static Integer getIntegerFromSubString(String target, String prefix, String suffix) {
-        if (target == null)
+        if (target == null) {
             return null;
+        }
 
         Integer retVal = null;
         try {
