@@ -352,6 +352,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     public int carDropoffTime = 120;
 
+    /** Time of getting in/out of a carPickup (taxi) */
+    public int carPickupTime = 60;
+
+    /** Cost of getting in/out of a carPickup (taxi) */
+    public int carPickupCost = 120;
+
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle
      * time as the same.
