@@ -4,6 +4,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
@@ -75,7 +76,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           tStop,
-          TraverseMode.WALK,
+          new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
@@ -95,7 +96,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       if (graph.getAllFlexStops().contains(tStop.getStop())) {
         graph.getLinker().linkVertexPermanently(
             tStop,
-            TraverseMode.CAR,
+            new TraverseModeSet(TraverseMode.CAR),
             LinkingDirection.BOTH_WAYS,
             (vertex, streetVertex) -> List.of(
                 new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
@@ -111,7 +112,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           tEntrance,
-          TraverseMode.WALK,
+          new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetTransitEntranceLink((TransitEntranceVertex) vertex, streetVertex),
@@ -127,7 +128,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (BikeRentalStationVertex bikeRental : graph.getVerticesOfType(BikeRentalStationVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           bikeRental,
-          TraverseMode.WALK,
+          new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
@@ -143,7 +144,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (BikeParkVertex bikePark : graph.getVerticesOfType(BikeParkVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           bikePark,
-          TraverseMode.WALK,
+          new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),

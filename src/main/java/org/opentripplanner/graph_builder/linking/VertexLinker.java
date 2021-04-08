@@ -1,17 +1,14 @@
 package org.opentripplanner.graph_builder.linking;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.geocoder.google.Geometry;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -26,6 +23,7 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -86,13 +84,13 @@ public class VertexLinker {
 
   public void linkVertexPermanently(
       Vertex vertex,
-      TraverseMode traverseMode,
+      TraverseModeSet traverseModes,
       LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
     link(
       vertex,
-      traverseMode,
+      traverseModes,
       direction,
       Scope.PERMANENT,
       edgeFunction
@@ -101,13 +99,13 @@ public class VertexLinker {
 
   public DisposableEdgeCollection linkVertexForRealTime(
       Vertex vertex,
-      TraverseMode traverseMode,
+      TraverseModeSet traverseModes,
       LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
     return link(
         vertex,
-        traverseMode,
+        traverseModes,
         direction,
         Scope.REALTIME,
         edgeFunction
@@ -116,13 +114,13 @@ public class VertexLinker {
 
   public DisposableEdgeCollection linkVertexForRequest(
       Vertex vertex,
-      TraverseMode traverseMode,
+      TraverseModeSet traverseModes,
       LinkingDirection direction,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
     return link(
         vertex,
-        traverseMode,
+        traverseModes,
         direction,
         Scope.REQUEST,
         edgeFunction
@@ -146,7 +144,7 @@ public class VertexLinker {
    * more efficient in dense areas.
    *
    * @param vertex        Vertex to be linked into the street graph
-   * @param traverseMode  Only street edges allowing this mode will be linked
+   * @param traverseModes Only street edges allowing one of these modes will be linked
    * @param direction     The direction of the new edges to be created
    * @param scope         The scope of the split
    * @param edgeFunction  How the provided vertex should be linked into the street graph
@@ -156,7 +154,7 @@ public class VertexLinker {
    */
   private DisposableEdgeCollection link(
       Vertex vertex,
-      TraverseMode traverseMode,
+      TraverseModeSet traverseModes,
       LinkingDirection direction,
       Scope scope,
       BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
@@ -167,7 +165,7 @@ public class VertexLinker {
 
     try {
       Set<StreetVertex> streetVertices = linkToStreetEdges(vertex,
-          traverseMode,
+          traverseModes,
           direction,
           scope,
           INITIAL_SEARCH_RADIUS_METERS,
@@ -175,7 +173,7 @@ public class VertexLinker {
       );
       if (streetVertices.isEmpty()) {
         streetVertices = linkToStreetEdges(vertex,
-            traverseMode,
+            traverseModes,
             direction,
             scope,
             MAX_SEARCH_RADIUS_METERS,
@@ -203,7 +201,7 @@ public class VertexLinker {
 
   private Set<StreetVertex> linkToStreetEdges(
       Vertex vertex,
-      TraverseMode traverseMode,
+      TraverseModeSet traverseModes,
       LinkingDirection direction,
       Scope scope,
       int radiusMeters,
@@ -220,23 +218,43 @@ public class VertexLinker {
     // Expand more in the longitude direction than the latitude direction to account for converging meridians.
     env.expandBy(radiusDeg / xscale, radiusDeg);
 
-    final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary.metersToDegrees(
-        DUPLICATE_WAY_EPSILON_METERS
-    );
-
-    final TraverseModeSet traverseModeSet = new TraverseModeSet(traverseMode);
-
-    // Perform several transformations at once on the edges returned by the index.
-    // Only consider street edges traversable by the given mode and still present in the graph.
-    // Calculate a distance to each of those edges, and keep only the ones within the search radius.
+    // Perform several transformations at once on the edges returned by the index. Only consider
+    // street edges traversable by at least one of the given modes and are still present in the
+    // graph. Calculate a distance to each of those edges, and keep only the ones within the search
+    // radius.
     List<DistanceTo<StreetEdge>> candidateEdges = streetSpatialIndex
         .query(env, scope)
         .filter(StreetEdge.class::isInstance)
         .map(StreetEdge.class::cast)
-        .filter(e -> e.canTraverse(traverseModeSet) && edgeReachableFromGraph(e))
+        .filter(e -> e.canTraverse(traverseModes) && edgeReachableFromGraph(e))
         .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
         .filter(ead -> ead.distanceDegreesLat < radiusDeg)
         .collect(Collectors.toList());
+
+    if (candidateEdges.isEmpty()) { return Set.of(); }
+
+    Set<DistanceTo<StreetEdge>> closesEdges = getClosestEdgesPerMode(
+        traverseModes,
+        candidateEdges
+    );
+
+    return closesEdges.stream()
+            .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges))
+            .collect(Collectors.toSet());
+  }
+
+  /**
+   * We need to get the closest edges per mode to be sure that we are linking to edges traversable
+   * by all the specified modes. We use a set here to avoid duplicates in the case that edges
+   * are traversable by more than one of the modes specified.
+   */
+  private Set<DistanceTo<StreetEdge>> getClosestEdgesPerMode(
+      TraverseModeSet traverseModeSet,
+      List<DistanceTo<StreetEdge>> candidateEdges
+  ) {
+    final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary.metersToDegrees(
+        DUPLICATE_WAY_EPSILON_METERS
+    );
 
     // The following logic has gone through several different versions using different approaches.
     // The core idea is to find all edges that are roughly the same distance from the given vertex, which will
@@ -249,21 +267,23 @@ public class VertexLinker {
     // other half lost. It seems like this was based on some incorrect premises about floating point calculations
     // being non-deterministic.
 
-    if (candidateEdges.isEmpty()) { return Set.of(); }
+    Set<DistanceTo<StreetEdge>> closesEdges = new HashSet<>();
+    for (TraverseMode mode : traverseModeSet.getModes()) {
+      TraverseModeSet modeSet = new TraverseModeSet(mode);
+      // There is at least one appropriate edge within range.
+      double closestDistance = candidateEdges
+          .stream()
+          .filter(e -> e.item.canTraverse(modeSet))
+          .mapToDouble(ce -> ce.distanceDegreesLat)
+          .min()
+          .getAsDouble();
 
-    // There is at least one appropriate edge within range.
-    double closestDistance = candidateEdges
-        .stream()
-        .mapToDouble(ce -> ce.distanceDegreesLat)
-        .min()
-        .getAsDouble();
-
-    return candidateEdges
-        .stream()
-        .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
-        .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges))
-        .collect(Collectors.toSet());
-
+      closesEdges.addAll(candidateEdges
+          .stream()
+          .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
+          .collect(Collectors.toSet()));
+    }
+    return closesEdges;
   }
 
   /**
@@ -373,8 +393,8 @@ public class VertexLinker {
    * @param originalEdge   to be split
    * @param ll             fraction at which to split the edge
    * @param scope          the scope of the split
-   * @param endVertex      if this is temporary edge this is true if this is end vertex otherwise it
-   *                       doesn't matter
+   * @param direction      what direction to link the edges
+   * @param tempEdges      collection of temporary edges
    * @return Splitter vertex with added new edges
    */
   private SplitterVertex split(

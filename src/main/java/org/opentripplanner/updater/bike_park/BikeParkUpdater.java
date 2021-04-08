@@ -5,6 +5,7 @@ import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
@@ -110,7 +111,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
                     DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
                         bikeParkVertex,
-                        TraverseMode.WALK,
+                        new TraverseModeSet(TraverseMode.WALK),
                         LinkingDirection.BOTH_WAYS,
                         (vertex, streetVertex) -> List.of(
                             new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),
