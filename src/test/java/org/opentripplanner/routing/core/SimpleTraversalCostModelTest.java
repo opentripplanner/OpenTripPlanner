@@ -1,20 +1,20 @@
 package org.opentripplanner.routing.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for SimpleIntersectionTraversalCostModel.
@@ -50,6 +50,7 @@ public class SimpleTraversalCostModelTest {
         // Graph for a fictional grid city with turn restrictions
         IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false);
         IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false);
+        v2.trafficLight = true;
 
         StreetEdge e1 = edge(v1, v2, 1.0, false);
 
@@ -86,6 +87,33 @@ public class SimpleTraversalCostModelTest {
         assertEquals(90, leftHandDriveAngle);
         assertTrue(costModel.isEasyTurn(leftHandDriveAngle));
         assertFalse(costModel.isTurnAcrossTraffic(leftHandDriveAngle));
+
+        // on a bike the turn cost for crossing traffic (left turn in left hand driving countries)
+        // should be higher than going the opposite direction
+
+        assertEquals(
+                1.6875,
+                costModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, options, 40, 40),
+                0.1
+        );
+        assertEquals(
+                0.5625,
+                costModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, options, 40, 40),
+                0.1
+        );
+
+        // in left hand driving countries it should be the opposite
+
+        assertEquals(
+                0.5625,
+                costModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, leftHandReq, 40, 40),
+                0.1
+        );
+        assertEquals(
+                1.6875,
+                costModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, leftHandReq, 40, 40),
+                0.1
+        );
     }
 
     @Test
