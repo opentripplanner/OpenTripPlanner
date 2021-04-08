@@ -112,7 +112,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (BikeRentalStationVertex bikeRental : graph.getVerticesOfType(BikeRentalStationVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           bikeRental,
-          new TraverseModeSet(TraverseMode.WALK),
+          new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
@@ -128,7 +128,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (BikeParkVertex bikePark : graph.getVerticesOfType(BikeParkVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           bikePark,
-          new TraverseModeSet(TraverseMode.WALK),
+          new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),

@@ -123,7 +123,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     bikeRentalVertex = new BikeRentalStationVertex(graph, station);
                     DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
                         bikeRentalVertex,
-                        new TraverseModeSet(TraverseMode.WALK),
+                        new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE),
                         LinkingDirection.BOTH_WAYS,
                         (vertex, streetVertex) -> List.of(
                             new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
