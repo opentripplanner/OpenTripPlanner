@@ -2,6 +2,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -9,8 +10,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
-
-import java.util.stream.Collectors;
 
 public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlan {
 
@@ -83,7 +82,7 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<DebugOutput> debugOutput() {
-    return environment -> getSource(environment).getDebugAggregator().finishedRendering();
+    return environment -> getSource(environment).getDebugTimingAggregator().finishedRendering();
   }
 
   private RoutingResponse getSource(DataFetchingEnvironment environment) {

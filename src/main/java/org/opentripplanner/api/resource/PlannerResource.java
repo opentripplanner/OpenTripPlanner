@@ -1,5 +1,15 @@
 package org.opentripplanner.api.resource;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.RoutingResource;
@@ -14,17 +24,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 /**
  * This is the primary entry point for the trip planning web service.
@@ -90,7 +89,7 @@ public class PlannerResource extends RoutingResource {
             response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
             response.elevationMetadata.geoidElevation = request.geoidElevation;
 
-            response.debugOutput = res.getDebugAggregator().finishedRendering();
+            response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
         }
         catch (Exception e) {
             LOG.error("System error", e);

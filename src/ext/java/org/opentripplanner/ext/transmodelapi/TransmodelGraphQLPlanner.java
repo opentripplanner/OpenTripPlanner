@@ -1,7 +1,20 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.DoubleFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
@@ -25,20 +38,6 @@ import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.DoubleFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
-
 public class TransmodelGraphQLPlanner {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphQLPlanner.class);
@@ -57,7 +56,7 @@ public class TransmodelGraphQLPlanner {
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
             response.messages = res.getRoutingErrors();
-            response.debugOutput = res.getDebugAggregator().finishedRendering();
+            response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
         }
         catch (ParameterException e) {
             var msg = e.message.get();

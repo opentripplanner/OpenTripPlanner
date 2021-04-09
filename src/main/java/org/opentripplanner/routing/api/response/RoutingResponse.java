@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.api.response;
 
-import org.opentripplanner.model.plan.TripPlan;
-import org.opentripplanner.routing.framework.DebugTimingAggregator;
-
 import java.util.List;
 import java.util.StringJoiner;
+import org.opentripplanner.model.plan.TripPlan;
+import org.opentripplanner.routing.framework.DebugTimingAggregator;
 
 public class RoutingResponse {
     private final TripPlan tripPlan;
@@ -32,7 +31,7 @@ public class RoutingResponse {
         return metadata;
     }
 
-    public DebugTimingAggregator getDebugAggregator() {
+    public DebugTimingAggregator getDebugTimingAggregator() {
         return debugTimingAggregator;
     }
 
