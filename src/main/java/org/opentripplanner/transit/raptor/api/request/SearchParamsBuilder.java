@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -176,4 +177,16 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return new SearchParams(this);
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(SearchParams.class)
+                .addServiceTime("earliestDepartureTime", earliestDepartureTime, SearchParams.TIME_NOT_SET)
+                .addServiceTime("latestArrivalTime", latestArrivalTime, SearchParams.TIME_NOT_SET)
+                .addDurationSec("searchWindow", searchWindowInSeconds)
+                .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
+                .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+                .addCollection("accessPaths", accessPaths, 5)
+                .addCollection("egressPaths", egressPaths, 5)
+                .toString();
+    }
 }
