@@ -164,7 +164,7 @@ public class RaptorPathToItineraryMapper {
         leg.endTime = createCalendar(pathLeg.toTime());
         leg.from = mapStopToPlace(boardStop, boardStopIndexInPattern, tripTimes);
         leg.to = mapStopToPlace(alightStop, alightStopIndexInPattern, tripTimes);
-        List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg);
+        List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern);
         leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
         leg.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
 
@@ -357,23 +357,14 @@ public class RaptorPathToItineraryMapper {
         return visits;
     }
 
-    private List<Coordinate> extractTransitLegCoordinates(TransitPathLeg<TripSchedule> pathLeg) {
+    private List<Coordinate> extractTransitLegCoordinates(TransitPathLeg<TripSchedule> pathLeg, int boardStopIndexInPattern, int alightStopIndexInPattern) {
         List<Coordinate> transitLegCoordinates = new ArrayList<>();
         TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
-        TripSchedule tripSchedule = pathLeg.trip();
-        boolean boarded = false;
-        for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
-            int currentStopIndex = transitLayer.getStopIndex().indexByStop.get(tripPattern.getStop(j));
-            if (boarded) {
-                transitLegCoordinates.addAll(Arrays.asList(tripPattern.getHopGeometry(j - 1).getCoordinates()));
-            }
-            if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime() && currentStopIndex == pathLeg.fromStop()) {
-                boarded = true;
-            }
-            if (boarded && tripSchedule.arrival(j) == pathLeg.toTime() && currentStopIndex == pathLeg.toStop()) {
-                break;
-            }
+
+        for (int i = boardStopIndexInPattern + 1; i <= alightStopIndexInPattern; i++) {
+            transitLegCoordinates.addAll(Arrays.asList(tripPattern.getHopGeometry(i - 1).getCoordinates()));
         }
+
         return transitLegCoordinates;
     }
 
