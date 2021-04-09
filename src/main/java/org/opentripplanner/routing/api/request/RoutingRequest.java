@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,6 +52,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
+import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +79,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
+
+    private static final long NOW_THRESHOLD_SEC = DurationUtils.duration("15h");
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -949,6 +953,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public void setDateTime(String date, String time, TimeZone tz) {
         Date dateObject = DateUtils.toDate(date, time, tz);
         setDateTime(dateObject);
+    }
+
+    /**
+     * Is the trip originally planned withing the previous/next 15h?
+     */
+    public boolean isTripPlannedForNow() {
+        return Math.abs(Instant.now().getEpochSecond() - dateTime) < NOW_THRESHOLD_SEC;
     }
 
     /**

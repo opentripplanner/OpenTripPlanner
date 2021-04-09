@@ -41,10 +41,6 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PatternAtStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -56,6 +52,10 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.graphfinder.PatternAtStop;
+import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.ResourceBundleSingleton;
@@ -808,7 +808,8 @@ public class LegacyGraphQLQueryTypeImpl
       request.setDateTime(
           environment.getArgument("date"),
           environment.getArgument("time"),
-          context.getRouter().graph.getTimeZone());
+          context.getRouter().graph.getTimeZone()
+      );
 
       callWith.argument("wheelchair", request::setWheelchairAccessible);
       callWith.argument("numItineraries", request::setNumItineraries);
@@ -919,9 +920,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       callWith.argument("maxTransfers", (Integer v) -> request.maxTransfers = v);
 
-      final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-      boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-      request.useVehicleRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
+      request.useVehicleRentalAvailabilityInformation = request.isTripPlannedForNow();
 
       callWith.argument("startTransitStopId", (String v) -> request.startingTransitStopId = FeedScopedId.parseId(v));
       callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = FeedScopedId.parseId(v));
