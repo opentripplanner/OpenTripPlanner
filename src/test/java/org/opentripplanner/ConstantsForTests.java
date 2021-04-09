@@ -65,9 +65,9 @@ public class ConstantsForTests {
 
     private static ConstantsForTests instance = null;
 
-    private Graph minNetexGraph = null;
+    private Graph portlandGraph = null;
 
-    private Graph portlandGraph;
+    private Graph minNetexGraph = null;
 
     private GtfsContext portlandContext = null;
 

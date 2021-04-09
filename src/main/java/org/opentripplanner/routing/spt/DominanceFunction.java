@@ -5,7 +5,6 @@ import java.util.Objects;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
@@ -83,6 +82,7 @@ public abstract class DominanceFunction implements Serializable {
          */
         if (a.backEdge != b.getBackEdge()
                 && (a.backEdge instanceof StreetEdge)
+                && a.getBackMode() != null && a.getBackMode().isDriving()
                 && a.getOptions().isCloseToStartOrEnd(a.getVertex())) {
             return false;
         }

@@ -1477,7 +1477,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 var stream = new ByteArrayOutputStream();
                 geoJson.write(geom, stream);
                 LOG.debug(
-                        "Computing closeness envelope around coordinate {}. GeoJSON: {}", c,
+                        "Computing {}m envelope around coordinate {}. GeoJSON: {}", meters, c,
                         stream.toString()
                 );
             }
