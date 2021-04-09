@@ -80,9 +80,6 @@ public abstract class DominanceFunction implements Serializable {
          * Therefore, if we are close to the start or the end of a route we allow this.
          *
          * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
-         *
-         * The following variable determines how close you have to be to the start or the end point for it to be
-         * considered "close enough for a loop".
          */
         if (a.backEdge != b.getBackEdge()
                 && (a.backEdge instanceof StreetEdge)

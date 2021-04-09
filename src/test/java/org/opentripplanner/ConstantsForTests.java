@@ -1,6 +1,7 @@
 package org.opentripplanner;
 
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -22,7 +23,6 @@ import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.BuildConfig;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ConstantsForTests {
     public static final String BOEBLINGEN_OSM = "src/test/resources/germany/boeblingen-minimal.osm.pbf";
     public static final String VVS_BUS_764_ONLY = "src/test/resources/germany/vvs-bus-764-only.gtfs.zip";
     public static final String VVS_BUS_751_ONLY = "src/test/resources/germany/vvs-bus-751-only.gtfs.zip";
-    public static final String HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = "src/test/resources/herrenberg/herrenberg-minimal.osm.pbf";
+    public static final String HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = "src/test/resources/germany/herrenberg-hindenburgstr-under-construction.osm.pbf";
 
     private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
             new File(NETEX_DIR, NETEX_FILENAME),
@@ -65,9 +65,9 @@ public class ConstantsForTests {
 
     private static ConstantsForTests instance = null;
 
-    private Graph portlandGraph = null;
-
     private Graph minNetexGraph = null;
+
+    private Graph portlandGraph;
 
     private GtfsContext portlandContext = null;
 
@@ -143,6 +143,26 @@ public class ConstantsForTests {
             );
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Graph buildOsmGraph(String osmPath) {
+
+        try {
+            var graph = new Graph();
+            // Add street data from OSM
+            File osmFile = new File(osmPath);
+            BinaryOpenStreetMapProvider osmProvider =
+                    new BinaryOpenStreetMapProvider(osmFile, false);
+            OpenStreetMapModule osmModule =
+                    new OpenStreetMapModule(Lists.newArrayList(osmProvider));
+            osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+            osmModule.skipVisibility = true;
+            osmModule.buildGraph(graph, new HashMap<>());
+            return graph;
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
