@@ -69,11 +69,24 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
-        // if we are close to the start or the end of the route we allow loops to happen because
-        // otherwise we might not
+        /*
+         * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
+         * useless loops in the traversal leading to way faster processing time.
+         *
+         * However there is are certain rare pathological cases where through a series of turn restrictions and/or roadworks
+         * you absolutely must visit a vertex twice if you want to produce a result. One example would be a route like this:
+         *   https://tinyurl.com/ycqux93g (Note: At the time of writing this Hindenburgstr. is closed due to roadworks.)
+         *
+         * Therefore, if we are close to the start or the end of a route we allow this.
+         *
+         * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
+         *
+         * The following variable determines how close you have to be to the start or the end point for it to be
+         * considered "close enough for a loop".
+         */
         if (a.backEdge != b.getBackEdge()
                 && (a.backEdge instanceof StreetEdge)
-                && isCloseToStartOrEnd(a.getVertex(), a.getOptions())) {
+                && a.getOptions().isCloseToStartOrEnd(a.getVertex())) {
             return false;
         }
 
@@ -82,43 +95,7 @@ public abstract class DominanceFunction implements Serializable {
 
     }
 
-    /**
-     * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
-     * useless loops in the traversal leading to way faster processing time.
-     *
-     * However there is are certain rare pathological cases where through a series of turn restrictions and roadworks
-     * you absolutely must visit a vertex twice if you want to produce a result. One example would be a route like this:
-     *   https://tinyurl.com/ycqux93g (Note: At the time of writing this Hindenburgstr. is closed due to roadworks.)
-     *
-     * Therefore, if we are close to the start or the end of a route we allow this.
-     *
-     * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
-     *
-     * The following variable determines how close you have to be to the start or the end point for it to be
-     * considered "close enough for a loop".
-     *
-     * Because calculating the distance in meters is quite expensive, particularly if you do it for
-     * every visited vertex, the unit is the Euclidian distance of the current location and the start/end.
-     *
-     * Note: that it the Euclidian distance between two point converts to different amounts of meters
-     * depending where on Earth the coordinates are. In Europe 0.005 is roughly 500 meters.
-     */
-    private static final float MAX_ROUTE_LOOP_EUCLIDIAN_DISTANCE = 0.005f;
 
-    private static boolean isCloseToStartOrEnd(Vertex v, RoutingRequest req) {
-        var from = req.from.getCoordinate();
-        var to = req.to.getCoordinate();
-        var currentLocation = v.getCoordinate();
-        var allNonNull = from != null && to != null && currentLocation != null;
-        if(allNonNull) {
-            var euclidianDistanceToStart = currentLocation.distance(from);
-            var euclidianDistanceToEnd = currentLocation.distance(to);
-
-            return euclidianDistanceToStart < MAX_ROUTE_LOOP_EUCLIDIAN_DISTANCE
-                    || euclidianDistanceToEnd < MAX_ROUTE_LOOP_EUCLIDIAN_DISTANCE;
-        }
-        else return false;
-    }
 
     /**
      * Create a new shortest path tree using this function, considering whether it allows co-dominant States.
