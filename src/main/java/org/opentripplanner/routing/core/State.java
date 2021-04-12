@@ -47,7 +47,7 @@ public class State implements Cloneable {
      * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
      * states must be created from a parent and associated with an edge.
      */
-    public static Collection<State> getStates(RoutingRequest request) {
+    public static Collection<State> getInitialStates(RoutingRequest request) {
         Collection<State> states = new ArrayList<>();
         for (Vertex vertex : request.rctx.fromVertices) {
             /* carPickup searches may end in two states (see isFinal()): IN_CAR and WALK_FROM_DROP_OFF/WALK_TO_PICKUP

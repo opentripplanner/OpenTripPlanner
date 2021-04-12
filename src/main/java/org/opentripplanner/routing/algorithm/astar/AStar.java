@@ -124,7 +124,7 @@ public class AStar {
         runState.targetAcceptedStates = Lists.newArrayList();
         
         if (addToQueue) {
-            for (State initialState : State.getStates(options)) {
+            for (State initialState : State.getInitialStates(options)) {
                 runState.spt.add(initialState);
                 runState.pq.insert(initialState, 0);
             }
