@@ -51,6 +51,10 @@ public class ConstantsForTests {
 
     private static final String NETEX_FILENAME = "netex_minimal.zip";
 
+    public static final String DEUFRINGEN_OSM = "src/test/resources/germany/deufringen.osm.pbf";
+
+    public static final String VVS_BUS_764_ONLY = "src/test/resources/germany/vvs-bus-764-only.gtfs.zip";
+
     private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
             new File(NETEX_DIR, NETEX_FILENAME),
             FileType.NETEX
@@ -158,6 +162,25 @@ public class ConstantsForTests {
         catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Graph buildGtfsGraph(String osmPath, String gtfsPath) throws IOException {
+        var graph = buildOsmGraph(osmPath);
+
+        var context = contextBuilder(gtfsPath)
+                .withIssueStoreAndDeduplicator(graph)
+                .build();
+        AddTransitModelEntitiesToGraph.addToGraph(context, graph);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
+        factory.run(graph);
+        // Link transit stops to streets
+        GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
+        streetTransitLinker.buildGraph(graph, new HashMap<>());
+        graph.putService(
+                CalendarServiceData.class,
+                context.getCalendarServiceData()
+        );
+        return graph;
     }
 
     private void setupMinNetex() {
