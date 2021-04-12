@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.street;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.io.IOException;
@@ -35,7 +33,48 @@ public class LinkedEdgeTurnRestrictionsTest {
 
     static long dateTime = TestUtils.dateInSeconds("Europe/Berlin", 2020, 3, 3, 7, 0, 0);
 
-    private static String computeCarPolyline(Graph graph, GenericLocation from, GenericLocation to) {
+    @Test
+    public void shouldTakeDeufringenTurnRestrictionsIntoAccount() throws IOException {
+        Graph graph = ConstantsForTests.buildGtfsGraph(
+                ConstantsForTests.DEUFRINGEN_OSM,
+                ConstantsForTests.VVS_BUS_764_ONLY
+        );
+        // https://www.openstreetmap.org/relation/10264251 has a turn restriction so when leaving Hardtheimer Weg
+        // you must turn right and take the long way to Steinhaldenweg.
+        // on top of this, it has a bus stop so this test also makes sure that the turn restrictions work
+        // even when the streets are split.
+        var noRightTurnPermitted = computeCarPolyline(graph, hardtheimerWeg, steinhaldenWeg);
+        assertThatPolylinesAreEqual(
+                noRightTurnPermitted,
+                "ijbhHuycu@g@Uq@[VeAj@iCTsANoAJiAHsAFuDLoG@_@?YBeGCaAO@C?KBKBKFIJKREf@?d@?h@\\TNb@Ff@?bAMnEKjEOxDWbCc@vCIDMDCB"
+        );
+
+        // when to drive in reverse direction it's fine to go this way
+        var leftTurnOk = computeCarPolyline(graph, steinhaldenWeg, hardtheimerWeg);
+        assertThatPolylinesAreEqual(leftTurnOk, "kmbhHo_du@BCLEAd@Q`Ak@~CC\\@HBFFWDOd@}Bp@Zf@T");
+
+        // make sure that going straight on a straight-only turn direction also works
+        var straightAhead = computeCarPolyline(graph, hardtheimerWeg, k1022);
+        assertThatPolylinesAreEqual(straightAhead, "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAXn@Hd@");
+
+        var straightAheadBack = computeCarPolyline(graph, k1022, hardtheimerWeg);
+        assertThatPolylinesAreEqual(straightAheadBack, "kobhHwmcu@Ie@Yo@\\yAXyAFWDOd@}Bp@Zf@T");
+
+        // make sure that turning left onto the minor road works even when the opposite direction has a straight-only
+        // restriction
+        var leftTurnAllowed = computeCarPolyline(graph, k1022, steinhaldenWeg);
+        assertThatPolylinesAreEqual(leftTurnAllowed, "kobhHwmcu@Ie@Yo@\\yAXyACGAIB]j@_DPaA@e@MDCB");
+
+        var rightTurnAllowed = computeCarPolyline(graph, steinhaldenWeg, k1022);
+        assertThatPolylinesAreEqual(
+                rightTurnAllowed, "kmbhHo_du@BCLEAd@Q`Ak@~CC\\@HBFYxA]xAXn@Hd@");
+    }
+
+    private static String computeCarPolyline(
+            Graph graph,
+            GenericLocation from,
+            GenericLocation to
+    ) {
         RoutingRequest request = new RoutingRequest();
         request.dateTime = dateTime;
         request.from = from;
@@ -53,36 +92,6 @@ public class LinkedEdgeTurnRestrictionsTest {
         itineraries.forEach(
                 i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.CAR)));
         return itineraries.get(0).legs.get(0).legGeometry.getPoints();
-    }
-
-    @Test
-    public void shouldTakeDeufringenTurnRestrictionsIntoAccount() throws IOException {
-        Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.DEUFRINGEN_OSM, ConstantsForTests.VVS_BUS_764_ONLY);
-        // https://www.openstreetmap.org/relation/10264251 has a turn restriction so when leaving Hardtheimer Weg
-        // you must turn right and take the long way to Steinhaldenweg.
-        // on top of this, it has a bus stop so this test also makes sure that the turn restrictions work
-        // even when the streets are split.
-        String noRightTurnPermitted = computeCarPolyline(graph, hardtheimerWeg, steinhaldenWeg);
-        assertThatPolylinesAreEqual(noRightTurnPermitted, "ijbhHuycu@g@Uq@[VeAj@iCTsANoAJiAHsAFuDLoG@_@?YBeGCaAO@C?KBKBKFIJKREf@?d@?h@\\TNb@Ff@?bAMnEKjEOxDWbCc@vCIDMDCB");
-
-        // when to drive in reverse direction it's fine to go this way
-        String leftTurnOk = computeCarPolyline(graph, steinhaldenWeg, hardtheimerWeg);
-        assertThat(leftTurnOk, is("kmbhHo_du@BCLEAd@Q`Ak@~CC\\@HBFFWDOd@}Bp@Zf@T"));
-
-        // make sure that going straight on a straight-only turn direction also works
-        String straightAhead = computeCarPolyline(graph, hardtheimerWeg, k1022);
-        assertThat(straightAhead, is("ijbhHuycu@g@Uq@[e@|BENGVYxA]xAXn@Hd@"));
-
-        String straightAheadBack = computeCarPolyline(graph, k1022, hardtheimerWeg);
-        assertThat(straightAheadBack, is("kobhHwmcu@Ie@Yo@\\yAXyAFWDOd@}Bp@Zf@T"));
-
-        // make sure that turning left onto the minor road works even when the opposite direction has a straight-only
-        // restriction
-        String leftTurnAllowed = computeCarPolyline(graph, k1022, steinhaldenWeg);
-        assertThat(leftTurnAllowed, is("kobhHwmcu@Ie@Yo@\\yAXyACGAIB]j@_DPaA@e@MDCB"));
-
-        String rightTurnAllowed = computeCarPolyline(graph, steinhaldenWeg, k1022);
-        assertThat(rightTurnAllowed, is("kmbhHo_du@BCLEAd@Q`Ak@~CC\\@HBFYxA]xAXn@Hd@"));
     }
 
     /*
