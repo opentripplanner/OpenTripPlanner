@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -35,6 +36,11 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch);
 
     /**
+     * Alight the current trip at the given stop with the arrival times.
+     */
+    void alight(final int stopIndex, final int stopPos, ToIntFunction<T> getStopArrivalTime);
+
+    /**
      * Perform the routing with the initialized pattern and tripSearch at the given
      * stopPositionInPattern.
      * <p/>
@@ -44,5 +50,5 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
      * @param stopPositionInPattern the current stop position in the pattern set in {@link
      *                              #prepareForTransitWith(RaptorTripPattern, TripScheduleSearch)}
      */
-    void routeTransitAtStop(final int stopPositionInPattern);
+    void routeTransitAtStop(final int stopIndex, final int stopPositionInPattern);
 }

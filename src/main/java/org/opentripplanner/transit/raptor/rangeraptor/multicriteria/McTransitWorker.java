@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -67,20 +68,19 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     @Override
-    public void routeTransitAtStop(int stopPos) {
-        final int stopIndex = pattern.stopIndex(stopPos);
-
-        // Alight at boardStopPos
-        if (pattern.alightingPossibleAt(stopPos)) {
-            for (PatternRide<T> ride : patternRides) {
-                state.transitToStop(
+    public void alight(final int stopIndex, final int stopPos, ToIntFunction<T> stopArrivalTimeOp) {
+        for (PatternRide<T> ride : patternRides) {
+            state.transitToStop(
                     ride,
                     stopIndex,
                     ride.trip.arrival(stopPos),
                     slackProvider.alightSlack()
-                );
-            }
+            );
         }
+    }
+
+    @Override
+    public void routeTransitAtStop(int stopIndex, int stopPos) {
 
         // If it is not possible to board the pattern at this stop, then return
         if(!pattern.boardingPossibleAt(stopPos)) {

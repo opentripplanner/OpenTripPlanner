@@ -1,10 +1,11 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
@@ -60,17 +61,15 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public void routeTransitAtStop(int stopPositionInPattern) {
-        int stop = pattern.stopIndex(stopPositionInPattern);
-
-        // attempt to alight if we're on board, done above the board search so that we don't check
-        // for alighting when boarding
+    public void alight(final int stopIndex, final int stopPos, ToIntFunction<T> stopArrivalTimeOp) {
         if (onTripIndex != NOT_SET) {
-            if (pattern.alightingPossibleAt(stopPositionInPattern)) {
-                final int alightTime = alightTime(onTrip, stopPositionInPattern);
-                state.transitToStop(stop, alightTime, onTripBoardStop, onTripBoardTime, onTrip);
-            }
+            final int stopArrivalTime = stopArrivalTimeOp.applyAsInt(onTrip);
+            state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
         }
+    }
+
+    @Override
+    public void routeTransitAtStop(int stop, int stopPositionInPattern) {
 
         // Don't attempt to board if this stop was not reached in the last round.
         // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
