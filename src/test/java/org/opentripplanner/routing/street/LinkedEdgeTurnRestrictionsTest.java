@@ -70,6 +70,62 @@ public class LinkedEdgeTurnRestrictionsTest {
                 rightTurnAllowed, "kmbhHo_du@BCLEAd@Q`Ak@~CC\\@HBFYxA]xAXn@Hd@");
     }
 
+    @Test
+    public void shouldTakeBoeblingenTurnRestrictionsIntoAccount() throws IOException {
+        // this tests that the following turn restriction is transferred correctly to the split edges
+        // https://www.openstreetmap.org/relation/299171
+        var graph = ConstantsForTests.buildGtfsGraph(
+                ConstantsForTests.BOEBLINGEN_OSM,
+                ConstantsForTests.VVS_BUS_751_ONLY
+        );
+
+        // turning left from the main road onto a residential one
+        var turnLeft = computeCarPolyline(graph, parkStrasse, paulGerhardtWegEast);
+        assertThatPolylinesAreEqual(
+                turnLeft, "kochHsl~u@HQL]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFYj@DP^lAJX");
+
+        // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
+        // is a bus station along the way, splitting the edge
+        var noLeftTurnPermitted = computeCarPolyline(graph, paulGerhardtWegEast, parkStrasse);
+        assertThatPolylinesAreEqual(noLeftTurnPermitted, "sochHof~u@KY_@mAVi@Te@DK");
+
+        // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
+        // is a bus station along the way, splitting the edge
+        var longWay = computeCarPolyline(graph, paulGerhardtWegEast, herrenbergerStrasse);
+        assertThatPolylinesAreEqual(
+                longWay,
+                "sochHof~u@KY_@mAVi@Te@N]L]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFa@`@_@XWPSHQDMCEAQMKKSgAa@qCMe@"
+        );
+
+        var longWayBack = computeCarPolyline(graph, herrenbergerStrasse, paulGerhardtWegEast);
+        assertThatPolylinesAreEqual(
+                longWayBack,
+                "axchHwq~u@G_@Qc@@UCMAK@Q@WTUh@eA@Cb@gANg@Nu@Lq@Fe@Da@Bo@Bq@BUD[Je@Li@DWFBHJt@bAFFTZLN@@d@j@|@lA`@r@\\r@z@tBLZ]TYX]`@e@z@Yp@GJM\\{@~BKXWj@KRKPCFYj@DP^lAJX"
+        );
+
+        // test that you can correctly turn right here https://www.openstreetmap.org/relation/415123 when approaching
+        // from south
+        var fromSouth = computeCarPolyline(graph, steinbeissWeg, paulGerhardtWegWest);
+        assertThatPolylinesAreEqual(fromSouth, "wcchHk~}u@Fd@Hj@o@\\{@b@KFyBlAWmA");
+        var toSouth = computeCarPolyline(graph, paulGerhardtWegWest, steinbeissWeg);
+        assertThatPolylinesAreEqual(toSouth, "okchHoy}u@VlAxBmAJGz@c@n@]Ik@Ge@");
+
+        // test that you cannot turn left here https://www.openstreetmap.org/relation/415123 when approaching
+        // from north
+        var fromNorth = computeCarPolyline(graph, paulGerhardtWegWest, herrenbergerStrasse);
+        assertThatPolylinesAreEqual(
+                fromNorth,
+                "okchHoy}u@VlA{BlAIBOLCBIDc@{AYiAM_@Kc@K_@I_@Ia@Ga@Gc@Gc@Ei@EYAIKaAEe@CQCSIm@SgAa@qCMe@"
+        );
+
+        // when you approach you cannot turn left so you have to take a long way
+        var toNorth = computeCarPolyline(graph, herrenbergerStrasse, paulGerhardtWegWest);
+        assertThatPolylinesAreEqual(
+                toNorth,
+                "axchHwq~u@G_@Qc@@UCMAK@Q@WTUh@eA@Cb@gANg@Nu@Lq@Fe@Da@Bo@Bq@BUD[Je@Li@DWFBHJt@bAFFTZLN@@d@j@|@lA`@r@\\r@z@tBLZ]TYX]`@e@z@Yp@GJJJBDDDBBBFvAhCXv@Rp@`@lC@Ff@`D@HRpAJt@Hj@o@\\{@b@KFyBlAWmA"
+        );
+    }
+
     private static String computeCarPolyline(
             Graph graph,
             GenericLocation from,
@@ -93,65 +149,4 @@ public class LinkedEdgeTurnRestrictionsTest {
                 i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.CAR)));
         return itineraries.get(0).legs.get(0).legGeometry.getPoints();
     }
-
-    /*
-    @Test
-    public void shouldTakeBoeblingenTurnRestrictionsIntoAccount() throws IOException {
-        // this tests that the following turn restriction is transferred correctly to the split edges
-        // https://www.openstreetmap.org/relation/299171
-        Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.BOEBLINGEN_OSM, ConstantsForTests.BOEBLINGEN_GTFS);
-
-        // turning left from the main road onto a residential one
-        String turnLeft = computeCarPolyline(graph, parkStrasse, paulGerhardtWegEast);
-        assertThatPolylinesAreEqual(turnLeft, "kochHsl~u@HQL]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFYj@DP^lAJX");
-
-        // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
-        // is a bus station along the way, splitting the edge
-        String noLeftTurnPermitted = computeCarPolyline(graph, paulGerhardtWegEast, parkStrasse);
-        assertThat(noLeftTurnPermitted, is("sochHof~u@KY_@mAVi@Te@DK"));
-
-        // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
-        // is a bus station along the way, splitting the edge
-        String longWay = computeCarPolyline(graph, paulGerhardtWegEast, herrenbergerStrasse);
-        assertThatPolylinesAreEqual(longWay, "sochHof~u@KY_@mAVi@Te@N]L]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFa@`@_@XWPSHQDMCEAQMKKSgAa@qCMe@");
-
-        String longWayBack = computeCarPolyline(graph, herrenbergerStrasse, paulGerhardtWegEast);
-        assertThatPolylinesAreEqual(longWayBack, "axchHwq~u@G_@Qc@CGGKGIQKKEKCWC]Am@EWC[CYGYGg@QSQQKKGMCEIGCG@GBEFCH?H?H@HDHFDD?F?DEDGPBTFVLNBPDNDRDr@Hz@FF@l@JVFLFNPFLFLDNDJDZHb@Lx@d@dDBTBRTLNBTARKpAiA^lAJX");
-
-        // test that you can correctly turn right here https://www.openstreetmap.org/relation/415123 when approaching
-        // from south
-        String fromSouth = computeCarPolyline(graph, steinbeissWeg, paulGerhardtWegWest);
-        assertThat(fromSouth, is("wcchHk~}u@Fd@Hj@o@\\{@b@KFyBlAWmA"));
-        String toSouth = computeCarPolyline(graph, paulGerhardtWegWest, steinbeissWeg);
-        assertThat(toSouth, is("okchHoy}u@VlAxBmAJGz@c@n@]Ik@Ge@"));
-
-        // test that you cannot turn left here https://www.openstreetmap.org/relation/415123 when approaching
-        // from north
-        String fromNorth = computeCarPolyline(graph, paulGerhardtWegWest, herrenbergerStrasse);
-        assertThat(fromNorth, is("okchHoy}u@VlA{BlAIBOLCBIDc@{AYiAM_@Kc@K_@I_@Ia@Ga@Gc@Gc@Ei@EYAIKaAEe@CQCSIm@SgAa@qCMe@"));
-
-        // this doesn't actually work!
-        // when you approach you cannot turn left so you have to take a long way but it seems that OTP gives up beforehand!
-        //String toNorth = computeCarPolyline(graph, herrenbergerStrasse, paulGerhardtWegWest);
-        //assertThat(toNorth, is("???"));
-    }
-
-    @Test
-    public void shouldBeAbleToRouteReinholdSchickPlatz() throws IOException {
-        Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.HERRENBERG_OSM, ConstantsForTests.HERRENBERG_ONLY_BRONNTOR_BUS_STOP);
-
-        var hindenburgStr = new GenericLocation(48.59532, 8.86777);
-        var seeStr = new GenericLocation(48.59640, 8.86744);
-        var horberStr = new GenericLocation(48.59491, 8.86676);
-        var gisiloStrGueltstein = new GenericLocation(48.5748987, 8.8788304);
-
-        var polyline1 = computeCarPolyline(graph, hindenburgStr, seeStr);
-        assertThatPolylinesAreEqual(polyline1, "ugrgHo~bu@EHGLIFGHGDIHGFGDIFI@I@MBO@K?IAKAKAQCMEKGA?");
-
-        var polyline2 = computeCarPolyline(graph, seeStr, horberStr);
-        assertThatPolylinesAreEqual(polyline2, "onrgHm|bu@@?JFLHNJLDLBB@T?NAN?FANCFAB?JAHAF?D@FDB@HDFJHJLPHJJJTV");
-
-        var polyline3 = computeCarPolyline(graph, gisiloStrGueltstein, seeStr);
-        assertThatPolylinesAreEqual(polyline3, "ahngHuceu@OoAKe@]n@MTWd@i@x@m@j@m@Xi@Ja@Ds@E]MkA_AeA}AMQMUU]MYM[IOSa@gBcDo@gASYc@k@Y][]sBiAu@a@[][a@]u@S_@]y@a@s@[_@i@m@[M]OsA]gCi@}BW_H]}DE]Gk@e@W]OECFk@pAWj@[l@S^U`@U`@W^W`@Y`@Y^WZWZc@j@i@n@g@r@q@x@s@`AW^Y^g@t@[f@S\\SX[h@Yf@Yh@c@v@a@v@a@x@U`@MVWf@S`@e@|@Yl@Wd@OXw@|As@tAk@bAU`@wBfEQ\\[f@GJ[b@}A|B]d@U\\U\\IPUh@KXAHCn@Bz@Dt@Dh@@TDd@@l@Et@UrDE~@Ez@Eh@Cn@AZKv@CPEREPMVKVMXMVS^GLIFGHGDIHGFGDIFI@I@MBO@K?IAKAKAQCMEKGA?");
-    }*/
 }

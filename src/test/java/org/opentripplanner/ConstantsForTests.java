@@ -51,9 +51,11 @@ public class ConstantsForTests {
 
     private static final String NETEX_FILENAME = "netex_minimal.zip";
 
-    public static final String DEUFRINGEN_OSM = "src/test/resources/germany/deufringen.osm.pbf";
-
+    /* Stuttgart area, Germany */
+    public static final String DEUFRINGEN_OSM = "src/test/resources/germany/deufringen-minimal.osm.pbf";
+    public static final String BOEBLINGEN_OSM = "src/test/resources/germany/boeblingen-minimal.osm.pbf";
     public static final String VVS_BUS_764_ONLY = "src/test/resources/germany/vvs-bus-764-only.gtfs.zip";
+    public static final String VVS_BUS_751_ONLY = "src/test/resources/germany/vvs-bus-751-only.gtfs.zip";
 
     private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
             new File(NETEX_DIR, NETEX_FILENAME),
