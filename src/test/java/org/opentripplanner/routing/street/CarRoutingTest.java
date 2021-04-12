@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.street;
 
-import static org.opentripplanner.routing.core.PolylineAssert.assertThatPolylinesAreEqual;
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
