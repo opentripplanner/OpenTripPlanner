@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.street;
 
-import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -39,8 +39,8 @@ public class BicycleRoutingTest {
     }
 
     /**
-     * Tests that that https://www.openstreetmap.org/way/35097400 is taken due to
-     * motor_vehicle=destination.
+     * Tests that that https://www.openstreetmap.org/way/35097400 is allowed for cars due to
+     * motor_vehicle=destination being meant for cars only.
      */
     @Test
     public void shouldNotRespectMotorCarNoThru() {
@@ -68,7 +68,7 @@ public class BicycleRoutingTest {
 
         var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
         // make sure that we only get BICYLE legs
-        itineraries.forEach(i -> i.legs.forEach(l -> assertEquals(l.mode, TraverseMode.BICYCLE)));
+        itineraries.forEach(i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.BICYCLE)));
         return itineraries.get(0).legs.get(0).legGeometry.getPoints();
     }
 }

@@ -3,10 +3,8 @@ package org.opentripplanner.routing.street;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
-
-import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -25,7 +23,12 @@ public class CarRoutingTest {
 
     static long dateTime = Instant.now().toEpochMilli();
 
-    static Graph herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    static private Graph herrenbergGraph;
+
+    @BeforeAll
+    static void setup() {
+        herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    }
 
     /**
      * The OTP algorithm tries hard to never visit the same node twice. This is generally a good
@@ -61,7 +64,7 @@ public class CarRoutingTest {
     }
 
     @Test
-    public void shouldRespectNoThroughTraffic() {
+    public void shouldRespectGeneralNoThroughTraffic() {
         var mozartStr = new GenericLocation(48.59521, 8.88391);
         var fritzLeharStr = new GenericLocation(48.59460, 8.88291);
 
