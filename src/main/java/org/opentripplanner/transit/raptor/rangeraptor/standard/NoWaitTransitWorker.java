@@ -6,8 +6,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
 
@@ -22,24 +20,15 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     private static final int NOT_SET = -1;
 
     private final StdWorkerState<T> state;
-    private final TransitCalculator calculator;
-    private final SlackProvider slackProvider;
 
     private int onTripIndex;
     private int onTripBoardTime;
     private int onTripBoardStop;
     private T onTrip;
     private int onTripTimeShift;
-    private TripScheduleSearch<T> tripSearch;
 
-    public NoWaitTransitWorker(
-            StdWorkerState<T> state,
-            SlackProvider slackProvider,
-            TransitCalculator calculator
-    ) {
+    public NoWaitTransitWorker(StdWorkerState<T> state) {
         this.state = state;
-        this.slackProvider = slackProvider;
-        this.calculator = calculator;
     }
 
     @Override
@@ -53,18 +42,21 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
-        this.tripSearch = tripSearch;
+    public final int onTripIndex() {
+        return onTripIndex;
+    }
+
+    @Override
+    public final void prepareForTransitWith(RaptorTripPattern pattern) {
         this.onTripIndex = NOT_SET;
         this.onTripBoardTime = NOT_SET;
         this.onTripBoardStop = NOT_SET;
         this.onTrip = null;
         this.onTripTimeShift = NOT_SET;
-        this.slackProvider.setCurrentPattern(pattern);
     }
 
     @Override
-    public void alight(int stopIndex, int stopPos, ToIntFunction<T> getStopArrivalTime) {
+    public final void alight(int stopIndex, int stopPos, ToIntFunction<T> getStopArrivalTime) {
         // attempt to alight if we're on board
         if (onTripIndex != NOT_SET) {
             // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
@@ -80,34 +72,20 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
+    public final void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
         if (state.isStopReachedInPreviousRound(stopIndex)) {
             prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
         }
     }
+
     @Override
-    public void routeTransitAtStop(int stopIndex, int stopPos) {
-        // Add board-slack(forward-search) or alight-slack(reverse-search)
-        int earliestBoardTime = calculator.plusDuration(
-            state.bestTimePreviousRound(stopIndex),
-            slackProvider.boardSlack()
-        );
-
-        // check if we can back up to an earlier trip due to this stop being reached earlier
-        boolean found = tripSearch.search(
-            earliestBoardTime,
-            stopPos,
-            onTripIndex
-        );
-
-        if (found) {
-            onTripIndex = tripSearch.getCandidateTripIndex();
-            onTrip = tripSearch.getCandidateTrip();
-            onTripBoardTime = earliestBoardTime;
-            onTripBoardStop = stopIndex;
-            // Calculate the time-shift, the time-shift will be a positive duration in a
-            // forward-search, and a negative value in case of a reverse-search.
-            onTripTimeShift = tripSearch.getCandidateTripTime() - earliestBoardTime;
-        }
+    public final void board(int stopIndex, int stopPos, TripScheduleSearch<T> tripSearch) {
+        onTripIndex = tripSearch.getCandidateTripIndex();
+        onTrip = tripSearch.getCandidateTrip();
+        onTripBoardTime = tripSearch.getEarliestBoardTime();
+        onTripBoardStop = stopIndex;
+        // Calculate the time-shift, the time-shift will be a positive duration in a
+        // forward-search, and a negative value in case of a reverse-search.
+        onTripTimeShift = tripSearch.getCandidateTripTime() - onTripBoardTime;
     }
 }

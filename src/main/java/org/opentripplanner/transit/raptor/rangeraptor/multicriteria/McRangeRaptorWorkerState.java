@@ -94,7 +94,8 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         addStopArrival(
             new AccessStopArrival<>(
                 departureTime,
-                costCalculator.walkCost(accessPath.durationInSeconds()), accessPath
+                costCalculator.walkCost(accessPath.durationInSeconds()),
+                accessPath
             )
         );
     }

@@ -19,7 +19,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
+public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
     private final int nTripsBinarySearchThreshold;
     private final RaptorTimeTable<T> timeTable;
     private final int nTrips;
@@ -37,18 +37,23 @@ public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements T
     }
 
     @Override
-    public T getCandidateTrip() {
+    public final T getCandidateTrip() {
         return candidateTrip;
     }
 
     @Override
-    public int getCandidateTripIndex() {
+    public final int getCandidateTripIndex() {
         return candidateTripIndex;
     }
 
     @Override
-    public int getCandidateTripTime() {
+    public final int getCandidateTripTime() {
         return candidateTrip.arrival(stopPositionInPattern);
+    }
+
+    @Override
+    public final int getEarliestBoardTime() {
+        return latestAlightTime;
     }
 
     /**
@@ -57,7 +62,8 @@ public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements T
      *
      * @see #search(int, int, int)
      */
-    public boolean search(int latestAlightTime, int stopPositionInPattern) {
+    @Override
+    public final boolean search(int latestAlightTime, int stopPositionInPattern) {
         return search(latestAlightTime, stopPositionInPattern, -1);
     }
 
@@ -69,7 +75,8 @@ public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements T
      * @param stopPositionInPattern The stop to board.
      * @param tripIndexLowerBound   Upper bound for trip index to search for (exclusive).
      */
-    public boolean search(int latestAlightTime, int stopPositionInPattern, int tripIndexLowerBound) {
+    @Override
+    public final boolean search(int latestAlightTime, int stopPositionInPattern, int tripIndexLowerBound) {
         this.latestAlightTime = latestAlightTime;
         this.stopPositionInPattern = stopPositionInPattern;
         this.candidateTrip = null;

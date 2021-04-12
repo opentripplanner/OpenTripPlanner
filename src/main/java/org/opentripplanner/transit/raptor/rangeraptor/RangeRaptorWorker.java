@@ -207,9 +207,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 TripScheduleSearch<T> tripSearch = createTripSearch(route.timetable());
 
                 slackProvider.setCurrentPattern(pattern);
-                transitWorker.prepareForTransitWith(pattern, tripSearch);
+                transitWorker.prepareForTransitWith(pattern);
 
                 IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
+
                 while (stop.hasNext()) {
                     int stopPos = stop.next();
                     int stopIndex = pattern.stopIndex(stopPos);
@@ -226,7 +227,22 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
                     if(pattern.boardingPossibleAt(stopPos)) {
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
-                            transitWorker.routeTransitAtStop(stopIndex, stopPos);
+                            // Add board-slack(forward-search) or alight-slack(reverse-search)
+                            int earliestBoardTime = calculator.plusDuration(
+                                    prevArrivalTime,
+                                    slackProvider.boardSlack()
+                            );
+
+                            // check if we can back up to an earlier trip due to this stop being reached earlier
+                            boolean found = tripSearch.search(
+                                    earliestBoardTime,
+                                    stopPos,
+                                    transitWorker.onTripIndex()
+                            );
+
+                            if (found) {
+                                transitWorker.board(stopIndex, stopPos, tripSearch);
+                            }
                         });
                     }
                 }

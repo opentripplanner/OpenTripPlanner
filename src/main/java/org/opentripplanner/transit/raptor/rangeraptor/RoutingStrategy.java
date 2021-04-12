@@ -34,7 +34,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Prepare the {@link RoutingStrategy} to route using the given pattern and tripSearch.
      */
-    void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch);
+    void prepareForTransitWith(RaptorTripPattern pattern);
 
     /**
      * Alight the current trip at the given stop with the arrival times.
@@ -47,14 +47,18 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTime);
 
     /**
-     * Perform the routing with the initialized pattern and tripSearch at the given
-     * stopPositionInPattern.
-     * <p/>
-     * This method is called for each stop position in a pattern after the first stop reached in the
-     * previous round.
-     *
-     * @param stopPositionInPattern the current stop position in the pattern set in {@link
-     *                              #prepareForTransitWith(RaptorTripPattern, TripScheduleSearch)}
+     * Board trip found in the given trip-search at the given stop.
      */
-    void routeTransitAtStop(final int stopIndex, final int stopPositionInPattern);
+    void board(final int stopIndex, final int stopPos, TripScheduleSearch<T> tripSearch);
+
+    /**
+     * The trip search will use this index to search relative to an existing boarding.
+     * This make a subsequent search faster since it must board an earlier trip, and the
+     * trip search can start at the given onTripIndex.
+     * if not the current trip is used.
+     * <p>
+     * Return -1 to if the tripIndex is unknown.
+     */
+    default int onTripIndex() { return -1; }
+
 }
