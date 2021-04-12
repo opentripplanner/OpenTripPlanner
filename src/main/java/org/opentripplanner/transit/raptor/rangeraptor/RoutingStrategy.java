@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
+import java.util.function.IntConsumer;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -39,6 +40,11 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
      * Alight the current trip at the given stop with the arrival times.
      */
     void alight(final int stopIndex, final int stopPos, ToIntFunction<T> getStopArrivalTime);
+
+    /**
+     * Board trip for each stopArrival (Std have only one "best" arrival, while Mc may have many).
+     */
+    void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTime);
 
     /**
      * Perform the routing with the initialized pattern and tripSearch at the given

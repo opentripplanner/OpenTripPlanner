@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
+import java.util.function.IntConsumer;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -29,7 +30,6 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     private int onTripBoardStop;
     private T onTrip;
     private int onTripTimeShift;
-    private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
 
     public NoWaitTransitWorker(
@@ -54,7 +54,6 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
 
     @Override
     public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
-        this.pattern = pattern;
         this.tripSearch = tripSearch;
         this.onTripIndex = NOT_SET;
         this.onTripBoardTime = NOT_SET;
@@ -81,35 +80,34 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public void routeTransitAtStop(int stopIndex, int stopPos) {
-
-        // Don't attempt to board if this stop was not reached in the last round.
-        // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
+    public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
         if (state.isStopReachedInPreviousRound(stopIndex)) {
-            if (pattern.boardingPossibleAt(stopPos)) {
-                // Add board-slack(forward-search) or alight-slack(reverse-search)
-                int earliestBoardTime = calculator.plusDuration(
-                    state.bestTimePreviousRound(stopIndex),
-                    slackProvider.boardSlack()
-                );
+            prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
+        }
+    }
+    @Override
+    public void routeTransitAtStop(int stopIndex, int stopPos) {
+        // Add board-slack(forward-search) or alight-slack(reverse-search)
+        int earliestBoardTime = calculator.plusDuration(
+            state.bestTimePreviousRound(stopIndex),
+            slackProvider.boardSlack()
+        );
 
-                // check if we can back up to an earlier trip due to this stop being reached earlier
-                boolean found = tripSearch.search(
-                    earliestBoardTime,
-                    stopPos,
-                    onTripIndex
-                );
+        // check if we can back up to an earlier trip due to this stop being reached earlier
+        boolean found = tripSearch.search(
+            earliestBoardTime,
+            stopPos,
+            onTripIndex
+        );
 
-                if (found) {
-                    onTripIndex = tripSearch.getCandidateTripIndex();
-                    onTrip = tripSearch.getCandidateTrip();
-                    onTripBoardTime = earliestBoardTime;
-                    onTripBoardStop = stopIndex;
-                    // Calculate the time-shift, the time-shift will be a positive duration in a
-                    // forward-search, and a negative value in case of a reverse-search.
-                    onTripTimeShift = tripSearch.getCandidateTripTime() - earliestBoardTime;
-                }
-            }
+        if (found) {
+            onTripIndex = tripSearch.getCandidateTripIndex();
+            onTrip = tripSearch.getCandidateTrip();
+            onTripBoardTime = earliestBoardTime;
+            onTripBoardStop = stopIndex;
+            // Calculate the time-shift, the time-shift will be a positive duration in a
+            // forward-search, and a negative value in case of a reverse-search.
+            onTripTimeShift = tripSearch.getCandidateTripTime() - earliestBoardTime;
         }
     }
 }
