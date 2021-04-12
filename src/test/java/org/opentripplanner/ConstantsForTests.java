@@ -8,6 +8,7 @@ import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
+import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -135,6 +136,26 @@ public class ConstantsForTests {
             );
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Graph buildOsmGraph(String osmPath) {
+
+        try {
+            var graph = new Graph();
+            // Add street data from OSM
+            File osmFile = new File(osmPath);
+            BinaryOpenStreetMapProvider osmProvider =
+                    new BinaryOpenStreetMapProvider(osmFile, true);
+            OpenStreetMapModule osmModule =
+                    new OpenStreetMapModule(Lists.newArrayList(osmProvider));
+            osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+            osmModule.skipVisibility = true;
+            osmModule.buildGraph(graph, new HashMap<>());
+            return graph;
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
