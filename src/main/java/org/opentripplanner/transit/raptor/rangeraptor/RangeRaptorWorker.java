@@ -224,7 +224,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                         );
                     }
 
-                    transitWorker.routeTransitAtStop(stopIndex, stopPos);
+                    if(pattern.boardingPossibleAt(stopPos)) {
+                        transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
+                            transitWorker.routeTransitAtStop(stopIndex, stopPos);
+                        });
+                    }
                 }
             }
             lifeCycle.transitsForRoundComplete();

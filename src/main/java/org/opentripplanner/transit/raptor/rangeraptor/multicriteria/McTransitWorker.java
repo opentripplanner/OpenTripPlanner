@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
+import java.util.function.IntConsumer;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -30,8 +31,8 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     private final SlackProvider slackProvider;
     private final ParetoSet<PatternRide<T>> patternRides;
 
-    private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
+    private AbstractStopArrival<T> prevArrival;
 
     public McTransitWorker(
         McRangeRaptorWorkerState<T> state,
@@ -61,7 +62,6 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
 
     @Override
     public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
-        this.pattern = pattern;
         this.tripSearch = tripSearch;
         this.patternRides.clear();
         this.slackProvider.setCurrentPattern(pattern);
@@ -80,51 +80,49 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     @Override
-    public void routeTransitAtStop(int stopIndex, int stopPos) {
-
-        // If it is not possible to board the pattern at this stop, then return
-        if(!pattern.boardingPossibleAt(stopPos)) {
-            return;
-        }
-
-        // For each arrival at the current stop
+    public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
         for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
+            this.prevArrival = prevArrival;
+            prevStopArrivalTimeConsumer.accept(prevArrival.arrivalTime());
+        }
+    }
 
-            int earliestBoardTime = calculator.plusDuration(
-                prevArrival.arrivalTime(),
-                slackProvider.boardSlack()
-            );
+    @Override
+    public void routeTransitAtStop(int stopIndex, int stopPos) {
+        int earliestBoardTime = calculator.plusDuration(
+            prevArrival.arrivalTime(),
+            slackProvider.boardSlack()
+        );
 
-            boolean found = tripSearch.search(earliestBoardTime, stopPos);
+        boolean found = tripSearch.search(earliestBoardTime, stopPos);
 
-            if (found) {
-                final T trip = tripSearch.getCandidateTrip();
-                final int boardTime = trip.departure(stopPos);
+        if (found) {
+            final T trip = tripSearch.getCandidateTrip();
+            final int boardTime = trip.departure(stopPos);
 
-                if (prevArrival.arrivedByAccess()) {
-                    prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
-                }
+            if(prevArrival.arrivedByAccess()) {
+                prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
+            }
 
                 final int boardWaitTimeForCostCalculation = boardTime - prevArrival.arrivalTime();
-                final int relativeBoardCost = calculateOnTripRelativeCost(
-                    prevArrival,
-                    boardTime,
-                    boardWaitTimeForCostCalculation
-                );
+            final int relativeBoardCost = calculateOnTripRelativeCost(
+                prevArrival,
+                boardTime,
+                boardWaitTimeForCostCalculation
+            );
 
-                patternRides.add(
-                    new PatternRide<>(
-                        prevArrival,
-                        stopIndex,
-                        stopPos,
-                        boardTime,
-                        boardWaitTimeForCostCalculation,
-                        relativeBoardCost,
-                        trip,
-                        tripSearch.getCandidateTripIndex()
-                    )
-                );
-            }
+            patternRides.add(
+                new PatternRide<>(
+                    prevArrival,
+                    stopIndex,
+                    stopPos,
+                    boardTime,
+                    boardWaitTimeForCostCalculation,
+                    relativeBoardCost,
+                    trip,
+                    tripSearch.getCandidateTripIndex()
+                )
+            );
         }
     }
 
