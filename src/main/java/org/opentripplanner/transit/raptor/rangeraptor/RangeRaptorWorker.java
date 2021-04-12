@@ -78,6 +78,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private final RaptorTransitDataProvider<T> transitData;
 
+    private final SlackProvider slackProvider;
+
     private final TransitCalculator calculator;
 
     private final WorkerPerformanceTimers timers;
@@ -101,6 +103,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             WorkerState<T> state,
             RoutingStrategy<T> transitWorker,
             RaptorTransitDataProvider<T> transitData,
+            SlackProvider slackProvider,
             Collection<RaptorTransfer> accessPaths,
             RoundProvider roundProvider,
             TransitCalculator calculator,
@@ -110,6 +113,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         this.transitWorker = transitWorker;
         this.state = state;
         this.transitData = transitData;
+        this.slackProvider = slackProvider;
         this.calculator = calculator;
         this.timers = timers;
         this.accessArrivedByWalking = groupByRound(accessPaths, Predicate.not(RaptorTransfer::stopReachedOnBoard));
@@ -202,11 +206,25 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 RaptorTripPattern pattern = route.pattern();
                 TripScheduleSearch<T> tripSearch = createTripSearch(route.timetable());
 
+                slackProvider.setCurrentPattern(pattern);
                 transitWorker.prepareForTransitWith(pattern, tripSearch);
 
                 IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
                 while (stop.hasNext()) {
-                    transitWorker.routeTransitAtStop(stop.next());
+                    int stopPos = stop.next();
+                    int stopIndex = pattern.stopIndex(stopPos);
+
+                    // attempt to alight if we're on board, this is done above the board search
+                    // so that we don't alight on first stop boarded
+                    if (pattern.alightingPossibleAt(stopPos)) {
+                        transitWorker.alight(
+                                stopIndex,
+                                stopPos,
+                                (T trip) -> stopArrivalTime(trip, stopPos)
+                        );
+                    }
+
+                    transitWorker.routeTransitAtStop(stopIndex, stopPos);
                 }
             }
             lifeCycle.transitsForRoundComplete();
@@ -279,6 +297,15 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private int round() {
         return roundTracker.round();
+    }
+
+    private int stopArrivalTime(final T trip, final int stopPositionInPattern) {
+        // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
+        return calculator.stopArrivalTime(
+                trip,
+                stopPositionInPattern,
+                slackProvider.alightSlack()
+        );
     }
 
     /**
