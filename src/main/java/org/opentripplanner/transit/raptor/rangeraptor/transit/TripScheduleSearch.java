@@ -40,6 +40,9 @@ public interface TripScheduleSearch<T extends RaptorTripSchedule> {
      */
     boolean search(int arrivalDepartureTime, int stopPositionInPattern, int tripIndexLimit);
 
+
+    int getEarliestBoardTime();
+
     /**
      * This i a reference to the trip found.
      */

@@ -17,7 +17,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
+public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
     private static final int NOT_SET = -1;
 
     private final int nTripsBinarySearchThreshold;
@@ -39,18 +39,23 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public T getCandidateTrip() {
+    public final T getCandidateTrip() {
         return candidateTrip;
     }
 
     @Override
-    public int getCandidateTripIndex() {
+    public final int getCandidateTripIndex() {
         return candidateTripIndex;
     }
 
     @Override
-    public int getCandidateTripTime() {
+    public final int getCandidateTripTime() {
         return candidateTrip.departure(stopPositionInPattern);
+    }
+
+    @Override
+    public final int getEarliestBoardTime() {
+        return earliestBoardTime;
     }
 
     /**
@@ -59,7 +64,8 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
      *
      * @see #search(int, int, int)
      */
-    public boolean search(int earliestBoardTime, int stopPositionInPattern) {
+    @Override
+    public final boolean search(int earliestBoardTime, int stopPositionInPattern) {
         return search(earliestBoardTime, stopPositionInPattern, -1);
     }
 
@@ -73,7 +79,8 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
      *                              at {@code tripIndexUpperBound - 1}.
      *                              Use {@code -1} (negative value) for an unbounded search.
      */
-    public boolean search(int earliestBoardTime, int stopPositionInPattern, int tripIndexUpperBound) {
+    @Override
+    public final boolean search(int earliestBoardTime, int stopPositionInPattern, int tripIndexUpperBound) {
         this.earliestBoardTime = earliestBoardTime;
         this.stopPositionInPattern = stopPositionInPattern;
         this.candidateTrip = null;

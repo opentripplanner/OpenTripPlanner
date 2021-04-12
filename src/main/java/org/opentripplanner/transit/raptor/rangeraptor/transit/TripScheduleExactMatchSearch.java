@@ -16,7 +16,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
+public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
 
     private final int slack;
     private final TripScheduleSearch<T> delegate;
@@ -53,6 +53,11 @@ public class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> implemen
     @Override
     public int getCandidateTripTime() {
         return delegate.getCandidateTripTime();
+    }
+
+    @Override
+    public int getEarliestBoardTime() {
+        return delegate.getEarliestBoardTime();
     }
 
     private boolean isWithinSlack(int timeLimit) {

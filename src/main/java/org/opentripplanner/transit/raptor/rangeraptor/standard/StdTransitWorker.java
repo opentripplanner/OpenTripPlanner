@@ -6,8 +6,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
 
@@ -21,23 +19,14 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     private static final int NOT_SET = -1;
 
     private final StdWorkerState<T> state;
-    private final TransitCalculator calculator;
-    private final SlackProvider slackProvider;
 
     private int onTripIndex;
     private int onTripBoardTime;
     private int onTripBoardStop;
     private T onTrip;
-    private TripScheduleSearch<T> tripSearch;
 
-    public StdTransitWorker(
-            StdWorkerState<T> state,
-            SlackProvider slackProvider,
-            TransitCalculator calculator
-    ) {
+    public StdTransitWorker(StdWorkerState<T> state) {
         this.state = state;
-        this.slackProvider = slackProvider;
-        this.calculator = calculator;
     }
 
     @Override
@@ -50,13 +39,16 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
-        this.tripSearch = tripSearch;
+    public final int onTripIndex() {
+        return onTripIndex;
+    }
+
+    @Override
+    public void prepareForTransitWith(RaptorTripPattern pattern) {
         this.onTripIndex = NOT_SET;
         this.onTripBoardTime = NOT_SET;
         this.onTripBoardStop = NOT_SET;
         this.onTrip = null;
-        this.slackProvider.setCurrentPattern(pattern);
     }
 
     @Override
@@ -77,25 +69,10 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public void routeTransitAtStop(int stop, int stopPositionInPattern) {
-        // Add board-slack(forward-search) or alight-slack(reverse-search)
-        int earliestBoardTime = calculator.plusDuration(
-            state.bestTimePreviousRound(stop),
-            slackProvider.boardSlack()
-        );
-
-        // check if we can back up to an earlier trip due to this stop being reached earlier
-        boolean found = tripSearch.search(
-            earliestBoardTime,
-            stopPositionInPattern,
-            onTripIndex
-        );
-
-        if (found) {
-            onTripIndex = tripSearch.getCandidateTripIndex();
-            onTrip = tripSearch.getCandidateTrip();
-            onTripBoardTime = tripSearch.getCandidateTripTime();
-            onTripBoardStop = stop;
-        }
+    public void board(int stopIndex, int stopPos, TripScheduleSearch<T> tripSearch) {
+        onTripIndex = tripSearch.getCandidateTripIndex();
+        onTrip = tripSearch.getCandidateTrip();
+        onTripBoardTime = tripSearch.getCandidateTripTime();
+        onTripBoardStop = stopIndex;
     }
 }
