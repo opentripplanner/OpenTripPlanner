@@ -63,7 +63,7 @@ public class LinkedEdgeTurnRestrictionsTest {
         // on top of this, it has a bus stop so this test also makes sure that the turn restrictions work
         // even when the streets are split.
         String noRightTurnPermitted = computeCarPolyline(graph, hardtheimerWeg, steinhaldenWeg);
-        assertThatPolylinesAreEqual(noRightTurnPermitted, "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAYz@Yp@Yj@^n@JDN_@?Wa@i@Xq@X{@\\yAXyACGAIB]j@_DPaA@e@MDCB");
+        assertThatPolylinesAreEqual(noRightTurnPermitted, "ijbhHuycu@g@Uq@[VeAj@iCTsANoAJiAHsAFuDLoG@_@?YBeGCaAO@C?KBKBKFIJKREf@?d@?h@\\TNb@Ff@?bAMnEKjEOxDWbCc@vCIDMDCB");
 
         // when to drive in reverse direction it's fine to go this way
         String leftTurnOk = computeCarPolyline(graph, steinhaldenWeg, hardtheimerWeg);

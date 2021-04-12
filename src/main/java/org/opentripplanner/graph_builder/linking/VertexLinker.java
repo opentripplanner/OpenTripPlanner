@@ -1,17 +1,20 @@
 package org.opentripplanner.graph_builder.linking;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.geocoder.google.Geometry;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -25,11 +28,6 @@ import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -343,6 +341,7 @@ public class VertexLinker {
     }
   }
 
+
   /** projected distance from stop to edge, in latitude degrees */
   private static double distance(Vertex tstop, StreetEdge edge, double xscale) {
     // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
@@ -433,7 +432,71 @@ public class VertexLinker {
       }
     }
 
+    copyRestrictionsToSplitEdges(originalEdge, newEdges);
+
     return v;
+  }
+
+  /**
+   * Copy restrictions having former edge as from to appropriate split edge, as well as
+   * restrictions on incoming edges.
+   */
+  private void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> edges) {
+
+    graph.getTurnRestrictions(edge).forEach(restriction -> {
+      // figure which one is the "from" edge
+      StreetEdge fromEdge = shouldUseFirstSplitEdge(edge, restriction) ? edges.first : edges.second;
+
+      TurnRestriction splitTurnRestriction = new TurnRestriction(fromEdge, restriction.to,
+              restriction.type, restriction.modes
+      );
+      splitTurnRestriction.time = restriction.time;
+      LOG.debug(
+              "Recreate new restriction {} with split edge as from edge {}", splitTurnRestriction,
+              fromEdge
+      );
+      graph.addTurnRestriction(fromEdge, splitTurnRestriction);
+      // Not absolutely necessary, as old edge will not be accessible, but for good housekeeping
+      graph.removeTurnRestriction(edge, restriction);
+    });
+
+    applyToAdjacentEdges(edge, edges.second, edge.getToVertex().getOutgoing(), graph);
+    applyToAdjacentEdges(edge, edges.first, edge.getFromVertex().getIncoming(), graph);
+  }
+
+  private boolean shouldUseFirstSplitEdge(StreetEdge edge, TurnRestriction restriction) {
+    return restriction.to.getToVertex() == edge.getToVertex();
+  }
+
+  private static void applyToAdjacentEdges(
+          StreetEdge formerEdge,
+          StreetEdge newToEdge,
+          Collection<Edge> adjacentEdges,
+          Graph graph
+  ) {
+    adjacentEdges.stream()
+            .flatMap(originatingEdge -> graph.getTurnRestrictions(originatingEdge).stream())
+            .filter(restriction -> restriction.to == formerEdge)
+            .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction, graph));
+  }
+
+  private static void applyRestrictionsToNewEdge(
+          StreetEdge newEdge,
+          TurnRestriction restriction,
+          Graph graph
+  ) {
+    TurnRestriction splitTurnRestriction = new TurnRestriction(restriction.from,
+            newEdge, restriction.type, restriction.modes
+    );
+    splitTurnRestriction.time = restriction.time;
+    LOG.debug(
+            "Recreate new restriction {} with split edge as to edge {}", splitTurnRestriction,
+            newEdge
+    );
+    graph.addTurnRestriction(restriction.from, splitTurnRestriction);
+    // Former turn restriction needs to be removed. Especially no only_turn
+    // restriction to a non existent edge must not survive
+    graph.removeTurnRestriction(restriction.from, restriction);
   }
 
   // TODO Temporary code until we refactor WalkableAreaBuilder (#3152)
