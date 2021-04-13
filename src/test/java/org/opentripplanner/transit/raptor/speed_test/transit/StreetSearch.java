@@ -70,8 +70,8 @@ class StreetSearch {
             linker.linkVertexForRequest(
                 vertex,
                 TraverseMode.WALK,
-                fromOrigin ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
-                fromOrigin
+                !fromOrigin ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
+                !fromOrigin
                     ? (v, streetVertex) -> List.of(
                     new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation)v)
                 )
