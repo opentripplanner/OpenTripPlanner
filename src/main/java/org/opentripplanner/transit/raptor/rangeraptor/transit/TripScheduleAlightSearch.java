@@ -57,19 +57,8 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
     }
 
     /**
-     * Find the last trip arriving at the given stop BEFORE the given {@code latestAlightTime}.
-     * This is the same as calling {@link #search(int, int, int)} with {@code tripIndexLowerBound: -1}.
-     *
-     * @see #search(int, int, int)
-     */
-    @Override
-    public final boolean search(int latestAlightTime, int stopPositionInPattern) {
-        return search(latestAlightTime, stopPositionInPattern, -1);
-    }
-
-    /**
-     * Find the last trip leaving from the given stop BEFORE the the {@code latestAlightTime}, but after the
-     * given trip ({@code tripIndexLowerBound}).
+     * Find the last trip leaving from the given stop BEFORE the the {@code latestAlightTime}, but
+     * after the given trip ({@code tripIndexLowerBound}).
      *
      * @param latestAlightTime      The latest acceptable alight time (exclusive).
      * @param stopPositionInPattern The stop to board.
@@ -83,7 +72,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
         this.candidateTripIndex = -1;
 
         // No previous trip is found
-        if (tripIndexLowerBound < 0) {
+        if (tripIndexLowerBound == UNBOUNDED_TRIP_INDEX) {
             if(nTrips > nTripsBinarySearchThreshold) {
                 return findFirstBoardingOptimizedForLargeSetOfTrips();
             }

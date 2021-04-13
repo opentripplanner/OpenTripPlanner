@@ -59,17 +59,6 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
     }
 
     /**
-     * Find the first trip leaving from the given stop AFTER the given {@code earliestBoardTime}.
-     * This is the same as calling {@link #search(int, int, int)} with {@code tripIndexUpperBound: -1}.
-     *
-     * @see #search(int, int, int)
-     */
-    @Override
-    public final boolean search(int earliestBoardTime, int stopPositionInPattern) {
-        return search(earliestBoardTime, stopPositionInPattern, -1);
-    }
-
-    /**
      * Find the first trip leaving from the given stop AFTER the the 'earliestBoardTime', but
      * before the given trip ({@code tripIndexUpperBound}).
      *
@@ -87,7 +76,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         this.candidateTripIndex = NOT_SET;
 
         // No previous trip is found
-        if (tripIndexUpperBound < 0) {
+        if (tripIndexUpperBound == UNBOUNDED_TRIP_INDEX) {
             if (nTrips > nTripsBinarySearchThreshold) {
                 return findFirstBoardingOptimizedForLargeSetOfTrips();
             }

@@ -29,12 +29,6 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> im
     }
 
     @Override
-    public boolean search(int timeLimit, int stopPositionInPattern) {
-        boolean result = delegate.search(timeLimit, stopPositionInPattern);
-        return result && isWithinSlack(timeLimit);
-    }
-
-    @Override
     public boolean search(int timeLimit, int stopPositionInPattern, int tripIndexLimit) {
         boolean result = delegate.search(timeLimit, stopPositionInPattern, tripIndexLimit);
         return result && isWithinSlack(timeLimit);
