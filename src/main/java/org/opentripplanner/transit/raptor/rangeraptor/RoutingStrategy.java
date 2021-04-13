@@ -49,7 +49,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Board trip found in the given trip-search at the given stop.
      */
-    void board(final int stopIndex, final int stopPos, TripScheduleSearch<T> tripSearch);
+    void board(final int stopIndex, TripScheduleSearch<T> tripSearch);
 
     /**
      * The trip search will use this index to search relative to an existing boarding.

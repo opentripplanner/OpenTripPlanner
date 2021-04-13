@@ -82,9 +82,9 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     @Override
-    public void board(int stopIndex, int stopPos, TripScheduleSearch<T> tripSearch) {
+    public void board(int stopIndex, TripScheduleSearch<T> tripSearch) {
         final T trip = tripSearch.getCandidateTrip();
-        final int boardTime = trip.departure(stopPos);
+        final int boardTime = tripSearch.getCandidateTripTime();
 
         if(prevArrival.arrivedByAccess()) {
             // What if access is FLEX with rides, should not FLEX alightSlack and
@@ -103,7 +103,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
             new PatternRide<>(
                 prevArrival,
                 stopIndex,
-                stopPos,
+                tripSearch.getStopPositionInPattern(),
                 boardTime,
                 boardWaitTimeForCostCalculation,
                 relativeBoardCost,

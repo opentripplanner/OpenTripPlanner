@@ -241,7 +241,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                             );
 
                             if (found) {
-                                transitWorker.board(stopIndex, stopPos, tripSearch);
+                                transitWorker.board(stopIndex, tripSearch);
                             }
                         });
                     }

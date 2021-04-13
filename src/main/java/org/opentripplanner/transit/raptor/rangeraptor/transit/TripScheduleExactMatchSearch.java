@@ -35,6 +35,16 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> im
     }
 
     @Override
+    public int getEarliestBoardTime() {
+        return delegate.getEarliestBoardTime();
+    }
+
+    @Override
+    public final int getStopPositionInPattern() {
+        return delegate.getStopPositionInPattern();
+    }
+
+    @Override
     public T getCandidateTrip() {
         return delegate.getCandidateTrip();
     }
@@ -47,11 +57,6 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> im
     @Override
     public int getCandidateTripTime() {
         return delegate.getCandidateTripTime();
-    }
-
-    @Override
-    public int getEarliestBoardTime() {
-        return delegate.getEarliestBoardTime();
     }
 
     private boolean isWithinSlack(int timeLimit) {

@@ -58,6 +58,11 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         return earliestBoardTime;
     }
 
+    @Override
+    public final int getStopPositionInPattern() {
+        return stopPositionInPattern;
+    }
+
     /**
      * Find the first trip leaving from the given stop AFTER the the 'earliestBoardTime', but
      * before the given trip ({@code tripIndexUpperBound}).
