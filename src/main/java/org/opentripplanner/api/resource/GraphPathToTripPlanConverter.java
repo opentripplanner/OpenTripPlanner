@@ -42,6 +42,7 @@ import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
@@ -655,6 +656,15 @@ public abstract class GraphPathToTripPlanConverter {
             String alightRule = null;
 
             for (int j = 1; j < legsStates[i].length; j++) {
+                if (legsStates[i][j].getBackEdge() instanceof TimedTransferEdge) {
+                    // TimedTransferEdges bypass the street network (thus not resulting in the traversal of pathway
+                    // edges) and are going to force a transfer (thus not interlining with a previous leg). Therefore,
+                    // this loop can be exited safely since this information does not need to be collected. If this loop
+                    // isn't exited from in this case, an ArrayIndexOutOfBounds exception might occur resulting from a
+                    // mismatch of transit data in the leg state data info (which might be another bug in itself (at
+                    // least with the data inserted into the Leg instance representing the timed transfer)).
+                    break;
+                }
                 if (legsStates[i][j].getBackEdge() instanceof PatternEdge) {
                     PatternEdge patternEdge = (PatternEdge) legsStates[i][j].getBackEdge();
                     TripPattern tripPattern = patternEdge.getPattern();
