@@ -111,7 +111,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
                     DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
                         bikeParkVertex,
-                        new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE),
+                        new TraverseModeSet(TraverseMode.WALK),
                         LinkingDirection.BOTH_WAYS,
                         (vertex, streetVertex) -> List.of(
                             new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),
