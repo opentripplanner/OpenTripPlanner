@@ -80,13 +80,13 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     }
 
     /**
-     * Returns if this angle represents an easy turn were incoming traffic does not have to be
+     * Returns if this angle represents a safe turn were incoming traffic does not have to be
      * crossed.
      * <p>
      * In right hand driving countries, this is a right turn. In left hand driving countries this is
      * a left turn.
      */
-    protected boolean isEasyTurn(int turnAngle) {
+    protected boolean isSafeTurn(int turnAngle) {
         switch (drivingDirection) {
             case RIGHT_HAND_DRIVE:
                 return isRightTurn(turnAngle);
@@ -125,7 +125,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         int turnAngle = calculateTurnAngle(from, to, request);
         if (v.trafficLight) {
             // Use constants that apply when there are stop lights.
-            if (isEasyTurn(turnAngle)) {
+            if (isSafeTurn(turnAngle)) {
                 turnCost = expectedRightAtLightTimeSec;
             }
             else if (isTurnAcrossTraffic(turnAngle)) {
@@ -143,7 +143,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
             }
 
             // Use constants that apply when no stop lights.
-            if (isEasyTurn(turnAngle)) {
+            if (isSafeTurn(turnAngle)) {
                 turnCost = expectedRightNoLightTimeSec;
             }
             else if (isTurnAcrossTraffic(turnAngle)) {
@@ -167,7 +167,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         if (isTurnAcrossTraffic(turnAngle)) {
             return baseCost * acrossTrafficBicyleTurnMultiplier;
         }
-        else if (isEasyTurn(turnAngle)) {
+        else if (isSafeTurn(turnAngle)) {
             return baseCost * safeBicycleTurnModifier;
         }
         else {

@@ -78,7 +78,7 @@ public class SimpleTraversalCostModelTest {
         int rightHandDriveAngle = costModel.calculateTurnAngle(e1, e2, options);
         assertEquals(270, rightHandDriveAngle);
         assertTrue(costModel.isTurnAcrossTraffic(rightHandDriveAngle));
-        assertFalse(costModel.isEasyTurn(rightHandDriveAngle));
+        assertFalse(costModel.isSafeTurn(rightHandDriveAngle));
 
         // and on the left hand side
 
@@ -86,7 +86,7 @@ public class SimpleTraversalCostModelTest {
         int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e2, options);
         assertEquals(270, leftHandDriveAngle);
 
-        assertTrue(leftHandDriveCostModel.isEasyTurn(leftHandDriveAngle));
+        assertTrue(leftHandDriveCostModel.isSafeTurn(leftHandDriveAngle));
         assertFalse(leftHandDriveCostModel.isTurnAcrossTraffic(leftHandDriveAngle));
 
         // on a bike the turn cost for crossing traffic (left turn in left hand driving countries)
@@ -134,7 +134,7 @@ public class SimpleTraversalCostModelTest {
         StreetEdge toEdge = edge(v, w, 1.0, false);
         
         int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
-        assertFalse(costModel.isEasyTurn(turnAngle));
+        assertFalse(costModel.isSafeTurn(turnAngle));
         assertFalse(costModel.isTurnAcrossTraffic(turnAngle));
         
         // AKA is a straight ahead.
@@ -242,7 +242,7 @@ public class SimpleTraversalCostModelTest {
         StreetEdge extraEdge = edge(v, u, 1.0, false);
                 
         int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
-        assertTrue(costModel.isEasyTurn(turnAngle));
+        assertTrue(costModel.isSafeTurn(turnAngle));
         assertFalse(costModel.isTurnAcrossTraffic(turnAngle));
         
         float fromSpeed = 1.0f;
@@ -275,7 +275,7 @@ public class SimpleTraversalCostModelTest {
         StreetEdge extraEdge = edge(v, u, 1.0, false);
                 
         int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
-        assertFalse(costModel.isEasyTurn(turnAngle));
+        assertFalse(costModel.isSafeTurn(turnAngle));
         assertTrue(costModel.isTurnAcrossTraffic(turnAngle));
         
         float fromSpeed = 1.0f;
