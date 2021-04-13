@@ -79,7 +79,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final void board(int stopIndex, int stopPos, TripScheduleSearch<T> tripSearch) {
+    public final void board(int stopIndex, TripScheduleSearch<T> tripSearch) {
         onTripIndex = tripSearch.getCandidateTripIndex();
         onTrip = tripSearch.getCandidateTrip();
         onTripBoardTime = tripSearch.getEarliestBoardTime();

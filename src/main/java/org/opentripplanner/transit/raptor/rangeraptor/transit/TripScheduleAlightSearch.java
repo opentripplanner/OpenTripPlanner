@@ -56,6 +56,11 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
         return latestAlightTime;
     }
 
+    @Override
+    public final int getStopPositionInPattern() {
+        return stopPositionInPattern;
+    }
+
     /**
      * Find the last trip leaving from the given stop BEFORE the the {@code latestAlightTime}, but
      * after the given trip ({@code tripIndexLowerBound}).

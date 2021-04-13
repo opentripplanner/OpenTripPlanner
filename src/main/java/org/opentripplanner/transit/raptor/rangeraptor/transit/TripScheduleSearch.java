@@ -54,6 +54,11 @@ public interface TripScheduleSearch<T extends RaptorTripSchedule> {
     int getEarliestBoardTime();
 
     /**
+     * Return the stop-position-in-pattern for the current trip board search.
+     */
+    int getStopPositionInPattern();
+
+    /**
      * This i a reference to the trip found.
      */
     T getCandidateTrip();
@@ -62,7 +67,6 @@ public interface TripScheduleSearch<T extends RaptorTripSchedule> {
      * The trip index of the last trip found.
      */
     int getCandidateTripIndex();
-
 
     /**
      * Get the board/alight time for the trip found.
