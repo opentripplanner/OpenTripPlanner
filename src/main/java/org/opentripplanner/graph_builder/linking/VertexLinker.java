@@ -408,8 +408,8 @@ public class VertexLinker {
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
     P2<StreetEdge> newEdges = scope == Scope.PERMANENT
-        ? originalEdge.splitDestructively(v)
-        : originalEdge.splitNonDestructively(v, tempEdges, direction);
+        ? originalEdge.splitDestructively(v, graph)
+        : originalEdge.splitNonDestructively(v, tempEdges, direction, graph);
 
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
@@ -431,72 +431,7 @@ public class VertexLinker {
         removeEdgeFromIndex(originalEdge, scope);
       }
     }
-
-    copyRestrictionsToSplitEdges(originalEdge, newEdges);
-
     return v;
-  }
-
-  /**
-   * Copy restrictions having former edge as from to appropriate split edge, as well as
-   * restrictions on incoming edges.
-   */
-  private void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> edges) {
-
-    graph.getTurnRestrictions(edge).forEach(restriction -> {
-      // figure which one is the "from" edge
-      StreetEdge fromEdge = shouldUseFirstSplitEdge(edge, restriction) ? edges.first : edges.second;
-
-      TurnRestriction splitTurnRestriction = new TurnRestriction(fromEdge, restriction.to,
-              restriction.type, restriction.modes
-      );
-      splitTurnRestriction.time = restriction.time;
-      LOG.debug(
-              "Recreate new restriction {} with split edge as from edge {}", splitTurnRestriction,
-              fromEdge
-      );
-      graph.addTurnRestriction(fromEdge, splitTurnRestriction);
-      // Not absolutely necessary, as old edge will not be accessible, but for good housekeeping
-      graph.removeTurnRestriction(edge, restriction);
-    });
-
-    applyToAdjacentEdges(edge, edges.second, edge.getToVertex().getOutgoing(), graph);
-    applyToAdjacentEdges(edge, edges.first, edge.getFromVertex().getIncoming(), graph);
-  }
-
-  private boolean shouldUseFirstSplitEdge(StreetEdge edge, TurnRestriction restriction) {
-    return restriction.to.getToVertex() == edge.getToVertex();
-  }
-
-  private static void applyToAdjacentEdges(
-          StreetEdge formerEdge,
-          StreetEdge newToEdge,
-          Collection<Edge> adjacentEdges,
-          Graph graph
-  ) {
-    adjacentEdges.stream()
-            .flatMap(originatingEdge -> graph.getTurnRestrictions(originatingEdge).stream())
-            .filter(restriction -> restriction.to == formerEdge)
-            .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction, graph));
-  }
-
-  private static void applyRestrictionsToNewEdge(
-          StreetEdge newEdge,
-          TurnRestriction restriction,
-          Graph graph
-  ) {
-    TurnRestriction splitTurnRestriction = new TurnRestriction(restriction.from,
-            newEdge, restriction.type, restriction.modes
-    );
-    splitTurnRestriction.time = restriction.time;
-    LOG.debug(
-            "Recreate new restriction {} with split edge as to edge {}", splitTurnRestriction,
-            newEdge
-    );
-    graph.addTurnRestriction(restriction.from, splitTurnRestriction);
-    // Former turn restriction needs to be removed. Especially no only_turn
-    // restriction to a non existent edge must not survive
-    graph.removeTurnRestriction(restriction.from, restriction);
   }
 
   // TODO Temporary code until we refactor WalkableAreaBuilder (#3152)

@@ -17,7 +17,14 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.TestUtils;
 
-public class LinkedEdgeTurnRestrictionsTest {
+/*
+ * When bus stops are added to graph they split an existing edge in two parts so that an artifical
+ * intersection can be added and routes can be found to the station.
+ *
+ * During this process turn restrictions also need to be propagated from the old edges to the newly
+ * created ones. This test makes sure that this happens correctly.
+ */
+public class SplitEdgeTurnRestrictionsTest {
 
     // Deufringen
     static GenericLocation hardtheimerWeg = new GenericLocation(48.67765, 8.87212);
