@@ -1,10 +1,12 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public class TestWayPropertySet extends TestCase {
+public class TestWayPropertySet {
 
     WayPropertySet wps = new WayPropertySet();
     float epsilon = 0.01f;
