@@ -597,12 +597,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useBikeRentalAvailabilityInformation = false;
 
     /**
-     * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
-     * driving occurs on the left.
-     */
-    public boolean driveOnRight = true;
-
-    /**
      * The deceleration speed of an automobile, in meters per second per second.
      */
     // 2.9 m/s/s: 65 mph - 0 mph in 10 seconds

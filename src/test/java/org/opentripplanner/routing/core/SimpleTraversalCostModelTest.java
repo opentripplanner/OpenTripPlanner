@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -81,11 +83,12 @@ public class SimpleTraversalCostModelTest {
         // and on the left hand side
 
         var leftHandReq = options.clone();
-        leftHandReq.driveOnRight = false;
-        int leftHandDriveAngle = costModel.calculateTurnAngle(e1, e2, leftHandReq);
-        assertEquals(90, leftHandDriveAngle);
-        assertTrue(costModel.isEasyTurn(leftHandDriveAngle));
-        assertFalse(costModel.isTurnAcrossTraffic(leftHandDriveAngle));
+
+        var leftHandDriveCostModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.LEFT_HAND_DRIVE);
+        int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e2, leftHandReq);
+        assertEquals(270, leftHandDriveAngle);
+        assertTrue(leftHandDriveCostModel.isEasyTurn(leftHandDriveAngle));
+        assertFalse(leftHandDriveCostModel.isTurnAcrossTraffic(leftHandDriveAngle));
 
         // on a bike the turn cost for crossing traffic (left turn in left hand driving countries)
         // should be higher than going the opposite direction
@@ -105,12 +108,12 @@ public class SimpleTraversalCostModelTest {
 
         assertEquals(
                 0.5625,
-                costModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, leftHandReq, 40, 40),
+                leftHandDriveCostModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, leftHandReq, 40, 40),
                 0.1
         );
         assertEquals(
                 1.6875,
-                costModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, leftHandReq, 40, 40),
+                leftHandDriveCostModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, leftHandReq, 40, 40),
                 0.1
         );
     }

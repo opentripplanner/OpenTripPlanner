@@ -143,7 +143,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      */
     public boolean staticBikeParkAndRide;
 
-    private WayPropertySetSource wayPropertySetSource;
+    private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");

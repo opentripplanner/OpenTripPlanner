@@ -34,7 +34,11 @@ public interface WayPropertySetSource {
 	}
 
 	enum DrivingDirection {
-		RIGHT_HAND_DRIVE, LEFT_HAND_DRIVE
+		RIGHT_HAND_DRIVE, LEFT_HAND_DRIVE;
+
+		public boolean isRightHandDrive() {
+			return this == RIGHT_HAND_DRIVE;
+		}
 	}
 
 	DrivingDirection drivingDirection();
