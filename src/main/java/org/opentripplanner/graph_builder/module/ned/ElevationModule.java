@@ -605,7 +605,7 @@ public class ElevationModule implements GraphBuilderModule {
             setEdgeElevationProfile(ee, elevPCS, graph);
         } catch (ElevationLookupException e) {
             // only catch known elevation lookup exceptions
-            log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
+            log.warn("Error processing elevation for edge: {} due to error: {}", ee, e);
         }
     }
 
@@ -634,7 +634,7 @@ public class ElevationModule implements GraphBuilderModule {
                     try {
                         getElevation(coverage, examplarCoordinate);
                     } catch (ElevationLookupException e) {
-                        log.debug(
+                        log.warn(
                             "Error processing elevation for coordinate: {} due to error: {}",
                             examplarCoordinate,
                             e
