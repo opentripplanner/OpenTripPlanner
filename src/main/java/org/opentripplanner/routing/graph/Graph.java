@@ -49,16 +49,17 @@ import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
@@ -888,6 +889,15 @@ public class Graph implements Serializable {
         return null;
     }
 
+    private Collection<Entrance> getEntranceForId(FeedScopedId id) {
+        Entrance entrance = index.getEntranceforId(id);
+        if (entrance != null) {
+            return Collections.singleton(entrance);
+        }
+
+        return null;
+    }
+
     /**
      *
      * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
@@ -897,6 +907,12 @@ public class Graph implements Serializable {
         Collection<Stop> stops = getStopsForId(id);
 
         if (stops == null) {
+            Collection<Entrance> entrance = getEntranceForId(id);
+
+            if ( entrance != null ) {
+                return entrance.stream().map(index.getEntranceVertexForEntrance()::get).collect(Collectors.toSet());
+            }
+
             return null;
         }
 

@@ -18,12 +18,14 @@ import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -43,9 +45,11 @@ public class GraphIndex {
     private final Map<FeedScopedId, Agency> agencyForId = Maps.newHashMap();
     private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
     private final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
+    private final Map<FeedScopedId, Entrance> entranceForId = Maps.newHashMap();
     private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
     private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
     private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
+    private final Map<Entrance, TransitEntranceVertex> entranceVertexForEntrance = Maps.newHashMap();
     private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
     private final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
@@ -75,6 +79,13 @@ public class GraphIndex {
                 Stop stop = stopVertex.getStop();
                 stopForId.put(stop.getId(), stop);
                 stopVertexForStop.put(stop, stopVertex);
+            }
+
+            if (vertex instanceof TransitEntranceVertex) {
+                TransitEntranceVertex transitEntranceVertex = (TransitEntranceVertex) vertex;
+                Entrance entrance = transitEntranceVertex.getEntrance();
+                entranceForId.put(entrance.getId(), entrance);
+                entranceVertexForEntrance.put(entrance, transitEntranceVertex);
             }
         }
         for (TransitStopVertex stopVertex : stopVertexForStop.values()) {
@@ -159,6 +170,8 @@ public class GraphIndex {
         return stopForId.get(id);
     }
 
+    public Entrance getEntranceforId(FeedScopedId id) { return entranceForId.get(id); }
+
     public Route getRouteForId(FeedScopedId id) {
         return routeForId.get(id);
     }
@@ -218,6 +231,8 @@ public class GraphIndex {
         return stopForId.values();
     }
 
+    public Collection<Entrance> getAllEntrances(){ return entranceForId.values(); }
+
     public Map<FeedScopedId, Trip> getTripForId() {
         return tripForId;
     }
@@ -226,9 +241,9 @@ public class GraphIndex {
         return routeForId.values();
     }
 
-    public Map<Stop, TransitStopVertex> getStopVertexForStop() {
-        return stopVertexForStop;
-    }
+    public Map<Stop, TransitStopVertex> getStopVertexForStop() { return stopVertexForStop; }
+
+    public Map<Entrance, TransitEntranceVertex> getEntranceVertexForEntrance() { return entranceVertexForEntrance; }
 
     public Map<Trip, TripPattern> getPatternForTrip() {
         return patternForTrip;
