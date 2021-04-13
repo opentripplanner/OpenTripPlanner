@@ -23,19 +23,21 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * If you would add 3 separate matches that would mean that a way that is tagged with all of them would receive
  * too high a safety value leading to undesired detours.
  *
- * Logical ORs make only sense in a mixin without wildcards and might lead to unintended results when using it outside of that.
+ * Logical ORs are only implemented for mixins without wildcards.
  */
 public class OSMSpecifier {
 
-    private List<P2<String>> logicalANDPairs = new ArrayList<>();
-    private List<P2<String>> logicalORPairs = new ArrayList<>();
-
-    public OSMSpecifier() {}
+    private List<P2<String>> logicalANDPairs = new ArrayList<>(3);
+    private List<P2<String>> logicalORPairs = new ArrayList<>(3);
 
     public OSMSpecifier(String spec) {
         if(spec.contains("|") && spec.contains(";")) {
             throw new RuntimeException(String.format("You cannot mix logical AND (';') and logical OR ('|') in same OSM spec: '%s'", spec));
-        } else if(spec.contains("|")){
+        }
+        else if(spec.contains("|") && spec.contains("*")) {
+            throw new RuntimeException(String.format("You cannot mix logical OR ('|') and wildcards ('*') in the same OSM spec: '%s'", spec));
+        }
+        else if(spec.contains("|")){
             logicalORPairs = getPairsFromString(spec, "\\|");
         } else {
             logicalANDPairs = getPairsFromString(spec, ";");
@@ -165,10 +167,6 @@ public class OSMSpecifier {
         }
     }
 
-    public void addTag(String key, String value) {
-        logicalANDPairs.add(new P2<>(key, value));
-    }
-
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (P2<String> pair : logicalANDPairs) {
@@ -184,5 +182,9 @@ public class OSMSpecifier {
             builder.append("|");
         }
         return builder.toString();
+    }
+
+    public boolean containsLogicalOr() {
+        return !logicalORPairs.isEmpty();
     }
 }

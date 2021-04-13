@@ -266,6 +266,12 @@ public class WayPropertySet {
     }
 
     public void addProperties(OSMSpecifier spec, WayProperties properties, boolean mixin) {
+        if(!mixin && spec.containsLogicalOr()) {
+           throw new RuntimeException(
+                   String.format("The logical OR operator ('|') is only implemented for mixins. Spec %s",
+                   spec.toString())
+           );
+        }
         wayProperties.add(new WayPropertyPicker(spec, properties, mixin));
     }
 
