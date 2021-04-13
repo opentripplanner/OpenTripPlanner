@@ -14,7 +14,8 @@
 - Apply turn restrictions when splitting edges. [#3414](https://github.com/opentripplanner/OpenTripPlanner/pull/3414)
 - Add German way property set [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
 - Process OSM bicycle routes correctly [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
-- Avoid turns accross traffic on bicycles [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
+- Avoid turns across traffic on bicycles [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
+- Remove request parameter `driveOnRight` and derive information from way property set [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
 
 ## 2.0.0 (2020-11-27)
 
