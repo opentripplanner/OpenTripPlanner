@@ -1441,11 +1441,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     private Envelope toEnvelope;
 
     /**
+     * Returns if the vertex is considered "close" to the start or end point of the request.
+     * This is useful if you want to allow loops in car routes under certain conditions.
      *
-     * @param vertex
-     * @return If the vertex is considered "close" to the start or end point of the request.
+     * Note: If you are doing Raptor access/egress searches this method does not take the possible
+     * intermediate points (stations) into account. This means that stations might be skipped
+     * because a car route to it cannot be found and a suboptimal route to another station is
+     * returned instead.
+     *
+     * If you encounter a case of this, you can adjust this code to take this into account.
      *
      * @see RoutingRequest.MAX_CLOSENESS_METERS
+     * @see DominanceFunction#betterOrEqualAndComparable(State, State)
      */
     public boolean isCloseToStartOrEnd(Vertex vertex) {
         if(from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
