@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.forwardSlackProvider;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
+
+import java.util.Collection;
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.McCostParams;
@@ -23,12 +28,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
-
-import java.util.Collection;
-import java.util.function.ToIntFunction;
-
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.forwardSlackProvider;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
 
 /**
  * The search context is used to hold search scoped instances and to pass these
@@ -121,7 +120,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
      * <p>
      * The {@code SlackProvider} is stateful, so this method create a new instance
      * every time it is called, so each consumer could have their own instance and
-     * not get surprised by the life-cycle update.
+     * not get surprised by the life-cycle update. Remember to call the
+     * {@link SlackProvider#setCurrentPattern(RaptorTripPattern)} before retriving
+     * slack values.
      */
     public SlackProvider slackProvider() {
         return createSlackProvider(request, lifeCycle());

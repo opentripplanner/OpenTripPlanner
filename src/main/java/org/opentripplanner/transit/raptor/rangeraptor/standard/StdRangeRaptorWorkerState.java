@@ -136,17 +136,17 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
      * Set the time at a transit stop iff it is optimal. This sets both the bestTime and the transitTime.
      */
     @Override
-    public final void transitToStop(int stop, int alightTime, int boardStop, int boardTime, T trip) {
-        if (exceedsTimeLimit(alightTime)) {
+    public final void transitToStop(int stop, int arrivalTime, int boardStop, int boardTime, T trip) {
+        if (exceedsTimeLimit(arrivalTime)) {
             return;
         }
 
-        if (newTransitBestTime(stop, alightTime)) {
+        if (newTransitBestTime(stop, arrivalTime)) {
             // transitTimes upper bounds bestTimes
-            final boolean newBestOverall = newOverallBestTime(stop, alightTime);
-            stopArrivalsState.setNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime, newBestOverall);
+            final boolean newBestOverall = newOverallBestTime(stop, arrivalTime);
+            stopArrivalsState.setNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime, newBestOverall);
         } else {
-            stopArrivalsState.rejectNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime);
+            stopArrivalsState.rejectNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime);
         }
     }
 

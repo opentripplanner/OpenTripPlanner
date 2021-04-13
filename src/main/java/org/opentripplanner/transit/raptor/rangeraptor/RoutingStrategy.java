@@ -44,7 +44,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Board trip for each stopArrival (Std have only one "best" arrival, while Mc may have many).
      */
-    void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTime);
+    void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer);
 
     /**
      * Board trip found in the given trip-search at the given stop.

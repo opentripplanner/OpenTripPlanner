@@ -22,25 +22,35 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface TripScheduleSearch<T extends RaptorTripSchedule> {
+    /** Used in a trip search to indicate that all trips should be included in the search. */
+    int UNBOUNDED_TRIP_INDEX = -1;
+
     /**
      * Find the best trip matching the given {@code timeLimit}.
      * This is the same as calling {@link #search(int, int, int)} with {@code tripIndexLimit: -1}.
      *
      * @see #search(int, int, int)
      */
-    boolean search(int timeLimit, int stopPositionInPattern);
+    default boolean search(int timeLimit, int stopPositionInPattern) {
+        return search(timeLimit, stopPositionInPattern, UNBOUNDED_TRIP_INDEX);
+    };
 
     /**
      * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}.
      *
-     * @param tripIndexLimit        Lower bound for trip index to search for. Inclusive. Use {@code 0}
-     *                              for an unbounded search.
      * @param arrivalDepartureTime  The time of arrival(departure for reverse search) at the given stop.
      * @param stopPositionInPattern The stop to board
+     * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use
+     *                              {@code -1} for an unbounded search. This is an optimization
+     *                              which allow us to search faster, and it exclude results witch
+     *                              is less favorable than trips already processed.
      */
     boolean search(int arrivalDepartureTime, int stopPositionInPattern, int tripIndexLimit);
 
-
+    /**
+     * Return the earliest-board-time for the current trip board search.
+     * Latest-arrival-time for alight search.
+     */
     int getEarliestBoardTime();
 
     /**
