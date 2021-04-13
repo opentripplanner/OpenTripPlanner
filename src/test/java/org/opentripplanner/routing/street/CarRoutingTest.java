@@ -39,7 +39,8 @@ public class CarRoutingTest {
     @DisplayName("car routes can contain loops (traversing the same edge twice)")
     public void shouldAllowLoopCausedByTurnRestrictions() {
         var hindenburgStrUnderConstruction = ConstantsForTests.buildOsmGraph(
-                ConstantsForTests.HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM);
+                ConstantsForTests.HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM
+        );
 
         var gueltsteinerStr = new GenericLocation(48.59240, 8.87024);
         var aufDemGraben = new GenericLocation(48.59487, 8.87133);
@@ -48,7 +49,9 @@ public class CarRoutingTest {
                 computePolyline(hindenburgStrUnderConstruction, gueltsteinerStr, aufDemGraben);
 
         assertThatPolylinesAreEqual(
-                polyline, "ouqgH}mcu@gAE]U}BaA]Q}@]uAs@[SAm@Ee@AUEi@XEQkBQ?Bz@Dt@Dh@@TGBC@KBSHGx@");
+                polyline,
+                "ouqgH}mcu@gAE]U}BaA]Q}@]uAs@[SAm@Ee@AUEi@XEQkBQ?Bz@Dt@Dh@@TGBC@KBSHGx@"
+        );
     }
 
     private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
@@ -67,7 +70,8 @@ public class CarRoutingTest {
         var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
         // make sure that we only get CAR legs
         itineraries.forEach(
-                i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.CAR)));
+                i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.CAR))
+        );
         return itineraries.get(0).legs.get(0).legGeometry.getPoints();
     }
 }
