@@ -29,7 +29,7 @@ public class TripTimeShort {
     private final boolean cancelledStop;
     private final RealTimeState realtimeState;
     private final long serviceDay;
-    private final FeedScopedId tripId;
+    private final Trip trip;
     private final String blockId;
     private final String headsign;
     private final int pickupType;
@@ -40,7 +40,7 @@ public class TripTimeShort {
      */
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {
         serviceDay         = sd != null ? sd.time(0) : UNDEFINED;
-        tripId             = tt.trip.getId();
+        trip               = tt.trip;
         stopId             = stop.getId();
         stopIndex          = i;
         stopCount          = tt.getNumStops();
@@ -168,6 +168,11 @@ public class TripTimeShort {
         return cancelledStop;
     }
 
+    /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
+    public boolean isCanceledEffectively() {
+        return cancelledStop || trip.getTripAlteration().isCanceledOrReplaced();
+    }
+
     public RealTimeState getRealtimeState() {
         return realtimeState;
     }
@@ -176,8 +181,8 @@ public class TripTimeShort {
         return serviceDay;
     }
 
-    public FeedScopedId getTripId() {
-        return tripId;
+    public Trip getTrip() {
+        return trip;
     }
 
     public String getBlockId() {

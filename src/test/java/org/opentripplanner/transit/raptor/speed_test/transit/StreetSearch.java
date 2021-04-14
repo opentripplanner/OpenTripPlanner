@@ -1,7 +1,16 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
+import static org.opentripplanner.graph_builder.linking.LinkingDirection.INCOMING;
+import static org.opentripplanner.graph_builder.linking.LinkingDirection.OUTGOING;
+
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
@@ -16,16 +25,11 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 /**
@@ -68,17 +72,26 @@ class StreetSearch {
                     !fromOrigin
             );
 
+            LinkingDirection direction;
+            BiFunction<Vertex, StreetVertex, List<Edge>> createEdgeOp;
+
+            if(fromOrigin) {
+                direction = INCOMING;
+                createEdgeOp = (t, v) -> List.of(
+                        new TemporaryFreeEdge((TemporaryStreetLocation) t, v)
+                );
+            }
+            else {
+                direction = OUTGOING;
+                createEdgeOp = (t, v) -> List.of(
+                        new TemporaryFreeEdge(v, (TemporaryStreetLocation) t)
+                );
+            }
             linker.linkVertexForRequest(
                 vertex,
                 new TraverseModeSet(TraverseMode.WALK),
-                fromOrigin ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
-                fromOrigin
-                    ? (v, streetVertex) -> List.of(
-                    new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation)v)
-                )
-                    : (v, streetVertex) -> List.of(
-                        new TemporaryFreeEdge((TemporaryStreetLocation)v, streetVertex)
-                    )
+                direction,
+                createEdgeOp
             );
         }
 

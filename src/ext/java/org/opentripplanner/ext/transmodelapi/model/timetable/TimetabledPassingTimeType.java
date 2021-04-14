@@ -69,9 +69,7 @@ public class TimetabledPassingTimeType {
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
                   .getPatternForTrip()
-                  .get(GqlUtil.getRoutingService(environment)
-                      .getTripForId()
-                      .get(((TripTimeShort) environment.getSource()).getTripId()))
+                  .get(((TripTimeShort) environment.getSource()).getTrip())
                   .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
             })
             .build())
@@ -83,9 +81,7 @@ public class TimetabledPassingTimeType {
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
                   .getPatternForTrip()
-                  .get(GqlUtil.getRoutingService(environment)
-                      .getTripForId()
-                      .get(((TripTimeShort) environment.getSource()).getTripId()))
+                  .get(((TripTimeShort) environment.getSource()).getTrip())
                   .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex())
                   != PICKDROP_NONE;
             })
@@ -98,9 +94,7 @@ public class TimetabledPassingTimeType {
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
                   .getPatternForTrip()
-                  .get(GqlUtil.getRoutingService(environment)
-                      .getTripForId()
-                      .get(((TripTimeShort) environment.getSource()).getTripId()))
+                  .get(((TripTimeShort) environment.getSource()).getTrip())
                   .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex())
                   == PICKDROP_COORDINATE_WITH_DRIVER;
             })
@@ -109,11 +103,7 @@ public class TimetabledPassingTimeType {
             .newFieldDefinition()
             .name("serviceJourney")
             .type(serviceJourneyType)
-            .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment)
-                  .getTripForId()
-                  .get(((TripTimeShort) environment.getSource()).getTripId());
-            })
+            .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).getTrip())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()

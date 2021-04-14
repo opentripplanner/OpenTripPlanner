@@ -200,6 +200,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.timepoints = object.timepoints;
         this.pickups = object.pickups;
         this.dropoffs = object.dropoffs;
+        this.bookingInfos = object.bookingInfos;
     }
 
     /**
