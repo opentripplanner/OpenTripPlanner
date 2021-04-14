@@ -47,13 +47,14 @@ public class SplitEdgeTurnRestrictionsTest {
                 ConstantsForTests.VVS_BUS_764_ONLY
         );
         // https://www.openstreetmap.org/relation/10264251 has a turn restriction so when leaving Hardtheimer Weg
-        // you must turn right and take the long way to Steinhaldenweg.
+        // you must either turn right and take the long way to Steinhaldenweg or go past the intersection with the
+        // turn restriction and turn around.
         // on top of this, it has a bus stop so this test also makes sure that the turn restrictions work
         // even when the streets are split.
         var noRightTurnPermitted = computeCarPolyline(graph, hardtheimerWeg, steinhaldenWeg);
         assertThatPolylinesAreEqual(
                 noRightTurnPermitted,
-                "ijbhHuycu@g@Uq@[VeAj@iCTsANoAJiAHsAFuDLoG@_@?YBeGCaAO@C?KBKBKFIJKREf@?d@?h@\\TNb@Ff@?bAMnEKjEOxDWbCc@vCIDMDCB"
+                "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAYz@Yp@Yj@^n@JDN_@?Wa@i@Xq@X{@\\yAXyACGAIB]j@_DPaA@e@MDCB"
         );
 
         // when to drive in reverse direction it's fine to go this way
