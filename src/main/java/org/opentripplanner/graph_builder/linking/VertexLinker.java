@@ -1,17 +1,20 @@
 package org.opentripplanner.graph_builder.linking;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.geocoder.google.Geometry;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -25,11 +28,6 @@ import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -343,6 +341,7 @@ public class VertexLinker {
     }
   }
 
+
   /** projected distance from stop to edge, in latitude degrees */
   private static double distance(Vertex tstop, StreetEdge edge, double xscale) {
     // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
@@ -409,8 +408,8 @@ public class VertexLinker {
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
     P2<StreetEdge> newEdges = scope == Scope.PERMANENT
-        ? originalEdge.splitDestructively(v)
-        : originalEdge.splitNonDestructively(v, tempEdges, direction);
+        ? originalEdge.splitDestructively(v, graph)
+        : originalEdge.splitNonDestructively(v, tempEdges, direction, graph);
 
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
@@ -432,7 +431,6 @@ public class VertexLinker {
         removeEdgeFromIndex(originalEdge, scope);
       }
     }
-
     return v;
   }
 

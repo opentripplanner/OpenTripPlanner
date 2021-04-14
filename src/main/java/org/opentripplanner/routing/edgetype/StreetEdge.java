@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
@@ -19,7 +20,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.CarPickupState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author novalis
  * 
  */
-public class StreetEdge extends Edge implements Cloneable {
+public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
@@ -250,70 +250,31 @@ public class StreetEdge extends Edge implements Cloneable {
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
-        final TraverseMode currMode = s0.getNonTransitMode();
         StateEditor editor = doTraverse(s0, options, s0.getNonTransitMode());
         State state = (editor == null) ? null : editor.makeState();
-        /* Kiss and ride support. Mode transitions occur without the explicit loop edges used in park-and-ride. */
-        // TODO Replace with a more general state machine implementation
-        if (options.carPickup) {
-            if (options.arriveBy) {
-                // Check if we can enter the taxi and continue by car
-                // Final WALK check needed to prevent infinite recursion.
-                if (s0.getCarPickupState().equals(CarPickupState.WALK_FROM_DROP_OFF)
-                        && currMode == TraverseMode.WALK) {
-                    editor = doTraverse(s0, options, TraverseMode.CAR);
-                    if (editor != null) {
-                        editor.setTaxiState(CarPickupState.IN_CAR);
-                        State forkState = editor.makeState();
-                        if (forkState != null) {
-                            forkState.addToExistingResultChain(state);
-                            return forkState; // return both taxi and walk states
-                        }
-                    }
-                }
 
-                // Check if we can exit the taxi and continue by walking
-                // Final CAR check needed to prevent infinite recursion.
-                if ( s0.getCarPickupState().equals(CarPickupState.IN_CAR) &&
-                        !getPermission().allows(TraverseMode.CAR)
-                        && currMode == TraverseMode.CAR) {
-                    // Check if it is possible to continue by walking
-                    editor = doTraverse(s0, options, TraverseMode.WALK);
-                    if (editor != null) {
-                        editor.setTaxiState(CarPickupState.WALK_TO_PICKUP);
-                        return editor.makeState(); // return only the walk state
-                    }
-                }
-            } else { /* departAfter */
-                // Check if we can enter the taxi and continue by car
-                // Final WALK check needed to prevent infinite recursion.
-                if (s0.getCarPickupState().equals(CarPickupState.WALK_TO_PICKUP)
-                    && currMode == TraverseMode.WALK) {
-                    editor = doTraverse(s0, options, TraverseMode.CAR);
-                    if (editor != null) {
-                        editor.setTaxiState(CarPickupState.IN_CAR);
-                        State forkState = editor.makeState();
-                        if (forkState != null) {
-                            forkState.addToExistingResultChain(state);
-                            return forkState; // return both the car and the walk state
-                        }
-                    }
-                }
-
-                // Check if we can exit the taxi and continue by walking
-                // Final CAR check needed to prevent infinite recursion.
-                if ( s0.getCarPickupState().equals(CarPickupState.IN_CAR) &&
-                    !getPermission().allows(TraverseMode.CAR)
-                    && currMode == TraverseMode.CAR) {
-                    // Check if it is possible to continue by walking
-                    editor = doTraverse(s0, options, TraverseMode.WALK);
-                    if (editor != null) {
-                        editor.setTaxiState(CarPickupState.WALK_FROM_DROP_OFF);
-                        return editor.makeState(); // return only the walk state
-                    }
+        if (canPickupAndDrive(s0)) {
+            StateEditor inCar = doTraverse(s0, options, TraverseMode.CAR);
+            if (inCar != null) {
+                driveAfterPickup(s0, inCar);
+                State forkState = inCar.makeState();
+                if (forkState != null) {
+                    // Return both the original WALK state, along with the new IN_CAR state
+                    forkState.addToExistingResultChain(state);
+                    return forkState;
                 }
             }
         }
+
+        if (canDropOffAfterDriving(s0) && !getPermission().allows(TraverseMode.CAR)) {
+            editor = doTraverse(s0, options, TraverseMode.WALK);
+            if (editor != null) {
+                dropOffAfterDriving(s0, editor);
+                // Only the walk state is returned, since traversing by car was not possible
+                return editor.makeState();
+            }
+        }
+
         return state;
     }
 
@@ -794,7 +755,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** Split this street edge and return the resulting street edges. After splitting, the original
      * edge will be removed from the graph. */
-    public P2<StreetEdge> splitDestructively(SplitterVertex v) {
+    public P2<StreetEdge> splitDestructively(SplitterVertex v, Graph graph) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
@@ -851,14 +812,18 @@ public class StreetEdge extends Edge implements Cloneable {
             e.setBack(isBack());
         }
 
-        return new P2<>(e1, e2);
+        var splitEdges = new P2<>(e1, e2);
+        copyRestrictionsToSplitEdges(this, splitEdges, graph);
+        return splitEdges;
     }
+
 
     /** Split this street edge and return the resulting street edges. The original edge is kept. */
     public P2<StreetEdge> splitNonDestructively(
         SplitterVertex v,
         DisposableEdgeCollection tempEdges,
-        LinkingDirection direction
+        LinkingDirection direction,
+        Graph graph
     ) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
@@ -878,7 +843,71 @@ public class StreetEdge extends Edge implements Cloneable {
             tempEdges.addEdge(e2);
         }
 
-        return new P2<>(e1, e2);
+        var splitEdges = new P2<>(e1, e2);
+        copyRestrictionsToSplitEdges(this, splitEdges, graph);
+        return splitEdges;
+    }
+
+    /**
+     * Copy restrictions having former edge as from to appropriate split edge, as well as
+     * restrictions on incoming edges.
+     */
+    private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges, Graph graph) {
+
+        graph.getTurnRestrictions(edge).forEach(restriction -> {
+            // figure which one is the "from" edge
+            StreetEdge fromEdge = shouldUseFirstSplitEdge(edge, restriction) ? splitEdges.first : splitEdges.second;
+
+            TurnRestriction splitTurnRestriction = new TurnRestriction(fromEdge, restriction.to,
+                    restriction.type, restriction.modes
+            );
+            splitTurnRestriction.time = restriction.time;
+            LOG.debug(
+                    "Recreate new restriction {} with split edge as from edge {}", splitTurnRestriction,
+                    fromEdge
+            );
+            graph.addTurnRestriction(fromEdge, splitTurnRestriction);
+            // Not absolutely necessary, as old edge will not be accessible, but for good housekeeping
+            graph.removeTurnRestriction(edge, restriction);
+        });
+
+        applyToAdjacentEdges(edge, splitEdges.second, edge.getToVertex().getOutgoing(), graph);
+        applyToAdjacentEdges(edge, splitEdges.first, edge.getFromVertex().getIncoming(), graph);
+    }
+
+    private static boolean shouldUseFirstSplitEdge(StreetEdge edge, TurnRestriction restriction) {
+        return restriction.to.getToVertex() == edge.getToVertex();
+    }
+
+    private static void applyToAdjacentEdges(
+            StreetEdge formerEdge,
+            StreetEdge newToEdge,
+            Collection<Edge> adjacentEdges,
+            Graph graph
+    ) {
+        adjacentEdges.stream()
+                .flatMap(originatingEdge -> graph.getTurnRestrictions(originatingEdge).stream())
+                .filter(restriction -> restriction.to == formerEdge)
+                .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction, graph));
+    }
+
+    private static void applyRestrictionsToNewEdge(
+            StreetEdge newEdge,
+            TurnRestriction restriction,
+            Graph graph
+    ) {
+        TurnRestriction splitTurnRestriction = new TurnRestriction(restriction.from,
+                newEdge, restriction.type, restriction.modes
+        );
+        splitTurnRestriction.time = restriction.time;
+        LOG.debug(
+                "Recreate new restriction {} with split edge as to edge {}", splitTurnRestriction,
+                newEdge
+        );
+        graph.addTurnRestriction(restriction.from, splitTurnRestriction);
+        // Former turn restriction needs to be removed. Especially no only_turn
+        // restriction to a non existent edge must not survive
+        graph.removeTurnRestriction(restriction.from, restriction);
     }
 
     /**

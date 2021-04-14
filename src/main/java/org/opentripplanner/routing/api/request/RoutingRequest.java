@@ -1,8 +1,16 @@
 package org.opentripplanner.routing.api.request;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Comparator;
+import org.geotools.geojson.geom.GeometryJSON;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -12,6 +20,7 @@ import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
@@ -33,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1118,9 +1126,11 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
     private void resetRoutingContext() {
-        Graph graph = rctx.graph;
-        rctx = null;
-        setRoutingContext(graph);
+        if (rctx != null) {
+            Graph graph = rctx.graph;
+            rctx = null;
+            setRoutingContext(graph);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1418,5 +1428,71 @@ public class RoutingRequest implements Cloneable, Serializable {
             return new DurationComparator();
         }
         return new PathComparator(compareStartTimes);
+    }
+
+    /**
+     * How close to do you have to be to the start or end to be considered "close".
+     *
+     * @see RoutingRequest#isCloseToStartOrEnd(Vertex)
+     * @see DominanceFunction#betterOrEqualAndComparable(State, State)
+     */
+    private final int MAX_CLOSENESS_METERS = 500;
+    private Envelope fromEnvelope;
+    private Envelope toEnvelope;
+
+    /**
+     * Returns if the vertex is considered "close" to the start or end point of the request.
+     * This is useful if you want to allow loops in car routes under certain conditions.
+     *
+     * Note: If you are doing Raptor access/egress searches this method does not take the possible
+     * intermediate points (stations) into account. This means that stations might be skipped
+     * because a car route to it cannot be found and a suboptimal route to another station is
+     * returned instead.
+     *
+     * If you encounter a case of this, you can adjust this code to take this into account.
+     *
+     * @see RoutingRequest.MAX_CLOSENESS_METERS
+     * @see DominanceFunction#betterOrEqualAndComparable(State, State)
+     */
+    public boolean isCloseToStartOrEnd(Vertex vertex) {
+        if(from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
+            return false;
+        }
+        if (fromEnvelope == null) {
+            fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);
+        }
+        if (toEnvelope == null) {
+            toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);
+        }
+        return fromEnvelope.intersects(vertex.getCoordinate()) || toEnvelope.intersects(
+                vertex.getCoordinate());
+    }
+
+    private static Envelope getEnvelope(Coordinate c, int meters) {
+        double lat = SphericalDistanceLibrary.metersToDegrees(meters);
+        double lon = SphericalDistanceLibrary.metersToLonDegrees(meters, c.y);
+
+        Envelope env = new Envelope(c);
+        env.expandBy(lon, lat);
+
+        if (LOG.isDebugEnabled()) {
+
+            var geom = new GeometryFactory().toGeometry(env);
+            var geoJson = new GeometryJSON();
+
+            try {
+                var stream = new ByteArrayOutputStream();
+                geoJson.write(geom, stream);
+                LOG.debug(
+                        "Computing {}m envelope around coordinate {}. GeoJSON: {}", meters, c,
+                        stream.toString()
+                );
+            }
+            catch (IOException e) {
+                LOG.error("Could not build debug GeoJSON", e);
+            }
+        }
+
+        return env;
     }
 }
