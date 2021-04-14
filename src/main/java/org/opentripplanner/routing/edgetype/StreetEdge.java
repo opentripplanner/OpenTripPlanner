@@ -20,7 +20,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.CarPickupState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -44,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author novalis
  * 
  */
-public class StreetEdge extends Edge implements Cloneable {
+public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
@@ -251,70 +250,31 @@ public class StreetEdge extends Edge implements Cloneable {
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
-        final TraverseMode currMode = s0.getNonTransitMode();
         StateEditor editor = doTraverse(s0, options, s0.getNonTransitMode());
         State state = (editor == null) ? null : editor.makeState();
-        /* Kiss and ride support. Mode transitions occur without the explicit loop edges used in park-and-ride. */
-        // TODO Replace with a more general state machine implementation
-        if (options.carPickup) {
-            if (options.arriveBy) {
-                // Check if we can enter the taxi and continue by car
-                // Final WALK check needed to prevent infinite recursion.
-                if (s0.getCarPickupState().equals(CarPickupState.WALK_FROM_DROP_OFF)
-                        && currMode == TraverseMode.WALK) {
-                    editor = doTraverse(s0, options, TraverseMode.CAR);
-                    if (editor != null) {
-                        editor.setTaxiState(CarPickupState.IN_CAR);
-                        State forkState = editor.makeState();
-                        if (forkState != null) {
-                            forkState.addToExistingResultChain(state);
-                            return forkState; // return both taxi and walk states
-                        }
-                    }
-                }
 
-                // Check if we can exit the taxi and continue by walking
-                // Final CAR check needed to prevent infinite recursion.
-                if ( s0.getCarPickupState().equals(CarPickupState.IN_CAR) &&
-                        !getPermission().allows(TraverseMode.CAR)
-                        && currMode == TraverseMode.CAR) {
-                    // Check if it is possible to continue by walking
-                    editor = doTraverse(s0, options, TraverseMode.WALK);
-                    if (editor != null) {
-                        editor.setTaxiState(CarPickupState.WALK_TO_PICKUP);
-                        return editor.makeState(); // return only the walk state
-                    }
-                }
-            } else { /* departAfter */
-                // Check if we can enter the taxi and continue by car
-                // Final WALK check needed to prevent infinite recursion.
-                if (s0.getCarPickupState().equals(CarPickupState.WALK_TO_PICKUP)
-                    && currMode == TraverseMode.WALK) {
-                    editor = doTraverse(s0, options, TraverseMode.CAR);
-                    if (editor != null) {
-                        editor.setTaxiState(CarPickupState.IN_CAR);
-                        State forkState = editor.makeState();
-                        if (forkState != null) {
-                            forkState.addToExistingResultChain(state);
-                            return forkState; // return both the car and the walk state
-                        }
-                    }
-                }
-
-                // Check if we can exit the taxi and continue by walking
-                // Final CAR check needed to prevent infinite recursion.
-                if ( s0.getCarPickupState().equals(CarPickupState.IN_CAR) &&
-                    !getPermission().allows(TraverseMode.CAR)
-                    && currMode == TraverseMode.CAR) {
-                    // Check if it is possible to continue by walking
-                    editor = doTraverse(s0, options, TraverseMode.WALK);
-                    if (editor != null) {
-                        editor.setTaxiState(CarPickupState.WALK_FROM_DROP_OFF);
-                        return editor.makeState(); // return only the walk state
-                    }
+        if (canPickupAndDrive(s0)) {
+            StateEditor inCar = doTraverse(s0, options, TraverseMode.CAR);
+            if (inCar != null) {
+                driveAfterPickup(s0, inCar);
+                State forkState = inCar.makeState();
+                if (forkState != null) {
+                    // Return both the original WALK state, along with the new IN_CAR state
+                    forkState.addToExistingResultChain(state);
+                    return forkState;
                 }
             }
         }
+
+        if (canDropOffAfterDriving(s0) && !getPermission().allows(TraverseMode.CAR)) {
+            editor = doTraverse(s0, options, TraverseMode.WALK);
+            if (editor != null) {
+                dropOffAfterDriving(s0, editor);
+                // Only the walk state is returned, since traversing by car was not possible
+                return editor.makeState();
+            }
+        }
+
         return state;
     }
 
