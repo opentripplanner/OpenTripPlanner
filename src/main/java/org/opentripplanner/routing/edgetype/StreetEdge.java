@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
@@ -794,7 +795,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     /** Split this street edge and return the resulting street edges. After splitting, the original
      * edge will be removed from the graph. */
-    public P2<StreetEdge> splitDestructively(SplitterVertex v) {
+    public P2<StreetEdge> splitDestructively(SplitterVertex v, Graph graph) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
@@ -851,14 +852,18 @@ public class StreetEdge extends Edge implements Cloneable {
             e.setBack(isBack());
         }
 
-        return new P2<>(e1, e2);
+        var splitEdges = new P2<>(e1, e2);
+        copyRestrictionsToSplitEdges(this, splitEdges, graph);
+        return splitEdges;
     }
+
 
     /** Split this street edge and return the resulting street edges. The original edge is kept. */
     public P2<StreetEdge> splitNonDestructively(
         SplitterVertex v,
         DisposableEdgeCollection tempEdges,
-        LinkingDirection direction
+        LinkingDirection direction,
+        Graph graph
     ) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
@@ -878,7 +883,71 @@ public class StreetEdge extends Edge implements Cloneable {
             tempEdges.addEdge(e2);
         }
 
-        return new P2<>(e1, e2);
+        var splitEdges = new P2<>(e1, e2);
+        copyRestrictionsToSplitEdges(this, splitEdges, graph);
+        return splitEdges;
+    }
+
+    /**
+     * Copy restrictions having former edge as from to appropriate split edge, as well as
+     * restrictions on incoming edges.
+     */
+    private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges, Graph graph) {
+
+        graph.getTurnRestrictions(edge).forEach(restriction -> {
+            // figure which one is the "from" edge
+            StreetEdge fromEdge = shouldUseFirstSplitEdge(edge, restriction) ? splitEdges.first : splitEdges.second;
+
+            TurnRestriction splitTurnRestriction = new TurnRestriction(fromEdge, restriction.to,
+                    restriction.type, restriction.modes
+            );
+            splitTurnRestriction.time = restriction.time;
+            LOG.debug(
+                    "Recreate new restriction {} with split edge as from edge {}", splitTurnRestriction,
+                    fromEdge
+            );
+            graph.addTurnRestriction(fromEdge, splitTurnRestriction);
+            // Not absolutely necessary, as old edge will not be accessible, but for good housekeeping
+            graph.removeTurnRestriction(edge, restriction);
+        });
+
+        applyToAdjacentEdges(edge, splitEdges.second, edge.getToVertex().getOutgoing(), graph);
+        applyToAdjacentEdges(edge, splitEdges.first, edge.getFromVertex().getIncoming(), graph);
+    }
+
+    private static boolean shouldUseFirstSplitEdge(StreetEdge edge, TurnRestriction restriction) {
+        return restriction.to.getToVertex() == edge.getToVertex();
+    }
+
+    private static void applyToAdjacentEdges(
+            StreetEdge formerEdge,
+            StreetEdge newToEdge,
+            Collection<Edge> adjacentEdges,
+            Graph graph
+    ) {
+        adjacentEdges.stream()
+                .flatMap(originatingEdge -> graph.getTurnRestrictions(originatingEdge).stream())
+                .filter(restriction -> restriction.to == formerEdge)
+                .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction, graph));
+    }
+
+    private static void applyRestrictionsToNewEdge(
+            StreetEdge newEdge,
+            TurnRestriction restriction,
+            Graph graph
+    ) {
+        TurnRestriction splitTurnRestriction = new TurnRestriction(restriction.from,
+                newEdge, restriction.type, restriction.modes
+        );
+        splitTurnRestriction.time = restriction.time;
+        LOG.debug(
+                "Recreate new restriction {} with split edge as to edge {}", splitTurnRestriction,
+                newEdge
+        );
+        graph.addTurnRestriction(restriction.from, splitTurnRestriction);
+        // Former turn restriction needs to be removed. Especially no only_turn
+        // restriction to a non existent edge must not survive
+        graph.removeTurnRestriction(restriction.from, restriction);
     }
 
     /**

@@ -10,6 +10,7 @@
 - A pathway's `traversal_time` is used when calculating the duration of transfers [#3357](https://github.com/opentripplanner/OpenTripPlanner/issues/3357).
 - GTFS Trips will by default not allow bikes if no explicit value is set [#3359](https://github.com/opentripplanner/OpenTripPlanner/issues/3359).
 - Improve the dynamic search window calculation. The configuration parameters `minTransitTimeCoefficient` and `minWaitTimeCoefficient` replace the old `minTripTimeCoefficient` parameter. [#3366](https://github.com/opentripplanner/OpenTripPlanner/issues/3366)   
+- Apply turn restrictions when splitting edges. [#3414](https://github.com/opentripplanner/OpenTripPlanner/pull/3414)
 
 ## 2.0.0 (2020-11-27)
 
