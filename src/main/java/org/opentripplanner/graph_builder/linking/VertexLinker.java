@@ -429,8 +429,8 @@ public class VertexLinker {
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
     P2<StreetEdge> newEdges = scope == Scope.PERMANENT
-        ? originalEdge.splitDestructively(v)
-        : originalEdge.splitNonDestructively(v, tempEdges, direction);
+        ? originalEdge.splitDestructively(v, graph)
+        : originalEdge.splitNonDestructively(v, tempEdges, direction, graph);
 
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges

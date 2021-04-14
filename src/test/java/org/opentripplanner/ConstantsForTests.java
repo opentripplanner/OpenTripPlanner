@@ -8,6 +8,7 @@ import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
+import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -49,6 +50,12 @@ public class ConstantsForTests {
     private static final String NETEX_DIR = "src/test/resources/netex";
 
     private static final String NETEX_FILENAME = "netex_minimal.zip";
+
+    /* Stuttgart area, Germany */
+    public static final String DEUFRINGEN_OSM = "src/test/resources/germany/deufringen-minimal.osm.pbf";
+    public static final String BOEBLINGEN_OSM = "src/test/resources/germany/boeblingen-minimal.osm.pbf";
+    public static final String VVS_BUS_764_ONLY = "src/test/resources/germany/vvs-bus-764-only.gtfs.zip";
+    public static final String VVS_BUS_751_ONLY = "src/test/resources/germany/vvs-bus-751-only.gtfs.zip";
 
     private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
             new File(NETEX_DIR, NETEX_FILENAME),
@@ -137,6 +144,45 @@ public class ConstantsForTests {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public static Graph buildOsmGraph(String osmPath) {
+
+        try {
+            var graph = new Graph();
+            // Add street data from OSM
+            File osmFile = new File(osmPath);
+            BinaryOpenStreetMapProvider osmProvider =
+                    new BinaryOpenStreetMapProvider(osmFile, true);
+            OpenStreetMapModule osmModule =
+                    new OpenStreetMapModule(Lists.newArrayList(osmProvider));
+            osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+            osmModule.skipVisibility = true;
+            osmModule.buildGraph(graph, new HashMap<>());
+            return graph;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Graph buildGtfsGraph(String osmPath, String gtfsPath) throws IOException {
+        var graph = buildOsmGraph(osmPath);
+
+        var context = contextBuilder(gtfsPath)
+                .withIssueStoreAndDeduplicator(graph)
+                .build();
+        AddTransitModelEntitiesToGraph.addToGraph(context, graph);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
+        factory.run(graph);
+        // Link transit stops to streets
+        GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
+        streetTransitLinker.buildGraph(graph, new HashMap<>());
+        graph.putService(
+                CalendarServiceData.class,
+                context.getCalendarServiceData()
+        );
+        return graph;
     }
 
     private void setupMinNetex() {

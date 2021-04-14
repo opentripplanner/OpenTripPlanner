@@ -1118,9 +1118,11 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
     private void resetRoutingContext() {
-        Graph graph = rctx.graph;
-        rctx = null;
-        setRoutingContext(graph);
+        if (rctx != null) {
+            Graph graph = rctx.graph;
+            rctx = null;
+            setRoutingContext(graph);
+        }
     }
 
     @SuppressWarnings("unchecked")

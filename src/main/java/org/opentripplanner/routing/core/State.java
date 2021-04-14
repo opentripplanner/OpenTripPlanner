@@ -47,9 +47,15 @@ public class State implements Cloneable {
      * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
      * states must be created from a parent and associated with an edge.
      */
-    public static Collection<State> getStates(RoutingRequest request) {
+    public static Collection<State> getInitialStates(RoutingRequest request) {
         Collection<State> states = new ArrayList<>();
         for (Vertex vertex : request.rctx.fromVertices) {
+            /* carPickup searches may end in two states (see isFinal()): IN_CAR and WALK_FROM_DROP_OFF/WALK_TO_PICKUP
+               for forward/reverse searches to be symmetric both inital states need to be created. */
+            if (request.carPickup) {
+                states.add(new State(vertex, request.rctx.originBackEdge, request.getSecondsSinceEpoch(), request, true));
+            }
+
             states.add(new State(vertex, request.rctx.originBackEdge, request.getSecondsSinceEpoch(), request));
         }
         return states;
@@ -87,14 +93,22 @@ public class State implements Cloneable {
      * a RoutingContext in TransitIndex, tests, etc.
      */
     public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options) {
-        this(vertex, backEdge, timeSeconds, timeSeconds, options);
+        this(vertex, backEdge, timeSeconds, timeSeconds, options, false);
     }
-    
+
+    /**
+     * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing
+     * a RoutingContext in TransitIndex, tests, etc.
+     */
+    public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options, boolean carPickupStateInCar) {
+        this(vertex, backEdge, timeSeconds, timeSeconds, options, carPickupStateInCar);
+    }
+
     /**
      * Create an initial state, forcing vertex, back edge, time and start time to the specified values. Useful for starting
      * a multiple initial state search, for example when propagating profile results to the street network in RoundBasedProfileRouter.
      */
-    public State(Vertex vertex, Edge backEdge, long timeSeconds, long startTime, RoutingRequest options) {
+    public State(Vertex vertex, Edge backEdge, long timeSeconds, long startTime, RoutingRequest options, boolean carPickupStateInCar) {
         this.weight = 0;
         this.vertex = vertex;
         this.backEdge = backEdge;
@@ -105,14 +119,20 @@ public class State implements Cloneable {
         this.stateData.opt = options;
         this.stateData.startTime = startTime;
         this.stateData.usingRentedBike = false;
+        if (options.carPickup) {
+            /* For carPickup two initial states are created in getStates(request):
+                 1. WALK / WALK_FROM_DROP_OFF or WALK_TO_PICKUP for cases with an initial walk
+                 2. CAR / IN_CAR where pickup happens directly at the bus stop */
+            if (carPickupStateInCar) {
+                this.stateData.carPickupState = CarPickupState.IN_CAR;
+                this.stateData.nonTransitMode = TraverseMode.CAR;
+            } else {
+                this.stateData.carPickupState = options.arriveBy ? CarPickupState.WALK_FROM_DROP_OFF : CarPickupState.WALK_TO_PICKUP;
+                this.stateData.nonTransitMode = TraverseMode.WALK;
+            }
+        }
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
-        if (options.carPickup) {
-            this.stateData.carPickupState = options.arriveBy
-                ? CarPickupState.WALK_FROM_DROP_OFF
-                : CarPickupState.WALK_TO_PICKUP;
-            this.stateData.nonTransitMode = TraverseMode.WALK;
-        }
         if (options.parkAndRide) {
             this.stateData.carParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
@@ -463,6 +483,9 @@ public class State implements Cloneable {
             }
             if (orig.isBikeParked() != orig.getBackState().isBikeParked()) {
                 editor.setBikeParked(!orig.isBikeParked());
+            }
+            if (orig.getCarPickupState() != null) {
+                editor.setCarPickupState(orig.getCarPickupState());
             }
 
             ret = editor.makeState();
