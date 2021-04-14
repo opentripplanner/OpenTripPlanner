@@ -1,5 +1,7 @@
 package org.opentripplanner.model.transfer;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +24,9 @@ public class TransferService implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransferService.class);
 
+    /** Index of guaranteed transfers by the to/destination point. */
+    private final Multimap<TripTransferPoint, Transfer> guaranteedTransferByToPoint;
+
     /**
      * Table which contains transfers between two trips/routes
      */
@@ -43,6 +48,7 @@ public class TransferService implements Serializable {
     private final Map<P2<Stop>, Transfer> stop2StopTransfers;
 
     public TransferService() {
+        this.guaranteedTransferByToPoint = ArrayListMultimap.create();
         this.trip2tripTransfers = new HashMap<>();
         this.trip2StopTransfers = new HashMap<>();
         this.stop2TripTransfers = new HashMap<>();
@@ -53,6 +59,10 @@ public class TransferService implements Serializable {
         for (Transfer transfer : transfers) {
             add(transfer);
         }
+    }
+
+    public Collection<Transfer> listGuaranteedTransfersTo(Trip toTrip, int toStopIndex) {
+        return guaranteedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
     }
 
     public Transfer findTransfer(
@@ -86,6 +96,8 @@ public class TransferService implements Serializable {
     void add(Transfer transfer) {
         TransferPoint from = transfer.getFrom();
         TransferPoint to = transfer.getTo();
+
+        addGuaranteedTransfer(transfer);
 
         if (from instanceof TripTransferPoint) {
             var fromTrip = (TripTransferPoint) from;
@@ -150,5 +162,14 @@ public class TransferService implements Serializable {
                         + "dropped. A={}, B={}", existingTransfer, newTransfer
         );
         return false;
+    }
+
+    private void addGuaranteedTransfer(Transfer transfer) {
+        var toPoint = transfer.getTo();
+        if(transfer.isStaySeated() || transfer.isGuaranteed()) {
+            if(toPoint instanceof TripTransferPoint) {
+                guaranteedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
+            }
+        }
     }
 }

@@ -183,8 +183,9 @@ class TransferMapper {
       result.addAll(createTransferPointForTrip(stops, trip, TripTransferPoint::new));
     }
     else if (route != null) {
+      /*
+      TODO - This code result in a OutOfMemory exception, fin out why and fix it
       for (Trip tripInRoute : tripsByRoute.get(route)) {
-        /*
         result.addAll(
             createTransferPointForTrip(
               stops,
@@ -192,8 +193,8 @@ class TransferMapper {
               (t,i) -> new RouteTransferPoint(route, t, i)
             )
         );
-       */
       }
+       */
     }
     else {
       for (Stop stop : stops) {

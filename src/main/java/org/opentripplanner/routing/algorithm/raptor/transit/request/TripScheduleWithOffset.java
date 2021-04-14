@@ -37,7 +37,7 @@ public class TripScheduleWithOffset implements TripSchedule {
     }
 
     @Override
-    public RaptorTripPattern pattern() {
+    public RaptorTripPattern<TripSchedule> pattern() {
         return pattern;
     }
 

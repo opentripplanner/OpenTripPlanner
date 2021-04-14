@@ -18,5 +18,5 @@ public interface RaptorRoute<T extends RaptorTripSchedule> {
     /**
      * Return the trip-pattern, the list of stops visited by this route.
      */
-    RaptorTripPattern pattern();
+    RaptorTripPattern<T> pattern();
 }

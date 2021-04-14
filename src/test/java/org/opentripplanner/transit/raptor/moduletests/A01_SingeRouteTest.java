@@ -1,5 +1,12 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -10,13 +17,6 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 /**
  * FEATURE UNDER TEST
@@ -47,7 +47,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
    */
   @Before
   public void setup() {
-    data.add(
+    data.withRoute(
         route(
             pattern("R1", STOP_B, STOP_C, STOP_D)
         )
@@ -62,8 +62,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
         .latestArrivalTime(T00_10)
         .timetableEnabled(true);
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test

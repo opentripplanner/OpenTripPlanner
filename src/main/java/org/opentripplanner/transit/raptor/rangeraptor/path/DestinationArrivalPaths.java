@@ -31,7 +31,7 @@ import java.util.Collection;
  */
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final ParetoSet<Path<T>> paths;
-    private final TransitCalculator transitCalculator;
+    private final TransitCalculator<T> transitCalculator;
     private final CostCalculator<T> costCalculator;
     private final SlackProvider slackProvider;
     private final PathMapper<T> pathMapper;
@@ -41,7 +41,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
     public DestinationArrivalPaths(
             ParetoComparator<Path<T>> paretoComparator,
-            TransitCalculator transitCalculator,
+            TransitCalculator<T> transitCalculator,
             CostCalculator<T> costCalculator,
             SlackProvider slackProvider,
             PathMapper<T> pathMapper,

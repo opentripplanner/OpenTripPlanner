@@ -5,7 +5,8 @@ import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
+import org.opentripplanner.transit.raptor.api.transit.TripScheduleBoardOrAlightEvent;
 
 
 /**
@@ -34,7 +35,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Prepare the {@link RoutingStrategy} to route using the given pattern and tripSearch.
      */
-    void prepareForTransitWith(RaptorTripPattern pattern);
+    void prepareForTransitWith(RaptorTripPattern<T> pattern);
 
     /**
      * Alight the current trip at the given stop with the arrival times.
@@ -49,7 +50,13 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Board trip found in the given trip-search at the given stop.
      */
-    void board(final int stopIndex, TripScheduleSearch<T> tripSearch);
+    void board(final int stopIndex, TripScheduleBoardOrAlightEvent<T> result);
+
+    /**
+     * Get the current boarding previous transit arrival. This is used to look up any
+     * guaranteed transfers.
+     */
+    TransitArrival<T> previousTransit(int boardStopIndex);
 
     /**
      * The trip search will use this index to search relative to an existing boarding.
@@ -60,5 +67,4 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
      * Return -1 to if the tripIndex is unknown.
      */
     default int onTripIndex() { return -1; }
-
 }

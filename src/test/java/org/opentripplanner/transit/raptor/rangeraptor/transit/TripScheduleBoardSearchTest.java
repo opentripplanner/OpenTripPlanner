@@ -64,7 +64,7 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
     private final TestTripSchedule tripB = route.timetable().getTripSchedule(TRIP_B);
 
     // The service under test - the subject
-    private TripScheduleBoardSearch<TestTripSchedule> subject = new TripScheduleBoardSearch<>(
+    private TripScheduleBoardingSearch<TestTripSchedule> subject = new TripScheduleBoardingSearch<>(
             TRIPS_BINARY_SEARCH_THRESHOLD, route.timetable()
     );
 
@@ -197,7 +197,7 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
     private void useTripPattern(TestRoute route) {
         this.route = route;
-        this.subject = new TripScheduleBoardSearch<>(
+        this.subject = new TripScheduleBoardingSearch<>(
                 TRIPS_BINARY_SEARCH_THRESHOLD,
                 this.route.timetable()
         );

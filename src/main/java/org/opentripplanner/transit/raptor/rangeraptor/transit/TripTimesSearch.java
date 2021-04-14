@@ -106,7 +106,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     }
 
     private BoarAndAlightTime findTripBefore(int latestArrivalTime) {
-        RaptorTripPattern p = schedule.pattern();
+        RaptorTripPattern<?> p = schedule.pattern();
         int i = schedule.findArrivalStopPosition(latestArrivalTime, toStop);
 
         if(i < 0) {

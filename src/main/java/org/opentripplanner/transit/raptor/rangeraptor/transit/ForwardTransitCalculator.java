@@ -1,11 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import java.util.Collection;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -13,7 +18,7 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * Used to calculate times in a forward trip search.
  */
-final class ForwardTransitCalculator implements TransitCalculator {
+final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements TransitCalculator<T> {
     private final int tripSearchBinarySearchThreshold;
     private final int earliestDepartureTime;
     private final int searchWindowInSeconds;
@@ -62,7 +67,7 @@ final class ForwardTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {
+    public int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {
         return onTrip.arrival(stopPositionInPattern) + alightSlack;
     }
 
@@ -114,20 +119,46 @@ final class ForwardTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            RaptorTimeTable<T> timeTable
+    @Nullable
+    public Collection<GuaranteedTransfer<T>> guaranteedTransfers(
+            RaptorTripPattern<T> toPattern, int toStopPos
     ) {
-        return new TripScheduleBoardSearch<>(tripSearchBinarySearchThreshold, timeTable);
+        return toPattern.listGuaranteedTransfersToPattern(toStopPos);
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            RaptorTimeTable<T> pattern
+    @Nullable
+    public final T findTargetTripInGuarantiedTransfers(
+            Collection<GuaranteedTransfer<T>> list,
+            TransitArrival<T> fromStopArrival,
+            int alightSlack,
+            int toStopPos
     ) {
+        // We ignore any slack when boarding guaranteed transfers, so we have to revert
+        // addition of slack here (the arrival have alightSlack added)
+        final int earliestDepartureTime = fromStopArrival.arrivalTime() - alightSlack;
+
+        for (GuaranteedTransfer<T> tx : list) {
+            if(tx.fromTripMatches(fromStopArrival)) {
+                T toTrip = tx.getToTrip();
+                return earliestDepartureTime <= toTrip.departure(toStopPos) ? toTrip : null;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public final TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+        return new TripScheduleBoardingSearch<>(tripSearchBinarySearchThreshold, timeTable);
+    }
+
+    @Override
+    public final TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> pattern) {
         return new TripScheduleExactMatchSearch<>(
                 createTripSearch(pattern),
                 this,
                 iterationStep
         );
     }
+
 }
