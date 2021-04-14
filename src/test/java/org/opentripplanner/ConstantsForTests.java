@@ -154,26 +154,6 @@ public class ConstantsForTests {
             // Add street data from OSM
             File osmFile = new File(osmPath);
             BinaryOpenStreetMapProvider osmProvider =
-                    new BinaryOpenStreetMapProvider(osmFile, false);
-            OpenStreetMapModule osmModule =
-                    new OpenStreetMapModule(Lists.newArrayList(osmProvider));
-            osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-            osmModule.skipVisibility = true;
-            osmModule.buildGraph(graph, new HashMap<>());
-            return graph;
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Graph buildOsmGraph(String osmPath) {
-
-        try {
-            var graph = new Graph();
-            // Add street data from OSM
-            File osmFile = new File(osmPath);
-            BinaryOpenStreetMapProvider osmProvider =
                     new BinaryOpenStreetMapProvider(osmFile, true);
             OpenStreetMapModule osmModule =
                     new OpenStreetMapModule(Lists.newArrayList(osmProvider));
