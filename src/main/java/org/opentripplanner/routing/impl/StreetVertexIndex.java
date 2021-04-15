@@ -193,6 +193,7 @@ public class StreetVertexIndex {
   public Set<Vertex> getVerticesForLocation(
       GenericLocation location, RoutingRequest options, boolean endVertex, Set<DisposableEdgeCollection> tempEdges
   ) {
+    if (location == null) { return null; }
     // Check if Stop/StopCollection is found by FeedScopeId
     if (location.stopId != null) {
       Set<Vertex> transitStopVertices = graph.getStopVerticesById(location.stopId);
