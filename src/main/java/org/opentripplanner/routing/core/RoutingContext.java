@@ -145,7 +145,6 @@ public class RoutingContext implements Cloneable {
 
         remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
     }
-
     private RoutingContext(
             RoutingRequest routingRequest,
             Graph graph,
@@ -167,15 +166,15 @@ public class RoutingContext implements Cloneable {
     public void checkIfVerticesFound() {
         List<RoutingError> routingErrors = new ArrayList<>();
 
-        // check origin present when not doing an arrive-by batch search
-        if (fromVertices == null) {
+        // check that vertices where found if from-location was specified
+        if (opt.from.isSpecified() && fromVertices == null) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
             );
         }
 
-        // check destination present when not doing a depart-after batch search
-        if (toVertices == null) {
+        // check that vertices where found if to-location was specified
+        if (opt.to.isSpecified() && toVertices == null) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
             );

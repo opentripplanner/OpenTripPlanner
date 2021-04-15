@@ -54,6 +54,10 @@ public class GenericLocation {
         return new Coordinate(this.lng, this.lat);
     }
 
+    public boolean isSpecified() {
+        return stopId != null || (lat != null && lng != null);
+    }
+
     @Override
     public String toString() {
         return ValueObjectToStringBuilder.of()
