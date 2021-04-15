@@ -167,14 +167,14 @@ public class RoutingContext implements Cloneable {
         List<RoutingError> routingErrors = new ArrayList<>();
 
         // check that vertices where found if from-location was specified
-        if (opt.from != null && fromVertices == null) {
+        if (opt.from.isSpecified() && fromVertices == null) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
             );
         }
 
         // check that vertices where found if to-location was specified
-        if (opt.to != null && toVertices == null) {
+        if (opt.to.isSpecified() && toVertices == null) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
             );
