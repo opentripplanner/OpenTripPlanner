@@ -729,6 +729,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, new HashSet<>(
             Arrays.asList(TransitMode.values())));
         bikeWalkingOptions = this;
+
+        // So that they are never null.
+        from = new GenericLocation(null, null);
+        to = new GenericLocation(null, null);
     }
 
     public RoutingRequest(TraverseModeSet streetSubRequestModes) {
