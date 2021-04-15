@@ -36,7 +36,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   ) {
     List<Edge> egressEdges = egress.edges;
 
-    Vertex flexToVertex = egressEdges.get(0).getFromVertex();
+    Vertex flexToVertex = egress.state.getVertex();
 
     if (!isRouteable(flexToVertex)) {
       return null;

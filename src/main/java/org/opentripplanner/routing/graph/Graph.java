@@ -984,4 +984,12 @@ public class Graph implements Serializable {
     public FlexStopLocation getLocationById(FeedScopedId id) {
         return locationsById.get(id);
     }
+
+    public Set<StopLocation> getAllFlexStops() {
+        return flexTripsById
+            .values()
+            .stream()
+            .flatMap(t -> t.getStops().stream())
+            .collect(Collectors.toSet());
+    }
 }

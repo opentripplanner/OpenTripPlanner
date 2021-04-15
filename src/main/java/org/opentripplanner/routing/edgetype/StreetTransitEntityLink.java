@@ -107,7 +107,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
             if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
                 dropOffAfterDriving(s0, s1);
                 mode = TraverseMode.WALK;
-            } else {
+            } else if (s0.getCarPickupState() != null) {
                 return null;
             }
         }

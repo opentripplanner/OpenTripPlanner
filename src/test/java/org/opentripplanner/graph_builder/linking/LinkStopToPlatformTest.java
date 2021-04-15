@@ -12,6 +12,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
@@ -79,7 +80,7 @@ public class LinkStopToPlatformTest {
         for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
             linker.linkVertexPermanently(
                 tStop,
-                TraverseMode.WALK,
+                new TraverseModeSet(TraverseMode.WALK),
                 LinkingDirection.BOTH_WAYS,
                 (vertex, streetVertex) -> List.of(
                     new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
