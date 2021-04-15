@@ -344,6 +344,13 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setProperties("highway=motorway_link;bicycle=designated",
                 StreetTraversalPermission.BICYCLE_AND_CAR, 2, 2);
 
+        // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
+        // this uses a OR since you don't want to apply the safety multiplier more than once.
+        props.setProperties(
+                "lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.7, 0.7, true
+        );
+
+
         /*
          * Automobile speeds in the United States: Based on my (mattwigway) personal experience, primarily in California
          */

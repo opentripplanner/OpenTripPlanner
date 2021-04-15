@@ -94,11 +94,6 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
                 "tracktype=grade5", StreetTraversalPermission.ALL, 1.5, 1.5, true
         );
 
-        // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad
-        // This uses a OR since you don't want to apply the safety multiplier more than once.
-        props.setProperties(
-                "lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.7, 0.7, true
-        );
 
         // lit=yes currently is tagged very rarely, so we just want to discount where lit=no explicitly
         // not lit decreases safety
