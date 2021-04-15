@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -278,6 +279,7 @@ public class VertexLinker {
           .min()
           .getAsDouble();
 
+      // Because this is a set, each instance of DistanceTo<StreetEdge> will only be added once
       closesEdges.addAll(candidateEdges
           .stream()
           .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
@@ -471,6 +473,19 @@ public class VertexLinker {
     public DistanceTo(T item, double distanceDegreesLat) {
       this.item = item;
       this.distanceDegreesLat = distanceDegreesLat;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) { return true; }
+      if (o == null || getClass() != o.getClass()) { return false; }
+      DistanceTo<?> that = (DistanceTo<?>) o;
+      return Objects.equals(item, that.item);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(item);
     }
   }
 }
