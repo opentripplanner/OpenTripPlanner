@@ -74,6 +74,6 @@ public class UKWayPropertySetSource implements WayPropertySetSource {
 
     @Override
     public DrivingDirection drivingDirection() {
-        return LEFT_HAND_DRIVE;
+        return LEFT_HAND_TRAFFIC;
     }
 }

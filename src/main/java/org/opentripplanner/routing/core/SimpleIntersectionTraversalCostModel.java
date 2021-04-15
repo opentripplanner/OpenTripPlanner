@@ -83,14 +83,14 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
      * Returns if this angle represents a safe turn were incoming traffic does not have to be
      * crossed.
      * <p>
-     * In right hand driving countries, this is a right turn. In left hand driving countries this is
-     * a left turn.
+     * In right hand traffic countries (US, mainland Europe), this is a right turn.
+     * In left hand traffic countries (UK, Japan) this is a left turn.
      */
     protected boolean isSafeTurn(int turnAngle) {
         switch (drivingDirection) {
-            case RIGHT_HAND_DRIVE:
+            case RIGHT_HAND_TRAFFIC:
                 return isRightTurn(turnAngle);
-            case LEFT_HAND_DRIVE:
+            case LEFT_HAND_TRAFFIC:
                 return isLeftTurn(turnAngle);
             default:
                 throw new RuntimeException("New driving direction introduced!");
@@ -105,9 +105,9 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
      */
     protected boolean isTurnAcrossTraffic(int turnAngle) {
         switch (drivingDirection) {
-            case RIGHT_HAND_DRIVE:
+            case RIGHT_HAND_TRAFFIC:
                 return isLeftTurn(turnAngle);
-            case LEFT_HAND_DRIVE:
+            case LEFT_HAND_TRAFFIC:
                 return isRightTurn(turnAngle);
             default:
                 throw new RuntimeException("New driving direction introduced!");

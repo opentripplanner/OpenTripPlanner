@@ -35,7 +35,7 @@ public class SimpleTraversalCostModelTest {
     @BeforeEach
     public void before() {
         graph = new Graph();
-        costModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.RIGHT_HAND_DRIVE);
+        costModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.RIGHT_HAND_TRAFFIC);
         
         // Initialize the routing request.
         options = new RoutingRequest();
@@ -82,7 +82,7 @@ public class SimpleTraversalCostModelTest {
 
         // and on the left hand side
 
-        var leftHandDriveCostModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.LEFT_HAND_DRIVE);
+        var leftHandDriveCostModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.LEFT_HAND_TRAFFIC);
         int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e2, options);
         assertEquals(270, leftHandDriveAngle);
 

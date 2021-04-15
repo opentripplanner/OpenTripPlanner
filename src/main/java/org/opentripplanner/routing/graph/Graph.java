@@ -260,7 +260,7 @@ public class Graph implements Serializable {
 
     private transient TransitAlertService transitAlertService;
 
-    private DrivingDirection drivingDirection;
+    private DrivingDirection drivingDirection = DrivingDirection.RIGHT_HAND_TRAFFIC;
 
     /**
      * Hack. I've tried three different ways of generating unique labels.

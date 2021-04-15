@@ -81,7 +81,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * TODO: move this to the Router or the Graph if it doesn't clutter the code too much
      */
     public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel(
-            DrivingDirection.RIGHT_HAND_DRIVE);
+            DrivingDirection.RIGHT_HAND_TRAFFIC);
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 

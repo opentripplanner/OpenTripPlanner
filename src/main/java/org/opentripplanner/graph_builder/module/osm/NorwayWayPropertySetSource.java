@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_DRIVE;
+import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
@@ -48,6 +48,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     @Override
     public DrivingDirection drivingDirection() {
-        return RIGHT_HAND_DRIVE;
+        return RIGHT_HAND_TRAFFIC;
     }
 }

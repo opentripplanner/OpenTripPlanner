@@ -12,7 +12,7 @@ public interface WayPropertySetSource {
 
 	/**
 	 * Return the given WayPropertySetSource or throws IllegalArgumentException
-	 * if an unkown type is specified
+	 * if an unknown type is specified
 	 */
 	static WayPropertySetSource fromConfig(String type) {
 		// type is set to "default" by GraphBuilderParameters if not provided in
@@ -34,11 +34,16 @@ public interface WayPropertySetSource {
 	}
 
 	enum DrivingDirection {
-		RIGHT_HAND_DRIVE, LEFT_HAND_DRIVE;
-
-		public boolean isRightHandDrive() {
-			return this == RIGHT_HAND_DRIVE;
-		}
+		/**
+		 * Specifies that cars go on the right hand side of the road. This is true for the US
+		 * mainland Europe.
+		 */
+        RIGHT_HAND_TRAFFIC,
+		/**
+		 * Specifies that cars go on the left hand side of the road. This is true for the UK,
+		 * Japan and Australia.
+		 */
+		LEFT_HAND_TRAFFIC
 	}
 
 	DrivingDirection drivingDirection();
