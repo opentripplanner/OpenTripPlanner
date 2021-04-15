@@ -5,7 +5,7 @@ import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * OSM way properties for German roads Speed limits where adjusted to German regulation and some
+ * OSM way properties for German roads. Speed limits where adjusted to German regulation and some
  * bike safety settings tweaked, especially including tracktype's grade and preference of bicycle
  * networks.
  *
@@ -18,12 +18,9 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
     public void populateProperties(WayPropertySet props) {
         // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
 
-        /*
-         * Automobile speeds in Germany. General speed limit is 50kph in settlements, 100kph outside settlements.
-         * For motorways, there (currently still) is no limit. Nevertheless 120kph is assumed to reflect varying
-         * traffic conditions
-         *
-         */
+        // Automobile speeds in Germany. General speed limit is 50kph in settlements, 100kph outside settlements.
+        // For motorways, there (currently still) is no limit. Nevertheless 120kph is assumed to reflect varying
+        // traffic conditions.
         props.setCarSpeed(
                 "highway=motorway",
                 33.33f
@@ -38,11 +35,9 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
         // ideally they would be set to noThruTraffic but that would mean the parking lots are inaccessible
         props.setCarSpeed("service=parking_aisle", 5);
 
-        /*
-         * Many agricultural ways are tagged as 'track' but have no access tags. We assume this to mean that cars
-         * are prohibited.
-         * https://www.openstreetmap.org/way/124263424
-         */
+        // Many agricultural ways are tagged as 'track' but have no access tags. We assume this to mean that cars
+        // are prohibited.
+        // https://www.openstreetmap.org/way/124263424
         props.setProperties(
                 "highway=track", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
         props.setProperties(
@@ -75,38 +70,46 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
         props.setProperties("maxspeed=90", StreetTraversalPermission.ALL, 3.0, 3.0, true);
         props.setProperties("maxspeed=100", StreetTraversalPermission.ALL, 5.0, 5.0, true);
 
-        /* tracktype */
+        // tracktypes
+
+        // solid
         props.setProperties(
-                "tracktype=grade1", StreetTraversalPermission.ALL, 1.0, 1.0, true); // Solid
+                "tracktype=grade1", StreetTraversalPermission.ALL, 1.0, 1.0, true);
+        // solid but unpaved
         props.setProperties(
                 "tracktype=grade2", StreetTraversalPermission.ALL, 1.1, 1.1,
                 true
-        ); // Solid but unpaved.
+        );
+        // mostly solid.
         props.setProperties(
                 "tracktype=grade3", StreetTraversalPermission.ALL, 1.15, 1.15,
                 true
-        ); // Mostly solid.
+        );
+        // mostly soft
         props.setProperties(
-                "tracktype=grade4", StreetTraversalPermission.ALL, 1.3, 1.3, true); // Mostly soft.
+                "tracktype=grade4", StreetTraversalPermission.ALL, 1.3, 1.3, true
+        );
+        // soft
         props.setProperties(
-                "tracktype=grade5", StreetTraversalPermission.ALL, 1.5, 1.5, true); // Soft.
+                "tracktype=grade5", StreetTraversalPermission.ALL, 1.5, 1.5, true
+        );
 
-        /* We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad \
-         *
-         * This uses a newly added logical OR since you don't want to apply the safety multiplier more than once.
-         */
+        // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad
+        // This uses a OR since you don't want to apply the safety multiplier more than once.
         props.setProperties(
-                "lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.7, 0.7, true);
+                "lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.7, 0.7, true
+        );
 
-        // lit=yes currently is tagged very seldom, so we just want to discount where lit=no explicitly
-        // props.setProperties("lit=yes", StreetTraversalPermission.ALL, 0.99, 0.99, true); // lit increases safety
+        // lit=yes currently is tagged very rarely, so we just want to discount where lit=no explicitly
+        // not lit decreases safety
         props.setProperties(
                 "lit=no", StreetTraversalPermission.ALL, 1.05, 1.05,
                 true
-        ); // not lit decreases safety
+        );
 
         props.setProperties(
-                "highway=unclassified;cycleway=lane", StreetTraversalPermission.ALL, 0.87, 0.87);
+                "highway=unclassified;cycleway=lane", StreetTraversalPermission.ALL, 0.87, 0.87
+        );
 
         // Read the rest from the default set
         new DefaultWayPropertySetSource().populateProperties(props);

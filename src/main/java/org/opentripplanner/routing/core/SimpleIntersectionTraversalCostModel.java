@@ -100,8 +100,8 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     /**
      * Returns if this angle represents a turn across incoming traffic.
      * <p>
-     * In right hand driving countries this is a left turn. In left hand driving countries this is a
-     * right turn.
+     * In right hand traffic countries (US) this is a left turn. In left hand traffic (UK) countries
+     * this is a right turn.
      */
     protected boolean isTurnAcrossTraffic(int turnAngle) {
         switch (drivingDirection) {
