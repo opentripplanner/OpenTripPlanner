@@ -31,6 +31,16 @@ public abstract class FlexAccessEgressTemplate {
   public final ServiceDate serviceDate;
   protected final FlexPathCalculator calculator;
 
+  /**
+   *
+   * @param accessEgress  Path from origin to the point of boarding for this flex trip
+   * @param trip          The FlexTrip used for this Template
+   * @param fromStopIndex Stop sequence index where this FlexTrip is boarded
+   * @param toStopIndex   The stop where this FlexTrip alights
+   * @param transferStop  The stop location where this FlexTrip alights
+   * @param date          The service date of this FlexTrip
+   * @param calculator    Calculates the path and duration of the FlexTrip
+   */
   FlexAccessEgressTemplate(
       NearbyStop accessEgress,
       FlexTrip trip,

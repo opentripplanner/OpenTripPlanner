@@ -6,7 +6,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.CarPickupState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -17,7 +16,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 /**
  * This represents the connection between a street vertex and a transit vertex.
  */
-public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge {
+public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge implements CarPickupableEdge {
 
     private static final long serialVersionUID = -3311099256178798981L;
     static final int STEL_TRAVERSE_COST = 1;
@@ -101,15 +100,19 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge {
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
-        /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
-        /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
+        TraverseMode mode = s0.getBackMode() == null ? s0.getNonTransitMode() : s0.getBackMode();
+
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            if (req.carPickup && s0.getCarPickupState() == CarPickupState.IN_CAR) {
-                s1.setTaxiState(s0.getOptions().arriveBy ? CarPickupState.WALK_TO_PICKUP : CarPickupState.WALK_FROM_DROP_OFF);
-            } else {
+            // For Kiss & Ride allow dropping of the passenger before entering the station
+            if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
+                dropOffAfterDriving(s0, s1);
+                mode = TraverseMode.WALK;
+            } else if (s0.getCarPickupState() != null) {
                 return null;
             }
         }
+
+        s1.setBackMode(mode);
 
         // We do not increase the time here, so that searching from the stop coordinates instead of
         // the stop id catch transit departing at that exact search time.
@@ -119,12 +122,16 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge {
         return s1.makeState();
     }
 
+    boolean isLeavingStreetNetwork(RoutingRequest req) {
+        return (req.arriveBy ? fromv : tov) == getTransitEntityVertex();
+    }
+
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(STEL_TRAVERSE_COST);
         return s1.makeState();
     }
-    
+
     // anecdotally, the lower bound search is about 2x faster when you don't reach stops
     // and therefore don't even consider boarding
     @Override

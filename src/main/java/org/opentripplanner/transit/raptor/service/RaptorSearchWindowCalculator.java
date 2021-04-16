@@ -17,10 +17,10 @@ public class RaptorSearchWindowCalculator {
     private final int NOT_SET = -9_999_999;
 
 
-    /** Min trip time coefficient */
+    /** The coefficient to multiply with heuristicMinTransitTime */
     private final double minTransitTimeCoefficient;
 
-    /** Min trip time coefficient */
+    /** The coefficient to multiply with heuristicMinWaitTime */
     private final double minWaitTimeCoefficient;
 
     /** Min search window in seconds */

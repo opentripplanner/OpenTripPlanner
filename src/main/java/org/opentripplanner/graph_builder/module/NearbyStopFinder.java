@@ -5,9 +5,7 @@ import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.MinMap;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
@@ -18,10 +16,13 @@ import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWe
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -46,12 +47,11 @@ import java.util.Set;
  */
 public class NearbyStopFinder {
 
-    private static Logger LOG = LoggerFactory.getLogger(NearbyStopFinder.class);
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private static final Logger LOG = LoggerFactory.getLogger(NearbyStopFinder.class);
 
     public  final boolean useStreets;
-    private Graph graph;
-    private double radiusMeters;
+    private final Graph graph;
+    private final double radiusMeters;
 
     /* Fields used when finding stops via the street network. */
     private AStar astar;
@@ -172,6 +172,7 @@ public class NearbyStopFinder {
 
         List<NearbyStop> stopsFound = Lists.newArrayList();
 
+        // Only used if OTPFeature.FlexRouting.isOn()
         Multimap<FlexStopLocation, State> locationsMap = ArrayListMultimap.create();
 
         if (spt != null) {
@@ -188,20 +189,33 @@ public class NearbyStopFinder {
                         // This is for a simplification, so that we only return one vertex from each
                         // stop location. All vertices are added to the multimap, which is filtered
                         // below, so that only the closest vertex is added to stopsFound
-                        locationsMap.put(flexStopLocation, state);
+                        if (canBoardFlex(state, reverseDirection)) {
+                            locationsMap.put(flexStopLocation, state);
+                        }
                     }
                 }
             }
         }
 
-        for (var locationStates : locationsMap.asMap().entrySet()) {
-            FlexStopLocation flexStopLocation = locationStates.getKey();
-            Collection<State> states = locationStates.getValue();
-            // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
-            // the minimum walking distance
-            State min = Collections.min(states, (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance));
+        if (OTPFeature.FlexRouting.isOn()) {
+            for (var locationStates : locationsMap.asMap().entrySet()) {
+                FlexStopLocation flexStopLocation = locationStates.getKey();
+                Collection<State> states = locationStates.getValue();
+                // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
+                // the minimum walking distance
+                State min = Collections.min(states,
+                    (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance)
+                );
 
-            stopsFound.add(NearbyStop.nearbyStopForState(min, flexStopLocation));
+                // If the best state for this FlexStopLocation is a SplitterVertex, we want to get the
+                // TemporaryStreetLocation instead. This allows us to reach SplitterVertices in both
+                // directions when routing later.
+                if (min.getBackState().getVertex() instanceof TemporaryStreetLocation) {
+                    min = min.getBackState();
+                }
+
+                stopsFound.add(NearbyStop.nearbyStopForState(min, flexStopLocation));
+            }
         }
 
         /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
@@ -247,5 +261,15 @@ public class NearbyStopFinder {
                 reverseDirection,
                 true
         );
+    }
+
+    private boolean canBoardFlex(State state, boolean reverse) {
+        Collection<Edge> edges = reverse
+            ? state.getVertex().getIncoming()
+            : state.getVertex().getOutgoing();
+
+        return edges.stream().anyMatch(e ->
+                e instanceof StreetEdge
+                && ((StreetEdge) e).getPermission().allows(TraverseMode.CAR));
     }
 }

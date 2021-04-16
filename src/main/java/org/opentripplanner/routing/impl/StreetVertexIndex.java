@@ -245,7 +245,7 @@ public class StreetVertexIndex {
 
     tempEdges.add(vertexLinker.linkVertexForRequest(
         temporaryStreetLocation,
-        nonTransitMode,
+        new TraverseModeSet(nonTransitMode),
         endVertex ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
         endVertex
             ? (vertex, streetVertex) -> List.of(

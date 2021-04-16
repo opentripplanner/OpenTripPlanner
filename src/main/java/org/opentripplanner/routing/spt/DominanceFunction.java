@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.spt;
 
+import java.io.Serializable;
+import java.util.Objects;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-
-import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
@@ -24,8 +23,8 @@ import java.util.Objects;
 public abstract class DominanceFunction implements Serializable {
     private static final long serialVersionUID = 1;
 
-    /** 
-     * Return true if the first state "defeats" the second state or at least ties with it in terms of suitability. 
+    /**
+     * Return true if the first state "defeats" the second state or at least ties with it in terms of suitability.
      * In the case that they are tied, we still want to return true so that an existing state will kick out a new one.
      * Provide this custom logic in subclasses. You would think this could be static, but in Java for some reason 
      * calling a static function will call the one on the declared type, not the runtime instance type. 
@@ -60,23 +59,41 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        if (a.getCarPickupState() != b.getCarPickupState()) {
+            return false;
+        }
+
         // Does one state represent riding a bike and the other represent walking after the bike was parked?
         if (a.isBikeParked() != b.isBikeParked()) {
             return false;
         }
 
-        // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
-        if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
-            if (! a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {
-                return false;
-            }
+        /*
+         * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
+         * useless loops in the traversal leading to way faster processing time.
+         *
+         * However there is are certain rare pathological cases where through a series of turn restrictions and/or roadworks
+         * you absolutely must visit a vertex twice if you want to produce a result. One example would be a route like this:
+         *   https://tinyurl.com/ycqux93g (Note: At the time of writing this Hindenburgstr. is closed due to roadworks.)
+         *
+         * Therefore, if we are close to the start or the end of a route we allow this.
+         *
+         * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
+         */
+        if (a.backEdge != b.getBackEdge()
+                && (a.backEdge instanceof StreetEdge)
+                && a.getBackMode() != null && a.getBackMode().isDriving()
+                && a.getOptions().isCloseToStartOrEnd(a.getVertex())) {
+            return false;
         }
-        
+
         // These two states are comparable (they are on the same "plane" or "copy" of the graph).
         return betterOrEqual(a, b);
-        
+
     }
-    
+
+
+
     /**
      * Create a new shortest path tree using this function, considering whether it allows co-dominant States.
      * MultiShortestPathTree is the general case -- it will work with both single- and multi-state functions.
