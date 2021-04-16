@@ -12,6 +12,7 @@
 - Improve the dynamic search window calculation. The configuration parameters `minTransitTimeCoefficient` and `minWaitTimeCoefficient` replace the old `minTripTimeCoefficient` parameter. [#3366](https://github.com/opentripplanner/OpenTripPlanner/issues/3366)   
 - Allow loops caused by turn restriction in street routes [#3399](https://github.com/opentripplanner/OpenTripPlanner/pull/3399)
 - Apply turn restrictions when splitting edges. [#3414](https://github.com/opentripplanner/OpenTripPlanner/pull/3414)
+- Add basic support for routing using floating bikes [#3370](https://github.com/opentripplanner/OpenTripPlanner/pull/3370)
 
 ## 2.0.0 (2020-11-27)
 
