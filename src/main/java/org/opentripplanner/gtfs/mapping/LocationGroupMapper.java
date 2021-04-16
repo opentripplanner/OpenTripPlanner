@@ -41,7 +41,7 @@ public class LocationGroupMapper {
     locationGroup.setId(mapAgencyAndId(element.getId()));
     locationGroup.setName(element.getName());
 
-    for (org.onebusaway.gtfs.model.Stoplike location : element.getLocations()) {
+    for (org.onebusaway.gtfs.model.StopLocation location : element.getLocations()) {
       if (location instanceof org.onebusaway.gtfs.model.Stop) {
         locationGroup.addLocation(stopMapper.map((org.onebusaway.gtfs.model.Stop) location));
       }
