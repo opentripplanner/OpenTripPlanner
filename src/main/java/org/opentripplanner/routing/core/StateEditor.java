@@ -281,7 +281,8 @@ public class StateEditor {
         child.stateData.bikeRentalState = state.stateData.bikeRentalState;
     }
 
-    public void setTaxiState(CarPickupState carPickupState) {
+    public void setCarPickupState(CarPickupState carPickupState) {
+        cloneStateDataAsNeeded();
         child.stateData.carPickupState = carPickupState;
         switch (carPickupState) {
             case WALK_TO_PICKUP:

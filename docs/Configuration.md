@@ -831,7 +831,8 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
         "iterationDepartureStepInSeconds": 60,
         "searchThreadPoolSize": 0,
         "dynamicSearchWindow": {
-            "minTripTimeCoefficient": 0.4,
+            "minTransitTimeCoefficient" : 0.5,
+            "minWaitTimeCoefficient" : 0.5,
             "minTimeMinutes": 30,
             "maxLengthMinutes" : 360,
             "stepMinutes": 10

@@ -152,7 +152,7 @@ otp.config = {
         {
             id : 'planner',
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
-            defaultBaseLayer : 'Stamen Terrain',
+            defaultBaseLayer : 'OSM Standard Tiles',
             isDefault: true
         },
         {
@@ -310,10 +310,13 @@ otp.config.modes = {
     "WALK"                : _tr('Walk Only'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "CAR"                 : _tr('Drive Only'),
+    "CAR_PICKUP,WALK"     : _tr('Taxi'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "CAR_PARK,WALK,TRANSIT"     : _tr('Park and Ride'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "CAR,WALK,TRANSIT"          : _tr('Kiss and Ride'),
+    "CAR_PICKUP,WALK,TRANSIT"   : _tr('Ride and Kiss (Car Pickup)'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    "CAR_DROPOFF,WALK,TRANSIT"   : _tr('Kiss and Ride (Car Dropoff)'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "BICYCLE_PARK,WALK,TRANSIT" : _tr('Bike and Ride'),
     //uncomment only if bike rental exists in a map

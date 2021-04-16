@@ -81,6 +81,17 @@ GitHub will automatically update issues when commits are merged in: if your comm
 If you simply mention ` #123 ` in your message, your message will be appended to the issue but it will remain open.
 Many other expressions exist to close issues via commit messages. See [the GitHub help page on this topic](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
+### Unit tests using real OSM data
+
+Sometimes it is useful to build a graph from actual OSM or GTFS data. Since building these graphs
+in a test can be quite slow they will be accepted in pull requests only if they conform to certain
+standards:
+
+1. Use the smallest possible regional extract - the OSM file should not contain more than a few hundred ways.
+   Use `osmium-extract` to cut down a larger OSM file into a tiny subset of it.
+   
+2. Strip out any unneeded information by using the `osmium filter-tags` as describe in [Preparing OSM](Preparing-OSM.md)
+
 
 ### Code Comments
 
