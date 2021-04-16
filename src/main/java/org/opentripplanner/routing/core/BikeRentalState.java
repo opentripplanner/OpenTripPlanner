@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.core;
 
-enum BikeRentalState {
+public enum BikeRentalState {
   /**
    * This is the state before any bike rental has been initiated.
    */

@@ -7,8 +7,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -72,8 +71,7 @@ public class TestBikeRental extends TestCase {
         new StreetBikeRentalLink(stationVertex, v2);
         new StreetBikeRentalLink(v2, stationVertex);
         Set<String> networks = new HashSet<String>(Arrays.asList("default"));
-        new RentABikeOnEdge(stationVertex, stationVertex, networks);
-        new RentABikeOffEdge(stationVertex, stationVertex, networks);
+        new BikeRentalEdge(stationVertex, stationVertex, networks);
 
         // but we can't get off the bike at v3, so we still fail
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.BICYCLE,TraverseMode.TRANSIT));
@@ -95,8 +93,7 @@ public class TestBikeRental extends TestCase {
         BikeRentalStationVertex stationVertex2 = new BikeRentalStationVertex(graph, station2);
         new StreetBikeRentalLink(stationVertex2, v3);
         new StreetBikeRentalLink(v3, stationVertex2);
-        new RentABikeOnEdge(stationVertex2, stationVertex2, networks);
-        new RentABikeOffEdge(stationVertex2, stationVertex2, networks);
+        new BikeRentalEdge(stationVertex2, stationVertex2, networks);
 
         // now we succeed!
         options = new RoutingRequest();

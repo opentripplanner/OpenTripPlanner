@@ -6,8 +6,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Graph;
@@ -134,13 +133,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                         // the toString includes the text "Bike rental station"
                         LOG.info("BikeRentalStation {} is unlinked", bikeRentalVertex);
                     }
-                    tempEdges.addEdge(new RentABikeOnEdge(bikeRentalVertex, bikeRentalVertex, station.networks));
-                    if (station.allowDropoff) {
-                        tempEdges.addEdge(new RentABikeOffEdge(bikeRentalVertex,
-                            bikeRentalVertex,
-                            station.networks
-                        ));
-                    }
+                    tempEdges.addEdge(new BikeRentalEdge(bikeRentalVertex, bikeRentalVertex, station.networks));
                     verticesByStation.put(station, bikeRentalVertex);
                     tempEdgesByStation.put(station, tempEdges);
                 } else {

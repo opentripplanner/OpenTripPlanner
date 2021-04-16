@@ -5,7 +5,6 @@ import java.util.Set;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -20,72 +19,66 @@ import java.util.Locale;
  * @author laurent
  * 
  */
-public abstract class RentABikeAbstractEdge extends Edge {
+public class BikeRentalEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
     private Set<String> networks;
 
-    public RentABikeAbstractEdge(Vertex from, Vertex to, Set<String> networks) {
+    public BikeRentalEdge(Vertex from, Vertex to, Set<String> networks) {
         super(from, to);
         this.networks = networks;
     }
 
-    protected State traverseRent(State s0) {
-        RoutingRequest options = s0.getOptions();
-        /*
-         * If we already have a bike (rented or own) we won't go any faster by having a second one.
-         */
-        if (!s0.getNonTransitMode().equals(TraverseMode.WALK))
-            return null;
-        /*
-         * To rent a bike, we need to have BICYCLE in allowed modes.
-         */
-        if (!options.streetSubRequestModes.contains(TraverseMode.BICYCLE))
-            return null;
-
-        BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
-        if (options.useBikeRentalAvailabilityInformation && dropoff.getBikesAvailable() == 0) {
-            return null;
-        }
+    public State traverse(State s0) {
+        if (!s0.getOptions().bikeRental) { return null; }
 
         StateEditor s1 = s0.edit(this);
+        RoutingRequest options = s0.getOptions();
+
+        BikeRentalStationVertex stationVertex = (BikeRentalStationVertex) tov;
+
+        if (options.arriveBy) {
+            switch (s0.getBikeRentalState()) {
+                case BEFORE_RENTING:
+                    return null;
+                case HAVE_RENTED:
+                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(),true);
+                    break;
+                case RENTING_FLOATING:
+                    s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), true);
+                case RENTING_FROM_STATION:
+                    if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
+                    s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), true);
+                    break;
+            }
+        } else {
+            switch (s0.getBikeRentalState()) {
+                case BEFORE_RENTING:
+                    if (options.useBikeRentalAvailabilityInformation && stationVertex.getBikesAvailable() == 0) {
+                        return null;
+                    }
+                    if (stationVertex.getStation().isFloatingBike) {
+                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), false);
+                    } else {
+                        s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), false);
+                    }
+                    break;
+                case HAVE_RENTED:
+                case RENTING_FLOATING:
+                    return null;
+                case RENTING_FROM_STATION:
+                    if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
+                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), false);
+                    break;
+            }
+        }
+
         s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost : options.bikeRentalPickupCost);
         s1.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalDropoffTime : options.bikeRentalPickupTime);
-        if (dropoff.getStation().isFloatingBike) {
-            s1.beginFloatingVehicleRenting(((BikeRentalStationVertex)fromv).getVehicleMode());
-        } else {
-            s1.beginVehicleRentingAtStation(((BikeRentalStationVertex)fromv).getVehicleMode());
-        }
         s1.setBikeRentalNetwork(networks);
         s1.setBackMode(s0.getNonTransitMode());
-        State s1b = s1.makeState();
-        return s1b;
-    }
-
-    protected State traverseDropoff(State s0) {
-        RoutingRequest options = s0.getOptions();
-        /*
-         * To dropoff a bike, we need to have rented one.
-         */
-        if (!s0.isBikeRentingFromStation() || !hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) {
-            return null;
-        }
-        if (s0.backEdge instanceof RentABikeOnEdge) {
-            return null;
-        }
-        BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
-        if (options.useBikeRentalAvailabilityInformation && pickup.getSpacesAvailable() == 0) {
-            return null;
-        }
-
-        StateEditor s1e = s0.edit(this);
-        s1e.incrementWeight(options.arriveBy ? options.bikeRentalPickupCost : options.bikeRentalDropoffCost);
-        s1e.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalPickupTime : options.bikeRentalDropoffTime);
-        s1e.dropOffRentedVehicleAtStation();
-        s1e.setBackMode(TraverseMode.WALK);
-        State s1 = s1e.makeState();
-        return s1;
+        return s1.makeState();
     }
 
     @Override

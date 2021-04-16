@@ -208,22 +208,37 @@ public class StateEditor {
         child.walkDistance = walkDistance;
     }
 
-    public void beginFloatingVehicleRenting(TraverseMode vehicleMode) {
+    public void beginFloatingVehicleRenting(TraverseMode vehicleMode, boolean reverse) {
         cloneStateDataAsNeeded();
-        child.stateData.bikeRentalState = BikeRentalState.RENTING_FLOATING;
-        child.stateData.currentMode = vehicleMode;
+        if (reverse) {
+            child.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
+            child.stateData.currentMode = TraverseMode.WALK;
+        } else {
+            child.stateData.bikeRentalState = BikeRentalState.RENTING_FLOATING;
+            child.stateData.currentMode = vehicleMode;
+        }
     }
 
-    public void beginVehicleRentingAtStation(TraverseMode vehicleMode) {
+    public void beginVehicleRentingAtStation(TraverseMode vehicleMode, boolean reverse) {
         cloneStateDataAsNeeded();
-        child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
-        child.stateData.currentMode = vehicleMode;
+        if (reverse) {
+            child.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
+            child.stateData.currentMode = TraverseMode.WALK;
+        } else {
+            child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
+            child.stateData.currentMode = vehicleMode;
+        }
     }
 
-    public void dropOffRentedVehicleAtStation() {
+    public void dropOffRentedVehicleAtStation(TraverseMode vehicleMode, boolean reverse) {
         cloneStateDataAsNeeded();
-        child.stateData.bikeRentalState = BikeRentalState.HAVE_RENTED;
-        child.stateData.currentMode = TraverseMode.WALK;
+        if (reverse) {
+            child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
+            child.stateData.currentMode = vehicleMode;
+        } else {
+            child.stateData.bikeRentalState = BikeRentalState.HAVE_RENTED;
+            child.stateData.currentMode = TraverseMode.WALK;
+        }
     }
 
     /**

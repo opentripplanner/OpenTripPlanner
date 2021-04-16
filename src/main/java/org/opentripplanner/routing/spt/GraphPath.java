@@ -34,13 +34,11 @@ public class GraphPath {
      * Optionally re-traverses all edges backward in order to remove excess waiting time from the
      * final itinerary presented to the user. When planning with departure time, the edges will then
      * be re-traversed once more in order to move the waiting time forward in time, towards the end.
-     * 
-     * @param s
+     *  @param s
      *            - the state for which a path is requested
-     * @param optimize
-     *            - whether excess waiting time should be removed
+     *
      */
-    public GraphPath(State s, boolean optimize) {
+    public GraphPath(State s) {
         this.rctx = s.getContext();
         this.back = s.getOptions().arriveBy;
 

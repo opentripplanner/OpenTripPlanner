@@ -37,6 +37,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
+import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -44,8 +45,6 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -345,8 +344,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 station.realTimeData = false;
                 bikeRentalService.addBikeRentalStation(station);
                 BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
-                new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
-                new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
+                new BikeRentalEdge(stationVertex, stationVertex, networkSet);
             }
             if (n > 1) {
                 graph.hasBikeSharing = true;
