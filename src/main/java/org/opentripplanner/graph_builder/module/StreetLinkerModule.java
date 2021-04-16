@@ -69,6 +69,12 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitStops(Graph graph) {
     LOG.info("Linking transit stops to graph...");
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
+
+      // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
+      if (tStop.hasPathways()) {
+        continue;
+      }
+
       TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
 
       if (OTPFeature.FlexRouting.isOn()) {
