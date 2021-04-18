@@ -19,17 +19,21 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * This class can be used to export transfers for human verification. This is useful when trying
- * to debug the rather complicated NeTEx data format.
+ * This class is used to export transfers for human verification. This is useful when trying
+ * to debug the rather complicated NeTEx data format or to get the GTFS transfers in a more human
+ * readable form. It can also be used to test transfer functionality, since it is easy to read and
+ * find special test-cases when needed.
  */
-class TransferExportToCsvFile {
+class TransferExport {
+    private static final Logger LOG = LoggerFactory.getLogger("TRANSFERS_EXPORT");
+    private static final File FILE = new File("transfers-debug.csv");
 
-    static final Logger LOG = LoggerFactory.getLogger(TransferExportToCsvFile.class);
+    static void exportTransfers(List<Transfer> transfers, TripStopTimes stopTimesByTrip) {
+    if (!TransferExport.LOG.isDebugEnabled()) { return; }
 
-    static void exportTransfers(File file, List<Transfer> transfers, TripStopTimes stopTimesByTrip) {
-        try(PrintWriter p = new PrintWriter(file)) {
+    try(PrintWriter p = new PrintWriter(FILE)) {
             LOG.info("Transfers total: " + transfers.size());
-            LOG.info("Transfers dumped: " + file.getAbsolutePath());
+            LOG.info("Transfers dumped: " + FILE.getAbsolutePath());
 
             p.println("Op;FromTrip;FromStop;ToTrip;ToStop;ArrivalTime;DepartureTime;TransferTime;Walk;Priority;MaxWaitTime;StaySeated;Guaranteed;");
 

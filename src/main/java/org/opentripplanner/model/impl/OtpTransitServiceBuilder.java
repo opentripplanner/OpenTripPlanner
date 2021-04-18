@@ -2,7 +2,6 @@ package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -356,19 +355,13 @@ public class OtpTransitServiceBuilder {
 
     /**
      * Dump all transfers imported to the 'transfers-debug.csv' file. This is performed if the
-     * debugging is enabled for the 'TransferExportToCsvFile' logger. The file is written to the
+     * debugging is enabled for the 'TRANSFERS_EXPORT' logger. The file is written to the
      * current directory.
      * <p>
      * The CSV file is meant to be human friendly and contain name and description for route and
      * stop elements, rather than ids.
      */
     private void dumpTransferDebugCSVFile() {
-        if(TransferExportToCsvFile.LOG.isDebugEnabled()) {
-            TransferExportToCsvFile.exportTransfers(
-                    new File("transfers-debug.csv"),
-                    transfers,
-                    stopTimesByTrip
-            );
-        }
+        TransferExport.exportTransfers(transfers, stopTimesByTrip);
     }
 }

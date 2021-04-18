@@ -22,7 +22,10 @@ public class DebugLoggingSupport {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         for (Logger log : context.getLoggerList()) {
             var name = log.getName();
-            if(name.matches("org\\.opentripplanner\\..*"))  {
+            if (
+                    name.matches("(org\\.opentripplanner\\..*|[A-Z0-9_]*)")
+                    && !name.equals("ROOT")
+            ) {
                 result.add(logDisplayName(name));
             }
         }
