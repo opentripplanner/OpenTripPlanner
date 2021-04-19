@@ -23,7 +23,7 @@ public class BikeRentalEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    private Set<String> networks;
+    private final Set<String> networks;
 
     public BikeRentalEdge(Vertex from, Vertex to, Set<String> networks) {
         super(from, to);
