@@ -188,7 +188,6 @@ public abstract class GraphPathToTripPlanConverter {
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
                 lastLeg.to.orig = plan.to.orig;
             }
-            addRentalInfo(plan, paths);
         }
         request.rctx.debugOutput.finishedRendering();
         return plan;
@@ -759,52 +758,6 @@ public abstract class GraphPathToTripPlanConverter {
                 }
             }
         }
-    }
-
-    /**
-     * Adds overall information about all rental systems that might have been available for this particular request.
-     */
-    private static void addRentalInfo(TripPlan plan, List<GraphPath> paths) {
-        RoutingRequest options = paths.get(0).states.get(0).getOptions();
-        Graph graph = options.rctx.graph;
-        BikeRentalStationService bikeRentalStationService = graph.getService(BikeRentalStationService.class);
-        CarRentalStationService carRentalStationService = graph.getService(CarRentalStationService.class);
-        VehicleRentalStationService vehicleRentalStationService = graph.getService(VehicleRentalStationService.class);
-
-        if (bikeRentalStationService != null && options.allowBikeRental) {
-            plan.bikeRentalInfo = makeRentalInfo(
-                bikeRentalStationService.getErrorsByNetwork(),
-                bikeRentalStationService.getSystemInformationDataByNetwork()
-            );
-        }
-
-        if (carRentalStationService != null && options.allowCarRental) {
-            plan.carRentalInfo = makeRentalInfo(
-                carRentalStationService.getErrorsByNetwork(),
-                carRentalStationService.getSystemInformationDataByNetwork()
-            );
-        }
-
-        if (vehicleRentalStationService != null && options.allowVehicleRental) {
-            plan.vehicleRentalInfo = makeRentalInfo(
-                vehicleRentalStationService.getErrorsByNetwork(),
-                vehicleRentalStationService.getSystemInformationDataByNetwork()
-            );
-        }
-    }
-
-    private static Map<String, RentalInfo> makeRentalInfo(
-        Map<String, List<RentalUpdaterError>> errorsByNetwork,
-        Map<String, SystemInformation.SystemInformationData> systemInformationDataByNetwork
-    ) {
-        Map<String, RentalInfo> rentalInfo = new HashMap<>();
-        for (String network : errorsByNetwork.keySet()) {
-            rentalInfo.put(
-                network,
-                new RentalInfo(errorsByNetwork.get(network), systemInformationDataByNetwork.get(network))
-            );
-        }
-        return rentalInfo;
     }
 
     /**

@@ -113,7 +113,9 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
             return false;
         } finally {
             try {
-                data.close();
+                if (data != null) {
+                    data.close();
+                }
             } catch (IOException e) {
                 log.warn("An error occurred while closing data stream {}");
                 e.printStackTrace();

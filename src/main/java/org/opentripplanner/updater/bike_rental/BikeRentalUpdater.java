@@ -54,6 +54,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private int timeToLiveMinutes;
 
+    private String networkName = "default";
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -67,7 +69,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         String apiKey = config.path("apiKey").asText();
         // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
         // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
-        String networkName = config.path("network").asText();
+        networkName = config.path("network").asText();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
             if (sourceType.equals("jcdecaux")) {
@@ -157,8 +159,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
 		@Override
         public void run(Graph graph) {
-            service.setErrorsForNetwork(network, errors);
-            service.setSystemInformationDataForNetwork(network, systemInformationData);
+            service.setErrorsForNetwork(networkName, errors);
+            service.setSystemInformationDataForNetwork(networkName, systemInformationData);
 
             // check if any critical errors occurred
             boolean feedWideError = false;

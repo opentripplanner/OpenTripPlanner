@@ -309,6 +309,20 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
 
         // TODO have NABSA make rental regions a part of their spec somehow. See https://github.com/NABSA/gbfs/issues/65
         updateRegions();
+
+        // Add a feed-wide error if there was a problem fetching both stations and floating vehicles
+        boolean errorFetchingStations = false;
+        boolean errorFetchingFloatingVehicles = false;
+        for (RentalUpdaterError error : errors) {
+            if (error.severity == RentalUpdaterError.Severity.ALL_STATIONS) {
+                errorFetchingStations = true;
+            } else if (error.severity == RentalUpdaterError.Severity.ALL_FLOATING_VEHICLES) {
+                errorFetchingFloatingVehicles = true;
+            }
+        }
+        if (errorFetchingStations && errorFetchingFloatingVehicles) {
+            addError(RentalUpdaterError.Severity.FEED_WIDE, "Both station and vehicle info not found!");
+        }
     }
 
     /**

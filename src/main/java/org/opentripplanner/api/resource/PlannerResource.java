@@ -63,6 +63,7 @@ public class PlannerResource extends RoutingResource {
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
             request = super.buildRequest();
             router = otpServer.getRouter(request.routerId);
+            response.setRentalInfo(request, router);
 
             /* Find some good GraphPaths through the OTP Graph. */
             GraphPathFinder gpFinder = new GraphPathFinder(router); // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here

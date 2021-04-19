@@ -64,12 +64,19 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         errors = new LinkedList<>();
         updateUrls();
         // These first two GBFS files are required.
-        boolean updatesFound = stationInformationSource.update();
-        updatesFound |= stationStatusSource.update();
+        boolean stationInfoFound = stationInformationSource.update();
+        stationInfoFound &= stationStatusSource.update();
         // This floating-bikes file is optional, and does not appear in all GBFS feeds.
-        updatesFound |= floatingBikeSource.update();
+        boolean floatingInfoFound = floatingBikeSource.update();
+
+        // since a GBFS may not need a GBFS.json file, create a feed-wide error if there was a problem fetching both the
+        // station information and floating vehicle info
+        if (!stationInfoFound && !floatingInfoFound) {
+            addError(RentalUpdaterError.Severity.FEED_WIDE, "Both station and vehicle info not found!");
+        }
+
         // Return true if ANY of the sub-updaters found any updates.
-        return updatesFound;
+        return stationInfoFound || floatingInfoFound;
     }
 
     /**
