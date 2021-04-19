@@ -65,8 +65,8 @@ public class BikeRentalEdge extends Edge {
                     }
                     break;
                 case HAVE_RENTED:
-                case RENTING_FLOATING:
                     return null;
+                case RENTING_FLOATING:
                 case RENTING_FROM_STATION:
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), false);
