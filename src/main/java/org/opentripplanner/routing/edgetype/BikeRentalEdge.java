@@ -51,6 +51,8 @@ public class BikeRentalEdge extends Edge {
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
                     s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), true);
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         } else {
             switch (s0.getBikeRentalState()) {
@@ -71,6 +73,8 @@ public class BikeRentalEdge extends Edge {
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), false);
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         }
 
