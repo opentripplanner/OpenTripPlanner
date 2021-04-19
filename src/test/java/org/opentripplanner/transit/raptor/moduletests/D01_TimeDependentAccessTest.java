@@ -145,7 +145,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
                 ""
                         + "Walk 2m ~ 2 ~ BUS R1 0:15 0:30 ~ 5 ~ Walk 1m [00:13:00 00:31:00 18m, cost: 2220]\n"
                         + "Walk 2m ~ 2 ~ BUS R2 0:20 0:35 ~ 5 ~ Walk 1m [00:18:00 00:36:00 18m, cost: 2220]\n"
-                        + "Walk 2m ~ 2 ~ BUS R3 0:25 0:40 ~ 5 ~ Walk 1m [00:20:00 00:41:00 21m, cost: 2220]",
+                        + "Walk 2m ~ 2 ~ BUS R3 0:25 0:40 ~ 5 ~ Walk 1m [00:20:00 00:41:00 21m, cost: 2400]",
                 pathsToString(response)
         );
     }
@@ -171,7 +171,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
         assertEquals(
                 ""
                         + "Walk 2m ~ 2 ~ BUS R2 0:20 0:35 ~ 5 ~ Walk 1m [00:18:00 00:36:00 18m, cost: 2220]\n"
-                        + "Walk 2m ~ 2 ~ BUS R3 0:25 0:40 ~ 5 ~ Walk 1m [00:20:00 00:41:00 21m, cost: 2220]",
+                        + "Walk 2m ~ 2 ~ BUS R3 0:25 0:40 ~ 5 ~ Walk 1m [00:20:00 00:41:00 21m, cost: 2400]",
                 pathsToString(response)
         );
     }
