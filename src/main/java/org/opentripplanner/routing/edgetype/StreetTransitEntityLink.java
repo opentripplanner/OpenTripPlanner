@@ -121,19 +121,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         return (req.arriveBy ? fromv : tov) == getTransitEntityVertex();
     }
 
-    public State optimisticTraverse(State s0) {
-        StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(STEL_TRAVERSE_COST);
-        return s1.makeState();
-    }
-
-    // anecdotally, the lower bound search is about 2x faster when you don't reach stops
-    // and therefore don't even consider boarding
-    @Override
-    public double weightLowerBound(RoutingRequest options) {
-        return options.transitAllowed() ? 0 : Double.POSITIVE_INFINITY;
-    }
-
     public Vertex getFromVertex() {
         return fromv;
     }

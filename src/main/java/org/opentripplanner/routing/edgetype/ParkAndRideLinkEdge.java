@@ -4,7 +4,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -117,18 +116,6 @@ public class ParkAndRideLinkEdge extends Edge {
             return null;
         }
         return s1.makeState();
-    }
-
-    @Override
-    public State optimisticTraverse(State s0) {
-        return traverse(s0);
-    }
-
-    @Override
-    public double weightLowerBound(RoutingRequest options) {
-        boolean parkAndRide = options.streetSubRequestModes.getWalk() && options.streetSubRequestModes
-            .getCar();
-        return parkAndRide ? 0 : Double.POSITIVE_INFINITY;
     }
 
     @Override

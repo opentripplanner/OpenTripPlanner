@@ -1,17 +1,15 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
 
 /**
@@ -80,11 +78,6 @@ public class StreetBikeParkLink extends Edge {
         s1.incrementWeight(1);
         // Do not force any mode, will use the latest one (walking bike or bike)
         return s1.makeState();
-    }
-
-    @Override
-    public double weightLowerBound(RoutingRequest options) {
-        return options.streetSubRequestModes.contains(TraverseMode.BICYCLE) ? 0 : Double.POSITIVE_INFINITY;
     }
 
     public Vertex getFromVertex() {
