@@ -29,13 +29,16 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
 
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
 
-    private final RentalUpdaterError.Severity severityFailureType;
-
     private String url;
     private String headerName;
     private String headerValue;
 
     private String jsonParsePath;
+
+    /**
+     * The severity level to assign to any error that occurs when fetching from this particular data source.
+     */
+    private final RentalUpdaterError.Severity severityFailureType;
 
     // any errors that occured in the last update
     protected List<RentalUpdaterError> errors;
@@ -45,6 +48,9 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     /**
      * Construct superclass
      *
+     * @param severityFailureType The severity level to create an error with when fetching from this particular data
+     *                            source. This can be used to differentiate different error types for fetching from
+     *                            stations of floating vehicles for example.
      * @param jsonPath JSON path to get from enclosing elements to nested rental list.
      *        Separate path levels with '/' For example "d/list"
      *
@@ -55,6 +61,9 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
 
     /**
      *
+     * @param severityFailureType The severity level to create an error with when fetching from this particular data
+     *                            source. This can be used to differentiate different error types for fetching from
+     *                            stations of floating vehicles for example.
      * @param jsonPath path to get from enclosing elements to nested rental list.
      *        Separate path levels with '/' For example "d/list"
      * @param headerName header name
@@ -76,9 +85,16 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      * Adds an error message to the list of errors and also logs the error message.
      */
     private void addError(String message) {
+        addError(message, null);
+    }
+
+    /**
+     * Adds an error message to the list of errors and also logs the error message (plus Exception if provided).
+     */
+    private void addError(String message, Exception e) {
         message = String.format("%s (url: %s)", message, url);
         errors.add(new RentalUpdaterError(severityFailureType, message));
-        log.error(String.format("[severity: %s] %s", severityFailureType, message));
+        log.error(String.format("[severity: %s] %s", severityFailureType, message), e);
     }
 
     @Override
@@ -103,13 +119,13 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
             }
             parseJSON(data);
         } catch (IllegalArgumentException e) {
-            addError("Error parsing bike rental feed from " + url);
+            addError("Error parsing bike rental feed from " + url, e);
             return false;
         } catch (JsonProcessingException e) {
-            addError("Error parsing bike rental feed from " + url + "(bad JSON of some sort)");
+            addError("Error parsing bike rental feed from " + url + "(bad JSON of some sort)", e);
             return false;
         } catch (IOException e) {
-            addError("Error reading bike rental feed from " + url);
+            addError("Error reading bike rental feed from " + url, e);
             return false;
         } finally {
             try {
@@ -117,8 +133,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
                     data.close();
                 }
             } catch (IOException e) {
-                log.warn("An error occurred while closing data stream {}");
-                e.printStackTrace();
+                log.warn("An error occurred while closing data stream!", e);
             }
         }
         return true;
