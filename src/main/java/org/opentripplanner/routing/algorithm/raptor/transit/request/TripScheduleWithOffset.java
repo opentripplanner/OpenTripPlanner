@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import java.util.Objects;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -51,7 +53,8 @@ public class TripScheduleWithOffset implements TripSchedule {
         return pattern.getTripPattern().getPattern();
     }
 
-    @Override public LocalDate getServiceDate() {
+    @Override
+    public LocalDate getServiceDate() {
         return serviceDate;
     }
 
@@ -66,6 +69,27 @@ public class TripScheduleWithOffset implements TripSchedule {
             "No stop position(index) in pattern found. StopIndex=" + stopIndex + ", time=" + time +
                 ", departure=" + departure + "."
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (!(o instanceof TripScheduleWithOffset)) { return false; }
+        final TripScheduleWithOffset that = (TripScheduleWithOffset) o;
+        return secondsOffset == that.secondsOffset && Objects.equals(tripTimes, that.tripTimes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(secondsOffset, tripTimes);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(TripScheduleWithOffset.class)
+                .addObj("trip", pattern.debugInfo())
+                .addServiceTime("depart", secondsOffset + tripTimes.getDepartureTime(0))
+                .toString();
     }
 
     public int getSecondsOffset() {

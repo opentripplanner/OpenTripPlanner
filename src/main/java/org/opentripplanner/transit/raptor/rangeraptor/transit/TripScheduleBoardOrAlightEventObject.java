@@ -57,7 +57,7 @@ public class TripScheduleBoardOrAlightEventObject<T extends RaptorTripSchedule>
     @Override
     public String toString() {
         return ToStringBuilder.of(TripScheduleBoardOrAlightEventObject.class)
-                .addServiceTime("earliestTime", earliestTime, -9999)
+                .addServiceTime("earliestTime", earliestTime)
                 .addNum("stopPositionInPattern", stopPositionInPattern)
                 .addNum("tripIndex", tripIndex)
                 .addObj("trip", trip)

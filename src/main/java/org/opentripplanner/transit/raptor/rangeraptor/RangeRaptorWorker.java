@@ -96,11 +96,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private final LifeCycleEventPublisher lifeCycle;
 
-    private final int mimNumberOfRounds;
+    private final int minNumberOfRounds;
+
+    private final boolean enableGuaranteedTransfers;
 
     private boolean inFirstIteration = true;
 
-    private boolean hasTimeDependentAccess = false;
+   private boolean hasTimeDependentAccess = false;
 
     private int iterationDepartureTime;
 
@@ -114,7 +116,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             RoundProvider roundProvider,
             TransitCalculator<T> calculator,
             LifeCycleEventPublisher lifeCyclePublisher,
-            WorkerPerformanceTimers timers
+            WorkerPerformanceTimers timers,
+            boolean enableGuaranteedTransfers
     ) {
         this.transitWorker = transitWorker;
         this.state = state;
@@ -124,7 +127,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         this.timers = timers;
         this.accessArrivedByWalking = groupByRound(accessPaths, Predicate.not(RaptorTransfer::stopReachedOnBoard));
         this.accessArrivedOnBoard = groupByRound(accessPaths, RaptorTransfer::stopReachedOnBoard);
-        this.mimNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
+        this.minNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
+        this.enableGuaranteedTransfers = enableGuaranteedTransfers;
 
         // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
         // "everyone" by providing access to it in the context.
@@ -195,7 +199,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Check if the RangeRaptor should continue with a new round.
      */
     private boolean hasMoreRounds() {
-        if(round() < mimNumberOfRounds) { return true; }
+        if(round() < minNumberOfRounds) { return true; }
         return state.isNewRoundAvailable() && roundTracker.hasMoreRounds();
     }
 
@@ -234,10 +238,12 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                     if(pattern.boardingPossibleAt(stopPos)) {
                         // MC Raptor have many, while RR have one boarding
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
-                            TripScheduleBoardOrAlightEvent<T> result;
+                            TripScheduleBoardOrAlightEvent<T> result = null;
 
-                            // Board using guaranteed transfers
-                            result = findGuaranteedTransfer(route, stopIndex, stopPos);
+                            if(enableGuaranteedTransfers) {
+                                // Board using guaranteed transfers
+                                result = findGuaranteedTransfer(route, stopIndex, stopPos);
+                            }
 
                             // Find the best trip and board [no guaranteed transfer exist]
                             if(result == null) {
@@ -277,7 +283,6 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         // Get the previous transit stop arrival (transfer source)
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return null; }
-
 
         // Search for the targetTrip to board
         T targetTrip = calculator.findTargetTripInGuarantiedTransfers(

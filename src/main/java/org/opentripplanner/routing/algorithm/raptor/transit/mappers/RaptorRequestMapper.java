@@ -12,6 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
 
@@ -53,6 +54,7 @@ public class RaptorRequestMapper {
                 .searchParams()
                 .searchWindow(request.searchWindow)
                 .timetableEnabled(request.timetableView)
+                .guaranteedTransfersEnabled(OTPFeature.GuaranteedTransfers.isOn())
                 .addAccessPaths(accessPaths)
                 .addEgressPaths(egressPaths);
 

@@ -22,10 +22,10 @@ final class BasicStopTime implements StopTime {
   @Override
   public String toString() {
     return ValueObjectToStringBuilder.of()
-        .addLbl("[")
+        .addText("[")
         .addNum(stop)
         .addServiceTime(time)
-        .addLbl("]")
+        .addText("]")
         .toString();
   }
 

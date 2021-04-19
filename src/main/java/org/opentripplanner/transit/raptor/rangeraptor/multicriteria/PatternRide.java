@@ -124,7 +124,7 @@ public final class PatternRide<T extends RaptorTripSchedule> {
             .addNum("prevArrival", prevArrival.stop())
             .addNum("boardStop", boardStopIndex)
             .addNum("boardPos", boardPos)
-            .addServiceTime("boardTime", boardTime , -1)
+            .addServiceTime("boardTime", boardTime)
             .addDurationSec("boardWaitTime", boardWaitTimeForCostCalculation)
             .addObj("trip", trip)
             .addNum("relativeCost", relativeCost)

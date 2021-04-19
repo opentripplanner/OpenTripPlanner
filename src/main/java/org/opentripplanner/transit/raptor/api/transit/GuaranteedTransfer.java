@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 
 /**
  *
@@ -37,25 +38,27 @@ public class GuaranteedTransfer<T extends RaptorTripSchedule> {
         return toStopPos;
     }
 
-    public boolean fromTripMatches(TransitArrival<T> from) {
-        T fromTrip = getFromTrip();
-        if(fromTrip != from.trip()) { return false; }
-        return fromTrip.findArrivalStopPosition(from.arrivalTime(), from.stop()) == getFromStopPos();
+    public boolean matchesFrom(T trip, int stopPos) {
+        return fromTrip.equals(trip) && fromStopPos == stopPos;
     }
 
-    public boolean toTripMatches(TransitArrival<T> to) {
-        T toTrip = getToTrip();
-        if(toTrip != to.trip()) { return false; }
-        return toTrip.findDepartureStopPosition(to.arrivalTime(), to.stop()) == getToStopPos();
+    public boolean matchesTo(T trip, int stopPos) {
+        return toTrip == trip && toStopPos == stopPos;
     }
 
     @Override
     public String toString() {
         return ToStringBuilder.of(GuaranteedTransfer.class)
-                .addObj("toTrip", toTrip)
-                .addNum("toStopPos", toStopPos)
-                .addObj("fromTrip", fromTrip)
-                .addNum("fromStopPos", fromStopPos)
+                .addObj("from", toString(fromTrip, fromStopPos, true))
+                .addObj("to", toString(toTrip, toStopPos, false))
+                .toString();
+    }
+
+    private static <T extends RaptorTripSchedule> String toString(T trip, int stopPos, boolean arrival) {
+        return ValueObjectToStringBuilder.of()
+                .addObj(trip.pattern().debugInfo())
+                .addServiceTime(arrival ? trip.arrival(stopPos) : trip.departure(stopPos))
+                .addText("[").addNum(stopPos).addText("]")
                 .toString();
     }
 }

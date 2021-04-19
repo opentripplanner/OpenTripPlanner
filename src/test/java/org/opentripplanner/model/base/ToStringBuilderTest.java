@@ -161,11 +161,17 @@ public class ToStringBuilderTest {
 
   @Test
   public void addServiceTime() {
+    var EXPECTED = "ToStringBuilderTest{t: 2:30:04}";
     // 02:30:04 in seconds is:
     int seconds = TimeUtils.time("2:30:04");
+
+    assertEquals(EXPECTED, subject().addServiceTime("t", seconds, -1).toString());
+    assertEquals(EXPECTED, subject().addServiceTime("t", seconds).toString());
+
+    // Expect ignore value
     assertEquals(
-        "ToStringBuilderTest{t: 2:30:04}",
-        subject().addServiceTime("t", seconds, -1).toString()
+            "ToStringBuilderTest{}",
+            subject().addServiceTime("t", -1, -1).toString()
     );
   }
 

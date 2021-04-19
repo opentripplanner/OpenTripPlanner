@@ -130,16 +130,18 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     @Nullable
     public final T findTargetTripInGuarantiedTransfers(
             Collection<GuaranteedTransfer<T>> list,
-            TransitArrival<T> fromStopArrival,
+            TransitArrival<T> from,
             int alightSlack,
             int toStopPos
     ) {
         // We ignore any slack when boarding guaranteed transfers, so we have to revert
         // addition of slack here (the arrival have alightSlack added)
-        final int earliestDepartureTime = fromStopArrival.arrivalTime() - alightSlack;
+        final int earliestDepartureTime = from.arrivalTime() - alightSlack;
 
         for (GuaranteedTransfer<T> tx : list) {
-            if(tx.fromTripMatches(fromStopArrival)) {
+            T trip = from.trip();
+            int stopPos = trip.findArrivalStopPosition(from.arrivalTime(), from.stop());
+            if(tx.matchesFrom(trip, stopPos)) {
                 T toTrip = tx.getToTrip();
                 return earliestDepartureTime <= toTrip.departure(toStopPos) ? toTrip : null;
             }
@@ -160,5 +162,4 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
                 iterationStep
         );
     }
-
 }

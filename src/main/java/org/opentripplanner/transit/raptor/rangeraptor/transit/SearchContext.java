@@ -189,16 +189,23 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return publisher;
     }
 
+    public boolean enableGuaranteedTransfers() {
+        if(profile().isOneOf(RaptorProfile.BEST_TIME, RaptorProfile.NO_WAIT_BEST_TIME)) {
+            return false;
+        }
+        return searchParams().guaranteedTransfersEnabled();
+    }
+
     /* private methods */
 
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static TransitCalculator createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
+    private static TransitCalculator<?> createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
         SearchParams s = r.searchParams();
         return r.searchDirection().isForward()
-                ? new ForwardTransitCalculator(s, t)
-                : new ReverseTransitCalculator(s, t);
+                ? new ForwardTransitCalculator<>(s, t)
+                : new ReverseTransitCalculator<>(s, t);
     }
 
     private static DebugRequest debugRequest(

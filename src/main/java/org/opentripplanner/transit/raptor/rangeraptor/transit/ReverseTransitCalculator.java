@@ -146,16 +146,18 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     @Nullable
     public final T findTargetTripInGuarantiedTransfers(
             Collection<GuaranteedTransfer<T>> list,
-            TransitArrival<T> toStopArrival,
+            TransitArrival<T> to,
             int boardSlack,
             int fromStopPos
     ) {
         // We need to ignore any transfer- and/or board-slack here when using the guaranteed
         // transfer, so we have to revert the slack addition. Here the Raptor boardSlack
         // is the "transfer-slack + board-slack".
-        int latestArrivalTime = toStopArrival.arrivalTime() + boardSlack;
+        int latestArrivalTime = to.arrivalTime() + boardSlack;
         for (GuaranteedTransfer<T> tx : list) {
-            if(tx.toTripMatches(toStopArrival)) {
+            T trip = to.trip();
+            int stopPos = trip.findDepartureStopPosition(to.arrivalTime(), to.stop());
+            if(tx.matchesTo(trip, stopPos)) {
                 T fromTrip = tx.getFromTrip();
                 return fromTrip.arrival(fromStopPos) <= latestArrivalTime ? fromTrip : null;
             }

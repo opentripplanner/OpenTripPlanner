@@ -58,6 +58,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
         data.withGuaranteedTransfers(tripA, STOP_B, tripB, STOP_B);
 
         requestBuilder.searchParams()
+                .guaranteedTransfersEnabled(true)
                 .addAccessPaths(walk(STOP_A, D30s))
                 .addEgressPaths(walk(STOP_C, D30s))
                 .earliestDepartureTime(T00_00)
