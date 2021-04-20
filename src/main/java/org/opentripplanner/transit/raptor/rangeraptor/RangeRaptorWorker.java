@@ -92,6 +92,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private boolean inFirstIteration = true;
 
+    private boolean hasTimeDependentAccess = false;
+
     private int iterationDepartureTime;
 
 
@@ -232,7 +234,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * This is protected to allow reverse search to override and create a alight search instead.
      */
     private TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
-        if(!inFirstIteration && roundTracker.isFirstRound()) {
+        if (!inFirstIteration && roundTracker.isFirstRound() && !hasTimeDependentAccess) {
             // For the first round of every iteration(except the first) we restrict the first
             // departure to happen within the time-window of the iteration. Another way to put this,
             // is to say that we allow for the access path to be time-shifted to a later departure,
@@ -263,6 +265,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
             // This access is not available after the iteration departure time
             if (timeDependentDepartureTime == -1) { continue; }
+
+            // If the time differs from the iterationDepartureTime, than the access has time
+            // restrictions. If the difference between _any_ access between iterations is not a
+            // uniform iterationStep, than the exactTripSearch optimisation may not be used.
+            if (timeDependentDepartureTime != iterationDepartureTime) {
+                hasTimeDependentAccess = true;
+            }
 
             transitWorker.setAccessToStop(it, iterationDepartureTime, timeDependentDepartureTime);
         }
