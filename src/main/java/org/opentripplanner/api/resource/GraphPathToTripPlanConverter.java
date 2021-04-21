@@ -656,7 +656,8 @@ public abstract class GraphPathToTripPlanConverter {
             String alightRule = null;
 
             for (int j = 1; j < legsStates[i].length; j++) {
-                if (legsStates[i][j].getBackEdge() instanceof TimedTransferEdge) {
+                Edge backEdge = legsStates[i][j].getBackEdge();
+                if (backEdge instanceof TimedTransferEdge) {
                     // TimedTransferEdges bypass the street network (thus not resulting in the traversal of pathway
                     // edges) and are going to force a transfer (thus not interlining with a previous leg). Therefore,
                     // this loop can be exited safely since this information does not need to be collected. If this loop
@@ -665,8 +666,8 @@ public abstract class GraphPathToTripPlanConverter {
                     // least with the data inserted into the Leg instance representing the timed transfer)).
                     break;
                 }
-                if (legsStates[i][j].getBackEdge() instanceof PatternEdge) {
-                    PatternEdge patternEdge = (PatternEdge) legsStates[i][j].getBackEdge();
+                if (backEdge instanceof PatternEdge) {
+                    PatternEdge patternEdge = (PatternEdge) backEdge;
                     TripPattern tripPattern = patternEdge.getPattern();
 
                     Integer fromIndex = legs.get(i).from.stopIndex;
@@ -678,7 +679,7 @@ public abstract class GraphPathToTripPlanConverter {
                     boardRule = getBoardAlightMessage(boardType);
                     alightRule = getBoardAlightMessage(alightType);
                 }
-                if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
+                if (backEdge instanceof PathwayEdge) {
                     legs.get(i).pathway = true;
                 }
             }
