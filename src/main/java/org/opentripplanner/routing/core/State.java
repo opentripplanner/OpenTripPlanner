@@ -566,7 +566,7 @@ public class State implements Cloneable {
                         false
                     );
                 }
-                else {
+                else if (orig.getBikeRentalState() == BikeRentalState.RENTING_FLOATING) {
                     editor.beginFloatingVehicleRenting(
                         ((BikeRentalStationVertex) orig.vertex).getVehicleMode(),
                         false

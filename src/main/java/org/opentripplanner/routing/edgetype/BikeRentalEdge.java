@@ -43,11 +43,22 @@ public class BikeRentalEdge extends Edge {
                 case BEFORE_RENTING:
                     return null;
                 case HAVE_RENTED:
+                    if (options.useBikeRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
+                        return null;
+                    }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(),true);
                     break;
                 case RENTING_FLOATING:
-                    s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), true);
+                    if (stationVertex.getStation().isFloatingBike) {
+                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), true);
+                    } else {
+                        return null;
+                    }
+                    break;
                 case RENTING_FROM_STATION:
+                    if (options.useBikeRentalAvailabilityInformation && stationVertex.getBikesAvailable() == 0) {
+                        return null;
+                    }
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
                     s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), true);
                     break;
@@ -71,6 +82,9 @@ public class BikeRentalEdge extends Edge {
                 case RENTING_FLOATING:
                 case RENTING_FROM_STATION:
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
+                    if (options.useBikeRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
+                        return null;
+                    }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), false);
                     break;
                 default:
