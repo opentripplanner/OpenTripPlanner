@@ -1,5 +1,9 @@
 package org.opentripplanner.model.impl;
 
+import static org.opentripplanner.model.transfer.Transfer.MAX_WAIT_TIME_NOT_SET;
+import static org.opentripplanner.util.time.DurationUtils.durationToStr;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,8 +29,11 @@ import org.slf4j.LoggerFactory;
  * find special test-cases when needed.
  */
 class TransferExport {
+
     private static final Logger LOG = LoggerFactory.getLogger("TRANSFERS_EXPORT");
     private static final File FILE = new File("transfers-debug.csv");
+    private static final String SEP = ";";
+    private static final int NOT_SET = -1;
 
     static void exportTransfers(List<Transfer> transfers, TripStopTimes stopTimesByTrip) {
     if (!TransferExport.LOG.isDebugEnabled()) { return; }
@@ -35,7 +42,7 @@ class TransferExport {
             LOG.info("Transfers total: " + transfers.size());
             LOG.info("Transfers dumped: " + FILE.getAbsolutePath());
 
-            p.println("Op;FromTrip;FromStop;ToTrip;ToStop;ArrivalTime;DepartureTime;TransferTime;Walk;Priority;MaxWaitTime;StaySeated;Guaranteed;");
+            p.println("Op;FromTripId;FromTrip;FromStop;ToTripId;ToTrip;ToStop;ArrivalTime;DepartureTime;TransferTime;Walk;Priority;MaxWaitTime;StaySeated;Guaranteed;");
 
             transfers.forEach(t -> {
                 var from = pointInfo(stopTimesByTrip, t.getFrom(), true);
@@ -45,20 +52,20 @@ class TransferExport {
                         : String.format("%.0fm",
                                 SphericalDistanceLibrary.fastDistance(from.c, to.c)
                         );
-                var time = (from.time == -1 || to.time == -1)
-                        ? "" : DurationUtils.durationToStr(to.time - from.time);
+                var time = (from.time == NOT_SET || to.time == NOT_SET)
+                        ? "" : durationToStr(to.time - from.time);
 
                 p.println(
-                        t.getFrom().getTrip().getOperator().getId().getId().substring(0, 3) + ";"
-                                + from.trip + ";" + from.loc + ";"
-                                + to.trip + ";" + to.loc + ";"
-                                + TimeUtils.timeToStrCompact(from.time, -1) + ";"
-                                + TimeUtils.timeToStrCompact(to.time, -1) + ";"
-                                + time + ";" + dist + ";"
-                                + t.getPriority() + ";"
-                                + t.getMaxWaitTime() + ";"
-                                + (t.isStaySeated() ? "TRUE;" : ";")
-                                + (t.isGuaranteed() ? "TRUE;" : ";")
+                        t.getFrom().getTrip().getOperator().getId().getId().substring(0, 3) + SEP
+                                + from.tripId + SEP + from.trip + SEP + from.loc + SEP
+                                + to.tripId + SEP + to.trip + SEP + to.loc + SEP
+                                + timeToStrCompact(from.time, NOT_SET) + SEP
+                                + timeToStrCompact(to.time, NOT_SET) + SEP
+                                + time + SEP + dist + SEP
+                                + t.getPriority() + SEP
+                                + durationToStr(t.getMaxWaitTime(), MAX_WAIT_TIME_NOT_SET) + SEP
+                                + (t.isStaySeated() ? "YES;" : SEP)
+                                + (t.isGuaranteed() ? "YES;" : SEP)
                 );
             });
             p.flush();
@@ -78,7 +85,9 @@ class TransferExport {
         var trip = p.getTrip();
         var route = trip.getRoute();
 
-        r.trip = route.getName() +  " " + route.getMode() + " " + route.getLongName();
+        r.tripId = trip.getId().getId();
+        r.trip = route.getName() +  " " + route.getMode() + " " + route.getLongName()
+                + " " + trip.getTripHeadsign();
         r.c = null;
         if(s.size() > p.getStopPosition()) {
             StopTime stopTime = s.get(p.getStopPosition());
@@ -96,8 +105,9 @@ class TransferExport {
 
     static class TxPoint {
         private String loc = "";
+        private String tripId = "";
         private String trip = "";
         private Coordinate c = null;
-        private int time = -1;
+        private int time = NOT_SET;
     }
 }
