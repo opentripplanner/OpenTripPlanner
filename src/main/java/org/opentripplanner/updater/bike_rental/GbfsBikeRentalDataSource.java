@@ -63,10 +63,9 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
     public boolean update() {
         errors = new LinkedList<>();
         updateUrls();
-        // These first two GBFS files are required.
-        boolean stationInfoFound = stationInformationSource.update();
-        stationInfoFound &= stationStatusSource.update();
-        // This floating-bikes file is optional, and does not appear in all GBFS feeds.
+        // Get information about stations
+        boolean stationInfoFound = stationInformationSource.update() && stationStatusSource.update();
+        // Get info about floating-bikes.
         boolean floatingInfoFound = floatingBikeSource.update();
 
         // since a GBFS may not need a GBFS.json file, create a feed-wide error if there was a problem fetching both the
@@ -90,7 +89,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
      * Adds an error message to the list of errors and also logs the error message.
      */
     private void addError(RentalUpdaterError.Severity severity, String message) {
-        message = String.format("%s (feed: %s)", message, networkName);
+        message = String.format("%s (network: %s)", message, networkName);
         errors.add(new RentalUpdaterError(severity, message));
         LOG.error(String.format("[severity: %s] %s", severity, message));
     }

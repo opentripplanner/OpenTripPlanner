@@ -188,7 +188,7 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
      * Adds an error message to the list of errors and also logs the error message.
      */
     private void addError(RentalUpdaterError.Severity severity, Exception e, String message) {
-        message = String.format("%s (feed: %s)", message, networkName);
+        message = String.format("%s (network: %s)", message, networkName);
         errors.add(new RentalUpdaterError(severity, message));
         LOG.error(String.format("[severity: %s] %s", severity, message), e);
     }
@@ -240,7 +240,7 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
                     RentalUpdaterError.Severity.FEED_WIDE,
                     e,
                     "Failed to deserialize gbfs.json response: %s",
-                    e
+                    e.toString()
                 );
                 return;
             } finally {

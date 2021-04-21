@@ -48,8 +48,8 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     /**
      * Construct superclass
      *
-     * @param severityFailureType The severity level to create an error with when fetching from this particular data
-     *                            source. This can be used to differentiate different error types for fetching from
+     * @param severityFailureType The severity level given to an error with when fetching from this particular data
+     *                            source. This can be used to define different error types when fetching from
      *                            stations of floating vehicles for example.
      * @param jsonPath JSON path to get from enclosing elements to nested rental list.
      *        Separate path levels with '/' For example "d/list"
@@ -61,8 +61,8 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
 
     /**
      *
-     * @param severityFailureType The severity level to create an error with when fetching from this particular data
-     *                            source. This can be used to differentiate different error types for fetching from
+     * @param severityFailureType The severity level given to an error with when fetching from this particular data
+     *                            source. This can be used to define different error types when fetching from
      *                            stations of floating vehicles for example.
      * @param jsonPath path to get from enclosing elements to nested rental list.
      *        Separate path levels with '/' For example "d/list"
