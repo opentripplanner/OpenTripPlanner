@@ -1,10 +1,13 @@
 package org.opentripplanner.routing.trippattern;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
 
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.MavenVersion;
@@ -454,15 +457,16 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     /**
      * Once a trip has been found departing or arriving at an appropriate time, check whether that
-     * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility
+     * trip fits other restrictive search criteria such as wheelchair or bicycle accessibility
      * and transfers with minimum time or forbidden transfers.
      */
     public boolean tripAcceptable(final State state0, final int stopIndex) {
         final RoutingRequest options = state0.getOptions();
-        final BannedStopSet banned = options.bannedTrips.get(trip.getId());
-        if (banned != null && banned.contains(stopIndex)) {
+
+        if (tripOrTripSequenceIsBanned(state0, stopIndex)) {
             return false;
         }
+
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
             return false;
         }
@@ -472,6 +476,63 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns true if the current state chain contains a banned trip, or banned trip/stop index or banned trip sequence
+     */
+    public boolean tripOrTripSequenceIsBanned(State state0, final int stopIndex) {
+        final RoutingRequest options = state0.getOptions();
+
+        // check if an exact trip ID or stop index within a stop pattern of trip is banned
+        final BannedStopSet bannedStopIndexesForTrip = options.bannedTrips.get(trip.getId());
+        if (bannedStopIndexesForTrip != null && bannedStopIndexesForTrip.contains(stopIndex)) {
+            return true;
+        }
+
+        // check if a trip ID sequence is banned, but first return false if there are not banned sequences
+        if (options.bannedTripSequences.isEmpty()) {
+            return false;
+        }
+
+        // compile list of trips seen so far in states (use ArrayList constructor to ensure a mutable list is returned)
+        List<FeedScopedId> tripsInState = new ArrayList<>(Arrays.asList(trip.getId()));
+        State tripFindingState = state0;
+        Trip lastTrip = trip;
+        while (tripFindingState != null) {
+            if (tripFindingState.getBackEdge() != null) {
+                Trip trip = tripFindingState.getBackTrip();
+                if (trip != null && trip != lastTrip) {
+                    tripsInState.add(trip.getId());
+                    lastTrip = trip;
+                }
+            }
+            tripFindingState = tripFindingState.getBackState();
+        }
+
+        // reverse trips if finding for depart-at search to make sure the list is in chronological order
+        if (!options.arriveBy) {
+            Collections.reverse(tripsInState);
+        }
+
+        // Check for the trip state sequence in all banned trip sequences. This will return true even for sequences that
+        // have additional trips included between a banned sequence. (ex: if trip A > trip B is banned, trip A >
+        // Trip C > Trip B will be flagged as a banned sequence).
+        for (List<FeedScopedId> bannedTripSequence : options.bannedTripSequences) {
+            int bannedSequenceIdx = 0;
+            for (FeedScopedId tripInState : tripsInState) {
+                if (tripInState.equals(bannedTripSequence.get(bannedSequenceIdx))) {
+                    bannedSequenceIdx++;
+                    if (bannedSequenceIdx == bannedTripSequence.size()) {
+                        // A matching trip sequence has been found!
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // none of the banned trip sequences has a match, therefore this trip ID and/or sequence is not banned
+        return false;
     }
 
     /** Cancel this entire trip */
