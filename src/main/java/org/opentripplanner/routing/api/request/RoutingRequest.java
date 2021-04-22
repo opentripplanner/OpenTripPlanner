@@ -11,6 +11,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -79,7 +80,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * The model that computes turn/traversal costs.
      * TODO: move this to the Router or the Graph if it doesn't clutter the code too much
      */
-    public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
+    public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel(
+            DrivingDirection.RIGHT_HAND_TRAFFIC);
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -593,12 +595,6 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
     public boolean useBikeRentalAvailabilityInformation = false;
-
-    /**
-     * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
-     * driving occurs on the left.
-     */
-    public boolean driveOnRight = true;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.

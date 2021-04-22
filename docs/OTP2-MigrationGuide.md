@@ -135,7 +135,7 @@ The following parameters are missing in OTP2 but will be added:
   - `startingTransitStopId` - duplicative with fromPlace
   - `onlyTransitTrips` - the new feature for specifying access, egress, transit and direct mode
     replace the need for this parameter.
-
+  - `driveOnRight` - this is removed. You can specify the driving direction in your way property set.
 
 Parameters that have changed:
 

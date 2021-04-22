@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.*;
+
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -68,5 +70,10 @@ public class UKWayPropertySetSource implements WayPropertySetSource {
 
         // Read the rest from the default set
         new DefaultWayPropertySetSource().populateProperties(props);
+    }
+
+    @Override
+    public DrivingDirection drivingDirection() {
+        return LEFT_HAND_TRAFFIC;
     }
 }

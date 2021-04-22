@@ -12,6 +12,10 @@
 - Improve the dynamic search window calculation. The configuration parameters `minTransitTimeCoefficient` and `minWaitTimeCoefficient` replace the old `minTripTimeCoefficient` parameter. [#3366](https://github.com/opentripplanner/OpenTripPlanner/issues/3366)   
 - Allow loops caused by turn restriction in street routes [#3399](https://github.com/opentripplanner/OpenTripPlanner/pull/3399)
 - Apply turn restrictions when splitting edges. [#3414](https://github.com/opentripplanner/OpenTripPlanner/pull/3414)
+- Add German way property set [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
+- Process OSM bicycle routes correctly [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
+- Avoid turns across traffic on bicycles [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
+- Remove request parameter `driveOnRight` and derive information from way property set [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
 
 ## 2.0.0 (2020-11-27)
 
