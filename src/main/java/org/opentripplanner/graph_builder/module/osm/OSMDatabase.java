@@ -297,7 +297,10 @@ public class OSMDatabase {
                         .isOsmEntityRoutable(relation))
                 && !(relation.isTag("type", "level_map"))
                 && !(relation.isTag("type", "public_transport") && relation.isTag(
-                        "public_transport", "stop_area"))) {
+                        "public_transport", "stop_area"))
+                && !(relation.isTag("type", "route") && (
+                        relation.isTag("route", "road") ||
+                        relation.isTag("route", "bicycle")))){
             return;
         }
 
@@ -793,10 +796,45 @@ public class OSMDatabase {
                 processLevelMap(relation);
             } else if (relation.isTag("type", "route")) {
                 processRoad(relation);
+                processBicycleRoute(relation);
             } else if (relation.isTag("type", "public_transport")) {
                 processPublicTransportStopArea(relation);
             }
         }
+    }
+
+    /**
+     * Handle route=bicycle relations. Copies their network type to all way members.
+     *
+     * @see "https://wiki.openstreetmap.org/wiki/Tag:route%3Dbicycle"
+     */
+    private void processBicycleRoute(OSMRelation relation) {
+        if (relation.isTag("route", "bicycle")) {
+            var network = relation.getTag("network");
+
+            if (network == null)
+                network = "lcn";
+            switch (network) {
+                case "lcn": setNetworkForAllMembers(relation, "lcn"); break;
+                case "rcn": setNetworkForAllMembers(relation, "rcn"); break;
+                case "ncn": setNetworkForAllMembers(relation, "ncn"); break;
+                case "icn": setNetworkForAllMembers(relation, "icn"); break;
+                // we treat networks without known network type like local networks
+                default: setNetworkForAllMembers(relation, "lcn"); break;
+            }
+        }
+    }
+
+    private void setNetworkForAllMembers(OSMRelation relation, String key) {
+        relation.getMembers().forEach(member -> {
+            var isOsmWay = "way".equals(member.getType());
+            var way = waysById.get(member.getRef());
+            // if it is an OSM way (rather than a node) and it it doesn't already contain the tag
+            // we add it
+            if (way != null && isOsmWay && !way.hasTag(key)) {
+                way.addTag(key, "yes");
+            }
+        });
     }
 
     /**
@@ -990,14 +1028,14 @@ public class OSMDatabase {
         }
         return routes + ", " + name;
     }
-    
+
     /**
      * Check if a point is within an epsilon of a node.
      */
     private static boolean checkIntersectionDistance(Point p, OSMNode n, double epsilon) {
     	return Math.abs(p.getY() - n.lat) < epsilon && Math.abs(p.getX() - n.lon) < epsilon;
     }
-    
+
     /**
      * Check if two nodes are within an epsilon.
      */

@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
+
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -59,5 +61,10 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
+  }
+
+  @Override
+  public DrivingDirection drivingDirection() {
+    return RIGHT_HAND_TRAFFIC;
   }
 }

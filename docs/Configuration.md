@@ -181,7 +181,7 @@ config key | description | value type | value default | notes
 `maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
 `multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
-`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`, `germany`
 `platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
 `readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 

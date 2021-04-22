@@ -142,6 +142,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      */
     public boolean staticBikeParkAndRide;
 
+    private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
     }
@@ -172,6 +174,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
         wayPropertySet = new WayPropertySet();
         source.populateProperties(wayPropertySet);
+        wayPropertySetSource = source;
     }
 
     /**
@@ -204,6 +207,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             provider.readOSM(osmdb);
         }
         osmdb.postLoad();
+
+        LOG.info("Using OSM way configuration from {}. Setting driving direction of the graph to {}.",
+                wayPropertySetSource.getClass().getSimpleName(), wayPropertySetSource.drivingDirection());
+        graph.setDrivingDirection(wayPropertySetSource.drivingDirection());
+
         LOG.info("Building street graph from OSM");
         handler.buildGraph(extra);
         graph.hasStreets = true;

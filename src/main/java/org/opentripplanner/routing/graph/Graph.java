@@ -46,6 +46,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -259,6 +260,7 @@ public class Graph implements Serializable {
 
     private transient TransitAlertService transitAlertService;
 
+    private DrivingDirection drivingDirection = DrivingDirection.RIGHT_HAND_TRAFFIC;
 
     /**
      * Hack. I've tried three different ways of generating unique labels.
@@ -272,6 +274,7 @@ public class Graph implements Serializable {
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
+        this.drivingDirection = basedOn.drivingDirection;
     }
 
     // Constructor for deserialization.
@@ -975,6 +978,14 @@ public class Graph implements Serializable {
 
     public Collection<SimpleTransfer> getTransfersByStop(StopLocation stop) {
         return transfersByStop.get(stop);
+    }
+
+    public DrivingDirection getDrivingDirection() {
+        return drivingDirection;
+    }
+
+    public void setDrivingDirection(DrivingDirection drivingDirection) {
+        this.drivingDirection = drivingDirection;
     }
 
     /**
