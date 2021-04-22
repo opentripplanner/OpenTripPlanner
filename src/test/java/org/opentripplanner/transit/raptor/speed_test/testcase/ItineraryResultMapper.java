@@ -52,7 +52,8 @@ class ItineraryResultMapper {
         AGENCY_NAMES_SHORT.put("Norgesbuss Ekspress AS", "NorBuss");
         AGENCY_NAMES_SHORT.put("Opplandstrafikk", "OPP");
         AGENCY_NAMES_SHORT.put("Vestfold Kollektivtrafikk as", "VF");
-        AGENCY_NAMES_SHORT.put("Østfold fylkeskommune", "Øst");
+        AGENCY_NAMES_SHORT.put("Østfold fylkeskommune", "ØstFyl");
+        AGENCY_NAMES_SHORT.put("Østfold kollektivtrafikk", "ØstKol");
     }
 
     private ItineraryResultMapper(boolean skipCost, String testCaseId) {
