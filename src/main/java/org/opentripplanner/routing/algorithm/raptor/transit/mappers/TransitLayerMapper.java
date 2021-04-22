@@ -125,10 +125,7 @@ public class TransitLayerMapper {
             });
         // END PARALLEL CODE
 
-        HashMap<LocalDate, List<TripPatternForDate>> result =
-            keyByRunningPeriodDates(tripPatternForDates);
-
-        return result;
+        return keyByRunningPeriodDates(tripPatternForDates);
     }
 
     // TODO We can save time by either pre-sorting these or use a sorting algorithm that is

@@ -108,8 +108,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                 boardTime,
                 boardWaitTimeForCostCalculation,
                 relativeBoardCost,
-                trip,
-                result.getTripIndex()
+                trip
             )
         );
     }

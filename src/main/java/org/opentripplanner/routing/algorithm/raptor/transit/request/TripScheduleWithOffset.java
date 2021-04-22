@@ -14,18 +14,26 @@ import java.time.LocalDate;
  * a trip on a subsequent service day than the first one in the date range used.
  */
 
-public class TripScheduleWithOffset implements TripSchedule {
+public final class TripScheduleWithOffset implements TripSchedule {
 
     private final int secondsOffset;
     private final TripPatternForDates pattern;
     private final TripTimes tripTimes;
     private final LocalDate serviceDate;
+    private final int sortIndex;
 
     TripScheduleWithOffset(TripPatternForDates pattern, LocalDate localDate, TripTimes tripTimes, int offset) {
         this.pattern = pattern;
         this.tripTimes = tripTimes;
         this.secondsOffset = offset;
         this.serviceDate = localDate;
+        // Trip times are sorted based on the arrival times at stop 0,
+        this.sortIndex = arrival(0);
+    }
+
+    @Override
+    public final int tripSortIndex() {
+        return sortIndex;
     }
 
     @Override

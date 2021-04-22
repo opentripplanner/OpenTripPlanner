@@ -13,6 +13,12 @@ package org.opentripplanner.transit.raptor.api.transit;
 public interface RaptorTripSchedule {
 
     /**
+     * An id/index for the trip witch can be used to sort trips so they follow each other
+     * in time. The id/index must increase with the departure time.
+     */
+    int tripSortIndex();
+
+    /**
      * The arrival time at the given stop position in pattern.
      * @param stopPosInPattern the stop position.
      * @return the arrival time in seconds at the given stop
