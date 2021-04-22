@@ -105,20 +105,6 @@ public class TimeUtils {
         return hm2time(hh, mm);
     }
 
-    /** pares time of format hh:mm:ss. */
-    public static int parseTimeLong(String hhmmss, int defaultValue) {
-        String[] tokens = hhmmss.split(":");
-        if(tokens.length != 3) {
-            return defaultValue;
-        }
-
-        int hh = Integer.parseInt(tokens[0]);
-        int mm = Integer.parseInt(tokens[1]);
-        int ss = Integer.parseInt(tokens[2]);
-
-        return hms2time(hh, mm, ss);
-    }
-
     /**
      * Parse a string of times like "00:20 01:20 05:57:30" into an array of local times.
      * This can be very helpful when specifying a schedule using a sting instead of using a
