@@ -1,37 +1,27 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 /**
  * Basic TripScheduleBoardOrAlightEvent implementation.
- *
- * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class TripScheduleBoardOrAlightEventObject<T extends RaptorTripSchedule>
-        implements TripScheduleBoardOrAlightEvent<T> {
+public class TripScheduleBoardOrAlightEvent implements RaptorTripScheduleBoardOrAlightEvent<TripSchedule> {
 
-    private final int earliestTime;
     private final int stopPositionInPattern;
     private final int tripIndex;
-    private final T trip;
+    private final TripSchedule trip;
 
-    public TripScheduleBoardOrAlightEventObject(
-            int earliestTime,
+    public TripScheduleBoardOrAlightEvent(
             int stopPositionInPattern,
             int tripIndex,
-            T trip
+            TripSchedule trip
     ) {
-        this.earliestTime = earliestTime;
         this.stopPositionInPattern = stopPositionInPattern;
         this.tripIndex = tripIndex;
         this.trip = trip;
-    }
-
-    @Override
-    public final int getEarliestTime() {
-        return earliestTime;
     }
 
     @Override
@@ -40,7 +30,7 @@ public class TripScheduleBoardOrAlightEventObject<T extends RaptorTripSchedule>
     }
 
     @Override
-    public final T getTrip() {
+    public final TripSchedule getTrip() {
         return trip;
     }
 
@@ -56,8 +46,7 @@ public class TripScheduleBoardOrAlightEventObject<T extends RaptorTripSchedule>
 
     @Override
     public String toString() {
-        return ToStringBuilder.of(TripScheduleBoardOrAlightEventObject.class)
-                .addServiceTime("earliestTime", earliestTime)
+        return ToStringBuilder.of(TripScheduleBoardOrAlightEvent.class)
                 .addNum("stopPositionInPattern", stopPositionInPattern)
                 .addNum("tripIndex", tripIndex)
                 .addObj("trip", trip)

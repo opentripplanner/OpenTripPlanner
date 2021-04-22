@@ -2,11 +2,11 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Assert;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 class TripAssert {
     private final TripScheduleSearch<TestTripSchedule> subject;
-    private TripScheduleBoardOrAlightEvent<TestTripSchedule> result;
+    private RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> result;
     private int stopPosition;
 
 

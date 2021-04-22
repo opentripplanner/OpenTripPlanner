@@ -262,6 +262,16 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return scheduledDepartureTimes[stop] + timeShift;
     }
 
+    /**
+     * Return an integer witch can be used to sort TripTimes in order of departure/arrivals.
+     * <p>
+     * This sorted trip times is used to search for trips. OTP assume one trip do NOT pass another
+     * trip down the line.
+     */
+    public int sortIndex() {
+        return getArrivalTime(0);
+    }
+
     /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
     public int getArrivalTime(final int stop) {
         if (arrivalTimes == null) { return getScheduledArrivalTime(stop); }

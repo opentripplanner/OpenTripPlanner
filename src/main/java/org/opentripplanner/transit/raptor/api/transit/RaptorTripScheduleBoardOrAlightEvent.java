@@ -16,17 +16,12 @@ package org.opentripplanner.transit.raptor.api.transit;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface TripScheduleBoardOrAlightEvent<T extends RaptorTripSchedule> {
-    /**
-     * Return the earliest-board-time for the current trip board search.
-     * Latest-arrival-time for alight search.
-     */
-    int getEarliestTime();
+public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedule> {
 
     /**
-     * Return the stop-position-in-pattern for the current trip board search.
+     * The trip timetable index for the trip  found.
      */
-    int getStopPositionInPattern();
+    int getTripIndex();
 
     /**
      * This i a reference to the trip found.
@@ -34,9 +29,9 @@ public interface TripScheduleBoardOrAlightEvent<T extends RaptorTripSchedule> {
     T getTrip();
 
     /**
-     * The trip timetable index for the trip  found.
+     * Return the stop-position-in-pattern for the current trip board search.
      */
-    int getTripIndex();
+    int getStopPositionInPattern();
 
     /**
      * Get the board/alight time for the trip found.

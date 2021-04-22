@@ -9,23 +9,20 @@ import java.util.Map;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardOrAlightEventObject;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleEventMatcher;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
@@ -105,6 +102,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
    private boolean hasTimeDependentAccess = false;
 
     private int iterationDepartureTime;
+
+    private int earliestBoardTime;
 
 
     public RangeRaptorWorker(
@@ -212,9 +211,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
 
             while (routeIterator.hasNext()) {
-                RaptorRoute<T> route = routeIterator.next();
-                RaptorTripPattern<T> pattern = route.pattern();
-                TripScheduleSearch<T> tripSearch = createTripSearch(route.timetable());
+                var route = routeIterator.next();
+                var pattern = route.pattern();
+                var tripSearch = createTripSearch(route.timetable());
+                var txService = enableGuaranteedTransfers
+                        ? calculator.guaranteedTransfers(route) : null;
 
                 slackProvider.setCurrentPattern(pattern);
                 transitWorker.prepareForTransitWith(pattern);
@@ -238,25 +239,27 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                     if(pattern.boardingPossibleAt(stopPos)) {
                         // MC Raptor have many, while RR have one boarding
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
-                            TripScheduleBoardOrAlightEvent<T> result = null;
+                            RaptorTripScheduleBoardOrAlightEvent<T> result = null;
 
                             if(enableGuaranteedTransfers) {
                                 // Board using guaranteed transfers
-                                result = findGuaranteedTransfer(route, stopIndex, stopPos);
+                                result = findGuaranteedTransfer(txService, stopIndex, stopPos);
                             }
 
                             // Find the best trip and board [no guaranteed transfer exist]
                             if(result == null) {
-                                // check if we can back up to an earlier trip due to this stop being reached earlier
+                                this.earliestBoardTime = earliestBoardTime(prevArrivalTime);
+                                // check if we can back up to an earlier trip due to this stop
+                                // being reached earlier
                                 result = tripSearch.search(
-                                        earliestBoardTime(prevArrivalTime),
+                                        earliestBoardTime,
                                         stopPos,
                                         transitWorker.onTripIndex()
                                 );
                             }
 
                             if (result != null) {
-                                transitWorker.board(stopIndex, result);
+                                transitWorker.board(stopIndex, earliestBoardTime, result);
                             }
                         });
                     }
@@ -267,35 +270,20 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     @Nullable
-    private TripScheduleBoardOrAlightEvent<T> findGuaranteedTransfer(
-            RaptorRoute<T> targetRoute,
+    private RaptorTripScheduleBoardOrAlightEvent<T> findGuaranteedTransfer(
+            RaptorGuaranteedTransferProvider<T> txService,
             int targetStopIndex,
             int targetStopPos
     ) {
-        // Get all guaranteed transfers for the target pattern at the target stop position
-        Collection<GuaranteedTransfer<T>> list = calculator.guaranteedTransfers(
-                targetRoute.pattern(), targetStopPos
-        );
-        if(list == null || list.isEmpty()) {
-            return null;
-        }
+        if(!txService.transferExist(targetStopPos)) { return null; }
 
         // Get the previous transit stop arrival (transfer source)
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return null; }
 
-        // Search for the targetTrip to board
-        T targetTrip = calculator.findTargetTripInGuarantiedTransfers(
-                list, sourceStopArrival, slackProvider.alightSlack(), targetStopPos
-        );
-        if(targetTrip == null) { return null; }
+        earliestBoardTime = calculator.minusDuration(sourceStopArrival.arrivalTime(), slackProvider.alightSlack());
 
-        int tripIndex = TripScheduleEventMatcher.findTripIndex(targetRoute.timetable(), targetTrip);
-        if(tripIndex < 0) { return null; }
-
-        return new TripScheduleBoardOrAlightEventObject<>(
-                sourceStopArrival.arrivalTime(), targetStopPos, tripIndex, targetTrip
-        );
+        return txService.find(sourceStopArrival.trip(), sourceStopArrival.stop(), earliestBoardTime);
     }
 
     private void transfersForRound() {

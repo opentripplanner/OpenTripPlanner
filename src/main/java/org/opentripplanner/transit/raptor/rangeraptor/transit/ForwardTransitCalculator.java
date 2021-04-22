@@ -1,16 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import java.util.Collection;
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -119,34 +116,8 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    @Nullable
-    public Collection<GuaranteedTransfer<T>> guaranteedTransfers(
-            RaptorTripPattern<T> toPattern, int toStopPos
-    ) {
-        return toPattern.listGuaranteedTransfersToPattern(toStopPos);
-    }
-
-    @Override
-    @Nullable
-    public final T findTargetTripInGuarantiedTransfers(
-            Collection<GuaranteedTransfer<T>> list,
-            TransitArrival<T> from,
-            int alightSlack,
-            int toStopPos
-    ) {
-        // We ignore any slack when boarding guaranteed transfers, so we have to revert
-        // addition of slack here (the arrival have alightSlack added)
-        final int earliestDepartureTime = from.arrivalTime() - alightSlack;
-
-        for (GuaranteedTransfer<T> tx : list) {
-            T trip = from.trip();
-            int stopPos = trip.findArrivalStopPosition(from.arrivalTime(), from.stop());
-            if(tx.matchesFrom(trip, stopPos)) {
-                T toTrip = tx.getToTrip();
-                return earliestDepartureTime <= toTrip.departure(toStopPos) ? toTrip : null;
-            }
-        }
-        return null;
+    public RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route) {
+        return route.getGuaranteedTransfersTo();
     }
 
     @Override

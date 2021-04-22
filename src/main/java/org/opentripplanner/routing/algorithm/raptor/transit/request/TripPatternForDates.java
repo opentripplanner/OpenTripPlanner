@@ -2,19 +2,15 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -27,7 +23,7 @@ public class TripPatternForDates
         implements
                 RaptorRoute<TripSchedule>,
                 RaptorTimeTable<TripSchedule>,
-                RaptorTripPattern<TripSchedule>
+                RaptorTripPattern
 {
 
     private final TripPatternWithRaptorStopIndexes tripPattern;
@@ -65,8 +61,18 @@ public class TripPatternForDates
     }
 
     @Override
-    public RaptorTripPattern<TripSchedule> pattern() {
+    public RaptorTripPattern pattern() {
         return this;
+    }
+
+    @Override
+    public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersTo() {
+        return new PatternGuaranteedTransferProvider(true, this, transfersTo);
+    }
+
+    @Override
+    public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersFrom() {
+        return new PatternGuaranteedTransferProvider(false, this, transfersFrom);
     }
 
     // Implementing RaptorTripPattern
@@ -94,21 +100,6 @@ public class TripPatternForDates
         return tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().route.getShortName();
     }
 
-    @Override
-    @Nullable
-    public Collection<GuaranteedTransfer<TripSchedule>> listGuaranteedTransfersFromPattern(
-            int stopPos
-    ) {
-        return transfersFrom == null ? null : transfersFrom.get(stopPos);
-    }
-
-    @Override
-    @Nullable
-    public Collection<GuaranteedTransfer<TripSchedule>> listGuaranteedTransfersToPattern(
-            int stopPos
-    ) {
-        return transfersTo == null ? null : transfersTo.get(stopPos);
-    }
 
     // Implementing RaptorTimeTable
 

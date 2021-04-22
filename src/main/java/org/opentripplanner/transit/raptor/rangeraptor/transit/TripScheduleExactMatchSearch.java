@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
 /**
@@ -38,12 +38,12 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule>
 
     @Override
     @Nullable
-    public TripScheduleBoardOrAlightEvent<T> search(
+    public RaptorTripScheduleBoardOrAlightEvent<T> search(
             int timeLimit,
             int stopPositionInPattern,
             int tripIndexLimit
     ) {
-        TripScheduleBoardOrAlightEvent<T> result = delegate.search(
+        RaptorTripScheduleBoardOrAlightEvent<T> result = delegate.search(
                 timeLimit, stopPositionInPattern, tripIndexLimit
         );
         return result != null && isWithinSlack(timeLimit, result.getTime()) ? result : null;

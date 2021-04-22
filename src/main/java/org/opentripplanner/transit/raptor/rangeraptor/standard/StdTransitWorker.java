@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 
 
@@ -45,7 +45,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public final void prepareForTransitWith(RaptorTripPattern<T> pattern) {
+    public final void prepareForTransitWith(RaptorTripPattern pattern) {
         this.onTripIndex = NOT_SET;
         this.onTripBoardTime = NOT_SET;
         this.onTripBoardStop = NOT_SET;
@@ -70,7 +70,11 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public final void board(int stopIndex, TripScheduleBoardOrAlightEvent<T> result) {
+    public final void board(
+            int stopIndex,
+            final int earliestBoardTime,
+            RaptorTripScheduleBoardOrAlightEvent<T> result
+    ) {
         onTripIndex = result.getTripIndex();
         onTrip = result.getTrip();
         onTripBoardTime = result.getTime();

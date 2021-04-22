@@ -61,7 +61,7 @@ public interface RaptorTripSchedule {
     /**
      * Return the pattern for this trip.
      */
-    RaptorTripPattern<?> pattern();
+    RaptorTripPattern pattern();
 
     /**
      * Search for departure-stop-position for the given trip, earliest-departure-time
@@ -72,7 +72,7 @@ public interface RaptorTripSchedule {
      * @return the stop-position in the trip pattern if found, if not -1 is returned.
      */
     default int findArrivalStopPosition(int latestArrivalTime, int stop) {
-        RaptorTripPattern<?> p = pattern();
+        RaptorTripPattern p = pattern();
         int i = p.numberOfStopsInPattern() -1 ;
 
         while (arrival(i) > latestArrivalTime) {

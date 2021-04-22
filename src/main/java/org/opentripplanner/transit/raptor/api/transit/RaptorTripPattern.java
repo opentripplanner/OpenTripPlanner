@@ -1,15 +1,12 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
-import java.util.Collection;
-import javax.annotation.Nullable;
-
 /**
  * This interface represent a trip pattern. A trip-pattern in the raptor context is
  * just a list of stops visited by ALL trips in the pattern. The stops must be ordered
  * in the same sequence, with no gaps, as the trips visit the stops.
  */
-public interface RaptorTripPattern<T extends RaptorTripSchedule> {
+public interface RaptorTripPattern {
 
     /**
      * The stop index
@@ -38,14 +35,6 @@ public interface RaptorTripPattern<T extends RaptorTripSchedule> {
      * Number of stops in pattern.
      */
     int numberOfStopsInPattern();
-
-
-    @Nullable
-    Collection<GuaranteedTransfer<T>> listGuaranteedTransfersFromPattern(int stopPos);
-
-
-    @Nullable
-    Collection<GuaranteedTransfer<T>> listGuaranteedTransfersToPattern(int stopPos);
 
     /**
      * Pattern debug info, return transit mode and route name. This is  used for debugging purposes

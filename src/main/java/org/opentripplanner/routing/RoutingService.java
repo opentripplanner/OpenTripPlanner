@@ -20,6 +20,7 @@ import org.opentripplanner.standalone.server.Router;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.transit.raptor.util.AvgTimer;
 
 /**
  * This is the entry point of all API requests towards the OTP graph. A new instance of this class
@@ -60,6 +61,9 @@ public class RoutingService {
             }
             throw e;
         }
+
+        AvgTimer.listResults().forEach(System.out::println);
+
         request.cleanup();
         return response;
     }

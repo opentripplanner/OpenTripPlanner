@@ -1,12 +1,10 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import java.util.Collection;
-import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
+import java.util.Arrays;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-public class TestTripPattern implements RaptorTripPattern<TestTripSchedule> {
+public class TestTripPattern implements RaptorTripPattern {
   public static final byte BOARDING_MASK   = 0b0001;
   public static final byte ALIGHTING_MASK  = 0b0010;
   public static final byte WHEELCHAIR_MASK = 0b0100;
@@ -22,17 +20,10 @@ public class TestTripPattern implements RaptorTripPattern<TestTripSchedule> {
    */
   private final int[] restrictions;
 
-  private final Multimap<Integer, GuaranteedTransfer<TestTripSchedule>> transfersFrom;
-
-  private final Multimap<Integer, GuaranteedTransfer<TestTripSchedule>> transfersTo;
-
-
   private TestTripPattern(String name, int[] stopIndexes, int[] restrictions) {
     this.name = name;
     this.stopIndexes = stopIndexes;
     this.restrictions = restrictions;
-    this.transfersFrom = ArrayListMultimap.create();
-    this.transfersTo = ArrayListMultimap.create();
   }
 
   public static TestTripPattern pattern(String name, int ... stopIndexes) {
@@ -42,14 +33,6 @@ public class TestTripPattern implements RaptorTripPattern<TestTripSchedule> {
   /** Create a pattern with name 'R1' and given stop indexes */
   public static TestTripPattern pattern(int ... stopIndexes) {
     return new TestTripPattern("R1", stopIndexes, new int[stopIndexes.length]);
-  }
-
-  public void addGuaranteedTransfersFrom(GuaranteedTransfer<TestTripSchedule> tx) {
-    transfersFrom.put(tx.getFromStopPos(), tx);
-  }
-
-  public void addGuaranteedTransfersTo(GuaranteedTransfer<TestTripSchedule> tx) {
-    transfersTo.put(tx.getToStopPos(), tx);
   }
 
   @Override public int stopIndex(int stopPositionInPattern) {
@@ -70,21 +53,16 @@ public class TestTripPattern implements RaptorTripPattern<TestTripSchedule> {
   public int numberOfStopsInPattern() { return stopIndexes.length; }
 
   @Override
-  public Collection<GuaranteedTransfer<TestTripSchedule>> listGuaranteedTransfersFromPattern(
-          int stopPos
-  ) {
-    return transfersFrom.get(stopPos);
-  }
-
-  @Override
-  public Collection<GuaranteedTransfer<TestTripSchedule>> listGuaranteedTransfersToPattern(
-          int stopPos
-  ) {
-    return transfersTo.get(stopPos);
-  }
-
-  @Override
   public String debugInfo() { return "BUS " + name; }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(TestTripPattern.class)
+            .addStr("name", name)
+            .addInts("stops", stopIndexes)
+            .addInts("restrictions", restrictions)
+            .toString();
+  }
 
   private boolean isNotRestricted(int index, int mask) {
     return restrictions == null || (restrictions[index] & mask) == 0;

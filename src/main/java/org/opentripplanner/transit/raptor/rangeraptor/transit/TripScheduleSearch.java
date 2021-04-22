@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
 /**
@@ -34,7 +34,7 @@ public interface TripScheduleSearch<T extends RaptorTripSchedule> {
      * @see #search(int, int, int)
      */
     @Nullable
-    default TripScheduleBoardOrAlightEvent<T> search(int earliestBoardTime, int stopPositionInPattern) {
+    default RaptorTripScheduleBoardOrAlightEvent<T> search(int earliestBoardTime, int stopPositionInPattern) {
         return search(earliestBoardTime, stopPositionInPattern, UNBOUNDED_TRIP_INDEX);
     };
 
@@ -55,7 +55,7 @@ public interface TripScheduleSearch<T extends RaptorTripSchedule> {
      *                              is less favorable than trips already processed.
      */
     @Nullable
-    TripScheduleBoardOrAlightEvent<T> search(
+    RaptorTripScheduleBoardOrAlightEvent<T> search(
             int earliestBoardTime,
             int stopPositionInPattern,
             int tripIndexLimit

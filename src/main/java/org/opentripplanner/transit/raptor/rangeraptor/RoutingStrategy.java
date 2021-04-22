@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
 /**
@@ -35,7 +35,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Prepare the {@link RoutingStrategy} to route using the given pattern and tripSearch.
      */
-    void prepareForTransitWith(RaptorTripPattern<T> pattern);
+    void prepareForTransitWith(RaptorTripPattern pattern);
 
     /**
      * Alight the current trip at the given stop with the arrival times.
@@ -50,7 +50,11 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Board trip found in the given trip-search at the given stop.
      */
-    void board(final int stopIndex, TripScheduleBoardOrAlightEvent<T> result);
+    void board(
+            final int stopIndex,
+            final int earliestBoardTime,
+            RaptorTripScheduleBoardOrAlightEvent<T> result
+    );
 
     /**
      * Get the current boarding previous transit arrival. This is used to look up any

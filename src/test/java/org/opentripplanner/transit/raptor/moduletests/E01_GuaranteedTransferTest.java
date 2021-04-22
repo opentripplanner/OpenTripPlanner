@@ -22,7 +22,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should return a path if it exist when a transfer is only possible because it is
- * guaranteed. A guarantied transfer should be able even if there is zero time to do the transfer.
+ * guaranteed/stay-seated. A guarantied transfer should be able even if there is zero time to do the transfer.
  * In these cases the transfer-slack should be ignored and the connection should be possible. .
  */
 public class E01_GuaranteedTransferTest implements RaptorTestConstants {
@@ -37,7 +37,6 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
             + "~ BUS R2 0:05 0:10 ~ 3 ~ Walk 30s [00:01:10 00:10:40 9m30s";
     private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
     private static final String EXP_PATH_WITH_COST = EXP_PATH + ", cost: 1950]";
-
 
     /**
      * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
@@ -55,7 +54,13 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
         var tripB = r2.timetable().getTripSchedule(0);
 
         data.withRoutes(r1, r2);
-        data.withGuaranteedTransfers(tripA, STOP_B, tripB, STOP_B);
+
+
+        // Transfer at stop B for both trips
+        final int TRIP_A_TX_POS = tripA.pattern().findStopPositionAfter(0, STOP_B);
+        final int TRIP_B_TX_POS = tripB.pattern().findStopPositionAfter(0, STOP_B);
+
+        data.withGuaranteedTransfers(tripA, TRIP_A_TX_POS, tripB, TRIP_B_TX_POS);
 
         requestBuilder.searchParams()
                 .guaranteedTransfersEnabled(true)

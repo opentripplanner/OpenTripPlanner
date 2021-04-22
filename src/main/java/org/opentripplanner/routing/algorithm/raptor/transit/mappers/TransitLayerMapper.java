@@ -132,7 +132,7 @@ public class TransitLayerMapper {
     //      optimized for sorting nearly sorted list
     static List<TripTimes> getSortedTripTimes (Timetable timetable) {
         return timetable.tripTimes.stream()
-                .sorted(Comparator.comparing(t -> t.getArrivalTime(0)))
+                .sorted(Comparator.comparing(TripTimes::sortIndex))
                 .collect(Collectors.toList());
     }
 

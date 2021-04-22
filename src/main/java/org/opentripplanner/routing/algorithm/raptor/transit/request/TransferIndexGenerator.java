@@ -11,6 +11,7 @@ import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
+import org.opentripplanner.transit.raptor.util.AvgTimer;
 
 public class TransferIndexGenerator {
     private final TransferService transferService;
@@ -24,15 +25,20 @@ public class TransferIndexGenerator {
         this.tripScheduleIndex = tripScheduleIndex;
     }
 
+    private static AvgTimer timerGenTx = AvgTimer.timerMilliSec("a_generateTransfers");
+
+
     public static void generateTransfers(
             TransferService transferService,
             List<TripPatternForDates> tripPatterns
     ) {
-        var index = createTripScheduleIndex(tripPatterns);
-        var generator = new TransferIndexGenerator(transferService, index);
-        for (TripPatternForDates pattern : tripPatterns) {
-            generator.generateTransfers(pattern);
-        }
+        timerGenTx.time(() -> {
+            var index = createTripScheduleIndex(tripPatterns);
+            var generator = new TransferIndexGenerator(transferService, index);
+            for (TripPatternForDates pattern : tripPatterns) {
+                generator.generateTransfers(pattern);
+            }
+        });
     }
 
     private void generateTransfers(TripPatternForDates pattern) {
