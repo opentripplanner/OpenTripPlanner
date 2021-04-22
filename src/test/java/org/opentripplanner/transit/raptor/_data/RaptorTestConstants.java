@@ -24,6 +24,7 @@ public interface RaptorTestConstants {
   int T00_04 = hm2time(0, 4);
   int T00_10 = hm2time(0, 10);
   int T00_30 = hm2time(0, 30);
+  int T01_00 = hm2time(1, 0);
 
   // Stop indexes - Note! There is no stop defined for index 0(zero)! You must
   // account for that in the test if you uses a stop index.
