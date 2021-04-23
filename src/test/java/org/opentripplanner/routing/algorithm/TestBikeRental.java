@@ -12,6 +12,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -65,30 +66,30 @@ public class TestBikeRental extends GraphRoutingTest {
     }
 
     public void testBikeRentalFromStation() {
-        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75,187970, 38), BICYCLE - RENTING_FROM_STATION - BC street (400,000000, 200), WALK - HAVE_RENTED - CD street (75,187970, 38)");
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), BICYCLE - RENTING_FROM_STATION - BC street (400.00, 200), WALK - HAVE_RENTED - CD street (75.19, 38)");
     }
 
     public void testFallBackToWalking() {
         SE2.setPermission(StreetTraversalPermission.PEDESTRIAN);
-        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75,187970, 38), WALK - BEFORE_RENTING - BC street (1503,759398, 752), WALK - BEFORE_RENTING - CD street (75,187970, 38)");
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
         SE2.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    }
+}
 
     public void testNoBikesAvailable() {
         B1.setBikesAvailable(0);
-        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75,187970, 38), WALK - BEFORE_RENTING - BC street (1503,759398, 752), WALK - BEFORE_RENTING - CD street (75,187970, 38)");
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
         B1.setBikesAvailable(Integer.MAX_VALUE);
     }
 
     public void testNoSpacesAvailable() {
         B2.setSpacesAvailable(0);
-        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75,187970, 38), WALK - BEFORE_RENTING - BC street (1503,759398, 752), WALK - BEFORE_RENTING - CD street (75,187970, 38)");
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
         B2.setSpacesAvailable(Integer.MAX_VALUE);
     }
 
     public void testFloatingBike() {
         B1.getStation().isFloatingBike = true;
-        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75,187970, 38), BICYCLE - RENTING_FLOATING - BC street (400,000000, 200), BICYCLE - RENTING_FLOATING - CD street (20,000000, 10)");
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), BICYCLE - RENTING_FLOATING - BC street (400.00, 200), BICYCLE - RENTING_FLOATING - CD street (20.00, 10)");
         B1.getStation().isFloatingBike = false;
     }
 
@@ -139,15 +140,18 @@ public class TestBikeRental extends GraphRoutingTest {
                 false
         );
 
-        return path != null ? path.states.stream()
+        return path != null ? path.states
+            .stream()
             .filter(s -> s.getBackEdge() instanceof StreetEdge)
             .map(s -> String.format(
-                "%s - %s - %s (%f, %d)",
+                Locale.ROOT,
+                "%s - %s - %s (%,.2f, %d)",
                 s.getBackMode(),
                 s.getBikeRentalState(),
                 s.getBackEdge() != null ? s.getBackEdge().getName() : null,
                 s.getWeightDelta(),
                 s.getTimeDeltaSeconds()
-        )).collect(Collectors.joining(", ")) : "path not found";
+            ))
+            .collect(Collectors.joining(", ")) : "path not found";
     }
 }
