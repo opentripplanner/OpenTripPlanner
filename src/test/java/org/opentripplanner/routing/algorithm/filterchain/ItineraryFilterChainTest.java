@@ -41,7 +41,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
     // Given a default chain
     ItineraryFilter chain = createBuilder(false, false, 10).build();
 
-    assertEquals(toStr(List.of(i1, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
+    assertEquals(toStr(List.of(i3, i1)), toStr(chain.filter(List.of(i2, i3, i1))));
   }
 
   @Test
@@ -85,7 +85,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
         .build();
 
     // Walk first, then transit sorted on arrival-time
-    assertEquals(toStr(List.of(i1, i2, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
+    assertEquals(toStr(List.of(i2, i3, i1)), toStr(chain.filter(List.of(i2, i3, i1))));
     assertTrue(i1.systemNotices.isEmpty());
     assertFalse(i2.systemNotices.isEmpty());
     assertFalse(i3.systemNotices.isEmpty());
@@ -106,7 +106,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
 
     // Disable filter and allow none optimal bus itinerary pass through
     chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(false).build();
-    assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
+    assertEquals(toStr(List.of(bus, walk)), toStr(chain.filter(List.of(walk, bus))));
 
     // Enable filter and remove bus itinerary
     chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(true).build();

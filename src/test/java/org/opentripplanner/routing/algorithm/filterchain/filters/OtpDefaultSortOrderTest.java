@@ -16,7 +16,7 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
 
 
     @Test
-    public void sortStreetBeforeTransitThenTime() {
+    public void sortStreetAfterTransitThenTime() {
         Itinerary walk = newItinerary(A, 0).walk(5, G).build();
         Itinerary bicycle = newItinerary(B).bicycle(4, 6, G).build();
         Itinerary bus  = newItinerary(C).bus(21, 1, 4, G).build();
@@ -26,12 +26,12 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
         walk.generalizedCost = bicycle.generalizedCost = bus.generalizedCost = rail.generalizedCost = 0;
 
         // Depart-after-sort
-        result = departAfterSort().filter(List.of(walk, bicycle, bus, rail));
-        assertEquals(toStr(walk, bicycle, bus, rail), toStr(result));
+        result = departAfterSort().filter(List.of(bicycle, bus, rail, walk));
+        assertEquals(toStr(bus, rail, walk, bicycle), toStr(result));
 
         // Arrive-by-sort
-        result = arriveBySort().filter(List.of(walk, bicycle, bus, rail));
-        assertEquals(toStr(bicycle, walk, rail, bus), toStr(result));
+        result = arriveBySort().filter(List.of(bicycle, bus, rail, walk));
+        assertEquals(toStr(rail, bus, bicycle, walk), toStr(result));
     }
 
     @Test
@@ -133,10 +133,10 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
     }
 
     private OtpDefaultSortOrder arriveBySort() {
-        return new OtpDefaultSortOrder(true);
+        return new OtpDefaultSortOrder(true, false);
     }
 
     private OtpDefaultSortOrder departAfterSort() {
-        return new OtpDefaultSortOrder(false);
+        return new OtpDefaultSortOrder(false, false);
     }
 }

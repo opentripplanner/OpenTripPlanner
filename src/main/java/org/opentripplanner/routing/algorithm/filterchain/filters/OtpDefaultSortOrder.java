@@ -35,10 +35,15 @@ import static java.util.Comparator.comparingInt;
 public class OtpDefaultSortOrder extends SortFilter {
 
   /**
-   * This comparator will sort all itineraries with STREET ONLY first. So, if there is an itinerary
+   * This comparator will sort all itineraries with STREET ONLY last. So, if there is an itinerary
    * with walking/bicycle/car from origin all the way to the destination, than it will be sorted
-   * before any itineraries with one or more transit legs.
+   * after any itineraries with one or more transit legs.
    */
+  static final Comparator<Itinerary> STREET_ONLY_LAST = (a, b) -> Boolean.compare(
+      a.isOnStreetAllTheWay(),
+      b.isOnStreetAllTheWay()
+  );
+
   static final Comparator<Itinerary> STREET_ONLY_FIRST = (a, b) -> Boolean.compare(
       b.isOnStreetAllTheWay(),
       a.isOnStreetAllTheWay()
@@ -50,9 +55,8 @@ public class OtpDefaultSortOrder extends SortFilter {
   static final Comparator<Itinerary> GENERALIZED_COST = comparingInt(a -> a.generalizedCost);
   static final Comparator<Itinerary> NUM_OF_TRANSFERS = comparingInt(a -> a.nTransfers);
 
-  public OtpDefaultSortOrder(boolean arriveBy) {
-    // Put walking first - encourage healthy lifestyle
-    super(new CompositeComparator<>(STREET_ONLY_FIRST,
+  public OtpDefaultSortOrder(boolean arriveBy, boolean nonTransitFirst) {
+    super(new CompositeComparator<>(nonTransitFirst ? STREET_ONLY_FIRST : STREET_ONLY_LAST,
         arriveBy ? DEPARTURE_TIME : ARRIVAL_TIME,
         GENERALIZED_COST,
         NUM_OF_TRANSFERS,
