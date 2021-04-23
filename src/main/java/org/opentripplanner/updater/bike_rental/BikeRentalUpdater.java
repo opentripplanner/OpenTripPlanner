@@ -133,7 +133,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                         // the toString includes the text "Bike rental station"
                         LOG.info("BikeRentalStation {} is unlinked", bikeRentalVertex);
                     }
-                    tempEdges.addEdge(new BikeRentalEdge(bikeRentalVertex, bikeRentalVertex, station.networks));
+                    tempEdges.addEdge(new BikeRentalEdge(bikeRentalVertex, station.networks));
                     verticesByStation.put(station, bikeRentalVertex);
                     tempEdgesByStation.put(station, tempEdges);
                 } else {

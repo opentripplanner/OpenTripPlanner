@@ -47,7 +47,7 @@ public class BikeRentalModule implements GraphBuilderModule {
         for (BikeRentalStation station : stations) {
             service.addBikeRentalStation(station);
             BikeRentalStationVertex vertex = new BikeRentalStationVertex(graph, station);
-            new BikeRentalEdge(vertex, vertex, station.networks);
+            new BikeRentalEdge(vertex, station.networks);
         }
         LOG.info("Created " + stations.size() + " bike rental stations.");
     }

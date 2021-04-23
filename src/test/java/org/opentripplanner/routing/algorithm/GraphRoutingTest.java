@@ -237,7 +237,7 @@ public abstract class GraphRoutingTest extends TestCase {
                     graph,
                     bikeRentalStationEntity(id, latitude, longitude)
             );
-            new BikeRentalEdge(vertex, vertex, networks);
+            new BikeRentalEdge(vertex, networks);
             return vertex;
         }
 
