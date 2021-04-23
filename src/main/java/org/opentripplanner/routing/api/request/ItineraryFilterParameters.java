@@ -58,12 +58,22 @@ public class ItineraryFilterParameters {
    */
   public DoubleFunction<Double> transitGeneralizedCostLimit = null;
 
+  /**
+   * This value works the same way as {@link #transitGeneralizedCostLimit}, only for non-transit
+   * itineraries.
+    */
+  public DoubleFunction<Double> nonTransitGeneralizedCostLimit = null;
+
 
   private ItineraryFilterParameters() {
     this.debug = false;
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepNumOfItineraries = 0.68;
     this.minSafeTransferTimeFactor = 0.0;
+    this.transitGeneralizedCostLimit =
+        RequestFunctions.createLinearFunction(3600, 2);
+    this.nonTransitGeneralizedCostLimit =
+        RequestFunctions.createLinearFunction(3600, 2);
   }
 
   public static ItineraryFilterParameters createDefault() {
@@ -75,12 +85,14 @@ public class ItineraryFilterParameters {
       double groupSimilarityKeepOne,
       double groupSimilarityKeepNumOfItineraries,
       double minSafeTransferTimeFactor,
-      DoubleFunction<Double> transitGeneralizedCostLimit
+      DoubleFunction<Double> transitGeneralizedCostLimit,
+      DoubleFunction<Double> nonTransitGeneralizedCostLimit
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
     this.groupSimilarityKeepNumOfItineraries = groupSimilarityKeepNumOfItineraries;
     this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
     this.transitGeneralizedCostLimit = transitGeneralizedCostLimit;
+    this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;
   }
 }

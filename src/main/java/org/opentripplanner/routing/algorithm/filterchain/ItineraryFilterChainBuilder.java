@@ -7,6 +7,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupBySimilarLegsFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
@@ -37,6 +38,7 @@ public class ItineraryFilterChainBuilder {
     private double minSafeTransferTimeFactor;
     private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
+    private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
@@ -95,6 +97,15 @@ public class ItineraryFilterChainBuilder {
      */
     public ItineraryFilterChainBuilder withTransitGeneralizedCostLimit(DoubleFunction<Double> value){
         this.transitGeneralizedCostLimit = value;
+        return this;
+    }
+
+    /**
+     * This is the same as {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, only for
+     * non-transit itineraries.
+     */
+    public ItineraryFilterChainBuilder withNonTransitGeneralizedCostLimit(DoubleFunction<Double> value){
+        this.nonTransitGeneralizedCostLimit = value;
         return this;
     }
     /**
@@ -186,6 +197,11 @@ public class ItineraryFilterChainBuilder {
         // Filter transit itineraries on generalized-cost
         if(transitGeneralizedCostLimit != null) {
             filters.add(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit));
+        }
+
+        // Filter non-transit itineraries on generalized-cost
+        if(nonTransitGeneralizedCostLimit != null) {
+            filters.add(new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit));
         }
 
         // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that

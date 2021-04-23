@@ -9,28 +9,27 @@ import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 
 /**
- * This filter remove all transit results witch have a generalized-cost higher than
- * the max-limit computed by the {@link #costLimitFunction}.
+ * This filter is similar to {@link TransitGeneralizedCostFilter}, but it will only remove
+ * non-transit results.
  * <p>
- * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#transitGeneralizedCostLimit
+ * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#nonTransitGeneralizedCostLimit
  */
-public class TransitGeneralizedCostFilter implements ItineraryFilter {
+public class NonTransitGeneralizedCostFilter implements ItineraryFilter {
   private final DoubleFunction<Double> costLimitFunction;
 
-  public TransitGeneralizedCostFilter(DoubleFunction<Double> costLimitFunction) {
+  public NonTransitGeneralizedCostFilter(DoubleFunction<Double> costLimitFunction) {
     this.costLimitFunction = costLimitFunction;
   }
 
   @Override
   public String name() {
-    return "transit-cost-filter";
+    return "non-transit-cost-filter";
   }
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     OptionalDouble minGeneralizedCost = itineraries
         .stream()
-        .filter(Itinerary::hasTransit)
         .mapToDouble(it -> it.generalizedCost)
         .min();
 
@@ -39,7 +38,7 @@ public class TransitGeneralizedCostFilter implements ItineraryFilter {
     final double maxLimit = costLimitFunction.apply(minGeneralizedCost.getAsDouble());
 
     return itineraries.stream().filter(
-      it -> !it.hasTransit() || it.generalizedCost <= maxLimit
+      it -> it.hasTransit() || it.generalizedCost <= maxLimit
     ).collect(Collectors.toList());
   }
 
