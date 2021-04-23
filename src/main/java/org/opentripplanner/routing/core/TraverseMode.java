@@ -36,10 +36,6 @@ public enum TraverseMode {
         return this == WALK;
     }
 
-    public boolean isCycling() {
-        return this == BICYCLE;
-    }
-
     public static TraverseMode fromTransitMode(TransitMode transitMode) {
         switch (transitMode) {
             case RAIL:

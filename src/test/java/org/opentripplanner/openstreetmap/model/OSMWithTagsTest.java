@@ -3,6 +3,9 @@ package org.opentripplanner.openstreetmap.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
 public class OSMWithTagsTest {
 
@@ -110,24 +113,28 @@ public class OSMWithTagsTest {
     @Test
     public void isMotorThroughTrafficExplicitlyDisallowed() {
         OSMWithTags o = new OSMWithTags();
-        assertFalse(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
+        WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+        assertFalse(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(o));
         
         o.addTag("access", "something");
-        assertFalse(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
+        assertFalse(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(o));
         
         o.addTag("access", "destination");
-        assertTrue(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
+        assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(o));
 
         o.addTag("access", "private");
-        assertTrue(o.isMotorVehicleThroughTrafficExplicitlyDisallowed());
+        assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(o));
 
-        assertTrue(way("motor_vehicle", "destination").isMotorVehicleThroughTrafficExplicitlyDisallowed());
+        assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(way("motor_vehicle", "destination")));
     }
 
     @Test
     public void isBicycleNoThroughTrafficExplicitlyDisallowed() {
-        assertTrue(way("bicycle", "destination").isBicycleNoThroughTrafficExplicitlyDisallowed());
-        assertTrue(way("access", "destination").isBicycleNoThroughTrafficExplicitlyDisallowed());
+        OSMWithTags o = new OSMWithTags();
+        WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+        assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(way("bicycle", "destination")));
+        assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(way("access", "destination")));
     }
 
     public  OSMWithTags way(String key, String value) {

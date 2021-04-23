@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
+
 /**
  * Interface for populating a {@link WayPropertySet} that determine how OSM
  * streets can be traversed in various modes and named.
@@ -47,4 +49,29 @@ public interface WayPropertySetSource {
 	}
 
 	DrivingDirection drivingDirection();
+
+	/**
+	 * Returns true if through traffic for motor vehicles is not allowed.
+	 *
+	 * @return
+	 */
+	default boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+		String motorVehicle = way.getTag("motor_vehicle");
+		return isGeneralNoThroughTraffic(way) || "destination".equals(motorVehicle);
+	}
+
+	default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+		String bicycle = way.getTag("bicycle");
+		return isGeneralNoThroughTraffic(way) || "destination".equals(bicycle);
+	}
+	/**
+	 * Returns true if through traffic for bicycle is not allowed.
+	 *
+	 * @return
+	 */
+	default boolean isGeneralNoThroughTraffic(OSMWithTags way) {
+		String access = way.getTag("access");
+		return "destination".equals(access) || "private".equals(access)
+				|| "customers".equals(access) || "delivery".equals(access);
+	}
 }

@@ -9,6 +9,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -32,10 +33,10 @@ public class BicycleRoutingTest {
         var fritzLeharStr = new GenericLocation(48.59696, 8.85806);
 
         var polyline1 = computePolyline(herrenbergGraph, mozartStr, fritzLeharStr);
-        assertThatPolylinesAreEqual(polyline1, "_srgHutau@h@B|@Jf@B?PdABJT@jA?DSp@_@fFsAT{@DBpC");
+        assertThatPolylinesAreEqual(polyline1, "_srgHutau@h@B|@Jf@BdAG?\\JT@jA?DSp@_@fFsAT{@DBpC");
 
         var polyline2 = computePolyline(herrenbergGraph, fritzLeharStr, mozartStr);
-        assertThatPolylinesAreEqual(polyline2, "{qrgH{aau@CqCz@ErAU^gFRq@?EAkAKUeACg@A?S}@Ki@C");
+        assertThatPolylinesAreEqual(polyline2, "{qrgH{aau@CqCz@ErAU^gFRq@?EAkAKUeACg@A_AM_AEDQF@H?");
     }
 
     /**

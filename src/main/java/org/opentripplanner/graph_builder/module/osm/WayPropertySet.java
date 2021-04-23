@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
 public class WayPropertySet {
     private static Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
+    private WayPropertySetSource wayPropertySetSource;
+
     private List<WayPropertyPicker> wayProperties;
 
     /** Assign names to ways that do not have them based on OSM tags. */
@@ -64,6 +66,7 @@ public class WayPropertySet {
         // regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed
         // and edited
         maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
+        wayPropertySetSource = new DefaultWayPropertySetSource();
     }
 
     /**
@@ -388,4 +391,7 @@ public class WayPropertySet {
 		addSpeedPicker(picker);
 	}
 
+    public void setWayPropertySetSource(WayPropertySetSource wayPropertySetSource) {
+        this.wayPropertySetSource = wayPropertySetSource;
+    }
 }

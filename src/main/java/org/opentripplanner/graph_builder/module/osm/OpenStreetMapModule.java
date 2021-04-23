@@ -174,6 +174,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      */
     public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
         wayPropertySet = new WayPropertySet();
+        wayPropertySet.setWayPropertySetSource(source);
         source.populateProperties(wayPropertySet);
         wayPropertySetSource = source;
     }
@@ -738,11 +739,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
         // TODO Set this to private once WalkableAreaBuilder is gone
         protected void applyWayProperties(StreetEdge street, StreetEdge backStreet,
-                                        WayProperties wayData, OSMWithTags way) {
+                                        WayProperties wayData,  OSMWithTags way) {
+
+            boolean motorVehicleNoThrough = wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
+            boolean bicycleVehicleNoThrough = wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
 
             Set<T2<StreetNote, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
-            boolean motorVehicleNoThrough = way.isMotorVehicleThroughTrafficExplicitlyDisallowed();
-            boolean bicycleNoThrough = way.isBicycleNoThroughTrafficExplicitlyDisallowed();
             // if (noThruTraffic) LOG.info("Way {} does not allow through traffic.", way.getId());
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().first;
@@ -755,7 +757,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         graph.streetNotesService.addStaticNote(street, note.first, note.second);
                 }
                 street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
-                street.setBicycleNoThruTraffic(bicycleNoThrough);
+                street.setBicycleNoThruTraffic(bicycleVehicleNoThrough);
             }
 
             if (backStreet != null) {
@@ -769,7 +771,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         graph.streetNotesService.addStaticNote(backStreet, note.first, note.second);
                 }
                 backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
-                backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
+                backStreet.setBicycleNoThruTraffic(bicycleVehicleNoThrough);
             }
         }
 
