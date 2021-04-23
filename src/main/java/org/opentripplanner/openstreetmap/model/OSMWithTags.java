@@ -279,31 +279,6 @@ public class OSMWithTags {
     public boolean isPedestrianExplicitlyAllowed() {
         return doesTagAllowAccess("foot");
     }
-
-    /**
-     * Returns true if through traffic for motor vehicles is not allowed.
-     *
-     * @return
-     */
-    public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed() {
-        String motorVehicle = getTag("motor_vehicle");
-        return isGeneralNoThroughTraffic() || "destination".equals(motorVehicle);
-    }
-
-    public boolean isBicycleNoThroughTrafficExplicitlyDisallowed() {
-        String bicycle = getTag("bicycle");
-        return isGeneralNoThroughTraffic() || "destination".equals(bicycle);
-    }
-    /**
-     * Returns true if through traffic for bicycle is not allowed.
-     *
-     * @return
-     */
-    public boolean isGeneralNoThroughTraffic() {
-        String access = getTag("access");
-        return "destination".equals(access) || "private".equals(access)
-                || "customers".equals(access) || "delivery".equals(access);
-    }
     
     /**
      * @return True if this node / area is a park and ride.
