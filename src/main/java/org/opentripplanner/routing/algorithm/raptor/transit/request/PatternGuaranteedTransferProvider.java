@@ -19,28 +19,25 @@ import org.opentripplanner.transit.raptor.util.AvgTimer;
  * This is implemented as a class. It might make sense to use an interface instead,
  * but it is overkill for now.
  */
-final class PatternGuaranteedTransferProvider
+public final class PatternGuaranteedTransferProvider
         implements RaptorGuaranteedTransferProvider<TripSchedule> {
 
     private static final AvgTimer LOOKUP_GUARANTEED_TRANSFER_TIMER = AvgTimer.timerMicroSec("lookupGuaranteedTransfer");
 
     private final DirectionHelper translator;
-    private final RaptorRoute<TripSchedule> targetRoute;
 
     // TODO GuaranteedTransfer
     private final TIntObjectMap<List<Transfer>> transfers;
 
     private List<Transfer> currentTransfers;
 
-    PatternGuaranteedTransferProvider(
+    public PatternGuaranteedTransferProvider(
             boolean forwardSearch,
-            RaptorRoute<TripSchedule> targetRoute,
             TIntObjectMap<List<Transfer>> transfers
     ) {
         this.translator = forwardSearch
                 ? new ForwardDirectionHelper()
                 : new ReverseDirectionHelper();
-        this.targetRoute = targetRoute;
         this.transfers = transfers;
     }
 
@@ -55,6 +52,7 @@ final class PatternGuaranteedTransferProvider
 
     @Override
     public final RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
+            RaptorTimeTable<TripSchedule> timetable,
             TripSchedule sourceTripSchedule,
             int sourceStopIndex,
             int sourceArrivalTime
@@ -70,7 +68,7 @@ final class PatternGuaranteedTransferProvider
             if(targetPoint == null) { return null; }
 
             return translator.findTimetableTripIndex(
-                    targetRoute.timetable(),
+                    timetable,
                     targetPoint.getTrip(),
                     targetPoint.getStopPosition(),
                     sourceArrivalTime

@@ -23,6 +23,7 @@ public interface RaptorGuaranteedTransferProvider<T extends RaptorTripSchedule> 
      */
     @Nullable
     RaptorTripScheduleBoardOrAlightEvent<T> find(
+            RaptorTimeTable<T> timetable,
             T sourceTrip,
             int sourceStopIndex,
             int sourceArrivalTime

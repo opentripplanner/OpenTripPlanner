@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 public class TestTransferProvider implements RaptorGuaranteedTransferProvider<TestTripSchedule> {
@@ -25,7 +26,10 @@ public class TestTransferProvider implements RaptorGuaranteedTransferProvider<Te
     @Override
     @Nullable
     public RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> find(
-            TestTripSchedule sourceTrip, int sourceStopIndex, int sourceArrivalTime
+            RaptorTimeTable<TestTripSchedule> timeTable,
+            TestTripSchedule sourceTrip,
+            int sourceStopIndex,
+            int sourceArrivalTime
     ) {
         var list = transfersByFromStopPos.get(currentTargetStopPos);
         for (GuaranteedTransfer tx : list) {

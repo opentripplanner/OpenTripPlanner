@@ -19,7 +19,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.util.OTPFeature;
 
 
 /**
@@ -56,13 +55,6 @@ class RaptorRoutingRequestTransitDataCreator {
     );
 
     List<TripPatternForDates> tripPatternForDateList = merge(searchStartTime, tripPatternForDates);
-
-    if(OTPFeature.GuaranteedTransfers.isOn()) {
-      TransferIndexGenerator.generateTransfers(
-              transitLayer.getTransferService(),
-              tripPatternForDateList
-      );
-    }
 
     return createTripPatternsPerStop(tripPatternForDateList, transitLayer.getStopCount());
   }

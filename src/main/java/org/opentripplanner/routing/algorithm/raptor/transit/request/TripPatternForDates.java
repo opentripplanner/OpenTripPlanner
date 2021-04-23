@@ -1,12 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -33,12 +29,6 @@ public class TripPatternForDates
     private final int[] offsets;
 
     private final int numberOfTripSchedules;
-
-    // TODO
-    private final TIntObjectMap<List<Transfer>> guaranteedTransfersFrom = new TIntObjectHashMap<>();
-
-    private final TIntObjectMap<List<Transfer>> guaranteedTransfersTo = new TIntObjectHashMap<>();
-
 
     TripPatternForDates(
             TripPatternWithRaptorStopIndexes tripPattern,
@@ -70,12 +60,12 @@ public class TripPatternForDates
     // TODO
     @Override
     public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersTo() {
-        return new PatternGuaranteedTransferProvider(true, this, guaranteedTransfersTo);
+        return getTripPattern().getGuaranteedTransfersTo();
     }
 
     @Override
     public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersFrom() {
-        return new PatternGuaranteedTransferProvider(false, this, guaranteedTransfersFrom);
+        return getTripPattern().getGuaranteedTransfersFrom();
     }
 
     // Implementing RaptorTripPattern
@@ -130,27 +120,5 @@ public class TripPatternForDates
                 .addServiceTimeSchedule("offsets", offsets)
                 .addNum("nTrips", numberOfTripSchedules)
                 .toString();
-    }
-
-    // TODO
-    void addGuaranteedTransferFrom(Transfer tx) {
-        addTransfer(tx, tx.getFrom().getStopPosition(), guaranteedTransfersFrom);
-    }
-
-    void addGuaranteedTransfersTo(Transfer tx) {
-        addTransfer(tx, tx.getTo().getStopPosition(), guaranteedTransfersTo);
-    }
-
-    private static void addTransfer(
-            Transfer tx,
-            int stopPos,
-            TIntObjectMap<List<Transfer>> index
-    ) {
-        var transfersAtStop = index.get(stopPos);
-        if(transfersAtStop == null) {
-            transfersAtStop = new ArrayList<>();
-            index.put(stopPos, transfersAtStop);
-        }
-        transfersAtStop.add(tx);
     }
 }
