@@ -142,10 +142,12 @@ public class TestBikeRental extends GraphRoutingTest {
         return path != null ? path.states.stream()
             .filter(s -> s.getBackEdge() instanceof StreetEdge)
             .map(s -> String.format(
-                "%s - %s - %s",
+                "%s - %s - %s (%f, %d)",
                 s.getBackMode(),
                 s.getBikeRentalState(),
-                s.getBackEdge() != null ? s.getBackEdge().getName() : null
+                s.getBackEdge() != null ? s.getBackEdge().getName() : null,
+                s.getWeightDelta(),
+                s.getTimeDeltaSeconds()
         )).collect(Collectors.joining(", ")) : "path not found";
     }
 }
