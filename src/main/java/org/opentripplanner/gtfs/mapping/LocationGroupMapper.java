@@ -37,8 +37,7 @@ public class LocationGroupMapper {
   private FlexLocationGroup doMap(org.onebusaway.gtfs.model.LocationGroup element) {
     FlexLocationGroup locationGroup;
 
-    locationGroup = new FlexLocationGroup();
-    locationGroup.setId(mapAgencyAndId(element.getId()));
+    locationGroup = new FlexLocationGroup(mapAgencyAndId(element.getId()));
     locationGroup.setName(element.getName());
 
     for (org.onebusaway.gtfs.model.StopLocation location : element.getLocations()) {
