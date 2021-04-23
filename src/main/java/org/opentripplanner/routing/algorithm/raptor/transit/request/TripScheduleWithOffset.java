@@ -66,7 +66,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
         return serviceDate;
     }
 
-    @Override
+     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (!(o instanceof TripScheduleWithOffset)) { return false; }

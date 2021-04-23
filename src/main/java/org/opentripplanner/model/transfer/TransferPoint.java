@@ -69,4 +69,9 @@ public interface TransferPoint {
    * </a>
    */
   int getSpecificityRanking();
+
+  default boolean matches(Trip trip, int stopPos) {
+    // Note! We use "==" here since there should not be duplicate instances of trips
+    return getStopPosition() == stopPos && getTrip() == trip;
+  }
 }
