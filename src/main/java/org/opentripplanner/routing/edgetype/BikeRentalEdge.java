@@ -25,8 +25,8 @@ public class BikeRentalEdge extends Edge {
 
     private final Set<String> networks;
 
-    public BikeRentalEdge(Vertex from, Vertex to, Set<String> networks) {
-        super(from, to);
+    public BikeRentalEdge(BikeRentalStationVertex vertex, Set<String> networks) {
+        super(vertex, vertex);
         this.networks = networks;
     }
 
