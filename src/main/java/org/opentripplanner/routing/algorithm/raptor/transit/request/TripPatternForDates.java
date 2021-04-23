@@ -9,7 +9,6 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;

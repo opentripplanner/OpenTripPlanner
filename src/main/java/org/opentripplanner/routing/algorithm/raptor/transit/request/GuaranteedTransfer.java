@@ -1,7 +1,8 @@
-package org.opentripplanner.transit.raptor.api.transit;
+package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  *

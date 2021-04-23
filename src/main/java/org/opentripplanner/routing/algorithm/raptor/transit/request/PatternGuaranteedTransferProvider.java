@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import gnu.trove.map.TIntObjectMap;
 import java.util.List;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
@@ -22,7 +21,7 @@ final class PatternGuaranteedTransferProvider
 
     private static final AvgTimer lookupTripIndex = AvgTimer.timerMicroSec("b_lookupTripIndex");
 
-    private final boolean forward;
+    private final boolean forwardSearch;
     private final RaptorRoute<TripSchedule> targetRoute;
     private final TIntObjectMap<List<GuaranteedTransfer<TripSchedule>>> transfers;
 
@@ -30,11 +29,11 @@ final class PatternGuaranteedTransferProvider
     private int targetStopPos;
 
     PatternGuaranteedTransferProvider(
-            boolean forward,
+            boolean forwardSearch,
             RaptorRoute<TripSchedule> targetRoute,
             TIntObjectMap<List<GuaranteedTransfer<TripSchedule>>> transfers
     ) {
-        this.forward = forward;
+        this.forwardSearch = forwardSearch;
         this.targetRoute = targetRoute;
         this.transfers = transfers;
     }
@@ -57,7 +56,7 @@ final class PatternGuaranteedTransferProvider
     ) {
         // Search for the targetTrip to board
 
-        TripSchedule targetTrip = forward
+        TripSchedule targetTrip = forwardSearch
                 ? findToTrip(sourceTrip, sourceStopIndex, sourceArrivalTime)
                 : findFromTrip(sourceTrip, sourceStopIndex, sourceArrivalTime);
 

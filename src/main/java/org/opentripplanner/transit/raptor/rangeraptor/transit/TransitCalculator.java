@@ -3,17 +3,13 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
-import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating

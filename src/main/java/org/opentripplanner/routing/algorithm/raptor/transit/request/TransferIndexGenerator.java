@@ -1,16 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.GuaranteedTransfer;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 
 public class TransferIndexGenerator {
