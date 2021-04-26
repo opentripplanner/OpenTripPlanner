@@ -90,7 +90,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private final LifeCycleEventPublisher lifeCycle;
 
-    private final int mimNumberOfRounds;
+    private final int minNumberOfRounds;
 
     private boolean inFirstIteration = true;
 
@@ -118,7 +118,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         this.timers = timers;
         this.accessArrivedByWalking = groupByRound(accessPaths, Predicate.not(RaptorTransfer::stopReachedOnBoard));
         this.accessArrivedOnBoard = groupByRound(accessPaths, RaptorTransfer::stopReachedOnBoard);
-        this.mimNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
+        this.minNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
 
         // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
         // "everyone" by providing access to it in the context.
@@ -189,7 +189,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Check if the RangeRaptor should continue with a new round.
      */
     private boolean hasMoreRounds() {
-        if(round() < mimNumberOfRounds) { return true; }
+        if(round() < minNumberOfRounds) { return true; }
         return state.isNewRoundAvailable() && roundTracker.hasMoreRounds();
     }
 
