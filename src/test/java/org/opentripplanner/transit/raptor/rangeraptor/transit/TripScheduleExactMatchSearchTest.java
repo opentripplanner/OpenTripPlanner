@@ -1,13 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator.testDummyCalculator;
+
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
 
@@ -26,7 +27,7 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
     private TripScheduleSearch<TestTripSchedule> subject;
 
     public void setup(boolean forward) {
-        TransitCalculator calculator = TransitCalculator.testDummyCalculator(forward);
+        TransitCalculator<TestTripSchedule> calculator = testDummyCalculator(forward);
         subject = calculator.createExactTripSearch(TIME_TABLE);
     }
 

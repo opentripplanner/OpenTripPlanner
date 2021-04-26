@@ -21,9 +21,13 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> im
 
     private final int slack;
     private final TripScheduleSearch<T> delegate;
-    private final TransitCalculator calculator;
+    private final TransitCalculator<T> calculator;
 
-    TripScheduleExactMatchSearch(TripScheduleSearch<T> delegate, TransitCalculator calculator, int slack) {
+    TripScheduleExactMatchSearch(
+            TripScheduleSearch<T> delegate,
+            TransitCalculator<T> calculator,
+            int slack
+    ) {
         this.delegate = delegate;
         this.slack = slack;
         this.calculator = calculator;

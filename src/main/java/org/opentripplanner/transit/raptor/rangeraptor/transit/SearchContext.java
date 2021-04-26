@@ -47,7 +47,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
      */
     protected final RaptorTransitDataProvider<T> transit;
 
-    private final TransitCalculator calculator;
+    private final TransitCalculator<T> calculator;
     private final CostCalculator<T> costCalculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
@@ -110,7 +110,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return transit;
     }
 
-    public TransitCalculator calculator() {
+    public TransitCalculator<T> calculator() {
         return calculator;
     }
 
@@ -194,11 +194,12 @@ public class SearchContext<T extends RaptorTripSchedule> {
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static TransitCalculator createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
+    private static <T extends RaptorTripSchedule>
+    TransitCalculator<T> createCalculator(RaptorRequest<T> r, RaptorTuningParameters t) {
         SearchParams s = r.searchParams();
         return r.searchDirection().isForward()
-                ? new ForwardTransitCalculator(s, t)
-                : new ReverseTransitCalculator(s, t);
+                ? new ForwardTransitCalculator<>(s, t)
+                : new ReverseTransitCalculator<>(s, t);
     }
 
     private static DebugRequest debugRequest(

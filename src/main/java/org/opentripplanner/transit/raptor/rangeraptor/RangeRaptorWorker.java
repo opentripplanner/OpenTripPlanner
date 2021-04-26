@@ -79,7 +79,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private final SlackProvider slackProvider;
 
-    private final TransitCalculator calculator;
+    private final TransitCalculator<T> calculator;
 
     private final WorkerPerformanceTimers timers;
 
@@ -105,7 +105,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             SlackProvider slackProvider,
             Collection<RaptorTransfer> accessPaths,
             RoundProvider roundProvider,
-            TransitCalculator calculator,
+            TransitCalculator<T> calculator,
             LifeCycleEventPublisher lifeCyclePublisher,
             WorkerPerformanceTimers timers
     ) {
