@@ -53,13 +53,13 @@ public final class TripStopTime<T extends RaptorTripSchedule> implements StopTim
   @Override
   public String toString() {
     return ValueObjectToStringBuilder.of()
-        .addLbl("[")
+        .addText("[")
         .addNum(stop())
-        .addLbl(" ")
+        .addText(" ")
         .addServiceTime(time())
-        .addLbl(" ")
+        .addText(" ")
         .addObj(trip.pattern().debugInfo())
-        .addLbl("]")
+        .addText("]")
         .toString();
   }
 

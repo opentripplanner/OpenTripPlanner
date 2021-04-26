@@ -56,8 +56,19 @@ public class ValueObjectToStringBuilder {
         return addIt(value, it -> it ? ifTrue : ifFalse);
     }
 
+    /** Add a quoted string value */
     public ValueObjectToStringBuilder addStr(String value) {
         return addIt(value, it -> "'" + it + "'");
+    }
+
+    /**
+     * Add plain text without quotes or any pending whitespace separator after it. Include
+     * white space if you need it.
+     */
+    public ValueObjectToStringBuilder addText(String label) {
+        sb.append(label);
+        skipSep = true;
+        return this;
     }
 
     public ValueObjectToStringBuilder addEnum(Enum<?> value) {
@@ -66,17 +77,6 @@ public class ValueObjectToStringBuilder {
 
     public ValueObjectToStringBuilder addObj(Object obj) {
         return addIt(obj, Object::toString);
-    }
-
-    /**
-     * A text/labels to your string. No separator character is writen to the buffer
-     * before or after the label - hence you need to include white space in the label if you
-     * want it.
-     */
-    public ValueObjectToStringBuilder addLbl(String label) {
-        sb.append(label);
-        skipSep = true;
-        return this;
     }
 
 
