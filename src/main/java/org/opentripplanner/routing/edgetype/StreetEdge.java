@@ -193,7 +193,7 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
      * @return
      */
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
-        if (options.wheelchairAccessible) {
+        if (mode.isWalking() && options.wheelchairAccessible) {
             if (!isWheelchairAccessible()) {
                 return false;
             }
