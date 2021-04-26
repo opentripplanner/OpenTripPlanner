@@ -74,8 +74,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
         .searchWindowInSeconds(D3m)
     ;
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test

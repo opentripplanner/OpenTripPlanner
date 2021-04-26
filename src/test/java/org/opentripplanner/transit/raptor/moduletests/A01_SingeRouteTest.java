@@ -62,8 +62,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
         .latestArrivalTime(T00_10)
         .timetableEnabled(true);
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test

@@ -64,8 +64,7 @@ public class B11_FlexEgress implements RaptorTestConstants {
         defaultSlackProvider(60, 0, 0)
     );
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test

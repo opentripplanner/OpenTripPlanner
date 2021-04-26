@@ -73,8 +73,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
         .searchWindowInSeconds(D3m)
     ;
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test

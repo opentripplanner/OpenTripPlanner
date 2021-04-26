@@ -58,8 +58,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
         .latestArrivalTime(T00_30)
     ;
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test
