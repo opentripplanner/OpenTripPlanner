@@ -57,13 +57,13 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
         .logger(logger);
   }
 
-  public TestTransitData add(int fromStop, TestTransfer transfer) {
+  public TestTransitData withTransfer(int fromStop, TestTransfer transfer) {
     expandNumOfStops(Math.max(fromStop, transfer.stop()));
     transfersByStop.get(fromStop).add(transfer);
     return this;
   }
 
-  public TestTransitData add(TestRoute route) {
+  public TestTransitData withRoute(TestRoute route) {
     RaptorTripPattern pattern = route.pattern();
     for(int i=0; i< pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
