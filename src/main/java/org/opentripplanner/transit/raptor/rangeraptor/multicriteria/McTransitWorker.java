@@ -9,6 +9,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -114,6 +115,11 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                 trip
             )
         );
+    }
+
+    @Override
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        return prevArrival.mostResentTransitArrival();
     }
 
     /**

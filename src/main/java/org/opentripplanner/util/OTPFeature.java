@@ -19,6 +19,7 @@ public enum OTPFeature {
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),
     OptimizeTransfers(true),
+    GuaranteedTransfers(true),
 
     // Sandbox extension features - Must be turned OFF by default
     ActuatorAPI(false),

@@ -6,6 +6,7 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -14,8 +15,12 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay
  * refers to days in order.
  */
-public class TripPatternForDates implements RaptorRoute<TripSchedule>,
-        RaptorTimeTable<TripSchedule>, RaptorTripPattern {
+public class TripPatternForDates
+        implements
+                RaptorRoute<TripSchedule>,
+                RaptorTimeTable<TripSchedule>,
+                RaptorTripPattern
+{
 
     private final TripPatternWithRaptorStopIndexes tripPattern;
 
@@ -25,7 +30,11 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
 
     private final int numberOfTripSchedules;
 
-    TripPatternForDates(TripPatternWithRaptorStopIndexes tripPattern, List<TripPatternForDate> tripPatternForDates, List<Integer> offsets) {
+    TripPatternForDates(
+            TripPatternWithRaptorStopIndexes tripPattern,
+            List<TripPatternForDate> tripPatternForDates,
+            List<Integer> offsets
+    ) {
         this.tripPattern = tripPattern;
         this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[]{});
         this.offsets = offsets.stream().mapToInt(i -> i).toArray();
@@ -47,6 +56,17 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
         return this;
     }
 
+
+    // TODO
+    @Override
+    public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersTo() {
+        return getTripPattern().getGuaranteedTransfersTo();
+    }
+
+    @Override
+    public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersFrom() {
+        return getTripPattern().getGuaranteedTransfersFrom();
+    }
 
     // Implementing RaptorTripPattern
 
