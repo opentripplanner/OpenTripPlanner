@@ -194,8 +194,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static <T extends RaptorTripSchedule>
-    TransitCalculator<T> createCalculator(RaptorRequest<T> r, RaptorTuningParameters t) {
+    private static <T extends RaptorTripSchedule> TransitCalculator<T> createCalculator(
+            RaptorRequest<T> r, RaptorTuningParameters t
+    ) {
         SearchParams s = r.searchParams();
         return r.searchDirection().isForward()
                 ? new ForwardTransitCalculator<>(s, t)
@@ -203,7 +204,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     private static DebugRequest debugRequest(
-        RaptorRequest<?> request
+            RaptorRequest<?> request
     ) {
         return request.searchDirection().isForward()
                 ? request.debug()

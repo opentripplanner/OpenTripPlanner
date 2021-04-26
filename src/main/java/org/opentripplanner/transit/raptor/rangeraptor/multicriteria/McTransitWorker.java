@@ -8,11 +8,11 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 
 
@@ -82,9 +82,13 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     @Override
-    public void board(int stopIndex, TripScheduleSearch<T> tripSearch) {
-        final T trip = tripSearch.getCandidateTrip();
-        final int boardTime = tripSearch.getCandidateTripTime();
+    public void board(
+            final int stopIndex,
+            final int earliestBoardTime,
+            final RaptorTripScheduleBoardOrAlightEvent<T> result
+    ) {
+        final T trip = result.getTrip();
+        final int boardTime = result.getTime();
 
         if(prevArrival.arrivedByAccess()) {
             // What if access is FLEX with rides, should not FLEX alightSlack and
@@ -103,7 +107,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
             new PatternRide<>(
                 prevArrival,
                 stopIndex,
-                tripSearch.getStopPositionInPattern(),
+                result.getStopPositionInPattern(),
                 boardTime,
                 boardWaitTimeForCostCalculation,
                 relativeBoardCost,

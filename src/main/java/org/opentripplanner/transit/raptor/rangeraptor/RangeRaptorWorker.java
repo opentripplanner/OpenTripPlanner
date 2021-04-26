@@ -14,6 +14,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
@@ -96,6 +97,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     private boolean hasTimeDependentAccess = false;
 
     private int iterationDepartureTime;
+
+    private int earliestBoardTime;
 
 
     public RangeRaptorWorker(
@@ -226,21 +229,21 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
                     if(pattern.boardingPossibleAt(stopPos)) {
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
-                            // Add board-slack(forward-search) or alight-slack(reverse-search)
-                            int earliestBoardTime = calculator.plusDuration(
-                                    prevArrivalTime,
-                                    slackProvider.boardSlack()
-                            );
+                            RaptorTripScheduleBoardOrAlightEvent<T> result = null;
 
-                            // check if we can back up to an earlier trip due to this stop being reached earlier
-                            boolean found = tripSearch.search(
+                            // Add board-slack(forward-search) or alight-slack(reverse-search)
+                            this.earliestBoardTime = earliestBoardTime(prevArrivalTime);
+
+                            // check if we can back up to an earlier trip due to this stop
+                            // being reached earlier
+                            result = tripSearch.search(
                                     earliestBoardTime,
                                     stopPos,
                                     transitWorker.onTripIndex()
                             );
 
-                            if (found) {
-                                transitWorker.board(stopIndex, tripSearch);
+                            if (result != null) {
+                                transitWorker.board(stopIndex, earliestBoardTime, result);
                             }
                         });
                     }
@@ -325,6 +328,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 stopPositionInPattern,
                 slackProvider.alightSlack()
         );
+    }
+
+    /**
+     * Add board-slack(forward-search) or alight-slack(reverse-search)
+     */
+    private int earliestBoardTime(int prevArrivalTime) {
+        return calculator.plusDuration(prevArrivalTime,  slackProvider.boardSlack());
     }
 
     /**

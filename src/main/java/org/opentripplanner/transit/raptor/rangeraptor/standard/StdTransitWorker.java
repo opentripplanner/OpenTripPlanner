@@ -5,8 +5,8 @@ import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
 
 /**
@@ -69,10 +69,14 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public final void board(int stopIndex, TripScheduleSearch<T> tripSearch) {
-        onTripIndex = tripSearch.getCandidateTripIndex();
-        onTrip = tripSearch.getCandidateTrip();
-        onTripBoardTime = tripSearch.getCandidateTripTime();
+    public final void board(
+            int stopIndex,
+            final int earliestBoardTime,
+            RaptorTripScheduleBoardOrAlightEvent<T> result
+    ) {
+        onTripIndex = result.getTripIndex();
+        onTrip = result.getTrip();
+        onTripBoardTime = result.getTime();
         onTripBoardStop = stopIndex;
     }
 }

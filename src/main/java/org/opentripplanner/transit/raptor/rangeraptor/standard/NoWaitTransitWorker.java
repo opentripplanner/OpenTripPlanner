@@ -5,8 +5,8 @@ import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
 
 /**
@@ -79,13 +79,17 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final void board(int stopIndex, TripScheduleSearch<T> tripSearch) {
-        onTripIndex = tripSearch.getCandidateTripIndex();
-        onTrip = tripSearch.getCandidateTrip();
-        onTripBoardTime = tripSearch.getEarliestBoardTime();
+    public final void board(
+            final int stopIndex,
+            final int earliestBoardTime,
+            final RaptorTripScheduleBoardOrAlightEvent<T> result
+    ) {
+        onTripIndex = result.getTripIndex();
+        onTrip = result.getTrip();
+        onTripBoardTime = earliestBoardTime;
         onTripBoardStop = stopIndex;
         // Calculate the time-shift, the time-shift will be a positive duration in a
         // forward-search, and a negative value in case of a reverse-search.
-        onTripTimeShift = tripSearch.getCandidateTripTime() - onTripBoardTime;
+        onTripTimeShift = result.getTime() - onTripBoardTime;
     }
 }

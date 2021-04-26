@@ -5,7 +5,7 @@ import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
 /**
@@ -49,7 +49,11 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Board trip found in the given trip-search at the given stop.
      */
-    void board(final int stopIndex, TripScheduleSearch<T> tripSearch);
+    void board(
+            final int stopIndex,
+            final int earliestBoardTime,
+            RaptorTripScheduleBoardOrAlightEvent<T> result
+    );
 
     /**
      * The trip search will use this index to search relative to an existing boarding.
@@ -60,5 +64,4 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
      * Return -1 to if the tripIndex is unknown.
      */
     default int onTripIndex() { return -1; }
-
 }
