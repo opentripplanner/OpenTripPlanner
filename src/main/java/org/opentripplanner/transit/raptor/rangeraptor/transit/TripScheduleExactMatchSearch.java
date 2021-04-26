@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 
@@ -57,6 +58,14 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> im
     @Override
     public int getCandidateTripTime() {
         return delegate.getCandidateTripTime();
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(TripScheduleExactMatchSearch.class)
+                .addNum("slack", slack)
+                .addObj("delegate", delegate)
+                .toString();
     }
 
     private boolean isWithinSlack(int timeLimit) {

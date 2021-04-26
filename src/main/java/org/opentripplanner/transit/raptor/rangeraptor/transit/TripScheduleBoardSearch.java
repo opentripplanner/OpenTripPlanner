@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -93,6 +94,20 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
         // Hence searching reverse from the upper bound is the fastest way to proceed.
         return findBoardingBySteppingBackwardsInTime(tripIndexUpperBound);
     }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(TripScheduleBoardSearch.class)
+                .addObj("nTrips", nTrips)
+                .addObj("earliestBoardTime", earliestBoardTime)
+                .addObj("stopPos", stopPositionInPattern)
+                .addObj("tripIndex", candidateTripIndex)
+                .addObj("trip", candidateTrip)
+                .toString();
+    }
+
+
+    /* private methods */
 
     private boolean findFirstBoardingOptimizedForLargeSetOfTrips() {
         int indexBestGuess = binarySearchForTripIndex();

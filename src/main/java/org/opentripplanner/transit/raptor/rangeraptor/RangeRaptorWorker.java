@@ -13,7 +13,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
@@ -202,9 +201,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
 
             while (routeIterator.hasNext()) {
-                RaptorRoute<T> route = routeIterator.next();
-                RaptorTripPattern pattern = route.pattern();
-                TripScheduleSearch<T> tripSearch = createTripSearch(route.timetable());
+                var route = routeIterator.next();
+                var pattern = route.pattern();
+                var tripSearch = createTripSearch(route.timetable());
 
                 slackProvider.setCurrentPattern(pattern);
                 transitWorker.prepareForTransitWith(pattern);

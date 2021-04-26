@@ -117,7 +117,7 @@ public class HeuristicsAdapter implements Heuristics {
     @Override
     public String toString() {
         return ToStringBuilder.of(Heuristics.class)
-            .addServiceTime("originDepartureTime(last iteration)", originDepartureTime, NOT_SET)
+            .addServiceTime("originDepartureTime(last iteration)", originDepartureTime)
             .addBoolIfTrue("resultsExist", aggregatedResultsCalculated)
             .addDurationSec("minJourneyTravelDuration", minJourneyTravelDuration, NOT_SET)
             .addDurationSec("minJourneyNumOfTransfers", minJourneyNumOfTransfers, NOT_SET)
