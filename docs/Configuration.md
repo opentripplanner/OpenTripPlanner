@@ -773,7 +773,8 @@ Steps to add a GBFS feed to a router:
      "type": "bike-rental",
      "frequencySec": 60,
      "sourceType": "gbfs",
-     "url": "http://coast.socialbicycles.com/opendata/"
+     "url": "http://coast.socialbicycles.com/opendata/",
+     "timeToLiveMinutes": 5
 }
 ```
 
@@ -783,7 +784,8 @@ Steps to add a GBFS feed to a router:
 type: "bike-rental"
 frequencySec: frequency in seconds in which the GBFS service will be polled
 sourceType: "gbfs"
-url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
+url: the URL of the GBFS feed (do not include the gbfs.json at the end)
+timeToLiveMinutes: the amount of minutes to consider a reported vehicle to be active
 ```
 \* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
 
@@ -852,7 +854,8 @@ Add one entry in the `updater` field of `router-config.json` in the format:
     "sourceType": "car2go",
     "frequencySec": 60,
     "vehiclesUrl": "http://example.com/vehicles.json",
-    "regionsUrl": "http://example.com/regions.json"
+    "regionsUrl": "http://example.com/regions.json",
+    "timeToLiveMinutes": 5
 }
 ```
 
@@ -873,7 +876,8 @@ Add one entry in the `updater` field of `router-config.json` in the format:
     "network": "LIME",
     "sourceType": "gbfs",
     "url": "https://example.com/gbfs.json",
-    "regionsUrl": "file:/home/workspace/boundary.json"
+    "regionsUrl": "file:/home/workspace/boundary.json",
+    "timeToLiveMinutes": 5
 }
 ```
 

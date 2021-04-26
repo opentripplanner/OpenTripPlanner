@@ -8,13 +8,16 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalRegion;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.FreeBikeStatus;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.GbfsResponse;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.StationInformation;
 import org.opentripplanner.updater.vehicle_rental.GBFSMappings.StationStatus;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +54,9 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
     private List<VehicleRentalStation> stations;
     private boolean regionsLoadedFromConfig;
     private List<VehicleRentalRegion> regions;
+    private List<RentalUpdaterError> errors;
+    private SystemInformation.SystemInformationData systemInformationData;
+    private Date systemStartDate;
 
     public GenericGbfsService() {
         this(null, null, "en");
@@ -139,17 +145,8 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
         }
     }
 
-    @Override public boolean regionsUpdated() {
-        // return a one-time update if the regions were loaded from config
-        if (regionsLoadedFromConfig) {
-            regionsLoadedFromConfig = false;
-            return true;
-        }
-        return regionsUpdated;
-    }
-
-    @Override public boolean stationsUpdated() {
-        return vehiclesUpdated;
+    @Override public List<RentalUpdaterError> getErrors() {
+        return errors;
     }
 
     @Override public List<VehicleRentalStation> getStations() {
@@ -160,12 +157,51 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
         return regions;
     }
 
+    @Override public boolean regionsUpdated() {
+        // return a one-time update if the regions were loaded from config
+        if (regionsLoadedFromConfig) {
+            regionsLoadedFromConfig = false;
+            return true;
+        }
+        return regionsUpdated;
+    }
+
+    @Override public SystemInformation.SystemInformationData getSystemInformation() {
+        return systemInformationData;
+    }
+
+    /**
+     * Helper method for adding an error with a template String and associated values
+     */
+    private void addError(RentalUpdaterError.Severity severity, Exception e, String template, Object... values) {
+        addError(severity, e, String.format(template, values));
+    }
+
+    /**
+     * Helper method for adding an error with a template String and associated values
+     */
+    private void addError(RentalUpdaterError.Severity severity, String template, Object... values) {
+        addError(severity, null, String.format(template, values));
+    }
+
+    /**
+     * Adds an error message to the list of errors and also logs the error message.
+     */
+    private void addError(RentalUpdaterError.Severity severity, Exception e, String message) {
+        message = String.format("%s (network: %s)", message, networkName);
+        errors.add(new RentalUpdaterError(severity, message));
+        LOG.error(String.format("[severity: %s] %s", severity, message), e);
+    }
+
     @Override
     public void update () {
         // reset update statuses and data
         vehiclesUpdated = false;
         regionsUpdated = false;
-        stations = new ArrayList<>();
+        stations = new LinkedList<>();
+        errors = new LinkedList<>();
+        systemInformationData = null;
+        systemStartDate = null;
 
         String systemInformationUrl = null;
         String stationInformationUrl = null;
@@ -200,7 +236,12 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
             try {
                 gbfsResponse = mapper.readValue(rootData, GbfsResponse.class);
             } catch (IOException e) {
-                LOG.error("failed to deserialize gbfs.json response: {}", e);
+                addError(
+                    RentalUpdaterError.Severity.FEED_WIDE,
+                    e,
+                    "Failed to deserialize gbfs.json response: %s",
+                    e.toString()
+                );
                 return;
             } finally {
                 try {
@@ -210,7 +251,7 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
                 }
             }
             if (gbfsResponse.data == null) {
-                LOG.error("failed to read gbfs.json, no data found");
+                addError(RentalUpdaterError.Severity.FEED_WIDE, "Failed to read gbfs.json, no data found");
                 return;
             }
 
@@ -218,7 +259,12 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
             // FIXME: the configured language always defaults to "en" in this current implementation.
             GbfsResponse.GbfsFeeds feeds = gbfsResponse.data.get(language);
             if (feeds == null) {
-                LOG.error("requested language ({}) not available in GBFS: {}", language, rootUrl);
+                addError(
+                    RentalUpdaterError.Severity.FEED_WIDE,
+                    "requested language (%s) not available in GBFS: %s",
+                    language,
+                    rootUrl
+                );
                 return;
             }
 
@@ -256,11 +302,11 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
             }
         }
 
-        // TODO: make the following methods asynchronous
         // get basic system information. Although this URL/file is technically required, don't fail fast if fetching
         // data from this service doesn't work for some reason.
         updateSystemInformation(systemInformationUrl);
 
+        // TODO: make the following methods asynchronous
         // get information related to docking stations
         updateDockedStationInformation(stationInformationUrl, stationStatusUrl);
 
@@ -271,6 +317,20 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
 
         // TODO have NABSA make rental regions a part of their spec somehow. See https://github.com/NABSA/gbfs/issues/65
         updateRegions();
+
+        // Add a feed-wide error if there was a problem fetching both stations and floating vehicles
+        boolean errorFetchingStations = false;
+        boolean errorFetchingFloatingVehicles = false;
+        for (RentalUpdaterError error : errors) {
+            if (error.severity == RentalUpdaterError.Severity.ALL_STATIONS) {
+                errorFetchingStations = true;
+            } else if (error.severity == RentalUpdaterError.Severity.ALL_FLOATING_VEHICLES) {
+                errorFetchingFloatingVehicles = true;
+            }
+        }
+        if (errorFetchingStations && errorFetchingFloatingVehicles) {
+            addError(RentalUpdaterError.Severity.FEED_WIDE, "Both station and vehicle info not found!");
+        }
     }
 
     /**
@@ -283,35 +343,41 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
     }
 
     /**
-     * Update the system information URL
-     * @param url
+     * Update the system information URL.
      */
     private void updateSystemInformation(String url) {
         if (url == null) {
-            LOG.error("system_information URL is required, but none was found for feed: {}", networkName);
+            addError(
+                RentalUpdaterError.Severity.SYSTEM_INFORMATION,
+                "system_information URL is required, but none was found."
+            );
             return;
         }
-        InputStream data = fetchFromUrl(url, true);
+        SystemInformation data = fetchAndParseFromUrl(url, SystemInformation.class, true);
         if (data == null) {
-            LOG.error("failed to fetch required data from system_information URL for feed: {}", networkName);
+            addError(
+                RentalUpdaterError.Severity.SYSTEM_INFORMATION,
+                "failed to fetch or parse required data from system_information URL."
+            );
             return;
         }
-        // TODO consume data regarding system start date
-        try {
-            data.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        systemInformationData = data.data;
+    }
+
+    /**
+     * Only add and log an error if the config specifically notes that docking stations are expected in this feed.
+     */
+    private void addErrorIfDocksExpected(String message) {
+        if (hasDocks) {
+            addError(RentalUpdaterError.Severity.ALL_STATIONS, message);
         }
     }
 
     private void updateDockedStationInformation(String stationInformationUrl, String stationStatusUrl) {
         // get the station information
         if (stationInformationUrl == null) {
-            // this URL/file is not required unless the system uses docks. Only log a warning if the config specifically
-            // notes that docking stations are expected in this feed.
-            if (hasDocks) {
-                LOG.error("Conditionally required station_information URL is not defined for feed: {}", networkName);
-            }
+            // this URL/file is not required unless the system uses docks.
+            addErrorIfDocksExpected("Conditionally required station_information URL is not defined.");
 
             // There is no point in continuing without gps info on the station locations
             return;
@@ -323,6 +389,7 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
         );
         if (stationInfo == null) {
             // There is no point in continuing without gps info on the station locations
+            addErrorIfDocksExpected("Failed to fetched/parse station info.");
             return;
         }
 
@@ -337,18 +404,16 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
 
         // get status statuses
         if (stationStatusUrl == null) {
-            LOG.error("Station information found, but station status URL is not defined for feed: {}", networkName);
+            addError(
+                RentalUpdaterError.Severity.ALL_STATIONS,
+                "Station information found, but station status URL is not defined."
+            );
             return;
         }
         StationStatus stationStatus = fetchAndParseFromUrl(stationStatusUrl, StationStatus.class, hasDocks);
         if (stationStatus == null) {
-            if (hasDocks) {
-                // this file is required, so something went wrong.
-                LOG.error(
-                    "Failed to fetch and/or parse conditionally required data from station information for feed: {}",
-                    networkName
-                );
-            }
+            // this file is required, so something went wrong.
+            addErrorIfDocksExpected("Failed to fetch/parse station status.");
             // Don't process null station status info
             return;
         }
@@ -356,48 +421,55 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
         for (StationStatus.DockingStationStatusInformation station : stationStatus.data.stations) {
             VehicleRentalStation vehicleRentalStation = stationsByStationId.get(station.station_id);
             if (vehicleRentalStation == null) {
-                LOG.error(
-                    "Station with id: {} not found in station information data for feed: {}",
-                    station.station_id,
-                    networkName
+                addError(
+                    RentalUpdaterError.Severity.INDIVIDUAL_DOCKING_STATION,
+                    "Station with id: %s not found in station information data.",
+                    station.station_id
+                );
+                continue;
+            }
+            if (station.num_bikes_available == null) {
+                addError(
+                    RentalUpdaterError.Severity.INDIVIDUAL_DOCKING_STATION,
+                    "Station with id: %s missing required information on number of vehicles available.",
+                    station.station_id
+                );
+                continue;
+            }
+            if (station.num_docks_available == null) {
+                addError(
+                    RentalUpdaterError.Severity.INDIVIDUAL_DOCKING_STATION,
+                    "Station with id: %s missing required information on number of docks available.",
+                    station.station_id
                 );
                 continue;
             }
             vehicleRentalStation.spacesAvailable = station.num_docks_available;
             vehicleRentalStation.vehiclesAvailable = station.num_bikes_available;
-            if (station.num_bikes_available == null) {
-                LOG.error(
-                    "Station with id: {} missing required information on number of vehicles available within feed: {}",
-                    station.station_id,
-                    networkName
-                );
-                continue;
-            }
-            if (station.num_docks_available == null) {
-                LOG.error(
-                    "Station with id: {} missing required information on number of docks available within feed: {}",
-                    station.station_id,
-                    networkName
-                );
-                continue;
-            }
+
             // assume pickups and dropoffs are allowed if installed if optional data is not provided
-            vehicleRentalStation.allowPickup = station.num_bikes_available > 0 &&
-                (station.is_installed == null || station.is_installed == 1) &&
+            vehicleRentalStation.allowPickup = (station.is_installed == null || station.is_installed == 1) &&
                 (station.is_renting == null || station.is_renting == 1);
-            vehicleRentalStation.allowDropoff = station.num_docks_available > 0 &&
-                (station.is_installed == null || station.is_installed == 1) &&
+            vehicleRentalStation.allowDropoff = (station.is_installed == null || station.is_installed == 1) &&
                 (station.is_returning == null || station.is_returning == 1);
+
+            // set the last reported time
+            vehicleRentalStation.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+                station.last_reported,
+                stationStatus.last_updated
+            );
         }
         stations.addAll(stationsByStationId.values());
-        if (stations.size() > 0) {
-            vehiclesUpdated = true;
-        }
+        vehiclesUpdated = true;
     }
 
     private void updateFreeFloatingVehicles(String freeBikeStatusUrl) {
         FreeBikeStatus floatingBikes = fetchAndParseFromUrl(freeBikeStatusUrl, FreeBikeStatus.class);
         if (floatingBikes == null) {
+            addError(
+                RentalUpdaterError.Severity.ALL_FLOATING_VEHICLES,
+                "Unable to fetch/parse floating vehicles."
+            );
             return;
         }
         for (FreeBikeStatus.FreeBike bike : floatingBikes.data.bikes) {
@@ -417,13 +489,15 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
                 floatingVehicle.networks = Sets.newHashSet(networkName);
                 floatingVehicle.spacesAvailable = 0;
                 floatingVehicle.vehiclesAvailable = 1;
+                floatingVehicle.lastReportedEpochSeconds = RentalStation.getLastReportedTimeUsingFallbacks(
+                    bike.last_reported,
+                    floatingBikes.last_updated
+                );
 
                 stations.add(floatingVehicle);
             }
         }
-        if (stations.size() > 0) {
-            vehiclesUpdated = true;
-        }
+        vehiclesUpdated = true;
     }
 
     /**

@@ -61,6 +61,8 @@ public class BikeRental {
         }
         BikeRentalStationList brsl = new BikeRentalStationList();
         brsl.stations = out;
+        brsl.errorsByNetwork = bikeRentalService.getErrorsByNetwork();
+        brsl.systemInformationDataByNetwork = bikeRentalService.getSystemInformationDataByNetwork();
         return brsl;
     }
 

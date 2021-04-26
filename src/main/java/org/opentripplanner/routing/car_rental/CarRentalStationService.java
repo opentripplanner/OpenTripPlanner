@@ -13,10 +13,14 @@
 
 package org.opentripplanner.routing.car_rental;
 
+import org.opentripplanner.updater.RentalUpdaterError;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +31,12 @@ public class CarRentalStationService implements Serializable {
     private Map<String, CarRentalRegion> carRentalRegions = new HashMap<>();
 
     private Set<CarRentalStation> carRentalStations = new HashSet<CarRentalStation>();
+
+    /* A map of car network name to the latest errors encountered while fetching the feed */
+    private Map<String, List<RentalUpdaterError>> errorsByNetwork = new HashMap<>();
+
+    /* A map of car network name to the latest system information data received while fetching the feed */
+    private Map<String, SystemInformation.SystemInformationData> systemInformationDataByNetwork = new HashMap<>();
 
     public Collection<CarRentalStation> getCarRentalStations() {
         return carRentalStations;
@@ -48,5 +58,24 @@ public class CarRentalStationService implements Serializable {
     
     public void addCarRentalRegion(CarRentalRegion carRentalRegion) {
         carRentalRegions.put(carRentalRegion.network, carRentalRegion); 
+    }
+
+    public Map<String, List<RentalUpdaterError>> getErrorsByNetwork() {
+        return errorsByNetwork;
+    }
+
+    public void setErrorsForNetwork(String network, List<RentalUpdaterError> errors) {
+        errorsByNetwork.put(network, errors);
+    }
+
+    public Map<String, SystemInformation.SystemInformationData> getSystemInformationDataByNetwork() {
+        return systemInformationDataByNetwork;
+    }
+
+    public void setSystemInformationDataForNetwork(
+        String network,
+        SystemInformation.SystemInformationData systemInformationData
+    ) {
+        systemInformationDataByNetwork.put(network, systemInformationData);
     }
 }

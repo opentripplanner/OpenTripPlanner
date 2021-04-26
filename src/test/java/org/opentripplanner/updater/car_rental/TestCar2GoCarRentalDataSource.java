@@ -44,7 +44,7 @@ public class TestCar2GoCarRentalDataSource extends TestCase {
         car2GoCarRentalDataSource.configure(null, config);
 
         // update data source and consume vehicles json
-        assertTrue(car2GoCarRentalDataSource.updateStations());
+        car2GoCarRentalDataSource.update();
         List<CarRentalStation> rentalStations = car2GoCarRentalDataSource.getStations();
         assertEquals(3, rentalStations.size());
         for (CarRentalStation rentalStation : rentalStations) {
@@ -73,7 +73,7 @@ public class TestCar2GoCarRentalDataSource extends TestCase {
         Car2GoCarRentalDataSource car2GoCarRentalDataSource = new Car2GoCarRentalDataSource();
         car2GoCarRentalDataSource.configure(null, config);
 
-        assertTrue(car2GoCarRentalDataSource.updateRegions());
+        car2GoCarRentalDataSource.update();
         CarRentalRegion firstRegion = car2GoCarRentalDataSource.getRegions().get(0);
 
         // verify integrity of region, by checking if a particular point exists inside it

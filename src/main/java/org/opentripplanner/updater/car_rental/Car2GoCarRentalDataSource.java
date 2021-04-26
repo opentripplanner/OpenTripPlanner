@@ -55,5 +55,4 @@ public class Car2GoCarRentalDataSource extends GenericCarRentalDataSource {
 
         return car2go;
     }
-
 }

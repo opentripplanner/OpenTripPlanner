@@ -44,7 +44,6 @@ public class TestGenericGbfsService extends TestCase {
 
         // update data source and consume vehicles json
         gbfsVehicleRentalDataSource.update();
-        assertTrue(gbfsVehicleRentalDataSource.stationsUpdated());
         List<VehicleRentalStation> rentalStations = gbfsVehicleRentalDataSource.getStations();
         assertEquals(4, rentalStations.size());
         for (VehicleRentalStation rentalStation : rentalStations) {

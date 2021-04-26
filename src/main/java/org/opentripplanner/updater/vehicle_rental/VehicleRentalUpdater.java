@@ -12,26 +12,24 @@ import org.opentripplanner.graph_builder.linking.StreetSplitter;
 import org.opentripplanner.routing.edgetype.RentAVehicleOffEdge;
 import org.opentripplanner.routing.edgetype.RentAVehicleOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalRegion;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.RentalUpdaterError;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
+import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +62,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private VehicleRentalDataSource source;
 
+    private int timeToLiveMinutes;
+
     private GraphUpdaterManager updaterManager;
 
     Map<VehicleRentalStation, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
@@ -71,23 +71,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         LOG.debug("Updating vehicle rental stations and regions from " + source);
-        List<VehicleRentalRegion> regions = new ArrayList<>();
-        List<VehicleRentalStation> stations = new ArrayList<>();
         source.update();
-        if (source.stationsUpdated()) {
-            stations = source.getStations();
-        } else {
-            LOG.debug("No station updates");
-        }
-
-        if (source.regionsUpdated()) {
-            regions = source.getRegions();
-        } else {
-            LOG.debug("No region updates");
-        }
 
         // Create graph writer runnable to apply these stations and regions to the graph
-        updaterManager.execute(new VehicleRentalGraphWriterRunnable(stations, regions));
+        updaterManager.execute(new VehicleRentalGraphWriterRunnable(source));
     }
 
     @Override
@@ -111,6 +98,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up vehicle rental updater.");
         this.graph = graph;
         this.source = source;
+        this.timeToLiveMinutes = config.path("timeToLiveMinutes").asInt(Integer.MAX_VALUE);
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating vehicle rental updater running once only (non-polling): {}", source);
         } else {
@@ -133,63 +121,115 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     public void teardown() {}
 
     private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
-        private List<VehicleRentalStation> stations;
-        private List<VehicleRentalRegion> regions;
-        private GeometryFactory geometryFactory = new GeometryFactory();
+        private final List<RentalUpdaterError> errors;
+        private final List<VehicleRentalRegion> regions;
+        private final boolean regionsUpdated;
+        private final List<VehicleRentalStation> stations;
+        private final SystemInformation.SystemInformationData systemInformationData;
 
+        private final GeometryFactory geometryFactory = new GeometryFactory();
 
-        public VehicleRentalGraphWriterRunnable(List<VehicleRentalStation> stations, List<VehicleRentalRegion> regions) {
-            this.stations = stations;
-            this.regions = regions;
+        public VehicleRentalGraphWriterRunnable(VehicleRentalDataSource source) {
+            errors = source.getErrors();
+            regions = source.getRegions();
+            regionsUpdated = source.regionsUpdated();
+            stations = source.getStations();
+            systemInformationData = source.getSystemInformation();
         }
 
         @Override
         public void run(Graph graph) {
-            if (!this.stations.isEmpty()) {
-                applyStations(graph);
-            }
-            if (!this.regions.isEmpty()) {
-                applyRegions(graph);
-            }
+            applyStations(graph);
+            applyRegions(graph);
+            service.setErrorsForNetwork(network, errors);
+            service.setSystemInformationDataForNetwork(network, systemInformationData);
         }
 
         private void applyStations(Graph graph) {
-            // Apply stations to graph
-            Set<VehicleRentalStation> stationSet = new HashSet<>();
-            Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
-            LOG.info("Updating {} vehicle rental stations for network {}.", stations.size(), network);
-            /* add any new stations and update vehicle counts for existing stations */
-            for (VehicleRentalStation station : stations) {
-                service.addVehicleRentalStation(station);
-                stationSet.add(station);
-                VehicleRentalStationVertex vertex = verticesByStation.get(station);
-                if (vertex == null) {
-                    makeVertex(graph, station);
-                } else if (vertex.hasDifferentApproximatePosition(station)) {
-                    LOG.info("Vehicle rental {} has changed position, re-graphing", station);
-
-                    // First remove the old vertices and edges
-                    splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(vertex);
-
-                    // then make a new vertices and edges
-                    makeVertex(graph, station);
-                } else {
-                    vertex.setVehiclesAvailable(station.vehiclesAvailable);
-                    vertex.setSpacesAvailable(station.spacesAvailable);
+            // check if any critical errors occurred
+            boolean feedWideError = false;
+            boolean allStationsError = false;
+            boolean allFloatingVehiclesError = false;
+            for (RentalUpdaterError error : errors) {
+                switch (error.severity) {
+                    case FEED_WIDE:
+                        feedWideError = true;
+                        break;
+                    case ALL_STATIONS:
+                        allStationsError = true;
+                        break;
+                    case ALL_FLOATING_VEHICLES:
+                        allFloatingVehiclesError = true;
+                        break;
                 }
             }
-            // Remove existing stations that were not present in the update
-            List<VehicleRentalStation> toRemove = new ArrayList<>();
+
+            Set<VehicleRentalStation> toRemove = new HashSet<>();
+            Set<VehicleRentalStation> stationsInUpdate = new HashSet<>();
+            LOG.info("Updating vehicle rental stations for network {}.", network);
+
+            // Apply stations to graph if a feed-wide error did not occur
+            if (!feedWideError) {
+                // add any new stations that have fresh-enough data and update vehicle counts for existing stations
+                for (VehicleRentalStation station : stations) {
+                    if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
+                        // skip station as it does not have fresh-enough data
+                        continue;
+                    }
+                    service.addVehicleRentalStation(station);
+                    stationsInUpdate.add(station);
+                    VehicleRentalStationVertex vertex = verticesByStation.get(station);
+                    if (vertex == null) {
+                        makeVertex(graph, station);
+                    } else if (vertex.hasDifferentApproximatePosition(station)) {
+                        LOG.info("Vehicle rental {} has changed position, re-graphing", station);
+
+                        // First remove the old vertices and edges
+                        splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(vertex);
+
+                        // then make a new vertices and edges
+                        makeVertex(graph, station);
+                    } else {
+                        vertex.setVehiclesAvailable(station.vehiclesAvailable);
+                        vertex.setSpacesAvailable(station.spacesAvailable);
+                    }
+                }
+            }
+
+            // Add stations that were not present in the update to a list of stations to remove
             for (Entry<VehicleRentalStation, VehicleRentalStationVertex> entry : verticesByStation.entrySet()) {
                 VehicleRentalStation station = entry.getKey();
-                if (stationSet.contains(station))
+                if (stationsInUpdate.contains(station)) {
+                    // station present in update, do not remove
                     continue;
+                }
+
+                // if there was an error with fetching stations, do not remove any stations that had a last reported
+                // time within the time to live threshold
+                if (
+                    allStationsError &&
+                        !station.isFloatingVehicle &&
+                        DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)
+                ) {
+                    continue;
+                }
+
+                // if there was an error with fetching floating vehicles, do not remove any stations that had a last
+                // reported time within the time to live threshold
+                if (
+                    allFloatingVehiclesError &&
+                        station.isFloatingVehicle &&
+                        DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)
+                ) {
+                    continue;
+                }
 
                 splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(entry.getValue());
 
                 toRemove.add(station);
                 service.removeVehicleRentalStation(station);
             }
+
             for (VehicleRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);
@@ -210,6 +250,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         }
 
         public void applyRegions(Graph graph) {
+            if (!regionsUpdated) return;
             // Adding vehicle rental regions to all edges of the network.
             Map<Coordinate, Set<String>> coordToNetworksMap = new HashMap<>();
             Collection<StreetEdge> edges = graph.getStreetEdges();

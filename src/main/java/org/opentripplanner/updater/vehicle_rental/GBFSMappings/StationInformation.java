@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * Response class for the station_information.json file.
- * See https://github.com/NABSA/gbfs/blob/master/gbfs.md#station_informationjson
+ * See https://github.com/NABSA/gbfs/blob/v1.0/gbfs.md#station_informationjson
  */
 public class StationInformation extends BaseGtfsResponse {
     public StationInformationData data;

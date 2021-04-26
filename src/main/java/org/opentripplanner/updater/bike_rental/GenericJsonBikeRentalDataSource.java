@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,54 +28,82 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
+
     private String url;
     private String headerName;
     private String headerValue;
 
     private String jsonParsePath;
 
+    /**
+     * The severity level to assign to any error that occurs when fetching from this particular data source.
+     */
+    private final RentalUpdaterError.Severity severityFailureType;
+
+    // any errors that occured in the last update
+    protected List<RentalUpdaterError> errors;
+
     List<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
 
     /**
      * Construct superclass
      *
+     * @param severityFailureType The severity level given to an error with when fetching from this particular data
+     *                            source. This can be used to define different error types when fetching from
+     *                            stations of floating vehicles for example.
      * @param jsonPath JSON path to get from enclosing elements to nested rental list.
      *        Separate path levels with '/' For example "d/list"
      *
      */
-    public GenericJsonBikeRentalDataSource(String jsonPath) {
-        jsonParsePath = jsonPath;
-        headerName = "Default";
-        headerValue = null;
+    public GenericJsonBikeRentalDataSource(RentalUpdaterError.Severity severityFailureType, String jsonPath) {
+        this(severityFailureType, jsonPath, "Default", null);
     }
 
     /**
      *
+     * @param severityFailureType The severity level given to an error with when fetching from this particular data
+     *                            source. This can be used to define different error types when fetching from
+     *                            stations of floating vehicles for example.
      * @param jsonPath path to get from enclosing elements to nested rental list.
      *        Separate path levels with '/' For example "d/list"
      * @param headerName header name
      * @param headerValue header value
      */
-    public GenericJsonBikeRentalDataSource(String jsonPath, String headerName, String headerValue) {
+    public GenericJsonBikeRentalDataSource(
+        RentalUpdaterError.Severity severityFailureType,
+        String jsonPath,
+        String headerName,
+        String headerValue
+    ) {
+        this.severityFailureType = severityFailureType;
         jsonParsePath = jsonPath;
         this.headerName = headerName;
         this.headerValue = headerValue;
     }
 
     /**
-     * Construct superclass where rental list is on the top level of JSON code
-     *
+     * Adds an error message to the list of errors and also logs the error message.
      */
-    public GenericJsonBikeRentalDataSource() {
-        jsonParsePath = "";
+    private void addError(String message) {
+        addError(message, null);
+    }
+
+    /**
+     * Adds an error message to the list of errors and also logs the error message (plus Exception if provided).
+     */
+    private void addError(String message, Exception e) {
+        message = String.format("%s (url: %s)", message, url);
+        errors.add(new RentalUpdaterError(severityFailureType, message));
+        log.error(String.format("[severity: %s] %s", severityFailureType, message), e);
     }
 
     @Override
     public boolean update() {
+        errors = new LinkedList<>();
+
+        InputStream data = null;
         try {
-            InputStream data = null;
-        	
-        	URL url2 = new URL(url);
+            URL url2 = new URL(url);
         	
             String proto = url2.getProtocol();
             if (proto.equals("http") || proto.equals("https")) {
@@ -84,20 +114,27 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
             }
             // TODO handle optional GBFS files, where it's not warning-worthy that they don't exist.
             if (data == null) {
-                log.warn("Failed to get data from url " + url);
+                addError("Failed to get data from url " + url);
                 return false;
             }
             parseJSON(data);
-            data.close();
         } catch (IllegalArgumentException e) {
-            log.warn("Error parsing bike rental feed from " + url, e);
+            addError("Error parsing bike rental feed from " + url, e);
             return false;
         } catch (JsonProcessingException e) {
-            log.warn("Error parsing bike rental feed from " + url + "(bad JSON of some sort)", e);
+            addError("Error parsing bike rental feed from " + url + "(bad JSON of some sort)", e);
             return false;
         } catch (IOException e) {
-            log.warn("Error reading bike rental feed from " + url, e);
+            addError("Error reading bike rental feed from " + url, e);
             return false;
+        } finally {
+            try {
+                if (data != null) {
+                    data.close();
+                }
+            } catch (IOException e) {
+                log.warn("An error occurred while closing data stream!", e);
+            }
         }
         return true;
     }
@@ -111,6 +148,8 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(rentalString);
 
+        Integer feedUpdateEpochSeconds = rootNode.path("last_updated").asInt();
+
         if (!jsonParsePath.equals("")) {
             String delimiter = "/";
             String[] parseElement = jsonParsePath.split(delimiter);
@@ -120,7 +159,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
 
             if (rootNode.isMissingNode()) {
                 throw new IllegalArgumentException("Could not find jSON elements " + jsonParsePath);
-              }
+            }
         }
 
         for (int i = 0; i < rootNode.size(); i++) {
@@ -129,7 +168,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
             if (node == null) {
                 continue;
             }
-            BikeRentalStation brstation = makeStation(node);
+            BikeRentalStation brstation = makeStation(node, feedUpdateEpochSeconds);
             if (brstation != null)
                 out.add(brstation);
         }
@@ -146,14 +185,17 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
             scanner = new java.util.Scanner(is).useDelimiter("\\A");
             result = scanner.hasNext() ? scanner.next() : "";
             scanner.close();
-        }
-        finally
-        {
+        } finally {
            if(scanner!=null)
                scanner.close();
         }
         return result;
         
+    }
+
+    @Override
+    public List<RentalUpdaterError> getErrors() {
+        return errors;
     }
 
     @Override
@@ -169,7 +211,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     	this.url = url;
     }
 
-    public abstract BikeRentalStation makeStation(JsonNode rentalStationNode);
+    public abstract BikeRentalStation makeStation(JsonNode rentalStationNode, Integer feedUpdateEpochSeconds);
 
     @Override
     public String toString() {

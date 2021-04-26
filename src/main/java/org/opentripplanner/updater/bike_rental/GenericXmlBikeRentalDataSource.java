@@ -1,14 +1,15 @@
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,9 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     private static final Logger LOG = LoggerFactory.getLogger(GenericXmlBikeRentalDataSource.class);
 
     private String url;
+
+    // any errors that occured in the last update
+    private List<RentalUpdaterError> errors;
 
     List<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
 
@@ -38,8 +42,17 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
         });
     }
 
+    /**
+     * Adds an error message to the list of errors and also logs the error message.
+     */
+    private void addError(String message) {
+        errors.add(new RentalUpdaterError(RentalUpdaterError.Severity.ALL_STATIONS, message));
+        LOG.error(message);
+    }
+
     @Override
     public boolean update() {
+        errors = new LinkedList<>();
         List<BikeRentalStation> newStations = xmlDownloader.download(url, false);
         if (newStations != null) {
             synchronized(this) {
@@ -47,8 +60,13 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
             }
             return true;
         }
-        LOG.info("Can't update bike rental station list from: " + url + ", keeping current list.");
+        addError("Can't update bike rental station list from: " + url + ", keeping current list.");
         return false;
+    }
+
+    @Override
+    public List<RentalUpdaterError> getErrors() {
+        return errors;
     }
 
     @Override

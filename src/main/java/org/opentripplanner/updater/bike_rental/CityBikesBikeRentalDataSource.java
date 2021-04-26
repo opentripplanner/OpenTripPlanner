@@ -7,8 +7,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -26,10 +27,12 @@ import org.xml.sax.SAXException;
 
 // TODO This class could probably inherit from GenericJSONBikeRentalDataSource
 public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
-
-    private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
+    private static final Logger log = LoggerFactory.getLogger(CityBikesBikeRentalDataSource.class);
 
     private String url;
+
+    // any errors that occurred in the last update
+    private List<RentalUpdaterError> errors;
 
     ArrayList<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
 
@@ -37,12 +40,22 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Json
 
     }
 
+    /**
+     * Adds an error message to the list of errors and also logs the error message.
+     */
+    private void addError(String message) {
+        errors.add(new RentalUpdaterError(RentalUpdaterError.Severity.ALL_STATIONS, message));
+        log.error(message);
+    }
+
     @Override
     public boolean update() {
+        errors = new LinkedList<>();
+        InputStream stream = null;
         try {
-            InputStream stream = HttpUtils.getData(url);
+            stream = HttpUtils.getData(url);
             if (stream == null) {
-                log.warn("Failed to get data from url " + url);
+                addError("Failed to get data from url " + url);
                 return false;
             }
 
@@ -58,13 +71,22 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Json
 
             parseJson(data);
         } catch (IOException e) {
-            log.warn("Error reading bike rental feed from " + url, e);
+            addError("Error reading bike rental feed from " + url);
             return false;
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         } catch (SAXException e) {
-            log.warn("Error parsing bike rental feed from " + url + "(bad XML of some sort)", e);
+            addError("Error parsing bike rental feed from " + url + "(bad XML of some sort)");
             return false;
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    log.warn("Error encountered while trying to close input stream", e);
+                    e.printStackTrace();
+                }
+            }
         }
         return true;
     }
@@ -92,6 +114,11 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Json
         synchronized (this) {
             stations = out;
         }
+    }
+
+    @Override
+    public List<RentalUpdaterError> getErrors() {
+        return errors;
     }
 
     @Override

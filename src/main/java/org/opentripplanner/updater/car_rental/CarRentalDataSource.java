@@ -15,27 +15,30 @@ package org.opentripplanner.updater.car_rental;
 
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
+import org.opentripplanner.updater.RentalUpdaterError;
 
 import java.util.List;
 
 public interface CarRentalDataSource {
 
-    /** Update the regions from the source;
-     * returns true if there might have been changes */
-    boolean updateRegions();
-
-    /** Update the stations from the source;
-     * returns true if there might have been changes */
-    boolean updateStations();
+    /**
+     * @return a list of all errors that occurred during the most recent update.
+     */
+    List<RentalUpdaterError> getErrors();
 
     /**
-     * @return a List of all currently known car rental stations. The updater will use this to update the Graph.
+     * @return a list of all currently known car rental stations. The updater will use this to update the Graph.
      */
     List<CarRentalStation> getStations();
 
     /**
-     * @return a List of all currently known car rental regions. The updater will use this to update the Graph.
+     * @return a list of all currently known car rental regions. The updater will use this to update the Graph.
      */
     List<CarRentalRegion> getRegions();
 
+    /** returns true if the regions have been updated since the last updated */
+    boolean regionsUpdated();
+
+    /** updates to the latest data */
+    void update();
 }

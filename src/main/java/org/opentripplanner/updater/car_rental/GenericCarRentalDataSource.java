@@ -16,6 +16,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class GenericCarRentalDataSource implements CarRentalDataSource, JsonConfigurable {
@@ -57,14 +59,26 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
     // updates if the responses are the same
     private HashCode lastRegionsHash;
 
+    // whether the regions were updated in the last update
+    private boolean regionsUpdated;
+
+    // any errors that occured in the last update
+    private List<RentalUpdaterError> errors;
+
     // abstract method for parsing json into a list of CarRentalStations that should be implemented
     // by a company-specific car rental updater
     protected abstract List<CarRentalStation> parseVehicles(InputStream json)
         throws IOException;
 
+    @Override public List<RentalUpdaterError> getErrors() {
+        return errors;
+    }
+
     @Override public List<CarRentalStation> getStations() { return stations; }
 
     @Override public List<CarRentalRegion> getRegions() { return regions; }
+
+    @Override public boolean regionsUpdated() { return regionsUpdated; }
 
     protected void configure(JsonNode config) {
         String vehiclesUrl = config.path("vehiclesUrl").asText(); // path() returns MissingNode not null.
@@ -76,9 +90,28 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
     }
 
     /**
+     * Adds an error message to the list of errors and also logs the error message.
+     */
+    private void addError(RentalUpdaterError.Severity severity, String message) {
+        message = String.format("%s (feed: %s)", message, networkName);
+        errors.add(new RentalUpdaterError(severity, message));
+        LOG.error(String.format("[severity: %s] %s", severity, message));
+    }
+    
+    @Override
+    public void update() {
+        regionsUpdated = false;
+        stations = new LinkedList<>();
+        errors = new LinkedList<>();
+        
+        updateRegions();
+        updateStations();
+    }
+
+    /**
      * Update the allowable dropoff regions for the car rental datasource.
      */
-    @Override public boolean updateRegions() {
+    private boolean updateRegions() {
         // regions url is optional, so if it's not set, return false
         if (regionsUrl == null) return false;
         
@@ -87,12 +120,11 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
         long now = new Date().getTime();
         if (lastRegionsUpdateTime > now - MINIMUM_REGION_UPDATE_TIME) return false;
 
+        InputStream data = null;
         try {
             LOG.debug("fetching data for region of network {}", networkName);
 
             // fetch regions
-            InputStream data = null;
-
             URL url2 = new URL(regionsUrl);
 
             String proto = url2.getProtocol();
@@ -104,7 +136,10 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
             }
 
             if (data == null) {
-                LOG.warn("Failed to get data from url " + regionsUrl);
+                addError(
+                    RentalUpdaterError.Severity.ALL_REGIONS,
+                    "Failed to get data from url " + regionsUrl
+                );
                 return false;
             }
 
@@ -122,10 +157,20 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
 
             // response is different, update regions
             this.regions = parseRegionJson(rootNode);
-            data.close();
+            this.regionsUpdated = true;
         } catch (IOException e) {
-            LOG.warn("Error reading car rental regions from " + regionsUrl, e);
+            addError(
+                RentalUpdaterError.Severity.ALL_REGIONS,
+                "Failed to get data from url " + regionsUrl
+            );
             return false;
+        } finally {
+            try {
+                data.close();
+            } catch (IOException e) {
+                LOG.warn("Error encountered while trying to close car rental region input stream", e);
+                e.printStackTrace();
+            }
         }
 
         LOG.debug("successfully updated regions for network {}", networkName);
@@ -137,11 +182,10 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
      * Update all car rental stations.  Fetch from the url and then have the implementing datasource
      * parse the inputstream and return a list of CarRentalStations.
      */
-    @Override public boolean updateStations() {
+    private boolean updateStations() {
+        InputStream data = null;
         try {
             // fetch stations
-            InputStream data = null;
-
             URL url2 = new URL(vehiclesUrl);
 
             String proto = url2.getProtocol();
@@ -153,17 +197,31 @@ public abstract class GenericCarRentalDataSource implements CarRentalDataSource,
             }
 
             if (data == null) {
-                LOG.warn("Failed to get data from url " + vehiclesUrl);
+                addError(
+                    // it is assumed that all car rental stations are floating vehicles
+                    RentalUpdaterError.Severity.ALL_FLOATING_VEHICLES,
+                    "Failed to get data from url " + vehiclesUrl
+                );
                 return false;
             }
 
             // delegate parsing of json to implementing datasource and set the result as the
             // stations
             this.stations = parseVehicles(data);
-            data.close();
         } catch (IOException e) {
-            LOG.warn("Error reading car rental stations from " + vehiclesUrl, e);
+            addError(
+                // it is assumed that all car rental stations are floating vehicles
+                RentalUpdaterError.Severity.ALL_FLOATING_VEHICLES,
+                "Failed to get data from url " + vehiclesUrl
+            );
             return false;
+        } finally {
+            try {
+                data.close();
+            } catch (IOException e) {
+                LOG.warn("Error encountered while trying to close car rental station input stream", e);
+                e.printStackTrace();
+            }
         }
         return true;
     }

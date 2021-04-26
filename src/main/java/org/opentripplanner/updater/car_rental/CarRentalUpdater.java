@@ -22,13 +22,14 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.RentalUpdaterError;
+import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
+import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,6 +56,8 @@ public class CarRentalUpdater extends PollingGraphUpdater {
 
     private CarRentalDataSource source;
 
+    private int timeToLiveMinutes;
+
     private GraphUpdaterManager updaterManager;
 
     Map<CarRentalStation, CarRentalStationVertex> verticesByStation = new HashMap<>();
@@ -62,22 +65,10 @@ public class CarRentalUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() throws Exception {
         LOG.debug("Updating car rental stations and regions from " + source);
-        List<CarRentalRegion> regions = new ArrayList<>();
-        List<CarRentalStation> stations = new ArrayList<>();
-        if (source.updateStations()) {
-            stations = source.getStations();
-        } else {
-            LOG.debug("No station updates");
-        }
-
-        if (source.updateRegions()) {
-            regions = source.getRegions();
-        } else {
-            LOG.debug("No region updates");
-        }
+        source.update();
 
         // Create graph writer runnable to apply these stations and regions to the graph
-        updaterManager.execute(new CarRentalGraphWriterRunnable(stations, regions));
+        updaterManager.execute(new CarRentalGraphWriterRunnable(source));
     }
 
     @Override
@@ -100,6 +91,7 @@ public class CarRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up car rental updater.");
         this.graph = graph;
         this.source = source;
+        this.timeToLiveMinutes = config.path("timeToLiveMinutes").asInt(Integer.MAX_VALUE);
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating car rental updater running once only (non-polling): {}", source);
         } else {
@@ -123,63 +115,116 @@ public class CarRentalUpdater extends PollingGraphUpdater {
     public void teardown() {}
 
     private class CarRentalGraphWriterRunnable implements GraphWriterRunnable {
-        private List<CarRentalStation> stations;
-        private List<CarRentalRegion> regions;
+        private final List<RentalUpdaterError> errors;
+        private final List<CarRentalRegion> regions;
+        private final boolean regionsUpdated;
+        private final List<CarRentalStation> stations;
+        private final SystemInformation.SystemInformationData systemInformationData;
+
         private GeometryFactory geometryFactory = new GeometryFactory();
 
 
-        public CarRentalGraphWriterRunnable(List<CarRentalStation> stations, List<CarRentalRegion> regions) {
-            this.stations = stations;
-            this.regions = regions;
+        public CarRentalGraphWriterRunnable(CarRentalDataSource source) {
+            errors = source.getErrors();
+            regions = source.getRegions();
+            regionsUpdated = source.regionsUpdated();
+            stations = source.getStations();
+            systemInformationData = null;
         }
 
         @Override
         public void run(Graph graph) {
-            if (!this.stations.isEmpty()) {
-                applyStations(graph);
-            }
-            if (!this.regions.isEmpty()) {
-                applyRegions(graph);
-            }
+            applyStations(graph);
+            applyRegions(graph);
+            service.setErrorsForNetwork(network, errors);
+            service.setSystemInformationDataForNetwork(network, systemInformationData);
         }
 
         private void applyStations(Graph graph) {
-            // Apply stations to graph
-            Set<CarRentalStation> stationSet = new HashSet<>();
-            Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
-            LOG.info("Updating {} rental car stations for network {}.", stations.size(), network);
-            /* add any new stations and update car counts for existing stations */
-            for (CarRentalStation station : stations) {
-                service.addCarRentalStation(station);
-                stationSet.add(station);
-                CarRentalStationVertex vertex = verticesByStation.get(station);
-                if (vertex == null) {
-                    makeVertex(graph, station);
-                } else if (vertex.hasDifferentApproximatePosition(station)) {
-                    LOG.info("Rental car {} has changed position, re-graphing", station);
-
-                    // First remove the old vertices and edges
-                    splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(vertex);
-
-                    // then make a new vertices and edges
-                    makeVertex(graph, station);
-                } else {
-                    vertex.setCarsAvailable(station.carsAvailable);
-                    vertex.setSpacesAvailable(station.spacesAvailable);
+            // check if any critical errors occurred
+            boolean feedWideError = false;
+            boolean allStationsError = false;
+            boolean allFloatingVehiclesError = false;
+            for (RentalUpdaterError error : errors) {
+                switch (error.severity) {
+                case FEED_WIDE:
+                    feedWideError = true;
+                    break;
+                case ALL_STATIONS:
+                    allStationsError = true;
+                    break;
+                case ALL_FLOATING_VEHICLES:
+                    allFloatingVehiclesError = true;
+                    break;
                 }
             }
-            // Remove existing stations that were not present in the update
-            List<CarRentalStation> toRemove = new ArrayList<>();
+
+            Set<CarRentalStation> toRemove = new HashSet<>();
+            Set<CarRentalStation> stationsInUpdate = new HashSet<>();
+            LOG.info("Updating car rental stations for network {}.", network);
+
+            // Apply stations to graph if a feed-wide error did not occur
+            if (!feedWideError) {
+                // add any new stations that have fresh-enough data and update vehicle counts for existing stations
+                for (CarRentalStation station : stations) {
+                    if (!DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)) {
+                        // skip station as it does not have fresh-enough data
+                        continue;
+                    }
+                    service.addCarRentalStation(station);
+                    stationsInUpdate.add(station);
+                    CarRentalStationVertex vertex = verticesByStation.get(station);
+                    if (vertex == null) {
+                        makeVertex(graph, station);
+                    } else if (vertex.hasDifferentApproximatePosition(station)) {
+                        LOG.info("Rental car {} has changed position, re-graphing", station);
+
+                        // First remove the old vertices and edges
+                        splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(vertex);
+
+                        // then make a new vertices and edges
+                        makeVertex(graph, station);
+                    } else {
+                        vertex.setCarsAvailable(station.carsAvailable);
+                        vertex.setSpacesAvailable(station.spacesAvailable);
+                    }
+                }
+            }
+
+            // Add stations that were not present in the update to a list of stations to remove
             for (Entry<CarRentalStation, CarRentalStationVertex> entry : verticesByStation.entrySet()) {
                 CarRentalStation station = entry.getKey();
-                if (stationSet.contains(station))
+                if (stationsInUpdate.contains(station)) {
+                    // station present in update, do not remove
                     continue;
+                }
+
+                // if there was an error with fetching stations, do not remove any stations that had a last reported
+                // time within the time to live threshold
+                if (
+                    allStationsError &&
+                        !station.isFloatingCar &&
+                        DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)
+                ) {
+                    continue;
+                }
+
+                // if there was an error with fetching floating vehicles, do not remove any stations that had a last
+                // reported time within the time to live threshold
+                if (
+                    allFloatingVehiclesError &&
+                        station.isFloatingCar &&
+                        DateUtils.withinTimeToLive(station.lastReportedEpochSeconds, timeToLiveMinutes)
+                ) {
+                    continue;
+                }
 
                 splitter.removeRentalStationVertexAndAssociatedSemiPermanentVerticesAndEdges(entry.getValue());
 
                 toRemove.add(station);
                 service.removeCarRentalStation(station);
             }
+
             for (CarRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);
@@ -200,6 +245,8 @@ public class CarRentalUpdater extends PollingGraphUpdater {
         }
 
         public void applyRegions(Graph graph) {
+            if (!regionsUpdated) return;
+
             // Adding car service regions to all edges of the network.
             LOG.info("Applying {} rental car regions.", regions.size());
             Collection<StreetEdge> edges = graph.getStreetEdges();

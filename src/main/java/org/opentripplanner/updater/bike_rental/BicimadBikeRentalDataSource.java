@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.RentalUpdaterError;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -46,15 +48,26 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonCo
 
         private String url;
 
+        // any errors that occured in the last update
+        private List<RentalUpdaterError> errors;
+
         List<BikeRentalStation> stations = new ArrayList<>();
 
         public BicimadBikeRentalDataSource() {
         }
 
-        @Override public boolean update() {
-                try {
-                        InputStream data;
+        /**
+         * Adds an error message to the list of errors and also logs the error message.
+         */
+        private void addError(String message) {
+                errors.add(new RentalUpdaterError(RentalUpdaterError.Severity.ALL_STATIONS, message));
+                log.error(message);
+        }
 
+        @Override public boolean update() {
+                errors = new LinkedList<>();
+                InputStream data = null;
+                try {
                         URL url2 = new URL(url);
 
                         String proto = url2.getProtocol();
@@ -66,21 +79,29 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonCo
                         }
 
                         if (data == null) {
-                                log.warn("Failed to get data from url " + url);
+                                addError("Failed to get data from url " + url);
                                 return false;
                         }
                         parseJSON(data);
-                        data.close();
                 } catch (IllegalArgumentException e) {
-                        log.warn("Error parsing bike rental feed from " + url, e);
+                        addError("Error parsing bike rental feed from " + url);
                         return false;
                 } catch (JsonProcessingException e) {
                         log.warn("Error parsing bike rental feed from " + url
                                 + "(bad JSON of some sort)", e);
                         return false;
                 } catch (IOException e) {
-                        log.warn("Error reading bike rental feed from " + url, e);
+                        addError("Error reading bike rental feed from " + url);
                         return false;
+                } finally {
+                        if (data != null) {
+                                try {
+                                        data.close();
+                                } catch (IOException e) {
+                                        log.warn("Error encountered while trying to close input stream", e);
+                                        e.printStackTrace();
+                                }
+                        }
                 }
                 return true;
         }
@@ -141,6 +162,11 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonCo
                 }
                 return result;
 
+        }
+
+        @Override
+        public List<RentalUpdaterError> getErrors() {
+                return errors;
         }
 
         @Override public synchronized List<BikeRentalStation> getStations() {
