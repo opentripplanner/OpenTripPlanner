@@ -58,8 +58,13 @@ public interface RaptorTripSchedule {
     RaptorTripPattern pattern();
 
     /**
-     * Search for departure-stop-position for the given trip, earliest-departure-time
-     * and stop index.
+     * Search for departure-stop-position for the given trip, earliest-departure-time and stop
+     * index. We need the time in addition to the stop in cases were the trip pattern visit the
+     * same stop twice. Also the time is not sufficient, since more than one stop could have the
+     * exact same departure time.
+     * <p>
+     * Raptor save memory by NOT storing the board/arrival stop positions in pattern; Hence we need
+     * this method when mapping into a itinerary or raptor path.
      * <p>
      * Avoid using this during routing, it is not optimized for performance.
      *
@@ -77,7 +82,13 @@ public interface RaptorTripSchedule {
     }
 
     /**
-     * Search for departure-stop-position for the given trip, earliest-departure-time and stop index.
+     * Search for departure-stop-position for the given trip, earliest-departure-time and stop
+     * index. We need the time in addition to the stop in cases were the trip pattern visit the
+     * same stop twice. Also the time is not sufficient, since more than one stop could have the
+     * exact same departure time.
+     * <p>
+     * Raptor save memory by NOT storing the board/arrival stop positions in pattern; Hence we need
+     * this method when mapping into a itinerary or raptor path.
      * <p>
      * Avoid using this during routing, it is not optimized for performance.
      *
