@@ -67,9 +67,6 @@ class TransferMapper {
 
   private final TripStopTimes stopTimesByTrip;
 
-  private Map<Route, List<Trip>> tripsByRoute;
-
-
   TransferMapper(
       RouteMapper routeMapper,
       StationMapper stationMapper,
@@ -98,10 +95,6 @@ class TransferMapper {
   }
 
   Collection<Transfer> map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
-    tripsByRoute = createTripsByRouteMapIfRouteTransfersExist(
-        tripMapper.mappedTrips(),
-        allTransfers
-    );
     List<Transfer> result = new ArrayList<>();
 
     for (org.onebusaway.gtfs.model.Transfer it : allTransfers) {
