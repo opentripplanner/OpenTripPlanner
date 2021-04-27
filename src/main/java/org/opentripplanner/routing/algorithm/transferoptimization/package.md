@@ -38,18 +38,24 @@ two trips in a given path.
  - Using GTFS transfers.txt it is possible to set the `min_transfer_time` with `transfer_type = 2`. 
  - The NeTEx Interchange MaximumWaitTime is ignored.
 
-## Process
+## Implementation
 
 Finding the best transfers is done in 2 separate steps in OTP:
 
  1. As part of the routing. The routing engine (Raptor) has a generalized-cost and 
-    number-of-transfers as criteria during the routing. Some of the goals above are implemented 
-    using the generalized-cost.
- 2. Post processing paths. Paths from the routing search are optimized with respect to where 
-    transfers happen for each pair of transit rides(trips). This step do NOT compare two paths 
-    returned by the router(Raptor), but instead find all possible transfers for a given path, and 
-    the different alternatives to transfer between each pair of trip within the path. This is an 
-    outline of the process:
+    number-of-transfers as criteria during the routing. In addition, Raptor support overriding 
+    regular transfers with guaranteed transfers. 
+    1. Goal 1 is achieved by having `number-of-transfers` as a Raptor criteria.
+    2. Goal 2 is achieved by giving some stops a lower _visiting-cost_ according to the 
+       `StopTransferPriority`.
+    3. Goal 3 and 6 is achieved by allowing guaranteed transfers to override regular transfers. An 
+       optional `RaptorGuaranteedTransferProvider` is injected into Raptor witch Raptor calls to 
+       get guaranteed transfers. This service is also responsible for rejecting a transfer. 
+ 2. Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the routing search are 
+    optimized with respect to where transfers happen for each pair of transit rides(trips). This 
+    step does NOT compare two paths returned by the router(Raptor), but instead find all possible
+    transfers for a given path, and the different alternatives to transfer between each pair of 
+    trip within the path. This is an outline of the process:
     1. For each path find all possible permutations of transfers.
     2. Filter paths based on priority including `StaySeated=100`, `Guaranteed=10`, `Preferred=2`, 
        `Recommended=1`, `Allowed=0` and `NotAllowed=-1000`. Each path is given a combined score, 

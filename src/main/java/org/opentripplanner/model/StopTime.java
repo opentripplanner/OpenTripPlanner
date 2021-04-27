@@ -14,8 +14,6 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 public final class StopTime implements Comparable<StopTime> {
 
-    private static final long serialVersionUID = 1L;
-
     public static final int MISSING_VALUE = -999;
 
     private Trip trip;

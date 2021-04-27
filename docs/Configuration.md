@@ -81,7 +81,7 @@ deployment.
 }
 ```     
 In the example above the environment variable `GCS_SERVICE_CREDENTIALS` on the local machine where
-OTP is deployed is injected into the config. Also, the Maven version number `x.y.z` is injected.
+OTP is deployed is injected into the config. Also, the OTP serialization version id is injected.
 
 The project information variables available are:
 
@@ -126,7 +126,7 @@ serialization version id in use by the planning OPT instances you have deploied 
 This way you can roll forward and backward new OTP instances without worring about building new 
 graphs.
 
-There is various ways to acces this information. To get the `Graph.obj` serialization version id 
+There are various ways to access this information. To get the `Graph.obj` serialization version id 
 you can run the following bash command:
  - `head -c 29 Graph.obj  ==>  OpenTripPlannerGraph;0000007;` (file header)
  - `head -c 28 Graph.obj | tail -c 7  ==>  0000007`  (version id)
@@ -155,6 +155,29 @@ example:
     }
 }
 ```
+
+## OTP Features
+Here is a list of all features witch can be toggled on/off.
+
+Feature | Description | Enabled by default | Sandbox
+--------|-------------|--------------------|-------- 
+`APIExternalGeocoder` | Enable the geocode endpoint | yes | no
+`APIBikeRental` | Enable the bike rental endpoint | yes | no
+`APIServerInfo` | Enable the server info endpoint |  yes | no
+`APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
+`APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
+`OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (witch stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
+`GuaranteedTransfers` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
+`ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
+`GoogleCloudStorage` | Enable Google Cloud Storage integration | no | yes
+`SandboxAPITransmodelApi` | Enable Entur Transmodel(NeTEx) GraphQL API | no | yes
+`SandboxAPILegacyGraphQLApi` | Enable (GTFS) GraphQL API | no | yes
+`SandboxAPIMapboxVectorTilesApi` | Enable Mapbox vector tiles API | no | yes
+`SandboxAPIParkAndRideApi` | Enable park-and-ride endpoint | no | yes
+`TransferAnalyzer` | Analyze transfers during graph build | no | yes
+`FlexRouting` | Enable FLEX routing | no | yes
+`FloatingBike` | Enable floating bike routing | no | yes
+
 
 
 # Graph Build Configuration
