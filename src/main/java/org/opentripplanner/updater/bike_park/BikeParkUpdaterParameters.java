@@ -6,6 +6,7 @@ public class BikeParkUpdaterParameters implements PollingGraphUpdaterParameters 
 
   private final String configRef;
   private final String url;
+  private final String feedId;
   private final int frequencySec;
   private final String namePrefix;
   private final boolean zip;
@@ -13,12 +14,14 @@ public class BikeParkUpdaterParameters implements PollingGraphUpdaterParameters 
 
   public BikeParkUpdaterParameters(
       String configRef,
+      String feedId,
       String url,
       String namePrefix,
       int frequencySec,
       boolean zip
   ) {
     this.configRef = configRef;
+    this.feedId = feedId;
     this.url = url;
     this.frequencySec = frequencySec;
     this.namePrefix = namePrefix;
@@ -39,6 +42,7 @@ public class BikeParkUpdaterParameters implements PollingGraphUpdaterParameters 
   KmlBikeParkDataSource.Parameters sourceParameters() {
     return new KmlBikeParkDataSource.Parameters() {
       @Override public String getUrl() { return url; }
+      @Override public String getFeedId() { return feedId; }
       @Override public String getNamePrefix() { return namePrefix; }
       @Override public boolean zip() { return zip; }
     };

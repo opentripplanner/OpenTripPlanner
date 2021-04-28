@@ -7,11 +7,16 @@ import java.util.List;
 
 public class TestKmlBikeParkSource extends TestCase {
 
+  private static final String TEST_FEED_ID = "testFeed";
+
   public void testKML() {
 
     KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new KmlBikeParkDataSource.Parameters() {
       @Override public String getNamePrefix() {
         return null;
+      }
+      @Override public String getFeedId() {
+        return TEST_FEED_ID;
       }
       @Override public boolean zip() {
         return false;
@@ -39,6 +44,9 @@ public class TestKmlBikeParkSource extends TestCase {
           @Override public String getNamePrefix() {
               return null;
           }
+        @Override public String getFeedId() {
+          return TEST_FEED_ID;
+        }
           @Override public boolean zip() {
               return false;
           }

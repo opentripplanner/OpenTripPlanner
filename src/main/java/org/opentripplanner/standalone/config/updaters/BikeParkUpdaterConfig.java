@@ -8,6 +8,7 @@ public class BikeParkUpdaterConfig {
     return new BikeParkUpdaterParameters(
         updaterRef,
         c.asText("url", null),
+        c.asText("feedId", null),
         c.asText("namePrefix", null),
         c.asInt("frequencySec", 60),
         c.asBoolean("zip", false)
