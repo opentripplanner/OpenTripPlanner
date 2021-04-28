@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Stop;
@@ -66,6 +67,7 @@ class TripPatternMapper {
             EntityById<Operator> operatorById,
             EntityById<Stop> stopsById,
             EntityById<FlexStopLocation> flexStopLocationsById,
+            EntityById<FlexLocationGroup> flexLocationGroupsById,
             EntityById<org.opentripplanner.model.Route> otpRouteById,
             Set<FeedScopedId> shapePointsIds,
             ReadOnlyHierarchicalMap<String, Route> routeById,
@@ -94,6 +96,7 @@ class TripPatternMapper {
             idFactory,
             stopsById,
             flexStopLocationsById,
+            flexLocationGroupsById,
             destinationDisplayById,
             quayIdByStopPointRef,
             flexibleStopPlaceIdByStopPointRef,
@@ -152,7 +155,8 @@ class TripPatternMapper {
         if (result.tripStopTimes
             .get(trips.get(0))
             .stream()
-            .anyMatch(t -> t.getStop() instanceof FlexStopLocation)) {
+            .anyMatch(t -> t.getStop() instanceof FlexStopLocation
+                || t.getStop() instanceof FlexLocationGroup)) {
             return result;
         }
 

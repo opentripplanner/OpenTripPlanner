@@ -33,6 +33,7 @@ public class TripPatternMapperTest {
                 new EntityById<>(),
                 sample.getStopsById(),
                 new EntityById<>(),
+                new EntityById<>(),
                 sample.getOtpRouteByid(),
                 Collections.emptySet(),
                 sample.getRouteById(),

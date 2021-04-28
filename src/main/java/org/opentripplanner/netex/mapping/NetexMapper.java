@@ -5,11 +5,13 @@ import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
@@ -227,12 +229,14 @@ public class NetexMapper {
     }
 
     private void mapFlexibleStopPlaces(NetexEntityIndexReadOnlyView netexIndex) {
-        FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(idFactory);
+        FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(idFactory, transitBuilder.getStops().values());
 
         for (FlexibleStopPlace flexibleStopPlace : netexIndex.getFlexibleStopPlacesById().localValues()) {
-            FlexStopLocation stopLocation = flexStopLocationMapper.map(flexibleStopPlace);
-            if (stopLocation != null) {
-                transitBuilder.getLocations().add(stopLocation);
+            StopLocation stopLocation = flexStopLocationMapper.map(flexibleStopPlace);
+            if (stopLocation instanceof FlexStopLocation) {
+                transitBuilder.getLocations().add((FlexStopLocation) stopLocation);
+            } else if (stopLocation instanceof FlexLocationGroup) {
+                transitBuilder.getLocationGroups().add((FlexLocationGroup) stopLocation);
             }
         }
     }
@@ -288,6 +292,7 @@ public class NetexMapper {
                 transitBuilder.getOperatorsById(),
                 transitBuilder.getStops(),
                 transitBuilder.getLocations(),
+                transitBuilder.getLocationGroups(),
                 transitBuilder.getRoutes(),
                 transitBuilder.getShapePoints().keySet(),
                 netexIndex.getRouteById(),

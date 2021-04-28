@@ -40,6 +40,7 @@ public class StopTimesMapperTest {
                 MappingSupport.ID_FACTORY,
                 sample.getStopsById(),
                 new EntityById<>(),
+                new EntityById<>(),
                 sample.getDestinationDisplayById(),
                 sample.getQuayIdByStopPointRef(),
                 new HierarchicalMap<>(),
