@@ -1,22 +1,23 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
+import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class TestUnconnectedAreas extends TestCase {
+import static org.junit.Assert.*;
+
+public class TestUnconnectedAreas {
 
     /**
      * The P+R.osm.gz file contains 2 park and ride, one a single way area and the other a
@@ -27,7 +28,7 @@ public class TestUnconnectedAreas extends TestCase {
      * virtual nodes at the place where the street intersects the P+R areas. See ticket #1562.
      */
     @Test
-    public void testUnconnectedParkAndRide() throws Exception {
+    public void testUnconnectedParkAndRide() {
 
         Graph gg = new Graph();
 
@@ -38,19 +39,19 @@ public class TestUnconnectedAreas extends TestCase {
         File file = new File(getClass().getResource("P+R.osm.pbf").getFile());
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
         loader.setProvider(provider);
-        loader.buildGraph(gg, new HashMap<Class<?>, Object>(), issueStore);
+        loader.buildGraph(gg, new HashMap<>(), issueStore);
 
         assertEquals(1, issueStore.getIssues().size());
 
         int nParkAndRide = 0;
         int nParkAndRideLink = 0;
         for (Vertex v : gg.getVertices()) {
-            if (v instanceof ParkAndRideVertex) {
+            if (v instanceof VehicleParkingVertex) {
                 nParkAndRide++;
             }
         }
         for (Edge e : gg.getEdges()) {
-            if (e instanceof ParkAndRideLinkEdge) {
+            if (e instanceof StreetVehicleParkingLink) {
                 nParkAndRideLink++;
             }
         }
@@ -73,21 +74,21 @@ public class TestUnconnectedAreas extends TestCase {
         File file = new File(getClass().getResource("hackett_pr.osm.pbf").getFile());
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
         loader.setProvider(provider);
-        loader.buildGraph(g, new HashMap<Class<?>, Object>());
+        loader.buildGraph(g, new HashMap<>());
     	
         Vertex washTwp = null;
         
         int nParkAndRide = 0;
         int nParkAndRideLink = 0;
         for (Vertex v : g.getVertices()) {
-        	if (v instanceof ParkAndRideVertex) {
+        	if (v instanceof VehicleParkingVertex) {
         		nParkAndRide++;
         		washTwp = v;
         	}
         }
         
         for (Edge e : g.getEdges()) {
-            if (e instanceof ParkAndRideLinkEdge) {
+            if (e instanceof StreetVehicleParkingLink) {
                 nParkAndRideLink++;
             }
         }
@@ -101,23 +102,23 @@ public class TestUnconnectedAreas extends TestCase {
         
         assertNotNull(washTwp);
         
-        List<String> connections = new ArrayList<String>();
+        List<String> connections = new ArrayList<>();
         
         for (Edge e : washTwp.getOutgoing()) {
-        	if (e instanceof ParkAndRideEdge)
+        	if (e instanceof VehicleParkingEdge)
         		continue;
         	
-        	assertTrue(e instanceof ParkAndRideLinkEdge);
+        	assertTrue(e instanceof StreetVehicleParkingLink);
         	
         	connections.add(e.getToVertex().getLabel());
         }
         
         // symmetry
         for (Edge e : washTwp.getIncoming()) {
-        	if (e instanceof ParkAndRideEdge)
+        	if (e instanceof VehicleParkingEdge)
         		continue;
         	
-        	assertTrue(e instanceof ParkAndRideLinkEdge);
+        	assertTrue(e instanceof StreetVehicleParkingLink);
         	assertTrue(connections.contains(e.getFromVertex().getLabel()));
         }
         
@@ -131,7 +132,7 @@ public class TestUnconnectedAreas extends TestCase {
      * Test the situation where a road passes over a node of a park and ride but does not have a node there.
      */
      @Test
-     public void testRoadPassingOverNode () throws Exception {
+     public void testRoadPassingOverNode () {
     	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
     	 assertTrue(connections.contains("osm:node:-10"));
      }
@@ -141,7 +142,7 @@ public class TestUnconnectedAreas extends TestCase {
       * Additionally, the node of the road is duplicated to test this corner case.
       */
      @Test
-     public void testAreaPassingOverNode () throws Exception {
+     public void testAreaPassingOverNode () {
     	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
     	 assertTrue(connections.contains("osm:node:-10"));
      }
@@ -179,14 +180,14 @@ public class TestUnconnectedAreas extends TestCase {
          int nParkAndRide = 0;
          int nParkAndRideLink = 0;
          for (Vertex v : g.getVertices()) {
-         	if (v instanceof ParkAndRideVertex) {
+         	if (v instanceof VehicleParkingVertex) {
          		nParkAndRide++;
          		pr = v;
          	}
          }
-         
+
          for (Edge e : g.getEdges()) {
-             if (e instanceof ParkAndRideLinkEdge) {
+             if (e instanceof StreetVehicleParkingLink) {
                  nParkAndRideLink++;
              }
          }
@@ -197,23 +198,23 @@ public class TestUnconnectedAreas extends TestCase {
          
          // make sure it is connected
         
-         List<String> connections = new ArrayList<String>();
+         List<String> connections = new ArrayList<>();
          
          for (Edge e : pr.getOutgoing()) {
-         	if (e instanceof ParkAndRideEdge)
+         	if (e instanceof VehicleParkingEdge)
          		continue;
          	
-         	assertTrue(e instanceof ParkAndRideLinkEdge);
+         	assertTrue(e instanceof StreetVehicleParkingLink);
          	
          	connections.add(e.getToVertex().getLabel());
          }
          
          // symmetry
          for (Edge e : pr.getIncoming()) {
-         	if (e instanceof ParkAndRideEdge)
+         	if (e instanceof VehicleParkingEdge)
          		continue;
          	
-         	assertTrue(e instanceof ParkAndRideLinkEdge);
+         	assertTrue(e instanceof StreetVehicleParkingLink);
          	assertTrue(connections.contains(e.getFromVertex().getLabel()));
          }
          

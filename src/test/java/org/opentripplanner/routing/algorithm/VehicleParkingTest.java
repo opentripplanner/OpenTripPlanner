@@ -82,6 +82,48 @@ public class VehicleParkingTest {
     assertParkingPath(path);
   }
 
+  @Test
+  public void carParkingToCarParkingPlaceTest() {
+    createVehicleParkingToFirstVertex(false, true);
+
+    AStar aStar = new AStar();
+
+    RoutingRequest request = carParkingRequest();
+
+    ShortestPathTree tree = aStar.getShortestPathTree(request);
+    GraphPath path = tree.getPath(B, false);
+
+    assertParkingPath(path);
+  }
+
+  @Test
+  public void carParkingToCarAndBicycleParkingPlaceTest() {
+    createVehicleParkingToFirstVertex(true, true);
+
+    AStar aStar = new AStar();
+
+    RoutingRequest request = carParkingRequest();
+
+    ShortestPathTree tree = aStar.getShortestPathTree(request);
+    GraphPath path = tree.getPath(B, false);
+
+    assertParkingPath(path);
+  }
+
+  @Test
+  public void carParkingToBicycleParkingPlaceTest() {
+    createVehicleParkingToFirstVertex(true, false);
+
+    AStar aStar = new AStar();
+
+    RoutingRequest request = carParkingRequest();
+
+    ShortestPathTree tree = aStar.getShortestPathTree(request);
+    GraphPath path = tree.getPath(B, false);
+
+    assertNull(path);
+  }
+
   private void createVehicleParkingToFirstVertex(boolean bicyclePlaces, boolean carPlaces) {
     var vehicleParking = VehicleParking.builder()
         .id(new FeedScopedId(TEST_FEED_ID, "Parking"))
@@ -100,6 +142,13 @@ public class VehicleParkingTest {
     RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE));
     request.setRoutingContext(graph, A, B);
     request.bikeParkAndRide = true;
+    return request;
+  }
+
+  private RoutingRequest carParkingRequest() {
+    RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR));
+    request.setRoutingContext(graph, A, B);
+    request.parkAndRide = true;
     return request;
   }
 

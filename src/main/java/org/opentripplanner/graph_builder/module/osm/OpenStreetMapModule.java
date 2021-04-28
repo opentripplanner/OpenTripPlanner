@@ -39,10 +39,9 @@ import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.NamedArea;
-import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -56,7 +55,6 @@ import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 import org.opentripplanner.util.I18NString;
@@ -500,13 +498,19 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 // but this is an issue with OSM data.
             }
             // Place the P+R at the center of the envelope
-            ParkAndRideVertex parkAndRideVertex = new ParkAndRideVertex(graph, "P+R" + osmId,
-                    "P+R_" + osmId, (envelope.getMinX() + envelope.getMaxX()) / 2,
-                    (envelope.getMinY() + envelope.getMaxY()) / 2, creativeName);
-            new ParkAndRideEdge(parkAndRideVertex);
+            VehicleParking vehicleParking = VehicleParking.builder()
+                .id(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, "P+R" + osmId))
+                .name(creativeName)
+                .x((envelope.getMinX() + envelope.getMaxX()) / 2)
+                .y((envelope.getMinY() + envelope.getMaxY()) / 2)
+                .carPlaces(true)
+                .build();
+
+            VehicleParkingVertex parkAndRideVertex = new VehicleParkingVertex(graph, vehicleParking);
+            new VehicleParkingEdge(parkAndRideVertex);
             for (OsmVertex accessVertex : accessVertexes) {
-                new ParkAndRideLinkEdge(parkAndRideVertex, accessVertex);
-                new ParkAndRideLinkEdge(accessVertex, parkAndRideVertex);
+                new StreetVehicleParkingLink(parkAndRideVertex, accessVertex);
+                new StreetVehicleParkingLink(accessVertex, parkAndRideVertex);
             }
             LOG.debug("Created P+R '{}' ({})", creativeName, osmId);
             return true;

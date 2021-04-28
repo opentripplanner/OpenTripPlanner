@@ -10,8 +10,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -22,7 +20,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -80,11 +77,18 @@ public class TestParkAndRide extends TestCase {
         assertNull(path);
 
         // So we Add a P+R at B.
-        ParkAndRideVertex PRB = new ParkAndRideVertex(graph, "P+R", "P+R.B", 0.001, 45.00001,
-                new NonLocalizedString("P+R B"));
-        new ParkAndRideEdge(PRB);
-        new ParkAndRideLinkEdge(PRB, B);
-        new ParkAndRideLinkEdge(B, PRB);
+        var vehicleParkingName = new NonLocalizedString("P+R B");
+        VehicleParking vehicleParking = VehicleParking.builder()
+            .id(new FeedScopedId(TEST_FEED_ID, "P+R.B"))
+            .name(vehicleParkingName)
+            .x(0.001)
+            .y(45.00001)
+            .carPlaces(true)
+            .build();
+        VehicleParkingVertex PRB = new VehicleParkingVertex(graph, vehicleParking);
+        new VehicleParkingEdge(PRB);
+        new StreetVehicleParkingLink(PRB, B);
+        new StreetVehicleParkingLink(B, PRB);
 
         // But it is still impossible to get from A to C by WALK only
         // (AB is CAR only).

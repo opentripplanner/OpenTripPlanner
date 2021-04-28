@@ -16,11 +16,10 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 class StreetGraphFinderTest extends GraphRoutingTest {
 
@@ -28,7 +27,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
     private IntersectionVertex A, B, C, D;
     private VehicleRentalStationVertex BR1, BR2;
     private VehicleParkingVertex BP1;
-    private ParkAndRideVertex PR1, PR2;
+    private VehicleParkingVertex PR1, PR2;
     private RoutingService routingService;
     private StreetGraphFinder graphFinder;
     private Route R1, R2;
