@@ -229,9 +229,7 @@ public class ItineraryFilterChainBuilder {
 
         // Remove itineraries if max limit is set
         if (maxNumberOfItineraries > 0) {
-            // Sort non-transit itineraries first here, to ensure that they will pass trough the
-            // MaxLimitFilter. Then sort non-transit itineraries last for the final result.
-            filters.add(new OtpDefaultSortOrder(arriveBy, true));
+            filters.add(new OtpDefaultSortOrder(arriveBy));
             filters.add(
                 new MaxLimitFilter(
                     "number-of-itineraries-filter",
@@ -242,7 +240,7 @@ public class ItineraryFilterChainBuilder {
         }
 
         // Do the final itineraries sort
-        filters.add(new OtpDefaultSortOrder(arriveBy, false));
+        filters.add(new OtpDefaultSortOrder(arriveBy));
         
         if(debug) {
             filters = addDebugWrappers(filters);

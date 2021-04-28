@@ -109,7 +109,7 @@ public class GroupByFilterTest implements PlanTestConstants {
     private GroupByFilter<AGroupId> createFilter(int minLimit) {
         return new GroupByFilter<>(
             "test", i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
-            new OtpDefaultSortOrder(false, false),
+            new OtpDefaultSortOrder(false),
             minLimit
         );
     }
