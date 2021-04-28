@@ -318,6 +318,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 //TODO: use wayPropertySet.getCreativeNameForWay(node)
                 //Currently this names them as platform n
                 I18NString creativeName = node.getAssumedName();
+                if (creativeName == null) {
+                    creativeName = new NonLocalizedString("" + node.getId());
+                }
+
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
