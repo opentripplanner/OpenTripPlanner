@@ -129,6 +129,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     McCostParams p = raptorRequest.multiCriteriaCostFactors();
     return new DefaultCostCalculator<>(
         transitDataProvider.stopBoarAlightCost(),
+        p.transitReluctanceFactors(),
         p.boardCost(),
         p.transferCost(),
         p.walkReluctanceFactor(),

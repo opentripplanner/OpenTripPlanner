@@ -247,6 +247,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     private CostCalculator<T> createCostCalculator(int[] stopVisitCost, McCostParams f) {
         return new DefaultCostCalculator<T>(
                 stopVisitCost,
+                f.transitReluctanceFactors(),
                 f.boardCost(),
                 f.transferCost(),
                 f.walkReluctanceFactor(),

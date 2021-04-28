@@ -22,7 +22,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
+public final class
+TripScheduleAlightSearch<T extends RaptorTripSchedule>
         implements TripScheduleSearch<T>, RaptorTripScheduleBoardOrAlightEvent<T>
 {
     private final int nTripsBinarySearchThreshold;

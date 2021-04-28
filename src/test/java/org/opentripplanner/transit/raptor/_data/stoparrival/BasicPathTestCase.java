@@ -59,6 +59,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
     public static final double TRANSFER_RELUCTANCE = 2.0;
+    public static final double[] TRANSIT_RELUCTANCE = new double[] { 1.0 };
+    public static final int TRANSIT_RELUCTANCE_INDEX = 0;
     public static final double WAIT_RELUCTANCE = 0.8;
 
     /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
@@ -138,7 +140,12 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
 
     public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
-        STOP_COSTS, BOARD_COST_SEC, TRANSFER_COST_SEC, TRANSFER_RELUCTANCE, WAIT_RELUCTANCE
+            STOP_COSTS,
+            TRANSIT_RELUCTANCE,
+            BOARD_COST_SEC,
+            TRANSFER_COST_SEC,
+            TRANSFER_RELUCTANCE,
+            WAIT_RELUCTANCE
     );
 
     public static final RaptorSlackProvider SLACK_PROVIDER =
@@ -248,20 +255,20 @@ public class BasicPathTestCase implements RaptorTestConstants {
         assertEquals(
             LINE_11_COST,
             COST_CALCULATOR.transitArrivalCost(
-                true, STOP_A, L11_WAIT_DURATION, L11_DURATION, STOP_B
+                true, STOP_A, L11_WAIT_DURATION, L11_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_B
             )
         );
         assertEquals(TX_COST, COST_CALCULATOR.walkCost(TX_DURATION));
         assertEquals(
             LINE_21_COST,
             COST_CALCULATOR.transitArrivalCost(
-                false, STOP_C, L21_WAIT_DURATION, L21_DURATION, STOP_D
+                false, STOP_C, L21_WAIT_DURATION, L21_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_D
             )
         );
         assertEquals(
             LINE_31_COST,
             COST_CALCULATOR.transitArrivalCost(
-                false, STOP_D, L31_WAIT_DURATION, L31_DURATION, STOP_E
+                false, STOP_D, L31_WAIT_DURATION, L31_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_E
             )
         );
         assertEquals(EGRESS_COST, COST_CALCULATOR.walkCost(EGRESS_DURATION));

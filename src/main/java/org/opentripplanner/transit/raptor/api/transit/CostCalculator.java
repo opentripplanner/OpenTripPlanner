@@ -15,22 +15,30 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
      * debugging easier if the cost can be compared with the "stop-arrival-cost". The cost must
      * incorporate the fact that 2 boarding may happen at 2 different stops.
      *
-     * @param prevStopArrival The previous stop arrival
-     * @param waitTime        The time waiting before boarding at the board stop
-     * @param boardTime       The time of boarding
+     * @param prevStopArrival    The previous stop arrival
+     * @param waitTime           The time waiting before boarding at the board stop
+     * @param boardTime          The time of boarding
+     * @param transitFactorIndex The index used to look up the transit reluctance/factor
      */
-    int onTripRidingCost(ArrivalView<T> prevStopArrival, int waitTime, int boardTime);
+    int onTripRidingCost(
+            ArrivalView<T> prevStopArrival,
+            int waitTime,
+            int boardTime,
+            int transitFactorIndex
+    );
 
     /**
      * Calculate the value when arriving by transit.
      *
-     * @param firstRound Indicate if this is the first round (first transit).
+     * @param firstRound         Indicate if this is the first round (first transit).
+     * @param transitFactorIndex The index used to look up the transit reluctance/factor
      */
     int transitArrivalCost(
         boolean firstRound,
         int fromStop,
         int waitTime,
         int transitTime,
+        int transitFactorIndex,
         int toStop
     );
 

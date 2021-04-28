@@ -100,6 +100,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                 final int boardWaitTimeForCostCalculation = boardTime - prevArrival.arrivalTime();
         final int relativeBoardCost = calculateOnTripRelativeCost(
             prevArrival,
+            trip.transitReluctanceFactorIndex(),
             boardTime,
             boardWaitTimeForCostCalculation
         );
@@ -136,9 +137,15 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
      */
     private int calculateOnTripRelativeCost(
         AbstractStopArrival<T> prevArrival,
+        int transitReluctanceIndex,
         int boardTime,
         int boardWaitTime
     ) {
-        return costCalculator.onTripRidingCost(prevArrival, boardWaitTime, boardTime);
+        return costCalculator.onTripRidingCost(
+                prevArrival,
+                boardWaitTime,
+                boardTime,
+                transitReluctanceIndex
+        );
     }
 }

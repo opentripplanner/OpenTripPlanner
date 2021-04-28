@@ -61,9 +61,10 @@ public class PathBuilder {
     int toTime = trip.arrival(trip.pattern().findStopPositionAfter(0, toStop));
 
     int waitTime = currentTransitWaitTime(fromTime);
+    int transitTime = toTime - fromTime;
 
     int cost  = costCalculator.transitArrivalCost(
-        firstTransit(), fromStop, waitTime, toTime-fromTime, toStop
+        firstTransit(), fromStop, waitTime, transitTime, trip.transitReluctanceFactorIndex(), toStop
     );
 
     return leg(fromStop, fromTime, toStop, toTime, cost, trip);
@@ -81,7 +82,7 @@ public class PathBuilder {
         .build();
 
     int cost  = costCalculator.transitArrivalCost(
-        firstTransit(), fromStop, waitTime, duration, toStop
+        firstTransit(), fromStop, waitTime, duration, trip.transitReluctanceFactorIndex(), toStop
     );
 
     return leg(fromStop, fromTime, toStop, toTime, cost, trip);
@@ -165,10 +166,6 @@ public class PathBuilder {
       this.toStop = toStop;
       this.raptorCost = raptorCost;
       this.trip = trip;
-    }
-
-    int stopArrivalTime(int alightSlack) {
-      return trip == null ? toTime : toTime + alightSlack;
     }
 
     AccessPathLeg<TestTripSchedule> accessLeg(PathLeg<TestTripSchedule> next) {

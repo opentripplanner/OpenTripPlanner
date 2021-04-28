@@ -16,6 +16,7 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.LINE_21;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.LINE_31;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_DURATION;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
 import static org.opentripplanner.util.time.DurationUtils.duration;
@@ -45,7 +46,8 @@ public class PathBuilderTest implements RaptorTestConstants {
     int walkCost = COST_CALCULATOR.walkCost(D1m + D2m);
     int waitTime = BOARD_SLACK + ALIGHT_SLACK;
 
-    int transitCost = COST_CALCULATOR.transitArrivalCost(true, STOP_A, waitTime, transitDuration, STOP_B
+    int transitCost = COST_CALCULATOR.transitArrivalCost(
+            true, STOP_A, waitTime, transitDuration, TRANSIT_RELUCTANCE_INDEX, STOP_B
     );
 
     assertEquals(toOtpDomainCost(walkCost + transitCost), path.generalizedCost());
