@@ -12,11 +12,11 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
@@ -28,9 +28,8 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
 
     if (o instanceof Agency) { return schema.getObjectType("Agency"); }
     if (o instanceof TransitAlert) { return schema.getObjectType("Alert"); }
-    if (o instanceof BikePark) { return schema.getObjectType("BikePark"); }
+    if (o instanceof VehicleParking) { return schema.getObjectType("BikePark"); }
     if (o instanceof VehicleRentalStation) { return schema.getObjectType("BikeRentalStation"); }
-    // if (o instanceof CarPark) { return schema.getObjectType("CarPark"); }
     // if (o instanceof Cluster) { return schema.getObjectType("Cluster"); }
     if (o instanceof PatternAtStop) { return schema.getObjectType("DepartureRow"); }
     if (o instanceof TripPattern) { return schema.getObjectType("Pattern"); }

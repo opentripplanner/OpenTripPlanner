@@ -22,6 +22,7 @@ import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
@@ -29,13 +30,10 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.BikeParkEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -45,19 +43,22 @@ import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.ProgressTracker;
@@ -81,6 +82,8 @@ import java.util.stream.Collectors;
 public class OpenStreetMapModule implements GraphBuilderModule {
 
     private static Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
+
+    private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
 
     private DataImportIssueStore issueStore;
 
@@ -308,15 +311,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 //TODO: localize
                 if (creativeName == null)
                     creativeName = new NonLocalizedString("P+R");
-                BikePark bikePark = new BikePark();
-                bikePark.id = "" + node.getId();
-                //TODO: localize bikePark name
-                bikePark.name = creativeName.toString();
-                bikePark.x = node.lon;
-                bikePark.y = node.lat;
+                VehicleParking bikePark = VehicleParking.builder()
+                    .id(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, "" + node.getId()))
+                    .name(creativeName)
+                    .x(node.lon)
+                    .y(node.lat)
+                    .bicyclePlaces(true)
+                    .build();
                 bikeRentalService.addBikePark(bikePark);
-                BikeParkVertex parkVertex = new BikeParkVertex(graph, bikePark);
-                new BikeParkEdge(parkVertex);
+                VehicleParkingVertex parkVertex = new VehicleParkingVertex(graph, bikePark);
+                new VehicleParkingEdge(parkVertex);
             }
             LOG.info("Created " + n + " bike P+R.");
         }
@@ -358,15 +362,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     envelope.expandToInclude(new Coordinate(node.lon, node.lat));
                 }
             }
-            BikePark bikePark = new BikePark();
-            bikePark.id = "" + osmId;
-            //TODO: localize 
-            bikePark.name = creativeName.toString();
-            bikePark.x = (envelope.getMinX() + envelope.getMaxX()) / 2;
-            bikePark.y = (envelope.getMinY() + envelope.getMaxY()) / 2;
+            VehicleParking bikePark = VehicleParking.builder()
+                .id(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, "" + osmId))
+                .name(creativeName)
+                .x((envelope.getMinX() + envelope.getMaxX()) / 2)
+                .y((envelope.getMinY() + envelope.getMaxY()) / 2)
+                .bicyclePlaces(true)
+                .build();
             bikeRentalService.addBikePark(bikePark);
-            BikeParkVertex bikeParkVertex = new BikeParkVertex(graph, bikePark);
-            new BikeParkEdge(bikeParkVertex);
+            VehicleParkingVertex bikeParkVertex = new VehicleParkingVertex(graph, bikePark);
+            new VehicleParkingEdge(bikeParkVertex);
             LOG.debug("Created area bike P+R '{}' ({})", creativeName, osmId);
         }
 

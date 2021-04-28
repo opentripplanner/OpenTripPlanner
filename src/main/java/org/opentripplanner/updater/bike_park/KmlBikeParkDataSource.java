@@ -3,7 +3,10 @@ package org.opentripplanner.updater.bike_park;
 import static java.util.Locale.ROOT;
 
 import java.util.List;
-import org.opentripplanner.routing.bike_park.BikePark;
+import java.util.Locale;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,15 +25,17 @@ class KmlBikeParkDataSource implements BikeParkDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(KmlBikeParkDataSource.class);
 
+    private static final String KML_FEED_ID = "KML";
+
     private final String url;
 
     private final String namePrefix;
 
     private final boolean zip;
 
-    private final XmlDataListDownloader<BikePark> xmlDownloader;
+    private final XmlDataListDownloader<VehicleParking> xmlDownloader;
 
-    private List<BikePark> bikeParks;
+    private List<VehicleParking> bikeParks;
 
     public KmlBikeParkDataSource(Parameters config) {
         this.url = config.getUrl();
@@ -41,7 +46,6 @@ class KmlBikeParkDataSource implements BikeParkDataSource {
         xmlDownloader
                 .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']|//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Folder']/*[local-name()='Placemark']");
         xmlDownloader.setDataFactory(attributes -> {
-            BikePark bikePark = new BikePark();
             if (!attributes.containsKey("name")) {
                 LOG.warn("Missing name in KML Placemark, cannot create bike park.");
                 return null;
@@ -50,17 +54,25 @@ class KmlBikeParkDataSource implements BikeParkDataSource {
                 LOG.warn("Missing Point geometry in KML Placemark, cannot create bike park.");
                 return null;
             }
-            bikePark.name = attributes.get("name").trim();
-            if (namePrefix != null) {
-                bikePark.name = namePrefix + bikePark.name;
-            }
+
+            var name = (namePrefix != null ? namePrefix : "") + attributes.get("name").trim();
             String[] coords = attributes.get("Point").trim().split(",");
-            bikePark.x = Double.parseDouble(coords[0]);
-            bikePark.y = Double.parseDouble(coords[1]);
-            // There is no ID in KML, assume unique names and location.
-            bikePark.id = String.format(ROOT, "%s[%.3f-%.3f]",
-                    bikePark.name.replace(" ", "_"), bikePark.x, bikePark.y);
-            return bikePark;
+            var x = Double.parseDouble(coords[0]);
+            var y = Double.parseDouble(coords[1]);
+            var id = String.format(
+                    ROOT, "%s[%.3f-%.3f]",
+                    name.replace(" ", "_"),
+                    x, y
+            );
+
+            var localizedName = new NonLocalizedString(name);
+
+            return VehicleParking.builder()
+                .name(localizedName)
+                .x(x)
+                .y(y)
+                .id(new FeedScopedId(KML_FEED_ID, id))
+                .build();
         });
     }
 
@@ -71,7 +83,7 @@ class KmlBikeParkDataSource implements BikeParkDataSource {
      */
     @Override
     public boolean update() {
-        List<BikePark> newBikeParks = xmlDownloader.download(url, zip);
+        List<VehicleParking> newBikeParks = xmlDownloader.download(url, zip);
         if (newBikeParks != null) {
             synchronized (this) {
                 // Update atomically
@@ -83,7 +95,7 @@ class KmlBikeParkDataSource implements BikeParkDataSource {
     }
 
     @Override
-    public synchronized List<BikePark> getBikeParks() {
+    public synchronized List<VehicleParking> getBikeParks() {
         return bikeParks;
     }
 

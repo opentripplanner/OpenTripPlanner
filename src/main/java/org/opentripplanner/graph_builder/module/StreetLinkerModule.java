@@ -1,25 +1,24 @@
 package org.opentripplanner.graph_builder.module;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
-import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
+import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links various
@@ -57,7 +56,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     if (graph.hasStreets) {
       linkTransitStops(graph);
       linkTransitEntrances(graph);
-      linkBikeParks(graph);
+      linkVehicleParks(graph);
     }
 
     // Calculates convex hull of a graph which is shown in routerInfo API point
@@ -120,17 +119,21 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
   }
 
-  private void linkBikeParks(Graph graph) {
-    LOG.info("Linking bike parks to graph...");
+  private void linkVehicleParks(Graph graph) {
+    LOG.info("Linking vehicle parks to graph...");
     // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
-    for (BikeParkVertex bikePark : graph.getVerticesOfType(BikeParkVertex.class)) {
+    for (VehicleParkingVertex vehicleParkingVertex : graph.getVerticesOfType(VehicleParkingVertex.class)) {
+      var traverseModes = vehicleParkingVertex.getVehicleParking().hasCarPlaces() ?
+          new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR)
+          : new TraverseModeSet(TraverseMode.WALK);
+
       graph.getLinker().linkVertexPermanently(
-          bikePark,
-          new TraverseModeSet(TraverseMode.WALK),
+          vehicleParkingVertex,
+          traverseModes,
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
-              new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),
-              new StreetBikeParkLink(streetVertex, (BikeParkVertex) vertex)
+              new StreetVehicleParkingLink((VehicleParkingVertex) vertex, streetVertex),
+              new StreetVehicleParkingLink(streetVertex, (VehicleParkingVertex) vertex)
           )
       );
     }

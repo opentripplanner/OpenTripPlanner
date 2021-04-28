@@ -22,24 +22,9 @@ public class ParkAndRideLinkEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    /*
-     * By how much we have to really walk compared to straight line distance. This is a magic factor
-     * as we really can't guess, unless we know 1) where the user will park, and 2) we route inside
-     * the parking lot.
-     *
-     * TODO: perhaps all of this obstruction and distance calculation should just be reduced to
-     * a single static cost. Parking lots are not that big, and these are all guesses.
-     */
-    private double WALK_OBSTRUCTION_FACTOR = 2.0;
+    private final ParkAndRideVertex parkAndRideVertex;
 
-    private double DRIVE_OBSTRUCTION_FACTOR = 2.0;
-
-    /* This is magic too. Driver tend to drive slowly in P+R. */
-    private double DRIVE_SPEED_MS = 3;
-
-    private ParkAndRideVertex parkAndRideVertex;
-
-    private boolean exit;
+    private final boolean exit;
 
     @SuppressWarnings("unused")
     private LineString geometry = null;
@@ -95,15 +80,14 @@ public class ParkAndRideLinkEdge extends Edge {
         TraverseMode mode = s0.getNonTransitMode();
         if (mode == TraverseMode.WALK) {
             // Walking
-            double walkTime = linkDistance * WALK_OBSTRUCTION_FACTOR
-                    / s0.getOptions().walkSpeed;
+            double walkTime = linkDistance / s0.getOptions().walkSpeed;
             s1.incrementTimeInSeconds((int) Math.round(walkTime));
             s1.incrementWeight(walkTime);
             s1.incrementWalkDistance(linkDistance);
             s1.setBackMode(TraverseMode.WALK);
         } else if (mode == TraverseMode.CAR) {
             // Driving
-            double driveTime = linkDistance * DRIVE_OBSTRUCTION_FACTOR / DRIVE_SPEED_MS;
+            double driveTime = linkDistance / s0.getOptions().carSpeed;
             s1.incrementTimeInSeconds((int) Math.round(driveTime));
             s1.incrementWeight(driveTime);
             s1.setBackMode(TraverseMode.CAR);

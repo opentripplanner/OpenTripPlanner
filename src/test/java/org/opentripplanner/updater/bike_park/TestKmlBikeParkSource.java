@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.bike_park;
 
 import junit.framework.TestCase;
-import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
 import java.util.List;
 
@@ -21,16 +21,16 @@ public class TestKmlBikeParkSource extends TestCase {
       }
     });
     assertTrue(kmlDataSource.update());
-    List<BikePark> bikeParks = kmlDataSource.getBikeParks();
+    List<VehicleParking> bikeParks = kmlDataSource.getBikeParks();
     assertEquals(5, bikeParks.size());
-    BikePark alkmaar = bikeParks.get(0);
-    BikePark zwolle = bikeParks.get(4);
-    assertEquals("Station Alkmaar", alkmaar.name);
-    assertEquals("Station Zwolle", zwolle.name);
-    assertTrue(alkmaar.x >= 4.739850 && alkmaar.x <= 4.739851);
-    assertTrue(alkmaar.y >= 52.637531 && alkmaar.y <= 52.637532);
-    assertTrue(zwolle.x >= 6.091060 && zwolle.x <= 6.091061);
-    assertTrue(zwolle.y >= 52.504990 && zwolle.y <= 52.504991);
+    VehicleParking alkmaar = bikeParks.get(0);
+    VehicleParking zwolle = bikeParks.get(4);
+    assertEquals("Station Alkmaar", alkmaar.getName().toString());
+    assertEquals("Station Zwolle", zwolle.getName().toString());
+    assertTrue(alkmaar.getX() >= 4.739850 && alkmaar.getX() <= 4.739851);
+    assertTrue(alkmaar.getY() >= 52.637531 && alkmaar.getY() <= 52.637532);
+    assertTrue(zwolle.getX() >= 6.091060 && zwolle.getX() <= 6.091061);
+    assertTrue(zwolle.getY() >= 52.504990 && zwolle.getY() <= 52.504991);
   }
 
   public void testKMLWithFolder() {
@@ -47,16 +47,16 @@ public class TestKmlBikeParkSource extends TestCase {
           }
       });
     assertTrue(kmlDataSource.update());
-    List<BikePark> bikeParks = kmlDataSource.getBikeParks();
+    List<VehicleParking> bikeParks = kmlDataSource.getBikeParks();
     assertEquals(5, bikeParks.size());
-    BikePark alkmaar = bikeParks.get(0);
-    BikePark almere = bikeParks.get(4);
-    assertEquals("Station Alkmaar", alkmaar.name);
-    assertEquals("Station Almere Centrum", almere.name);
-    assertTrue(alkmaar.x >= 4.739850 && alkmaar.x <= 4.739851);
-    assertTrue(alkmaar.y >= 52.637531 && alkmaar.y <= 52.637532);
-    assertTrue(almere.x >= 5.21780 && almere.x <= 5.21782);
-    assertTrue(almere.y >= 52.3746190 && almere.y <= 52.3746191);
+    VehicleParking alkmaar = bikeParks.get(0);
+    VehicleParking almere = bikeParks.get(4);
+    assertEquals("Station Alkmaar", alkmaar.getName().toString());
+    assertEquals("Station Almere Centrum", almere.getName().toString());
+    assertTrue(alkmaar.getX() >= 4.739850 && alkmaar.getX() <= 4.739851);
+    assertTrue(alkmaar.getY() >= 52.637531 && alkmaar.getY() <= 52.637532);
+    assertTrue(almere.getX() >= 5.21780 && almere.getX() <= 5.21782);
+    assertTrue(almere.getY() >= 52.3746190 && almere.getY() <= 52.3746191);
   }
 
 }

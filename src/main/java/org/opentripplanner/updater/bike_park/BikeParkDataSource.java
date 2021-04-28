@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.bike_park;
 
-import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
 import java.util.List;
 
@@ -21,6 +21,6 @@ public interface BikeParkDataSource {
      */
     boolean update();
     
-    List<BikePark> getBikeParks();
+    List<VehicleParking> getBikeParks();
     
 }

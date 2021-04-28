@@ -6,7 +6,7 @@ import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
@@ -495,7 +495,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
-        public DataFetcher<BikePark> bikePark();
+        public DataFetcher<VehicleParking> bikePark();
 
         public DataFetcher<Object> carPark();
     }
@@ -620,9 +620,9 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
-        public DataFetcher<Iterable<BikePark>> bikeParks();
+        public DataFetcher<Iterable<VehicleParking>> bikeParks();
 
-        public DataFetcher<BikePark> bikePark();
+        public DataFetcher<VehicleParking> bikePark();
 
         public DataFetcher<Iterable<Object>> carParks();
 
@@ -932,5 +932,4 @@ public class LegacyGraphQLDataFetchers {
 
         default public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id() { return null; }
     }
-
 }

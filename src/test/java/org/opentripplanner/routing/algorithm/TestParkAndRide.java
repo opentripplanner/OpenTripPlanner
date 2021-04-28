@@ -2,24 +2,25 @@ package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.BikeParkEdge;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
+import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -31,6 +32,8 @@ import org.opentripplanner.util.NonLocalizedString;
  * @author laurent
  */
 public class TestParkAndRide extends TestCase {
+
+    private static final String TEST_FEED_ID = "testFeed";
 
     private Graph graph;
     private StreetVertex A,B,C,D;
@@ -56,9 +59,9 @@ public class TestParkAndRide extends TestCase {
         @SuppressWarnings("unused")
         Edge walkOnly = new StreetEdge(C, D, GeometryUtils.makeLineString(0.002, 45, 0.003,
                 45), "CD street", 87, StreetTraversalPermission.PEDESTRIAN, false);
-    };
+    }
     
-    public void testCar() throws Exception {
+    public void testCar() {
 
         AStar aStar = new AStar();
 
@@ -138,7 +141,7 @@ public class TestParkAndRide extends TestCase {
         assertNotNull(path);
     }
 
-    public void testBike() throws Exception {
+    public void testBike() {
 
         AStar aStar = new AStar();
 
@@ -151,16 +154,18 @@ public class TestParkAndRide extends TestCase {
         assertNull(path);
 
         // So we add a bike P+R at C.
-        BikePark bpc = new BikePark();
-        bpc.id = "bpc";
-        bpc.name = "Bike Park C";
-        bpc.x = 0.002;
-        bpc.y = 45.00001;
-        bpc.spacesAvailable = 1;
-        BikeParkVertex BPRC = new BikeParkVertex(graph, bpc);
-        new BikeParkEdge(BPRC);
-        new StreetBikeParkLink(BPRC, C);
-        new StreetBikeParkLink(C, BPRC);
+        var vehicleParkingName = new NonLocalizedString("Bike Park C");
+        VehicleParking bpc = VehicleParking.builder()
+            .id(new FeedScopedId(TEST_FEED_ID, "bpc"))
+            .name(vehicleParkingName)
+            .x(0.002)
+            .y(45.00001)
+            .bicyclePlaces(true)
+            .build();
+        VehicleParkingVertex BPRC = new VehicleParkingVertex(graph, bpc);
+        new VehicleParkingEdge(BPRC);
+        new StreetVehicleParkingLink(BPRC, C);
+        new StreetVehicleParkingLink(C, BPRC);
 
         // Still impossible from B to D by bike only (CD is WALK only).
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
@@ -172,7 +177,7 @@ public class TestParkAndRide extends TestCase {
         assertFalse(s.isBikeParked());
         // TODO backWalkingBike flag is broken
         // assertTrue(s.isBackWalkingBike());
-        assertTrue(s.getBackMode() == TraverseMode.WALK);
+        assertSame(s.getBackMode(), TraverseMode.WALK);
 
         // But we can go from B to D using bike P+R.
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.WALK,TraverseMode.TRANSIT));
