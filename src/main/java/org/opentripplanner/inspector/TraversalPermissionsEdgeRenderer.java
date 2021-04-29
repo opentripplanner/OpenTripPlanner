@@ -46,6 +46,12 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
                 attrs.color = getColor(pse.getPermission());
                 attrs.label = getLabel(pse.getPermission());
             }
+            if(pse.isMotorVehicleNoThruTraffic()) {
+                attrs.label+=" motor NTT";
+            }
+            if(pse.isBicycleNoThruTraffic()) {
+                attrs.label+=" bicycle NTT";
+            }
         } else if (e instanceof StreetTransitStopLink) {
             attrs.color = LINK_COLOR_EDGE;
             attrs.label = "link";

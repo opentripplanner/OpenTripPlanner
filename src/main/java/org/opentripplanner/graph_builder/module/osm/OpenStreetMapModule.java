@@ -741,8 +741,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                         WayProperties wayData, OSMWithTags way) {
 
             Set<T2<StreetNote, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
-            boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
-            // if (noThruTraffic) LOG.info("Way {} does not allow through traffic.", way.getId());
+            boolean motorVehicleNoThrough = wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
+            boolean bicycleNoThrough = wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
+
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().first;
                 street.setBicycleSafetyFactor((float)safety);
@@ -753,7 +754,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     for (T2<StreetNote, NoteMatcher> note : notes)
                         graph.streetNotesService.addStaticNote(street, note.first, note.second);
                 }
-                street.setNoThruTraffic(noThruTraffic);
+                street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
+                street.setBicycleNoThruTraffic(bicycleNoThrough);
             }
 
             if (backStreet != null) {
@@ -766,7 +768,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     for (T2<StreetNote, NoteMatcher> note : notes)
                         graph.streetNotesService.addStaticNote(backStreet, note.first, note.second);
                 }
-                backStreet.setNoThruTraffic(noThruTraffic);
+                backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
+                backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
             }
         }
 

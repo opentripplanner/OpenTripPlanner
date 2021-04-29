@@ -446,7 +446,7 @@ public class State implements Cloneable {
      * due to different weights on time-dependent (e.g. transit boarding) edges. If the optimize 
      * parameter is false, the path will be reversed but will have the same duration. This is the 
      * result of combining the functions from GraphPath optimize and reverse.
-     * 
+     *
      * @return a state at the other end (or this end, in the case of a forward search)
      * of a reversed, optimized path
      */
@@ -503,8 +503,11 @@ public class State implements Cloneable {
         return reverse();
     }
 
-    boolean hasEnteredNoThruTrafficArea() {
-        return stateData.enteredNoThroughTrafficArea;
+    boolean hasEnteredMotorVehicleNoThruTrafficArea() {
+        return stateData.enteredMotorVehicleNoThroughTrafficArea;
     }
 
+    public boolean hasEnteredBicycleNoThruTrafficArea() {
+        return stateData.enteredBicycleNoThroughTrafficArea;
+    }
 }
