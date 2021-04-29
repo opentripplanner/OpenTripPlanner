@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 
 /**
  * This is adapted from {@link TestCarPickup}. All tests use the same graph structure, but a part
- * of the graph is changed before running each test, and then changed back again. This means that
- * each test has to be run in sequence.
+ * of the graph is changed before running each test. The setup method runs for each test, so this
+ * is not a problem.
  */
 public class TestBikeRental extends GraphRoutingTest {
 
@@ -72,25 +72,21 @@ public class TestBikeRental extends GraphRoutingTest {
     public void testFallBackToWalking() {
         SE2.setPermission(StreetTraversalPermission.PEDESTRIAN);
         assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
-        SE2.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 }
 
     public void testNoBikesAvailable() {
         B1.setBikesAvailable(0);
         assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
-        B1.setBikesAvailable(Integer.MAX_VALUE);
     }
 
     public void testNoSpacesAvailable() {
         B2.setSpacesAvailable(0);
         assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
-        B2.setSpacesAvailable(Integer.MAX_VALUE);
     }
 
     public void testFloatingBike() {
         B1.getStation().isFloatingBike = true;
         assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), BICYCLE - RENTING_FLOATING - BC street (400.00, 200), BICYCLE - RENTING_FLOATING - CD street (20.00, 10)");
-        B1.getStation().isFloatingBike = false;
     }
 
     private void assertPath(Vertex fromVertex, Vertex toVertex, String descriptor) {
