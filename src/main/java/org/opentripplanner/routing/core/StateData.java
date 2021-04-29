@@ -26,6 +26,10 @@ public class StateData implements Cloneable {
 
     protected RoutingRequest opt;
 
+    /**
+     * The preferred mode, which may differ from backMode when for example walking with a bike.
+     * It may also change during traversal when switching between modes as in the case of Park & Ride or Kiss & Ride.
+     */
     protected TraverseMode currentMode;
 
     /**
