@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 
+import com.google.common.collect.ArrayListMultimap;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
@@ -10,7 +11,6 @@ import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.netex.index.OrderedListMap;
 import org.opentripplanner.netex.issues.InterchangePointMappingFailed;
 import org.opentripplanner.netex.issues.InterchangeWithoutConstraint;
 import org.opentripplanner.netex.issues.ObjectNotFound;
@@ -23,13 +23,13 @@ public class TransferMapper {
 
     private final FeedScopedIdFactory idFactory;
     private final DataImportIssueStore issueStore;
-    private final OrderedListMap<String, String> scheduledStopPointsIndex;
+    private final ArrayListMultimap<String, String> scheduledStopPointsIndex;
     private final EntityById<Trip> trips;
 
     public TransferMapper(
             FeedScopedIdFactory idFactory,
             DataImportIssueStore issueStore,
-            OrderedListMap<String, String> scheduledStopPointsIndex,
+            ArrayListMultimap<String, String> scheduledStopPointsIndex,
             EntityById<Trip> trips
     ) {
         this.idFactory = idFactory;
@@ -123,13 +123,14 @@ public class TransferMapper {
             ScheduledStopPointRefStructure scheduledStopPointRef
     ) {
         String sspId = scheduledStopPointRef.getRef();
-        int index = scheduledStopPointsIndex.index(sjId, sspId);
+        int index = scheduledStopPointsIndex.get(sjId).indexOf(sspId);
+
         if (index >= 0) { return index; }
 
-        String detailedMsg;
-        if (index == -1) { detailedMsg = "Service-journey not found"; }
-        else if (index == -2) { detailedMsg = "Scheduled-stop-point-ref not found"; }
-        else { throw new IllegalStateException("Unexpected value from scheduledStopPointsIndex"); }
+        String detailedMsg = scheduledStopPointsIndex.containsKey(sjId)
+                ? "Scheduled-stop-point-ref not found"
+                : "Service-journey not found";
+
         issueStore.add(
                 new InterchangePointMappingFailed(detailedMsg, interchangeId, label, sjId, sspId)
         );

@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import com.google.common.collect.ArrayListMultimap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +8,6 @@ import java.util.Map;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.netex.index.OrderedListMap;
 
 /**
  * This mapper returnes two collections, so we need to use a simple wraper to be able to return the
@@ -18,7 +18,7 @@ class TripPatternMapperResult {
     /**
      * A map from trip/serviceJourney id to a ordered list of scheduled stop point ids.
      */
-    final OrderedListMap<String, String> scheduledStopPointsIndex = new OrderedListMap<>();
+    final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
 
     final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
 
