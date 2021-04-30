@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.router.street;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -7,10 +10,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This uses a street search to find paths to all the access/egress stop within range
@@ -41,16 +40,17 @@ public class AccessEgressRouter {
         //      main request.
         Set<Vertex> vertices = fromTarget ^ rr.arriveBy ? rr.rctx.toVertices : rr.rctx.fromVertices;
 
-        RoutingRequest nonTransitRoutingRequest = rr.getStreetSearchRequest(streetMode);
+        // A new RoutingRequest needs to be constructed, because findNearbyStopsViaStreets() resets
+        // the routingContext (rctx), which results in the created temporary edges being removed prematurely.
+        // findNearbyStopsViaStreets() will call cleanup() on the created routing request.
+        RoutingRequest nearbyRequest = rr.getStreetSearchRequest(streetMode);
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
-        // We set removeTempEdges to false because this is a sub-request - the temporary edges for the origin and
-        // target vertex will be cleaned up at the end of the super-request, and we don't want that to happen twice.
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
             vertices,
             fromTarget,
-            false,
-            nonTransitRoutingRequest
+            true,
+            nearbyRequest
         );
 
         LOG.debug("Found {} {} stops", nearbyStopList.size(), fromTarget ? "egress" : "access");
