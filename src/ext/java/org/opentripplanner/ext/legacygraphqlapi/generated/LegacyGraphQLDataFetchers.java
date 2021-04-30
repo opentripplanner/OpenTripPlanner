@@ -107,6 +107,10 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Double> lon();
 
         public DataFetcher<Double> lat();
+
+        public DataFetcher<Integer> capacity();
+
+        public DataFetcher<Boolean> allowOverloading();
     }
 
     /**
