@@ -41,6 +41,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.ResourceBundleSingleton;
@@ -68,6 +69,7 @@ public class LegacyGraphQLQueryTypeImpl
       String type = args.getLegacyGraphQLId().getType();
       String id = args.getLegacyGraphQLId().getId();
       RoutingService routingService = environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+      VehicleParkingService vehicleParkingService = routingService.getVehicleParkingService();
       VehicleRentalStationService vehicleRentalStationService = routingService.getVehicleRentalStationService();
 
       switch (type) {
@@ -77,9 +79,8 @@ public class LegacyGraphQLQueryTypeImpl
           return null; //TODO
         case "BikePark":
           var bikeParkId = FeedScopedId.parseId(id);
-          return vehicleRentalStationService == null ? null : vehicleRentalStationService
+          return vehicleParkingService == null ? null : vehicleParkingService
               .getBikeParks()
-              .stream()
               .filter(bikePark -> bikePark.getId().equals(bikeParkId))
               .findAny()
               .orElse(null);
@@ -87,7 +88,12 @@ public class LegacyGraphQLQueryTypeImpl
           return vehicleRentalStationService == null ? null :
               vehicleRentalStationService.getVehicleRentalStation(FeedScopedId.parseId(id));
         case "CarPark":
-          return null; //TODO
+          var carParkId = FeedScopedId.parseId(id);
+          return vehicleParkingService == null ? null : vehicleParkingService
+              .getCarParks()
+              .filter(carPark -> carPark.getId().equals(carParkId))
+              .findAny()
+              .orElse(null);
         case "Cluster":
           return null; //TODO
         case "DepartureRow":
@@ -536,12 +542,12 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleParking>> bikeParks() {
     return environment -> {
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
-          .getVehicleRentalStationService();
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
 
-      if (vehicleRentalStationService == null) { return null; }
+      if (vehicleParkingService == null) { return null; }
 
-      return vehicleRentalStationService.getBikeParks();
+      return vehicleParkingService.getBikeParks().collect(Collectors.toList());
     };
   }
 
@@ -550,15 +556,14 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeParkArgs(environment.getArguments());
 
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
-          .getVehicleRentalStationService();
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
 
-      if (vehicleRentalStationService == null) { return null; }
+      if (vehicleParkingService == null) { return null; }
 
       var bikeParkId = FeedScopedId.parseId(args.getLegacyGraphQLId());
-      return vehicleRentalStationService
+      return vehicleParkingService
               .getBikeParks()
-              .stream()
               .filter(bikePark -> bikePark.getId().equals(bikeParkId))
               .findAny()
               .orElse(null);

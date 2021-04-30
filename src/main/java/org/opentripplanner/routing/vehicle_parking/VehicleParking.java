@@ -105,6 +105,10 @@ public class VehicleParking implements Serializable {
     return bicyclePlaces;
   }
 
+  public boolean hasAnyCarPlaces() {
+    return hasCarPlaces() || hasWheelchairAccessibleCarPlaces();
+  }
+
   public boolean hasCarPlaces() {
     return carPlaces;
   }

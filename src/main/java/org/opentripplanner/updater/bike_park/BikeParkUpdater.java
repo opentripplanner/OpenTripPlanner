@@ -2,7 +2,6 @@ package org.opentripplanner.updater.bike_park;
 
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
@@ -10,6 +9,7 @@ import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -49,7 +49,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private VertexLinker linker;
 
-    private VehicleRentalStationService bikeService;
+    private VehicleParkingService vehicleParkingService;
 
     public BikeParkUpdater(BikeParkUpdaterParameters parameters) {
         super(parameters);
@@ -69,7 +69,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         // Creation of network linker library will not modify the graph
         linker = graph.getLinker();
         // Adding a bike park station service needs a graph writer runnable
-        bikeService = graph.getService(VehicleRentalStationService.class, true);
+        vehicleParkingService = graph.getService(VehicleParkingService.class, true);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
             Set<VehicleParking> bikeParkSet = new HashSet<>();
             /* Add any new park and update space available for existing parks */
             for (VehicleParking bikePark : bikeParks) {
-                bikeService.addBikePark(bikePark);
+                vehicleParkingService.addVehicleParking(bikePark);
                 bikeParkSet.add(bikePark);
                 VehicleParkingVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
@@ -138,7 +138,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 if (bikeParkSet.contains(bikePark))
                     continue;
                 toRemove.add(bikePark);
-                bikeService.removeBikePark(bikePark);
+                vehicleParkingService.removeVehicleParking(bikePark);
             }
             for (VehicleParking bikePark : toRemove) {
                 // post-iteration removal to avoid concurrent modification

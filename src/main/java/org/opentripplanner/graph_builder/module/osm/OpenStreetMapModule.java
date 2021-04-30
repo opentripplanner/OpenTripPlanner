@@ -50,7 +50,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -320,8 +320,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         private void processBikeParkAndRideNodes() {
             LOG.info("Processing bike P+R nodes...");
             int n = 0;
-            VehicleRentalStationService bikeRentalService = graph.getService(
-                    VehicleRentalStationService.class, true);
+            VehicleParkingService vehicleParkingService = graph.getService(
+                VehicleParkingService.class, true);
             for (OSMNode node : osmdb.getBikeParkingNodes()) {
                 n++;
                 I18NString creativeName = wayPropertySet.getCreativeNameForWay(node);
@@ -344,7 +344,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     .capacity(vehiclePlaces)
                     .availability(vehiclePlaces)
                     .build();
-                bikeRentalService.addBikePark(bikePark);
+                vehicleParkingService.addVehicleParking(bikePark);
                 VehicleParkingVertex parkVertex = new VehicleParkingVertex(graph, bikePark);
                 new VehicleParkingEdge(parkVertex);
             }
@@ -378,8 +378,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * @param area
          */
         private void buildBikeParkAndRideForArea(Area area) {
-            VehicleRentalStationService bikeRentalService = graph.getService(
-                    VehicleRentalStationService.class, true);
+            VehicleParkingService vehicleParkingService = graph.getService(
+                VehicleParkingService.class, true);
             Envelope envelope = new Envelope();
             long osmId = area.parent.getId();
             I18NString creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
@@ -404,7 +404,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 .capacity(vehiclePlaces)
                 .availability(vehiclePlaces)
                 .build();
-            bikeRentalService.addBikePark(bikePark);
+            vehicleParkingService.addVehicleParking(bikePark);
             VehicleParkingVertex bikeParkVertex = new VehicleParkingVertex(graph, bikePark);
             new VehicleParkingEdge(bikeParkVertex);
             LOG.debug("Created area bike P+R '{}' ({})", creativeName, osmId);
@@ -561,6 +561,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 .availability(vehiclePlaces)
                 .capacity(vehiclePlaces)
                 .build();
+
+            VehicleParkingService vehicleParkingService = graph.getService(VehicleParkingService.class, true);
+            vehicleParkingService.addVehicleParking(vehicleParking);
 
             VehicleParkingVertex parkAndRideVertex = new VehicleParkingVertex(graph, vehicleParking);
             new VehicleParkingEdge(parkAndRideVertex);
