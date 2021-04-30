@@ -2,6 +2,8 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcherConfig;
+import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
@@ -27,7 +29,6 @@ import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParamete
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,10 +71,13 @@ public class UpdatersConfig implements UpdatersParameters {
 
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
 
-  private final URI bikeRentalServiceDirectoryUrl;
+  private final BikeRentalServiceDirectoryFetcherParameters bikeRentalServiceDirectoryFetcherParameters;
 
   public UpdatersConfig(NodeAdapter rootAdapter) {
-    this.bikeRentalServiceDirectoryUrl = rootAdapter.asUri("bikeRentalServiceDirectoryUrl", null);
+    this.bikeRentalServiceDirectoryFetcherParameters =
+        BikeRentalServiceDirectoryFetcherConfig.create(
+          rootAdapter.path("bikeRentalServiceDirectory")
+        );
 
     List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
 
@@ -92,8 +96,8 @@ public class UpdatersConfig implements UpdatersParameters {
    * @see org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher
    */
   @Override
-  public URI bikeRentalServiceDirectoryUrl() {
-   return this.bikeRentalServiceDirectoryUrl;
+  public BikeRentalServiceDirectoryFetcherParameters getBikeRentalServiceDirectoryFetcherParameters() {
+   return this.bikeRentalServiceDirectoryFetcherParameters;
   }
 
   @Override

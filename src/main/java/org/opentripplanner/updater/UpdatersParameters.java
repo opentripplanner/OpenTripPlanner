@@ -1,5 +1,6 @@
 package org.opentripplanner.updater;
 
+import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
@@ -17,7 +18,7 @@ import java.util.List;
 
 public interface UpdatersParameters {
 
-  URI bikeRentalServiceDirectoryUrl();
+  BikeRentalServiceDirectoryFetcherParameters getBikeRentalServiceDirectoryFetcherParameters();
 
   List<BikeRentalUpdaterParameters> getBikeRentalParameters();
 

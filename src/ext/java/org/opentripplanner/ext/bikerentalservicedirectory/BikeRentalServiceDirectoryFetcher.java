@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,19 +25,21 @@ public class BikeRentalServiceDirectoryFetcher {
 
   private static final String GBFS_JSON_FILENAME = "gbfs.json";
 
-  public static List<GraphUpdater> createUpdatersFromEndpoint(URI url) {
+  public static List<GraphUpdater> createUpdatersFromEndpoint(
+      BikeRentalServiceDirectoryFetcherParameters parameters
+  ) {
 
-    LOG.info("Fetching list of updaters from {}", url);
+    LOG.info("Fetching list of updaters from {}", parameters.getUrl());
 
     List<GraphUpdater> updaters = new ArrayList<>();
 
     try {
-      InputStream is = HttpUtils.getData(url);
+      InputStream is = HttpUtils.getData(parameters.getUrl());
       JsonNode node = (new ObjectMapper()).readTree(is);
 
-      for (JsonNode operator : node.get("operators")) {
-        String network = operator.get("name").asText();
-        String updaterUrl = adjustUrlForUpdater(operator.get("url").asText());
+      for (JsonNode source : node.get(parameters.getSourcesName())) {
+        String network = source.get(parameters.getSourceNetworkName()).asText();
+        String updaterUrl = adjustUrlForUpdater(source.get(parameters.getSourceUrlName()).asText());
 
         BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(
             "bike-rental-service-directory:" + network,
@@ -53,7 +54,14 @@ public class BikeRentalServiceDirectoryFetcher {
       }
     }
     catch (java.io.IOException e) {
-      LOG.warn("Error fetching list of bike rental endpoints from {}", url, e);
+      LOG.warn("Error fetching list of bike rental endpoints from {}", parameters.getUrl(), e);
+    }
+    catch (NullPointerException e) {
+      LOG.warn(
+          "Error reading json from {}. Are json tag names configured properly?",
+          parameters.getUrl(),
+          e
+      );
     }
 
     LOG.info("{} updaters fetched", updaters.size());

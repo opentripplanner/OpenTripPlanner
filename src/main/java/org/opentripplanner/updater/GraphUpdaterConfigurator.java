@@ -1,6 +1,7 @@
 package org.opentripplanner.updater;
 
 import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
+import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
@@ -53,7 +54,7 @@ public abstract class GraphUpdaterConfigurator {
         );
         updaters.addAll(
             fetchBikeRentalServicesFromOnlineDirectory(
-                updatersParameters.bikeRentalServiceDirectoryUrl()
+                updatersParameters.getBikeRentalServiceDirectoryFetcherParameters()
             )
         );
 
@@ -95,9 +96,11 @@ public abstract class GraphUpdaterConfigurator {
     /**
      * Use the online UpdaterDirectoryService to fetch BikeRental updaters.
      */
-    private static List<GraphUpdater> fetchBikeRentalServicesFromOnlineDirectory(URI endpoint) {
-        if (endpoint == null) { return List.of(); }
-        return BikeRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(endpoint);
+    private static List<GraphUpdater> fetchBikeRentalServicesFromOnlineDirectory(
+        BikeRentalServiceDirectoryFetcherParameters parameters
+    ) {
+        if (parameters == null) { return List.of(); }
+        return BikeRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(parameters);
     }
 
     /**
