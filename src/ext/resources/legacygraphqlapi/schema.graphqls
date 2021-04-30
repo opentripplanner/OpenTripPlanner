@@ -1442,7 +1442,14 @@ type QueryType {
     serviceTimeRange: serviceTimeRange
 
     """Get all bike rental stations"""
-    bikeRentalStations: [BikeRentalStation]
+    bikeRentalStations(
+        """
+        Return bike rental stations with these ids.
+        **Note:** if an id is invalid (or the bike rental station service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [BikeRentalStation]
 
     """
     Get a single bike rental station based on its ID, i.e. value of field `stationId`
