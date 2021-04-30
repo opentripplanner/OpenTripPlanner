@@ -115,7 +115,7 @@ public class RaptorPathToItineraryMapper {
 
         if (accessPath.durationInSeconds() == 0) { return List.of(); }
 
-        GraphPath graphPath = new GraphPath(accessPath.getLastState(), false);
+        GraphPath graphPath = new GraphPath(accessPath.getLastState());
 
         Itinerary subItinerary = GraphPathToItineraryMapper
             .generateItinerary(graphPath, request.locale);
@@ -216,7 +216,7 @@ public class RaptorPathToItineraryMapper {
 
         if (egressPath.durationInSeconds() == 0) { return List.of(); }
 
-        GraphPath graphPath = new GraphPath(egressPath.getLastState(), false);
+        GraphPath graphPath = new GraphPath(egressPath.getLastState());
 
         Itinerary subItinerary = GraphPathToItineraryMapper
             .generateItinerary(graphPath, request.locale);
@@ -262,7 +262,7 @@ public class RaptorPathToItineraryMapper {
             }
 
             State[] states = transferStates.toArray(new State[0]);
-            GraphPath graphPath = new GraphPath(states[states.length - 1], false);
+            GraphPath graphPath = new GraphPath(states[states.length - 1]);
 
             Itinerary subItinerary = GraphPathToItineraryMapper
                     .generateItinerary(graphPath, request.locale);

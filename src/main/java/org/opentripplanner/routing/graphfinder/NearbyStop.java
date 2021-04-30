@@ -66,7 +66,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
   public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
     double effectiveWalkDistance = 0.0;
     int distanceIndependentTime = 0;
-    GraphPath graphPath = new GraphPath(state, false);
+    GraphPath graphPath = new GraphPath(state);
     CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
     List<Edge> edges = new ArrayList<>();
     for (Edge edge : graphPath.edges) {
