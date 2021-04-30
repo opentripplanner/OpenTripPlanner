@@ -16,7 +16,8 @@ public class ItineraryFiltersMapper {
         c.asDouble("groupSimilarityKeepOne", dft.groupSimilarityKeepOne),
         c.asDouble("groupSimilarityKeepNumOfItineraries", dft.groupSimilarityKeepNumOfItineraries),
         c.asDouble("minSafeTransferTimeFactor", dft.minSafeTransferTimeFactor),
-        c.asLinearFunction("transitGeneralizedCostLimit", dft.transitGeneralizedCostLimit)
+        c.asLinearFunction("transitGeneralizedCostLimit", dft.transitGeneralizedCostLimit),
+        c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio)
     );
   }
 }
