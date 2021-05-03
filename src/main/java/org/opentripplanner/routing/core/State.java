@@ -60,23 +60,13 @@ public class State implements Cloneable {
                     request.getSecondsSinceEpoch(),
                     request,
                     true,
-                    null
+                    false
                 ));
             }
 
-            /* bike rental searches may end in three states (see isFinal()): RENTING_FLOATING/HAVE_RENTED/BEFORE_RENTING
-               for forward/reverse searches to be symmetric all three initial states need to be created. */
+            /* bike rental searches may end in three states (see isFinal()): BEFORE_RENTING/RENTING_FLOATING/HAVE_RENTED
+               for forward/reverse searches to be symmetric an additional RENTING_FLOATING state needs to be created. */
             if (request.bikeRental && request.arriveBy) {
-                states.add(
-                    new State(
-                    vertex,
-                    request.rctx.originBackEdge,
-                    request.getSecondsSinceEpoch(),
-                    request,
-                    false,
-                    BikeRentalState.HAVE_RENTED
-                ));
-
                 states.add(
                     new State(
                         vertex,
@@ -84,7 +74,7 @@ public class State implements Cloneable {
                         request.getSecondsSinceEpoch(),
                         request,
                         false,
-                        BikeRentalState.RENTING_FLOATING
+                        true
                     ));
             }
 
@@ -130,7 +120,7 @@ public class State implements Cloneable {
      * a RoutingContext in TransitIndex, tests, etc.
      */
     public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options) {
-        this(vertex, backEdge, timeSeconds, timeSeconds, options, false, null);
+        this(vertex, backEdge, timeSeconds, timeSeconds, options, false, false);
     }
 
     /**
@@ -143,8 +133,8 @@ public class State implements Cloneable {
         long timeSeconds,
         RoutingRequest options,
         boolean carPickupStateInCar,
-        BikeRentalState bikeRentalState) {
-        this(vertex, backEdge, timeSeconds, timeSeconds, options, carPickupStateInCar, bikeRentalState);
+        boolean bikeRentalFloatingState) {
+        this(vertex, backEdge, timeSeconds, timeSeconds, options, carPickupStateInCar, bikeRentalFloatingState);
     }
 
     /**
@@ -158,7 +148,7 @@ public class State implements Cloneable {
         long startTime,
         RoutingRequest options,
         boolean carPickupStateInCar,
-        BikeRentalState bikeRentalState
+        boolean bikeRentalFloatingState
     ) {
         this.weight = 0;
         this.vertex = vertex;
@@ -171,13 +161,11 @@ public class State implements Cloneable {
         this.stateData.startTime = startTime;
         if (options.bikeRental) {
             if (options.arriveBy) {
-                this.stateData.bikeRentalState =
-                    bikeRentalState == null
-                        ? BikeRentalState.BEFORE_RENTING
-                        : bikeRentalState;
-                if (bikeRentalState == BikeRentalState.RENTING_FLOATING) {
+                if (bikeRentalFloatingState) {
+                    this.stateData.bikeRentalState = BikeRentalState.RENTING_FLOATING;
                     this.stateData.currentMode = TraverseMode.BICYCLE;
                 } else {
+                    this.stateData.bikeRentalState = BikeRentalState.HAVE_RENTED;
                     this.stateData.currentMode = TraverseMode.WALK;
                 }
             }

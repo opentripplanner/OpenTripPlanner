@@ -1,6 +1,10 @@
 package org.opentripplanner.routing.algorithm;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -20,14 +24,14 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  *
  * arriveBy and departAt paths should be symmetric.
  */
-public class TestCarPickup extends GraphRoutingTest {
+public class CarPickupTest extends GraphRoutingTest {
 
     private Graph graph;
     private TransitStopVertex S1;
     private TransitEntranceVertex E1;
     private StreetVertex A, B, C, D, E;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         // Generate a very simple graph
         //
@@ -56,10 +60,12 @@ public class TestCarPickup extends GraphRoutingTest {
         });
     }
 
+    @Test
     public void testCarPickupCarOnly() {
         assertPath(B, C, "null - IN_CAR - null, CAR - IN_CAR - BC street");
     }
 
+    @Test
     public void testCarPickupCarThenWalk() {
         assertPath(
                 A, C,
@@ -67,6 +73,7 @@ public class TestCarPickup extends GraphRoutingTest {
         );
     }
 
+    @Test
     public void testCarPickupFromEntranceThenCar() {
         assertPath(
                 S1, C,
@@ -74,6 +81,7 @@ public class TestCarPickup extends GraphRoutingTest {
         );
     }
 
+    @Test
     public void testCarPickupWalkFromEntranceThenCarThenWalk() {
         assertPath(
                 S1, D,
@@ -81,6 +89,7 @@ public class TestCarPickup extends GraphRoutingTest {
         );
     }
 
+    @Test
     public void testCarPickupCarThenWalkToStop() {
         assertPath(
                 B, E1,
@@ -88,6 +97,7 @@ public class TestCarPickup extends GraphRoutingTest {
         );
     }
 
+    @Test
     public void testCarPickupWalkFromEntranceThenCarThenWalkToStop() {
         assertPath(
                 S1, E1,
@@ -95,6 +105,7 @@ public class TestCarPickup extends GraphRoutingTest {
         );
     }
 
+    @Test
     public void testCarPickupWalkThenCarThenWalk() {
         assertPath(
                 A, D,
@@ -102,6 +113,7 @@ public class TestCarPickup extends GraphRoutingTest {
         );
     }
 
+    @Test
     public void testWalkOnlyCarPickup() {
         // This is a special case where the reverse states differ, due to both starting in the IN_CAR
         // state and switching to walking when encountering the first edge. This is the only valid
