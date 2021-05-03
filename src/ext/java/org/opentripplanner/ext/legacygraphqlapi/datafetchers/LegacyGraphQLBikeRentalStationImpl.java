@@ -75,8 +75,7 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     @Override
     public DataFetcher<Integer> capacity() {
         // TODO implement this
-        return environment -> getSource(environment).spacesAvailable + getSource(
-                environment).bikesAvailable;
+        return environment -> 0;
     }
 
     private BikeRentalStation getSource(DataFetchingEnvironment environment) {
