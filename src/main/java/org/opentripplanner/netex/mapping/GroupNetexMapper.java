@@ -1,12 +1,12 @@
 package org.opentripplanner.netex.mapping;
 
+import com.google.common.collect.ArrayListMultimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.model.transfer.Transfer;
-import org.opentripplanner.netex.index.OrderedListMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
@@ -24,7 +24,7 @@ class GroupNetexMapper {
     /**
      * A map from trip/serviceJourney id to a ordered list of scheduled stop point ids.
      */
-    final OrderedListMap<String, String> scheduledStopPointsIndex = new OrderedListMap<>();
+    final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
 
     GroupNetexMapper(
             FeedScopedIdFactory idFactory,

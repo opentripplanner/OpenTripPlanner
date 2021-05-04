@@ -135,7 +135,7 @@ class TripPatternMapper {
             // Unable to map StopTimes, problem logged by the mapper above
             if (stopTimes == null) { continue; }
 
-            result.scheduledStopPointsIndex.put(
+            result.scheduledStopPointsIndex.putAll(
                     serviceJourney.getId(),
                     stopTimes.scheduledStopPointIds
             );
