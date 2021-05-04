@@ -7,9 +7,9 @@ import javax.annotation.Nullable;
 /**
  * FlexPathCalculator is used to calculate the driving times and distances during flex routing
  */
-public interface FlexPathCalculator {
+public interface FlexPathCalculator<T> {
 
   @Nullable
-  FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex);
+  FlexPath calculateFlexPath(Vertex fromv, Vertex tov, T fromStopIndex, T toStopIndex);
 
 }

@@ -23,7 +23,7 @@ import java.util.Map;
  * Subsequents requests from the same fromVertex can fetch the path to the toVertex from the
  * existing ShortestPathTree. This one-to-many approach is needed to make the performance acceptable.
  */
-public class StreetFlexPathCalculator implements FlexPathCalculator {
+public class StreetFlexPathCalculator implements FlexPathCalculator<Integer> {
 
   private static final long MAX_FLEX_TRIP_DURATION_SECONDS = Duration.ofMinutes(45).toSeconds();
 
@@ -35,7 +35,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   }
 
   @Override
-  public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
+  public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, Integer fromStopIndex, Integer toStopIndex) {
 
     ShortestPathTree shortestPathTree;
     if (cache.containsKey(fromv)) {

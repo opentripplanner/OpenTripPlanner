@@ -38,7 +38,7 @@ public class AccessEgressMapper {
   }
 
   public Collection<AccessEgress> mapFlexAccessEgresses(
-      Collection<FlexAccessEgress> flexAccessEgresses
+      Collection<FlexAccessEgress<?>> flexAccessEgresses
   ) {
     return flexAccessEgresses.stream()
         .map(flexAccessEgress -> new FlexAccessEgressAdapter(flexAccessEgress, stopIndex))

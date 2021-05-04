@@ -7,6 +7,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.model.TransitMode;
@@ -71,7 +72,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
                     for (int i = 0; i < pattern.numHopGeometries(); i++) {
                         LineString hopGeometry = pattern.getHopGeometry(i);
 
-                        List<Edge> edges = matcher.match(hopGeometry);
+                        List<StreetEdge> edges = matcher.match(hopGeometry);
                         if (edges == null || edges.isEmpty()) {
                             log.warn("Could not match to street network: {}", pattern);
                             continue;

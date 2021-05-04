@@ -151,6 +151,10 @@ public class GtfsModule implements GraphBuilderModule {
                 addTransitModelToGraph(graph, gtfsBundle, transitModel);
 
                 createGeometryAndBlockProcessor(gtfsBundle, transitModel).run(graph, issueStore);
+
+                if (OTPFeature.FlexRouting.isOn()) {
+                    FlexTripsMapper.addGeometriesToContinuousStops(graph);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

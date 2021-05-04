@@ -31,7 +31,7 @@ public class FlexServiceDate {
     this.servicesRunning = servicesRunning;
   }
 
-  boolean isFlexTripRunning(FlexTrip flexTrip, Graph graph) {
+  boolean isFlexTripRunning(FlexTrip<?> flexTrip, Graph graph) {
     return servicesRunning != null
         && servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()));
   }

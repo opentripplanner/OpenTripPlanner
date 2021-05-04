@@ -1,34 +1,33 @@
 package org.opentripplanner.graph_builder.module.map;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.util.AssertionFailedException;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Vertex;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class MidblockMatchState extends MatchState {
 
     private static final double MAX_ERROR = 1000;
 
-    private LinearLocation edgeIndex;
+    private final LinearLocation edgeIndex;
 
     public LinearLocation routeIndex;
 
     Geometry routeGeometry;
 
-    private Geometry edgeGeometry;
+    private final Geometry edgeGeometry;
 
-    private LocationIndexedLine indexedEdge;
+    private final LocationIndexedLine indexedEdge;
 
-    public MidblockMatchState(MatchState parent, Geometry routeGeometry, Edge edge,
+    public MidblockMatchState(MatchState parent, Geometry routeGeometry, StreetEdge edge,
             LinearLocation routeIndex, LinearLocation edgeIndex, double error,
             double distanceAlongRoute) {
         super(parent, edge, distanceAlongRoute);
@@ -134,7 +133,7 @@ public class MidblockMatchState extends MatchState {
                     return nextStates;
                 }
                 
-                for (Edge e : getOutgoingMatchableEdges(toVertex)) {
+                for (StreetEdge e : getOutgoingMatchableEdges(toVertex)) {
                     double cost = error + NEW_SEGMENT_PENALTY;
                     if (!carsCanTraverse(e)) {
                         cost += NO_TRAVERSE_PENALTY;
@@ -168,7 +167,7 @@ public class MidblockMatchState extends MatchState {
                 Vertex toVertex = edge.getToVertex();
                 double travelAlongOldEdge = distanceAlongGeometry(edgeGeometry, edgeIndex, null);
 
-                for (Edge e : getOutgoingMatchableEdges(toVertex)) {
+                for (StreetEdge e : getOutgoingMatchableEdges(toVertex)) {
                     Geometry newEdgeGeometry = e.getGeometry();
                     LocationIndexedLine newIndexedEdge = new LocationIndexedLine(newEdgeGeometry);
                     newEdgeIndex = newIndexedEdge.project(newRouteCoord);

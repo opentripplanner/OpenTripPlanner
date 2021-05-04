@@ -17,12 +17,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.opentripplanner.model.StopLocation.expandStops;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
@@ -30,7 +30,7 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
  * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop
  * locations, which are not stops, but other types, such as groups of stops or location areas.
  */
-public class ScheduledDeviatedTrip extends FlexTrip {
+public class ScheduledDeviatedTrip extends FlexTrip<Integer> {
 
   private final ScheduledDeviatedStopTime[] stopTimes;
 
@@ -62,21 +62,21 @@ public class ScheduledDeviatedTrip extends FlexTrip {
   }
 
   @Override
-  public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
+  public Stream<FlexAccessTemplate<Integer>> getFlexAccessTemplates(
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator<Integer> calculator
   ) {
-    FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
+    FlexPathCalculator<Integer> scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
     int fromIndex = getFromIndex(access);
 
     if (fromIndex == -1) { return Stream.empty(); }
 
-    ArrayList<FlexAccessTemplate> res = new ArrayList<>();
+    ArrayList<FlexAccessTemplate<Integer>> res = new ArrayList<>();
 
     for (int toIndex = fromIndex + 1; toIndex < stopTimes.length; toIndex++) {
       if (stopTimes[toIndex].dropOffType == PICKDROP_NONE) continue;
       for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
-        res.add(new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, scheduledCalculator));
+        res.add(new FlexAccessTemplate<>(access, this, fromIndex, toIndex, stop, date, scheduledCalculator));
       }
     }
 
@@ -84,21 +84,21 @@ public class ScheduledDeviatedTrip extends FlexTrip {
   }
 
   @Override
-  public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
+  public Stream<FlexEgressTemplate<Integer>> getFlexEgressTemplates(
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator<Integer> calculator
   ) {
-    FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
+    FlexPathCalculator<Integer> scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
     int toIndex = getToIndex(egress);
 
     if (toIndex == -1) { return Stream.empty(); }
 
-    ArrayList<FlexEgressTemplate> res = new ArrayList<>();
+    ArrayList<FlexEgressTemplate<Integer>> res = new ArrayList<>();
 
     for (int fromIndex = toIndex - 1; fromIndex >= 0; fromIndex--) {
       if (stopTimes[fromIndex].pickupType == PICKDROP_NONE) continue;
       for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
-        res.add(new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, scheduledCalculator));
+        res.add(new FlexEgressTemplate<>(egress, this, fromIndex, toIndex, stop, date, scheduledCalculator));
       }
     }
 
@@ -107,7 +107,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public int earliestDepartureTime(
-      int departureTime, int fromStopIndex, int toStopIndex, int flexTime
+      int departureTime, Integer fromStopIndex, Integer toStopIndex, int flexTime
   ) {
     int stopTime = MISSING_VALUE;
     for (int i = fromStopIndex; stopTime == MISSING_VALUE && i >= 0; i--) {
@@ -117,7 +117,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
   }
 
   @Override
-  public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
+  public int latestArrivalTime(int arrivalTime, Integer fromStopIndex, Integer toStopIndex, int flexTime) {
     int stopTime = MISSING_VALUE;
     for (int i = toStopIndex; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
       stopTime = stopTimes[i].arrivalTime;
@@ -136,12 +136,6 @@ public class ScheduledDeviatedTrip extends FlexTrip {
   @Override
   public BookingInfo getBookingInfo(int i) {
     return bookingInfos[i];
-  }
-
-  private Collection<StopLocation> expandStops(StopLocation stop) {
-    return stop instanceof FlexLocationGroup
-        ? ((FlexLocationGroup) stop).getLocations()
-        : Collections.singleton(stop);
   }
 
   private int getFromIndex(NearbyStop accessEgress) {

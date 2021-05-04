@@ -1,5 +1,8 @@
 package org.opentripplanner.model;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * A StopLocation describes a place where a vehicle can be boarded or alighted, which is not
  * necessarily a marked stop, but can be of other shapes, such as a service area for flexible
@@ -21,4 +24,11 @@ public interface StopLocation {
    * the centroid of an area or line.
    */
   WgsCoordinate getCoordinate();
+
+  static Collection<StopLocation> expandStops(StopLocation stop) {
+    return stop instanceof FlexLocationGroup
+        ? ((FlexLocationGroup) stop).getLocations()
+        : Collections.singleton(stop);
+  }
+
 }

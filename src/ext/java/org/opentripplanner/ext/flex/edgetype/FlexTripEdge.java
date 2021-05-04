@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 
-public class FlexTripEdge extends Edge {
+public class FlexTripEdge<T> extends Edge {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
 
@@ -27,13 +27,13 @@ public class FlexTripEdge extends Edge {
 
   public StopLocation s1;
   public StopLocation s2;
-  private FlexTrip trip;
-  public FlexAccessEgressTemplate flexTemplate;
+  private final FlexTrip<T> trip;
+  public FlexAccessEgressTemplate<T> flexTemplate;
   public FlexPath flexPath;
 
   public FlexTripEdge(
-      Vertex v1, Vertex v2, StopLocation s1, StopLocation s2, FlexTrip trip,
-      FlexAccessEgressTemplate flexTemplate, FlexPathCalculator calculator
+      Vertex v1, Vertex v2, StopLocation s1, StopLocation s2, FlexTrip<T> trip,
+      FlexAccessEgressTemplate<T> flexTemplate, FlexPathCalculator<T> calculator
   ) {
     // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
     // The first parameter in Vertex constructor is graph. If it is null, the vertex isn't added to it.

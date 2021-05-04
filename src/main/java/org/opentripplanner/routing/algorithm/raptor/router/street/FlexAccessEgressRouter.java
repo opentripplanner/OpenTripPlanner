@@ -13,7 +13,7 @@ public class FlexAccessEgressRouter {
 
   private FlexAccessEgressRouter() {}
 
-  public static Collection<FlexAccessEgress> routeAccessEgress(
+  public static Collection<FlexAccessEgress<?>> routeAccessEgress(
       RoutingRequest request,
       boolean isEgress
   ) {

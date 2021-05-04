@@ -6,18 +6,18 @@ import org.opentripplanner.routing.graph.Vertex;
 /**
  * Calculate the driving times based on the shcheduled timetable for the route.
  */
-public class ScheduledFlexPathCalculator implements FlexPathCalculator {
-  private final FlexPathCalculator flexPathCalculator;
-  private final FlexTrip trip;
+public class ScheduledFlexPathCalculator implements FlexPathCalculator<Integer> {
+  private final FlexPathCalculator<Integer> flexPathCalculator;
+  private final FlexTrip<Integer> trip;
 
-  public ScheduledFlexPathCalculator(FlexPathCalculator flexPathCalculator, FlexTrip trip) {
+  public ScheduledFlexPathCalculator(FlexPathCalculator<Integer> flexPathCalculator, FlexTrip<Integer> trip) {
     this.flexPathCalculator = flexPathCalculator;
     this.trip = trip;
   }
 
   @Override
   public FlexPath calculateFlexPath(
-      Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex
+      Vertex fromv, Vertex tov, Integer fromStopIndex, Integer toStopIndex
   ) {
     FlexPath flexPath = flexPathCalculator.calculateFlexPath(
         fromv,

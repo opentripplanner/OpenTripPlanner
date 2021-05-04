@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class FlexAccessTemplate extends FlexAccessEgressTemplate {
+public class FlexAccessTemplate<T> extends FlexAccessEgressTemplate<T> {
   public FlexAccessTemplate(
-      NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
-      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop accessEgress, FlexTrip<T> trip, T fromStopIndex, T toStopIndex,
+      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator<T> calculator
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator);
+    super(accessEgress, trip, fromStopIndex, toStopIndex, transferStop, date, calculator);
   }
 
   public Itinerary createDirectItinerary(
@@ -42,7 +42,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       return null;
     }
 
-    FlexTripEdge flexEdge = getFlexEdge(flexToVertex, egress.stop);
+    FlexTripEdge<T> flexEdge = getFlexEdge(flexToVertex, egress.stop);
 
     State state = flexEdge.traverse(accessEgress.state);
 
@@ -56,7 +56,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     int flexTime = flexTimes[1];
     int postFlexTime = flexTimes[2];
 
-    Integer timeShift = null;
+    int timeShift;
 
     if (arriveBy) {
       int lastStopArrivalTime = departureTime - postFlexTime - secondsFromStartOfTime;
@@ -124,17 +124,17 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
           fromStopIndex,
           toStopIndex
       ) != null;
-  };
+  }
 
-  protected int[] getFlexTimes(FlexTripEdge flexEdge, State state) {
+  protected int[] getFlexTimes(FlexTripEdge<T> flexEdge, State state) {
     int preFlexTime = (int) accessEgress.state.getElapsedTimeSeconds();
     int edgeTimeInSeconds = flexEdge.getTimeInSeconds();
     int postFlexTime = (int) state.getElapsedTimeSeconds() - preFlexTime - edgeTimeInSeconds;
     return new int[]{ preFlexTime, edgeTimeInSeconds, postFlexTime };
   }
 
-  protected FlexTripEdge getFlexEdge(Vertex flexToVertex, StopLocation transferStop) {
-    return new FlexTripEdge(
+  protected FlexTripEdge<T> getFlexEdge(Vertex flexToVertex, StopLocation transferStop) {
+    return new FlexTripEdge<>(
         accessEgress.state.getVertex(),
         flexToVertex,
         accessEgress.stop,
