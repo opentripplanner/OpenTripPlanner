@@ -35,9 +35,7 @@ public class LocationGroupMapper {
   }
 
   private FlexLocationGroup doMap(org.onebusaway.gtfs.model.LocationGroup element) {
-    FlexLocationGroup locationGroup;
-
-    locationGroup = new FlexLocationGroup(mapAgencyAndId(element.getId()));
+    FlexLocationGroup locationGroup = new FlexLocationGroup(mapAgencyAndId(element.getId()));
     locationGroup.setName(element.getName());
 
     for (org.onebusaway.gtfs.model.StopLocation location : element.getLocations()) {
@@ -51,7 +49,7 @@ public class LocationGroupMapper {
         throw new RuntimeException("Nested LocationGroups are not allowed");
       }
       else {
-        throw new RuntimeException("Unknown location type");
+        throw new RuntimeException("Unknown location type: " + location.getClass().getSimpleName());
       }
     }
 
