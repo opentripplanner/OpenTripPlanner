@@ -21,6 +21,7 @@
 - Add no thru traffic debug layer [#3443](https://github.com/opentripplanner/OpenTripPlanner/issues/3443)
 - Fix reading of cached elevation files [#3455](https://github.com/opentripplanner/OpenTripPlanner/pull/3455)
 - Added BikeRentalWithMostlyWalking filter [#3446](https://github.com/opentripplanner/OpenTripPlanner/pull/3446)
+- Import GTFS-Flex v2 Flexible trips [#3453](https://github.com/opentripplanner/OpenTripPlanner/pull/3453)
 
 ## 2.0.0 (2020-11-27)
 
