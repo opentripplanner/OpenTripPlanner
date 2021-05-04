@@ -68,8 +68,15 @@ public class StopTimesMapperTest {
         STOP_TIME.setTrip(TRIP);
     }
 
+    private final StopMapper stopMapper = new StopMapper();
+    private final LocationMapper locationMapper = new LocationMapper();
+    private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);
+
     private final StopTimeMapper subject = new StopTimeMapper(
-            new StopMapper(), new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)))
+            stopMapper,
+            locationMapper,
+            locationGroupMapper,
+            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)))
     );
 
     @Test
