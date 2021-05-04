@@ -16,11 +16,10 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
+import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -238,8 +237,7 @@ public abstract class GraphRoutingTest extends TestCase {
                     graph,
                     bikeRentalStationEntity(id, latitude, longitude)
             );
-            new RentABikeOnEdge(vertex, vertex, networks);
-            new RentABikeOffEdge(vertex, vertex, networks);
+            new BikeRentalEdge(vertex, networks);
             return vertex;
         }
 

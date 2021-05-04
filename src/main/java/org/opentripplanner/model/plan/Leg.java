@@ -13,7 +13,9 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -171,6 +173,8 @@ public class Leg {
 
    public Boolean rentedBike;
 
+   public List<String> bikeRentalNetworks = new ArrayList<>();
+
   /**
    * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
    * computed by the algorithm for the section this leg account for. This is relevant for anyone
@@ -245,7 +249,11 @@ public class Leg {
     }
 
     public void addAlert(TransitAlert alert) {
-        transitAlerts.add(alert);
+      transitAlerts.add(alert);
+    }
+
+    public void addBikeRentalNetworks(Collection<String> networks) {
+      bikeRentalNetworks.addAll(networks);
     }
 
     /**
@@ -322,6 +330,7 @@ public class Leg {
                 .addStr("boardRule", boardRule)
                 .addStr("alightRule", alightRule)
                 .addBool("rentedBike", rentedBike)
+                .addCol("bikeRentalNetworks", bikeRentalNetworks)
                 .toString();
     }
 }
