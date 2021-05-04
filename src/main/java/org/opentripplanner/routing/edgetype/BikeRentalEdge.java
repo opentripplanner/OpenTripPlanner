@@ -1,17 +1,14 @@
 package org.opentripplanner.routing.edgetype;
 
+import com.google.common.collect.Sets;
+import java.util.Locale;
 import java.util.Set;
-
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-
-import com.google.common.collect.Sets;
-import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
 
 /**
  * Renting or dropping off a rented bike edge.
@@ -38,6 +35,7 @@ public class BikeRentalEdge extends Edge {
 
         BikeRentalStationVertex stationVertex = (BikeRentalStationVertex) tov;
 
+        boolean pickedUp;
         if (options.arriveBy) {
             switch (s0.getBikeRentalState()) {
                 case BEFORE_RENTING:
@@ -47,10 +45,12 @@ public class BikeRentalEdge extends Edge {
                         return null;
                     }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(),true);
+                    pickedUp = false;
                     break;
                 case RENTING_FLOATING:
                     if (stationVertex.getStation().isFloatingBike) {
                         s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), true);
+                        pickedUp = true;
                     } else {
                         return null;
                     }
@@ -61,6 +61,7 @@ public class BikeRentalEdge extends Edge {
                     }
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
                     s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), true);
+                    pickedUp = true;
                     break;
                 default:
                     throw new IllegalStateException();
@@ -76,6 +77,7 @@ public class BikeRentalEdge extends Edge {
                     } else {
                         s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), false);
                     }
+                    pickedUp = true;
                     break;
                 case HAVE_RENTED:
                     return null;
@@ -86,14 +88,15 @@ public class BikeRentalEdge extends Edge {
                         return null;
                     }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), false);
+                    pickedUp = false;
                     break;
                 default:
                     throw new IllegalStateException();
             }
         }
 
-        s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost : options.bikeRentalPickupCost);
-        s1.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalDropoffTime : options.bikeRentalPickupTime);
+        s1.incrementWeight(pickedUp ? options.bikeRentalPickupCost : options.bikeRentalDropoffCost);
+        s1.incrementTimeInSeconds(pickedUp ? options.bikeRentalPickupTime : options.bikeRentalDropoffTime);
         s1.setBikeRentalNetwork(networks);
         s1.setBackMode(s0.getNonTransitMode());
         return s1.makeState();
