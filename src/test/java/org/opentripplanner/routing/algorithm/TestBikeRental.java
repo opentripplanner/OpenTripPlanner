@@ -1,110 +1,153 @@
 package org.opentripplanner.routing.algorithm;
 
-import junit.framework.TestCase;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
-public class TestBikeRental extends TestCase {
-    public void testBasic() throws Exception {
-        // generate a very simple graph
-        Graph graph = new Graph();
-        StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.856, "v1");
-        StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.857, "v2");
-        StreetVertex v3 = new IntersectionVertex(graph, "v3", -77.0492, 38.858, "v3");
+/**
+ * This is adapted from {@link TestCarPickup}. All tests use the same graph structure, but a part
+ * of the graph is changed before running each test. The setup method runs for each test, so this
+ * is not a problem.
+ */
+public class TestBikeRental extends GraphRoutingTest {
 
-        @SuppressWarnings("unused")
-        Edge walk = new StreetEdge(v1, v2, GeometryUtils.makeLineString(-77.0492, 38.856,
-                -77.0492, 38.857), "S. Crystal Dr", 87, StreetTraversalPermission.PEDESTRIAN, false);
+    private Graph graph;
+    private TransitStopVertex S1;
+    private TransitEntranceVertex E1;
+    private StreetVertex A, B, C, D;
+    private BikeRentalStationVertex B1, B2;
+    private StreetEdge SE1, SE2, SE3;
 
-        @SuppressWarnings("unused")
-        Edge mustBike = new StreetEdge(v2, v3, GeometryUtils.makeLineString(-77.0492, 38.857,
-                -77.0492, 38.858), "S. Crystal Dr", 87, StreetTraversalPermission.BICYCLE, false);
+    @Override
+    protected void setUp() throws Exception {
+        // Generate a very simple graph
+        //
+        //   A <-> B <-> C <-> D
+        //   A <-> S1
+        //   B <-> B1
+        //   C <-> B2
+        //   D <-> E1
 
-        AStar aStar = new AStar();
+        graph = graphOf(new Builder() {
+            @Override
+            public void build() {
+                S1 = stop("S1", 0, 45);
+                E1 = entrance("E1", 0.004, 45);
+                A = intersection("A", 0.001, 45);
+                B = intersection("B", 0.002, 45);
+                C = intersection("C", 0.003, 45);
+                D = intersection("D", 0.004, 45);
 
-        // it is impossible to get from v1 to v3 by walking
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.TRANSIT));
-        options.setRoutingContext(graph, v1, v3);
-        ShortestPathTree tree = aStar.getShortestPathTree(options);
+                B1 = bikeRentalStation("B1", 0.002, 45);
+                B2 = bikeRentalStation("B2", 0.004, 45);
 
-        GraphPath path = tree.getPath(v3, false);
-        assertNull(path);
+                biLink(A, S1);
+                biLink(D, E1);
 
-        // or biking + walking (assuming walking bikes is disallowed)
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.BICYCLE,TraverseMode.TRANSIT));
-        options.setRoutingContext(graph, v1, v3);
-        tree = aStar.getShortestPathTree(options);
+                biLink(B, B1);
+                biLink(C, B2);
 
-        path = tree.getPath(v3, false);
-        assertNull(path);
+                SE1 = street(A, B, 50, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+                SE2 = street(B, C, 1000, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+                SE3 = street(C, D, 50, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+            }
+        });
+    }
 
-        // so we add a bike share
-        BikeRentalStation station = new BikeRentalStation();
-        station.id = "id";
-        station.name = new NonLocalizedString("station");
-        station.x = -77.049;
-        station.y = 36.856;
-        station.bikesAvailable = 5;
-        station.spacesAvailable = 5;
-        BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
-        new StreetBikeRentalLink(stationVertex, v2);
-        new StreetBikeRentalLink(v2, stationVertex);
-        Set<String> networks = new HashSet<String>(Arrays.asList("default"));
-        new RentABikeOnEdge(stationVertex, stationVertex, networks);
-        new RentABikeOffEdge(stationVertex, stationVertex, networks);
+    public void testBikeRentalFromStation() {
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), BICYCLE - RENTING_FROM_STATION - BC street (400.00, 200), WALK - HAVE_RENTED - CD street (75.19, 38)");
+    }
 
-        // but we can't get off the bike at v3, so we still fail
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.BICYCLE,TraverseMode.TRANSIT));
-        options.setRoutingContext(graph, v1, v3);
-        tree = aStar.getShortestPathTree(options);
+    public void testFallBackToWalking() {
+        SE2.setPermission(StreetTraversalPermission.PEDESTRIAN);
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
+}
 
-        path = tree.getPath(v3, false);
-        // null is returned because the only state at the target is not final
-        assertNull(path);
+    public void testNoBikesAvailable() {
+        B1.setBikesAvailable(0);
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
+    }
 
-        BikeRentalStation station2 = new BikeRentalStation();
-        station2.id = "id2";
-        station2.name = new NonLocalizedString("station2");
-        station2.x = -77.049;
-        station2.y = 36.857;
-        station2.bikesAvailable = 5;
-        station2.spacesAvailable = 5;
-        BikeRentalStationVertex stationVertex2 = new BikeRentalStationVertex(graph, station2);
-        new StreetBikeRentalLink(stationVertex2, v3);
-        new StreetBikeRentalLink(v3, stationVertex2);
-        new RentABikeOnEdge(stationVertex2, stationVertex2, networks);
-        new RentABikeOffEdge(stationVertex2, stationVertex2, networks);
+    public void testNoSpacesAvailable() {
+        B2.setSpacesAvailable(0);
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), WALK - BEFORE_RENTING - BC street (1,503.76, 752), WALK - BEFORE_RENTING - CD street (75.19, 38)");
+    }
 
-        // now we succeed!
-        options = new RoutingRequest();
-        options.streetSubRequestModes.setWalk(true);
-        options.streetSubRequestModes.setBicycle(true);
-        options.bikeRental = true;
-        options.setRoutingContext(graph, v1, v3);
-        tree = aStar.getShortestPathTree(options);
+    public void testFloatingBike() {
+        B1.getStation().isFloatingBike = true;
+        assertPath(S1, E1,"WALK - BEFORE_RENTING - AB street (75.19, 38), BICYCLE - RENTING_FLOATING - BC street (400.00, 200), BICYCLE - RENTING_FLOATING - CD street (20.00, 10)");
+    }
 
-        path = tree.getPath(v3, false);
-        assertNotNull(path);
+    private void assertPath(Vertex fromVertex, Vertex toVertex, String descriptor) {
+        String departAt = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, false);
+        String arriveBy = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, true);
+
+        assertDescriptors(descriptor, descriptor, arriveBy, departAt);
+    }
+
+    private void assertDescriptors(
+            String expectedDepartAt,
+            String expectedArriveBy,
+            String arriveBy,
+            String departAt
+    ) {
+        String formatString = "DepartAt: %s%nArriveBy: %s";
+
+        assertEquals(
+                String.format(
+                        formatString,
+                        expectedDepartAt,
+                        expectedArriveBy
+                ),
+                String.format(
+                        formatString,
+                        departAt,
+                        arriveBy
+                )
+        );
+    }
+
+    private String runStreetSearchAndCreateDescriptor(
+            Vertex fromVertex,
+            Vertex toVertex,
+            boolean arriveBy
+    ) {
+        var options = new RoutingRequest();
+        options.arriveBy = arriveBy;
+        options.worstTime = arriveBy ? Long.MIN_VALUE : Long.MAX_VALUE;
+
+        var bikeRentalOptions = options.getStreetSearchRequest(StreetMode.BIKE_RENTAL);
+        bikeRentalOptions.useBikeRentalAvailabilityInformation = true;
+        bikeRentalOptions.setRoutingContext(graph, fromVertex, toVertex);
+        var tree = new AStar().getShortestPathTree(bikeRentalOptions);
+        var path = tree.getPath(
+                arriveBy ? fromVertex : toVertex,
+                false
+        );
+
+        return path != null ? path.states
+            .stream()
+            .filter(s -> s.getBackEdge() instanceof StreetEdge)
+            .map(s -> String.format(
+                Locale.ROOT,
+                "%s - %s - %s (%,.2f, %d)",
+                s.getBackMode(),
+                s.getBikeRentalState(),
+                s.getBackEdge() != null ? s.getBackEdge().getName() : null,
+                s.getWeightDelta(),
+                s.getTimeDeltaSeconds()
+            ))
+            .collect(Collectors.joining(", ")) : "path not found";
     }
 }

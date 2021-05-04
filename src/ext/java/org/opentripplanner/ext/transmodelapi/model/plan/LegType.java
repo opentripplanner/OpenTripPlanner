@@ -288,6 +288,11 @@ public class LegType {
             .type(bookingArrangementType)
             .dataFetcher(env -> leg(env).bookingInfo)
             .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("bikeRentalNetworks")
+            .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+            .build())
         .build();
   }
   
