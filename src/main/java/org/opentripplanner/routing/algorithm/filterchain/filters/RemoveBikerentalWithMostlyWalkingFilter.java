@@ -10,6 +10,8 @@ import java.util.List;
  * This is used to filter out bike rental itineraries that contain mostly walking. The value
  * describes the ratio of the total itinerary that has to consist of bike rental to allow the
  * itinerary.
+ * 
+ * This filter is turned off by default (bikeRentalDistanceRatio == 0)
  */
 public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryFilter {
 

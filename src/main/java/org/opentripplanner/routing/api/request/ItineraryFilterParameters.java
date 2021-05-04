@@ -73,7 +73,7 @@ public class ItineraryFilterParameters {
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepNumOfItineraries = 0.68;
     this.minSafeTransferTimeFactor = 0.0;
-    this.bikeRentalDistanceRatio = 0.3;
+    this.bikeRentalDistanceRatio = 0.0;
   }
 
   public static ItineraryFilterParameters createDefault() {
