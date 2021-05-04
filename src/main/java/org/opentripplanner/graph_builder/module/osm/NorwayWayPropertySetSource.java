@@ -56,7 +56,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("trail_visibility=no", StreetTraversalPermission.NONE);
     props.setProperties("trail_visibility=low", StreetTraversalPermission.NONE);
     props.setProperties("trail_visibility=poor", StreetTraversalPermission.NONE);
-    props.setProperties("trail_visibility=poor", StreetTraversalPermission.NONE);
 
     props.setProperties("sac_scale=mountain_hiking", StreetTraversalPermission.NONE);
     props.setProperties("sac_scale=demanding_mountain_hiking", StreetTraversalPermission.NONE);
