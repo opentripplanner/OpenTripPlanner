@@ -88,7 +88,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     }
 
     Itinerary itinerary = GraphPathToItineraryMapper.generateItinerary(
-        new GraphPath(state, false),
+        new GraphPath(state),
         Locale.ENGLISH
     );
 

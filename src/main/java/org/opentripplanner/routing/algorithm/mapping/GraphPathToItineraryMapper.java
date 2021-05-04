@@ -25,11 +25,10 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -290,6 +289,13 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
+        if (leg.rentedBike) {
+            Set<String> bikeRentalNetworks = states[0].getBikeRentalNetworks();
+            if (bikeRentalNetworks != null) {
+                leg.addBikeRentalNetworks(states[0].getBikeRentalNetworks());
+            }
+        }
+
         addAlerts(graph, leg, states);
 
         if (flexEdge != null) {
@@ -503,8 +509,12 @@ public abstract class GraphPathToItineraryMapper {
             State forwardState = states[i + 1];
             Edge edge = forwardState.getBackEdge();
 
-            if(edge instanceof RentABikeOnEdge) onBikeRentalState = forwardState;
-            if(edge instanceof RentABikeOffEdge) offBikeRentalState = forwardState;
+            if (edge instanceof BikeRentalEdge && forwardState.bikeRentalNotStarted()) {
+                onBikeRentalState = forwardState;
+            }
+            if (edge instanceof BikeRentalEdge && !forwardState.bikeRentalNotStarted()) {
+                offBikeRentalState = forwardState;
+            }
 
             boolean createdNewStep = false, disableZagRemovalForThisStep = false;
             if (edge instanceof FreeEdge) {

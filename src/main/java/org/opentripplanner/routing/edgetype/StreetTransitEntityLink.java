@@ -89,11 +89,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
             // Forbid taking your own bike in the station if bike P+R activated.
             return null;
         }
-        if (s0.isBikeRenting()) {
-            // Forbid taking a rented bike on any transit.
-            // TODO Check this condition, does this always make sense?
-            return null;
-        }
 
         // Do not check here whether any transit modes are selected. A check for the presence of
         // transit modes will instead be done in the following PreBoard edge.
