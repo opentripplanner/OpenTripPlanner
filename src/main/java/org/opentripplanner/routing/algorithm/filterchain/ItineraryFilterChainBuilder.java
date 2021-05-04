@@ -8,6 +8,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.GroupBySimilarL
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveBikerentalWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
@@ -37,6 +38,7 @@ public class ItineraryFilterChainBuilder {
     private double minSafeTransferTimeFactor;
     private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
+    private double bikeRentalDistanceRatio;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
@@ -95,6 +97,15 @@ public class ItineraryFilterChainBuilder {
      */
     public ItineraryFilterChainBuilder withTransitGeneralizedCostLimit(DoubleFunction<Double> value){
         this.transitGeneralizedCostLimit = value;
+        return this;
+    }
+    /**
+     * This is used to filter out bike rental itineraries that contain mostly walking. The value
+     * describes the ratio of the total itinerary that has to consist of bike rental to allow the
+     * itinerary.
+     */
+    public ItineraryFilterChainBuilder withBikeRentalDistanceRatio(double value){
+        this.bikeRentalDistanceRatio = value;
         return this;
     }
     /**
@@ -208,6 +219,10 @@ public class ItineraryFilterChainBuilder {
 
             if (latestDepartureTimeLimit != null) {
                 filters.add(new LatestDepartureTimeFilter(latestDepartureTimeLimit));
+            }
+
+            if (bikeRentalDistanceRatio > 0) {
+                filters.add(new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio));
             }
         }
 

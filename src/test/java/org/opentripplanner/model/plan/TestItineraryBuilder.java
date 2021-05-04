@@ -78,11 +78,21 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   /**
-   * Add a bus leg to the itinerary.
+   * Add a bicycle leg to the itinerary.
    */
   public TestItineraryBuilder bicycle(int startTime, int endTime, Place to) {
     cost += cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to);
+    return this;
+  }
+
+  /**
+   * Add a rented bicycle leg to the itinerary.
+   */
+  public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
+    cost += cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
+    streetLeg(BICYCLE, startTime, endTime, to);
+    this.legs.get(0).rentedBike = true;
     return this;
   }
 

@@ -52,11 +52,13 @@ It can be hard to use on large graphs since, whole graph is displayed at once. A
  travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer also
  draws links from transit stops/bike rentals and P+R to graph. And also draws transit stops, bike rentals
   and P+R vertices with different color.
+- No thru traffic - streets are colored if the edge has thru traffic restrictions (car and bicycle = `red`, car only = `orange`, bicycle only = `blue`, and no-restriction = `light gray`)
 
 ### Interpretation Traversal permissions layer
 
 A sample traversal permissions layer looks like the following 
 ![screen shot 2015-06-26 at 11 45 22](https://cloud.githubusercontent.com/assets/4493762/8374829/df05c438-1bf8-11e5-8ead-c1dea41af122.png)
+
 * Yellow lines is the link between a stop and the street graph.
 * Grey lines are streets one can travel with the mode walk, bike, or car
 * Green lines are paths one can travel with the mode walk only
