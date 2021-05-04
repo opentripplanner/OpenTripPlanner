@@ -2,6 +2,7 @@ package org.opentripplanner.ext.bikerentalservicedirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.opentripplanner.standalone.config.ext.bikerentalservicedirectoryfetcher.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -37,15 +38,35 @@ public class BikeRentalServiceDirectoryFetcher {
       InputStream is = HttpUtils.getData(parameters.getUrl());
       JsonNode node = (new ObjectMapper()).readTree(is);
 
-      for (JsonNode source : node.get(parameters.getSourcesName())) {
-        String network = source.get(parameters.getSourceNetworkName()).asText();
-        String updaterUrl = adjustUrlForUpdater(source.get(parameters.getSourceUrlName()).asText());
+      JsonNode sources = node.get(parameters.getSourcesName());
+
+      if (sources == null) {
+        LOG.warn(
+            "Error reading json from {}. Are json tag names configured properly?",
+            parameters.getUrl()
+        );
+        return updaters;
+      }
+
+      for (JsonNode source : sources) {
+        JsonNode network = source.get(parameters.getSourceNetworkName());
+        JsonNode updaterUrl = source.get(parameters.getSourceUrlName());
+
+        if (network == null || updaterUrl == null) {
+          LOG.warn(
+              "Error reading json from {}. Are json tag names configured properly?",
+              parameters.getUrl()
+          );
+          return updaters;
+        }
+
+        String adjustedUpdaterUrl = adjustUrlForUpdater(updaterUrl.asText());
 
         BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(
             "bike-rental-service-directory:" + network,
-            updaterUrl,
+            adjustedUpdaterUrl,
             DEFAULT_FREQUENCY_SEC,
-            new GbfsDataSourceParameters(updaterUrl, network)
+            new GbfsDataSourceParameters(updaterUrl.asText(), network.asText())
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 
@@ -55,13 +76,6 @@ public class BikeRentalServiceDirectoryFetcher {
     }
     catch (java.io.IOException e) {
       LOG.warn("Error fetching list of bike rental endpoints from {}", parameters.getUrl(), e);
-    }
-    catch (NullPointerException e) {
-      LOG.warn(
-          "Error reading json from {}. Are json tag names configured properly?",
-          parameters.getUrl(),
-          e
-      );
     }
 
     LOG.info("{} updaters fetched", updaters.size());

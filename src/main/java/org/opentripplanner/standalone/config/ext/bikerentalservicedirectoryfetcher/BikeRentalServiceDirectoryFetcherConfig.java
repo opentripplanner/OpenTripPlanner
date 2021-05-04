@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.bikerentalservicedirectory;
+package org.opentripplanner.standalone.config.ext.bikerentalservicedirectoryfetcher;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
 
