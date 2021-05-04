@@ -56,10 +56,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
         + " ~ Walk 7m45s "
         + "[10:00:00 12:00:00 2h, cost: 8184]";
 
-    public static final int BOARD_SLACK = 45;
-    public static final int ALIGHT_SLACK = 15;
-    public static final int TRANSIT_SLACK = 60;
-
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
     public static final double TRANSFER_RELUCTANCE = 2.0;
@@ -120,16 +116,21 @@ public class BasicPathTestCase implements RaptorTestConstants {
     private static final RaptorTransfer EGRESS = walk(STOP_F, EGRESS_DURATION);
 
 
+    public static final String LINE_11 = "L11";
+    public static final String LINE_21 = "L21";
+    public static final String LINE_31 = "L31";
+
+
     public static final TestTripSchedule TRIP_1 = TestTripSchedule
-        .schedule(pattern("L11", STOP_A, STOP_B))
+        .schedule(pattern(LINE_11, STOP_A, STOP_B))
         .times(L11_START, L11_END)
         .build();
     public static final TestTripSchedule TRIP_2 = TestTripSchedule
-        .schedule(pattern("L21", STOP_C, STOP_D))
+        .schedule(pattern(LINE_21, STOP_C, STOP_D))
         .times(L21_START, L21_END)
         .build();
     public static final TestTripSchedule TRIP_3 = TestTripSchedule
-        .schedule(pattern("L31", STOP_D, STOP_E))
+        .schedule(pattern(LINE_31, STOP_D, STOP_E))
         // The early arrival and late departure should not have any effect on tests
         .arrivals(VERY_EARLY, L31_END)
         .departures(L31_START, VERY_LATE)
@@ -141,11 +142,16 @@ public class BasicPathTestCase implements RaptorTestConstants {
     );
 
     public static final RaptorSlackProvider SLACK_PROVIDER =
-        RaptorSlackProvider.defaultSlackProvider(TRANSIT_SLACK, BOARD_SLACK, ALIGHT_SLACK);
+        RaptorSlackProvider.defaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK);
 
     public static final int TOTAL_COST = ACCESS_COST + LINE_11_COST + TX_COST + LINE_21_COST
         + LINE_31_COST + EGRESS_COST;
 
+    /** Wait time between trip L11 and L21 including slack */
+    public static final int WAIT_TIME_L11_L21 = L21_START - L11_END - TX_DURATION;
+
+    /** Wait time between trip L21 and L31 including slack */
+    public static final int WAIT_TIME_L21_L31 = L31_START - L21_END;
 
     public static WorkerLifeCycle lifeCycle() {
         return new LifeCycleSubscriptions();

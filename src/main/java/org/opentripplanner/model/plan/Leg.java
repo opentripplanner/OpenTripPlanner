@@ -1,5 +1,12 @@
 package org.opentripplanner.model.plan;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -9,17 +16,10 @@ import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
 
 /**
 * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -171,7 +171,11 @@ public class Leg {
 
    public BookingInfo bookingInfo = null;
 
-   public Boolean rentedBike;
+    public Transfer transferFromPrevLeg = null;
+
+    public Transfer transferToNextLeg = null;
+
+    public Boolean rentedBike;
 
    public List<String> bikeRentalNetworks = new ArrayList<>();
 

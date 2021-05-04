@@ -1,14 +1,13 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
@@ -16,7 +15,7 @@ import java.util.stream.Stream;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
+public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private final int iterationDepartureTime;
     private final int startTime;
     private final int endTime;
@@ -50,6 +49,19 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
         this.egressPathLeg = findEgressLeg(accessLeg);
         this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressPathLeg);
         this.endTime = egressPathLeg.toTime();
+    }
+
+    public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg) {
+        this(
+            iterationDepartureTime,
+            accessLeg,
+            accessLeg.stream().mapToInt(PathLeg::generalizedCost).sum()
+        );
+    }
+
+    /** Copy constructor */
+    protected Path(Path<T> original) {
+        this(original.iterationDepartureTime, original.accessLeg, original.generalizedCost);
     }
 
     /**
@@ -168,6 +180,13 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
             .filter(PathLeg::isTransitLeg)
             .mapToInt(PathLeg::duration)
             .sum();
+    }
+
+    /**
+     * Aggregated wait-time in seconds. This method compute the total wait time for this path.
+     */
+    public int waitTime() {
+        return travelDurationInSeconds() - transitDuration();
     }
 
     public Stream<PathLeg<T>> legStream() {

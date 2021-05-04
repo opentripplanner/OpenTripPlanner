@@ -2,6 +2,7 @@ package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.TransferPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -245,6 +247,7 @@ public class OtpTransitServiceBuilder {
     }
 
     public OtpTransitService build() {
+        dumpTransferDebugCSVFile();
         return new OtpTransitServiceImpl(this);
     }
 
@@ -331,17 +334,35 @@ public class OtpTransitServiceBuilder {
     /** Remove all transfers witch reference none existing trips */
     private void removeTransfersForNoneExistingTrips() {
         int orgSize = transfers.size();
-        transfers.removeIf(it -> noTripExist(it.getFromTrip()) || noTripExist(it.getToTrip()));
+        transfers.removeIf(this::transferTripsDoesNotExist);
         logRemove("Trip", orgSize, transfers.size(), "Transfer to/from trip does not exist.");
     }
 
+    /** Return {@code true} if the from/to trip reference is none null, but do not exist. */
+    private boolean transferTripsDoesNotExist(Transfer t) {
+        return transferTripPointDoesNotExist(t.getFrom())
+            || transferTripPointDoesNotExist(t.getTo());
+    }
+
     /** Return true if the trip is a valid reference; {@code null} or exist. */
-    private boolean noTripExist(Trip t) {
-        return t != null && !tripsById.containsKey(t.getId());
+    private boolean transferTripPointDoesNotExist(TransferPoint p) {
+        return p.getTrip() != null && !tripsById.containsKey(p.getTrip().getId());
     }
 
     private static void logRemove(String type, int orgSize, int newSize, String reason) {
         if(orgSize == newSize) { return; }
         LOG.info("{} of {} {}(s) removed. Reason: {}", orgSize - newSize, orgSize, type, reason);
+    }
+
+    /**
+     * Dump all transfers imported to the 'transfers-debug.csv' file. This is performed if the
+     * debugging is enabled for the 'TRANSFERS_EXPORT' logger. The file is written to the
+     * current directory.
+     * <p>
+     * The CSV file is meant to be human friendly and contain name and description for route and
+     * stop elements, rather than ids.
+     */
+    private void dumpTransferDebugCSVFile() {
+        TransferExport.exportTransfers(transfers, stopTimesByTrip);
     }
 }

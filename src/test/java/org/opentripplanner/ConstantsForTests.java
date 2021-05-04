@@ -1,7 +1,13 @@
 package org.opentripplanner;
 
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
 import com.google.common.collect.Lists;
+import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -14,20 +20,13 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
-import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.BuildConfig;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import org.opentripplanner.standalone.config.ConfigLoader;
 
 public class ConstantsForTests {
 
@@ -43,7 +42,7 @@ public class ConstantsForTests {
 
     public static final String KCM_GTFS = "src/test/resources/kcm_gtfs.zip";
     
-    public static final String FAKE_GTFS = "src/test/resources/testagency.zip";
+    public static final String FAKE_GTFS = "src/test/resources/testagency";
 
     public static final String FARE_COMPONENT_GTFS = "src/test/resources/farecomponent_gtfs.zip";
 
