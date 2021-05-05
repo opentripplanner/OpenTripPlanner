@@ -86,7 +86,37 @@ See [osmWayPropertySet config attribute](Configuration.md#Way-property-sets)
 
 OTP users in Helsinki have documented their best practices for coding railway platforms in OpenStreetMap. These guidelines are available [in the OSM Wiki.](https://wiki.openstreetmap.org/wiki/Digitransit#Editing_railway_platforms)
 
+## Debug logging
+
+OTP use [logback](http://logback.qos.ch/) and [slj4j](http://www.slf4j.org/) as a logging framework. Logging is configured in the _logback.xml_ file inside the OTP jar file. See these frameworks for more documentation on log configuration.
+
+For developers, starting OTP using the `InteractiveOtpMain` is an easy way to configure 
+debug logging.
+
+Some useful loggers
+- `TRANSFERS_EXPORT` Dump transfers to _transfers-debug.csv_ file.
+- `DATA_IMPORT_ISSUES` Write issues to debug lag as well as to the issue report.
+- `REQ_LOG` Router request log. Enable with `requestLogFile` config parameter in build config. 
+- `org.opentripplanner.transit.raptor.RaptorService` Debug Raptor request and response
+
+
+### Transit search
+
+The Raptor implementation support instrumentation of ACCEPT, REJECT, and DROP events for stop-arrivals and trip boardings. Use the SpeedTest to pass in a set of stops and/or a specific path to debug. This is useful when debugging why you do (not) get a particular result.
+
+### GTFS Transfers.txt and NeTEx Interchange import
+
+Transfers may have effects on the routing witch may be difficult to predict. OTP can dump all 
+imported transfers to file - _transfers-debug.csv_. This may help verify the result of the import
+or find special test cases. To turn on the export enable the slf4j logger:
+
+```
+  <logger name="TRANSFERS_EXPORT" level="info" />
+```
+
+
 ### Further information
+
 * [General information](https://github.com/opentripplanner/OpenTripPlanner/wiki/GraphBuilder#graph-concepts)
 * [Bicycle routing](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Bicycle_routing)
 * [Indoor mapping](https://github.com/opentripplanner/OpenTripPlanner/wiki/Indoor-mapping)

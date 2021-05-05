@@ -28,6 +28,12 @@ public class TestTripSchedule implements RaptorTripSchedule {
     }
 
     @Override
+    public int tripSortIndex() {
+        // We sort trips based on the departure from the first stop
+        return arrival(0);
+    }
+
+    @Override
     public int arrival(int stopPosInPattern) {
         return arrivalTimes[stopPosInPattern];
     }

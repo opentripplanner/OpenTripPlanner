@@ -1,18 +1,18 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * Mutable version of {@link SearchParams}.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
     private final RaptorRequestBuilder<T> parent;
@@ -64,10 +64,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return searchWindowInSeconds;
     }
 
-    public SearchParamsBuilder<T> searchOneIterationOnly() {
-        return searchWindowInSeconds(0);
-    }
-
     public SearchParamsBuilder<T> searchWindowInSeconds(int searchWindowInSeconds) {
         this.searchWindowInSeconds = searchWindowInSeconds;
         return this;
@@ -79,6 +75,15 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
                 : (int)searchWindow.toSeconds();
         return this;
     }
+
+    /**
+     * Do one RangeRaptor iteration. This disable the dynamic resolved search-window
+     * Alias for calling {@code searchWindow(Duration.ZERO)}.
+     */
+    public SearchParamsBuilder<T> searchOneIterationOnly() {
+        return searchWindowInSeconds(0);
+    }
+
 
     public boolean preferLateArrival() {
         return preferLateArrival;
@@ -159,5 +164,4 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     public SearchParams buildSearchParam() {
         return new SearchParams(this);
     }
-
 }

@@ -13,6 +13,12 @@ package org.opentripplanner.transit.raptor.api.transit;
 public interface RaptorTripSchedule {
 
     /**
+     * An id/index for the trip witch can be used to sort trips so they follow each other
+     * in time. The id/index must increase with the departure time.
+     */
+    int tripSortIndex();
+
+    /**
      * The arrival time at the given stop position in pattern.
      * @param stopPosInPattern the stop position.
      * @return the arrival time in seconds at the given stop
@@ -58,8 +64,13 @@ public interface RaptorTripSchedule {
     RaptorTripPattern pattern();
 
     /**
-     * Search for departure-stop-position for the given trip, earliest-departure-time
-     * and stop index.
+     * Search for departure-stop-position for the given trip, earliest-departure-time and stop
+     * index. We need the time in addition to the stop in cases were the trip pattern visit the
+     * same stop twice. Also the time is not sufficient, since more than one stop could have the
+     * exact same departure time.
+     * <p>
+     * Raptor save memory by NOT storing the board/arrival stop positions in pattern; Hence we need
+     * this method when mapping into a itinerary or raptor path.
      * <p>
      * Avoid using this during routing, it is not optimized for performance.
      *
@@ -77,7 +88,13 @@ public interface RaptorTripSchedule {
     }
 
     /**
-     * Search for departure-stop-position for the given trip, earliest-departure-time and stop index.
+     * Search for departure-stop-position for the given trip, earliest-departure-time and stop
+     * index. We need the time in addition to the stop in cases were the trip pattern visit the
+     * same stop twice. Also the time is not sufficient, since more than one stop could have the
+     * exact same departure time.
+     * <p>
+     * Raptor save memory by NOT storing the board/arrival stop positions in pattern; Hence we need
+     * this method when mapping into a itinerary or raptor path.
      * <p>
      * Avoid using this during routing, it is not optimized for performance.
      *

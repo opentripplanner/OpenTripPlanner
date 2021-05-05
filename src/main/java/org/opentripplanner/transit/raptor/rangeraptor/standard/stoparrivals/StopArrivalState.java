@@ -2,23 +2,25 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.transit.raptor.util.IntUtils;
+import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
- * This class main purpose is to hold data for a given arrival at a stop and raptor round. It should be as light
- * weight as possible to minimize memory consumption and cheap to create and garbage collect.
+ * This class main purpose is to hold data for a given arrival at a stop and raptor round. It should
+ * be as light weight as possible to minimize memory consumption and cheap to create and garbage
+ * collect.
  * <p/>
- * This class holds both the best transit and the best transfer to a stop if they exist for a given round and stop.
- * The normal case is that this class represent either a transit arrival or a transfer arrival. We only keep both
- * if the transfer is better, arriving before the transit.
+ * This class holds both the best transit and the best transfer to a stop if they exist for a given
+ * round and stop. The normal case is that this class represent either a transit arrival or a
+ * transfer arrival. We only keep both if the transfer is better, arriving before the transit.
  * <p/>
- * The reason we need to keep both the best transfer and the best transit for a given stop and round is that
- * we may arrive at a stop by transit, then in the same or later round we may arrive by transit. If the transfer
- * arrival is better then the transit arrival it might be tempting to remove the transit arrival, but this
- * transit might be the best way (or only way) to get to another stop by transfer.
+ * The reason we need to keep both the best transfer and the best transit for a given stop and round
+ * is that we may arrive at a stop by transit, then in the same or later round we may arrive by
+ * transit. If the transfer arrival is better then the transit arrival it might be tempting to
+ * remove the transit arrival, but this transit might be the best way (or only way) to get to
+ * another stop by transfer.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -95,10 +97,16 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         return false;
     }
 
+    /**
+     * A transit arrival exist, but it might be a better transfer arrival as well.
+     */
     public final boolean arrivedByTransit() {
         return transitArrivalTime != NOT_SET;
     }
 
+    /**
+     * The best arrival is by transfer.
+     */
     public final boolean arrivedByTransfer() {
         return transferFromStop != NOT_SET;
     }
@@ -130,7 +138,8 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
+     * Set the time at a transit index iff it is optimal. This sets both the best time and the
+     * transfer time
      */
     public final void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
         this.bestArrivalTime = arrivalTime;

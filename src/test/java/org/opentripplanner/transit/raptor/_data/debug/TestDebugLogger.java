@@ -1,6 +1,15 @@
 package org.opentripplanner.transit.raptor._data.debug;
 
 
+import static org.opentripplanner.util.TableFormatter.Align.Center;
+import static org.opentripplanner.util.TableFormatter.Align.Left;
+import static org.opentripplanner.util.TableFormatter.Align.Right;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
+
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
@@ -11,21 +20,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
-import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.opentripplanner.util.time.TimeUtils;
 import org.opentripplanner.util.TableFormatter;
-
-import java.text.NumberFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Consumer;
-
-import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
-import static org.opentripplanner.util.TableFormatter.Align.Center;
-import static org.opentripplanner.util.TableFormatter.Align.Left;
-import static org.opentripplanner.util.TableFormatter.Align.Right;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
@@ -178,7 +177,7 @@ public class TestDebugLogger implements DebugLogger {
     }
 
     private static String details(String action, String optReason, String element) {
-        return concat(optReason,  action + "ed element: " + element);
+        return concat(optReason,  action + ", element: " + element);
     }
 
     private static String path(ArrivalView<?> a) {

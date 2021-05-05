@@ -32,6 +32,8 @@ import org.opentripplanner.util.time.TimeUtils;
  * this allows us to use the toString in unit tests.
  */
 public class ToStringBuilder {
+    /** A random in value, not expected to exist in data */
+    private static final int RANDOM_IGNORE_VALUE = -9_371_207;
     private static final String FIELD_SEPARATOR = ", ";
     private static final String FIELD_VALUE_SEP = ": ";
     private static final String NULL_VALUE = "null";
@@ -157,7 +159,18 @@ public class ToStringBuilder {
      * Add time in seconds since midnight. Format:  hh:mm:ss. Ignore default values.
      */
     public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight, int ignoreValue) {
-        return addIfNotIgnored(name, timeSecondsPastMidnight, ignoreValue, TimeUtils::timeToStrCompact);
+        return addIfNotIgnored(
+                name, timeSecondsPastMidnight, ignoreValue, TimeUtils::timeToStrCompact
+        );
+    }
+
+    /**
+     * Add time in seconds since midnight. Format:  hh:mm:ss.
+     */
+    public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight) {
+        return addIfNotIgnored(
+                name, timeSecondsPastMidnight, RANDOM_IGNORE_VALUE, TimeUtils::timeToStrCompact
+        );
     }
 
     /**

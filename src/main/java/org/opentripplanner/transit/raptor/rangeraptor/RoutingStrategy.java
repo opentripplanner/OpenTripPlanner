@@ -1,9 +1,11 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
+import java.util.function.IntConsumer;
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
 /**
@@ -32,17 +34,34 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Prepare the {@link RoutingStrategy} to route using the given pattern and tripSearch.
      */
-    void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch);
+    void prepareForTransitWith(RaptorTripPattern pattern);
 
     /**
-     * Perform the routing with the initialized pattern and tripSearch at the given
-     * stopPositionInPattern.
-     * <p/>
-     * This method is called for each stop position in a pattern after the first stop reached in the
-     * previous round.
-     *
-     * @param stopPositionInPattern the current stop position in the pattern set in {@link
-     *                              #prepareForTransitWith(RaptorTripPattern, TripScheduleSearch)}
+     * Alight the current trip at the given stop with the arrival times.
      */
-    void routeTransitAtStop(final int stopPositionInPattern);
+    void alight(final int stopIndex, final int stopPos, ToIntFunction<T> getStopArrivalTime);
+
+    /**
+     * Board trip for each stopArrival (Std have only one "best" arrival, while Mc may have many).
+     */
+    void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer);
+
+    /**
+     * Board trip found in the given trip-search at the given stop.
+     */
+    void board(
+            final int stopIndex,
+            final int earliestBoardTime,
+            RaptorTripScheduleBoardOrAlightEvent<T> result
+    );
+
+    /**
+     * The trip search will use this index to search relative to an existing boarding.
+     * This make a subsequent search faster since it must board an earlier trip, and the
+     * trip search can start at the given onTripIndex.
+     * if not the current trip is used.
+     * <p>
+     * Return -1 to if the tripIndex is unknown.
+     */
+    default int onTripIndex() { return -1; }
 }

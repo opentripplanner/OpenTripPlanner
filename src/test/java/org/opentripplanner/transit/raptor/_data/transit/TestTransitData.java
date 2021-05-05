@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import lombok.val;
 import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -8,12 +13,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule> {
 
@@ -57,13 +56,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
         .logger(logger);
   }
 
-  public TestTransitData add(int fromStop, TestTransfer transfer) {
-    expandNumOfStops(Math.max(fromStop, transfer.stop()));
-    transfersByStop.get(fromStop).add(transfer);
-    return this;
-  }
-
-  public TestTransitData add(TestRoute route) {
+  public TestTransitData withRoute(TestRoute route) {
     RaptorTripPattern pattern = route.pattern();
     for(int i=0; i< pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);

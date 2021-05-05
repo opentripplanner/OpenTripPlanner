@@ -1,6 +1,15 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -11,15 +20,6 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -38,7 +38,7 @@ public class B11_FlexEgress implements RaptorTestConstants {
 
   @Before
   public void setup() {
-    data.add(
+    data.withRoute(
         route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
             .withTimetable(
                 schedule("0:10, 0:12, 0:14, 0:16, 0:18")
@@ -64,8 +64,7 @@ public class B11_FlexEgress implements RaptorTestConstants {
         defaultSlackProvider(60, 0, 0)
     );
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test

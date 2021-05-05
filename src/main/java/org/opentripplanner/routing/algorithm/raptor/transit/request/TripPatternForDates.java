@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import java.util.Arrays;
+import java.util.List;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay
@@ -36,7 +36,6 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
         return tripPattern;
     }
 
-
     // Implementing RaptorRoute
     @Override
     public RaptorTimeTable<TripSchedule> timetable() {
@@ -47,6 +46,7 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
     public RaptorTripPattern pattern() {
         return this;
     }
+
 
     // Implementing RaptorTripPattern
 
@@ -73,6 +73,7 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
         return tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().route.getShortName();
     }
 
+
     // Implementing RaptorTimeTable
 
     @Override public TripSchedule getTripSchedule(int index) {
@@ -90,5 +91,14 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
 
     @Override public int numberOfTripSchedules() {
         return numberOfTripSchedules;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(TripPatternForDates.class)
+                .addObj("pattern", debugInfo())
+                .addServiceTimeSchedule("offsets", offsets)
+                .addNum("nTrips", numberOfTripSchedules)
+                .toString();
     }
 }

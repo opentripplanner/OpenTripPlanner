@@ -27,7 +27,7 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements ArrivedAtDestinationCheck {
     private final DestinationArrivalPaths<T> paths;
-    private final TransitCalculator calculator;
+    private final TransitCalculator<T> calculator;
     private final StopsCursor<T> cursor;
     private final DebugHandler<ArrivalView<?>> debugHandler;
 
@@ -37,7 +37,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
 
     public EgressArrivalToPathAdapter(
             DestinationArrivalPaths<T> paths,
-            TransitCalculator calculator,
+            TransitCalculator<T> calculator,
             StopsCursor<T> cursor,
             WorkerLifeCycle lifeCycle,
             DebugHandlerFactory<T> debugHandlerFactory
