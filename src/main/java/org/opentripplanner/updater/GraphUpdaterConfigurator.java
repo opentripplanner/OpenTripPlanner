@@ -98,7 +98,7 @@ public abstract class GraphUpdaterConfigurator {
     private static List<GraphUpdater> fetchBikeRentalServicesFromOnlineDirectory(
         BikeRentalServiceDirectoryFetcherParameters parameters
     ) {
-        if (parameters.getUrl() == null) { return List.of(); }
+        if (parameters == null) { return List.of(); }
         return BikeRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(parameters);
     }
 

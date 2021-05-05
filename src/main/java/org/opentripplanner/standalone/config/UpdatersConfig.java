@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import javax.annotation.Nullable;
 import org.opentripplanner.standalone.config.sandbox.BikeRentalServiceDirectoryFetcherConfig;
 import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
@@ -71,6 +72,7 @@ public class UpdatersConfig implements UpdatersParameters {
 
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
 
+  @Nullable
   private final BikeRentalServiceDirectoryFetcherParameters bikeRentalServiceDirectoryFetcherParameters;
 
   public UpdatersConfig(NodeAdapter rootAdapter) {
@@ -96,6 +98,7 @@ public class UpdatersConfig implements UpdatersParameters {
    * @see org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher
    */
   @Override
+  @Nullable
   public BikeRentalServiceDirectoryFetcherParameters getBikeRentalServiceDirectoryFetcherParameters() {
    return this.bikeRentalServiceDirectoryFetcherParameters;
   }

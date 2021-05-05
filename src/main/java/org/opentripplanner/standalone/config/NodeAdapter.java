@@ -322,6 +322,11 @@ public class NodeAdapter {
         return uris;
     }
 
+    public URI asUri(String paramName) {
+        assertRequiredFieldExist(paramName);
+        return asUri(paramName, null);
+    }
+
     public URI asUri(String paramName, String defaultValue) {
         return uriFromString(paramName, asText(paramName, defaultValue));
     }

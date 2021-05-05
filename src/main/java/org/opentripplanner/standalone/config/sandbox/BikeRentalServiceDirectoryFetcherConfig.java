@@ -5,8 +5,11 @@ import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceD
 
 public class BikeRentalServiceDirectoryFetcherConfig {
   public static BikeRentalServiceDirectoryFetcherParameters create(NodeAdapter c) {
+
+    if(c.isEmpty()) { return null; }
+
     return new BikeRentalServiceDirectoryFetcherParameters(
-        c.asUri("url", null),
+        c.asUri("url"),
         c.asText("sourcesName", "systems"),
         c.asText("updaterUrlName", "url"),
         c.asText("updaterNetworkName", "id")
