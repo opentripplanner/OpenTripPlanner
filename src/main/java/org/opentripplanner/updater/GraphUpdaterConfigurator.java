@@ -52,6 +52,7 @@ public abstract class GraphUpdaterConfigurator {
             createUpdatersFromConfig(updatersParameters)
         );
         updaters.addAll(
+            // Setup updaters using the BikeRentalServiceDirectoryFetcher(Sandbox)
             fetchBikeRentalServicesFromOnlineDirectory(
                 updatersParameters.getBikeRentalServiceDirectoryFetcherParameters()
             )
