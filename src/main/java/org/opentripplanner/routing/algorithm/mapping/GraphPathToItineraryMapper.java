@@ -533,7 +533,7 @@ public abstract class GraphPathToItineraryMapper {
             // before or will come after
             if (edge instanceof ElevatorAlightEdge) {
                 // don't care what came before or comes after
-                step = createWalkStep(graph, forwardState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState, requestedLocale);
                 createdNewStep = true;
                 disableZagRemovalForThisStep = true;
 
@@ -561,7 +561,7 @@ public abstract class GraphPathToItineraryMapper {
 
             if (step == null) {
                 // first step
-                step = createWalkStep(graph, forwardState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState, requestedLocale);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -589,7 +589,7 @@ public abstract class GraphPathToItineraryMapper {
                     roundaboutExit = 0;
                 }
                 /* start a new step */
-                step = createWalkStep(graph, forwardState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState, requestedLocale);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -676,7 +676,7 @@ public abstract class GraphPathToItineraryMapper {
 
                     if (shouldGenerateContinue) {
                         // turn to stay on same-named street
-                        step = createWalkStep(graph, forwardState, requestedLocale);
+                        step = createWalkStep(graph, forwardState, backState, requestedLocale);
                         createdNewStep = true;
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle, false);
@@ -808,21 +808,21 @@ public abstract class GraphPathToItineraryMapper {
         return angleDiff;
     }
 
-    private static WalkStep createWalkStep(Graph graph, State s, Locale wantedLocale) {
-        Edge en = s.getBackEdge();
+    private static WalkStep createWalkStep(Graph graph, State forwardState, State backState, Locale wantedLocale) {
+        Edge en = forwardState.getBackEdge();
         WalkStep step;
         step = new WalkStep();
         step.streetName = en.getName(wantedLocale);
         step.startLocation = new WgsCoordinate(
-                en.getFromVertex().getLat(),
-                en.getFromVertex().getLon()
+                backState.getVertex().getLat(),
+                backState.getVertex().getLon()
         );
-        step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
-                s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
+        step.elevation = encodeElevationProfile(forwardState.getBackEdge(), 0,
+                forwardState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
-        step.addStreetNotes(graph.streetNotesService.getNotes(s));
-        step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
-        if (s.getBackEdge() instanceof AreaEdge) {
+        step.addStreetNotes(graph.streetNotesService.getNotes(forwardState));
+        step.angle = DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry());
+        if (forwardState.getBackEdge() instanceof AreaEdge) {
             step.area = true;
         }
         return step;
