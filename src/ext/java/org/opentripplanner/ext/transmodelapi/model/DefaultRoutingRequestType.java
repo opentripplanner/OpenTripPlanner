@@ -327,12 +327,6 @@ public class DefaultRoutingRequestType {
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
-                        .name("bikeParkAndRide")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.bikeParkAndRide)
-                        .build())
-                .field(GraphQLFieldDefinition
-                        .newFieldDefinition()
                         .name("parkAndRide")
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(env -> request.parkAndRide)

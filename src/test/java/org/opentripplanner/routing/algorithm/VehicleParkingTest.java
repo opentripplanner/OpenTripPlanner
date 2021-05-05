@@ -141,7 +141,7 @@ public class VehicleParkingTest {
   private RoutingRequest bicycleParkingRequest() {
     RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE));
     request.setRoutingContext(graph, A, B);
-    request.bikeParkAndRide = true;
+    request.parkAndRide = true;
     return request;
   }
 

@@ -16,9 +16,7 @@ public class StateData implements Cloneable {
 
     // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 
-    protected boolean carParked;
-
-    protected boolean bikeParked;
+    protected boolean vehicleParked;
 
     protected VehicleRentalState vehicleRentalState;
 

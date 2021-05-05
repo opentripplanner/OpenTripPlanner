@@ -31,6 +31,11 @@ public class VehicleParkingEdge extends Edge {
     @Override
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
+
+        if (!options.parkAndRide) {
+            return null;
+        }
+
         if (options.arriveBy) {
             return traverseUnPark(s0);
         } else {
@@ -41,98 +46,70 @@ public class VehicleParkingEdge extends Edge {
     protected State traverseUnPark(State s0) {
         RoutingRequest options = s0.getOptions();
 
-        if (s0.getNonTransitMode() != TraverseMode.WALK) {
+        if (s0.getNonTransitMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
             return null;
         }
 
         if (options.streetSubRequestModes.getBicycle()) {
-            return traverseUnParkWithBicycle(s0);
+            return traverseUnPark(s0, options.bikeParkCost, options.bikeParkTime, TraverseMode.BICYCLE);
         } else if (options.streetSubRequestModes.getCar()) {
-            return traverseUnParkWithCar(s0);
+            return traverseUnPark(s0, options.carParkCost, options.carParkTime, TraverseMode.CAR);
         } else {
             return null;
         }
     }
 
-    private State traverseUnParkWithBicycle(State s0) {
+    private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
         RoutingRequest options = s0.getOptions();
-
-        if (!options.bikeParkAndRide) {
+        if (!spacesAvailableForMode(mode, options.wheelchairAccessible)) {
             return null;
         }
 
         StateEditor s0e = s0.edit(this);
-        s0e.incrementWeight(options.bikeParkCost);
-        s0e.incrementTimeInSeconds(options.bikeParkTime);
-        s0e.setBikeParked(false);
+        s0e.incrementWeight(parkingCost);
+        s0e.incrementTimeInSeconds(parkingTime);
+        s0e.setVehicleParked(false, mode);
         return s0e.makeState();
     }
 
-    private State traverseUnParkWithCar(State s0) {
+    private State traversePark(State s0) {
         RoutingRequest options = s0.getOptions();
 
-        if (!options.parkAndRide) {
+        if (!options.streetSubRequestModes.getWalk() || s0.isVehicleParked()) {
             return null;
         }
 
-        StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(options.carDropoffTime);
-        s1.incrementTimeInSeconds(options.carDropoffTime);
-        s1.setCarParked(false);
-        return s1.makeState();
-    }
-
-    private State traversePark(State s0) {
-        switch (s0.getNonTransitMode()) {
-            case BICYCLE:
-                return traverseParkWithBicycle(s0);
-            case CAR:
-                return traverseParkWithCar(s0);
-            default:
+        if (options.streetSubRequestModes.getBicycle()) {
+            // Parking a rented bike is not allowed
+            if (s0.isBikeRenting()) {
                 return null;
+            }
+
+            return traversePark(s0, options.bikeParkCost, options.bikeParkTime);
+        } else if (options.streetSubRequestModes.getCar()) {
+            return traversePark(s0, options.carParkCost, options.carParkTime);
+        } else {
+            return null;
         }
     }
 
-    private State traverseParkWithBicycle(State s0) {
+    private State traversePark(State s0, int parkingCost, int parkingTime) {
         RoutingRequest options = s0.getOptions();
-        /*
-         * To park a bike, we need to be riding one, (not rented) and be allowed to walk and to park
-         * it.
-         */
-        if (s0.getNonTransitMode() != TraverseMode.BICYCLE || !options.streetSubRequestModes.getWalk()
-            || s0.isBikeRenting() || s0.isBikeParked() || !options.bikeParkAndRide
-            || !spacesAvailableForMode(TraverseMode.BICYCLE, false)) {
+
+        if (!spacesAvailableForMode(s0.getNonTransitMode(), options.wheelchairAccessible)) {
             return null;
         }
 
         StateEditor s0e = s0.edit(this);
-        s0e.incrementWeight(options.bikeParkCost);
-        s0e.incrementTimeInSeconds(options.bikeParkTime);
-        s0e.setBikeParked(true);
+        s0e.incrementWeight(parkingCost);
+        s0e.incrementTimeInSeconds(parkingTime);
+        s0e.setVehicleParked(true, TraverseMode.WALK);
         return s0e.makeState();
     }
 
     private boolean spacesAvailableForMode(TraverseMode traverseMode, boolean wheelchairAccessible) {
         VehicleParkingVertex vehicleParkingVertex = (VehicleParkingVertex) tov;
         return vehicleParkingVertex.isSpacesAvailable(traverseMode, wheelchairAccessible);
-    }
-
-    private State traverseParkWithCar(State s0) {
-        RoutingRequest options = s0.getOptions();
-        /*
-         * To park a car, we need to be in one and have allowed walk modes.
-         */
-        if (s0.getNonTransitMode() != TraverseMode.CAR || !options.streetSubRequestModes.getWalk()
-            || s0.isCarParked() || !options.parkAndRide
-            || !spacesAvailableForMode(TraverseMode.CAR, options.wheelchairAccessible)) {
-            return null;
-        }
-
-        StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(options.carDropoffTime);
-        s1.incrementTimeInSeconds(options.carDropoffTime);
-        s1.setCarParked(true);
-        return s1.makeState();
     }
 
     @Override

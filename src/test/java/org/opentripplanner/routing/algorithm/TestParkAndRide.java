@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
-import junit.framework.TestCase;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
@@ -11,69 +11,65 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Test P+R (both car P+R and bike P+R).
  * 
  * @author laurent
  */
-public class TestParkAndRide extends TestCase {
+public class TestParkAndRide extends GraphRoutingTest {
 
     private static final String TEST_FEED_ID = "testFeed";
 
     private Graph graph;
     private StreetVertex A,B,C,D;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         graph = new Graph();
 
-        // Generate a very simple graph
-        A = new IntersectionVertex(graph, "A", 0.000, 45, "A");
-        B = new IntersectionVertex(graph, "B", 0.001, 45, "B");
-        C = new IntersectionVertex(graph, "C", 0.002, 45, "C");
-        D = new IntersectionVertex(graph, "D", 0.003, 45, "D");
+        graph = graphOf(new Builder() {
+            @Override
+            public void build() {
+                A = intersection("A", 0.000, 45);
+                B = intersection("B", 0.001, 45);
+                C = intersection("C", 0.002, 45);
+                D = intersection("D", 0.003, 45);
 
-        @SuppressWarnings("unused")
-        Edge driveOnly = new StreetEdge(A, B, GeometryUtils.makeLineString(0.000, 45, 0.001, 45),
-                "AB street", 87, StreetTraversalPermission.CAR, false);
-
-        @SuppressWarnings("unused")
-        Edge walkAndBike = new StreetEdge(B, C, GeometryUtils.makeLineString(0.001, 45, 0.002,
-                45), "BC street", 87, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false);
-
-        @SuppressWarnings("unused")
-        Edge walkOnly = new StreetEdge(C, D, GeometryUtils.makeLineString(0.002, 45, 0.003,
-                45), "CD street", 87, StreetTraversalPermission.PEDESTRIAN, false);
+                street(A, B, 87, StreetTraversalPermission.CAR);
+                street(B, C, 87, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+                street(C, D, 87, StreetTraversalPermission.PEDESTRIAN);
+            }
+        });
     }
-    
+
+    @Test
     public void testCar() {
-
-        AStar aStar = new AStar();
-
         // It is impossible to get from A to C in WALK mode,
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
-        options.setRoutingContext(graph, A, C);
-        ShortestPathTree tree = aStar.getShortestPathTree(options);
-        GraphPath path = tree.getPath(C, false);
+        GraphPath path = runSearch(A, C, new TraverseModeSet(TraverseMode.WALK));
         assertNull(path);
 
         // or CAR+WALK (no P+R).
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR));
-        options.setRoutingContext(graph, A, C);
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(C, false);
+        path = runSearch(A, C, new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR));
         assertNull(path);
 
         // So we Add a P+R at B.
@@ -92,69 +88,74 @@ public class TestParkAndRide extends TestCase {
 
         // But it is still impossible to get from A to C by WALK only
         // (AB is CAR only).
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
-        options.setRoutingContext(graph, A, C);
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(C, false);
+        path = runSearch(A, C, new TraverseModeSet(TraverseMode.WALK));
         assertNull(path);
         
         // Or CAR only (BC is WALK only).
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.CAR));
-        options.setRoutingContext(graph, A, C);
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(C, false);
+        path = runSearch(A, C, new TraverseModeSet(TraverseMode.CAR));
         assertNull(path);
 
         // But we can go from A to C with CAR+WALK mode using P+R. arriveBy false
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR,TraverseMode.TRANSIT));
-        options.parkAndRide = true;
-        //options.arriveBy
-        options.setRoutingContext(graph, A, C);
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(C, false);
-        assertNotNull(path);
+        path = runSearch(A, C, new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR,TraverseMode.TRANSIT), false,
+            request -> request.parkAndRide = true);
+        assertEquals(
+            "A - AB street - B - P+R B - P+R B - P+R B - P+R B - P+R B - B - BC street - C",
+            pathToString(path)
+        );
 
         // But we can go from A to C with CAR+WALK mode using P+R. arriveBy true
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR,TraverseMode.TRANSIT));
-        options.parkAndRide = true;
-        options.setArriveBy(true);
-        options.setRoutingContext(graph, A, C);
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(A, false);
-        assertNotNull(path);
+        path = runSearch(A, C, new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR,TraverseMode.TRANSIT), true,
+            request -> request.parkAndRide = true);
+        assertEquals(
+            "A - AB street - B - P+R B - P+R B - P+R B - P+R B - P+R B - B - BC street - C",
+            pathToString(path)
+        );
 
 
         // But we can go from A to C with CAR+WALK mode using P+R. arriveBy true interleavedBidiHeuristic
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR,TraverseMode.TRANSIT));
-        options.parkAndRide = true;
-        options.setArriveBy(true);
-        options.setRoutingContext(graph, A, C);
-        options.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(A, false);
-        assertNotNull(path);
+        path = runSearch(A, C, new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR,TraverseMode.TRANSIT), true,
+            request -> {
+                request.parkAndRide = true;
+                request.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
+            }
+        );
+        assertEquals(
+            "A - AB street - B - P+R B - P+R B - P+R B - P+R B - P+R B - B - BC street - C",
+            pathToString(path)
+        );
 
         // But we can go from A to C with CAR+WALK mode using P+R. arriveBy false interleavedBidiHeuristic
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR,TraverseMode.TRANSIT));
-        options.parkAndRide = true;
-        //options.arriveBy
-        options.setRoutingContext(graph, A, C);
-        options.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(C, false);
-        assertNotNull(path);
+        path = runSearch(A, C, new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR,TraverseMode.TRANSIT), false,
+            request -> {
+                request.parkAndRide = true;
+                request.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
+            }
+        );
+        assertEquals(
+            "A - AB street - B - P+R B - P+R B - P+R B - P+R B - P+R B - B - BC street - C",
+            pathToString(path)
+        );
     }
 
+    private GraphPath runSearch(Vertex from, Vertex to, TraverseModeSet traverseModeSet) {
+        return runSearch(from, to, traverseModeSet, false, o -> {});
+    }
+
+    private GraphPath runSearch(Vertex from, Vertex to, TraverseModeSet traverseModeSet, boolean arriveBy, Consumer<RoutingRequest> options) {
+        RoutingRequest request = new RoutingRequest(traverseModeSet);
+        request.setArriveBy(arriveBy);
+        request.setRoutingContext(graph, from, to);
+        options.accept(request);
+        ShortestPathTree tree = new AStar().getShortestPathTree(request);
+        return tree.getPath(arriveBy ? from : to, false);
+    }
+
+    @Test
     public void testBike() {
-
-        AStar aStar = new AStar();
-
         // Impossible to get from B to D in BIKE+WALK (no bike P+R).
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.TRANSIT));
-        options.bikeParkAndRide = true;
-        options.setRoutingContext(graph, B, D);
-        ShortestPathTree tree = aStar.getShortestPathTree(options);
-        GraphPath path = tree.getPath(D, false);
+        GraphPath path = runSearch(B, D, new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.TRANSIT), false,
+            request -> request.parkAndRide = true
+        );
         assertNull(path);
 
         // So we add a bike P+R at C.
@@ -172,26 +173,32 @@ public class TestParkAndRide extends TestCase {
         new StreetVehicleParkingLink(C, BPRC);
 
         // Still impossible from B to D by bike only (CD is WALK only).
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
-        options.setRoutingContext(graph, B, D);
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(D, false);
-        assertNotNull(path);
-        State s = tree.getState(D);
-        assertFalse(s.isBikeParked());
+        path = runSearch(B, D, new TraverseModeSet(TraverseMode.BICYCLE));
+        assertEquals("B - BC street - C - CD street - D", pathToString(path));
+
+        State s = path.states.getLast();
+        assertFalse(s.isVehicleParked());
         // TODO backWalkingBike flag is broken
         // assertTrue(s.isBackWalkingBike());
         assertSame(s.getBackMode(), TraverseMode.WALK);
 
         // But we can go from B to D using bike P+R.
-        options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.WALK,TraverseMode.TRANSIT));
-        options.bikeParkAndRide = true;
-        options.setRoutingContext(graph, B, D);
-        tree = aStar.getShortestPathTree(options);
-        path = tree.getPath(D, false);
-        assertNotNull(path);
-        s = tree.getState(D);
-        assertTrue(s.isBikeParked());
-        assertFalse(s.isBackWalkingBike());
+        path = runSearch(B, D, new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.WALK,TraverseMode.TRANSIT), false,
+            request -> request.parkAndRide = true
+        );
+       assertEquals(
+           "B - BC street - C - Bike Park C - Bike Park C - Bike Park C - Bike Park C - Bike Park C - C - CD street - D",
+           pathToString(path)
+       );
+    }
+
+    private static String pathToString(GraphPath path) {
+        return path.states.stream()
+            .flatMap(s -> Stream.of(
+                s.getBackEdge() != null ? s.getBackEdge().getName() : null,
+                s.getVertex().getName()
+            ))
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(" - "));
     }
 }

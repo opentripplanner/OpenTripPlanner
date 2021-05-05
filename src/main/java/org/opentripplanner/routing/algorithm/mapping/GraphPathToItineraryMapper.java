@@ -199,8 +199,7 @@ public abstract class GraphPathToItineraryMapper {
 
             var modeChange = lastMode != forwardMode && lastMode != null && forwardMode != null;
             var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
-            var parkingChange = backState.isBikeParked() != forwardState.isBikeParked()
-                    || backState.isCarParked() != forwardState.isCarParked();
+            var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
 
             if (modeChange || rentalChange || parkingChange) {
                 legIndexPairs[1] = i;
