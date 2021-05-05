@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.standalone.config.ext.bikerentalservicedirectoryfetcher.BikeRentalServiceDirectoryFetcherConfig;
-import org.opentripplanner.standalone.config.ext.bikerentalservicedirectoryfetcher.BikeRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.standalone.config.sandbox.BikeRentalServiceDirectoryFetcherConfig;
+import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;

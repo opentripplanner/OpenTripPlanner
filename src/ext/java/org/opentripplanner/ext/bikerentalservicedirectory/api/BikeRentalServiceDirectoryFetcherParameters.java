@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.ext.bikerentalservicedirectoryfetcher;
+package org.opentripplanner.ext.bikerentalservicedirectory.api;
 
 import java.net.URI;
 

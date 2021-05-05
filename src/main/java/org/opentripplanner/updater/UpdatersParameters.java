@@ -1,6 +1,6 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.standalone.config.ext.bikerentalservicedirectoryfetcher.BikeRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;

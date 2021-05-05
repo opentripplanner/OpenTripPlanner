@@ -2,7 +2,7 @@ package org.opentripplanner.ext.bikerentalservicedirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.standalone.config.ext.bikerentalservicedirectoryfetcher.BikeRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
