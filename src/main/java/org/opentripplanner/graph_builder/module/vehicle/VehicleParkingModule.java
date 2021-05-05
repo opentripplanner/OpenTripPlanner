@@ -7,7 +7,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
-import org.opentripplanner.updater.bike_park.BikeParkDataSource;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +22,9 @@ public class VehicleParkingModule implements GraphBuilderModule {
 
     private final static Logger LOG = LoggerFactory.getLogger(VehicleParkingModule.class);
 
-    private BikeParkDataSource dataSource;
+    private VehicleParkingDataSource dataSource;
 
-    public void setDataSource(BikeParkDataSource dataSource) {
+    public void setDataSource(VehicleParkingDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -41,7 +41,7 @@ public class VehicleParkingModule implements GraphBuilderModule {
             LOG.warn("No vehicle parks found from the data source.");
             return;
         }
-        Collection<VehicleParking> vehicleParks = dataSource.getBikeParks();
+        Collection<VehicleParking> vehicleParks = dataSource.getVehicleParkings();
 
         for (VehicleParking vehicleParking : vehicleParks) {
             service.addVehicleParking(vehicleParking);

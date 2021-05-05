@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.bike_park;
+package org.opentripplanner.updater.vehicle_parking;
 
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
@@ -26,18 +26,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Graph updater that dynamically sets availability information on bike parking lots.
- * This updater fetches data from a single BikeParkDataSource.
- *
- * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
- * (https://goabout.com/).
- * 
- * @author laurent
- * @author GoAbout
+ * Graph updater that dynamically sets availability information on vehicle parking lots.
+ * This updater fetches data from a single {@link VehicleParkingDataSource}.
  */
-public class BikeParkUpdater extends PollingGraphUpdater {
+public class VehicleParkingUpdater extends PollingGraphUpdater {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BikeParkUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VehicleParkingUpdater.class);
 
     private GraphUpdaterManager updaterManager;
 
@@ -45,13 +39,13 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private final Map<VehicleParking, DisposableEdgeCollection> tempEdgesByPark = new HashMap<>();
 
-    private final BikeParkDataSource source;
+    private final VehicleParkingDataSource source;
 
     private VertexLinker linker;
 
     private VehicleParkingService vehicleParkingService;
 
-    public BikeParkUpdater(BikeParkUpdaterParameters parameters) {
+    public VehicleParkingUpdater(VehicleParkingUpdaterParameters parameters) {
         super(parameters);
         // Set source from preferences
         source = new KmlBikeParkDataSource(parameters.sourceParameters());
@@ -68,21 +62,21 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
         linker = graph.getLinker();
-        // Adding a bike park station service needs a graph writer runnable
+        // Adding a vehicle parking station service needs a graph writer runnable
         vehicleParkingService = graph.getService(VehicleParkingService.class, true);
     }
 
     @Override
     protected void runPolling() throws Exception {
-        LOG.debug("Updating bike parks from " + source);
+        LOG.debug("Updating vehicle parkings from " + source);
         if (!source.update()) {
             LOG.debug("No updates");
             return;
         }
-        List<VehicleParking> bikeParks = source.getBikeParks();
+        List<VehicleParking> vehicleParkings = source.getVehicleParkings();
 
         // Create graph writer runnable to apply these stations to the graph
-        BikeParkGraphWriterRunnable graphWriterRunnable = new BikeParkGraphWriterRunnable(bikeParks);
+        VehicleParkingGraphWriterRunnable graphWriterRunnable = new VehicleParkingGraphWriterRunnable(vehicleParkings);
         updaterManager.execute(graphWriterRunnable);
     }
 
@@ -90,27 +84,27 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     public void teardown() {
     }
 
-    private class BikeParkGraphWriterRunnable implements GraphWriterRunnable {
+    private class VehicleParkingGraphWriterRunnable implements GraphWriterRunnable {
 
-        private final List<VehicleParking> bikeParks;
+        private final List<VehicleParking> vehicleParkings;
 
-        private BikeParkGraphWriterRunnable(List<VehicleParking> bikeParks) {
-            this.bikeParks = bikeParks;
+        private VehicleParkingGraphWriterRunnable(List<VehicleParking> vehicleParkings) {
+            this.vehicleParkings = vehicleParkings;
         }
 
         @Override
         public void run(Graph graph) {
             // Apply stations to graph
-            Set<VehicleParking> bikeParkSet = new HashSet<>();
+            Set<VehicleParking> vehicleParkingSet = new HashSet<>();
             /* Add any new park and update space available for existing parks */
-            for (VehicleParking bikePark : bikeParks) {
-                vehicleParkingService.addVehicleParking(bikePark);
-                bikeParkSet.add(bikePark);
-                VehicleParkingVertex bikeParkVertex = verticesByPark.get(bikePark);
-                if (bikeParkVertex == null) {
-                    bikeParkVertex = new VehicleParkingVertex(graph, bikePark);
+            for (VehicleParking vehicleParking : vehicleParkings) {
+                vehicleParkingService.addVehicleParking(vehicleParking);
+                vehicleParkingSet.add(vehicleParking);
+                VehicleParkingVertex vehicleParkingVertex = verticesByPark.get(vehicleParking);
+                if (vehicleParkingVertex == null) {
+                    vehicleParkingVertex = new VehicleParkingVertex(graph, vehicleParking);
                     DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
-                        bikeParkVertex,
+                        vehicleParkingVertex,
                         new TraverseModeSet(TraverseMode.WALK),
                         LinkingDirection.BOTH_WAYS,
                         (vertex, streetVertex) -> List.of(
@@ -119,32 +113,31 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                         )
                     );
 
-                    if (bikeParkVertex.getOutgoing().isEmpty()) {
-                        // the toString includes the text "Bike park"
-                        LOG.info("Bike park {} unlinked", bikeParkVertex);
+                    if (vehicleParkingVertex.getOutgoing().isEmpty()) {
+                        LOG.info("Vehicle parking {} unlinked", vehicleParkingVertex);
                     }
 
-                    new VehicleParkingEdge(bikeParkVertex);
-                    verticesByPark.put(bikePark, bikeParkVertex);
-                    tempEdgesByPark.put(bikePark, tempEdges);
+                    new VehicleParkingEdge(vehicleParkingVertex);
+                    verticesByPark.put(vehicleParking, vehicleParkingVertex);
+                    tempEdgesByPark.put(vehicleParking, tempEdges);
                 } else {
-                    bikeParkVertex.getVehicleParking().updateVehiclePlaces(bikePark.getAvailability());
+                    vehicleParkingVertex.getVehicleParking().updateVehiclePlaces(vehicleParking.getAvailability());
                 }
             }
             /* Remove existing parks that were not present in the update */
             List<VehicleParking> toRemove = new ArrayList<>();
             for (Entry<VehicleParking, VehicleParkingVertex> entry : verticesByPark.entrySet()) {
-                VehicleParking bikePark = entry.getKey();
-                if (bikeParkSet.contains(bikePark))
+                VehicleParking vehicleParking = entry.getKey();
+                if (vehicleParkingSet.contains(vehicleParking))
                     continue;
-                toRemove.add(bikePark);
-                vehicleParkingService.removeVehicleParking(bikePark);
+                toRemove.add(vehicleParking);
+                vehicleParkingService.removeVehicleParking(vehicleParking);
             }
-            for (VehicleParking bikePark : toRemove) {
+            for (VehicleParking vehicleParking : toRemove) {
                 // post-iteration removal to avoid concurrent modification
-                verticesByPark.remove(bikePark);
-                tempEdgesByPark.get(bikePark).disposeEdges();
-                tempEdgesByPark.remove(bikePark);
+                verticesByPark.remove(vehicleParking);
+                tempEdgesByPark.get(vehicleParking).disposeEdges();
+                tempEdgesByPark.remove(vehicleParking);
             }
         }
     }

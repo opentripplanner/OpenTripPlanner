@@ -6,7 +6,7 @@ import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
@@ -37,7 +37,7 @@ public interface UpdatersParameters {
 
   List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters();
 
-  List<BikeParkUpdaterParameters> getBikeParkUpdaterParameters();
+  List<VehicleParkingUpdaterParameters> getVehicleParkingUpdaterParameters();
 
   List<WFSNotePollingGraphUpdaterParameters> getWinkkiPollingGraphUpdaterParameters();
 }

@@ -1,8 +1,8 @@
-package org.opentripplanner.updater.bike_park;
+package org.opentripplanner.updater.vehicle_parking;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
-public class BikeParkUpdaterParameters implements PollingGraphUpdaterParameters {
+public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParameters {
 
   private final String configRef;
   private final String url;
@@ -12,7 +12,7 @@ public class BikeParkUpdaterParameters implements PollingGraphUpdaterParameters 
   private final boolean zip;
 
 
-  public BikeParkUpdaterParameters(
+  public VehicleParkingUpdaterParameters(
       String configRef,
       String feedId,
       String url,

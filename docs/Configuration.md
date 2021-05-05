@@ -1005,9 +1005,9 @@ connect to a network resource is the `url` field.
           "url": "http://coast.socialbicycles.com/opendata/gbfs.json"
         },
 
-        // Bike parking availability
+        // Vehicle parking availability
         {
-            "type": "bike-park"
+            "type": "vehicle-parking"
         },
 
         // Polling for GTFS-RT TripUpdates)

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.bike_park;
+package org.opentripplanner.updater.vehicle_parking;
 
 import static java.util.Locale.ROOT;
 
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author laurent
  * @author GoAbout
  */
-class KmlBikeParkDataSource implements BikeParkDataSource {
+class KmlBikeParkDataSource implements VehicleParkingDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(KmlBikeParkDataSource.class);
 
@@ -96,7 +96,7 @@ class KmlBikeParkDataSource implements BikeParkDataSource {
     }
 
     @Override
-    public synchronized List<VehicleParking> getBikeParks() {
+    public synchronized List<VehicleParking> getVehicleParkings() {
         return bikeParks;
     }
 

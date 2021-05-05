@@ -13,8 +13,8 @@ import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.bike_park.BikeParkUpdater;
-import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
@@ -138,8 +138,8 @@ public abstract class GraphUpdaterConfigurator {
         for (MqttGtfsRealtimeUpdaterParameters configItem : config.getMqttGtfsRealtimeUpdaterParameters()) {
             updaters.add(new MqttGtfsRealtimeUpdater(configItem));
         }
-        for (BikeParkUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
-            updaters.add(new BikeParkUpdater(configItem));
+        for (VehicleParkingUpdaterParameters configItem : config.getVehicleParkingUpdaterParameters()) {
+            updaters.add(new VehicleParkingUpdater(configItem));
         }
         for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
             updaters.add(new WinkkiPollingGraphUpdater(configItem));

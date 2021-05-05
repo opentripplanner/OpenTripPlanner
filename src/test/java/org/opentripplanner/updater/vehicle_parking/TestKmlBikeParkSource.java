@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.bike_park;
+package org.opentripplanner.updater.vehicle_parking;
 
 import junit.framework.TestCase;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -26,7 +26,7 @@ public class TestKmlBikeParkSource extends TestCase {
       }
     });
     assertTrue(kmlDataSource.update());
-    List<VehicleParking> bikeParks = kmlDataSource.getBikeParks();
+    List<VehicleParking> bikeParks = kmlDataSource.getVehicleParkings();
     assertEquals(5, bikeParks.size());
     VehicleParking alkmaar = bikeParks.get(0);
     VehicleParking zwolle = bikeParks.get(4);
@@ -55,7 +55,7 @@ public class TestKmlBikeParkSource extends TestCase {
           }
       });
     assertTrue(kmlDataSource.update());
-    List<VehicleParking> bikeParks = kmlDataSource.getBikeParks();
+    List<VehicleParking> bikeParks = kmlDataSource.getVehicleParkings();
     assertEquals(5, bikeParks.size());
     VehicleParking alkmaar = bikeParks.get(0);
     VehicleParking almere = bikeParks.get(4);
