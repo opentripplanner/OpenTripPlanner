@@ -28,7 +28,7 @@ The design goals are:
 
 For historic reasons the configuration loader uses jackson and parses the config into a JSON node 
 tree. Java objects are mapped explicit by wrapping each `JsonNode` in a `NodeAdapter`. The 
-`NodeAdapter` decorate the `JsonNode` to provide type-safe getters for rich basic types, like 
+`NodeAdapter` decorates the `JsonNode` to provide type-safe getters for rich basic types like 
 `Enum`, `List`(type-safe), `Map`(type-safe), `LocalDateTime`, `URI` and so on. It also helps with 
 validation and providing a list of unused parameters. 
 
