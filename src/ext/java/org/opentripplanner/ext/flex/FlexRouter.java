@@ -101,7 +101,7 @@ public class FlexRouter {
 
     for (FlexAccessTemplate template : this.flexAccessTemplates) {
       StopLocation transferStop = template.getTransferStop();
-      if (egressStops.contains(transferStop)) {
+      if (this.flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))) {
         for(NearbyStop egress : streetEgressByStop.get(transferStop)) {
           Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
           if (itinerary != null) {
