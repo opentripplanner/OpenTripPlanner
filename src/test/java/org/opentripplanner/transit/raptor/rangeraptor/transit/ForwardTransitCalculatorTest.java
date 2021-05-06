@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
+
+import org.junit.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 public class ForwardTransitCalculatorTest {
     private static final int TRIP_SEARCH_BINARY_SEARCH_THRESHOLD = 7;
@@ -18,8 +18,8 @@ public class ForwardTransitCalculatorTest {
     private int iterationStep = 60;
 
 
-    private TransitCalculator create() {
-        return new ForwardTransitCalculator(
+    private TransitCalculator<TestTripSchedule> create() {
+        return new ForwardTransitCalculator<>(
                 TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
                 earliestDepartureTime,
                 searchWindowSizeInSeconds,
@@ -30,7 +30,7 @@ public class ForwardTransitCalculatorTest {
 
     @Test
     public void isBest() {
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertTrue(subject.isBest(10, 11));
         assertFalse(subject.isBest(11, 10));
@@ -40,7 +40,7 @@ public class ForwardTransitCalculatorTest {
     @Test
     public void exceedsTimeLimit() {
         latestAcceptableArrivalTime = 1200;
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertFalse(subject.exceedsTimeLimit(0));
         assertFalse(subject.exceedsTimeLimit(1200));
@@ -61,7 +61,7 @@ public class ForwardTransitCalculatorTest {
 
     @Test
     public void oneIterationOnly() {
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertFalse(subject.oneIterationOnly());
 
@@ -86,7 +86,7 @@ public class ForwardTransitCalculatorTest {
 
     @Test
     public void latestArrivalTime() {
-        TestTripSchedule s = TestTripSchedule.schedule().arrivals(500).build();
+        var s = TestTripSchedule.schedule().arrivals(500).build();
         assertEquals(500, create().stopArrivalTime(s, 0, 0));
     }
 

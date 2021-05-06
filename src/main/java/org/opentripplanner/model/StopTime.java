@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.Objects;
 import org.opentripplanner.util.time.TimeUtils;
 
 
@@ -12,8 +13,6 @@ import org.opentripplanner.util.time.TimeUtils;
  *           - object structure.
  */
 public final class StopTime implements Comparable<StopTime> {
-
-    private static final long serialVersionUID = 1L;
 
     public static final int MISSING_VALUE = -999;
 
@@ -73,6 +72,7 @@ public final class StopTime implements Comparable<StopTime> {
         this.flexWindowEnd = st.flexWindowEnd;
         this.flexContinuousPickup = st.flexContinuousPickup;
         this.flexContinuousDropOff = st.flexContinuousDropOff;
+        this.bookingInfo = st.bookingInfo;
     }
 
     /**

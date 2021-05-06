@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
 /**
@@ -22,39 +24,40 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface TripScheduleSearch<T extends RaptorTripSchedule> {
+    /** Used in a trip search to indicate that all trips should be included in the search. */
+    int UNBOUNDED_TRIP_INDEX = -1;
+
     /**
-     * Find the best trip matching the given {@code timeLimit}.
-     * This is the same as calling {@link #search(int, int, int)} with {@code tripIndexLimit: -1}.
+     * Find the best trip matching the given {@code timeLimit}. This is the same as calling
+     * {@link #search(int, int, int)} with {@code tripIndexLimit: -1}.
      *
      * @see #search(int, int, int)
      */
-    boolean search(int timeLimit, int stopPositionInPattern);
+    @Nullable
+    default RaptorTripScheduleBoardOrAlightEvent<T> search(int earliestBoardTime, int stopPositionInPattern) {
+        return search(earliestBoardTime, stopPositionInPattern, UNBOUNDED_TRIP_INDEX);
+    };
 
     /**
-     * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}.
+     * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}. This
+     * method returns {@code null} if no trip is found.
+     * <p>
+     * Note! The implementation may use a "fly-weight" pattern to implement this, witch mean no
+     * objects are created for the result, but the result object will instead be reused for the
+     * next search. So, the caller MUST copy values over and NOT store references to the result
+     * object. As soon as a new call the the search is done, the result object is invalid.
      *
-     * @param tripIndexLimit        Lower bound for trip index to search for. Inclusive. Use {@code 0}
-     *                              for an unbounded search.
-     * @param arrivalDepartureTime  The time of arrival(departure for reverse search) at the given stop.
+     * @param earliestBoardTime  The time of arrival(departure for reverse search) at the given stop.
      * @param stopPositionInPattern The stop to board
+     * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use
+     *                              {@code -1} for an unbounded search. This is an optimization
+     *                              which allow us to search faster, and it exclude results witch
+     *                              is less favorable than trips already processed.
      */
-    boolean search(int arrivalDepartureTime, int stopPositionInPattern, int tripIndexLimit);
-
-    /**
-     * This i a reference to the trip found.
-     */
-    T getCandidateTrip();
-
-    /**
-     * The trip index of the last trip found.
-     */
-    int getCandidateTripIndex();
-
-
-    /**
-     * Get the board/alight time for the trip found.
-     * In the case of a normal search the boarding time should be returned,
-     * and in the case of a reverse search the alight time should be returned.
-     */
-    int getCandidateTripTime();
+    @Nullable
+    RaptorTripScheduleBoardOrAlightEvent<T> search(
+            int earliestBoardTime,
+            int stopPositionInPattern,
+            int tripIndexLimit
+    );
 }

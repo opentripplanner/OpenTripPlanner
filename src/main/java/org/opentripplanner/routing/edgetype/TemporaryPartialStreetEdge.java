@@ -20,7 +20,11 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     /**
      * The edge on which this lies.
      */
-    private StreetEdge parentEdge;
+    private final StreetEdge parentEdge;
+
+    // An explicit geometry is stored, so that it may still be retrieved after this edge is removed
+    // from the graph and the from/to vertices are set to null.
+    private final LineString geometry;
 
 
     /**
@@ -32,6 +36,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
             LineString geometry, I18NString name, double length) {
         super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
+        this.geometry = super.getGeometry();
         setCarSpeed(parentEdge.getCarSpeed());
         setElevationProfileUsingParents();
     }
@@ -45,11 +50,17 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
             LineString geometry, I18NString name) {
         super(v1, v2, geometry, name, 0, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
+        this.geometry = super.getGeometry();
         setCarSpeed(parentEdge.getCarSpeed());
 
         // No length is known, so we use the provided geometry to estimate it
         calculateLengthFromGeometry();
         setElevationProfileUsingParents();
+    }
+
+    @Override
+    public LineString getGeometry() {
+        return geometry;
     }
 
     /**

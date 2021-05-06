@@ -37,6 +37,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
+import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -44,8 +45,6 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -319,6 +318,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 //TODO: use wayPropertySet.getCreativeNameForWay(node)
                 //Currently this names them as platform n
                 I18NString creativeName = node.getAssumedName();
+                if (creativeName == null) {
+                    creativeName = new NonLocalizedString("" + node.getId());
+                }
+
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
@@ -353,8 +356,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 station.realTimeData = false;
                 bikeRentalService.addBikeRentalStation(station);
                 BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
-                new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
-                new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
+                new BikeRentalEdge(stationVertex, networkSet);
             }
             if (n > 1) {
                 graph.hasBikeSharing = true;
@@ -741,8 +743,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                         WayProperties wayData, OSMWithTags way) {
 
             Set<T2<StreetNote, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
-            boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
-            // if (noThruTraffic) LOG.info("Way {} does not allow through traffic.", way.getId());
+            boolean motorVehicleNoThrough = wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
+            boolean bicycleNoThrough = wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
+
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().first;
                 street.setBicycleSafetyFactor((float)safety);
@@ -753,7 +756,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     for (T2<StreetNote, NoteMatcher> note : notes)
                         graph.streetNotesService.addStaticNote(street, note.first, note.second);
                 }
-                street.setNoThruTraffic(noThruTraffic);
+                street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
+                street.setBicycleNoThruTraffic(bicycleNoThrough);
             }
 
             if (backStreet != null) {
@@ -766,7 +770,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     for (T2<StreetNote, NoteMatcher> note : notes)
                         graph.streetNotesService.addStaticNote(backStreet, note.first, note.second);
                 }
-                backStreet.setNoThruTraffic(noThruTraffic);
+                backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
+                backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
             }
         }
 

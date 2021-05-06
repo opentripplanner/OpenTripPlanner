@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
+import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -12,8 +13,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
-
-import java.util.Collection;
 
 /**
  * The responsibility of this class is to collect result paths for destination arrivals.
@@ -31,7 +30,7 @@ import java.util.Collection;
  */
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final ParetoSet<Path<T>> paths;
-    private final TransitCalculator transitCalculator;
+    private final TransitCalculator<T> transitCalculator;
     private final CostCalculator<T> costCalculator;
     private final SlackProvider slackProvider;
     private final PathMapper<T> pathMapper;
@@ -41,7 +40,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
     public DestinationArrivalPaths(
             ParetoComparator<Path<T>> paretoComparator,
-            TransitCalculator transitCalculator,
+            TransitCalculator<T> transitCalculator,
             CostCalculator<T> costCalculator,
             SlackProvider slackProvider,
             PathMapper<T> pathMapper,

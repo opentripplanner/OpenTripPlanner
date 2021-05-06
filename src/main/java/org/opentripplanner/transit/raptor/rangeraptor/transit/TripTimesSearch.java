@@ -30,18 +30,6 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Search for board- and alight-times for the trip matching the given stop-arrival.
-     * This method determine the search direction from the given stop-arrival.
-     */
-    public static <S extends RaptorTripSchedule> BoarAndAlightTime findTripSearch(
-        ArrivalView<S> arrival
-    ) {
-        return arrival.arrivalTime() > arrival.previous().arrivalTime()
-                ? findTripForwardSearch(arrival)
-                : findTripReverseSearch(arrival);
-    }
-
-    /**
      * Search for board- and alight-times for the trip matching the given stop-arrival
      * when searching FORWARD. Hence, searching in the same direction as the trip travel
      * direction.
@@ -83,29 +71,17 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
             .findTripBefore(leg.toTime());
     }
 
-    private BoarAndAlightTime findTripAfter(int earliestDepartureTime) {
+    /* private methods */
+
+    private BoarAndAlightTime findTripAfter(final int earliestDepartureTime) {
         RaptorTripPattern p = schedule.pattern();
         final int size = p.numberOfStopsInPattern();
-        int i = 0;
 
-        // Search for departure
-        while (i < size && schedule.departure(i) < earliestDepartureTime) { ++i; }
+        int i = schedule.findDepartureStopPosition(earliestDepartureTime, fromStop);
 
-        if(i == size) {
-            throw noFoundException(
-                    "No departures after 'earliestDepartureTime'",
-                    "earliestDepartureTime",
-                    earliestDepartureTime
-            );
-        }
-
-        while (i < size && p.stopIndex(i) != fromStop) { ++i; }
-
-        if(i == size) {
-            throw noFoundException(
-                "No stops matching 'fromStop'",
-                "earliestDepartureTime",
-                earliestDepartureTime
+        if(i < 0) {
+            throw notFoundException(
+                "No stops matching 'fromStop'", "earliestDepartureTime", earliestDepartureTime
             );
         }
 
@@ -120,7 +96,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         }
 
         if(i == size) {
-            throw noFoundException(
+            throw notFoundException(
                 "No stops matching 'toStop'",
                 "earliestDepartureTime",
                 earliestDepartureTime
@@ -131,29 +107,11 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
 
     private BoarAndAlightTime findTripBefore(int latestArrivalTime) {
         RaptorTripPattern p = schedule.pattern();
-        final int size = p.numberOfStopsInPattern();
-        int i = size-1;
-
-        // Search for arrival
-        while (i >= 0 && schedule.arrival(i) > latestArrivalTime) {
-            --i;
-        }
+        int i = schedule.findArrivalStopPosition(latestArrivalTime, toStop);
 
         if(i < 0) {
-            throw noFoundException(
-                    "No arrivals before 'latestArrivalTime'",
-                    "latestArrivalTime",
-                    latestArrivalTime
-            );
-        }
-
-        while (i >= 0 && p.stopIndex(i) != toStop) { --i; }
-
-        if(i < 0) {
-            throw noFoundException(
-                    "No stops matching 'toStop'",
-                    "latestArrivalTime",
-                    latestArrivalTime
+            throw notFoundException(
+                "No stops matching 'toStop'", "latestArrivalTime", latestArrivalTime
             );
         }
 
@@ -168,7 +126,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         }
 
         if(i < 0) {
-            throw noFoundException(
+            throw notFoundException(
                     "No stops matching 'fromStop'",
                     "latestArrivalTime",
                     latestArrivalTime
@@ -177,7 +135,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         return new BoarAndAlightTime(schedule, i, alightStopPos);
     }
 
-    private IllegalStateException noFoundException(String hint, String lbl, int time) {
+    private IllegalStateException notFoundException(String hint, String lbl, int time) {
         return new IllegalStateException(
                 "Trip not found: " + hint + ". "
                         + " [FromStop: " + fromStop
@@ -186,5 +144,4 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
                         + ", pattern: " + schedule.pattern().debugInfo() + "]"
         );
     }
-
 }

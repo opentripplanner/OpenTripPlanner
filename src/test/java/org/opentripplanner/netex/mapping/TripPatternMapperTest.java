@@ -1,5 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -10,12 +15,6 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (29.11.2017)
@@ -47,7 +46,7 @@ public class TripPatternMapperTest {
                 new Deduplicator()
         );
 
-        TripPatternMapper.Result r = tripPatternMapper.mapTripPattern(sample.getJourneyPattern());
+        TripPatternMapperResult r = tripPatternMapper.mapTripPattern(sample.getJourneyPattern());
 
         assertEquals(1, r.tripPatterns.size());
 

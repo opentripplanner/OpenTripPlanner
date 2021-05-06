@@ -1,15 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /** Responsible for mapping GTFS TripMapper into the OTP model. */
 class TripMapper {
@@ -30,6 +29,10 @@ class TripMapper {
 
     Trip map(org.onebusaway.gtfs.model.Trip orginal) {
         return orginal == null ? null : mappedTrips.computeIfAbsent(orginal, this::doMap);
+    }
+
+    Collection<Trip> mappedTrips() {
+        return mappedTrips.values();
     }
 
     private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {

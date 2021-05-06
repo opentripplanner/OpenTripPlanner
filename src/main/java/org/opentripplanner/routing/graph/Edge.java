@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.graph;
 
+import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.State;
@@ -87,7 +88,7 @@ public abstract class Edge implements Serializable {
 
     @Override
     public int hashCode() {
-        return fromv.hashCode() * 31 + tov.hashCode();
+        return Objects.hash(fromv, tov);
     }
 
     /**

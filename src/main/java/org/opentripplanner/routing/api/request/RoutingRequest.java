@@ -1,12 +1,28 @@
 package org.opentripplanner.routing.api.request;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Comparator;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import javax.annotation.Nonnull;
+import org.geotools.geojson.geom.GeometryJSON;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
@@ -16,6 +32,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RouteMatcher;
@@ -36,22 +53,6 @@ import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
  * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
@@ -70,7 +71,7 @@ import java.util.TimeZone;
  *           class, but we want to keep it in the RoutingResource as long as we support the
  *           REST API.
  */
-public class RoutingRequest implements Cloneable, Serializable {
+public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -335,6 +336,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     @Deprecated
     public int nonpreferredTransferCost = 180;
+
+
+    /** Configure the transfer optimization */
+    public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest(this);
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
@@ -1073,6 +1078,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (streetMode != null) {
             switch (streetMode) {
                 case WALK:
+                case FLEXIBLE:
                     streetRequest.streetSubRequestModes.setWalk(true);
                     break;
                 case BIKE:
@@ -1230,6 +1236,11 @@ public class RoutingRequest implements Cloneable, Serializable {
             rctx.destroy();
             LOG.debug("routing context destroyed");
         }
+    }
+
+    @Override
+    public void close() {
+        cleanup();
     }
 
     /**

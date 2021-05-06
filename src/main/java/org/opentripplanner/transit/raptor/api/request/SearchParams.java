@@ -235,7 +235,7 @@ public class SearchParams {
             .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
             .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
             .addDurationSec("searchWindow", searchWindowInSeconds)
-            .addFieldIfTrue("departAsLateAsPossible", preferLateArrival)
+            .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
             .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
             .addCollection("accessPaths", accessPaths, 5)
             .addCollection("egressPaths", egressPaths, 5)

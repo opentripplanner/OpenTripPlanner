@@ -23,11 +23,6 @@ import java.util.Set;
 /**
  * Created by demory on 2017-03-14.
  *
- * Be aware that there are problems with the floating bike support. It therefore has to be
- * explicitly turned on by using OTPFeature.FloatingBike. Use at your own risk.
- *
- * See https://github.com/opentripplanner/OpenTripPlanner/issues/3316
- *
  * Leaving OTPFeature.FloatingBike turned off both prevents floating bike updaters added to
  * router-config.json from being used, but more importantly, floating bikes added by a
  * BikeRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be used.

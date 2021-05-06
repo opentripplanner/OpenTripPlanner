@@ -249,20 +249,16 @@ type BikeRentalStation implements Node & PlaceInterface {
     name: String!
 
     """
-    Number of bikes currently available on the rental station. The total capacity
-    of this bike rental station is the sum of fields `bikesAvailable` and
-    `spacesAvailable`.
+    Number of bikes currently available on the rental station.
     """
     bikesAvailable: Int
 
     """
-    Number of free spaces currently available on the rental station. The total
-    capacity of this bike rental station is the sum of fields `bikesAvailable` and
-    `spacesAvailable`.
-    Note that this value being 0 does not necessarily indicate that bikes cannot
-    be returned to this station, as it might be possible to leave the bike in the
-    vicinity of the rental station, even if the bike racks don't have any spaces
-    available (see field `allowDropoff`).
+    Number of free spaces currently available on the rental station.
+    Note that this value being 0 does not necessarily indicate that bikes cannot be returned
+    to this station, as it might be possible to leave the bike in the vicinity of
+    the rental station,
+    even if the bike racks don't have any spaces available (see field `allowDropoff`).
     """
     spacesAvailable: Int
 
@@ -287,6 +283,12 @@ type BikeRentalStation implements Node & PlaceInterface {
 
     """Latitude of the bike rental station (WGS 84)"""
     lat: Float
+
+    """Nominal capacity (number of racks) of the rental station."""
+    capacity: Int
+
+    """If true, bikes can be returned even if spacesAvailable is zero or bikes > capacity."""
+    allowOverloading: Boolean
 }
 
 enum BikesAllowed {
@@ -1442,7 +1444,14 @@ type QueryType {
     serviceTimeRange: serviceTimeRange
 
     """Get all bike rental stations"""
-    bikeRentalStations: [BikeRentalStation]
+    bikeRentalStations(
+        """
+        Return bike rental stations with these ids.
+        **Note:** if an id is invalid (or the bike rental station service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [BikeRentalStation]
 
     """
     Get a single bike rental station based on its ID, i.e. value of field `stationId`

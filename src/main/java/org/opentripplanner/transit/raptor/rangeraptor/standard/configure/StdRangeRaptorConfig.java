@@ -42,7 +42,6 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     private final SearchContext<T> ctx;
     private final PathConfig<T> pathConfig;
 
-    private boolean workerCreated = false;
     private BestTimes bestTimes = null;
     private Stops<T> stops = null;
     private ArrivedAtDestinationCheck destinationCheck = null;
@@ -94,10 +93,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         switch (ctx.profile()) {
             case STANDARD:
             case BEST_TIME:
-                return new StdTransitWorker<>(state, ctx.slackProvider(), ctx.calculator());
+                return new StdTransitWorker<>(state);
             case NO_WAIT_STD:
             case NO_WAIT_BEST_TIME:
-                return new NoWaitTransitWorker<>(state, ctx.slackProvider(), ctx.calculator());
+                return new NoWaitTransitWorker<>(state);
         }
         throw new IllegalArgumentException(ctx.profile().toString());
     }
@@ -221,19 +220,6 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
     private SimpleArrivedAtDestinationCheck simpleDestinationCheck() {
         return new SimpleArrivedAtDestinationCheck(ctx.egressStops(), bestTimes());
-    }
-
-    /**
-     * This assert should only be called when creating a worker is the next step
-     */
-    private void assertOnlyOneWorkerIsCreated() {
-        if (workerCreated) {
-            throw new IllegalStateException(
-                    "Create a new config for each worker. Do not reuse the config instance, " +
-                            "this may lead to unpredictable behavior."
-            );
-        }
-        workerCreated = true;
     }
 
     private void assertSetValueIsNull(String name, Object setValue, Object newValue) {

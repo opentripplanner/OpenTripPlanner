@@ -98,7 +98,8 @@ public class StreetVertexIndex {
           lengthIn
       );
 
-      temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
+      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
+      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     }
@@ -113,7 +114,8 @@ public class StreetVertexIndex {
       );
 
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
-      temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
+      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
+      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     }
   }
@@ -271,11 +273,11 @@ public class StreetVertexIndex {
     //It can be null in tests
     if (options != null) {
       TraverseModeSet modes = options.streetSubRequestModes;
-      if (modes.getCar()) {
-        // for park and ride we will start in car mode and walk to the end vertex
-        if (!endVertex && options.parkAndRide) {
-          nonTransitMode = TraverseMode.CAR;
-        }
+      // for park and ride we will start in car mode and walk to the end vertex
+      boolean parkAndRideDepart = modes.getCar() && options.parkAndRide && !endVertex;
+      boolean onlyCarAvailable = modes.getCar() && !(modes.getWalk() || modes.getBicycle());
+      if (onlyCarAvailable || parkAndRideDepart) {
+        nonTransitMode = TraverseMode.CAR;
       }
     }
     return nonTransitMode;
