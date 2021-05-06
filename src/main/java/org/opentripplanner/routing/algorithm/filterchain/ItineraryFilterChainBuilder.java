@@ -101,8 +101,17 @@ public class ItineraryFilterChainBuilder {
     }
 
     /**
-     * This is the same as {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, only for
-     * non-transit itineraries.
+     * This is a a bit similar to {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, with
+     * a few important differences.
+     *
+     * This function is used to compute a max-limit for generalized-cost. The limit
+     * is applied to itineraries with no transit legs, however ALL itineraries (including those with
+     * transit legs) are considered when calculating the minimum cost.
+     * <p>
+     * The smallest generalized-cost value is used as input to the function.
+     * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
+     * {@code 5000}, then all non-transit itineraries with a cost larger than
+     * {@code 1800 + 2 * 5000 = 11 800} is dropped.
      */
     public ItineraryFilterChainBuilder withNonTransitGeneralizedCostLimit(DoubleFunction<Double> value){
         this.nonTransitGeneralizedCostLimit = value;
