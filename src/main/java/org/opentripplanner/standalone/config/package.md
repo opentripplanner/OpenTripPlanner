@@ -68,7 +68,7 @@ public class <ModuleNnnnParameters> {
 ```
 
 In the `org.opentripplanner.standalone.config` package there will be a class called 
-`ModuleNnnnConfig` that either extend the interface above or instantiate the POJO. The
+`ModuleNnnnConfig` that either extends the interface above or instantiates the POJO. The
 config class should map from JSON using the `NodeAdapter` into itself(extending the interface)
 or into the POJO.
 
