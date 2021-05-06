@@ -3,7 +3,6 @@ package org.opentripplanner.ext.flex;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
@@ -37,7 +36,8 @@ public class FlexRouter {
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
-  private final FlexPathCalculator flexPathCalculator;
+  private final FlexPathCalculator accessFlexPathCalculator;
+  private final FlexPathCalculator egressFlexPathCalculator;
 
   /* Request data */
   private final ZonedDateTime startOfTime;
@@ -63,7 +63,8 @@ public class FlexRouter {
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = graph.index.getFlexIndex();
-    this.flexPathCalculator = new StreetFlexPathCalculator(graph);
+    this.accessFlexPathCalculator = new StreetFlexPathCalculator(graph, false);
+    this.egressFlexPathCalculator = new StreetFlexPathCalculator(graph, true);
 
     ZoneId tz = graph.getTimeZone().toZoneId();
     LocalDate searchDate = LocalDate.ofInstant(searchInstant, tz);
@@ -100,7 +101,7 @@ public class FlexRouter {
 
     for (FlexAccessTemplate template : this.flexAccessTemplates) {
       StopLocation transferStop = template.getTransferStop();
-      if (egressStops.contains(transferStop)) {
+      if (this.flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))) {
         for(NearbyStop egress : streetEgressByStop.get(transferStop)) {
           Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
           if (itinerary != null) {
@@ -141,7 +142,11 @@ public class FlexRouter {
             // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
             // Create templates from trip, boarding at the nearbyStop
-            .flatMap(date -> t2.second.getFlexAccessTemplates(t2.first, date, flexPathCalculator)))
+            .flatMap(date -> t2.second.getFlexAccessTemplates(
+                t2.first,
+                date,
+                accessFlexPathCalculator
+            )))
         .collect(Collectors.toList());
   }
 
@@ -155,7 +160,11 @@ public class FlexRouter {
             // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
             // Create templates from trip, alighting at the nearbyStop
-            .flatMap(date -> t2.second.getFlexEgressTemplates(t2.first, date, flexPathCalculator)))
+            .flatMap(date -> t2.second.getFlexEgressTemplates(
+                t2.first, 
+                date,
+                egressFlexPathCalculator
+            )))
         .collect(Collectors.toList());;
   }
 
