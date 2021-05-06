@@ -18,8 +18,8 @@ The design goals are:
   module should define the needed config as an interface(or simple Java class). This ensures
   type-safety and provides a consistent way to document needed configuration for each module.
 - For Sandbox modules the configuration loading should be put in the
-  `org.opentripplanner.standalone.config.sandbox` package. This keep all the configuration loading
-  in one place, avoiding fragmentation, and make it easier to get an overview. The parameters
+  `org.opentripplanner.standalone.config.sandbox` package. This keeps all the configuration loading
+  in one place, avoiding fragmentation and makes it easier to get an overview. The parameters
   (interface or POJO) injected into the Sandbox module itself, should be declared in the Sandbox
   module.
 
