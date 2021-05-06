@@ -56,6 +56,7 @@ public class RoutingRequestToFilterChainMapper {
         .withMinSafeTransferTimeFactor(p.minSafeTransferTimeFactor)
         .withTransitGeneralizedCostLimit(p.transitGeneralizedCostLimit)
         .withBikeRentalDistanceRatio(p.bikeRentalDistanceRatio)
+        .withNonTransitGeneralizedCostLimit(p.nonTransitGeneralizedCostLimit)
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
         .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
         .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
