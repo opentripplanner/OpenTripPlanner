@@ -142,7 +142,9 @@ public class FlexRouter {
             // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
             // Create templates from trip, boarding at the nearbyStop
-            .flatMap(date -> t2.second.getFlexAccessTemplates(t2.first, date,
+            .flatMap(date -> t2.second.getFlexAccessTemplates(
+                t2.first,
+                date,
                 accessFlexPathCalculator
             )))
         .collect(Collectors.toList());
@@ -158,7 +160,9 @@ public class FlexRouter {
             // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
             // Create templates from trip, alighting at the nearbyStop
-            .flatMap(date -> t2.second.getFlexEgressTemplates(t2.first, date,
+            .flatMap(date -> t2.second.getFlexEgressTemplates(
+                t2.first, 
+                date,
                 egressFlexPathCalculator
             )))
         .collect(Collectors.toList());;
