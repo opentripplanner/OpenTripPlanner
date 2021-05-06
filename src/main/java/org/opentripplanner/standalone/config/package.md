@@ -12,7 +12,8 @@ The design goals are:
 - Ignore unknown parameters, just print a warning message in the log. This will make the process of
   upgrading and downgrading OTP easier and less prune to service failure. Try to make reasonable
   default values instead of making a parameter required.
-- Encapsulate config parsing, so parsing and error handling is consistent - and stay consistent over time(maintenance).
+- Encapsulate config parsing, so parsing and error handling is consistent - and stay consistent over
+  time(maintenance).
 - Configuration should be injected into OTP components/modules in using inversion-of-control. Each module should define the needed config as an interface(or simple Java class). This ensures type-safety and provide a consistent way to document needed configuration for each module.
 - For Sandbox modules the configuration loading should be put in the `org.opentripplanner.standalone.config.sandbox` package. This keep all the configuration loading in one place, avoiding fragmentation, and make it easier to get an overview. The parameters(interface or POJO) injected into the Sandbox module itself, should be declared in the Sandbox module.
 
