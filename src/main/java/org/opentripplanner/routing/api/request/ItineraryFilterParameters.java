@@ -54,16 +54,24 @@ public class ItineraryFilterParameters {
    * {@code 3600 + 2.0 x}
    * <li>To set an absolute value(3000) use: {@code 3000 + 0x}
    * </ul>
-   * The default is {@code null} - no filter is applied.
+   * The default is {@code 3600 + 2x} - 1 hours plus 2 times the lowest cost.
    */
-  public DoubleFunction<Double> transitGeneralizedCostLimit = null;
+  public DoubleFunction<Double> transitGeneralizedCostLimit;
 
   /**
-   * This is used to filter out bike rental itineraries that contain mostly walking. The value
-   * describes the ratio of the total itinerary that has to consist of bike rental to allow the
-   * itinerary.
+   * This is a a bit similar to {@link #transitGeneralizedCostLimit}, with
+   * a few important differences.
    *
-   * Default value is 0.3 (30%), use a value of 0 to turn off.
+   * This function is used to compute a max-limit for generalized-cost. The limit
+   * is applied to itineraries with no transit legs, however ALL itineraries (including those with
+   * transit legs) are considered when calculating the minimum cost.
+   * <p>
+   * The smallest generalized-cost value is used as input to the function.
+   * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
+   * {@code 5000}, then all non-transit itineraries with a cost larger than
+   * {@code 1800 + 2 * 5000 = 11 800} is dropped.
+   *
+   * The default is {@code 3600 + 2x} - 1 hours plus 2 times the lowest cost.
    */
   public double bikeRentalDistanceRatio;
 
@@ -71,7 +79,7 @@ public class ItineraryFilterParameters {
    * This value works the same way as {@link #transitGeneralizedCostLimit}, only for non-transit
    * itineraries.
     */
-  public DoubleFunction<Double> nonTransitGeneralizedCostLimit = null;
+  public DoubleFunction<Double> nonTransitGeneralizedCostLimit;
 
 
   private ItineraryFilterParameters() {
