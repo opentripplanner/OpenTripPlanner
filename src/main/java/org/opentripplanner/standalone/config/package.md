@@ -35,8 +35,8 @@ validation and providing a list of unused parameters.
 
 ### Config Injection
 
-Each module in OTP witch need configuration should declare what it needs and document each parameter
-with using JavaDoc. It can be done using a interface or a simple plain-old-java-object(POJO):
+Each OTP module in need for configuration should declare needs and document each parameter
+using JavaDoc. It can be done using an interface or a simple plain-old-java-object(POJO):
 
 ```
 /** <Sumary doc goes here> */
