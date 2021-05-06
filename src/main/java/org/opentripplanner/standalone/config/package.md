@@ -39,7 +39,7 @@ Each OTP module in need for configuration should declare needs and document each
 using JavaDoc. It can be done using an interface or a simple plain-old-java-object(POJO):
 
 ```
-/** <Sumary doc goes here> */
+/** <Summary doc goes here> */
 interface <ModuleNnnnParameters> {
 
    /** 
@@ -53,7 +53,7 @@ interface <ModuleNnnnParameters> {
 
 or 
 
-/** <Sumary doc goes here> */
+/** <Summary doc goes here> */
 public class <ModuleNnnnParameters> {
     <fields>
 
