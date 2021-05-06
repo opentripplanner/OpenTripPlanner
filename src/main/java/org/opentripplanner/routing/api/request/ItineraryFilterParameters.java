@@ -59,6 +59,15 @@ public class ItineraryFilterParameters {
   public DoubleFunction<Double> transitGeneralizedCostLimit = null;
 
   /**
+   * This is used to filter out bike rental itineraries that contain mostly walking. The value
+   * describes the ratio of the total itinerary that has to consist of bike rental to allow the
+   * itinerary.
+   *
+   * Default value is 0.3 (30%), use a value of 0 to turn off.
+   */
+  public double bikeRentalDistanceRatio;
+
+  /**
    * This value works the same way as {@link #transitGeneralizedCostLimit}, only for non-transit
    * itineraries.
     */
@@ -70,6 +79,7 @@ public class ItineraryFilterParameters {
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepNumOfItineraries = 0.68;
     this.minSafeTransferTimeFactor = 0.0;
+    this.bikeRentalDistanceRatio = 0.0;
     this.transitGeneralizedCostLimit =
         RequestFunctions.createLinearFunction(3600, 2);
     this.nonTransitGeneralizedCostLimit =
@@ -86,7 +96,8 @@ public class ItineraryFilterParameters {
       double groupSimilarityKeepNumOfItineraries,
       double minSafeTransferTimeFactor,
       DoubleFunction<Double> transitGeneralizedCostLimit,
-      DoubleFunction<Double> nonTransitGeneralizedCostLimit
+      DoubleFunction<Double> nonTransitGeneralizedCostLimit,
+      double bikeRentalDistanceRatio
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -94,5 +105,6 @@ public class ItineraryFilterParameters {
     this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
     this.transitGeneralizedCostLimit = transitGeneralizedCostLimit;
     this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;
+    this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
   }
 }

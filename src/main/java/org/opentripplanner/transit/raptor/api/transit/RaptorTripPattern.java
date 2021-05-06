@@ -46,4 +46,38 @@ public interface RaptorTripPattern {
      * The recommended string to return is: {@code [MODE] [SHORT_ROUTE_DESCRIPTION]}.
      */
     String debugInfo();
+
+    /**
+     * Return the first occurrence of the stop position for the given stop index after the given
+     * startPosition(inclusive). Note that the returned value might not be the only occurrence, if the
+     * pattern goes in a loop.
+     * <p>
+     * {@code -1} is returned if not found.
+     *
+     * @param startPos  the stop position in pattern to start the search (inclusive)
+     * @param stopIndex the stopIndex to find
+     */
+    default int findStopPositionAfter(int startPos, int stopIndex) {
+        for (int i = startPos; i < numberOfStopsInPattern(); i++) {
+            if (stopIndex == stopIndex(i)) { return i; }
+        }
+        return -1;
+    }
+
+    /**
+     * Return the first occurrence of the stop position for the given stop index before the given
+     * stopPosition. Note that the returned value might not be the only occurrence, if the pattern
+     * goes in a loop.
+     * <p>
+     * {@code -1} is returned if not found.
+     *
+     * @param startPos  the stop position in pattern to start the search (inclusive)
+     * @param stopIndex the stopIndex to find
+     */
+    default int findStopPositionBefore(int startPos, int stopIndex) {
+        for (int i = startPos; i >= 0; i--) {
+            if (stopIndex == stopIndex(i)) { return i; }
+        }
+        return -1;
+    }
 }

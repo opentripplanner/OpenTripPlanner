@@ -1,15 +1,5 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.opentripplanner.transit.raptor.RaptorService;
-import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor._data.api.PathUtils;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
@@ -17,6 +7,16 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
 import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.opentripplanner.transit.raptor.RaptorService;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.api.PathUtils;
+import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
@@ -34,7 +34,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
   @Before
   public void setup() {
-    data.add(
+    data.withRoute(
         route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H)
             .withTimetable(
                 schedule("0:10, 0:12, 0:14, 0:16, 0:18, 0:20, 0:22, 0:24")
@@ -58,8 +58,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
         .latestArrivalTime(T00_30)
     ;
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test

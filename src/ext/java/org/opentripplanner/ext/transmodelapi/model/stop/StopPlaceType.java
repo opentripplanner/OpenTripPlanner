@@ -361,14 +361,19 @@ public class StopPlaceType {
       });
       return result;
     }
-    // Default "parent" - Multi modal parent stop places without their mono modal children
+    // Default "parent" - Multi modal parent stop places without their mono modal children, but add
+    // mono modal stop places if they have no parent stop place
     else if("parent".equals(multiModalMode)){
-      return stations
-          .map(it -> routingService.getMultiModalStationForStations().get(it))
-          .filter(Objects::nonNull)
-          .distinct()
-          .map(MonoOrMultiModalStation::new)
-          .collect(Collectors.toUnmodifiableList());
+      Set<MonoOrMultiModalStation> result = new HashSet<>();
+      stations.forEach(it -> {
+        MultiModalStation p = routingService.getMultiModalStationForStations().get(it);
+        if(p != null) {
+          result.add(new MonoOrMultiModalStation(p));
+        } else {
+          result.add(new MonoOrMultiModalStation(it, null));
+        }
+      });
+      return result;
     }
     else {
       throw new IllegalArgumentException("Unexpected multiModalMode: " + multiModalMode);

@@ -36,7 +36,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
     @Before
     public void setup() {
-        data.add(
+        data.withRoute(
                 route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E)
                         .withTimetable(
                                 schedule("00:10 00:15 00:20 00:25 00:30"),
@@ -56,6 +56,8 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
                 .earliestDepartureTime(T00_10)
                 .searchWindow(Duration.ofMinutes(30))
                 .timetableEnabled(true);
+
+        ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
     }
 
     /*

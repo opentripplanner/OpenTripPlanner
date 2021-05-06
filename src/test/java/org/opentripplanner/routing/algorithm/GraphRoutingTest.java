@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.List;
 import java.util.Set;
-import junit.framework.TestCase;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -16,11 +15,10 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
+import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -38,7 +36,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
-public abstract class GraphRoutingTest extends TestCase {
+public abstract class GraphRoutingTest {
 
     public static final String TEST_FEED_ID = "testFeed";
     public static final String TEST_BIKE_RENTAL_NETWORK = "test network";
@@ -51,7 +49,7 @@ public abstract class GraphRoutingTest extends TestCase {
 
         private final Graph graph = new Graph();
 
-        abstract void build();
+        public abstract void build();
 
         public Graph graph() {
             build();
@@ -69,7 +67,7 @@ public abstract class GraphRoutingTest extends TestCase {
 
         // -- Street network
         public IntersectionVertex intersection(String label, double latitude, double longitude) {
-            return new IntersectionVertex(graph, label, latitude, longitude);
+            return new IntersectionVertex(graph, label, longitude, latitude);
         }
 
         public StreetEdge street(
@@ -223,8 +221,8 @@ public abstract class GraphRoutingTest extends TestCase {
         ) {
             var bikeRentalStation = new BikeRentalStation();
             bikeRentalStation.id = id;
-            bikeRentalStation.x = latitude;
-            bikeRentalStation.y = longitude;
+            bikeRentalStation.x = longitude;
+            bikeRentalStation.y = latitude;
             return bikeRentalStation;
         }
 
@@ -238,8 +236,7 @@ public abstract class GraphRoutingTest extends TestCase {
                     graph,
                     bikeRentalStationEntity(id, latitude, longitude)
             );
-            new RentABikeOnEdge(vertex, vertex, networks);
-            new RentABikeOffEdge(vertex, vertex, networks);
+            new BikeRentalEdge(vertex, networks);
             return vertex;
         }
 
@@ -267,8 +264,8 @@ public abstract class GraphRoutingTest extends TestCase {
         public BikePark bikeParkEntity(String id, double latitude, double longitude) {
             var bikePark = new BikePark();
             bikePark.id = id;
-            bikePark.x = latitude;
-            bikePark.y = longitude;
+            bikePark.x = longitude;
+            bikePark.y = latitude;
             return bikePark;
         }
 

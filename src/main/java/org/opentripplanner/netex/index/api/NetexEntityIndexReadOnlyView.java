@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.index.api;
 
+import java.util.Collection;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
@@ -19,11 +20,10 @@ import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone;
-
-import java.util.Collection;
 
 public interface NetexEntityIndexReadOnlyView {
     Network lookupNetworkForLine(String groupOfLineOrNetworkId);
@@ -48,6 +48,7 @@ public interface NetexEntityIndexReadOnlyView {
     ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef();
     ReadOnlyHierarchicalMapById<Route> getRouteById();
     ReadOnlyHierarchicalMapById<ServiceJourney> getServiceJourneyById();
+    ReadOnlyHierarchicalMapById<ServiceJourneyInterchange> getServiceJourneyInterchangeById();
     ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById();
     ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
     ReadOnlyHierarchicalMapById<TariffZone> getTariffZonesById();

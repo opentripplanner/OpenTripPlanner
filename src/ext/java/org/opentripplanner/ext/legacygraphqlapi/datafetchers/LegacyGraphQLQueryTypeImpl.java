@@ -491,9 +491,23 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<Iterable<BikeRentalStation>> bikeRentalStations() {
     return environment -> {
       BikeRentalStationService bikerentalStationService = getRoutingService(environment)
-          .getBikerentalStationService();
+              .getBikerentalStationService();
 
       if (bikerentalStationService == null) { return null; }
+
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeRentalStationsArgs(
+              environment.getArguments());
+
+      if (args.getLegacyGraphQLIds() != null) {
+        Map<String, BikeRentalStation> bikeRentalStations =
+                bikerentalStationService.getBikeRentalStations()
+                        .stream()
+                        .collect(Collectors.toMap(station -> station.id, station -> station));
+        return ((List<String>) args.getLegacyGraphQLIds())
+                .stream()
+                .map(bikeRentalStations::get)
+                .collect(Collectors.toList());
+      }
 
       return bikerentalStationService.getBikeRentalStations();
     };

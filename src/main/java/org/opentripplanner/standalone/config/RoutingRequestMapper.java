@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +89,20 @@ public class RoutingRequestMapper {
         request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
         request.worstTime = c.asLong("worstTime", dft.worstTime);
 
+        mapTransferOptimization(
+            (TransferOptimizationRequest)request.transferOptimization,
+            c.path("transferOptimization")
+        );
+
         return request;
+    }
+
+    private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {
+        p.useOptimizeTransferCostFunction = c.asBoolean(
+            "adjustGeneralizedCost",
+            p.useOptimizeTransferCostFunction
+        );
+        p.minSafeWaitTimeFactor = c.asDouble("minSafeWaitTimeFactor", p.minSafeWaitTimeFactor);
+        p.inverseWaitReluctance = c.asDouble("inverseWaitReluctance", p.inverseWaitReluctance);
     }
 }

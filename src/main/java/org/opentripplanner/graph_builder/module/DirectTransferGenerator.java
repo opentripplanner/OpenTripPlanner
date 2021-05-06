@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class DirectTransferGenerator implements GraphBuilderModule {
 
-    private static Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
 
     final double radiusMeters;
 
@@ -107,6 +107,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                 issueStore.add(new StopNotLinkedForTransfers(ts0));
             }
             //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+            //noinspection Convert2MethodRef
             progress.step(m -> LOG.info(m));
             nTransfersTotal += n;
         }

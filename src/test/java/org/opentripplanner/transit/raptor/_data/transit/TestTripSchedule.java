@@ -11,7 +11,7 @@ import org.opentripplanner.util.time.TimeUtils;
  * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }.
  */
 public class TestTripSchedule implements RaptorTripSchedule {
-    private static final int DEFAULT_DEPATURE_DELAY = 10;
+    private static final int DEFAULT_DEPARTURE_DELAY = 10;
     private final RaptorTripPattern pattern;
     private final int[] arrivalTimes;
     private final int[] departureTimes;
@@ -25,6 +25,12 @@ public class TestTripSchedule implements RaptorTripSchedule {
         this.pattern = pattern;
         this.arrivalTimes = arrivalTimes;
         this.departureTimes = departureTimes;
+    }
+
+    @Override
+    public int tripSortIndex() {
+        // We sort trips based on the departure from the first stop
+        return arrival(0);
     }
 
     @Override
@@ -78,7 +84,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
         private TestTripPattern pattern;
         private int[] arrivalTimes;
         private int[] departureTimes;
-        private int arrivalDepartureOffset = DEFAULT_DEPATURE_DELAY;
+        private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
 
         public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
             this.pattern = pattern;

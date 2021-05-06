@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
 
@@ -57,5 +57,13 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
             schedules.add(tripSchedule);
         }
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(TestRoute.class)
+                .addObj("pattern", pattern)
+                .addObj("schedules", schedules)
+                .toString();
     }
 }
