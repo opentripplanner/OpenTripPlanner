@@ -64,7 +64,9 @@ public abstract class FlexAccessEgressTemplate {
     return transferStop;
   }
 
-  public StopLocation getAccessEgressStop() { return accessEgress.stop; }
+  public StopLocation getAccessEgressStop() {
+    return accessEgress.stop;
+  }
 
   public FlexTrip getFlexTrip() {
     return trip;
