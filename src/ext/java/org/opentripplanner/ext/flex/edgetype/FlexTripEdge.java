@@ -56,7 +56,7 @@ public class FlexTripEdge extends Edge {
     int timeInSeconds = getTimeInSeconds();
     editor.incrementTimeInSeconds(timeInSeconds);
     editor.incrementWeight(timeInSeconds);
-    editor.resetEnteredNoThroughTrafficArea();
+    editor.resetEnteredMotorVerhicleNoThroughTrafficArea();
     return editor.makeState();
   }
 

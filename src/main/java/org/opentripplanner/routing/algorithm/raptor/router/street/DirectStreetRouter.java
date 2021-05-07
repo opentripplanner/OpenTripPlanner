@@ -29,31 +29,26 @@ public class DirectStreetRouter {
   private static final double MAX_CAR_DISTANCE_METERS  = 500_000;
 
   public static List<Itinerary> route(Router router, RoutingRequest request) {
-    request.setRoutingContext(router.graph);
-    RoutingRequest nonTransitRequest = null;
-    try {
-      if (request.modes.directMode == null) {
-        return Collections.emptyList();
-      }
-      if(!streetDistanceIsReasonable(request)) { return Collections.emptyList(); }
+    if (request.modes.directMode == null) {
+      return Collections.emptyList();
+    }
 
-      nonTransitRequest = request.getStreetSearchRequest(request.modes.directMode);
+    try (RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode)) {
+      directRequest.setRoutingContext(router.graph);
+
+      if(!streetDistanceIsReasonable(directRequest)) { return Collections.emptyList(); }
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(router);
-      List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(nonTransitRequest);
+      List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(directRequest);
 
       // Convert the internal GraphPaths to itineraries
-      List<Itinerary> response = GraphPathToItineraryMapper.mapItineraries(paths, request);
-      ItinerariesHelper.decorateItinerariesWithRequestData(response, request);
+      List<Itinerary> response = GraphPathToItineraryMapper.mapItineraries(paths, directRequest);
+      ItinerariesHelper.decorateItinerariesWithRequestData(response, directRequest);
       return response;
     }
     catch (PathNotFoundException e) {
       return Collections.emptyList();
-    } finally {
-      if (nonTransitRequest != null) {
-        nonTransitRequest.cleanup();
-      }
     }
   }
 
