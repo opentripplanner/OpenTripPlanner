@@ -217,6 +217,11 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
         // See https://github.com/NABSA/gbfs/blob/master/gbfs.md#files
         InputStream rootData = fetchFromUrl(makeGbfsEndpointUrl("gbfs.json"));
 
+        // Some companies put their GBFS file at the root URL. If the rootData is null, try again from the root URL.
+        if (rootData == null) {
+            rootData = fetchFromUrl(rootUrl);
+        }
+
         // Check to see if data from the root url was able to be fetched. The GBFS.json file is not required.
         if (rootData == null) {
             // Root GBFS.json file not able to be fetched, set default endpoints.
