@@ -67,6 +67,19 @@ public class PathTest {
     }
 
     @Test
+    public void testToStringDetailed() {
+        assertEquals(
+                "Walk 3m15s 10:00 10:03:15 $390 ~ 1 45s ~ "
+                        + "BUS L11 10:04 10:35 31m $1998 ~ 2 15s ~ "
+                        + "Walk 3m45s 10:35:15 10:39 $450 ~ 3 21m ~ "
+                        + "BUS L21 11:00 11:23 23m $2640 ~ 4 17m ~ "
+                        + "BUS L31 11:40 11:52 12m $1776 ~ 5 15s ~ "
+                        + "Walk 7m45s 11:52:15 12:00 $930 "
+                        + "[10:00 12:00 2h $8184]",
+                subject.toStringDetailed()
+        );
+    }
+    @Test
     public void equals() {
         assertEquals(BasicPathTestCase.basicTripAsPath(), subject);
     }

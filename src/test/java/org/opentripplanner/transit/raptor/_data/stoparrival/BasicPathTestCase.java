@@ -54,7 +54,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
         + " ~ BUS L21 11:00 11:23 ~ 4"
         + " ~ BUS L31 11:40 11:52 ~ 5"
         + " ~ Walk 7m45s "
-        + "[10:00:00 12:00:00 2h $8184]";
+        + "[10:00 12:00 2h $8184]";
 
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;

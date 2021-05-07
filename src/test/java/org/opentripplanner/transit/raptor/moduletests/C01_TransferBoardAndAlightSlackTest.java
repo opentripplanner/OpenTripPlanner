@@ -43,7 +43,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
       + "BUS R1 0:02:11 0:03:01 ~ 3 ~ "
       + "BUS R2 0:04:41 0:05:01 ~ 4 ~ "
       + "Walk 20s "
-      + "[00:01:11 00:05:31 4m20s]";
+      + "[0:01:11 0:05:31 4m20s]";
 
   @Before
   public void setup() {
