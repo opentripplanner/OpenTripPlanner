@@ -25,7 +25,7 @@ public class Egress {
     @Override
     public String toString() {
             return String.format(
-                    "Egress { round: %d, stop: %d, arrival-time: %s, cost: %d }",
+                    "Egress { round: %d, stop: %d, arrival-time: %s $%d }",
                     previous.round(),
                     previous.stop(),
                     TimeUtils.timeToStrCompact(arrivalTime),

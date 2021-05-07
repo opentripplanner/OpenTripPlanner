@@ -93,9 +93,9 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     // expect: All pareto optimal paths
     assertEquals(""
-            + "Walk 3m ~ 4 ~ BUS R1 0:14 0:20 ~ 7 ~ Walk 1s [00:11:00 00:20:01 9m1s, cost: 1684]\n"
-            + "Walk 2m ~ 3 ~ BUS R1 0:12 0:20 ~ 7 ~ Walk 1s [00:10:00 00:20:01 10m1s, cost: 1564]\n"
-            + "Walk 1s ~ 2 ~ BUS R1 0:10 0:20 ~ 7 ~ Walk 1s [00:09:59 00:20:01 10m2s, cost: 1208]",
+            + "Walk 3m ~ 4 ~ BUS R1 0:14 0:20 ~ 7 ~ Walk 1s [00:11:00 00:20:01 9m1s $1684]\n"
+            + "Walk 2m ~ 3 ~ BUS R1 0:12 0:20 ~ 7 ~ Walk 1s [00:10:00 00:20:01 10m1s $1564]\n"
+            + "Walk 1s ~ 2 ~ BUS R1 0:10 0:20 ~ 7 ~ Walk 1s [00:09:59 00:20:01 10m2s $1208]",
         PathUtils.pathsToString(response)
     );
   }

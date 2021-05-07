@@ -171,7 +171,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                 " [" + TimeUtils.timeToStrLong(startTime) +
                 " " + TimeUtils.timeToStrLong(endTime) +
                 " " + DurationUtils.durationToStr(endTime - startTime) +
-                (generalizedCost == 0 ? "" : ", cost: " + generalizedCost) + "]";
+                (generalizedCost == 0 ? "" : " $" + generalizedCost) + "]";
     }
 
     /** Return the duration of time spent onBoard - excluding slack. */

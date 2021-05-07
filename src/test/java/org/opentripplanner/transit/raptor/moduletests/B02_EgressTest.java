@@ -90,9 +90,9 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     // expect: All pareto optimal paths
     assertEquals(""
-            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [00:09:40 00:19:00 9m20s, cost: 1760]\n"
-            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 2m [00:09:40 00:20:00 10m20s, cost: 1640]\n"
-            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:20 ~ 7 ~ Walk 1s [00:09:40 00:20:01 10m21s, cost: 1284]",
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [00:09:40 00:19:00 9m20s $1760]\n"
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 2m [00:09:40 00:20:00 10m20s $1640]\n"
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:20 ~ 7 ~ Walk 1s [00:09:40 00:20:01 10m21s $1284]",
         PathUtils.pathsToString(response)
     );
   }

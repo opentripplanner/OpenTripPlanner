@@ -100,10 +100,10 @@ public class B11_FlexEgress implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2tx [00:09:00 00:18:00 9m, cost: 1860]\n"
-            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Flex 2m1s 2tx [00:09:00 00:19:01 10m1s, cost: 1744]\n"
-            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:12 ~ 3 ~ Flex 7m 1tx [00:09:00 00:20:00 11m, cost: 2700]\n"
-            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 10m [00:09:00 00:28:00 19m, cost: 3720]",
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2tx [00:09:00 00:18:00 9m $1860]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Flex 2m1s 2tx [00:09:00 00:19:01 10m1s $1744]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:12 ~ 3 ~ Flex 7m 1tx [00:09:00 00:20:00 11m $2700]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 10m [00:09:00 00:28:00 19m $3720]",
         pathsToString(response)
     );
   }

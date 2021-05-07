@@ -98,10 +98,10 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [00:10:00 00:19:00 9m, cost: 1860]\n"
-            + "Flex 2m 2tx ~ 3 ~ BUS R1 0:12 0:18 ~ 6 ~ Walk 1m [00:09:00 00:19:00 10m, cost: 1740]\n"
-            + "Flex 7m 1tx ~ 5 ~ BUS R1 0:16 0:18 ~ 6 ~ Walk 1m [00:08:00 00:19:00 11m, cost: 2700]\n"
-            + "Walk 10m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 1m [00:00:00 00:19:00 19m, cost: 3720]",
+            + "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [00:10:00 00:19:00 9m $1860]\n"
+            + "Flex 2m 2tx ~ 3 ~ BUS R1 0:12 0:18 ~ 6 ~ Walk 1m [00:09:00 00:19:00 10m $1740]\n"
+            + "Flex 7m 1tx ~ 5 ~ BUS R1 0:16 0:18 ~ 6 ~ Walk 1m [00:08:00 00:19:00 11m $2700]\n"
+            + "Walk 10m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 1m [00:00:00 00:19:00 19m $3720]",
         pathsToString(response)
     );
   }
