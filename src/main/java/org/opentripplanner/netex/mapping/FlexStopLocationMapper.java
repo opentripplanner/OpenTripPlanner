@@ -27,6 +27,16 @@ class FlexStopLocationMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexStopLocationMapper.class);
 
+  /**
+   * Key-value pair used until proper NeTEx support is added
+   */
+  private static final String FLEXIBLE_STOP_AREA_TYPE_KEY = "FlexibleStopAreaType";
+
+  /**
+   * Key-value pair used until proper NeTEx support is added
+   */
+  private static final String UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE = "UnrestrictedPublicTransportAreas";
+
   FlexStopLocationMapper(FeedScopedIdFactory idFactory, Collection<Stop> stops) {
     this.idFactory = idFactory;
     this.stopsSpatialIndex = new HashGridSpatialIndex<>();
@@ -60,12 +70,12 @@ class FlexStopLocationMapper {
           .getKeyList()
           .getKeyValue()
           .stream()
-          .filter(k -> k.getKey().equals("FlexibleStopAreaType"))
+          .filter(k -> k.getKey().equals(FLEXIBLE_STOP_AREA_TYPE_KEY))
           .findFirst();
     }
 
     if (flexibleAreaType.isPresent()
-        && flexibleAreaType.get().getValue().equals("UnrestrictedPublicTransportAreas")
+        && flexibleAreaType.get().getValue().equals(UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE)
     ) {
       return mapStopsInFlexArea(flexibleStopPlace, (FlexibleArea) area);
     }
