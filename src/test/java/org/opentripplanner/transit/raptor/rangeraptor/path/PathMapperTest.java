@@ -13,38 +13,35 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRIP_DURATION;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_COST;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.basicTripByForwardSearch;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.basicTripByReverseSearch;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.lifeCycle;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.FLEX_PATH_A;
+import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.FLEX_PATH_B;
+import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.FLEX_PATH_W_OPENING_HOURS_A;
+import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.FLEX_PATH_W_OPENING_HOURS_B;
+import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flex_case_A_forwardSearch;
+import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flex_case_B_forwardSearch;
+import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flex_case_A_w_openingHours_forwardSearch;
+import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flex_case_B_w_openingHours_forwardSearch;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
-import org.opentripplanner.transit.raptor._data.stoparrival.Egress;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.util.time.TimeUtils;
 
-public class PathMapperTest {
+public class PathMapperTest implements RaptorTestConstants {
+
+    /* BASIC CASES */
 
     @Test
-    public void mapToPathForwardSearch() {
+    public void mapToPathBasicForwardSearch() {
         // Given:
-        Egress egress = BasicPathTestCase.basicTripByForwardSearch();
-        DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(
-                walk(egress.previous().stop(), egress.durationInSeconds()),
-                egress.previous(),
-                egress.arrivalTime(),
-                egress.additionalCost()
-        );
-
-        WorkerLifeCycle lifeCycle = BasicPathTestCase.lifeCycle();
-        PathMapper<TestTripSchedule> mapper = new ForwardPathMapper<>(
-            SLACK_PROVIDER,
-            lifeCycle
-        );
+        var destArrival = basicTripByForwardSearch();
+        var mapper = new ForwardPathMapper<TestTripSchedule>(SLACK_PROVIDER, lifeCycle());
 
         //When:
         Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
@@ -54,26 +51,67 @@ public class PathMapperTest {
     }
 
     @Test
-    public void mapToPathReverseSearch() {
+    public void mapToPathBasicReverseSearch() {
         // Given:
-        Egress egress = basicTripByReverseSearch();
-        DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(walk(egress
-            .previous()
-            .stop(), egress.durationInSeconds()),
-            egress.previous(),
-            egress.arrivalTime(),
-            egress.additionalCost()
-        );
-        WorkerLifeCycle lifeCycle = lifeCycle();
-        PathMapper<TestTripSchedule> mapper = new ReversePathMapper<>(
-            SLACK_PROVIDER, lifeCycle
-        );
+        var destArrival = basicTripByReverseSearch();
+        var mapper = new ReversePathMapper<TestTripSchedule>(SLACK_PROVIDER, lifeCycle());
 
         //When:
         Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
 
         // Then: verify path - should be the same for reverse and forward mapper
         assertPath(path);
+    }
+
+
+    /* FLEX CASES - FORWARD SEARCH */
+
+    @Test
+    public void mapToPathForFlexCaseAForwardSearch() {
+        runtTestFlexForward(flex_case_A_forwardSearch(), FLEX_PATH_A);
+    }
+
+    @Test
+    public void mapToPathForFlexWOpeningHoursCaseAForwardSearch() {
+        runtTestFlexForward(flex_case_A_w_openingHours_forwardSearch(), FLEX_PATH_W_OPENING_HOURS_A);
+    }
+
+    @Test
+    public void mapToPathForFlexCaseBForwardSearch() {
+        runtTestFlexForward(flex_case_B_forwardSearch(), FLEX_PATH_B);
+    }
+
+    @Test
+    public void mapToPathForFlexWOpeningHoursCaseBForwardSearch() {
+        runtTestFlexForward(flex_case_B_w_openingHours_forwardSearch(), FLEX_PATH_W_OPENING_HOURS_B);
+    }
+
+    /* FLEX CASES - REVERSE SEARCH */
+
+    /* TODO */
+
+    private void runtTestFlexForward(
+            DestinationArrival<TestTripSchedule> destArrival,
+            String expected
+    ) {
+        // Given:
+        var mapper = new ForwardPathMapper<TestTripSchedule>(SLACK_PROVIDER, lifeCycle());
+        // When:
+        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+        // Then:
+        assertEquals(path.toStringDetailed(), expected, path.toString());
+    }
+
+    private void runtTestFlexReverse(
+            DestinationArrival<TestTripSchedule> destArrival,
+            String expected
+    ) {
+        // Given:
+        var mapper = new ReversePathMapper<TestTripSchedule>(SLACK_PROVIDER, lifeCycle());
+        // When:
+        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+        // Then:
+        assertEquals(expected, path.toString());
     }
 
     private void assertPath(Path<TestTripSchedule> path) {

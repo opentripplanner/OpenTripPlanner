@@ -24,6 +24,7 @@ import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 
@@ -58,7 +59,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
-    public static final double TRANSFER_RELUCTANCE = 2.0;
+    public static final double WALK_RELUCTANCE = 2.0;
     public static final double WAIT_RELUCTANCE = 0.8;
 
     /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
@@ -72,7 +73,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     public static final int ACCESS_START = time("10:00");
     public static final int ACCESS_END = time("10:03:15");
     public static final int ACCESS_DURATION = ACCESS_END - ACCESS_START;
-    public static final int ACCESS_COST = toRaptorCost(ACCESS_DURATION * TRANSFER_RELUCTANCE);
+    public static final int ACCESS_COST = toRaptorCost(ACCESS_DURATION * WALK_RELUCTANCE);
 
     // Trip 1 (A ~ BUS L11 10:04 10:35 ~ B)
     public static final int L11_START = time("10:04");
@@ -86,7 +87,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     public static final int TX_START = time("10:35:15");
     public static final int TX_END = time("10:39:00");
     public static final int TX_DURATION = TX_END - TX_START;
-    public static final int TX_COST = toRaptorCost(TX_DURATION * TRANSFER_RELUCTANCE);
+    public static final int TX_COST = toRaptorCost(TX_DURATION * WALK_RELUCTANCE);
 
     // Trip 2 (C ~ BUS L21 11:00 11:23 ~ D)
     public static final int L21_START = time("11:00");
@@ -108,18 +109,16 @@ public class BasicPathTestCase implements RaptorTestConstants {
     public static final int EGRESS_START = time("11:52:15");
     public static final int EGRESS_END = time("12:00");
     public static final int EGRESS_DURATION = EGRESS_END - EGRESS_START;
-    public static final int EGRESS_COST = toRaptorCost(EGRESS_DURATION * TRANSFER_RELUCTANCE);
+    public static final int EGRESS_COST = toRaptorCost(EGRESS_DURATION * WALK_RELUCTANCE);
 
     public static final int TRIP_DURATION = EGRESS_END - ACCESS_START;
 
     private static final RaptorTransfer ACCESS = walk(STOP_B, ACCESS_DURATION);
     private static final RaptorTransfer EGRESS = walk(STOP_F, EGRESS_DURATION);
 
-
     public static final String LINE_11 = "L11";
     public static final String LINE_21 = "L21";
     public static final String LINE_31 = "L31";
-
 
     public static final TestTripSchedule TRIP_1 = TestTripSchedule
         .schedule(pattern(LINE_11, STOP_A, STOP_B))
@@ -138,7 +137,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
 
     public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
-        STOP_COSTS, BOARD_COST_SEC, TRANSFER_COST_SEC, TRANSFER_RELUCTANCE, WAIT_RELUCTANCE
+        STOP_COSTS, BOARD_COST_SEC, TRANSFER_COST_SEC, WALK_RELUCTANCE, WAIT_RELUCTANCE
     );
 
     public static final RaptorSlackProvider SLACK_PROVIDER =
@@ -157,20 +156,27 @@ public class BasicPathTestCase implements RaptorTestConstants {
         return new LifeCycleSubscriptions();
     }
 
-    public static Egress basicTripByForwardSearch() {
+    public static DestinationArrival<TestTripSchedule> basicTripByForwardSearch() {
         AbstractStopArrival prevArrival;
         prevArrival = new Access(STOP_A, ACCESS_START, ACCESS_END, ACCESS_COST);
         prevArrival = new Bus(1, STOP_B, L11_END, LINE_11_COST, TRIP_1, prevArrival);
         prevArrival = new Walk(1, STOP_C, TX_START, TX_END, TX_COST,  prevArrival);
         prevArrival = new Bus(2, STOP_D, L21_END, LINE_21_COST, TRIP_2, prevArrival);
         prevArrival = new Bus(3, STOP_E, L31_END, LINE_31_COST, TRIP_3, prevArrival);
-        return new Egress(EGRESS_START, EGRESS_END, EGRESS_COST, prevArrival);
+        Egress egress = new Egress(EGRESS_START, EGRESS_END, EGRESS_COST, prevArrival);
+        return new DestinationArrival<>(
+                walk(egress.previous().stop(), egress.durationInSeconds()),
+                egress.previous(),
+                egress.arrivalTime(),
+                egress.additionalCost()
+        );
     }
 
     /**
-     * This is the same itinerary as {@link #basicTripByForwardSearch()}, as found by a reverse search:
+     * This is the same itinerary as {@link #basicTripByForwardSearch()}, as found by a reverse
+     * search:
      */
-    public static Egress basicTripByReverseSearch() {
+    public static DestinationArrival<TestTripSchedule> basicTripByReverseSearch() {
         AbstractStopArrival nextArrival;
         nextArrival = new Access(STOP_E, EGRESS_END, EGRESS_START, EGRESS_COST);
         // Board slack is subtracted from the arrival time to get the latest possible
@@ -178,12 +184,18 @@ public class BasicPathTestCase implements RaptorTestConstants {
         nextArrival = new Bus(2, STOP_C, L21_START, LINE_21_COST, TRIP_2, nextArrival);
         nextArrival = new Walk(2, STOP_B, TX_END, TX_START, TX_COST, nextArrival);
         nextArrival = new Bus(3, STOP_A, L11_START, LINE_11_COST, TRIP_1, nextArrival);
-        return new Egress(ACCESS_END, ACCESS_START, ACCESS_COST, nextArrival);
+        Egress egress = new Egress(ACCESS_END, ACCESS_START, ACCESS_COST, nextArrival);
+        return new DestinationArrival<>(
+                walk(egress.previous().stop(), egress.durationInSeconds()),
+                egress.previous(),
+                egress.arrivalTime(),
+                egress.additionalCost()
+        );
     }
 
     /**
-     * Both {@link #basicTripByForwardSearch()} and {@link #basicTripByReverseSearch()} should return the same trip,
-     * here returned as a path.
+     * Both {@link #basicTripByForwardSearch()} and {@link #basicTripByReverseSearch()} should
+     * return the same trip, here returned as a path.
      */
     public static Path<TestTripSchedule> basicTripAsPath() {
         PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
