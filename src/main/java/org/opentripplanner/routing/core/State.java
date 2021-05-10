@@ -10,6 +10,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -282,6 +283,10 @@ public class State implements Cloneable {
 
     public boolean isBikeRentingFromStation() {
         return stateData.bikeRentalState == BikeRentalState.RENTING_FROM_STATION;
+    }
+
+    public boolean isBikeRentingFloating() {
+        return stateData.bikeRentalState == BikeRentalState.RENTING_FLOATING;
     }
 
     public boolean isBikeRenting() {
@@ -568,6 +573,32 @@ public class State implements Cloneable {
             // propagate the modes through to the reversed edge
             editor.setBackMode(orig.getBackMode());
 
+            if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
+                var stationVertex = ((BikeRentalStationVertex) orig.vertex);
+                editor.dropOffRentedVehicleAtStation(
+                        stationVertex.getVehicleMode(),
+                        stationVertex.getStation().networks,
+                        false
+                );
+            }
+            else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+                var stationVertex = ((BikeRentalStationVertex) orig.vertex);
+                if (orig.getBackState().isBikeRentingFromStation()) {
+                    editor.beginVehicleRentingAtStation(
+                            stationVertex.getVehicleMode(),
+                            stationVertex.getStation().networks,
+                            orig.backState.mayKeepRentedBicycleAtDestination(),
+                            false
+                    );
+                }
+                else if (orig.getBackState().isBikeRentingFloating()) {
+                    editor.beginFloatingVehicleRenting(
+                            stationVertex.getVehicleMode(),
+                            stationVertex.getStation().networks,
+                            false
+                    );
+                }
+            }
             if (orig.isCarParked() != orig.getBackState().isCarParked()) {
                 editor.setCarParked(!orig.isCarParked());
             }
