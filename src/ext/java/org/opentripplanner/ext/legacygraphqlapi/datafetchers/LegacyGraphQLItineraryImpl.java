@@ -83,6 +83,11 @@ public class LegacyGraphQLItineraryImpl
     return environment -> getSource(environment).elevationLost;
   }
 
+  @Override
+  public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
+    return environment -> getSource(environment).arrivedAtDestinationWithRentedBicycle;
+  }
+
   private Itinerary getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
