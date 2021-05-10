@@ -20,35 +20,14 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
 
     private final int minLeftTurnAngle = 225;
     private final int maxLeftTurnAngle = 315;
-    /**
-     * Expected time it takes to make a right at a light.
-     */
     private final double expectedRightAtLightTimeSec = 15.0;
-    /**
-     * Expected time it takes to continue straight at a light.
-     */
     private final double expectedStraightAtLightTimeSec = 15.0;
-    /**
-     * Expected time it takes to turn left at a light.
-     */
     private final double expectedLeftAtLightTimeSec = 15.0;
-    /**
-     * Expected time it takes to make a right without a stop light.
-     */
     private final double expectedRightNoLightTimeSec = 8.0;
-    /**
-     * Expected time it takes to continue straight without a stop light.
-     */
     private final double expectedStraightNoLightTimeSec = 5.0;
-    /**
-     * Expected time it takes to turn left without a stop light.
-     */
     private final double expectedLeftNoLightTimeSec = 8.0;
     private final double safeBicycleTurnModifier = 5;
-    /**
-     * Since doing a left turn on a bike is quite dangerous we add a cost for it
-     **/
-    private final double acrossTrafficBicyleTurnMultiplier = safeBicycleTurnModifier * 3;
+    private final double acrossTrafficBicyleTurnMultiplier = getSafeBicycleTurnModifier() * 3;
 
     public SimpleIntersectionTraversalCostModel(DrivingDirection drivingDirection) {
         this.drivingDirection = drivingDirection;
@@ -127,13 +106,13 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         if (v.trafficLight) {
             // Use constants that apply when there are stop lights.
             if (isSafeTurn(turnAngle)) {
-                turnCost = expectedRightAtLightTimeSec;
+                turnCost = getExpectedRightAtLightTimeSec();
             }
             else if (isTurnAcrossTraffic(turnAngle)) {
-                turnCost = expectedLeftAtLightTimeSec;
+                turnCost = getExpectedLeftAtLightTimeSec();
             }
             else {
-                turnCost = expectedStraightAtLightTimeSec;
+                turnCost = getExpectedStraightAtLightTimeSec();
             }
         }
         else {
@@ -145,13 +124,13 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
 
             // Use constants that apply when no stop lights.
             if (isSafeTurn(turnAngle)) {
-                turnCost = expectedRightNoLightTimeSec;
+                turnCost = getExpectedRightNoLightTimeSec();
             }
             else if (isTurnAcrossTraffic(turnAngle)) {
-                turnCost = expectedLeftNoLightTimeSec;
+                turnCost = getExpectedLeftNoLightTimeSec();
             }
             else {
-                turnCost = expectedStraightNoLightTimeSec;
+                turnCost = getExpectedStraightNoLightTimeSec();
             }
         }
 
@@ -166,10 +145,10 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         final var baseCost = computeNonDrivingTraversalCost(v, from, to, fromSpeed, toSpeed);
 
         if (isTurnAcrossTraffic(turnAngle)) {
-            return baseCost * acrossTrafficBicyleTurnMultiplier;
+            return baseCost * getAcrossTrafficBicyleTurnMultiplier();
         }
         else if (isSafeTurn(turnAngle)) {
-            return baseCost * safeBicycleTurnModifier;
+            return baseCost * getSafeBicycleTurnModifier();
         }
         else {
             return baseCost;
@@ -178,10 +157,79 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     }
 
     private boolean isLeftTurn(int turnAngle) {
-        return turnAngle >= minLeftTurnAngle && turnAngle < maxLeftTurnAngle;
+        return turnAngle >= getMinLeftTurnAngle() && turnAngle < getMaxLeftTurnAngle();
     }
 
     private boolean isRightTurn(int turnAngle) {
-        return turnAngle >= minRightTurnAngle && turnAngle < maxRightTurnAngle;
+        return turnAngle >= getMinRightTurnAngle() && turnAngle < getMaxRightTurnAngle();
+    }
+
+    public int getMinRightTurnAngle() {
+        return minRightTurnAngle;
+    }
+
+    public int getMaxRightTurnAngle() {
+        return maxRightTurnAngle;
+    }
+
+    public int getMinLeftTurnAngle() {
+        return minLeftTurnAngle;
+    }
+
+    public int getMaxLeftTurnAngle() {
+        return maxLeftTurnAngle;
+    }
+
+    /**
+     * Expected time it takes to make a right at a light.
+     */
+    public double getExpectedRightAtLightTimeSec() {
+        return expectedRightAtLightTimeSec;
+    }
+
+    /**
+     * Expected time it takes to continue straight at a light.
+     */
+    public double getExpectedStraightAtLightTimeSec() {
+        return expectedStraightAtLightTimeSec;
+    }
+
+    /**
+     * Expected time it takes to turn left at a light.
+     */
+    public double getExpectedLeftAtLightTimeSec() {
+        return expectedLeftAtLightTimeSec;
+    }
+
+    /**
+     * Expected time it takes to make a right without a stop light.
+     */
+    public double getExpectedRightNoLightTimeSec() {
+        return expectedRightNoLightTimeSec;
+    }
+
+    /**
+     * Expected time it takes to continue straight without a stop light.
+     */
+    public double getExpectedStraightNoLightTimeSec() {
+        return expectedStraightNoLightTimeSec;
+    }
+
+    /**
+     * Expected time it takes to turn left without a stop light.
+     */
+    public double getExpectedLeftNoLightTimeSec() {
+        return expectedLeftNoLightTimeSec;
+    }
+
+    public double getSafeBicycleTurnModifier() {
+        return safeBicycleTurnModifier;
+    }
+
+    /**
+     * Since doing a left turn on a bike is quite dangerous we add a cost for it
+     **/
+    public double getAcrossTrafficBicyleTurnMultiplier() {
+        return acrossTrafficBicyleTurnMultiplier;
     }
 }
