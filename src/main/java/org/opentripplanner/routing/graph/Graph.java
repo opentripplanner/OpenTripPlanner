@@ -77,6 +77,8 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
@@ -100,6 +102,11 @@ public class Graph implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
     private static final long serialVersionUID = 1L;
+
+    public static final DrivingDirection DEFAULT_DRIVING_DIRECTION = DrivingDirection.RIGHT_HAND_TRAFFIC;
+
+    public static final IntersectionTraversalCostModel DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL
+        = new SimpleIntersectionTraversalCostModel(DEFAULT_DRIVING_DIRECTION);
 
     private final OtpProjectInfo projectInfo = projectInfo();
 
@@ -260,7 +267,10 @@ public class Graph implements Serializable {
 
     private transient TransitAlertService transitAlertService;
 
-    private DrivingDirection drivingDirection = DrivingDirection.RIGHT_HAND_TRAFFIC;
+    private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
+
+    private IntersectionTraversalCostModel intersectionTraversalCostModel =
+        DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
 
     /**
      * Hack. I've tried three different ways of generating unique labels.
@@ -986,6 +996,16 @@ public class Graph implements Serializable {
 
     public void setDrivingDirection(DrivingDirection drivingDirection) {
         this.drivingDirection = drivingDirection;
+    }
+
+    public IntersectionTraversalCostModel getIntersectionTraversalModel() {
+        return intersectionTraversalCostModel;
+    }
+
+    public void setIntersectionTraversalCostModel(
+        IntersectionTraversalCostModel intersectionTraversalCostModel
+    ) {
+        this.intersectionTraversalCostModel = intersectionTraversalCostModel;
     }
 
     /**

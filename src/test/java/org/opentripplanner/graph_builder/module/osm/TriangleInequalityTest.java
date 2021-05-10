@@ -92,8 +92,9 @@ public class TriangleInequalityTest {
         prototypeOptions.carSpeed = 1.0;
         prototypeOptions.walkSpeed = 1.0;
         prototypeOptions.bikeSpeed = 1.0;
-        prototypeOptions.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
         prototypeOptions.dominanceFunction = new DominanceFunction.EarliestArrival();
+
+        graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
 
         
         if (traverseModes != null) {
