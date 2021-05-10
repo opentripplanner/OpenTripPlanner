@@ -287,6 +287,7 @@ public class StateEditor {
     public void setFromState(State state) {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalState = state.stateData.bikeRentalState;
+        child.stateData.carPickupState = state.stateData.carPickupState;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
     }

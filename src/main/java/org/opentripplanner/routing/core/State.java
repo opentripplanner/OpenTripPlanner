@@ -567,9 +567,6 @@ public class State implements Cloneable {
             if (orig.isBikeParked() != orig.getBackState().isBikeParked()) {
                 editor.setBikeParked(!orig.isBikeParked());
             }
-            if (orig.getCarPickupState() != null) {
-                editor.setCarPickupState(orig.getCarPickupState());
-            }
 
             ret = editor.makeState();
 
