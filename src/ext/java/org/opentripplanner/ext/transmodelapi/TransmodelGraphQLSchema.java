@@ -1084,11 +1084,10 @@ public class TransmodelGraphQLSchema {
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .build())
             .dataFetcher(environment -> {
-              final TransitAlert transitAlert = GqlUtil
+              return GqlUtil
                   .getRoutingService(environment)
                   .getTransitAlertService()
                   .getAlertById(environment.getArgument("situationNumber"));
-              return transitAlert;
             })
             .build())
         .field(GraphQLFieldDefinition
