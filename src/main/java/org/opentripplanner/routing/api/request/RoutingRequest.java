@@ -1489,6 +1489,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         if (this.rctx != null && this.rctx.graph != null) {
             return this.rctx.graph.getIntersectionTraversalModel();
         } else {
+            // This is only to maintain compatibility with existing tests
             return Graph.DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
         }
     }
