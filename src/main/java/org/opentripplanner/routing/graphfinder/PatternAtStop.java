@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.graphfinder;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
@@ -15,6 +17,8 @@ import java.util.List;
  *
  * TODO Is this the right package for this?
  */
+@ToString
+@EqualsAndHashCode
 public class PatternAtStop {
 
   public String id;

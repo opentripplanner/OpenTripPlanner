@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.graphfinder;
 
+import lombok.EqualsAndHashCode;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -20,9 +21,10 @@ import java.util.Objects;
  * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
  * state of how to reach the stop from the search origin
  */
+@EqualsAndHashCode
 public class NearbyStop implements Comparable<NearbyStop> {
 
-  private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+  private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
   public final StopLocation stop;
   public final double distance;
@@ -56,7 +58,14 @@ public class NearbyStop implements Comparable<NearbyStop> {
   }
 
   public String toString() {
-    return String.format("stop %s at %.1f meters", stop, distance);
+    return String.format(
+            "stop %s at %.1f meters%s%s%s",
+            stop, distance,
+            distanceIndependentTime > 0 ? " +" + distanceIndependentTime + " seconds" : "",
+            edges != null ? " (" + edges.size() + " edges)" : "",
+            geometry != null ? " w/geometry" : "",
+            state != null ? " w/state" : ""
+    );
   }
 
   /**

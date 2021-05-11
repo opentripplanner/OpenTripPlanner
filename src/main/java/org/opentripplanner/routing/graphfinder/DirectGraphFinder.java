@@ -37,7 +37,7 @@ public class DirectGraphFinder implements GraphFinder {
     List<NearbyStop> stopsFound = Lists.newArrayList();
     Coordinate coordinate = new Coordinate(lon, lat);
     for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
-      double distance = SphericalDistanceLibrary.distance(coordinate, it.getCoordinate());
+      double distance = Math.round(SphericalDistanceLibrary.distance(coordinate, it.getCoordinate()));
       if (distance < radiusMeters) {
         Coordinate coordinates[] = new Coordinate[] {coordinate, it.getCoordinate()};
         NearbyStop sd = new NearbyStop(
