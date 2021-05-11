@@ -169,7 +169,7 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
-    class GbfsStationDataSource extends GenericJsonBikeRentalDataSource {
+    class GbfsStationDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
 
         public GbfsStationDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/stations");
@@ -182,12 +182,13 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
             brstation.x = stationNode.path("lon").asDouble();
             brstation.y = stationNode.path("lat").asDouble();
             brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
+            brstation.isKeepingBicycleRentalAtDestinationAllowed = config.allowKeepingRentedBicycleAtDestination();
             brstation.isCarStation = routeAsCar;
             return brstation;
         }
     }
 
-    class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource {
+    class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
 
         public GbfsStationStatusDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/stations");
@@ -199,13 +200,14 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
             brstation.id = stationNode.path("station_id").asText();
             brstation.bikesAvailable = stationNode.path("num_bikes_available").asInt();
             brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
+            brstation.isKeepingBicycleRentalAtDestinationAllowed = config.allowKeepingRentedBicycleAtDestination();
             brstation.isCarStation = routeAsCar;
             return brstation;
         }
     }
 
     // TODO This is not currently safe to use. See javadoc on GbfsBikeRentalDataSource class.
-    class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
+    class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
 
         public GbfsFloatingBikeDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/bikes");

@@ -5,6 +5,6 @@ import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRental
 public class GbfsDataSourceParameters extends GbfsBikeRentalDataSourceParameters {
 
   public GbfsDataSourceParameters(String url, String network) {
-    super(url, network, false);
+    super(url, network, false, false);
   }
 }

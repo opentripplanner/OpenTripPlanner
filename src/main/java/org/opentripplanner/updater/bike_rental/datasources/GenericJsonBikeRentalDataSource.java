@@ -23,9 +23,10 @@ import java.util.List;
  *
  * @see BikeRentalDataSource
  */
-abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
+abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSourceParameters> implements BikeRentalDataSource {
 
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
+    protected final T config;
     private String url;
     private String headerName;
     private String headerValue;
@@ -42,9 +43,10 @@ abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
      *
      */
     public GenericJsonBikeRentalDataSource(
-        BikeRentalDataSourceParameters config,
+        T config,
         String jsonPath
     ) {
+        this.config = config;
         url = config.getUrl();
         jsonParsePath = jsonPath;
         headerName = "Default";
@@ -59,23 +61,16 @@ abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
      * @param headerValue header value
      */
     public GenericJsonBikeRentalDataSource(
-        BikeRentalDataSourceParameters config,
+        T config,
         String jsonPath,
         String headerName,
         String headerValue
     ) {
+        this.config = config;
         this.url = config.getUrl();
         this.jsonParsePath = jsonPath;
         this.headerName = headerName;
         this.headerValue = headerValue;
-    }
-
-    /**
-     * Construct superclass where rental list is on the top level of JSON code
-     *
-     */
-    public GenericJsonBikeRentalDataSource() {
-        jsonParsePath = "";
     }
 
     @Override

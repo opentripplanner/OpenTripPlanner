@@ -32,6 +32,8 @@ public class BikeRentalStation implements Serializable, Cloneable {
     public boolean isFloatingBike = false;
     @JsonSerialize
     public boolean isCarStation = false;
+    @JsonIgnore
+    public boolean isKeepingBicycleRentalAtDestinationAllowed = false;
 
     /**
      * List of compatible network names. Null (default) to be compatible with all.
