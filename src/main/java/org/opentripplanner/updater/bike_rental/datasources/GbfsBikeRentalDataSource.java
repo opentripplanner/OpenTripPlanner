@@ -31,8 +31,6 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
 
-    private static final String AUTO_DISCOVERY_FILENAME = "gbfs";
-
     private static final String DEFAULT_NETWORK_NAME = "GBFS";
 
     // station_information.json required by GBFS spec
@@ -62,27 +60,12 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
     }
 
     private void configureUrls(String url) {
-        String baseUrl = getBaseUrl(url);
-        GbfsAutoDiscoveryDataSource gbfsAutoDiscoveryDataSource = new GbfsAutoDiscoveryDataSource(baseUrl);
+        GbfsAutoDiscoveryDataSource gbfsAutoDiscoveryDataSource = new GbfsAutoDiscoveryDataSource(url);
         stationInformationSource.setUrl(gbfsAutoDiscoveryDataSource.stationInformationUrl);
         stationStatusSource.setUrl(gbfsAutoDiscoveryDataSource.stationStatusUrl);
         if (OTPFeature.FloatingBike.isOn()) {
             floatingBikeSource.setUrl(gbfsAutoDiscoveryDataSource.freeBikeStatusUrl);
         }
-    }
-
-    private String getBaseUrl(String url) {
-        String baseUrl = url;
-        if (baseUrl.endsWith("gbfs.json")) {
-            baseUrl = baseUrl.substring(0, url.length() - "gbfs.json".length());
-        }
-        if (baseUrl.endsWith("gbfs")) {
-            baseUrl = baseUrl.substring(0, url.length() - "gbfs".length());
-        }
-        if (!baseUrl.endsWith("/")) {
-            baseUrl += "/";
-        }
-        return baseUrl;
     }
 
     @Override
@@ -133,8 +116,7 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         private String stationStatusUrl;
         private String freeBikeStatusUrl;
 
-        public GbfsAutoDiscoveryDataSource(String baseUrl) {
-            String autoDiscoveryUrl = baseUrl + AUTO_DISCOVERY_FILENAME;
+        public GbfsAutoDiscoveryDataSource(String autoDiscoveryUrl) {
 
             try {
                 InputStream is = HttpUtils.getData(autoDiscoveryUrl);
@@ -163,10 +145,27 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
             } catch (IOException | IllegalArgumentException e) {
                 LOG.warn("Error reading auto discovery file at {}. Using default values.",
                     autoDiscoveryUrl, e);
+                // If the GBFS auto-discovery file (gbfs.json) can't be downloaded, fall back to the
+                // v1 logic of finding the files under the given base path.
+                var baseUrl = getBaseUrl(autoDiscoveryUrl);
                 stationInformationUrl = baseUrl + "station_information.json";
                 stationStatusUrl = baseUrl + "station_status.json";
                 freeBikeStatusUrl = baseUrl + "free_bike_status.json";
             }
+        }
+
+        private String getBaseUrl(String url) {
+            String baseUrl = url;
+            if (baseUrl.endsWith("gbfs.json")) {
+                baseUrl = baseUrl.substring(0, url.length() - "gbfs.json".length());
+            }
+            if (baseUrl.endsWith("gbfs")) {
+                baseUrl = baseUrl.substring(0, url.length() - "gbfs".length());
+            }
+            if (!baseUrl.endsWith("/")) {
+                baseUrl += "/";
+            }
+            return baseUrl;
         }
     }
 

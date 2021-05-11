@@ -1008,31 +1008,31 @@ connect to a network resource is the `url` field.
     ]
 }
 ```
+
 #### GBFS Configuration
 
-Steps to add a GBFS feed to a router:
+[GBFS](https://github.com/NABSA/gbfs) is used for a variety of shared mobility services, with partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)).
 
-- Add one entry in the `updater` field of `router-config.json` in the format
+To add a GBFS feed to the router add one entry in the `updater` field of `router-config.json` in the format:
 
 ```JSON
 // router-config.json
 {
-     "type": "bike-rental",
-     "frequencySec": 60,
-     "sourceType": "gbfs",
-     "url": "http://coast.socialbicycles.com/opendata/"
+   "type": "bike-rental",
+   "sourceType": "gbfs",
+   // frequency in seconds in which the GBFS service will be polled
+   "frequencySec": 60,
+   // The URL of the GBFS feed auto-discovery file
+   "url": "http://coast.socialbicycles.com/opendata/gbfs.json"
 }
 ```
 
-- Follow these instructions to fill these fields:
+If there is no GBFS autodiscovery file, specify the base `url` under which the files may be found
+using their standard names:
 
+```JSON
+  "url": "http://coast.socialbicycles.com/opendata/"
 ```
-type: "bike-rental"
-frequencySec: frequency in seconds in which the GBFS service will be polled
-sourceType: "gbfs"
-url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
-```
-\* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
 
 #### Bike Rental Service Directory configuration (sandbox feature)
 

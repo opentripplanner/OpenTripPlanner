@@ -10,7 +10,6 @@ public class BikeRentalUpdaterConfig {
     String sourceType = c.asText("sourceType");
     return new BikeRentalUpdaterParameters(
         configRef + "." + sourceType,
-        c.asText("url", null),
         c.asText("networks", null),
         c.asInt("frequencySec", 60),
         BikeRentalSourceFactory.create(sourceType, c)
