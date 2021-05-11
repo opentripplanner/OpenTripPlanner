@@ -15,18 +15,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     public static final Logger LOG =
             LoggerFactory.getLogger(SimpleIntersectionTraversalCostModel.class);
     private final DrivingDirection drivingDirection;
-    private final int minRightTurnAngle = 45;
-    private final int maxRightTurnAngle = 135;
 
-    private final int minLeftTurnAngle = 225;
-    private final int maxLeftTurnAngle = 315;
-    private final double expectedRightAtLightTimeSec = 15.0;
-    private final double expectedStraightAtLightTimeSec = 15.0;
-    private final double expectedLeftAtLightTimeSec = 15.0;
-    private final double expectedRightNoLightTimeSec = 8.0;
-    private final double expectedStraightNoLightTimeSec = 5.0;
-    private final double expectedLeftNoLightTimeSec = 8.0;
-    private final double safeBicycleTurnModifier = 5;
     private final double acrossTrafficBicyleTurnMultiplier = getSafeBicycleTurnModifier() * 3;
 
     public SimpleIntersectionTraversalCostModel(DrivingDirection drivingDirection) {
@@ -165,65 +154,65 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     }
 
     public int getMinRightTurnAngle() {
-        return minRightTurnAngle;
+        return 45;
     }
 
     public int getMaxRightTurnAngle() {
-        return maxRightTurnAngle;
+        return 135;
     }
 
     public int getMinLeftTurnAngle() {
-        return minLeftTurnAngle;
+        return 225;
     }
 
     public int getMaxLeftTurnAngle() {
-        return maxLeftTurnAngle;
+        return 315;
     }
 
     /**
      * Expected time it takes to make a right at a light.
      */
     public double getExpectedRightAtLightTimeSec() {
-        return expectedRightAtLightTimeSec;
+        return 15.0;
     }
 
     /**
      * Expected time it takes to continue straight at a light.
      */
     public double getExpectedStraightAtLightTimeSec() {
-        return expectedStraightAtLightTimeSec;
+        return 15.0;
     }
 
     /**
      * Expected time it takes to turn left at a light.
      */
     public double getExpectedLeftAtLightTimeSec() {
-        return expectedLeftAtLightTimeSec;
+        return 15.0;
     }
 
     /**
      * Expected time it takes to make a right without a stop light.
      */
     public double getExpectedRightNoLightTimeSec() {
-        return expectedRightNoLightTimeSec;
+        return 8.0;
     }
 
     /**
      * Expected time it takes to continue straight without a stop light.
      */
     public double getExpectedStraightNoLightTimeSec() {
-        return expectedStraightNoLightTimeSec;
+        return 5.0;
     }
 
     /**
      * Expected time it takes to turn left without a stop light.
      */
     public double getExpectedLeftNoLightTimeSec() {
-        return expectedLeftNoLightTimeSec;
+        return 8.0;
     }
 
     public double getSafeBicycleTurnModifier() {
-        return safeBicycleTurnModifier;
+        return 5;
     }
 
     /**

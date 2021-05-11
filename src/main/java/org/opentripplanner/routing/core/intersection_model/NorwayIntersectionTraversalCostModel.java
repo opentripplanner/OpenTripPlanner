@@ -4,8 +4,6 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
 public class NorwayIntersectionTraversalCostModel extends SimpleIntersectionTraversalCostModel{
 
-  private final double expectedStraightNoLightTimeSec = 0.0;
-
   public NorwayIntersectionTraversalCostModel(
       WayPropertySetSource.DrivingDirection drivingDirection
   ) {
@@ -14,6 +12,6 @@ public class NorwayIntersectionTraversalCostModel extends SimpleIntersectionTrav
 
   @Override
   public double getExpectedStraightNoLightTimeSec() {
-    return expectedStraightNoLightTimeSec;
+    return 0.0;
   }
 }
