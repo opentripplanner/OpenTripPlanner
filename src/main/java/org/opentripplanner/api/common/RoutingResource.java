@@ -339,6 +339,12 @@ public abstract class RoutingResource {
     @QueryParam("bikeBoardCost")
     protected Integer bikeBoardCost;
 
+    @QueryParam("allowKeepingRentedBicycleAtDestination")
+    protected Boolean allowKeepingRentedBicycleAtDestination;
+
+    @QueryParam("keepingRentedBicycleAtDestinationCost")
+    protected Double keepingRentedBicycleAtDestinationCost;
+
     /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
      * TriMet_100 (100 is route short name) or Trimet__42 (two underscores, 42 is the route
@@ -705,6 +711,12 @@ public abstract class RoutingResource {
 
         if (bikeSwitchCost != null)
             request.bikeSwitchCost = bikeSwitchCost;
+
+        if (allowKeepingRentedBicycleAtDestination != null)
+            request.allowKeepingRentedBicycleAtDestination = allowKeepingRentedBicycleAtDestination;
+
+        if (keepingRentedBicycleAtDestinationCost != null)
+            request.keepingRentedBicycleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle

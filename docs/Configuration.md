@@ -1023,7 +1023,9 @@ To add a GBFS feed to the router add one entry in the `updater` field of `router
    // frequency in seconds in which the GBFS service will be polled
    "frequencySec": 60,
    // The URL of the GBFS feed auto-discovery file
-   "url": "http://coast.socialbicycles.com/opendata/gbfs.json"
+   "url": "http://coast.socialbicycles.com/opendata/gbfs.json",
+   // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
+   "allowKeepingRentedBicycleAtDestination": true
 }
 ```
 
@@ -1033,6 +1035,23 @@ using their standard names:
 ```JSON
   "url": "http://coast.socialbicycles.com/opendata/"
 ```
+
+##### Arriving with rental bikes at the destination
+
+In some cases it may be useful to not drop off the rented bicycle before arriving at the
+destination. This is useful if bicycles may only be rented for round trips, or the destination is an
+intermediate place.
+
+For this to be possible three things need to be configured:
+
+1. In the updater configuration `allowKeepingRentedBicycleAtDestination` should be set to `true`.
+
+2. `allowKeepingRentedBicycleAtDestination` should also be set for each request, either using
+   [routing defaults](#routing-defaults), or per-request.
+
+3. If keeping the bicycle at the destination should be discouraged, then
+   `keepingRentedBicycleAtDestinationCost` (default: `0`) may also be set in the
+   [routing defaults](#routing-defaults).
 
 #### Bike Rental Service Directory configuration (sandbox feature)
 

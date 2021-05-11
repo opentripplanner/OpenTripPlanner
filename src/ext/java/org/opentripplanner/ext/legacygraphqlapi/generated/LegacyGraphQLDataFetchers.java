@@ -266,6 +266,8 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Double> elevationGained();
 
         public DataFetcher<Double> elevationLost();
+
+        public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle();
     }
 
     public interface LegacyGraphQLLeg {

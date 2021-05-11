@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- *
+ * <p>
  * By virtue of being in the same package as States, it can modify their package private fields.
  *
  * @author andrewbyrd
@@ -30,8 +30,9 @@ public class StateEditor {
 
     /* CONSTRUCTORS */
 
-    protected StateEditor() {}
-    
+    protected StateEditor() {
+    }
+
     public StateEditor(RoutingRequest options, Vertex v) {
         child = new State(v, options);
     }
@@ -157,7 +158,7 @@ public class StateEditor {
     public void incrementTimeInSeconds(int seconds) {
         incrementTimeInMilliseconds(seconds * 1000L);
     }
-    
+
     public void incrementTimeInMilliseconds(long milliseconds) {
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
@@ -194,15 +195,15 @@ public class StateEditor {
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backMode = mode;
     }
 
-    public void setBackWalkingBike (boolean walkingBike) {
+    public void setBackWalkingBike(boolean walkingBike) {
         if (walkingBike == child.stateData.backWalkingBike)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backWalkingBike = walkingBike;
     }
@@ -222,23 +223,34 @@ public class StateEditor {
         }
     }
 
-    public void beginVehicleRentingAtStation(TraverseMode vehicleMode, boolean reverse) {
+    public void beginVehicleRentingAtStation(
+            TraverseMode vehicleMode,
+            boolean mayKeep,
+            boolean reverse
+    ) {
         cloneStateDataAsNeeded();
         if (reverse) {
+            child.stateData.mayKeepRentedBicycleAtDestination = mayKeep;
             child.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
             child.stateData.currentMode = TraverseMode.WALK;
         } else {
+            child.stateData.mayKeepRentedBicycleAtDestination = mayKeep;
             child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
             child.stateData.currentMode = vehicleMode;
         }
     }
 
-    public void dropOffRentedVehicleAtStation(TraverseMode vehicleMode, boolean reverse) {
+    public void dropOffRentedVehicleAtStation(
+            TraverseMode vehicleMode,
+            boolean reverse
+    ) {
         cloneStateDataAsNeeded();
         if (reverse) {
+            child.stateData.mayKeepRentedBicycleAtDestination = false;
             child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
             child.stateData.currentMode = vehicleMode;
         } else {
+            child.stateData.mayKeepRentedBicycleAtDestination = false;
             child.stateData.bikeRentalState = BikeRentalState.HAVE_RENTED;
             child.stateData.currentMode = TraverseMode.WALK;
         }
@@ -286,12 +298,14 @@ public class StateEditor {
      */
     public void setFromState(State state) {
         cloneStateDataAsNeeded();
+        child.stateData.mayKeepRentedBicycleAtDestination = state.stateData.mayKeepRentedBicycleAtDestination;
         child.stateData.bikeRentalState = state.stateData.bikeRentalState;
+        child.stateData.carPickupState = state.stateData.carPickupState;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
     }
 
-    public void setNonTransitOptionsFromState(State state){
+    public void setNonTransitOptionsFromState(State state) {
         cloneStateDataAsNeeded();
         child.stateData.currentMode = state.getNonTransitMode();
         child.stateData.carParked = state.isCarParked();

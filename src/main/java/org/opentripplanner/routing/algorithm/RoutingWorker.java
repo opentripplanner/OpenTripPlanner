@@ -155,6 +155,7 @@ public class RoutingWorker {
         // Prepare access/egress lists
         try (RoutingRequest accessRequest = request.getStreetSearchRequest(request.modes.accessMode)) {
             accessRequest.setRoutingContext(router.graph);
+            accessRequest.allowKeepingRentedBicycleAtDestination = false;
 
             // Special handling of flex accesses
             if (OTPFeature.FlexRouting.isOn() && request.modes.accessMode.equals(

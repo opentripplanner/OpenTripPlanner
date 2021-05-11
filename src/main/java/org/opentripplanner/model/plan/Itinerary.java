@@ -88,6 +88,12 @@ public class Itinerary {
      */
     public boolean tooSloped = false;
 
+    /**
+     * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedBicycleAtDestination}
+     * is set than it is possible to end a trip without dropping off the rented bicycle.
+     */
+    public boolean arrivedAtDestinationWithRentedBicycle = false;
+
      /** TRUE if mode is WALK from start ot end (all legs are walking). */
     public final boolean walkOnly;
 

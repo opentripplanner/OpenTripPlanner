@@ -112,7 +112,8 @@ public class RaptorPathToItineraryMapper {
 
         // Map egress leg
         EgressPathLeg<TripSchedule> egressPathLeg = pathLeg.asEgressLeg();
-        legs.addAll(mapEgressLeg(egressPathLeg));
+        Itinerary mapped = mapEgressLeg(egressPathLeg);
+        legs.addAll(mapped == null ? List.of() : mapped.legs);
         propagateStopPlaceNamesToWalkingLegs(legs);
 
         Itinerary itinerary = new Itinerary(legs);
@@ -120,6 +121,7 @@ public class RaptorPathToItineraryMapper {
         // Map general itinerary fields
         itinerary.generalizedCost = path.generalizedCost();
         itinerary.nonTransitLimitExceeded = itinerary.nonTransitDistanceMeters > request.maxWalkDistance;
+        itinerary.arrivedAtDestinationWithRentedBicycle = mapped != null && mapped.arrivedAtDestinationWithRentedBicycle;
 
         if(optimizedPath != null) {
             itinerary.waitTimeAdjustedGeneralizedCost = optimizedPath.getWaitTimeOptimizedCost();
@@ -239,23 +241,23 @@ public class RaptorPathToItineraryMapper {
         return mapNonTransitLeg(pathLeg, transfer, from, to, false);
     }
 
-    private List<Leg> mapEgressLeg(EgressPathLeg<TripSchedule> egressPathLeg) {
+    private Itinerary mapEgressLeg(EgressPathLeg<TripSchedule> egressPathLeg) {
         AccessEgress egressPath = (AccessEgress) egressPathLeg.egress();
 
-        if (egressPath.durationInSeconds() == 0) { return List.of(); }
+        if (egressPath.durationInSeconds() == 0) { return null; }
 
         GraphPath graphPath = new GraphPath(egressPath.getLastState());
 
         Itinerary subItinerary = GraphPathToItineraryMapper
             .generateItinerary(graphPath, request.locale);
 
-        if (subItinerary.legs.isEmpty()) { return List.of(); }
+        if (subItinerary.legs.isEmpty()) { return null; }
 
         subItinerary.timeShiftToStartAt(createCalendar(egressPathLeg.fromTime()));
 
         applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, egressPathLeg);
 
-        return subItinerary.legs;
+        return subItinerary;
     }
 
     private List<Leg> mapNonTransitLeg(PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {

@@ -141,6 +141,7 @@ public abstract class GraphPathToItineraryMapper {
         calculateElevations(itinerary, edges);
 
         itinerary.generalizedCost = (int) lastState.weight;
+        itinerary.arrivedAtDestinationWithRentedBicycle = lastState.isBikeRentingFromStation();
 
         return itinerary;
     }
