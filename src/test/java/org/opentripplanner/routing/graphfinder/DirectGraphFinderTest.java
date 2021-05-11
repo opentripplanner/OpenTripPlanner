@@ -47,7 +47,7 @@ class DirectGraphFinderTest extends GraphRoutingTest {
         );
 
         assertEquals(
-                List.of(ns2, ns1),
+                List.of(ns1, ns2),
                 testee.findClosestStops(47.500, 19.000, 2000)
         );
     }
