@@ -1,19 +1,19 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.junit.Test;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -29,34 +29,18 @@ public class TestUnconnectedAreas {
      */
     @Test
     public void testUnconnectedParkAndRide() {
+      DataImportIssueStore issueStore = new DataImportIssueStore(true);
+      Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
 
-        Graph gg = new Graph();
+      assertEquals(1, issueStore.getIssues().size());
 
-        DataImportIssueStore issueStore = new DataImportIssueStore(true);
+      var vehicleParkingVertices = gg.getVerticesOfType(VehicleParkingEntranceVertex.class);
+      int nParkAndRide = vehicleParkingVertices.size();
 
-        OpenStreetMapModule loader = new OpenStreetMapModule();
-        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        File file = new File(getClass().getResource("P+R.osm.pbf").getFile());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
-        loader.setProvider(provider);
-        loader.buildGraph(gg, new HashMap<>(), issueStore);
+      int nParkAndRideLink = gg.getEdgesOfType(StreetVehicleParkingLink.class).size();
 
-        assertEquals(1, issueStore.getIssues().size());
-
-        int nParkAndRide = 0;
-        int nParkAndRideLink = 0;
-        for (Vertex v : gg.getVertices()) {
-            if (v instanceof VehicleParkingVertex) {
-                nParkAndRide++;
-            }
-        }
-        for (Edge e : gg.getEdges()) {
-            if (e instanceof StreetVehicleParkingLink) {
-                nParkAndRideLink++;
-            }
-        }
-        assertEquals(2, nParkAndRide);
-        assertEquals(10, nParkAndRideLink);
+      assertEquals(5, nParkAndRide);
+      assertEquals(10, nParkAndRideLink);
     }
     
     /**
@@ -66,66 +50,16 @@ public class TestUnconnectedAreas {
      */
     @Test
     public void testCoincidentNodeUnconnectedParkAndRide () {
-    	
-    	Graph g = new Graph();
-    	
-        OpenStreetMapModule loader = new OpenStreetMapModule();
-        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        File file = new File(getClass().getResource("hackett_pr.osm.pbf").getFile());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
-        loader.setProvider(provider);
-        loader.buildGraph(g, new HashMap<>());
-    	
-        Vertex washTwp = null;
-        
-        int nParkAndRide = 0;
-        int nParkAndRideLink = 0;
-        for (Vertex v : g.getVertices()) {
-        	if (v instanceof VehicleParkingVertex) {
-        		nParkAndRide++;
-        		washTwp = v;
-        	}
-        }
-        
-        for (Edge e : g.getEdges()) {
-            if (e instanceof StreetVehicleParkingLink) {
-                nParkAndRideLink++;
-            }
-        }
-        
-        assertEquals(1, nParkAndRide);
-        // the P+R should get four connections, since the entrance road is duplicated as well, and crosses twice
-        // since there are in and out edges, that brings the total to 8 per P+R.
-        // Even though the park and rides get merged, duplicate edges remain from when they were separate.
-        // FIXME: we shouldn't have duplicate edges.
-        assertEquals(16, nParkAndRideLink);
-        
-        assertNotNull(washTwp);
-        
-        List<String> connections = new ArrayList<>();
-        
-        for (Edge e : washTwp.getOutgoing()) {
-        	if (e instanceof VehicleParkingEdge)
-        		continue;
-        	
-        	assertTrue(e instanceof StreetVehicleParkingLink);
-        	
-        	connections.add(e.getToVertex().getLabel());
-        }
-        
-        // symmetry
-        for (Edge e : washTwp.getIncoming()) {
-        	if (e instanceof VehicleParkingEdge)
-        		continue;
-        	
-        	assertTrue(e instanceof StreetVehicleParkingLink);
-        	assertTrue(connections.contains(e.getFromVertex().getLabel()));
-        }
-        
-        assertTrue(connections.contains("osm:node:3096570222"));
-        assertTrue(connections.contains("osm:node:3094264704"));
-        assertTrue(connections.contains("osm:node:3094264709"));
-        assertTrue(connections.contains("osm:node:3096570227"));
+      // the P+R should get four connections, since the entrance road is duplicated as well, and crosses twice
+      // since there are in and out edges, that brings the total to 8 per P+R.
+      // Even though the park and rides get merged, duplicate edges remain from when they were separate.
+      // FIXME: we shouldn't have duplicate edges.
+      List<String> connections = testGeometricGraphWithClasspathFile("hackett_pr.osm.pbf", 8, 16);
+
+      assertTrue(connections.contains("osm:node:3096570222"));
+      assertTrue(connections.contains("osm:node:3094264704"));
+      assertTrue(connections.contains("osm:node:3094264709"));
+      assertTrue(connections.contains("osm:node:3096570227"));
     }
     
     /**
@@ -160,64 +94,69 @@ public class TestUnconnectedAreas {
     	 // the node that has already been injected into the way. So either of these cases are valid.
     	 assertTrue(connections.contains("osm:node:-10") || connections.contains("osm:node:-100"));
      }
+
+      private Graph buildOSMGraph(String osmFileName) {
+        return buildOSMGraph(osmFileName, new DataImportIssueStore(false));
+      }
+
+      private Graph buildOSMGraph(String osmFileName, DataImportIssueStore issueStore) {
+        Graph graph = new Graph();
+
+        OpenStreetMapModule loader = new OpenStreetMapModule();
+        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+
+        var fileUrl = getClass().getResource(osmFileName);
+        assertNotNull(fileUrl);
+        File file = new File(fileUrl.getFile());
+
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+        loader.setProvider(provider);
+        loader.buildGraph(graph, new HashMap<>(), issueStore);
+
+        StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
+        streetLinkerModule.buildGraph(graph, new HashMap<>(), issueStore);
+
+        return graph;
+      }
      
      /**
       * We've written several OSM files that exhibit different situations but should show the same results. Test with this code.
       */
-     public List<String> testGeometricGraphWithClasspathFile(String fn, int prCount, int prlCount) {
-    	 
-     	Graph g = new Graph();
-     	
-         OpenStreetMapModule loader = new OpenStreetMapModule();
-         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-         File file = new File(getClass().getResource(fn).getFile());
-         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
-         loader.setProvider(provider);
-         loader.buildGraph(g, new HashMap<>());
+     private List<String> testGeometricGraphWithClasspathFile(String fileName, int prCount, int prlCount) {
 
-         Vertex pr = null;
-         
-         int nParkAndRide = 0;
-         int nParkAndRideLink = 0;
-         for (Vertex v : g.getVertices()) {
-         	if (v instanceof VehicleParkingVertex) {
-         		nParkAndRide++;
-         		pr = v;
-         	}
-         }
+       Graph graph = buildOSMGraph(fileName);
 
-         for (Edge e : g.getEdges()) {
-             if (e instanceof StreetVehicleParkingLink) {
-                 nParkAndRideLink++;
-             }
-         }
-         
-         assertEquals(prCount, nParkAndRide);
-         assertEquals(prlCount, nParkAndRideLink);
-         assertNotNull(pr);
-         
-         // make sure it is connected
-        
-         List<String> connections = new ArrayList<>();
-         
-         for (Edge e : pr.getOutgoing()) {
-         	if (e instanceof VehicleParkingEdge)
-         		continue;
-         	
-         	assertTrue(e instanceof StreetVehicleParkingLink);
-         	
-         	connections.add(e.getToVertex().getLabel());
-         }
-         
-         // symmetry
-         for (Edge e : pr.getIncoming()) {
-         	if (e instanceof VehicleParkingEdge)
-         		continue;
-         	
-         	assertTrue(e instanceof StreetVehicleParkingLink);
-         	assertTrue(connections.contains(e.getFromVertex().getLabel()));
-         }
-         
-         return connections;
+       var vehicleParkingVertices = graph.getVerticesOfType(VehicleParkingEntranceVertex.class);
+       int nParkAndRide = vehicleParkingVertices.size();
+
+       int nParkAndRideLink = graph.getEdgesOfType(StreetVehicleParkingLink.class).size();
+
+       assertEquals(prCount, nParkAndRide);
+       assertEquals(prlCount, nParkAndRideLink);
+
+       var outgoingEdges = vehicleParkingVertices
+           .stream()
+           .flatMap(v -> v.getOutgoing().stream())
+           .filter(e -> !(e instanceof VehicleParkingEdge))
+           // make sure it is connected
+           .peek(e -> assertTrue(e instanceof StreetVehicleParkingLink))
+           .map(StreetVehicleParkingLink.class::cast)
+           .collect(Collectors.toCollection(HashSet::new));
+
+       List<String> connections = outgoingEdges
+           .stream()
+           .map(e -> e.getToVertex().getLabel())
+           .collect(Collectors.toList());
+
+       // Test symmetry
+       vehicleParkingVertices
+           .stream()
+           .flatMap(v -> v.getIncoming().stream())
+           .filter(e -> !(e instanceof VehicleParkingEdge))
+           .peek(e -> assertTrue(e instanceof StreetVehicleParkingLink))
+           .map(StreetVehicleParkingLink.class::cast)
+           .forEach(e -> assertTrue(connections.contains(e.getFromVertex().getLabel())));
+
+       return connections;
      }
 }

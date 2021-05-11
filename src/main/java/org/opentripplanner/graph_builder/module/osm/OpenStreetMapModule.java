@@ -3,6 +3,17 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.Iterables;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -13,8 +24,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
 import org.opentripplanner.graph_builder.issues.Graphwide;
+import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
@@ -42,7 +53,6 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -50,6 +60,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
@@ -57,24 +68,12 @@ import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.OptionalInt;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -335,6 +334,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         .bicycleSpaces(capacity.getAsInt())
                         .build();
                 }
+
+                var entrance = VehicleParking.VehicleParkingEntrance.builder()
+                    .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, node.getId() + " - entrance"))
+                    .name(creativeName)
+                    .x(node.lon)
+                    .y(node.lat)
+                    .walkAccessible(true)
+                    .build();
+
                 VehicleParking bikePark = VehicleParking.builder()
                     .id(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, "" + node.getId()))
                     .name(creativeName)
@@ -343,10 +351,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     .bicyclePlaces(true)
                     .capacity(vehiclePlaces)
                     .availability(vehiclePlaces)
+                    .entrances(List.of(entrance))
                     .build();
                 vehicleParkingService.addVehicleParking(bikePark);
-                VehicleParkingVertex parkVertex = new VehicleParkingVertex(graph, bikePark);
-                new VehicleParkingEdge(parkVertex);
+                VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(graph, entrance);
+                new VehicleParkingEdge(parkVertex, bikePark);
             }
             LOG.info("Created " + n + " bike P+R.");
         }
@@ -383,9 +392,19 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             Envelope envelope = new Envelope();
             long osmId = area.parent.getId();
             I18NString creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
+            List<VehicleParking.VehicleParkingEntrance> entrances = new ArrayList<>();
+            int entranceNumber = 1;
             for (Ring ring : area.outermostRings) {
                 for (OSMNode node : ring.nodes) {
                     envelope.expandToInclude(new Coordinate(node.lon, node.lat));
+                    var entranceName = new NonLocalizedString(osmId + " - Entrance " + entranceNumber++);
+                    entrances.add(VehicleParking.VehicleParkingEntrance.builder()
+                        .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, entranceName.toString()))
+                        .name(entranceName)
+                        .x(node.lon)
+                        .y(node.lat)
+                        .walkAccessible(true)
+                        .build());
                 }
             }
             VehicleParking.VehiclePlaces vehiclePlaces = null;
@@ -403,10 +422,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 .bicyclePlaces(true)
                 .capacity(vehiclePlaces)
                 .availability(vehiclePlaces)
+                .entrances(entrances)
                 .build();
             vehicleParkingService.addVehicleParking(bikePark);
-            VehicleParkingVertex bikeParkVertex = new VehicleParkingVertex(graph, bikePark);
-            new VehicleParkingEdge(bikeParkVertex);
+
+            VehicleParkingHelper.linkVehicleParkingToGraph(graph, bikePark);
             LOG.debug("Created area bike P+R '{}' ({})", creativeName, osmId);
         }
 
@@ -482,6 +502,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             OptionalInt bicycleCapacity = OptionalInt.empty();
             OptionalInt wheelchairAccessibleCapacity = OptionalInt.empty();
             OptionalInt carCapacity = OptionalInt.empty();
+            List<VehicleParking.VehicleParkingEntrance> entrances = new ArrayList<>();
+            int entranceNumber = 1;
             for (Area area : group.areas) {
                 osmId = area.parent.getId();
                 if (creativeName == null || area.parent.getTag("name") != null)
@@ -494,6 +516,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 || accessVertex.getOutgoing().isEmpty())
                             continue;
                         accessVertexes.add(accessVertex);
+                        var entranceName = new NonLocalizedString(osmId + " - Entrance " + entranceNumber++);
+                        entrances.add(VehicleParking.VehicleParkingEntrance.builder()
+                            .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, entranceName.toString()))
+                            .name(entranceName)
+                            .x(node.lon)
+                            .y(node.lat)
+                            .vertex(accessVertex)
+                            .walkAccessible(true)
+                            .carAccessible(true)
+                            .build());
                     }
                 }
                 carCapacity = parseCapacity(area.parent);
@@ -560,17 +592,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 .wheelchairAccessibleCarPlaces(wheelchairAccessibleCapacity.isPresent())
                 .availability(vehiclePlaces)
                 .capacity(vehiclePlaces)
+                .entrances(entrances)
                 .build();
 
             VehicleParkingService vehicleParkingService = graph.getService(VehicleParkingService.class, true);
             vehicleParkingService.addVehicleParking(vehicleParking);
 
-            VehicleParkingVertex parkAndRideVertex = new VehicleParkingVertex(graph, vehicleParking);
-            new VehicleParkingEdge(parkAndRideVertex);
-            for (OsmVertex accessVertex : accessVertexes) {
-                new StreetVehicleParkingLink(parkAndRideVertex, accessVertex);
-                new StreetVehicleParkingLink(accessVertex, parkAndRideVertex);
-            }
+            VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
+
             LOG.debug("Created P+R '{}' ({})", creativeName, osmId);
             return true;
         }

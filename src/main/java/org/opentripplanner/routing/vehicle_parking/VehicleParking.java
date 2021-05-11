@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -73,6 +73,8 @@ public class VehicleParking implements Serializable {
   @EqualsAndHashCode.Exclude
   private VehiclePlaces availability;
 
+  private final List<VehicleParkingEntrance> entrances;
+
   public String toString() {
     return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
   }
@@ -126,12 +128,38 @@ public class VehicleParking implements Serializable {
     this.capacity = vehiclePlaces;
   }
 
+  @Data
+  @Builder
+  @EqualsAndHashCode
+  public static class VehicleParkingEntrance implements Serializable {
+    private FeedScopedId entranceId;
+    private double x, y;
+    private I18NString name;
+    // Used to explicitly specify the intersection to link to instead of using (x, y)
+    @EqualsAndHashCode.Exclude
+    private transient StreetVertex vertex;
+    // If this entrance should be linked to car accessible streets
+    private boolean carAccessible;
+    // If this entrance should be linked to walk/bike accessible streets
+    private boolean walkAccessible;
+
+    void clearVertex() {
+      vertex = null;
+    }
+  }
+
   /*
    * These methods are overwritten so that the saved list always an array list and also so that
    * there is a default value.
    */
   public static class VehicleParkingBuilder {
+    private List<VehicleParkingEntrance> entrances = new ArrayList<>();
     private List<String> tags = new ArrayList<>();
+
+    public VehicleParkingBuilder entrances(Collection<VehicleParkingEntrance> entrances) {
+      this.entrances = new ArrayList<>(entrances);
+      return this;
+    }
 
     public VehicleParkingBuilder tags(Collection<String> tags) {
       this.tags = new ArrayList<>(tags);

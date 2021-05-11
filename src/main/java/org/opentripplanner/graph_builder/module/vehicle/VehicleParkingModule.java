@@ -2,11 +2,10 @@ package org.opentripplanner.graph_builder.module.vehicle;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +44,7 @@ public class VehicleParkingModule implements GraphBuilderModule {
 
         for (VehicleParking vehicleParking : vehicleParks) {
             service.addVehicleParking(vehicleParking);
-            VehicleParkingVertex vehicleParkingVertex = new VehicleParkingVertex(graph, vehicleParking);
-            new VehicleParkingEdge(vehicleParkingVertex);
+            VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
         }
         LOG.info("Created " + vehicleParks.size() + " vehicle parks.");
     }

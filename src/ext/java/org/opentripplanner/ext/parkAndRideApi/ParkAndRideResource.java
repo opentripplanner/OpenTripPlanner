@@ -4,7 +4,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 
@@ -58,7 +58,7 @@ public class ParkAndRideResource {
         List<ParkAndRideInfo> prs = new ArrayList<>();
         for (Vertex v : router.graph.getVertices()) {
             // Check if vertex is a ParkAndRideVertex
-            if (!(v instanceof VehicleParkingVertex)) continue;
+            if (!(v instanceof VehicleParkingEntranceVertex)) continue;
 
             // Check if vertex is within envelope
             if (!envelope.contains(v.getX(), v.getY())) continue;
@@ -70,7 +70,7 @@ public class ParkAndRideResource {
                 if (stops.isEmpty()) { continue; }
             }
 
-            prs.add(new ParkAndRideInfo((VehicleParkingVertex) v));
+            prs.add(new ParkAndRideInfo((VehicleParkingEntranceVertex) v));
         }
 
         return Response.status(Status.OK).entity(prs).build();
@@ -92,7 +92,7 @@ public class ParkAndRideResource {
 
         public Double x, y;
 
-        public ParkAndRideInfo(VehicleParkingVertex vertex) {
+        public ParkAndRideInfo(VehicleParkingEntranceVertex vertex) {
             this.name = vertex.getName();
             this.x = vertex.getX();
             this.y = vertex.getY();

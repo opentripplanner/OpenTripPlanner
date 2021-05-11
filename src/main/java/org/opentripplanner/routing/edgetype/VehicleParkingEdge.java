@@ -1,31 +1,34 @@
 package org.opentripplanner.routing.edgetype;
 
+import lombok.Getter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 
 import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
 
 /**
- * Parking a bike edge.
- * 
- * Note: There is an edge only in the "park" direction. We do not handle (yet) unparking a bike, as
- * you would need to know where you have parked your car, and is probably better handled by the
- * client by issuing two requests (first one from your origin to your bike, second one from your
- * bike to your destination).
- * 
- * Cost is the time to park a bike, estimated.
+ * Parking a vehicle edge.
  */
 public class VehicleParkingEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    public VehicleParkingEdge(VehicleParkingVertex vehicleParkingVertex) {
-        super(vehicleParkingVertex, vehicleParkingVertex);
+    @Getter
+    private final VehicleParking vehicleParking;
+
+    public VehicleParkingEdge(VehicleParkingEntranceVertex vehicleParkingEntranceVertex, VehicleParking vehicleParking) {
+        this(vehicleParkingEntranceVertex, vehicleParkingEntranceVertex, vehicleParking);
+    }
+
+    public VehicleParkingEdge(VehicleParkingEntranceVertex fromVehicleParkingEntranceVertex, VehicleParkingEntranceVertex toVehicleParkingEntranceVertex, VehicleParking vehicleParking) {
+        super(fromVehicleParkingEntranceVertex, toVehicleParkingEntranceVertex);
+        this.vehicleParking = vehicleParking;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class VehicleParkingEdge extends Edge {
 
     private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
         RoutingRequest options = s0.getOptions();
-        if (!spacesAvailableForMode(mode, options.wheelchairAccessible)) {
+        if (!isSpacesAvailable(mode, options.wheelchairAccessible)) {
             return null;
         }
 
@@ -96,7 +99,7 @@ public class VehicleParkingEdge extends Edge {
     private State traversePark(State s0, int parkingCost, int parkingTime) {
         RoutingRequest options = s0.getOptions();
 
-        if (!spacesAvailableForMode(s0.getNonTransitMode(), options.wheelchairAccessible)) {
+        if (!isSpacesAvailable(s0.getNonTransitMode(), options.wheelchairAccessible)) {
             return null;
         }
 
@@ -107,9 +110,15 @@ public class VehicleParkingEdge extends Edge {
         return s0e.makeState();
     }
 
-    private boolean spacesAvailableForMode(TraverseMode traverseMode, boolean wheelchairAccessible) {
-        VehicleParkingVertex vehicleParkingVertex = (VehicleParkingVertex) tov;
-        return vehicleParkingVertex.isSpacesAvailable(traverseMode, wheelchairAccessible);
+    private boolean isSpacesAvailable(TraverseMode traverseMode, boolean wheelchairAccessible) {
+        switch (traverseMode) {
+            case BICYCLE:
+                return vehicleParking.hasBicyclePlaces();
+            case CAR:
+                return wheelchairAccessible ? vehicleParking.hasWheelchairAccessibleCarPlaces() : vehicleParking.hasCarPlaces();
+            default:
+                return false;
+        }
     }
 
     @Override

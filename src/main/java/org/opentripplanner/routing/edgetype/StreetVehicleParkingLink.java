@@ -4,8 +4,9 @@ import java.util.Locale;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 /**
@@ -13,16 +14,16 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
  */
 public class StreetVehicleParkingLink extends Edge {
 
-    private final VehicleParkingVertex vehicleParkingVertex;
+    private final VehicleParkingEntranceVertex vehicleParkingEntranceVertex;
 
-    public StreetVehicleParkingLink(StreetVertex fromv, VehicleParkingVertex tov) {
+    public StreetVehicleParkingLink(StreetVertex fromv, VehicleParkingEntranceVertex tov) {
         super(fromv, tov);
-        vehicleParkingVertex = tov;
+        vehicleParkingEntranceVertex = tov;
     }
 
-    public StreetVehicleParkingLink(VehicleParkingVertex fromv, StreetVertex tov) {
+    public StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, StreetVertex tov) {
         super(fromv, tov);
-        vehicleParkingVertex = fromv;
+        vehicleParkingEntranceVertex = fromv;
     }
 
     public String getDirection() {
@@ -38,11 +39,11 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     public String getName() {
-        return vehicleParkingVertex.getName();
+        return vehicleParkingEntranceVertex.getName();
     }
 
     public String getName(Locale locale) {
-        return vehicleParkingVertex.getName(locale);
+        return vehicleParkingEntranceVertex.getName(locale);
     }
 
     public State traverse(State s0) {
@@ -50,6 +51,16 @@ public class StreetVehicleParkingLink extends Edge {
         // Prevents router using bike rental stations as shortcuts to get around
         // turn restrictions.
         if (s0.getBackEdge() instanceof StreetVehicleParkingLink) {
+            return null;
+        }
+
+        var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
+        if (s0.getNonTransitMode() == TraverseMode.CAR) {
+            if (!entrance.isCarAccessible()) {
+                return null;
+            }
+        }
+        else if (!entrance.isWalkAccessible()) {
             return null;
         }
 

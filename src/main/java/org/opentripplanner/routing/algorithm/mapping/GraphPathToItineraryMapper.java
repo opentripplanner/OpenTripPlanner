@@ -45,7 +45,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
@@ -474,7 +474,7 @@ public abstract class GraphPathToItineraryMapper {
             place.vehicleRentalStation = ((VehicleRentalStationVertex) vertex).getStation();
             LOG.trace("Added bike share Id {} to place", place.vehicleRentalStation.getId());
             place.vertexType = VertexType.BIKESHARE;
-        } else if (vertex instanceof VehicleParkingVertex) {
+        } else if (vertex instanceof VehicleParkingEntranceVertex) {
             place.vertexType = VertexType.VEHICLEPARK;
         } else {
             place.vertexType = VertexType.NORMAL;

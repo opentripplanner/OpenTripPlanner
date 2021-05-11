@@ -73,6 +73,14 @@ class KmlBikeParkDataSource implements VehicleParkingDataSource {
                 .x(x)
                 .y(y)
                 .id(new FeedScopedId(feedId, id))
+                .entrances(List.of(
+                    VehicleParking.VehicleParkingEntrance.builder()
+                        .entranceId(new FeedScopedId(feedId, id))
+                        .name(localizedName)
+                        .x(x)
+                        .y(y)
+                        .build()
+                ))
                 .build();
         });
     }
