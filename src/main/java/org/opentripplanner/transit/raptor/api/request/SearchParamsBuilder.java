@@ -25,6 +25,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private int maxNumberOfTransfers;
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
+    private boolean guaranteedTransfersEnabled;
     private final Collection<RaptorTransfer> accessPaths = new ArrayList<>();
     private final Collection<RaptorTransfer> egressPaths = new ArrayList<>();
 
@@ -38,6 +39,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
         this.timetableEnabled = defaults.timetableEnabled();
+        this.guaranteedTransfersEnabled = defaults.guaranteedTransfersEnabled();
         this.accessPaths.addAll(defaults.accessPaths());
         this.egressPaths.addAll(defaults.egressPaths());
     }
@@ -130,6 +132,15 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
+    public boolean guaranteedTransfersEnabled() {
+        return guaranteedTransfersEnabled;
+    }
+
+    public SearchParamsBuilder<T> guaranteedTransfersEnabled(boolean enable) {
+        this.guaranteedTransfersEnabled = enable;
+        return this;
+    }
+
     public Collection<RaptorTransfer> accessPaths() {
         return accessPaths;
     }
@@ -164,4 +175,5 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     public SearchParams buildSearchParam() {
         return new SearchParams(this);
     }
+
 }

@@ -38,6 +38,7 @@ public class SearchParams {
     private final int maxNumberOfTransfers;
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
+    private final boolean guaranteedTransfersEnabled;
     private final Collection<RaptorTransfer> accessPaths;
     private final Collection<RaptorTransfer> egressPaths;
 
@@ -53,6 +54,7 @@ public class SearchParams {
         maxNumberOfTransfers = NOT_SET;
         relaxCostAtDestination = NOT_SET;
         timetableEnabled = false;
+        guaranteedTransfersEnabled = false;
         accessPaths = List.of();
         egressPaths = List.of();
     }
@@ -66,6 +68,7 @@ public class SearchParams {
         this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
+        this.guaranteedTransfersEnabled = builder.guaranteedTransfersEnabled();
         this.accessPaths = List.copyOf(builder.accessPaths());
         this.egressPaths = List.copyOf(builder.egressPaths());
     }
@@ -206,6 +209,15 @@ public class SearchParams {
      */
     public boolean timetableEnabled() {
         return timetableEnabled;
+    }
+
+    /**
+     * If enabled guaranteed transfers are used during routing, if not they are ignored.
+     * Some of the profiles do not support guaranteed transfers, for these profiles this
+     * flag is ignored. Transfers are supported for all profiles returning paths.
+     */
+    public boolean guaranteedTransfersEnabled() {
+        return guaranteedTransfersEnabled;
     }
 
     /**

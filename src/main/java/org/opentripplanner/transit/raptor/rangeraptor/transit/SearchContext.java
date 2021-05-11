@@ -189,6 +189,13 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return publisher;
     }
 
+    public boolean enableGuaranteedTransfers() {
+        if(profile().isOneOf(RaptorProfile.BEST_TIME, RaptorProfile.NO_WAIT_BEST_TIME)) {
+            return false;
+        }
+        return searchParams().guaranteedTransfersEnabled();
+    }
+
     /* private methods */
 
     /**

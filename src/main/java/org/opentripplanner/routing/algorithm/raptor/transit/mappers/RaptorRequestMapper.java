@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
+import java.time.ZonedDateTime;
+import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -9,9 +11,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-
-import java.time.ZonedDateTime;
-import java.util.Collection;
+import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
 
@@ -53,6 +53,7 @@ public class RaptorRequestMapper {
                 .searchParams()
                 .searchWindow(request.searchWindow)
                 .timetableEnabled(request.timetableView)
+                .guaranteedTransfersEnabled(OTPFeature.GuaranteedTransfers.isOn())
                 .addAccessPaths(accessPaths)
                 .addEgressPaths(egressPaths);
 

@@ -5,6 +5,8 @@ import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -153,6 +155,13 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
      * trip search that only accept exact trip timeLimit matches.
      */
     TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
+
+    /**
+     * Return a guaranteed transfer provider for the given pattern. When searching forward the
+     * given {@code target} is the TO pattern/stop, while when searching in reverse the given
+     * target is the FROM pattern/stop.
+     */
+    RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route);
 
     /**
      * Return a calculator for test purpose. The following parameters are fixed:
