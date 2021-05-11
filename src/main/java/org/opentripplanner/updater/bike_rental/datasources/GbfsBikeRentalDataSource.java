@@ -215,17 +215,24 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
         @Override
         public BikeRentalStation makeStation(JsonNode stationNode) {
-            BikeRentalStation brstation = new BikeRentalStation();
-            brstation.id = stationNode.path("bike_id").asText();
-            brstation.name = new NonLocalizedString(stationNode.path("name").asText());
-            brstation.x = stationNode.path("lon").asDouble();
-            brstation.y = stationNode.path("lat").asDouble();
-            brstation.bikesAvailable = 1;
-            brstation.spacesAvailable = 0;
-            brstation.allowDropoff = false;
-            brstation.isFloatingBike = true;
-            brstation.isCarStation = routeAsCar;
-            return brstation;
+            if (stationNode.path("station_id").asText().isBlank() &&
+                    stationNode.has("lon") &&
+                    stationNode.has("lat")
+            ) {
+                BikeRentalStation brstation = new BikeRentalStation();
+                brstation.id = stationNode.path("bike_id").asText();
+                brstation.name = new NonLocalizedString(stationNode.path("name").asText());
+                brstation.x = stationNode.path("lon").asDouble();
+                brstation.y = stationNode.path("lat").asDouble();
+                brstation.bikesAvailable = 1;
+                brstation.spacesAvailable = 0;
+                brstation.allowDropoff = false;
+                brstation.isFloatingBike = true;
+                brstation.isCarStation = routeAsCar;
+                return brstation;
+            } else {
+                return null;
+            }
         }
     }
 
