@@ -50,11 +50,7 @@ public class TestUnconnectedAreas {
      */
     @Test
     public void testCoincidentNodeUnconnectedParkAndRide () {
-      // the P+R should get four connections, since the entrance road is duplicated as well, and crosses twice
-      // since there are in and out edges, that brings the total to 8 per P+R.
-      // Even though the park and rides get merged, duplicate edges remain from when they were separate.
-      // FIXME: we shouldn't have duplicate edges.
-      List<String> connections = testGeometricGraphWithClasspathFile("hackett_pr.osm.pbf", 8, 16);
+      List<String> connections = testGeometricGraphWithClasspathFile("hackett_pr.osm.pbf", 4, 8);
 
       assertTrue(connections.contains("osm:node:3096570222"));
       assertTrue(connections.contains("osm:node:3094264704"));
