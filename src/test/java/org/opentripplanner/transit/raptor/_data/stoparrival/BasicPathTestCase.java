@@ -48,6 +48,20 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
  * at 12:00, total 2 hours.
  */
 public class BasicPathTestCase implements RaptorTestConstants {
+    public static final String BASIC_PATH_AS_DETAILED_STRING =
+            "Walk 3m15s 10:00 10:03:15 $390 "
+            + "~ 1 45s ~ "
+            + "BUS L11 10:04 10:35 31m $1998 "
+            + "~ 2 15s ~ "
+            + "Walk 3m45s 10:35:15 10:39 $450 "
+            + "~ 3 21m ~ "
+            + "BUS L21 11:00 11:23 23m $2640 "
+            + "~ 4 17m ~ "
+            + "BUS L31 11:40 11:52 12m $1776 "
+            + "~ 5 15s ~ "
+            + "Walk 7m45s 11:52:15 12:00 $930 "
+            + "[10:00 12:00 2h $8184]";
+
     public static final String BASIC_PATH_AS_STRING =
         "Walk 3m15s ~ 1"
         + " ~ BUS L11 10:04 10:35 ~ 2"
@@ -57,17 +71,17 @@ public class BasicPathTestCase implements RaptorTestConstants {
         + " ~ Walk 7m45s "
         + "[10:00 12:00 2h $8184]";
 
-    public static final int BOARD_COST_SEC = 60;
-    public static final int TRANSFER_COST_SEC = 120;
-    public static final double WALK_RELUCTANCE = 2.0;
-    public static final double WAIT_RELUCTANCE = 0.8;
+    private static final int BOARD_COST_SEC = 60;
+    private static final int TRANSFER_COST_SEC = 120;
+    private static final double WALK_RELUCTANCE = 2.0;
+    private static final double WAIT_RELUCTANCE = 0.8;
 
     /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
     private static final int[] STOP_COSTS = {0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0};
 
     // Some times witch should not have eny effect on tests
-    public static final int VERY_EARLY = time("00:00");
-    public static final int VERY_LATE = time("23:59");
+    private static final int VERY_EARLY = time("00:00");
+    private static final int VERY_LATE = time("23:59");
 
     // Access (Walk 3m15s ~ A)
     public static final int ACCESS_START = time("10:00");
@@ -77,31 +91,31 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
     // Trip 1 (A ~ BUS L11 10:04 10:35 ~ B)
     public static final int L11_START = time("10:04");
-    public static final int L11_END = time("10:35");
+    private static final int L11_END = time("10:35");
     public static final int L11_DURATION = L11_END - L11_START;
-    public static final int L11_WAIT_DURATION = L11_START - ACCESS_END + ALIGHT_SLACK;
+    private static final int L11_WAIT_DURATION = L11_START - ACCESS_END + ALIGHT_SLACK;
     public static final int LINE_11_COST = STOP_COSTS[STOP_A] + STOP_COSTS[STOP_B]
         + toRaptorCost(BOARD_COST_SEC + WAIT_RELUCTANCE * L11_WAIT_DURATION + L11_DURATION);
 
     // Transfers (B ~ Walk 3m45s ~ C)
-    public static final int TX_START = time("10:35:15");
-    public static final int TX_END = time("10:39:00");
+    private static final int TX_START = time("10:35:15");
+    private static final int TX_END = time("10:39:00");
     public static final int TX_DURATION = TX_END - TX_START;
     public static final int TX_COST = toRaptorCost(TX_DURATION * WALK_RELUCTANCE);
 
     // Trip 2 (C ~ BUS L21 11:00 11:23 ~ D)
     public static final int L21_START = time("11:00");
-    public static final int L21_END = time("11:23");
+    private static final int L21_END = time("11:23");
     public static final int L21_DURATION = L21_END - L21_START;
-    public static final int L21_WAIT_DURATION = L21_START - TX_END + ALIGHT_SLACK;
+    private static final int L21_WAIT_DURATION = L21_START - TX_END + ALIGHT_SLACK;
     public static final int LINE_21_COST = STOP_COSTS[STOP_C] + STOP_COSTS[STOP_D]
         + toRaptorCost(BOARD_COST_SEC + TRANSFER_COST_SEC + WAIT_RELUCTANCE * L21_WAIT_DURATION + L21_DURATION);
 
     // Trip 3 (D ~ BUS L31 11:40 11:52 ~ E)
     public static final int L31_START = time("11:40");
-    public static final int L31_END = time("11:52");
+    private static final int L31_END = time("11:52");
     public static final int L31_DURATION = L31_END - L31_START;
-    public static final int L31_WAIT_DURATION = L31_START - (L21_END + ALIGHT_SLACK) + ALIGHT_SLACK;
+    private static final int L31_WAIT_DURATION = L31_START - (L21_END + ALIGHT_SLACK) + ALIGHT_SLACK;
     public static final int LINE_31_COST = STOP_COSTS[STOP_D] + STOP_COSTS[STOP_E]
         + toRaptorCost(BOARD_COST_SEC + TRANSFER_COST_SEC + WAIT_RELUCTANCE * L31_WAIT_DURATION + L31_DURATION);
 
@@ -120,15 +134,15 @@ public class BasicPathTestCase implements RaptorTestConstants {
     public static final String LINE_21 = "L21";
     public static final String LINE_31 = "L31";
 
-    public static final TestTripSchedule TRIP_1 = TestTripSchedule
+    private static final TestTripSchedule TRIP_1 = TestTripSchedule
         .schedule(pattern(LINE_11, STOP_A, STOP_B))
         .times(L11_START, L11_END)
         .build();
-    public static final TestTripSchedule TRIP_2 = TestTripSchedule
+    private static final TestTripSchedule TRIP_2 = TestTripSchedule
         .schedule(pattern(LINE_21, STOP_C, STOP_D))
         .times(L21_START, L21_END)
         .build();
-    public static final TestTripSchedule TRIP_3 = TestTripSchedule
+    private static final TestTripSchedule TRIP_3 = TestTripSchedule
         .schedule(pattern(LINE_31, STOP_D, STOP_E))
         // The early arrival and late departure should not have any effect on tests
         .arrivals(VERY_EARLY, L31_END)
