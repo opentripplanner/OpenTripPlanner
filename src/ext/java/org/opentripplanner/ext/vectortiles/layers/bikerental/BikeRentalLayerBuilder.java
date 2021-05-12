@@ -52,6 +52,6 @@ public class BikeRentalLayerBuilder extends LayerBuilder<BikeRentalStation> {
 
   @Override
   protected double getExpansionFactor() {
-    return 0.1;
+    return 0.25;
   }
 }
