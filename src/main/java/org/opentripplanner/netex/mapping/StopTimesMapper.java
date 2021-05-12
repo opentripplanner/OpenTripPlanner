@@ -290,7 +290,8 @@ class StopTimesMapper {
         List<StopTime> stopTimes = result.stopTimes;
         if (stopTimes.size() == 2 && stopTimes
             .stream()
-            .allMatch(s -> s.getStop() instanceof FlexStopLocation)) {
+            .allMatch(s -> s.getStop() instanceof FlexStopLocation
+                || s.getStop() instanceof FlexLocationGroup)) {
 
             int departureTime = stopTimes.get(0).getDepartureTime();
             int arrivalTime = stopTimes.get(1).getArrivalTime();
