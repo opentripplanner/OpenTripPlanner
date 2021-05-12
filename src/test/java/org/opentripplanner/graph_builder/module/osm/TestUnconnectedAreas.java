@@ -1,21 +1,22 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.junit.Test;
-import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
-import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 
 public class TestUnconnectedAreas {
 
@@ -28,21 +29,39 @@ public class TestUnconnectedAreas {
      * virtual nodes at the place where the street intersects the P+R areas. See ticket #1562.
      */
     @Test
-    public void testUnconnectedParkAndRide() {
+    public void testUnconnectedCarParkAndRide() {
       DataImportIssueStore issueStore = new DataImportIssueStore(true);
       Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
 
-      assertEquals(1, issueStore.getIssues().size());
+      assertEquals(2, issueStore.getIssues().size());
 
       var vehicleParkingVertices = gg.getVerticesOfType(VehicleParkingEntranceVertex.class);
       int nParkAndRide = vehicleParkingVertices.size();
-
       int nParkAndRideLink = gg.getEdgesOfType(StreetVehicleParkingLink.class).size();
+      int nParkAndRideEdge = gg.getEdgesOfType(VehicleParkingEdge.class).size();
 
-      assertEquals(5, nParkAndRide);
-      assertEquals(10, nParkAndRideLink);
+      assertEquals(11, nParkAndRide);
+      assertEquals(30, nParkAndRideLink);
+      assertEquals(41, nParkAndRideEdge);
     }
-    
+
+    @Test
+    public void testUnconnectedBikeParkAndRide() {
+        DataImportIssueStore issueStore = new DataImportIssueStore(true);
+        Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
+
+        assertEquals(3, issueStore.getIssues().size());
+
+        var vehicleParkingVertices = gg.getVerticesOfType(VehicleParkingEntranceVertex.class);
+        int nParkAndRideEntrances = vehicleParkingVertices.size();
+        int nParkAndRideLink = gg.getEdgesOfType(StreetVehicleParkingLink.class).size();
+        int nParkAndRideEdge = gg.getEdgesOfType(VehicleParkingEdge.class).size();
+
+        assertEquals(11, nParkAndRideEntrances);
+        assertEquals(24, nParkAndRideLink);
+        assertEquals(31, nParkAndRideEdge);
+    }
+
     /**
      * This test ensures that if a Park and Ride has a node that is exactly atop a node on a way, the graph
      * builder will not loop forever trying to split it. The hackett-pr.osm.gz file contains a park-and-ride lot in
@@ -100,6 +119,8 @@ public class TestUnconnectedAreas {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+        loader.staticParkAndRide = true;
+        loader.staticBikeParkAndRide = true;
 
         var fileUrl = getClass().getResource(osmFileName);
         assertNotNull(fileUrl);

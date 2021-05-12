@@ -320,7 +320,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         private void processParkAndRideNodes(Collection<OSMNode> nodes, boolean isCarParkAndRide) {
-            LOG.info("Processing bike P+R nodes...");
+            LOG.info("Processing {} P+R nodes.", isCarParkAndRide ? "car" : "bike");
             int n = 0;
             VehicleParkingService vehicleParkingService = graph.getService(
                 VehicleParkingService.class, true);
@@ -425,7 +425,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             if (n > 0) {
                 graph.hasParkRide = true;
             }
-            LOG.info("Created {} car P+R.", n);
+            LOG.info("Created {} car P+R areas.", n);
         }
 
         private boolean buildParkAndRideAreasForGroup(
@@ -486,20 +486,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
 
             if (isCarParkAndRide) {
-                if (!walkAccessibleOut || !carAccessibleIn) {
+                if (!walkAccessibleOut || !carAccessibleIn || !walkAccessibleIn || !carAccessibleOut) {
                     // This will prevent the P+R to be useful.
-                    issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity.getId()));
+                    issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
                     return false;
-                }
-                if (!walkAccessibleIn || !carAccessibleOut) {
-                    // This does not prevent routing as we only use P+R for car dropoff,
-                    // but this is an issue with OSM data.
-                    LOG.warn("P+R '{}' ({}) is not walk-accessible", creativeName, entity.getId());
                 }
             } else {
                 if (!walkAccessibleOut || !walkAccessibleIn) {
                     // This will prevent the P+R to be useful.
-                    issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity.getId()));
+                    issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
                     return false;
                 }
             }
@@ -600,6 +595,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     continue;
                 accessVertices.add(accessVertex);
             }
+
+            accessVertices.addAll(
+                    ring.holes.stream()
+                            .flatMap(innerRing -> processVehicleParkingArea(innerRing, entity, envelope).stream())
+                            .collect(Collectors.toList())
+            );
 
             return accessVertices;
         }
@@ -1059,16 +1060,22 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             // Intersect ways at area boundaries if needed.
             for (Area area : Iterables.concat(osmdb.getWalkableAreas(), osmdb.getParkAndRideAreas(), osmdb.getBikeParkingAreas())) {
                 for (Ring outerRing : area.outermostRings) {
-                    for (OSMNode node : outerRing.nodes) {
-                        long nodeId = node.getId();
-                        if (possibleIntersectionNodes.contains(nodeId)) {
-                            intersectionNodes.put(nodeId, null);
-                        } else {
-                            possibleIntersectionNodes.add(nodeId);
-                        }
-                    }
+                    intersectAreaRingNodes(possibleIntersectionNodes, outerRing);
                 }
             }
+        }
+
+        private void intersectAreaRingNodes(Set<Long> possibleIntersectionNodes, Ring outerRing) {
+            for (OSMNode node : outerRing.nodes) {
+                long nodeId = node.getId();
+                if (possibleIntersectionNodes.contains(nodeId)) {
+                    intersectionNodes.put(nodeId, null);
+                } else {
+                    possibleIntersectionNodes.add(nodeId);
+                }
+            }
+
+            outerRing.holes.forEach(hole -> intersectAreaRingNodes(possibleIntersectionNodes, hole));
         }
 
         /**

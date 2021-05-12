@@ -302,4 +302,8 @@ public class OSMWithTags {
     public void setCreativeName(I18NString creativeName) {
         this.creativeName = creativeName;
     }
+
+    public String getOpenStreetMapLink() {
+        return null;
+    }
 }
