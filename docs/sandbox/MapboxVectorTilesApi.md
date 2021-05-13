@@ -11,6 +11,7 @@
 - 2021-05-12: Make expansion factor configurable
 - 2021-09-07: Rename `BikeRental` to `VehicleRental`
 - 2021-10-13: Correctly serialize the vehicle rental name [#3648](https://github.com/opentripplanner/OpenTripPlanner/pull/3648)
+- 2021-01-03: Add support for VehicleParking entities
 
 ## Documentation
 
@@ -58,7 +59,7 @@ The feature must be configured in `router-config.json` as follows
 For each layer, the configuration includes:
 
  - `name` which is used in the url to fetch tiles, and as the layer name in the vector tiles.
- - `type` which tells the type of the layer. Currently `Stop`, `Station` and `BikeRental` are supported.
+ - `type` which tells the type of the layer. Currently `Stop`, `Station`, `BikeRental` and `VehicleParking` are supported.
  - `mapper` which describes the mapper converting the properties from the OTP model entities to the vector tile properties. Currently `Digitransit` is supported for all layer types.
  - `minZoom` and `maxZoom` which describe the zoom levels the layer is active for.
  - `cacheMaxSeconds` which sets the cache header in the response. The lowest value of the layers included is selected.
