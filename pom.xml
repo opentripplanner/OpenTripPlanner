@@ -695,9 +695,9 @@
         </dependency>
         <!-- OpenStreetMap protobuf (PBF) definitions -->
         <dependency>
-            <groupId>crosby.binary</groupId>
+            <groupId>org.openstreetmap.pbf</groupId>
             <artifactId>osmpbf</artifactId>
-            <version>1.3.4-SNAPSHOT</version>
+            <version>1.5.0</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>
