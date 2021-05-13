@@ -97,14 +97,15 @@ public class AlertsUpdateHandler {
                 routeId = informed.getRouteId();
             }
 
-            int direction;
+            int directionId;
             if (informed.hasTrip() && informed.getTrip().hasDirectionId()) {
-                direction = informed.getTrip().getDirectionId();
+                directionId = informed.getTrip().getDirectionId();
+            } else if (informed.hasDirectionId()) {
+                directionId = informed.getDirectionId();
             } else {
-                direction = -1;
+                directionId = -1;
             }
 
-            // TODO: The other elements of a TripDescriptor are ignored...
             String tripId = null;
             if (informed.hasTrip() && informed.getTrip().hasTripId()) {
                 tripId = informed.getTrip().getTripId();
@@ -119,13 +120,15 @@ public class AlertsUpdateHandler {
                 agencyId = informed.getAgencyId().intern();
             }
 
+            int routeType = informed.hasRouteType() ? informed.getRouteType() : -1;
+
             AlertPatch patch = new AlertPatch();
             patch.setFeedId(feedId);
             if (routeId != null) {
                 patch.setRoute(new FeedScopedId(feedId, routeId));
                 // Makes no sense to set direction if we don't have a route
-                if (direction != -1) {
-                    patch.setDirectionId(direction);
+                if (directionId != -1) {
+                    patch.setDirectionId(directionId);
                 }
             }
             if (tripId != null) {
@@ -136,6 +139,9 @@ public class AlertsUpdateHandler {
             }
             if (agencyId != null && routeId == null && tripId == null && stopId == null) {
                 patch.setAgencyId(agencyId);
+            }
+            if (routeType != -1) {
+                patch.setRouteType(routeType);
             }
             patch.setTimePeriods(periods);
             patch.setAlert(alertText);
@@ -149,12 +155,15 @@ public class AlertsUpdateHandler {
 
     private String createId(String id, EntitySelector informed) {
         return id + " "
-            + (informed.hasAgencyId  () ? informed.getAgencyId  () : " null ") + " "
-            + (informed.hasRouteId   () ? informed.getRouteId   () : " null ") + " "
+            + (informed.hasAgencyId() ? informed.getAgencyId() : " null ") + " "
+            + (informed.hasRouteId() ? informed.getRouteId() : " null ") + " "
+            + (informed.hasDirectionId() ? informed.getDirectionId() : " null ") + " "
             + (informed.hasTrip() && informed.getTrip().hasDirectionId() ?
-                informed.getTrip().hasDirectionId() : " null ") + " "
-            + (informed.hasRouteType () ? informed.getRouteType () : " null ") + " "
-            + (informed.hasStopId    () ? informed.getStopId    () : " null ") + " "
+                informed.getTrip().getDirectionId() : " null ") + " "
+            + (informed.hasTrip() && informed.getTrip().hasRouteId() ?
+                informed.getTrip().getRouteId() : " null ") + " "
+            + (informed.hasRouteType() ? informed.getRouteType() : " null ") + " "
+            + (informed.hasStopId() ? informed.getStopId() : " null ") + " "
             + (informed.hasTrip() && informed.getTrip().hasTripId() ?
                 informed.getTrip().getTripId() : " null ");
     }

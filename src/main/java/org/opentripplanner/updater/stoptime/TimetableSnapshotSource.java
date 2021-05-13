@@ -230,9 +230,11 @@ public class TimetableSnapshotSource {
                     case CANCELED:
                         applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                         break;
-                    case MODIFIED:
-                        applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
-                        break;
+// Evan Siroky note: MODIFIED doesn't seem to be a valid value after updating to the latest GTFS-RT bindings. Where did
+// this come from and is it still needed/or used anywhere?
+//                    case MODIFIED:
+//                        applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
+//                        break;
                 }
 
                 if (applied) {
@@ -295,10 +297,12 @@ public class TimetableSnapshotSource {
                 }
             }
 
-            // If stops are modified, handle trip update like a modified trip
-            if (hasModifiedStops) {
-                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.MODIFIED;
-            }
+// Evan Siroky note: MODIFIED doesn't seem to be a valid value after updating to the latest GTFS-RT bindings. Where did
+// this come from and is it still needed/or used anywhere?
+//            // If stops are modified, handle trip update like a modified trip
+//            if (hasModifiedStops) {
+//                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.MODIFIED;
+//            }
         }
 
         return tripScheduleRelationship;
