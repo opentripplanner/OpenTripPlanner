@@ -3242,7 +3242,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
   [
     {
       "arrivedAtDestinationWithRentedBicycle": true,
-      "durationSeconds": 337,
+      "durationSeconds": 338,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
       "fare": {
@@ -3425,8 +3425,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "test-network"
           ],
           "departureDelay": 0,
-          "distanceMeters": 699.131,
-          "endTime": "2009-10-21T23:15:37.000+0000",
+          "distanceMeters": 698.613,
+          "endTime": "2009-10-21T23:15:38.000+0000",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3439,8 +3439,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "generalizedCost": -1,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 9,
-            "points": "qb{tGn|{kVGsJEuKE}HAwAAo@EcJlCE?C"
+            "length": 10,
+            "points": "qb{tGn|{kVGsJL?F?tBCEuK?g@GmJEuK?C"
           },
           "mode": "BICYCLE",
           "onStreetNonTransit": true,
@@ -3467,7 +3467,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "angle": 1.5441765471733384,
               "area": false,
               "bogusName": false,
-              "distance": 618.377,
+              "distance": 144.546,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "LEFT",
@@ -3481,33 +3481,33 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             },
             {
               "absoluteDirection": "SOUTH",
-              "angle": 3.110936337978962,
+              "angle": 3.114702563033784,
               "area": false,
               "bogusName": false,
-              "distance": 78.785,
+              "distance": 77.976,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "RIGHT",
               "startLocation": {
-                "latitude": 45.527765200000005,
-                "longitude": -122.69245690000001
+                "latitude": 45.5276519,
+                "longitude": -122.6985374
               },
               "stayOn": false,
-              "streetName": "Northwest 20th Avenue",
+              "streetName": "Northwest 23rd Avenue",
               "streetNotes": [ ]
             },
             {
               "absoluteDirection": "EAST",
-              "angle": 1.545875745502869,
+              "angle": 1.545901243204427,
               "area": false,
               "bogusName": false,
-              "distance": 1.969,
+              "distance": 476.091,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "LEFT",
               "startLocation": {
-                "latitude": 45.527057000000006,
-                "longitude": -122.6924259
+                "latitude": 45.5269509,
+                "longitude": -122.69851030000001
               },
               "stayOn": false,
               "streetName": "Northwest Hoyt Street",
@@ -3518,9 +3518,9 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         }
       ],
       "nTransfers": 0,
-      "nonTransitDistanceMeters": 819.078,
+      "nonTransitDistanceMeters": 818.5600000000001,
       "nonTransitLimitExceeded": false,
-      "nonTransitTimeSeconds": 337,
+      "nonTransitTimeSeconds": 338,
       "onStreetAllTheWay": true,
       "streetOnly": true,
       "systemNotices": [ ],
