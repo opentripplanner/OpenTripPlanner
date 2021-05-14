@@ -32,6 +32,8 @@ public class AlertPatch implements Serializable {
 
     private static final long serialVersionUID = 20140319L;
 
+    public static final int MISSING_INT_FIELD_VALUE = -1;
+
     private String id;
 
     private Alert alert;
@@ -54,12 +56,12 @@ public class AlertPatch implements Serializable {
     /**
      * Direction id of the GTFS trips this alert concerns, set to -1 if no direction.
      */
-    private int directionId = -1;
+    private int directionId = MISSING_INT_FIELD_VALUE;
 
     /**
      * Route type of the route(s) this alert concerns, set to -1 if no route type.
      */
-    private int routeType = -1;
+    private int routeType = MISSING_INT_FIELD_VALUE;
 
     public Alert getAlert() {
         return alert;
@@ -85,16 +87,16 @@ public class AlertPatch implements Serializable {
     }
 
     public void applyOrRemove(Graph graph, Consumer<Edge> applyOrRemoveFn) {
-        Agency alertAgency = null;
+        Agency agency = null;
         if (feedId != null) {
             Map<String, Agency> agencies = graph.index.agenciesForFeedId.get(feedId);
-            alertAgency = this.agency != null ? agencies.get(this.agency) : null;
+            agency = this.agency != null ? agencies.get(this.agency) : null;
         }
         Route route = this.route != null ? graph.index.routeForId.get(this.route) : null;
         Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
 
-        if (route != null || trip != null || alertAgency != null || hasRouteType()) {
+        if (route != null || trip != null || agency != null || hasRouteType()) {
             Collection<TripPattern> tripPatterns = null;
 
             if (trip != null) {
@@ -112,7 +114,7 @@ public class AlertPatch implements Serializable {
 
             if (tripPatterns != null) {
                 for (TripPattern tripPattern : tripPatterns) {
-                    if (isNotApplicableTripPattern(tripPattern, alertAgency)) {
+                    if (isNotApplicableTripPattern(tripPattern, agency)) {
                         continue;
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
@@ -214,7 +216,7 @@ public class AlertPatch implements Serializable {
     }
 
     public boolean hasDirectionId() {
-        return directionId != -1;
+        return directionId != MISSING_INT_FIELD_VALUE;
     }
 
     public void setStop(FeedScopedId stop) {
@@ -235,7 +237,7 @@ public class AlertPatch implements Serializable {
 
     public void setRouteType(int routeType) { this.routeType = routeType; }
 
-    public boolean hasRouteType() { return routeType != -1; }
+    public boolean hasRouteType() { return routeType != MISSING_INT_FIELD_VALUE; }
 
     public int getRouteType() { return routeType; }
 
