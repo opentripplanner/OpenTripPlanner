@@ -47,11 +47,6 @@ public class AlertPatch implements Serializable {
     private FeedScopedId stop;
 
     /**
-     * The headsign of the alert
-     */
-    private String direction;
-
-    /**
      * The id of the feed this patch is intended for.
      */
     private String feedId;
@@ -159,10 +154,8 @@ public class AlertPatch implements Serializable {
      * Returns true if the trip pattern would NOT be affected by this alert patch.
      */
     private boolean isNotApplicableTripPattern(TripPattern tripPattern, Agency alertAgency) {
-        // make sure direction matches. Not sure why there is a string direction value still.
-        return (direction != null && !direction.equals(tripPattern.getDirection())) ||
-            // make sure direction ID matches
-            (hasDirectionId() && directionId != tripPattern.directionId) ||
+        // make sure direction ID matches
+        return (hasDirectionId() && directionId != tripPattern.directionId) ||
             // make sure route type matches
             (hasRouteType() && routeType != tripPattern.route.getType()) ||
             // make sure agency matches
@@ -212,19 +205,8 @@ public class AlertPatch implements Serializable {
         this.trip = trip;
     }
 
-    public void setDirection(String direction) {
-        if (direction != null && direction.equals("")) {
-            direction = null;
-        }
-        this.direction = direction;
-    }
-
     public void setDirectionId(int direction) {
         this.directionId = direction;
-    }
-
-    public String getDirection() {
-        return direction;
     }
 
     public int getDirectionId() {
@@ -262,15 +244,6 @@ public class AlertPatch implements Serializable {
             return false;
         }
         AlertPatch other = (AlertPatch) o;
-        if (direction == null) {
-            if (other.direction != null) {
-                return false;
-            }
-        } else {
-            if (!direction.equals(other.direction)) {
-                return false;
-            }
-        }
         if (directionId != other.directionId) {
             return false;
         }
@@ -353,14 +326,13 @@ public class AlertPatch implements Serializable {
     }
 
     public int hashCode() {
-        return ((direction == null ? 0 : direction.hashCode()) +
-                directionId +
-                (agency == null ? 0 : agency.hashCode()) +
-                (trip == null ? 0 : trip.hashCode()) +
-                (stop == null ? 0 : stop.hashCode()) +
-                (route == null ? 0 : route.hashCode()) +
-                routeType +
-                (alert == null ? 0 : alert.hashCode()) +
-                (feedId == null ? 0 : feedId.hashCode()));
+        return directionId +
+            (agency == null ? 0 : agency.hashCode()) +
+            (trip == null ? 0 : trip.hashCode()) +
+            (stop == null ? 0 : stop.hashCode()) +
+            (route == null ? 0 : route.hashCode()) +
+            routeType +
+            (alert == null ? 0 : alert.hashCode()) +
+            (feedId == null ? 0 : feedId.hashCode());
     }
 }
