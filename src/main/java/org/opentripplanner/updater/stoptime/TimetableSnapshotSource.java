@@ -230,11 +230,13 @@ public class TimetableSnapshotSource {
                     case CANCELED:
                         applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                         break;
-// Evan Siroky note: MODIFIED doesn't seem to be a valid value after updating to the latest GTFS-RT bindings. Where did
-// this come from and is it still needed/or used anywhere?
-//                    case MODIFIED:
-//                        applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
-//                        break;
+                    // Note (as of 2021-05-14): this was previously MODIFIED, but is now changed to REPLACEMENT after
+                    // updating to the latest GTFS-RT bindings. Both the MODIFIED and REPLACEMENT enums seem to have the
+                    // same underlying values, so this should still work. It might only be applicable to some GTFS-RT
+                    // feeds used in the Netherlands.
+                    case REPLACEMENT:
+                        applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
+                        break;
                 }
 
                 if (applied) {
@@ -297,12 +299,14 @@ public class TimetableSnapshotSource {
                 }
             }
 
-// Evan Siroky note: MODIFIED doesn't seem to be a valid value after updating to the latest GTFS-RT bindings. Where did
-// this come from and is it still needed/or used anywhere?
-//            // If stops are modified, handle trip update like a modified trip
-//            if (hasModifiedStops) {
-//                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.MODIFIED;
-//            }
+            // If stops are modified, handle trip update like a modified trip
+            if (hasModifiedStops) {
+                // Note (as of 2021-05-14): this was previously MODIFIED, but is now changed to REPLACEMENT after
+                // updating to the latest GTFS-RT bindings. Both the MODIFIED and REPLACEMENT enums seem to have the
+                // same underlying values, so this should still work. It might only be applicable to some GTFS-RT feeds
+                // used in the Netherlands.
+                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.REPLACEMENT;
+            }
         }
 
         return tripScheduleRelationship;
