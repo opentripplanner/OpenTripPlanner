@@ -36,6 +36,7 @@ import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -201,7 +202,16 @@ public abstract class GraphPathToItineraryMapper {
             var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
             var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
 
-            if (modeChange || rentalChange || parkingChange) {
+            if (parkingChange) {
+                /* Remove the state for actually parking (traversing VehicleParkingEdge) from the
+                 * states so that the leg from/to edges correspond to the actual entrances.
+                 * The actual time for parking is added to the walking leg in generateLeg().
+                 */
+                legIndexPairs[1] = i;
+                legsIndexes.add(legIndexPairs);
+                legIndexPairs = new int[] {i + 1, states.length - 1};
+            }
+            else if (modeChange || rentalChange) {
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[] {i, states.length - 1};
@@ -300,6 +310,17 @@ public abstract class GraphPathToItineraryMapper {
 
         if (flexEdge != null) {
             FlexLegMapper.fixFlexTripLeg(leg, flexEdge);
+        }
+
+        /* For the from/to vertices to be in the correct place for vehicle parking
+         * the state for actually parking (traversing the VehicleParkEdge) is excluded
+         * from the list of states.
+         * This add the time for parking to the walking leg.
+         */
+        var previousStateIsVehicleParking = states[0].getBackState() != null
+                && states[0].getBackEdge() instanceof VehicleParkingEdge;
+        if (previousStateIsVehicleParking) {
+            leg.startTime = makeCalendar(states[0].getBackState());
         }
 
         return leg;
