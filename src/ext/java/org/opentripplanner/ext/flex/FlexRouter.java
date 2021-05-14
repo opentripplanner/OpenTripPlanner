@@ -2,6 +2,7 @@ package org.opentripplanner.ext.flex;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.util.Locale;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;

@@ -25,7 +25,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -286,7 +285,11 @@ public abstract class GraphPathToItineraryMapper {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addPlaces(leg, states, requestedLocale);
+        if (flexEdge != null) {
+            FlexLegMapper.addFlexPlaces(leg, flexEdge, requestedLocale);
+        } else {
+            addPlaces(leg, states, requestedLocale);
+        }
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
@@ -472,10 +475,6 @@ public abstract class GraphPathToItineraryMapper {
      * @return The resulting {@link Place} object.
      */
     private static Place makePlace(Vertex vertex, Locale requestedLocale) {
-        if (vertex instanceof TransitStopVertex) {
-            return new Place(((TransitStopVertex) vertex).getStop());
-        }
-
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
@@ -484,24 +483,16 @@ public abstract class GraphPathToItineraryMapper {
         if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
-        Place place = new Place(
-                vertex.getLat(),
-                vertex.getLon(),
-                name
-        );
 
-
-        if (vertex instanceof VehicleRentalStationVertex) {
-            place.vehicleRentalStation = ((VehicleRentalStationVertex) vertex).getStation();
-            LOG.trace("Added bike share Id {} to place", place.vehicleRentalStation.getId());
-            place.vertexType = VertexType.BIKESHARE;
+        if (vertex instanceof TransitStopVertex) {
+            return Place.forStop((TransitStopVertex) vertex, name);
+        } else if(vertex instanceof VehicleRentalStationVertex) {
+            return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex, name);
         } else if (vertex instanceof VehicleParkingEntranceVertex) {
-            place.vertexType = VertexType.VEHICLEPARKING;
+            return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, name);
         } else {
-            place.vertexType = VertexType.NORMAL;
+            return Place.normal(vertex, name);
         }
-
-        return place;
     }
 
     /**

@@ -25,7 +25,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.64847
             },
             "name": "SE Morrison St. & SE 17th Ave. (P1)",
-            "orig": "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 7447,
@@ -48,7 +47,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.69659
             },
             "name": "NW Northrup St. & NW 22nd Ave. (P2)",
-            "orig": "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType": "NORMAL"
           },
           "transitAlerts": [ ],
@@ -2657,7 +2655,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653725
             },
             "name": "NE 12th & Couch",
-            "orig": "NE 12th & Couch",
             "stop": {
               "code": "6577",
               "coordinate": {
@@ -2703,7 +2700,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.70029
             },
             "name": "NW Northrup St. & NW 24th Ave. (P3)",
-            "orig": "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType": "NORMAL"
           },
           "transitAlerts": [ ],
@@ -5593,7 +5589,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.648567
             },
             "name": "SE Stark    St. & SE 17th Ave. (P0)",
-            "orig": "SE Stark    St. & SE 17th Ave. (P0)",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 7384,
@@ -5616,7 +5611,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.69659
             },
             "name": "NW Northrup St. & NW 22nd Ave. (P2)",
-            "orig": "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType": "NORMAL"
           },
           "transitAlerts": [ ],
@@ -5961,7 +5955,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653725
             },
             "name": "NE 12th & Couch",
-            "orig": "NE 12th & Couch",
             "stop": {
               "code": "6577",
               "coordinate": {
@@ -6007,7 +6000,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.69659
             },
             "name": "NW Northrup St. & NW 22nd Ave. (P2)",
-            "orig": "NW Northrup St. & NW 22nd Ave. (P2)",
             "vertexType": "NORMAL"
           },
           "transitAlerts": [ ],
@@ -6233,7 +6225,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.667794
             },
             "name": "Interstate/Rose Quarter MAX Station",
-            "orig": "Rose Quarter Transit Center",
             "stop": {
               "code": "11508",
               "coordinate": {
@@ -6292,7 +6283,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.70029
             },
             "name": "NW Northrup St. & NW 24th Ave. (P3)",
-            "orig": "NW Northrup St. & NW 24th Ave. (P3)",
             "vertexType": "NORMAL"
           },
           "transitAlerts": [ ],

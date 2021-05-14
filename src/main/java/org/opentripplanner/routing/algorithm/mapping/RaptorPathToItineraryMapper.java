@@ -229,8 +229,8 @@ public class RaptorPathToItineraryMapper {
         Stop transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = ((TransferWithDuration) pathLeg.transfer()).transfer();
 
-        Place from = new Place(transferFromStop);
-        Place to = new Place(transferToStop);
+        Place from = Place.forStop(transferFromStop, null, null);
+        Place to = Place.forStop(transferToStop, null, null);
         return mapNonTransitLeg(pathLeg, transfer, from, to, false);
     }
 
@@ -328,10 +328,7 @@ public class RaptorPathToItineraryMapper {
      * Maps stops for transit legs.
      */
     private Place mapStopToPlace(Stop stop, Integer stopIndex, TripTimes tripTimes) {
-        Place place = new Place(stop);
-        place.stopIndex = stopIndex;
-        place.stopSequence = tripTimes.getOriginalGtfsStopSequence(stopIndex);
-        return place;
+        return Place.forStop(stop, stopIndex, tripTimes.getOriginalGtfsStopSequence(stopIndex));
     }
 
     private Calendar createCalendar(int timeInSeconds) {

@@ -75,7 +75,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -182,7 +182,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -294,7 +294,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -362,7 +362,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -1687,7 +1687,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -1794,7 +1794,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -1906,7 +1906,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -1974,7 +1974,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -2419,7 +2419,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -2526,7 +2526,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -2638,7 +2638,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -2706,7 +2706,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -3496,7 +3496,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.70059
             },
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
-            "orig": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 288,
@@ -3519,7 +3518,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -3626,7 +3625,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -3738,7 +3737,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -3806,7 +3805,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -3856,7 +3855,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.6924
             },
             "name": "NW Hoyt St. & NW 20th Ave. (P2)",
-            "orig": "NW Hoyt St. & NW 20th Ave. (P2)",
             "vertexType": "NORMAL"
           },
           "transitAlerts": [ ],
@@ -3969,7 +3967,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.70059
             },
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
-            "orig": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 288,
@@ -3992,7 +3989,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -4099,7 +4096,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -4211,7 +4208,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.6924
             },
             "name": "NW Hoyt St. & NW 20th Ave. (P2)",
-            "orig": "NW Hoyt St. & NW 20th Ave. (P2)",
             "vertexType": "NORMAL"
           },
           "transitAlerts": [ ],
@@ -4319,7 +4315,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.70059
             },
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
-            "orig": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 288,
@@ -4342,7 +4337,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -4449,7 +4444,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -4561,7 +4556,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "longitude": -122.6924
             },
             "name": "NW Hoyt St. & NW 20th Ave. (P2)",
-            "orig": "NW Hoyt St. & NW 20th Ave. (P2)",
             "vertexType": "NORMAL"
           },
           "transitAlerts": [ ],
@@ -5009,7 +5003,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -5099,7 +5093,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -5211,7 +5205,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -5279,7 +5273,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -6689,7 +6683,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -6779,7 +6773,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.6942362
             },
             "name": "-102323",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -6891,7 +6885,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,
@@ -6959,7 +6953,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.7003879
             },
             "name": "-102309",
-            "vehicleRentalStation": {
+            "vehicleRentalPlace": {
               "allowDropoff": true,
               "carStation": false,
               "floatingBike": false,

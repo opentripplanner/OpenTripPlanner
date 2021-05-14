@@ -1,25 +1,26 @@
 package org.opentripplanner.model.plan;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.opentripplanner.model.WgsCoordinate;
 
 public class PlaceTest {
 
     @Test
     public void sameLocationBasedOnInstance() {
-        Place aPlace = new Place(60.0, 10.0, "A Place");
+        Place aPlace = Place.normal(60.0, 10.0, "A Place");
         assertTrue("same instance", aPlace.sameLocation(aPlace));
     }
 
     @Test
     public void sameLocationBasedOnCoordinates() {
-        Place aPlace = new Place(60.0, 10.0, "A Place");
-        Place samePlace = new Place(60.000000000001, 10.0000000000001, "Same Place");
-        Place otherPlace = new Place(65.0, 14.0, "Other Place");
+        Place aPlace = Place.normal(60.0, 10.0, "A Place");
+        Place samePlace = Place.normal(60.000000000001, 10.0000000000001, "Same Place");
+        Place otherPlace = Place.normal(65.0, 14.0, "Other Place");
 
         assertTrue("same place", aPlace.sameLocation(samePlace));
         assertTrue("same place(symmetric)", samePlace.sameLocation(aPlace));
@@ -29,9 +30,12 @@ public class PlaceTest {
 
     @Test
     public void sameLocationBasedOnStopId() {
-        Place aPlace = place("A Place", "1");
-        Place samePlace = place("Same Place", "1");
-        Place otherPlace = place("Other Place", "2");
+        var s1 = stop("1", 1.0, 1.0);
+        var s2 = stop("2", 1.0, 2.0);
+
+        Place aPlace = place(s1);
+        Place samePlace = place(s1);
+        Place otherPlace = place(s2);
 
         assertTrue("same place", aPlace.sameLocation(samePlace));
         assertTrue("same place(symmetric)", samePlace.sameLocation(aPlace));
@@ -39,14 +43,13 @@ public class PlaceTest {
         assertFalse("other place(symmetric)", otherPlace.sameLocation(aPlace));
     }
 
-    private static Place place(String name, String stopId) {
-        Place p = new Place(null, null, name);
-        p.stop = new Stop(
+    private static Stop stop(String stopId, double lat, double lon) {
+       return new Stop(
                 new FeedScopedId("S", stopId),
                 null,
                 null,
                 null,
-                null,
+                WgsCoordinate.creatOptionalCoordinate(lat, lon),
                 null,
                 null,
                 null,
@@ -55,6 +58,11 @@ public class PlaceTest {
                 null,
                 null
         );
-        return p;
+    }
+
+    private static Place place(Stop stop) {
+        return Place.forStop(
+                stop, null, null
+        );
     }
 }

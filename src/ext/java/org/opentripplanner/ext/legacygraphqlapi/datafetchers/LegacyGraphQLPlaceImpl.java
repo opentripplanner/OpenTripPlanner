@@ -4,13 +4,11 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlace {
@@ -57,7 +55,7 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
       if (!place.vertexType.equals(VertexType.BIKESHARE)) { return null; }
 
-      return place.vehicleRentalStation;
+      return place.vehicleRentalPlace;
     };
   }
 
@@ -71,19 +69,18 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
     return this::getVehicleParking;
   }
 
+  @Override
+  public DataFetcher<VehicleParking> vehicleParking() {
+    return this::getVehicleParking;
+  }
+
   private VehicleParking getVehicleParking(DataFetchingEnvironment environment) {
-    FeedScopedId vehiclePlaceId = getSource(environment).place.stop.getId(); // TODO
+    var vehicleParkingWithEntrance = getSource(environment).place.vehicleParkingWithEntrance;
+    if (vehicleParkingWithEntrance == null) {
+      return null;
+    }
 
-    VehicleParkingService vehicleParkingService = getRoutingService(environment)
-        .getVehicleParkingService();
-
-    if (vehicleParkingService == null) { return null; }
-
-    return vehicleParkingService
-        .getVehicleParkings()
-        .filter(vehicleParking -> vehicleParking.getId().equals(vehiclePlaceId))
-        .findAny()
-        .orElse(null);
+    return vehicleParkingWithEntrance.getVehicleParking();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

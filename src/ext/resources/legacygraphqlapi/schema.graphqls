@@ -286,6 +286,8 @@ type VehicleParking implements Node & PlaceInterface {
 
     bicyclePlaces: Boolean
 
+    anyCarPlaces: Boolean
+
     carPlaces: Boolean
 
     wheelchairAccessibleCarPlaces: Boolean
@@ -1191,6 +1193,9 @@ type Place {
 
     """The car parking related to the place"""
     carPark: CarPark
+
+    """The vehicle parking related to the place"""
+    vehicleParking: VehicleParking
 }
 
 type placeAtDistance implements Node {
