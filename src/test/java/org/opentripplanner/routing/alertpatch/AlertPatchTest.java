@@ -184,4 +184,97 @@ public class AlertPatchTest extends TestCase {
         }
         assertEquals(expectedAlerts, actualAlerts);
     }
+
+    // test originally written by sdjacobs. See https://github.com/opentripplanner/OpenTripPlanner/pull/2607
+    public void testRouteDirectionAlert() {
+
+        // on route 18, direction 1 (N) is E -> D, 0 (S) is D -> E
+
+        AlertPatch rnp1 = new AlertPatch();
+        rnp1.setFeedId(feedId);
+        rnp1.setTimePeriods(Collections.singletonList(new TimePeriod(
+            0, 1000L * 60 * 60 * 24 * 365 * 40))); // until ~1/1/2011
+        Alert note1 = Alert.createSimpleAlerts("The route alert for route 18 directionId=1");
+        rnp1.setAlert(note1);
+        rnp1.setId("id1");
+        rnp1.setRoute(new FeedScopedId("agency", "18"));
+        rnp1.setDirectionId(1);
+        rnp1.apply(graph);
+
+        AlertPatch rnp2 = new AlertPatch();
+        rnp2.setFeedId(feedId);
+        rnp2.setTimePeriods(Collections.singletonList(new TimePeriod(
+            0, 1000L * 60 * 60 * 24 * 365 * 40))); // until ~1/1/2011
+        Alert note2 = Alert.createSimpleAlerts("The route alert for route 18 directionId=0");
+        rnp2.setAlert(note2);
+        rnp2.setId("id2");
+        rnp2.setRoute(new FeedScopedId("agency", "18"));
+        rnp2.setDirectionId(0);
+        rnp2.apply(graph);
+
+        Vertex stop_d = graph.getVertex(feedId + ":D");
+        Vertex stop_e = graph.getVertex(feedId + ":E_arrive");
+
+        ShortestPathTree spt;
+        GraphPath path;
+
+        options.setRoutingContext(graph, stop_d, stop_e);
+        spt = aStar.getShortestPathTree(options);
+
+        path = spt.getPath(stop_e, false);
+        assertNotNull(path);
+        HashSet<Alert> expectedAlerts = new HashSet<Alert>();
+        expectedAlerts.add(note2);
+        Edge actualEdge = path.states.get(2).getBackEdge();
+        HashSet<Alert> actualAlerts = new HashSet<Alert>();
+        for (AlertPatch alertPatch : graph.getAlertPatches(actualEdge)) {
+            actualAlerts.add(alertPatch.getAlert());
+        }
+        assertEquals(expectedAlerts, actualAlerts);
+    }
+
+    public void testRouteTypeAlert() {
+
+        // on route 18, direction 1 (N) is E -> D, 0 (S) is D -> E
+
+        AlertPatch rnp1 = new AlertPatch();
+        rnp1.setFeedId("agency");
+        rnp1.setTimePeriods(Collections.singletonList(new TimePeriod(
+            0, 1000L * 60 * 60 * 24 * 365 * 40))); // until ~1/1/2011
+        Alert note1 = Alert.createSimpleAlerts("The route alert for route_type=1");
+        rnp1.setAlert(note1);
+        rnp1.setId("id1");
+        rnp1.setRouteType(1);
+        rnp1.apply(graph);
+
+        AlertPatch rnp2 = new AlertPatch();
+        rnp2.setFeedId("agency");
+        rnp2.setTimePeriods(Collections.singletonList(new TimePeriod(
+            0, 1000L * 60 * 60 * 24 * 365 * 40))); // until ~1/1/2011
+        Alert note2 = Alert.createSimpleAlerts("The route alert for route_type=2");
+        rnp2.setAlert(note2);
+        rnp2.setId("id2");
+        rnp2.setRouteType(2);
+        rnp2.apply(graph);
+
+        Vertex stop_d = graph.getVertex(feedId + ":D");
+        Vertex stop_e = graph.getVertex(feedId + ":E_arrive");
+
+        ShortestPathTree spt;
+        GraphPath path;
+
+        options.setRoutingContext(graph, stop_d, stop_e);
+        spt = aStar.getShortestPathTree(options);
+
+        path = spt.getPath(stop_e, false);
+        assertNotNull(path);
+        HashSet<Alert> expectedAlerts = new HashSet<Alert>();
+        expectedAlerts.add(note2);
+        Edge actualEdge = path.states.get(2).getBackEdge();
+        HashSet<Alert> actualAlerts = new HashSet<Alert>();
+        for (AlertPatch alertPatch : graph.getAlertPatches(actualEdge)) {
+            actualAlerts.add(alertPatch.getAlert());
+        }
+        assertEquals(expectedAlerts, actualAlerts);
+    }
 }
