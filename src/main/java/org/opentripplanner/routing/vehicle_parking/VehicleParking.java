@@ -3,9 +3,11 @@ package org.opentripplanner.routing.vehicle_parking;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
@@ -46,7 +48,7 @@ public class VehicleParking implements Serializable {
    * Source specific tags of the vehicle parking, which describe the available features. For example
    * park_and_ride, bike_lockers, or static_osm_data.
    */
-  private final List<String> tags;
+  private final Set<String> tags;
 
   /**
    * A short translatable note containing details of this vehicle parking.
@@ -95,7 +97,7 @@ public class VehicleParking implements Serializable {
           double y,
           String detailsUrl,
           String imageUrl,
-          List<String> tags,
+          Set<String> tags,
           I18NString note,
           VehicleParkingState state,
           boolean bicyclePlaces,
@@ -144,7 +146,7 @@ public class VehicleParking implements Serializable {
     return imageUrl;
   }
 
-  public List<String> getTags() {
+  public Set<String> getTags() {
     return tags;
   }
 
@@ -244,7 +246,7 @@ public class VehicleParking implements Serializable {
 
   @SuppressWarnings("unused")
   public static class VehicleParkingBuilder {
-    private List<String> tags = new ArrayList<>();
+    private Set<String> tags = Set.of();
     private final List<VehicleParkingEntranceCreator> entranceCreators = new ArrayList<>();
     private FeedScopedId id;
     private I18NString name;
@@ -264,7 +266,7 @@ public class VehicleParking implements Serializable {
     VehicleParkingBuilder() {}
 
     public VehicleParkingBuilder tags(Collection<String> tags) {
-      this.tags = new ArrayList<>(tags);
+      this.tags = new HashSet<>(tags);
       return this;
     }
 

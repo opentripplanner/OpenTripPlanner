@@ -371,6 +371,14 @@ public abstract class RoutingResource {
     @QueryParam("bannedVehicleRentalNetworks")
     protected Set<String> bannedVehicleRentalNetworks;
 
+    /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+    @QueryParam("requiredVehicleParkingTags")
+    protected Set<String> requiredVehicleParkingTags = Set.of();
+
+    /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+    @QueryParam("bannedVehicleParkingTags")
+    protected Set<String> bannedVehicleParkingTags = Set.of();
+
     /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
      * TriMet_100 (100 is route short name) or Trimet__42 (two underscores, 42 is the route
@@ -752,7 +760,13 @@ public abstract class RoutingResource {
             request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
 
         if (bannedVehicleRentalNetworks != null)
-            request.allowedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+            request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+
+        if (bannedVehicleParkingTags != null)
+            request.bannedVehicleParkingTags = bannedVehicleParkingTags;
+
+        if (requiredVehicleParkingTags != null)
+            request.requiredVehicleParkingTags = requiredVehicleParkingTags;
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle

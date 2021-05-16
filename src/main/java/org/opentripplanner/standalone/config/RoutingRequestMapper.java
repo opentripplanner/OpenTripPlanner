@@ -27,6 +27,7 @@ public class RoutingRequestMapper {
         request.allowedVehicleRentalNetworks = c.asStringSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
         request.bikeRental = c.asBoolean("allowBikeRental", dft.bikeRental);
         request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
+        request.bannedVehicleParkingTags = c.asStringSet("bannedVehicleParkingTags", dft.bannedVehicleParkingTags);
         request.bannedVehicleRentalNetworks = c.asStringSet("bannedVehicleRentalNetworks", dft.bannedVehicleRentalNetworks);
         request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
         request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
@@ -80,6 +81,7 @@ public class RoutingRequestMapper {
         request.otherThanPreferredRoutesPenalty = c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
         request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
         request.pathComparator = c.asText("pathComparator", dft.pathComparator);
+        request.requiredVehicleParkingTags = c.asStringSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
         request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
         request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);

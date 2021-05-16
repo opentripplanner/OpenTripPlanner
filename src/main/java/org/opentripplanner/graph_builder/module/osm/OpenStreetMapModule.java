@@ -562,11 +562,30 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     String.format("%s/%d", entity.getClass().getSimpleName(), entity.getId())
             );
 
+            var tags = new ArrayList<String>();
+
+            tags.add(isCarParkAndRide ? "osm:amenity=parking" : "osm:amenity=bicycle_parking");
+
+            if (entity.isTagTrue("fee")) {
+                tags.add("osm:fee");
+            }
+            if (entity.hasTag("supervised") && !entity.isTagTrue("supervised")) {
+                tags.add("osm:supervised");
+            }
+            if (entity.hasTag("covered") && !entity.isTagFalse("covered")) {
+                tags.add("osm:covered");
+            }
+            if (entity.hasTag("surveillance") && !entity.isTagFalse("surveillance")) {
+                tags.add("osm:surveillance");
+            }
+
             return VehicleParking.builder()
                     .id(id)
                     .name(creativeName)
                     .x(lon)
                     .y(lat)
+                    .tags(tags)
+                    .detailsUrl(entity.getTag("website"))
                     .bicyclePlaces(bicyclePlaces)
                     .carPlaces(carPlaces)
                     .wheelchairAccessibleCarPlaces(wheelchairAccessibleCarPlaces)
