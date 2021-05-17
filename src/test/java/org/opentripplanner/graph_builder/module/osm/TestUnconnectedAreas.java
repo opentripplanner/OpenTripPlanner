@@ -83,7 +83,7 @@ public class TestUnconnectedAreas {
      @Test
      public void testRoadPassingOverNode () {
     	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
-    	 assertTrue(connections.contains("osm:node:-10"));
+    	 assertTrue(connections.contains("osm:node:-102236"));
      }
      
      /**
@@ -92,25 +92,37 @@ public class TestUnconnectedAreas {
       */
      @Test
      public void testAreaPassingOverNode () {
-    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
-    	 assertTrue(connections.contains("osm:node:-10"));
+    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr_reverse.osm.pbf", 1, 2);
+    	 assertTrue(connections.contains("osm:node:-102296"));
      }
-     
+
      /**
      * Test the situation where a road passes over a node of a park and ride but does not have a node there.
       * Additionally, the node of the ring is duplicated to test this corner case.
       */
      @Test
      public void testRoadPassingOverDuplicatedNode () {
-    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
+    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr_dupl.osm.pbf", 1, 2);
     	 
     	 // depending on what order everything comes out of the spatial index, we will inject one of
     	 // the duplicated nodes into the way. When we get to the other ringsegments, we will just inject
     	 // the node that has already been injected into the way. So either of these cases are valid.
-    	 assertTrue(connections.contains("osm:node:-10") || connections.contains("osm:node:-100"));
+    	 assertTrue(connections.contains("osm:node:-102266") || connections.contains("osm:node:-102267"));
      }
 
-      private Graph buildOSMGraph(String osmFileName) {
+    /**
+     * Test the situation where a road passes over an edge of the park and ride. Both ends of the
+     * way are connected to the park and ride.
+     */
+    @Test
+    public void testRoadPassingOverParkRide() {
+        List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr_overlap.osm.pbf", 2, 4);
+
+        assertTrue(connections.contains("osm:node:-102283"));
+        assertTrue(connections.contains("osm:node:-102284"));
+    }
+
+    private Graph buildOSMGraph(String osmFileName) {
         return buildOSMGraph(osmFileName, new DataImportIssueStore(false));
       }
 

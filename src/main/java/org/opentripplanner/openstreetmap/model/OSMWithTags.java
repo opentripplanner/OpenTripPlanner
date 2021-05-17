@@ -287,8 +287,10 @@ public class OSMWithTags {
         String parkingType = getTag("parking");
         String parkAndRide = getTag("park_ride");
         return isTag("amenity", "parking")
-                && (parkingType != null && parkingType.contains("park_and_ride"))
-                || (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"));
+                && (
+                        (parkingType != null && parkingType.contains("park_and_ride"))
+                     || (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"))
+        );
     }
 
     /**
