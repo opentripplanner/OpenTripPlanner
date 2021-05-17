@@ -136,6 +136,9 @@ public class OSMWithTags {
      * {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule}
      */
     public I18NString getAssumedName() {
+        if (tags == null) {
+            return null;
+        }
         if (tags.containsKey("name")) {
             return TranslatedString.getI18NString(TemplateLibrary.generateI18N("{name}", this));
         }

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Data;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -71,6 +72,7 @@ import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.LocalizedStringFormat;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
@@ -434,7 +436,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         ) {
 
             Envelope envelope = new Envelope();
-            Set<OsmVertex> accessVertices = new HashSet<>();
+            Set<VertexAndName> accessVertices = new HashSet<>();
 
             OSMWithTags entity = null;
 
@@ -462,7 +464,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             boolean carAccessibleIn = false;
             boolean walkAccessibleOut = false;
             boolean carAccessibleOut = false;
-            for (OsmVertex accessVertex : accessVertices) {
+            for (VertexAndName access : accessVertices) {
+                var accessVertex = access.getVertex();
                 for (Edge incoming : accessVertex.getIncoming()) {
                     if (incoming instanceof StreetEdge) {
                         if (walkReq.canBeTraversed((StreetEdge)incoming))
@@ -499,7 +502,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
             }
 
-            List<VehicleParking.VehicleParkingEntranceCreator> entrances = createParkingEntrancesFromAccessVertices(accessVertices, creativeName.toString(), entity);
+            List<VehicleParking.VehicleParkingEntranceCreator> entrances = createParkingEntrancesFromAccessVertices(accessVertices, creativeName, entity);
 
             var vehicleParking = createVehicleParkingObjectFromOsmEntity(
                     isCarParkAndRide,
@@ -573,27 +576,27 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
         private I18NString nameParkAndRideEntity(boolean isCarParkAndRide, OSMWithTags osmWithTags) {
             I18NString creativeName = osmWithTags.getAssumedName();
-            if (creativeName == null)
-                creativeName = new NonLocalizedString(String.format("%s (%d)", isCarParkAndRide
-                        ? "P+R" : "B+R", osmWithTags.getId()));
+            if (creativeName == null) {
+                creativeName = new NonLocalizedString(isCarParkAndRide ? "P+R" : "B+R");
+            }
             return creativeName;
         }
 
-        private List<OsmVertex> processVehicleParkingArea(Area area, Envelope envelope) {
+        private List<VertexAndName> processVehicleParkingArea(Area area, Envelope envelope) {
             return area.outermostRings.stream()
                     .flatMap(ring -> processVehicleParkingArea(ring, area.parent, envelope).stream())
                     .collect(Collectors.toList());
         }
 
-        private List<OsmVertex> processVehicleParkingArea(Ring ring, OSMWithTags entity, Envelope envelope) {
-            List<OsmVertex> accessVertices = new ArrayList<>();
+        private List<VertexAndName> processVehicleParkingArea(Ring ring, OSMWithTags entity, Envelope envelope) {
+            List<VertexAndName> accessVertices = new ArrayList<>();
             for (OSMNode node : ring.nodes) {
                 envelope.expandToInclude(new Coordinate(node.lon, node.lat));
                 OsmVertex accessVertex = getVertexForOsmNode(node, entity);
                 if (accessVertex.getIncoming().isEmpty()
                         || accessVertex.getOutgoing().isEmpty())
                     continue;
-                accessVertices.add(accessVertex);
+                accessVertices.add(VertexAndName.of(node.getAssumedName(), accessVertex));
             }
 
             accessVertices.addAll(
@@ -606,24 +609,32 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         private List<VehicleParking.VehicleParkingEntranceCreator> createParkingEntrancesFromAccessVertices(
-                Set<OsmVertex> accessVertices,
-                String vehicleParkingName,
+                Set<VertexAndName> accessVertices,
+                I18NString vehicleParkingName,
                 OSMWithTags entity
         ) {
             List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
 
-            for (var accessVertex : accessVertices) {
-                var vertexName = accessVertex.getName();
-                var entranceName = vertexName == null ? String.format("#%d", entrances.size() + 1) : vertexName;
+            for (var access : accessVertices) {
+                I18NString suffix = null;
+                if (access.getName() != null) {
+                    suffix = access.getName();
+                }
+
+                if (suffix == null) {
+                        suffix = new NonLocalizedString(String.format("#%d", entrances.size() + 1));
+                }
+
+                var entranceName = new LocalizedStringFormat("%s (%s)", vehicleParkingName, suffix);
 
                 entrances.add((builder) -> builder
-                    .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, String.format("%s/%d/%d", entity.getClass().getSimpleName(), entity.getId(), accessVertex.nodeId)))
-                    .name(new NonLocalizedString(String.format("%s (%s)", vehicleParkingName, entranceName)))
-                    .x(accessVertex.getX())
-                    .y(accessVertex.getY())
-                    .vertex(accessVertex)
-                    .walkAccessible(accessVertex.isConnectedToWalkingEdge())
-                    .carAccessible(accessVertex.isConnectedToDriveableEdge()));
+                    .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, String.format("%s/%d/%d", entity.getClass().getSimpleName(), entity.getId(), access.getVertex().nodeId)))
+                    .name(entranceName)
+                    .x(access.getVertex().getX())
+                    .y(access.getVertex().getY())
+                    .vertex(access.getVertex())
+                    .walkAccessible(access.getVertex().isConnectedToWalkingEdge())
+                    .carAccessible(access.getVertex().isConnectedToDriveableEdge()));
             }
 
             return entrances;
@@ -1373,5 +1384,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         for (BinaryOpenStreetMapProvider provider : _providers) {
             provider.checkInputs();
         }
+    }
+
+    @Data(staticConstructor = "of")
+    private static class VertexAndName {
+        private final I18NString name;
+        private final OsmVertex vertex;
     }
 }
