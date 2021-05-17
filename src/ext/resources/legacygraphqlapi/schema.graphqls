@@ -205,21 +205,18 @@ enum AlertSeverityLevelType {
     SEVERE
 }
 
-"""Bike park represents a location where bicycles can be parked."""
-type BikePark implements Node & PlaceInterface {
+"""Vehicle parking represents a location where bicycles or cars can be parked."""
+type VehicleParking implements Node & PlaceInterface {
     """
     Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
     """
     id: ID!
 
-    """ID of the bike park"""
-    bikeParkId: String
+    """ID of the park"""
+    vehicleParkingId: String
 
-    """Name of the bike park"""
+    """Name of the park"""
     name: String!
-
-    """Number of spaces available for bikes"""
-    spacesAvailable: Int
 
     """
     If true, value of `spacesAvailable` is updated from a real-time source.
@@ -231,6 +228,40 @@ type BikePark implements Node & PlaceInterface {
 
     """Latitude of the bike park (WGS 84)"""
     lat: Float
+
+    detailsUrl: String
+
+    imageUrl: String
+
+    tags: [String]
+
+    note: String
+
+    state: VehicleParkingState
+
+    bicyclePlaces: Boolean
+
+    carPlaces: Boolean
+
+    wheelchairAccessibleCarPlaces: Boolean
+
+    capacity: VehiclePlaces
+
+    availability: VehiclePlaces
+}
+
+enum VehicleParkingState {
+    OPERATIONAL
+    TEMPORARILY_CLOSED
+    CLOSED
+}
+
+type VehiclePlaces {
+    bicycleSpaces: Int
+
+    carSpaces: Int
+
+    wheelchairAccessibleCarSpaces: Int
 }
 
 """
@@ -327,37 +358,6 @@ enum BikesAllowed {
 
     """No bicycles are allowed on this trip."""
     NOT_ALLOWED
-}
-
-"""Car park represents a location where cars can be parked."""
-type CarPark implements Node & PlaceInterface {
-    """
-    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
-    """
-    id: ID!
-
-    """ID of the car park"""
-    carParkId: String
-
-    """Name of the car park"""
-    name: String!
-
-    """Number of parking spaces at the car park"""
-    maxCapacity: Int
-
-    """Number of currently available parking spaces at the car park"""
-    spacesAvailable: Int
-
-    """
-    If true, value of `spacesAvailable` is updated from a real-time source.
-    """
-    realtime: Boolean
-
-    """Longitude of the car park (WGS 84)"""
-    lon: Float
-
-    """Latitude of the car park (WGS 84)"""
-    lat: Float
 }
 
 """Cluster is a list of stops grouped by name and proximity"""
@@ -1108,10 +1108,10 @@ type Place {
     bikeRentalStation: BikeRentalStation
 
     """The bike parking related to the place"""
-    bikePark: BikePark
+    bikePark: VehicleParking
 
     """The car parking related to the place"""
-    carPark: CarPark
+    carPark: VehicleParking
 }
 
 type placeAtDistance implements Node {
@@ -1545,12 +1545,12 @@ type QueryType {
     bikeRentalStation(id: String!): BikeRentalStation
 
     """Get all bike parks"""
-    bikeParks: [BikePark]
+    bikeParks: [VehicleParking]
 
     """
     Get a single bike park based on its ID, i.e. value of field `bikeParkId`
     """
-    bikePark(id: String!): BikePark
+    bikePark(id: String!): VehicleParking
 
     """Get all car parks"""
     carParks(
@@ -1559,10 +1559,10 @@ type QueryType {
         **Note:** if an id is invalid (or the car park service is unavailable) the returned list will contain `null` values.
         """
         ids: [String]
-    ): [CarPark]
+    ): [VehicleParking]
 
     """Get a single car park based on its ID, i.e. value of field `carParkId`"""
-    carPark(id: String!): CarPark
+    carPark(id: String!): VehicleParking
 
     """Needed until https://github.com/facebook/relay/issues/112 is resolved"""
     viewer: QueryType
@@ -2496,8 +2496,8 @@ enum VertexType {
     """TRANSIT"""
     TRANSIT
 
-    """BIKEPARK"""
-    BIKEPARK
+    """VEHICLEPARKING"""
+    VEHICLEPARKING
 
     """BIKESHARE"""
     BIKESHARE

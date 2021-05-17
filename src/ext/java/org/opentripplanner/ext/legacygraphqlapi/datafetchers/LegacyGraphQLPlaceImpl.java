@@ -4,11 +4,13 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlace {
@@ -59,16 +61,29 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
     };
   }
 
-  // TODO
   @Override
   public DataFetcher<VehicleParking> bikePark() {
-    return environment -> null;
+    return this::getVehicleParking;
   }
 
-  // TODO
   @Override
-  public DataFetcher<Object> carPark() {
-    return environment -> null;
+  public DataFetcher<VehicleParking> carPark() {
+    return this::getVehicleParking;
+  }
+
+  private VehicleParking getVehicleParking(DataFetchingEnvironment environment) {
+    FeedScopedId vehiclePlaceId = getSource(environment).place.stop.getId(); // TODO
+
+    VehicleParkingService vehicleParkingService = getRoutingService(environment)
+        .getVehicleParkingService();
+
+    if (vehicleParkingService == null) { return null; }
+
+    return vehicleParkingService
+        .getVehicleParkings()
+        .filter(vehicleParking -> vehicleParking.getId().equals(vehiclePlaceId))
+        .findAny()
+        .orElse(null);
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

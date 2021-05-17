@@ -1533,6 +1533,30 @@ public class LegacyGraphQLTypes {
         public String getLegacyGraphQLServiceDate() { return this._serviceDate; }
     }
 
+    public enum LegacyGraphQLVehicleParkingState {
+        Operational("OPERATIONAL"),
+        TemporarilyClosed("TEMPORARILY_CLOSED"),
+        Closed("CLOSED");
+
+        public final String label;
+
+        LegacyGraphQLVehicleParkingState(String label) {
+            this.label = label;
+        }
+
+        private static final Map<String, LegacyGraphQLVehicleParkingState> BY_LABEL = new HashMap<>();
+
+        static {
+            for (LegacyGraphQLVehicleParkingState e : values()) {
+                BY_LABEL.put(e.label, e);
+            }
+        }
+
+        public static LegacyGraphQLVehicleParkingState valueOfLabel(String label) {
+            return BY_LABEL.get(label);
+        }
+    }
+
     public enum LegacyGraphQLVertexType {
         Normal("NORMAL"),
         Transit("TRANSIT"),

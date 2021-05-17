@@ -30,6 +30,9 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.SystemNotice;
 import graphql.schema.TypeResolver;
@@ -497,7 +500,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<VehicleParking> bikePark();
 
-        public DataFetcher<Object> carPark();
+        public DataFetcher<VehicleParking> carPark();
     }
 
     public interface LegacyGraphQLPlaceAtDistance {
@@ -624,9 +627,9 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<VehicleParking> bikePark();
 
-        public DataFetcher<Iterable<Object>> carParks();
+        public DataFetcher<Iterable<VehicleParking>> carParks();
 
-        public DataFetcher<Object> carPark();
+        public DataFetcher<VehicleParking> carPark();
 
         public DataFetcher<Object> viewer();
 
@@ -932,4 +935,31 @@ public class LegacyGraphQLDataFetchers {
 
         default public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id() { return null; }
     }
+
+  /** Vehicle parking represents a location where bicycles or cars can be parked. */
+  public interface LegacyGraphQLVehicleParking {
+    public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+    public DataFetcher<String> vehicleParkingId();
+    public DataFetcher<String> name();
+    public DataFetcher<Boolean> realtime();
+    public DataFetcher<Double> lon();
+    public DataFetcher<Double> lat();
+    public DataFetcher<String> detailsUrl();
+    public DataFetcher<String> imageUrl();
+    public DataFetcher<Iterable<String>> tags();
+    public DataFetcher<String> note();
+    public DataFetcher<VehicleParking.VehicleParkingState> state();
+    public DataFetcher<Boolean> bicyclePlaces();
+    public DataFetcher<Boolean> carPlaces();
+    public DataFetcher<Boolean> wheelchairAccessibleCarPlaces();
+    public DataFetcher<VehicleParking.VehiclePlaces> capacity();
+    public DataFetcher<VehicleParking.VehiclePlaces> availability();
+  }
+  
+  public interface LegacyGraphQLVehiclePlaces {
+    public DataFetcher<Integer> bicycleSpaces();
+    public DataFetcher<Integer> carSpaces();
+    public DataFetcher<Integer> wheelchairAccessibleCarSpaces();
+  }
+
 }

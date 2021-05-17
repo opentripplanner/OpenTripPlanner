@@ -28,7 +28,7 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
 
     if (o instanceof Agency) { return schema.getObjectType("Agency"); }
     if (o instanceof TransitAlert) { return schema.getObjectType("Alert"); }
-    if (o instanceof VehicleParking) { return schema.getObjectType("BikePark"); }
+    if (o instanceof VehicleParking) { return schema.getObjectType("VehicleParking"); }
     if (o instanceof VehicleRentalStation) { return schema.getObjectType("BikeRentalStation"); }
     // if (o instanceof Cluster) { return schema.getObjectType("Cluster"); }
     if (o instanceof PatternAtStop) { return schema.getObjectType("DepartureRow"); }
