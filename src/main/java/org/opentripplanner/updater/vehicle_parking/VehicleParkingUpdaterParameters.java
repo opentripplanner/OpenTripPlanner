@@ -1,5 +1,7 @@
 package org.opentripplanner.updater.vehicle_parking;
 
+import java.util.Map;
+import javax.validation.constraints.NotNull;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
@@ -12,6 +14,7 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
   private final String namePrefix;
   private final boolean zip;
   private final DataSourceType sourceType;
+  private final Map<String, String> httpHeaders;
 
 
   public VehicleParkingUpdaterParameters(
@@ -21,6 +24,8 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
       String namePrefix,
       int frequencySec,
       boolean zip,
+      @NotNull
+      Map<String, String> httpHeaders,
       DataSourceType sourceType
   ) {
     this.configRef = configRef;
@@ -29,6 +34,7 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
     this.frequencySec = frequencySec;
     this.namePrefix = namePrefix;
     this.zip = zip;
+    this.httpHeaders = httpHeaders;
     this.sourceType = sourceType;
   }
 
@@ -53,6 +59,10 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
 
   public String getUrl() {
     return url;
+  }
+
+  public Map<String, String> getHttpHeaders() {
+    return httpHeaders;
   }
 
   public String getNamePrefix() {

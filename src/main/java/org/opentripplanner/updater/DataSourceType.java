@@ -7,6 +7,8 @@ public enum DataSourceType {
 
   // Vehicle Parking
   KML,
+  PARK_API,
+  BICYCLE_PARK_API,
 
   // GTFS RT
   GTFS_RT_HTTP,

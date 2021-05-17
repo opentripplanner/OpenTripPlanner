@@ -14,6 +14,8 @@ public class VehicleParkingUpdaterConfig {
 
   static {
     CONFIG_MAPPING.put("kml", DataSourceType.KML);
+    CONFIG_MAPPING.put("park-api", DataSourceType.PARK_API);
+    CONFIG_MAPPING.put("bicycle-park-api", DataSourceType.BICYCLE_PARK_API);
   }
 
   private static DataSourceType mapStringToSourceType(String typeKey) {
@@ -24,7 +26,6 @@ public class VehicleParkingUpdaterConfig {
     return type;
   }
 
-
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
     return new VehicleParkingUpdaterParameters(
         updaterRef,
@@ -33,6 +34,7 @@ public class VehicleParkingUpdaterConfig {
         c.asText("namePrefix", null),
         c.asInt("frequencySec", 60),
         c.asBoolean("zip", false),
+        c.asMap("headers", NodeAdapter::asText),
         mapStringToSourceType(c.asText("sourceType"))
     );
   }
