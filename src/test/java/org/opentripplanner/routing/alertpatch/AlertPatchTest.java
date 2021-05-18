@@ -218,6 +218,7 @@ public class AlertPatchTest extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
         options.setRoutingContext(graph, stop_d, stop_e);
         spt = aStar.getShortestPathTree(options);
 
@@ -263,6 +264,7 @@ public class AlertPatchTest extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
         options.setRoutingContext(graph, stop_d, stop_e);
         spt = aStar.getShortestPathTree(options);
 
