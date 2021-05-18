@@ -68,7 +68,8 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
     private final TestTripSchedule tripC = route.timetable().getTripSchedule(TRIP_C);
 
     // The service under test - the subject
-    private TripScheduleAlightSearch<TestTripSchedule> subject = new TripScheduleAlightSearch<>(
+    private TripScheduleAlightSearch<TestTripSchedule>
+            subject = new TripScheduleAlightSearch<>(
             TRIPS_BINARY_SEARCH_THRESHOLD, route.timetable()
     );
 

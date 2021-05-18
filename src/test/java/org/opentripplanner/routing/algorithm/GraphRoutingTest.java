@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.List;
 import java.util.Set;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -25,16 +26,20 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 public abstract class GraphRoutingTest {
 
@@ -213,6 +218,31 @@ public abstract class GraphRoutingTest {
                     from, to, String.format("%s%s pathway", from.getName(), to.getName()));
         }
 
+        // -- Street linking
+        public TemporaryStreetLocation streetLocation(
+                String name,
+                double latitude,
+                double longitude,
+                boolean endVertex
+        ) {
+            return new TemporaryStreetLocation(
+                    name, new Coordinate(longitude, latitude), new NonLocalizedString(name),
+                    endVertex
+            );
+        }
+
+        public TemporaryFreeEdge link(TemporaryVertex from, StreetVertex to) {
+            return new TemporaryFreeEdge(from, to);
+        }
+
+        public TemporaryFreeEdge link(StreetVertex from, TemporaryVertex to) {
+            return new TemporaryFreeEdge(from, to);
+        }
+
+        public List<TemporaryFreeEdge> biLink(StreetVertex from, TemporaryVertex to) {
+            return List.of(link(from, to), link(to, from));
+        }
+
         // -- Bike rental
         public BikeRentalStation bikeRentalStationEntity(
                 String id,
@@ -223,6 +253,7 @@ public abstract class GraphRoutingTest {
             bikeRentalStation.id = id;
             bikeRentalStation.x = longitude;
             bikeRentalStation.y = latitude;
+            bikeRentalStation.isKeepingBicycleRentalAtDestinationAllowed = false;
             return bikeRentalStation;
         }
 

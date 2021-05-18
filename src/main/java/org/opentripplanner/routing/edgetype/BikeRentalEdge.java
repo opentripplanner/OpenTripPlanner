@@ -44,7 +44,7 @@ public class BikeRentalEdge extends Edge {
                     if (options.useBikeRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
                         return null;
                     }
-                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(),true);
+                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), true);
                     pickedUp = false;
                     break;
                 case RENTING_FLOATING:
@@ -59,8 +59,13 @@ public class BikeRentalEdge extends Edge {
                     if (options.useBikeRentalAvailabilityInformation && stationVertex.getBikesAvailable() == 0) {
                         return null;
                     }
+                    // For arriveBy searches mayKeepRentedBicycleAtDestination is only set in State#getInitialStates(),
+                    // and so here it is checked if this bicycle could have been kept at the destination
+                    if (s0.mayKeepRentedBicycleAtDestination() && !stationVertex.getStation().isKeepingBicycleRentalAtDestinationAllowed) {
+                        return null;
+                    }
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
-                    s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), true);
+                    s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), false, true);
                     pickedUp = true;
                     break;
                 default:
@@ -75,7 +80,10 @@ public class BikeRentalEdge extends Edge {
                     if (stationVertex.getStation().isFloatingBike) {
                         s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), false);
                     } else {
-                        s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), false);
+                        var mayKeep =
+                                stationVertex.getStation().isKeepingBicycleRentalAtDestinationAllowed
+                                        && options.allowKeepingRentedBicycleAtDestination;
+                        s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), mayKeep, false);
                     }
                     pickedUp = true;
                     break;

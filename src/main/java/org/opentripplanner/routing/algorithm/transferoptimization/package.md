@@ -1,29 +1,29 @@
 # Transfers / Interchanges
 
-OTP2 handles transfers different from OTP1. In OTP1 optimizing transfers were done embedding it
-into the cost during the search. In OTP2 finding the best transfers is done partially during
-routing and then improved in a post processing step. It is easier to understand how you should tune
-OTP2 if you understand how OTP2 does the optimizations. When optimizing transfers we want to find 
-the best paths through the graph with respect to transfers, and the best stops to transfer between
-two trips in a given path.
+OTP2 handles transfers differently than OTP1. In OTP1, transfers were optimized by applying a cost 
+for each transfer edge during the search. In OTP2, finding the best transfers is done partially during
+routing and then improved in a post-processing step. It is easier to understand how you should tune
+OTP2 if you understand this process. When optimizing transfers we first find 
+the best paths (sequences of trips), then identify the best stops to transfer between
+subsequent trips in each of those paths (the post-processing).
 
-## Background
+## Supported Input Data
 
-- OTP support [GTFS Transfers.txt](https://gtfs.org/reference/static#transferstxt) and the Google 
+- OTP supports [GTFS Transfers.txt](https://gtfs.org/reference/static#transferstxt) and the Google 
   extention with [Trip to Trip transfers](https://developers.google.com/transit/gtfs/reference/gtfs-extensions#TripToTripTransfers).
-- OTP support [NeTEx Interchanges](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728760393/timetable#Interchange.1) as specified in the Nordic profile.  
+- OTP supports [NeTEx Interchanges](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728760393/timetable#Interchange.1) as specified in the Nordic profile.  
 
 
 ## Goals
 
  1. Prefer paths with fewer transfers over many transfers.
- 2. Some locations (stop pairs) is better than others.
+ 2. Prefer some locations (stop pairs) over others.
  3. Support `StaySeated` and `Guaranteed` transfers.
  4. Choose the transfer with the highest priority: `Preferred` over `Recommended` over `Allowed`. 
  5. Support for transfer specificity, [Specificity of a transfer](https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer).
  6. Prevent transfers between stops and/or trips/routes. GTFS Transfers `transfer_type = 3` and
     Netex Transfer `priority = -1(not allowed)`.
- 7. Find the best place to transfer for two given transit trips. Normally we want to maximize the
+ 7. Find the best place to transfer between two transit trips in a path. Normally we want to maximize the
     "wait-time"/"extra-time" to allow the traveler to have as much time to do the transfer as 
     possible.
     1. Maximize the wait-time
@@ -32,30 +32,36 @@ two trips in a given path.
        having 30 seconds for one and 7m30s for the other.  
     3. For a transfer between two trips we want to find the right balance, between
        extra-transfer-time and the path generalized-cost(like the cost of walking and riding a
-       buss). 
+       bus). 
  
-## Not supported
+## Not Supported
  - Using GTFS transfers.txt it is possible to set the `min_transfer_time` with `transfer_type = 2`. 
  - The NeTEx Interchange MaximumWaitTime is ignored.
 
-## Process
+## Implementation
 
 Finding the best transfers is done in 2 separate steps in OTP:
 
- 1. As part of the routing. The routing engine (Raptor) has a generalized-cost and 
-    number-of-transfers as criteria during the routing. Some of the goals above are implemented 
-    using the generalized-cost.
- 2. Post processing paths. Paths from the routing search are optimized with respect to where 
-    transfers happen for each pair of transit rides(trips). This step do NOT compare two paths 
-    returned by the router(Raptor), but instead find all possible transfers for a given path, and 
-    the different alternatives to transfer between each pair of trip within the path. This is an 
-    outline of the process:
+ 1. As part of the routing. The routing engine (Raptor) applies generalized-cost and 
+    number-of-transfers as criteria during the routing. In addition, Raptor supports overriding 
+    regular transfers with guaranteed transfers. 
+    1. Goal 1 is achieved by having `number-of-transfers` as a Raptor criterion.
+    2. Goal 2 is achieved by giving some stops a lower _visiting-cost_ according to the 
+       `StopTransferPriority`.
+    3. Goal 3 and 6 is achieved by allowing guaranteed transfers to override regular transfers. An 
+       optional `RaptorGuaranteedTransferProvider` is injected into Raptor witch Raptor calls to 
+       get guaranteed transfers. This service is also responsible for rejecting a transfer. 
+ 2. Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the routing search are revised,
+    optimizing the stop at which transfers happen between each pair of transit rides (trips). This
+    step does NOT compare different paths returned by the router (Raptor), but instead finds all possible
+    transfer locations for a given path, and the different alternatives to transfer between each pair of 
+    trips within the path. This is an outline of the process:
     1. For each path find all possible permutations of transfers.
     2. Filter paths based on priority including `StaySeated=100`, `Guaranteed=10`, `Preferred=2`, 
        `Recommended=1`, `Allowed=0` and `NotAllowed=-1000`. Each path is given a combined score, 
-       and the set of the paths with the lowest score is returned(more than one path might have
+       and the set of the paths with the lowest score is returned (more than one path might have
        the same score).
-    3. Another filter witch brakes ties based on a transfer-optimized-cost function, `F(t)`.
+    3. Another filter which breaks ties based on an "optimize-transfer-cost" function.
     
 
 
@@ -65,7 +71,7 @@ Finding the best transfers is done in 2 separate steps in OTP:
 
 ## Design
 
-### Optimize transfer cost function
+### The Optimize-transfer-cost Function
 
 The optimize-transfer-cost function is used select between alternative transfers for a
 "path" with the same set of on-board trips. This address goal 7 above:

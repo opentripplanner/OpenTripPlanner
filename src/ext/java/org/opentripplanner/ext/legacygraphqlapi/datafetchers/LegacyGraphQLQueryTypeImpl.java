@@ -586,7 +586,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<RoutingResponse> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      RoutingRequest request = new RoutingRequest();
+      RoutingRequest request = context.getRouter().defaultRoutingRequest.clone();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
@@ -617,6 +617,8 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
       callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
       callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
+      callWith.argument("allowKeepingRentedBicycleAtDestination", (Boolean v) -> request.allowKeepingRentedBicycleAtDestination = v);
+      callWith.argument("keepingRentedBicycleAtDestinationCost", (Integer v) -> request.keepingRentedBicycleAtDestinationCost = v);
 
       // callWith.argument("modeWeight.TRAM", (Double v) -> request.setModeWeight(TraverseMode.TRAM, v));
       // callWith.argument("modeWeight.SUBWAY", (Double v) -> request.setModeWeight(TraverseMode.SUBWAY, v));

@@ -104,4 +104,9 @@ public class ApiItinerary {
      */
     public boolean tooSloped = false;
 
+    /**
+     * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedBicycleAtDestination}
+     * is set than it is possible to end a trip without dropping off the rented bicycle.
+     */
+    public boolean arrivedAtDestinationWithRentedBicycle = false;
 }

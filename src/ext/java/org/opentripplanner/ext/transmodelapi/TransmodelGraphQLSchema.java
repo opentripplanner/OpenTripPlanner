@@ -1075,6 +1075,23 @@ public class TransmodelGraphQLSchema {
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
+            .name("situation")
+            .description("Get a single situation based on its situationNumber")
+            .type(ptSituationElementType)
+            .argument(GraphQLArgument
+                .newArgument()
+                .name("situationNumber")
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                .build())
+            .dataFetcher(environment -> {
+              return GqlUtil
+                  .getRoutingService(environment)
+                  .getTransitAlertService()
+                  .getAlertById(environment.getArgument("situationNumber"));
+            })
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
             .name("serverInfo")
             .description("Get OTP server information")
             .type(new GraphQLNonNull(serverInfoType))

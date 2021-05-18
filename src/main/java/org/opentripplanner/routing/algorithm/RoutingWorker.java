@@ -155,6 +155,7 @@ public class RoutingWorker {
         // Prepare access/egress lists
         try (RoutingRequest accessRequest = request.getStreetSearchRequest(request.modes.accessMode)) {
             accessRequest.setRoutingContext(router.graph);
+            accessRequest.allowKeepingRentedBicycleAtDestination = false;
 
             // Special handling of flex accesses
             if (OTPFeature.FlexRouting.isOn() && request.modes.accessMode.equals(
@@ -164,7 +165,7 @@ public class RoutingWorker {
                                 accessRequest,
                                 false
                         );
-                accessList = accessEgressMapper.mapFlexAccessEgresses(flexAccessList);
+                accessList = accessEgressMapper.mapFlexAccessEgresses(flexAccessList, false);
             }
             // Regular access routing
             else {
@@ -189,7 +190,7 @@ public class RoutingWorker {
                                 egressRequest,
                                 true
                         );
-                egressList = accessEgressMapper.mapFlexAccessEgresses(flexEgressList);
+                egressList = accessEgressMapper.mapFlexAccessEgresses(flexEgressList, true);
             }
             // Regular egress routing
             else {

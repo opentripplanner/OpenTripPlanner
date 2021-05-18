@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-import org.geotools.geojson.geom.GeometryJSON;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.GeometryFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -22,7 +18,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import javax.annotation.Nonnull;
-
+import org.geotools.geojson.geom.GeometryJSON;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
@@ -591,6 +590,22 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
     public boolean useBikeRentalAvailabilityInformation = false;
+
+    /**
+     * Whether arriving at the destination with a rented (station) bicycle is allowed without
+     * dropping it off.
+     *
+     * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
+     * @see org.opentripplanner.routing.bike_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
+     */
+    public boolean allowKeepingRentedBicycleAtDestination = false;
+
+    /**
+     * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
+     *
+     * @see RoutingRequest#allowKeepingRentedBicycleAtDestination
+     */
+    public double keepingRentedBicycleAtDestinationCost = 0;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.

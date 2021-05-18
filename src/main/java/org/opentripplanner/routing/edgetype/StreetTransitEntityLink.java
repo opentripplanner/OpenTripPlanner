@@ -26,8 +26,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
     private final boolean wheelchairAccessible;
 
     public StreetTransitEntityLink(StreetVertex fromv, T tov, boolean wheelchairAccessible) {
-    	super(fromv, tov);
-    	this.transitEntityVertex = tov;
+        super(fromv, tov);
+        this.transitEntityVertex = tov;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
@@ -52,7 +52,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
     }
 
     public LineString getGeometry() {
-        Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()};
+        Coordinate[] coordinates = new Coordinate[]{fromv.getCoordinate(), tov.getCoordinate()};
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
@@ -65,6 +65,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         return getName();
     }
 
+
     public State traverse(State s0) {
 
         // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
@@ -73,9 +74,9 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
         // if they are for the same stop.
         if (
-            s0.backEdge instanceof StreetTransitEntityLink &&
-                ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex
-                    == this.transitEntityVertex
+                s0.backEdge instanceof StreetTransitEntityLink &&
+                        ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex
+                                == this.transitEntityVertex
         ) {
             return null;
         }
@@ -105,6 +106,12 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
             } else if (s0.getCarPickupState() != null) {
                 return null;
             }
+        }
+
+        if (s0.isBikeRentingFromStation()
+                && s0.mayKeepRentedBicycleAtDestination()
+                && s0.getOptions().allowKeepingRentedBicycleAtDestination) {
+            s1.incrementWeight(s0.getOptions().keepingRentedBicycleAtDestinationCost);
         }
 
         s1.setBackMode(mode);
