@@ -8,7 +8,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -98,7 +98,7 @@ public class TurnCostTest {
         proto.stairsReluctance = (1.0);
         
         // Turn costs are all 0 by default.
-        proto.traversalCostModel = (new ConstantIntersectionTraversalCostModel(0.0));
+        graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(0.0));
     }
     
     private GraphPath checkForwardRouteDuration(RoutingRequest options, int expectedDuration) {
@@ -131,7 +131,7 @@ public class TurnCostTest {
     @Test
     public void testForwardDefaultConstTurnCosts() {
         RoutingRequest options = proto.clone();
-        options.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
+        graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
         options.setRoutingContext(graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
@@ -178,7 +178,7 @@ public class TurnCostTest {
     @Test
     public void testForwardCarConstTurnCosts() {
         RoutingRequest options = proto.clone();
-        options.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
+        graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
         options.setMode(TraverseMode.CAR);
         options.setRoutingContext(graph, topRight, bottomLeft);
         

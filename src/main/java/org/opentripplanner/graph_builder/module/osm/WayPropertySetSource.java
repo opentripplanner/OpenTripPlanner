@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 
 /**
  * Interface for populating a {@link WayPropertySet} that determine how OSM
@@ -49,6 +50,8 @@ public interface WayPropertySetSource {
 	}
 
 	DrivingDirection drivingDirection();
+
+	IntersectionTraversalCostModel getIntersectionTraversalCostModel();
 
 	/**
 	 * Returns true if through traffic for motor vehicles is not allowed.
