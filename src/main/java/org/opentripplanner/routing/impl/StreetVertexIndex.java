@@ -169,7 +169,7 @@ public class StreetVertexIndex {
     List<Edge> edges = edgeTree.query(envelope);
     for (Iterator<Edge> ie = edges.iterator(); ie.hasNext(); ) {
       Edge e = ie.next();
-      Envelope eenv = e.getGeometry().getEnvelopeInternal();
+      Envelope eenv = edgeGeometryOrStraightLine(e).getEnvelopeInternal();
       //Envelope eenv = e.getEnvelope();
         if (!envelope.intersects(eenv)) { ie.remove(); }
     }
@@ -296,10 +296,7 @@ public class StreetVertexIndex {
        * rasterizing splitting long segments.
        */
       for (Edge e : gv.getOutgoing()) {
-        LineString geometry = e.getGeometry();
-        if (geometry == null) {
-          continue;
-        }
+        LineString geometry = edgeGeometryOrStraightLine(e);
         Envelope env = geometry.getEnvelopeInternal();
           if (edgeTree instanceof HashGridSpatialIndex) {
               ((HashGridSpatialIndex) edgeTree).insert(geometry, e);
@@ -396,5 +393,14 @@ public class StreetVertexIndex {
     }
     location.setWheelchairAccessible(wheelchairAccessible);
     return location;
+  }
+
+  private static LineString edgeGeometryOrStraightLine(Edge e) {
+    LineString geometry = e.getGeometry();
+    if (geometry == null) {
+      Coordinate[] coordinates = new Coordinate[]{e.getFromVertex().getCoordinate(), e.getToVertex().getCoordinate()};
+      geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
+    }
+    return geometry;
   }
 }
