@@ -23,15 +23,16 @@ public enum OTPFeature {
 
     // Sandbox extension features - Must be turned OFF by default
     ActuatorAPI(false),
+    FlexRouting(false),
+    FloatingBike(false),
     GoogleCloudStorage(false),
+    ReportApi(false),
     SandboxAPITransmodelApi(false),
     SandboxAPILegacyGraphQLApi(false),
     SandboxAPIMapboxVectorTilesApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
-    TransferAnalyzer(false),
-    FlexRouting(false),
-    FloatingBike(false);
+    TransferAnalyzer(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 
