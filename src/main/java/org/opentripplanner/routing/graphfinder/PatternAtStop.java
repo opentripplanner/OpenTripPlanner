@@ -1,24 +1,21 @@
 package org.opentripplanner.routing.graphfinder;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.RoutingService;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
 
 /**
  * A reference to a pattern at a specific stop.
  *
  * TODO Is this the right package for this?
  */
-@ToString
-@EqualsAndHashCode
 public class PatternAtStop {
 
   public String id;
@@ -80,5 +77,29 @@ public class PatternAtStop {
         numberOfDepartures,
         omitNonPickups
     );
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) { return true; }
+    if (o == null || getClass() != o.getClass()) { return false; }
+    final PatternAtStop that = (PatternAtStop) o;
+    return Objects.equals(id, that.id)
+            && Objects.equals(stop, that.stop)
+            && Objects.equals(pattern, that.pattern);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, stop, pattern);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(getClass())
+            .addStr("id", id)
+            .addObj("stop", stop)
+            .addObj("pattern", pattern)
+            .toString();
   }
 }
