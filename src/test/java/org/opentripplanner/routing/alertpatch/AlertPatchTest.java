@@ -185,11 +185,12 @@ public class AlertPatchTest extends TestCase {
         assertEquals(expectedAlerts, actualAlerts);
     }
 
-    // test originally written by sdjacobs. See https://github.com/opentripplanner/OpenTripPlanner/pull/2607
+    /**
+     * Tests whether an alert that applies to a specific direction of a route shows up properly and that an alert that
+     * applies to the reverse direction will not show up.
+     * test originally written by sdjacobs. See https://github.com/opentripplanner/OpenTripPlanner/pull/2607
+     */
     public void testRouteDirectionAlert() {
-
-        // on route 18, direction 1 (N) is E -> D, 0 (S) is D -> E
-
         AlertPatch rnp1 = new AlertPatch();
         rnp1.setFeedId(feedId);
         rnp1.setTimePeriods(Collections.singletonList(new TimePeriod(
@@ -197,6 +198,7 @@ public class AlertPatchTest extends TestCase {
         Alert note1 = Alert.createSimpleAlerts("The route alert for route 18 directionId=1");
         rnp1.setAlert(note1);
         rnp1.setId("id1");
+        // on route 18, direction 1 (N) is E -> D, 0 (S) is D -> E
         rnp1.setRoute(new FeedScopedId("agency", "18"));
         rnp1.setDirectionId(1);
         rnp1.apply(graph);
@@ -208,6 +210,7 @@ public class AlertPatchTest extends TestCase {
         Alert note2 = Alert.createSimpleAlerts("The route alert for route 18 directionId=0");
         rnp2.setAlert(note2);
         rnp2.setId("id2");
+        // on route 18, direction 1 (N) is E -> D, 0 (S) is D -> E
         rnp2.setRoute(new FeedScopedId("agency", "18"));
         rnp2.setDirectionId(0);
         rnp2.apply(graph);
@@ -234,10 +237,11 @@ public class AlertPatchTest extends TestCase {
         assertEquals(expectedAlerts, actualAlerts);
     }
 
+    /**
+     * Tests whether an alert that applies to a specific route type shows up properly and that an alert that applies to
+     * a different route type will not show up.
+     */
     public void testRouteTypeAlert() {
-
-        // on route 18, direction 1 (N) is E -> D, 0 (S) is D -> E
-
         AlertPatch rnp1 = new AlertPatch();
         rnp1.setFeedId("agency");
         rnp1.setTimePeriods(Collections.singletonList(new TimePeriod(

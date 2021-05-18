@@ -33,10 +33,7 @@ public class AlertsUpdateHandlerTest {
 
     @Test
     public void testAlertWithTimePeriod() {
-        GtfsRealtime.Alert alert = GtfsRealtime.Alert.newBuilder()
-            .addActivePeriod(GtfsRealtime.TimeRange.newBuilder().setStart(10).setEnd(20).build())
-            .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
-            .build();
+        GtfsRealtime.Alert alert = generateAlertWithTimePeriod(10, 20);
         AlertPatch patch = processOneAlert(alert);
         assertEquals(new Date(10 * 1000), patch.getAlert().effectiveStartDate);
         assertEquals(new Date(20 * 1000), patch.getAlert().effectiveEndDate);
@@ -44,10 +41,7 @@ public class AlertsUpdateHandlerTest {
 
     @Test
     public void testAlertStart() {
-        GtfsRealtime.Alert alert = GtfsRealtime.Alert.newBuilder()
-            .addActivePeriod(GtfsRealtime.TimeRange.newBuilder().setStart(10).build())
-            .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
-            .build();
+        GtfsRealtime.Alert alert = generateAlertWithTimePeriod(10, null);
         AlertPatch patch = processOneAlert(alert);
         assertEquals(new Date(10 * 1000), patch.getAlert().effectiveStartDate);
         assertNull(patch.getAlert().effectiveEndDate);
@@ -55,10 +49,7 @@ public class AlertsUpdateHandlerTest {
 
     @Test
     public void testAlertEnd() {
-        GtfsRealtime.Alert alert = GtfsRealtime.Alert.newBuilder()
-            .addActivePeriod(GtfsRealtime.TimeRange.newBuilder().setEnd(20).build())
-            .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
-            .build();
+        GtfsRealtime.Alert alert = generateAlertWithTimePeriod(null, 20);
         AlertPatch patch = processOneAlert(alert);
         assertNull(patch.getAlert().effectiveStartDate);
         assertEquals(new Date(20 * 1000), patch.getAlert().effectiveEndDate);
@@ -72,6 +63,20 @@ public class AlertsUpdateHandlerTest {
         Collection<AlertPatch> patches = service.getAllAlertPatches();
         assertEquals(1, patches.size());
         return patches.iterator().next();
+    }
+
+    private GtfsRealtime.Alert generateAlertWithTimePeriod(Integer start, Integer end) {
+        GtfsRealtime.TimeRange.Builder builder = GtfsRealtime.TimeRange.newBuilder();
+        if (start != null) {
+            builder.setStart(start);
+        }
+        if (end != null) {
+            builder.setEnd(end);
+        }
+        return GtfsRealtime.Alert.newBuilder()
+            .addActivePeriod(builder.build())
+            .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
+            .build();
     }
 
     static abstract class FakeAlertPatchService implements AlertPatchService {
