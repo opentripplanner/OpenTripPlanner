@@ -246,7 +246,6 @@ public class OtpTransitServiceBuilder {
     }
 
     public OtpTransitService build() {
-        dumpTransferDebugCSVFile();
         return new OtpTransitServiceImpl(this);
     }
 
@@ -351,17 +350,5 @@ public class OtpTransitServiceBuilder {
     private static void logRemove(String type, int orgSize, int newSize, String reason) {
         if(orgSize == newSize) { return; }
         LOG.info("{} of {} {}(s) removed. Reason: {}", orgSize - newSize, orgSize, type, reason);
-    }
-
-    /**
-     * Dump all transfers imported to the 'transfers-debug.csv' file. This is performed if the
-     * debugging is enabled for the 'TRANSFERS_EXPORT' logger. The file is written to the
-     * current directory.
-     * <p>
-     * The CSV file is meant to be human friendly and contain name and description for route and
-     * stop elements, rather than ids.
-     */
-    private void dumpTransferDebugCSVFile() {
-        TransferExport.exportTransfers(transfers, stopTimesByTrip);
     }
 }

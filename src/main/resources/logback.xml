@@ -28,9 +28,6 @@
   <!-- Graph builder data import logs a summary at INFO level and issues at DEBUG level -->
   <logger name="DATA_IMPORT_ISSUES" level="info" />
 
-  <!-- Dump all transfers to file transfers-debug.csv in current directory [if level=debug] -->
-  <logger name="TRANSFERS_EXPORT" level="off"/>
-
   <logger name="org.opentripplanner" level="info"/>
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info"/>
 
