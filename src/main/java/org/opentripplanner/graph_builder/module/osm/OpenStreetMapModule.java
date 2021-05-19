@@ -331,7 +331,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             for (OSMNode node : nodes) {
                 n++;
 
-                I18NString creativeName = nameParkAndRideEntity(isCarParkAndRide, node);
+                I18NString creativeName = nameParkAndRideEntity(node);
 
                 VehicleParkingEntranceCreator entrance = (builder) -> builder
                         .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, String.format("%s/%s/entrance", node.getClass().getSimpleName(), node.getId())))
@@ -453,7 +453,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 return false;
             }
 
-            var creativeName = nameParkAndRideEntity(isCarParkAndRide, entity);
+            var creativeName = nameParkAndRideEntity(entity);
 
             // Check P+R accessibility by walking and driving.
             TraversalRequirements walkReq = new TraversalRequirements(new RoutingRequest(
@@ -574,10 +574,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     .build();
         }
 
-        private I18NString nameParkAndRideEntity(boolean isCarParkAndRide, OSMWithTags osmWithTags) {
+        private I18NString nameParkAndRideEntity(OSMWithTags osmWithTags) {
+            // If there is an explicit name user that. The explicit name is used so that tag-based
+            // translations are used, which are not handled by "CreativeNamer"s.
             I18NString creativeName = osmWithTags.getAssumedName();
             if (creativeName == null) {
-                creativeName = new NonLocalizedString(isCarParkAndRide ? "P+R" : "B+R");
+                // ... otherwise resort to "CreativeNamer"s
+                creativeName = wayPropertySet.getCreativeNameForWay(osmWithTags);
             }
             return creativeName;
         }
