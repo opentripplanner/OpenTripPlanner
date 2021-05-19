@@ -2,6 +2,8 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.NorwayIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -14,6 +16,8 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  * @see DefaultWayPropertySetSource
  */
 public class NorwayWayPropertySetSource implements WayPropertySetSource {
+
+  private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -102,6 +106,11 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public DrivingDirection drivingDirection() {
-    return RIGHT_HAND_TRAFFIC;
+    return drivingDirection;
+  }
+
+  @Override
+  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
+    return new NorwayIntersectionTraversalCostModel(drivingDirection);
   }
 }

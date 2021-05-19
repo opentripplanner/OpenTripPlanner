@@ -26,17 +26,15 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -75,13 +73,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
-
-    /**
-     * The model that computes turn/traversal costs.
-     * TODO: move this to the Router or the Graph if it doesn't clutter the code too much
-     */
-    public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel(
-            DrivingDirection.RIGHT_HAND_TRAFFIC);
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -860,11 +851,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return Collections.unmodifiableMap(transitReluctanceForMode);
     }
 
-    /** Returns the model that computes the cost of intersection traversal. */
-    public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-        return traversalCostModel;
-    }
-
     /** @return the (soft) maximum walk distance */
     // If transit is not to be used and this is a point to point search
     // or one with soft walk limiting, disable walk limit.
@@ -1529,5 +1515,18 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         }
 
         return env;
+    }
+
+    /**
+     * This method is needed because we sometimes traverse edges with no graph. It returns a
+     * default intersection traversal model if no graph is present.
+     */
+    public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
+        if (this.rctx != null && this.rctx.graph != null) {
+            return this.rctx.graph.getIntersectionTraversalModel();
+        } else {
+            // This is only to maintain compatibility with existing tests
+            return Graph.DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
+        }
     }
 }
