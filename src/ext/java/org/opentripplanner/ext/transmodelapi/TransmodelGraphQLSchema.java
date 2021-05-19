@@ -64,7 +64,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripType;
 import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
-import org.opentripplanner.ext.transmodelapi.model.stop.VehicleParkingType;
+import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeRentalStationType;
 import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceAtDistanceType;
@@ -149,7 +149,7 @@ public class TransmodelGraphQLSchema {
     GraphQLInterfaceType placeInterface = PlaceInterfaceType.create();
     GraphQLOutputType bikeRentalStationType = BikeRentalStationType.create(placeInterface);
     GraphQLOutputType rentalVehicleType = RentalVehicleType.create(rentalVehicleTypeType, placeInterface);
-    GraphQLOutputType vehicleParkingType = VehicleParkingType.createB(placeInterface);
+    GraphQLOutputType bikeParkType = BikeParkType.createB(placeInterface);
     GraphQLOutputType stopPlaceType = StopPlaceType.create(
         placeInterface,
         QuayType.REF,
@@ -1014,14 +1014,14 @@ public class TransmodelGraphQLSchema {
             .newFieldDefinition()
             .name("bikePark")
             .description("Get a single bike park based on its id")
-            .type(vehicleParkingType)
+            .type(bikeParkType)
             .argument(GraphQLArgument
                 .newArgument()
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .build())
             .dataFetcher(environment -> {
-              var bikeParkId = FeedScopedId.parseId(environment.getArgument("id"));
+              var bikeParkId = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
               return GqlUtil.getRoutingService(environment)
                   .getVehicleParkingService()
                   .getBikeParks()
@@ -1034,39 +1034,11 @@ public class TransmodelGraphQLSchema {
             .newFieldDefinition()
             .name("bikeParks")
             .description("Get all bike parks")
-            .type(new GraphQLNonNull(new GraphQLList(vehicleParkingType)))
+            .type(new GraphQLNonNull(new GraphQLList(bikeParkType)))
             .dataFetcher(environment -> GqlUtil.getRoutingService(environment)
                 .getVehicleParkingService()
-                .getBikeParks().collect(Collectors.toCollection(ArrayList::new)))
-            .build())
-        .field(GraphQLFieldDefinition
-            .newFieldDefinition()
-            .name("carPark")
-            .description("Get a single car park based on its id")
-            .type(vehicleParkingType)
-            .argument(GraphQLArgument
-                .newArgument()
-                .name("id")
-                .type(new GraphQLNonNull(Scalars.GraphQLString))
-                .build())
-            .dataFetcher(environment -> {
-              var carParkId = FeedScopedId.parseId(environment.getArgument("id"));
-              return GqlUtil.getRoutingService(environment)
-                  .getVehicleParkingService()
-                  .getCarParks()
-                  .filter(carPark -> carPark.getId().equals(carParkId))
-                  .findFirst()
-                  .orElse(null);
-            })
-            .build())
-        .field(GraphQLFieldDefinition
-            .newFieldDefinition()
-            .name("carParks")
-            .description("Get all car parks")
-            .type(new GraphQLNonNull(new GraphQLList(vehicleParkingType)))
-            .dataFetcher(environment -> GqlUtil.getRoutingService(environment)
-                .getVehicleParkingService()
-                .getCarParks().collect(Collectors.toCollection(ArrayList::new)))
+                .getBikeParks()
+                .collect(Collectors.toCollection(ArrayList::new)))
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
