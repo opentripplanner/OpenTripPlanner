@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
 import java.util.Objects;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Abstract intermediate leg in a path. It is either a Transit or Transfer leg.
@@ -22,6 +22,13 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
         this.toStop = toStop;
         this.toTime = toTime;
         this.cost = cost;
+        if(fromTime > toTime) {
+            throw new IllegalStateException(
+                    "It is not possible to travel back in time, yet!"
+                            + " From: " + TimeUtils.timeToStrLong(fromTime)
+                            + ", to: " + TimeUtils.timeToStrLong(toTime)
+            );
+        }
     }
 
     /**
