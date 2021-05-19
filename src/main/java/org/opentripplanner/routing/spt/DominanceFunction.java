@@ -67,6 +67,18 @@ public abstract class DominanceFunction implements Serializable {
         }
 
         /*
+         * When creating AccessEgress paths for RAPTOR states with have different time restrictions
+         * have to be considered, since a non-optimal VehicleParking could be used after the optimal
+         * VehicleParking is closed.
+         *
+         * Simply using the time restrictions isn't enough, since simply re-traversing edges in a
+         * loop would create new states.
+         */
+        if (!Objects.equals(a.getTimeRestrictionSources(), b.getTimeRestrictionSources())) {
+            return false;
+        }
+
+        /*
          * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
          * useless loops in the traversal leading to way faster processing time.
          *

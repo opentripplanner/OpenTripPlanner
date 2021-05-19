@@ -1,8 +1,11 @@
 package org.opentripplanner.routing.core;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -340,6 +343,10 @@ public class StateEditor {
         return child.getTimeSeconds();
     }
 
+    public ZonedDateTime getZonedDateTime() {
+        return child.getTimeAsZonedDateTime();
+    }
+
     public long getElapsedTimeSeconds() {
         return child.getElapsedTimeSeconds();
     }
@@ -380,5 +387,18 @@ public class StateEditor {
 
     public State getBackState() {
         return child.getBackState();
+    }
+
+    public void addTimeRestriction(TimeRestrictionWithOffset timeRestriction, Object source) {
+        if (child.getOptions().ignoreAndCollectTimeRestrictions) {
+            cloneStateDataAsNeeded();
+            child.stateData.timeRestrictions = new ArrayList<>();
+            child.stateData.timeRestrictions.addAll(child.backState.getTimeRestrictions());
+            child.stateData.timeRestrictions.add(timeRestriction);
+
+            child.stateData.timeRestrictionSources = new HashSet<>();
+            child.stateData.timeRestrictionSources.addAll(child.backState.getTimeRestrictionSources());
+            child.stateData.timeRestrictionSources.add(source);
+        }
     }
 }

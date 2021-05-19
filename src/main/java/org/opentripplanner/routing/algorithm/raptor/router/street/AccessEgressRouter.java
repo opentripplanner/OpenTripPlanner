@@ -40,6 +40,7 @@ public class AccessEgressRouter {
         // the routingContext (rctx), which results in the created temporary edges being removed prematurely.
         // findNearbyStopsViaStreets() will call cleanup() on the created routing request.
         RoutingRequest nearbyRequest = rr.getStreetSearchRequest(streetMode);
+        nearbyRequest.ignoreAndCollectTimeRestrictions = true;
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
             rr.rctx.graph,
