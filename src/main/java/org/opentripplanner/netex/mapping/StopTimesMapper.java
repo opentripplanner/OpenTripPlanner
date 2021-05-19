@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
@@ -52,6 +53,8 @@ class StopTimesMapper {
 
     private final EntityById<FlexStopLocation> flexibleStopLocationsById;
 
+    private final EntityById<FlexLocationGroup> flexLocationGroupsByid;
+
     private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
     private final ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef;
@@ -66,6 +69,7 @@ class StopTimesMapper {
             FeedScopedIdFactory idFactory,
             EntityById<Stop> stopsById,
             EntityById<FlexStopLocation> flexStopLocationsById,
+            EntityById<FlexLocationGroup> flexLocationGroupsById,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
             ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
@@ -76,6 +80,7 @@ class StopTimesMapper {
         this.destinationDisplayById = destinationDisplayById;
         this.stopsById = stopsById;
         this.flexibleStopLocationsById = flexStopLocationsById;
+        this.flexLocationGroupsByid = flexLocationGroupsById;
         this.quayIdByStopPointRef = quayIdByStopPointRef;
         this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
         this.flexibleLinesById = flexibleLinesById;
@@ -224,7 +229,13 @@ class StopTimesMapper {
         if (stopId != null) {
             stopLocation = stopsById.get(idFactory.createId(stopId));
         } else {
-            stopLocation = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
+            FlexStopLocation flexStopLocation = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
+            FlexLocationGroup flexLocationGroup = flexLocationGroupsByid.get(idFactory.createId(flexibleStopPlaceId));
+
+            if (flexStopLocation != null) {
+                stopLocation = flexStopLocation;
+            } else
+                stopLocation = flexLocationGroup;
         }
 
         if (stopLocation == null) {
@@ -279,7 +290,8 @@ class StopTimesMapper {
         List<StopTime> stopTimes = result.stopTimes;
         if (stopTimes.size() == 2 && stopTimes
             .stream()
-            .allMatch(s -> s.getStop() instanceof FlexStopLocation)) {
+            .allMatch(s -> s.getStop() instanceof FlexStopLocation
+                || s.getStop() instanceof FlexLocationGroup)) {
 
             int departureTime = stopTimes.get(0).getDepartureTime();
             int arrivalTime = stopTimes.get(1).getArrivalTime();
