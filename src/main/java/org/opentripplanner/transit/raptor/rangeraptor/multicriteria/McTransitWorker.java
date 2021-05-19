@@ -97,7 +97,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
             prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
         }
 
-                final int boardWaitTimeForCostCalculation = boardTime - prevArrival.arrivalTime();
+        final int boardWaitTimeForCostCalculation = boardTime - prevArrival.arrivalTime();
         final int relativeBoardCost = calculateOnTripRelativeCost(
             prevArrival,
             trip.transitReluctanceFactorIndex(),

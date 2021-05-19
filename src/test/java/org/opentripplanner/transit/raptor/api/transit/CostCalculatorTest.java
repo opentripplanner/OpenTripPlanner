@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.stoparrival.Access;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-
-import static org.junit.Assert.assertEquals;
 
 public class CostCalculatorTest {
 
@@ -35,10 +35,10 @@ public class CostCalculatorTest {
         assertEquals(1000, prev.cost());
 
         // Simulate round 1
-        //assertEquals("Board cost", 500, subject.transitArrivalCost(true, fromStop, 0, 0, 0, TRANSIT_RELUCTANCE_1));
-        //assertEquals("Board + transit cost", 600, subject.transitArrivalCost(true, fromStop, 0, 1, 0, TRANSIT_RELUCTANCE_1));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(true, fromStop, 0, 0, 0, TRANSIT_RELUCTANCE_1));
+        assertEquals("Board + transit cost", 600, subject.transitArrivalCost(true, fromStop, 0, 1, 0, TRANSIT_RELUCTANCE_1));
         assertEquals("Board + transit + stop cost", 625, subject.transitArrivalCost(true, fromStop, 0, 1, TRANSIT_RELUCTANCE_1, 1));
-        assertEquals("Board cost", 550, subject.transitArrivalCost(true, fromStop, 1, 0, TRANSIT_RELUCTANCE_1, 0));
+        assertEquals("Board + wait cost", 550, subject.transitArrivalCost(true, fromStop, 1, 0, TRANSIT_RELUCTANCE_1, 0));
 
         // Simulate round 2
         // There is a small cost (2-1) * 0.5 * 100 = 50 added for the second transit leg
