@@ -60,6 +60,9 @@ public class ParkAndRideResource {
             // Check if vertex is a ParkAndRideVertex
             if (!(v instanceof VehicleParkingEntranceVertex)) continue;
 
+            // Check if cars are allowed
+            if (!((VehicleParkingEntranceVertex) v).getVehicleParking().hasAnyCarPlaces()) continue;
+
             // Check if vertex is within envelope
             if (!envelope.contains(v.getX(), v.getY())) continue;
 
