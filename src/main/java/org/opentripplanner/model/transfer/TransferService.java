@@ -3,8 +3,10 @@ package org.opentripplanner.model.transfer;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
@@ -59,6 +61,15 @@ public class TransferService implements Serializable {
         for (Transfer transfer : transfers) {
             add(transfer);
         }
+    }
+
+    public List<Transfer> listAll() {
+        var list = new ArrayList<Transfer>();
+        list.addAll(trip2tripTransfers.values());
+        list.addAll(trip2StopTransfers.values());
+        list.addAll(stop2TripTransfers.values());
+        list.addAll(stop2StopTransfers.values());
+        return list;
     }
 
     public Collection<Transfer> listGuaranteedTransfersTo(Trip toTrip, int toStopIndex) {
