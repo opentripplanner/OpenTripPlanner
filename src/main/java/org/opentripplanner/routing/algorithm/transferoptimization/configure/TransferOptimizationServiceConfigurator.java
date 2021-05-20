@@ -128,12 +128,12 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private DefaultCostCalculator<T> createCostCalculator() {
     McCostParams p = raptorRequest.multiCriteriaCostFactors();
     return new DefaultCostCalculator<>(
-        transitDataProvider.stopBoarAlightCost(),
-        p.transitReluctanceFactors(),
         p.boardCost(),
         p.transferCost(),
         p.walkReluctanceFactor(),
-        p.waitReluctanceFactor()
+        p.waitReluctanceFactor(),
+        transitDataProvider.stopBoarAlightCost(),
+        p.transitReluctanceFactors()
     );
   }
 }

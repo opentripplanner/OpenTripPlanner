@@ -45,7 +45,7 @@ public interface SlackProvider {
 
     /**
      * Regular transfer slack should be added to all access and egress paths with one or more
-     * number of rides - like a flex-access. Access-slack and board-slack is only added to
+     * number of rides - like a flex-access. Alight-slack and board-slack is only added to
      * {@link RaptorTripPattern}s, not access or egress paths, even if they consist one or more
      * rides.
      */

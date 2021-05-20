@@ -89,6 +89,11 @@ public class TestTransfer implements RaptorTransfer {
         return new TestTransfer(stop, durationInSeconds, nRides, STOP_REACHED_ON_FOOT);
     }
 
+    /** Set opening and closing hours and return a new object. */
+    public TestTransfer openingHours(int opening, int closing) {
+        return new TestTransfer(stop, durationInSeconds, numberOfRides, stopReachedOnBoard, opening, closing);
+    }
+
     public static Collection<RaptorTransfer> transfers(int ... stopTimes) {
         List<RaptorTransfer> legs = new ArrayList<>();
         for (int i = 0; i < stopTimes.length; i+=2) {

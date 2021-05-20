@@ -32,7 +32,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
   );
 
   private final static String EXPECTED =  "Walk 30s ~ 1 ~ BUS %s 0:01 0:02:40 ~ 2 ~ Walk 20s "
-          + "[00:00:30 00:03:00 2m30s, cost: %d]";
+          + "[0:00:30 0:03 2m30s $%d]";
 
   @Before
   public void setup() {

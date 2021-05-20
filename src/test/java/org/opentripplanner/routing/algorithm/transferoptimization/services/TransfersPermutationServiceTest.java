@@ -3,11 +3,12 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.dummyT2TTransferService;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.tx;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.txSameStop;
+import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.tx;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
+import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathBuilder;
@@ -21,8 +22,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
  * <pre>
  * DEPARTURE TIMES
  * Stop        A      B      C      D      E      F      G
- * Trip 1    10:02  10:10         10:20
- * Trip 2           10:12  10:15  10:22         10:35
+ * Trip 1    10:02  10:10         10:20                10:35
+ * Trip 2           10:12  10:15  10:22         10:35  10:40
  * Trip 3                                10:24  10:37  10:49
  *
  * Note! The ARRIVAL TIMES are 1 minute BEFORE the departure times for all stops.
@@ -45,24 +46,24 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
 
   private final TestTripSchedule TRIP_1  = TestTripSchedule.schedule()
       .arrDepOffset(60)
-      .pattern(pattern("T1", STOP_A, STOP_B, STOP_D))
-      .departures("10:02 10:10 10:20").build();
+      .pattern(pattern("T1", STOP_A, STOP_B, STOP_D, STOP_G))
+      .departures("10:02 10:10 10:20 10:35").build();
 
   private final TestTripSchedule TRIP_2  = TestTripSchedule.schedule()
       .arrDepOffset(60)
-      .pattern(pattern("T2", STOP_B, STOP_C, STOP_D, STOP_F))
-      .departures("10:12 10:15 10:22 10:35").build();
+      .pattern(pattern("T2", STOP_B, STOP_C, STOP_D, STOP_F, STOP_G))
+      .departures("10:12 10:15 10:22 10:35 10:40").build();
 
   private final TestTripSchedule TRIP_3  = TestTripSchedule.schedule()
-      .arrDepOffset(60)
-      .pattern(pattern("T3", STOP_E, STOP_F, STOP_G))
-      .departures("10:24 10:37 10:49").build();
+          .arrDepOffset(0)
+          .pattern(pattern("T3", STOP_E, STOP_F, STOP_G))
+          .departures("10:24 10:37 10:49").build();
 
   private final PathBuilder pathBuilder = new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
 
 
   /**
-   * A PaAth without any transfers should be returned without any change.
+   * A Path without any transfers should be returned without any change.
    */
   @Test
   public void testTripWithoutTransfers() {
@@ -97,7 +98,7 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
         .egress(D1m);
     var transfers = dummyT2TTransferService(
         // Original transfer
-        tx(STOP_B, STOP_C, TRIP_1, TRIP_2, D1m)
+        tx(TRIP_1, STOP_B, D1m, STOP_C, TRIP_2)
     );
 
     var subject = new TransfersPermutationService<>(transfers, COST_CALCULATOR, SLACK_PROVIDER);
@@ -119,7 +120,9 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
         .egress(D1m);
     var transfers = dummyT2TTransferService(
         // Original transfer
-        txSameStop(TRIP_1, TRIP_2, STOP_D)
+        tx(TRIP_1, STOP_D, TRIP_2),
+        // Transfer exist after egress stop
+        tx(TRIP_1, STOP_G, TRIP_2)
     );
 
     var subject = new TransfersPermutationService<>(transfers, COST_CALCULATOR, SLACK_PROVIDER);
@@ -129,5 +132,45 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
 
     assertEquals(result.toString(), 1, result.size());
     assertEquals(original.toString(), result.get(0).toString());
+  }
+
+  @Test
+  public void testPathWithThreeTripsAndMultiplePlacesToTransfer() {
+    // Given
+    var original = pathBuilder
+            .access(START_TIME_T1, 0, STOP_A)
+            .bus(TRIP_1, STOP_B)
+            .bus(TRIP_2, STOP_D)
+            .walk(D30s, STOP_E)
+            .bus(TRIP_3, STOP_G)
+            .egress(0);
+    var transfers = dummyT2TTransferService(
+            tx(TRIP_1, STOP_B, TRIP_2),
+            tx(TRIP_1, STOP_B, D30s, STOP_C, TRIP_2),
+            tx(TRIP_1, STOP_D, TRIP_2),
+            tx(TRIP_1, STOP_G, TRIP_2),
+            tx(TRIP_1, STOP_G, TRIP_3),
+            tx(TRIP_2, STOP_D, D30s, STOP_E, TRIP_3),
+            tx(TRIP_2, STOP_F, TRIP_3),
+            tx(TRIP_2, STOP_G, TRIP_3)
+    );
+
+    var subject = new TransfersPermutationService<>(transfers, COST_CALCULATOR, SLACK_PROVIDER);
+
+    // When
+    var result = subject.findAllTransitPathPermutations(original);
+
+    var expected = List.of(
+            "1 ~ BUS T1 10:02 10:09 ~ 2 ~ BUS T2 10:12 10:21 ~ 4 ~ Walk 30s ~ 5 ~ BUS T3 10:24 10:49 ~ 7 [10:00:20 10:49:20 49m $3420]",
+            "1 ~ BUS T1 10:02 10:09 ~ 2 ~ BUS T2 10:12 10:34 ~ 6 ~ BUS T3 10:37 10:49 ~ 7 [10:00:20 10:49:20 49m $3324]",
+            "1 ~ BUS T1 10:02 10:09 ~ 2 ~ Walk 30s ~ 3 ~ BUS T2 10:15 10:21 ~ 4 ~ Walk 30s ~ 5 ~ BUS T3 10:24 10:49 ~ 7 [10:00:20 10:49:20 49m $3390]",
+            "1 ~ BUS T1 10:02 10:09 ~ 2 ~ Walk 30s ~ 3 ~ BUS T2 10:15 10:34 ~ 6 ~ BUS T3 10:37 10:49 ~ 7 [10:00:20 10:49:20 49m $3294]",
+            "1 ~ BUS T1 10:02 10:19 ~ 4 ~ BUS T2 10:22 10:34 ~ 6 ~ BUS T3 10:37 10:49 ~ 7 [10:00:20 10:49:20 49m $3384]"
+    );
+
+    for(int i=0; i<expected.size() && i< result.size(); ++i) {
+      assertEquals("#" + i, expected.get(i), result.get(i).toString());
+    }
+    assertEquals(result.toString(), expected.size(), result.size());
   }
 }

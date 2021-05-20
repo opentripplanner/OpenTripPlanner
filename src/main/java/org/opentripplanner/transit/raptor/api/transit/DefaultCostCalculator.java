@@ -24,14 +24,15 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
      *
      * @param stopVisitCost Unit centi-seconds. This parameter is used "as-is" and not transformed
      *                      into the Raptor cast unit to avoid the transformation for each request.
+     *                      Use {@code null} to ignore stop cost.
      */
     public DefaultCostCalculator(
-            int[] stopVisitCost,
-            @Nullable double[] transitReluctanceFactors,
             int boardCost,
             int transferCost,
             double walkReluctanceFactor,
-            double waitReluctanceFactor
+            double waitReluctanceFactor,
+            @Nullable int[] stopVisitCost,
+            @Nullable double[] transitReluctanceFactors
     ) {
         this.stopVisitCost = stopVisitCost;
         this.boardCostOnly = RaptorCostConverter.toRaptorCost(boardCost);

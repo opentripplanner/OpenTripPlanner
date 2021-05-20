@@ -19,12 +19,12 @@ public class CostCalculatorTest {
     private static final int TRANSIT_RELUCTANCE_2 = 1;
 
     private final CostCalculator<TestTripSchedule> subject = new DefaultCostCalculator<>(
-            new int[] { 0, 25 },
-            new double[] { TRANSIT_RELUCTANCE_FACTOR_1, TRANSIT_RELUCTANCE_FACTOR_2 },
             BOARD_COST,
             TRANSFER_COST,
             WALK_RELUCTANCE_FACTOR,
-            WAIT_RELUCTANCE_FACTOR
+            WAIT_RELUCTANCE_FACTOR,
+            new int[] { 0, 25 },
+            new double[] { TRANSIT_RELUCTANCE_FACTOR_1, TRANSIT_RELUCTANCE_FACTOR_2 }
     );
 
     @Test

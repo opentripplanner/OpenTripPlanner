@@ -39,7 +39,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
       = "Flex 2m 1tx ~ 2 ~ "
       + "BUS R1 0:04 0:06 ~ 3 ~ "
       + "Flex 2m 1tx "
-      + "[00:00:30 00:09:10 8m40s]";
+      + "[0:00:30 0:09:10 8m40s]";
 
   @Before
   public void setup() {
@@ -97,7 +97,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
   @Test
   public void multiCriteria() {
     // Add cost to result string
-    String expected = EXPECTED_RESULT.replace("]", ", cost: 1840]");
+    String expected = EXPECTED_RESULT.replace("]", " $1840]");
     var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
     var response = raptorService.route(request, data);
     assertEquals(expected, pathsToString(response));

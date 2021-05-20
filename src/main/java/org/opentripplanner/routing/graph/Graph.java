@@ -33,6 +33,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -1016,11 +1018,27 @@ public class Graph implements Serializable {
         return locationsById.get(id);
     }
 
-    public Set<StopLocation> getAllFlexStops() {
-        return flexTripsById
+    /**
+     * Gets all the flex stop locations, including the elements of FlexLocationGroups.
+     */
+    public Set<StopLocation> getAllFlexStopsFlat() {
+        Set<StopLocation> stopLocations = flexTripsById
             .values()
             .stream()
             .flatMap(t -> t.getStops().stream())
             .collect(Collectors.toSet());
+
+        stopLocations.addAll(
+            stopLocations
+                .stream()
+                .filter(s -> s instanceof FlexLocationGroup)
+                .flatMap(g -> ((FlexLocationGroup) g)
+                    .getLocations()
+                    .stream()
+                    .filter(e -> e instanceof Stop))
+                .collect(Collectors.toList())
+        );
+
+        return stopLocations;
     }
 }
