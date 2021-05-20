@@ -9,12 +9,12 @@ public class FlexAccessEgressAdapter extends AccessEgress {
   private final FlexAccessEgress flexAccessEgress;
 
   public FlexAccessEgressAdapter(
-      FlexAccessEgress flexAccessEgress, StopIndexForRaptor stopIndex
+          FlexAccessEgress flexAccessEgress, boolean isEgress, StopIndexForRaptor stopIndex
   ) {
     super(
         stopIndex.indexByStop.get(flexAccessEgress.stop),
         flexAccessEgress.preFlexTime + flexAccessEgress.flexTime + flexAccessEgress.postFlexTime,
-        flexAccessEgress.lastState
+        isEgress ? flexAccessEgress.lastState.reverse() : flexAccessEgress.lastState
     );
 
     this.flexAccessEgress = flexAccessEgress;

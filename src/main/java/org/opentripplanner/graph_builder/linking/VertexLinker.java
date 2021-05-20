@@ -272,9 +272,13 @@ public class VertexLinker {
     for (TraverseMode mode : traverseModeSet.getModes()) {
       TraverseModeSet modeSet = new TraverseModeSet(mode);
       // There is at least one appropriate edge within range.
-      double closestDistance = candidateEdges
-          .stream()
-          .filter(e -> e.item.canTraverse(modeSet))
+
+      var candidateEdgesForMode =
+          candidateEdges.stream().filter(e -> e.item.canTraverse(modeSet)).collect(Collectors.toList());
+
+      if (candidateEdgesForMode.isEmpty()) { continue; }
+
+      double closestDistance = candidateEdgesForMode.stream()
           .mapToDouble(ce -> ce.distanceDegreesLat)
           .min()
           .getAsDouble();
