@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 
 import javax.annotation.Nullable;
+import java.util.BitSet;
 import java.util.Iterator;
 
 
@@ -70,6 +71,20 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      */
     int numberOfStops();
 
+
+    /**
+     * Checks whether a given stop id is within the the set of hard banned stops to not allow travel
+     * through.
+     *
+     * @param index stop id within a pattern
+     * @return true if the stop is hard banned, false otherwise.
+     */
+    boolean isStopHardBanned(int index);
+
+    /**
+     * Gets a the {@link BitSet} of the hard banned stops
+     */
+    BitSet getHardBannedStops();
 
     /**
      * Return a the cost of boarding and alighting a trip at a particular stop.

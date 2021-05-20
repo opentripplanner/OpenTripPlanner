@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -9,10 +10,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -34,32 +32,25 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
    */
   private final List<List<RaptorTransfer>> transfers;
 
+  private final BitSet bannedStopsHard;
 
   private final ZonedDateTime startOfTime;
 
-  public RaptorRoutingRequestTransitData(
-      TransitLayer transitLayer,
-      Instant departureTime,
-      int additionalFutureSearchDays,
-      TransitDataProviderFilter filter,
-      double walkSpeed
-  ) {
+  public RaptorRoutingRequestTransitData(TransitLayer transitLayer, Instant departureTime, int additionalFutureSearchDays,
+                                         TransitDataProviderFilter filter, double walkSpeed, Set<FeedScopedId> bannedStopsHards) {
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at
     // the time of construction
-    RaptorRoutingRequestTransitDataCreator creator = new RaptorRoutingRequestTransitDataCreator(
-        transitLayer,
-        departureTime
-    );
+    RaptorRoutingRequestTransitDataCreator creator = new RaptorRoutingRequestTransitDataCreator(transitLayer, departureTime);
 
     this.transitLayer = transitLayer;
     this.startOfTime = creator.getSearchStartTime();
-    this.activeTripPatternsPerStop = creator.createTripPatternsPerStop(
-        additionalFutureSearchDays,
-        filter
-    );
+    this.activeTripPatternsPerStop = creator.createTripPatternsPerStop(additionalFutureSearchDays, filter);
     this.transfers = creator.calculateTransferDuration(walkSpeed);
+    this.bannedStopsHard = creator.createBannedStopSet(bannedStopsHards);
   }
+
+
 
   /**
    * Gets all the transfers starting at a given stop
@@ -84,6 +75,16 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   @Override
   public int numberOfStops() {
     return transitLayer.getStopCount();
+  }
+
+  @Override
+  public boolean isStopHardBanned(int index) {
+    return bannedStopsHard.get(index);
+  }
+
+  @Override
+  public BitSet getHardBannedStops() {
+    return bannedStopsHard;
   }
 
   @Override

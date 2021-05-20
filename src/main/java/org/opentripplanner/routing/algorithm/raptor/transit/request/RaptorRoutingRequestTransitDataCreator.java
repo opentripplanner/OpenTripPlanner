@@ -1,25 +1,28 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 
 /**
@@ -121,6 +124,21 @@ class RaptorRoutingRequestTransitDataCreator {
     }
 
     return combinedList;
+  }
+
+  /**
+   * Takes the set of {@link FeedScopedId}s and converts them to their stop indexes
+   *
+   * @param bannedStopsHard list of hard banned stops
+   * @return the stop indexes of the hard banned stops
+   */
+  BitSet createBannedStopSet(Set<FeedScopedId> bannedStopsHard) {
+      BitSet bannedStopsHardBitSet = new BitSet(bannedStopsHard.size());
+      bannedStopsHard.stream()
+              .map(feedScopedId -> transitLayer.getIndexByStop(Stop.stopForEquality(feedScopedId)))
+              .forEach(
+                      bannedStopsHardBitSet::set);
+      return bannedStopsHardBitSet;
   }
 
   private static List<List<TripPatternForDates>> createTripPatternsPerStop(

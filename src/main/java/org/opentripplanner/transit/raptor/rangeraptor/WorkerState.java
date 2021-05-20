@@ -5,6 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -24,6 +25,9 @@ public interface WorkerState<T extends RaptorTripSchedule> {
 
     /** List all stops visited last round. */
     IntIterator stopsTouchedPreviousRound();
+
+    /** List all stops visited last round as the original BitSet. */
+    BitSet stopsTouchedPreviousRoundAsBitSet();
 
     /** Return a list of stops visited by transit, before doing transfers. */
     IntIterator stopsTouchedByTransitCurrentRound();
@@ -46,9 +50,9 @@ public interface WorkerState<T extends RaptorTripSchedule> {
     void setAccessToStop(RaptorTransfer accessPath, int iterationDepartureTime);
 
     /**
-     *  Update state with a new transfer.
+     *  Update state with a new transfer. Skips any transfer whose's destination is within the hard banned set.
      */
-    void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
+    void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers, BitSet bannedStopsHard);
 
     /**
      * Extract paths after the search is complete. This method is optional,

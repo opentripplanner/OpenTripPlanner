@@ -2,11 +2,9 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 
 import static java.util.stream.Collectors.groupingBy;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
+
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
@@ -195,16 +193,25 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             IntIterator stops = state.stopsTouchedPreviousRound();
             Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
 
+            BitSet stopBitSet = state.stopsTouchedPreviousRoundAsBitSet();
             while (routeIterator.hasNext()) {
                 RaptorRoute<T> route = routeIterator.next();
                 RaptorTripPattern pattern = route.pattern();
                 TripScheduleSearch<T> tripSearch = createTripSearch(route.timetable());
 
                 transitWorker.prepareForTransitWith(pattern, tripSearch);
-
                 IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
+                boolean foundStopTouchedInPreviousRound = false;
                 while (stop.hasNext()) {
-                    transitWorker.routeTransitAtStop(stop.next());
+                  int next = stop.next();
+                  if(!stopBitSet.get(pattern.stopIndex(next)) && !foundStopTouchedInPreviousRound) {
+                    continue;
+                  }
+                  foundStopTouchedInPreviousRound = true;
+                  if (transitData.isStopHardBanned(pattern.stopIndex(next))) {
+                    break;
+                  }
+                  transitWorker.routeTransitAtStop(next);
                 }
             }
             lifeCycle.transitsForRoundComplete();
@@ -217,9 +224,12 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
             while (it.hasNext()) {
                 final int fromStop = it.next();
+                if (transitData.isStopHardBanned(fromStop)) {
+                  break;
+                }
                 // no need to consider loop transfers, since we don't mark patterns here any more
                 // loop transfers are already included by virtue of those stops having been reached
-                state.transferToStops(fromStop, transitData.getTransfers(fromStop));
+                state.transferToStops(fromStop, transitData.getTransfers(fromStop), transitData.getHardBannedStops());
             }
 
             lifeCycle.transfersForRoundComplete();

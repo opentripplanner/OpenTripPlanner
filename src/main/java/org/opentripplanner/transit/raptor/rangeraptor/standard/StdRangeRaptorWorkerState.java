@@ -9,6 +9,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -83,8 +84,12 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
         return bestTimes.stopsReachedLastRound();
     }
 
-
     @Override
+    public BitSet stopsTouchedPreviousRoundAsBitSet() {
+      return bestTimes.stopsReachedLastRoundAsBitSet();
+    }
+
+  @Override
     public final boolean isStopReachedInPreviousRound(int stop) {
         return bestTimes.isStopReachedLastRound(stop);
     }
@@ -154,10 +159,13 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
      * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
      */
     @Override
-    public final void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+    public final void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers, BitSet bannedStopsHard) {
         int arrivalTimeTransit = bestTimes.transitTime(fromStop);
         while (transfers.hasNext()) {
-            transferToStop(arrivalTimeTransit, fromStop, transfers.next());
+          RaptorTransfer transfer = transfers.next();
+          if (!bannedStopsHard.get(transfer.stop())) {
+            transferToStop(arrivalTimeTransit, fromStop, transfer);
+          }
         }
     }
 

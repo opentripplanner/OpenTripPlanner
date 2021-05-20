@@ -102,6 +102,13 @@ public final class BestTimes {
     }
 
     /**
+     * @return an iterator for all stops reached (overall best) in the last round.
+     */
+    public final BitSet stopsReachedLastRoundAsBitSet() {
+      return reachedLastRound;
+    }
+
+    /**
      * @return an iterator of all stops reached by transit in the current round.
      */
     public final BitSetIterator transitStopsReachedCurrentRound() {

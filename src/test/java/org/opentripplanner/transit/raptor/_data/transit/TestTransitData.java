@@ -9,16 +9,13 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule> {
 
   private final List<List<RaptorTransfer>> transfersByStop = new ArrayList<>();
   private final List<Set<RaptorRoute<TestTripSchedule>>> routesByStop = new ArrayList<>();
+  private final BitSet bannedStopsHard = new BitSet();
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfers(int fromStop) {
@@ -38,6 +35,16 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   @Override
   public int numberOfStops() {
     return routesByStop.size();
+  }
+
+  @Override
+  public boolean isStopHardBanned(int index) {
+    return bannedStopsHard.get(index);
+  }
+
+  @Override
+  public BitSet getHardBannedStops() {
+    return bannedStopsHard;
   }
 
   @Override
@@ -70,6 +77,11 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
       expandNumOfStops(stopIndex);
       routesByStop.get(stopIndex).add(route);
     }
+    return this;
+  }
+
+  public TestTransitData add(Integer bannedStop) {
+    bannedStopsHard.set(bannedStop);
     return this;
   }
 

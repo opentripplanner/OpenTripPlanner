@@ -11,10 +11,7 @@ import org.opentripplanner.graph_builder.issues.HopZeroTime;
 import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.issues.RepeatedStops;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

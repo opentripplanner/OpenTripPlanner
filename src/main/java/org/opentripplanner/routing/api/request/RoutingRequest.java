@@ -466,6 +466,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
 
+    /**
+     * Set of stops to not allow travel through.
+     */
+    public Set<FeedScopedId> bannedStopsHard = new HashSet<>();
+
     /** Set of preferred routes by user.
      *
      * @deprecated TODO OTP2 Needs to be implemented
@@ -966,6 +971,16 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+
+    public void setBannedStopsHardFromString(String s) {
+        if (!s.isEmpty()) {
+            String[] stops = s.split(",");
+            for (String stop : stops) {
+                bannedStopsHard.add(LocationStringParser.fromOldStyleString(stop).stopId);
+            }
+        }
+    }
+
     public void setWhiteListedRoutes(List<FeedScopedId> routeIds) {
         whiteListedRoutes = RouteMatcher.idMatcher(routeIds);
     }
@@ -1149,7 +1164,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.whiteListedRoutes = whiteListedRoutes.clone();
             clone.preferredRoutes = preferredRoutes.clone();
             clone.unpreferredRoutes = unpreferredRoutes.clone();
-
+            clone.bannedStopsHard = Set.copyOf(bannedStopsHard);
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
 
             if (this.bikeWalkingOptions != this) {

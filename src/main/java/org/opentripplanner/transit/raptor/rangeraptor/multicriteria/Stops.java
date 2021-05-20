@@ -69,6 +69,10 @@ public final class Stops<T extends RaptorTripSchedule> {
         return new BitSetIterator(touchedStops);
     }
 
+    BitSet stopsTouched() {
+      return touchedStops;
+    }
+
     void addStopArrival(AbstractStopArrival<T> arrival) {
         boolean added = findOrCreateSet(arrival.stop()).add(arrival);
         if (added) {

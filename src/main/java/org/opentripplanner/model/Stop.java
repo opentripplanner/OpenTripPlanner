@@ -81,6 +81,29 @@ public final class Stop extends StationElement implements StopLocation {
     );
   }
 
+  /**
+   * Creates a stop with just a {@link FeedScopedId} to use for stop look ups,
+   * making use of the id equality of {@link TransitEntity}
+   *
+   * @param feedScopedId the id of the stop
+   * @return a stop with only a feedScopedId and the rest of the fields null.
+   */
+  public static Stop stopForEquality(FeedScopedId feedScopedId) {
+    return new Stop(
+            feedScopedId,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+  }
+
 
   public void addBoardingArea(BoardingArea boardingArea) {
     if (boardingAreas == null) {

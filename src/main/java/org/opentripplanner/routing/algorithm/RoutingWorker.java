@@ -41,10 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Does a complete transit search, including access and egress legs.
@@ -259,7 +256,8 @@ public class RoutingWorker {
                 request.getDateTime().toInstant(),
                 request.additionalSearchDaysAfterToday,
                 createRequestTransitDataProviderFilter(),
-                request.walkSpeed
+                request.walkSpeed,
+                request.bannedStopsHard
         );
     }
 

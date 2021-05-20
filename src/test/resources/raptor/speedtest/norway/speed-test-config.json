@@ -1,6 +1,6 @@
 {
   // Run all test-cases on the given date
-  testDate: "2020-01-15",
+  testDate: "2021-05-20",
 
   accessEgressMaxWalkDistanceMeters: 1000,
 

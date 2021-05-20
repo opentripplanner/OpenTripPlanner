@@ -379,7 +379,8 @@ public class SpeedTest {
                 request.getDepartureDateWithZone().toInstant(),
                 1,
                 transitDataProviderFilter,
-                request.getWalkSpeedMeterPrSecond()
+                request.getWalkSpeedMeterPrSecond(),
+                Set.of()
         );
     }
 

@@ -15,10 +15,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.He
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -79,7 +76,12 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         return stops.stopsTouchedIterator();
     }
 
-    @Override
+  @Override
+  public BitSet stopsTouchedPreviousRoundAsBitSet() {
+    return stops.stopsTouched();
+  }
+
+  @Override
     public IntIterator stopsTouchedByTransitCurrentRound() {
         return stops.stopsTouchedIterator();
     }
@@ -103,11 +105,14 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
      * Set the time at a transit stops iff it is optimal.
      */
     @Override
-    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers, BitSet bannedStopsHard) {
         Iterable<? extends AbstractStopArrival<T>> fromArrivals = stops.listArrivalsAfterMarker(fromStop);
 
         while (transfers.hasNext()) {
-            transferToStop(fromArrivals, transfers.next());
+          RaptorTransfer transfer = transfers.next();
+          if (!bannedStopsHard.get(transfer.stop())) {
+            transferToStop(fromArrivals, transfer);
+          }
         }
     }
 
