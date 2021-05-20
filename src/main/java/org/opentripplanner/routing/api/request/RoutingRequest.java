@@ -331,6 +331,18 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /** Configure the transfer optimization */
     public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest(this);
 
+    /**
+     * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add
+     * a penalty to other modes (> 1.0). The type used here it the internal model
+     * {@link TransitMode} make sure to create a mapping for this before using it on the API.
+     * <p>
+     * If set, the alight-slack-for-mode override the default value {@code 1.0}.
+     * <p>
+     * This is a scalar multiplied with the time in second on board the transit vehicle. Default
+     * value is not-set(empty map).
+     */
+    private Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
+
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
      *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
@@ -828,6 +840,15 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
         this.wheelchairAccessible = wheelchairAccessible;
+    }
+
+    public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
+        transitReluctanceForMode.clear();
+        transitReluctanceForMode.putAll(reluctanceForMode);
+    }
+
+    public Map<TransitMode, Double> transitReluctanceForMode() {
+        return Collections.unmodifiableMap(transitReluctanceForMode);
     }
 
     /** @return the (soft) maximum walk distance */
@@ -1436,7 +1457,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * @see RoutingRequest#isCloseToStartOrEnd(Vertex)
      * @see DominanceFunction#betterOrEqualAndComparable(State, State)
      */
-    private final int MAX_CLOSENESS_METERS = 500;
+    private static final int MAX_CLOSENESS_METERS = 500;
     private Envelope fromEnvelope;
     private Envelope toEnvelope;
 

@@ -1,9 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
@@ -25,6 +30,18 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   public static final FeedScopedId TP_ID_2 = new FeedScopedId("F", "2");
   public static final FeedScopedId TP_ID_3 = new FeedScopedId("F", "3");
 
+  private static final TripPattern TP = new TripPattern(
+          new FeedScopedId("F", "P1"),
+          new Route(new FeedScopedId("F", "L1")),
+          new StopPattern(List.of())
+  );
+
+  @Before
+  public void setup() {
+    TP.route.setMode(TransitMode.BUS);
+  }
+
+
   @Test
   public void testMergeTripPatterns() {
     LocalDate first = LocalDate.of(2019, 3, 30);
@@ -36,9 +53,9 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 
     // Total available trip patterns
-    TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1, null, null);
-    TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(TP_ID_2, null, null);
-    TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(TP_ID_3, null, null);
+    TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1, null, TP);
+    TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(TP_ID_2, null, TP);
+    TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(TP_ID_3, null, TP);
 
     List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 

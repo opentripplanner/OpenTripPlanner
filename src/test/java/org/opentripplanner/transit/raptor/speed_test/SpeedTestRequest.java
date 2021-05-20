@@ -5,6 +5,7 @@ import gnu.trove.map.TIntIntMap;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -139,6 +140,10 @@ public class SpeedTestRequest {
         );
         builder.searchParams().addEgressPaths(
             mapToAccessEgress(streetRouter.getEgressTimesInSecondsByStopIndex())
+        );
+
+        builder.mcCostFactors().transitReluctanceFactors(
+                RaptorRequestMapper.mapTransitReluctance(config.request.transitReluctanceForMode())
         );
 
         addDebugOptions(builder, opts);

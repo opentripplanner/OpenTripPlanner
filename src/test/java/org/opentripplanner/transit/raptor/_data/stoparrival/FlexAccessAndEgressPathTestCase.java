@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
@@ -43,10 +44,9 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
     // The COST_CALCULATOR is not under test, so we use it to calculate correct cost values.
-    public static final DefaultCostCalculator<TestTripSchedule> COST_CALCULATOR =
-            new DefaultCostCalculator<>(
-                    null, BOARD_COST_SEC, TRANSFER_COST_SEC, WALK_RELUCTANCE, WAIT_RELUCTANCE
-            );
+    public static final DefaultCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+            BOARD_COST_SEC, TRANSFER_COST_SEC, WALK_RELUCTANCE, WAIT_RELUCTANCE, null, null
+    );
     // FLEX Access 5m tx 1 ~ A. Note! The actual times might get time-shifted.
     public static final int ACCESS_DURATION = DurationUtils.duration("5m15s");
     // Using transfer reluctance is incorrect, we should use the cost from the access path
@@ -72,7 +72,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     // Wait at least 1m45s (45s BOARD_SLACK and 60s TRANSFER_SLACK)
     public static final int L1_TRANSIT_DURATION = L1_END - L1_START;
     public static final int L1_COST_EX_WAIT = COST_CALCULATOR.transitArrivalCost(
-            false, STOP_B, 0, L1_TRANSIT_DURATION, STOP_C
+            false, STOP_B, 0, L1_TRANSIT_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_C
     );
     // Transfers (C ~ Walk 2m ~ D) (Used in Case B only)
     public static final int TX2_START = time("10:20:15");

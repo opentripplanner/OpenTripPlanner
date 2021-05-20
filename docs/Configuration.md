@@ -712,7 +712,7 @@ parameter to estimate a maxLimit for each group. For example, if the `numOfItine
 elements depending on the distribution. The _max-limit_ can never be less than 1.
 
 
-#### Minimum Safe Transfer Time Additonal Cost
+#### Minimum Safe Transfer Time Additional Cost
 
 Setting the `minSafeTransferTimeFactor` will enable the `add-min-safe-transfer-cost-filter`. The
 filter adds a cost the itinerary _generalized-cost_ if for each "unsafe" transfers to better 

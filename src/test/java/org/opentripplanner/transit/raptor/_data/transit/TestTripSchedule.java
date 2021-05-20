@@ -15,16 +15,19 @@ public class TestTripSchedule implements RaptorTripSchedule {
     private final RaptorTripPattern pattern;
     private final int[] arrivalTimes;
     private final int[] departureTimes;
+    private final int transitReluctanceIndex;
 
 
     private TestTripSchedule(
         TestTripPattern pattern,
         int[] arrivalTimes,
-        int[] departureTimes
+        int[] departureTimes,
+        int transitReluctanceIndex
     ) {
         this.pattern = pattern;
         this.arrivalTimes = arrivalTimes;
         this.departureTimes = departureTimes;
+        this.transitReluctanceIndex = transitReluctanceIndex;
     }
 
     @Override
@@ -50,6 +53,11 @@ public class TestTripSchedule implements RaptorTripSchedule {
 
     public int size() {
         return arrivalTimes.length;
+    }
+
+    @Override
+    public int transitReluctanceFactorIndex() {
+        return transitReluctanceIndex;
     }
 
     @Override
@@ -85,6 +93,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
         private int[] arrivalTimes;
         private int[] departureTimes;
         private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
+        private int transitReluctanceIndex = 0;
 
         public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
             this.pattern = pattern;
@@ -138,6 +147,16 @@ public class TestTripSchedule implements RaptorTripSchedule {
             return this;
         }
 
+        /**
+         * Set the transit-reluctance-index.
+         * <p>
+         * The default is 0.
+         */
+        public TestTripSchedule.Builder transitReluctanceIndex(int transitReluctanceIndex) {
+            this.transitReluctanceIndex = transitReluctanceIndex;
+            return this;
+        }
+
         public TestTripSchedule build() {
             if(arrivalTimes == null) {
                 arrivalTimes = copyWithOffset(departureTimes, -arrivalDepartureOffset);
@@ -163,7 +182,9 @@ public class TestTripSchedule implements RaptorTripSchedule {
                         + ", stops: " + pattern.numberOfStopsInPattern()
                 );
             }
-            return new TestTripSchedule(pattern, arrivalTimes, departureTimes);
+            return new TestTripSchedule(
+                    pattern, arrivalTimes, departureTimes, transitReluctanceIndex
+            );
         }
 
         private static int[] copyWithOffset(int[] source, int offset) {

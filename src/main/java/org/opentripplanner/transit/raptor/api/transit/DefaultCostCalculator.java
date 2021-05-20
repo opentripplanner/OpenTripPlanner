@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 /**
@@ -14,7 +15,7 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
     private final int boardAndTransferCost;
     private final int walkFactor;
     private final int waitFactor;
-    private final int transitFactor;
+    private final FactorStrategy transitFactors;
     private final int[] stopVisitCost;
 
     /**
@@ -26,25 +27,30 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
      *                      Use {@code null} to ignore stop cost.
      */
     public DefaultCostCalculator(
-            @Nullable int[] stopVisitCost,
             int boardCost,
             int transferCost,
             double walkReluctanceFactor,
-            double waitReluctanceFactor
+            double waitReluctanceFactor,
+            @Nullable int[] stopVisitCost,
+            @Nullable double[] transitReluctanceFactors
     ) {
         this.stopVisitCost = stopVisitCost;
         this.boardCostOnly = RaptorCostConverter.toRaptorCost(boardCost);
         this.boardAndTransferCost = RaptorCostConverter.toRaptorCost(transferCost) + boardCostOnly;
         this.walkFactor = RaptorCostConverter.toRaptorCost(walkReluctanceFactor);
         this.waitFactor = RaptorCostConverter.toRaptorCost(waitReluctanceFactor);
-        this.transitFactor = RaptorCostConverter.toRaptorCost(1.0);
+
+        this.transitFactors = transitReluctanceFactors == null
+            ? new SingleValueFactorStrategy(McCostParams.DEFAULT_TRANSIT_RELUCTANCE)
+            : new IndexBasedFactorStrategy(transitReluctanceFactors);
     }
 
     @Override
     public final int onTripRidingCost(
         ArrivalView<T> previousArrival,
         int waitTime,
-        int boardTime
+        int boardTime,
+        int transitFactorIndex
     ) {
         // The relative-transit-time is time spent on transit. We do not know the alight-stop, so
         // it is impossible to calculate the "correct" time. But the only thing that maters is that
@@ -56,7 +62,7 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
         // board/transfer cost.
         int cost = previousArrival.cost()
             + waitFactor * waitTime
-            + transitFactor * relativeTransitTime;
+            + transitFactors.factor(transitFactorIndex) * relativeTransitTime;
 
         if(stopVisitCost != null) {
             cost += stopVisitCost[previousArrival.stop()];
@@ -70,9 +76,10 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
         int fromStop,
         int waitTime,
         int transitTime,
+        int transitFactorIndex,
         int toStop
     ) {
-        int cost = waitFactor * waitTime + transitFactor * transitTime;
+        int cost = waitFactor * waitTime + transitFactors.factor(transitFactorIndex) * transitTime;
 
         cost += firstRound ? boardCostOnly : boardAndTransferCost;
 
@@ -96,6 +103,6 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
     public final int calculateMinCost(int minTravelTime, int minNumTransfers) {
         return  boardCostOnly
             + boardAndTransferCost * minNumTransfers
-            + transitFactor * minTravelTime;
+            + transitFactors.minFactor() * minTravelTime;
     }
 }

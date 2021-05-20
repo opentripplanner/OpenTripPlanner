@@ -11,7 +11,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
  * This represents a single trip within a TripPattern, but with a time offset in seconds. This is used to represent
  * a trip on a subsequent service day than the first one in the date range used.
  */
-
 public final class TripScheduleWithOffset implements TripSchedule {
 
     private final int secondsOffset;
@@ -19,6 +18,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
     private final TripTimes tripTimes;
     private final LocalDate serviceDate;
     private final int sortIndex;
+    private final int transitReluctanceIndex;
 
     TripScheduleWithOffset(TripPatternForDates pattern, LocalDate localDate, TripTimes tripTimes, int offset) {
         this.pattern = pattern;
@@ -27,6 +27,8 @@ public final class TripScheduleWithOffset implements TripSchedule {
         this.serviceDate = localDate;
         // Trip times are sorted based on the arrival times at stop 0,
         this.sortIndex = arrival(0);
+        // Mode ordinal is used to index the transit factor/reluctance
+        this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().ordinal();
     }
 
     @Override
@@ -62,6 +64,11 @@ public final class TripScheduleWithOffset implements TripSchedule {
     @Override
     public LocalDate getServiceDate() {
         return serviceDate;
+    }
+
+    @Override
+    public int transitReluctanceFactorIndex() {
+        return transitReluctanceIndex;
     }
 
     @Override

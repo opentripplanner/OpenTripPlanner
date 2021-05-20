@@ -111,4 +111,10 @@ public interface RaptorTripSchedule {
         }
         return p.findStopPositionAfter(i, stop);
     }
+
+    /**
+     * This index is used to lookup the transit factor/reluctance to be used with this trip
+     * schedule.
+     */
+    int transitReluctanceFactorIndex();
 }
