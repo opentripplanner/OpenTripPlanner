@@ -1,12 +1,12 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 
+import java.util.function.Consumer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
-
-import java.util.function.Consumer;
 
 /**
  *
@@ -122,5 +122,17 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
 
     private int round() {
         return roundProvider.round();
+    }
+
+    TransitArrival<T> previousTransit(int boardStopIndex) {
+        final int prevRound = round() - 1;
+        int stopIndex = boardStopIndex;
+        StopArrivalState<T> state = stops[prevRound][boardStopIndex];
+
+        if(state.arrivedByTransfer()) {
+            stopIndex = state.transferFromStop();
+            state = stops[prevRound][stopIndex];
+        }
+        return TransitArrival.create(state.trip(), stopIndex, state.transitTime());
     }
 }

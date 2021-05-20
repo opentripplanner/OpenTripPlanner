@@ -19,8 +19,8 @@ public enum TransferType {
      */
     MIN_TIME(2),
     /**
-     * Transfers between these stops (and route/trip) is not possible (or not allowed), even if a transfer is
-     * already defined via OpenStreetMap data or in transit data.
+     * Transfers between these stops (and route/trip) is not possible (or not allowed), even if
+     * a transfer is already defined via OpenStreetMap data or in transit data.
      */
     FORBIDDEN(3);
 

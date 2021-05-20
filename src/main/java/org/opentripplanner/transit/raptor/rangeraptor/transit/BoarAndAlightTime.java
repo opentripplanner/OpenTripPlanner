@@ -39,11 +39,11 @@ public class BoarAndAlightTime {
   public String toString() {
     return ValueObjectToStringBuilder
         .of()
-        .addLbl("(")
+        .addText("(")
         .addServiceTime(boardTime())
-        .addLbl(", ")
+        .addText(", ")
         .addServiceTime(alightTime())
-        .addLbl(")")
+        .addText(")")
         .toString();
   }
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.updater;
 
+import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
@@ -12,12 +13,11 @@ import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 
-import java.net.URI;
 import java.util.List;
 
 public interface UpdatersParameters {
 
-  URI bikeRentalServiceDirectoryUrl();
+  BikeRentalServiceDirectoryFetcherParameters getBikeRentalServiceDirectoryFetcherParameters();
 
   List<BikeRentalUpdaterParameters> getBikeRentalParameters();
 

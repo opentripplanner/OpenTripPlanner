@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.raptor.api.view;
 
 
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -65,6 +67,19 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
      */
     ArrivalView<T> previous();
 
+    /**
+     * If it exist, return the most resent transit arrival visited. For a transit-stop-arrival
+     * this is it self, for a transfer-stop-arrival it is the previous stop-arrival.
+     * <p>
+     * For access- and egress-arrivals, including flex this method return {@code null}.
+     * <p>
+     * The method should be as light as possible, since it is used during routing.
+     */
+    @Nullable
+    default TransitArrival<T> mostResentTransitArrival() {
+        return null;
+    }
+
     /* Access stop arrival */
 
     /**
@@ -118,7 +133,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     default String asString() {
         if(arrivedByAccess()) {
             return String.format(
-                "Access { stop: %d, duration: %s, arrival-time: %s, cost: %d }",
+                "Access { stop: %d, duration: %s, arrival-time: %s $%d }",
                 stop(), DurationUtils.durationToStr(accessPath().access().durationInSeconds()),
                 TimeUtils.timeToStrCompact(arrivalTime()),
                 cost()
@@ -126,7 +141,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         }
         if(arrivedByTransit()) {
             return String.format(
-                "Transit { round: %d, stop: %d, pattern: %s, arrival-time: %s, cost: %d }",
+                "Transit { round: %d, stop: %d, pattern: %s, arrival-time: %s $%d }",
                 round(),
                 stop(),
                 transitPath().trip().pattern().debugInfo(),
@@ -136,7 +151,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         }
         if(arrivedByTransfer()) {
             return String.format(
-                "Walk { round: %d, stop: %d, arrival-time: %s, cost: %d }",
+                "Walk { round: %d, stop: %d, arrival-time: %s $%d }",
                 round(),
                 stop(),
                 TimeUtils.timeToStrCompact(arrivalTime()),
@@ -145,7 +160,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         }
         if(arrivedAtDestination()) {
             return String.format(
-                "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s, cost: %d }",
+                "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s $%d }",
                 round(),
                 previous().stop(),
                 DurationUtils.durationToStr(egressPath().egress().durationInSeconds()),

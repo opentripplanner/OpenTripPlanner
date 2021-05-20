@@ -1,7 +1,9 @@
 package org.opentripplanner.standalone.config;
 
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,8 @@ public class RoutingRequestMapper {
         request.bikeTriangleTimeFactor = c.asDouble("bikeTriangleTimeFactor", dft.bikeTriangleTimeFactor);
         request.bikeSwitchTime = c.asInt("bikeSwitchTime", dft.bikeSwitchTime);
         request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
+        request.allowKeepingRentedBicycleAtDestination = c.asBoolean("allowKeepingRentedBicycleAtDestination", dft.allowKeepingRentedBicycleAtDestination);
+        request.keepingRentedBicycleAtDestinationCost = c.asDouble("keepingRentedBicycleAtDestinationCost", dft.keepingRentedBicycleAtDestinationCost);
         request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
         request.boardSlackForMode = c.asEnumMap("boardSlackForMode", TraverseMode.class, NodeAdapter::asInt);
         request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
@@ -47,7 +51,6 @@ public class RoutingRequestMapper {
         request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"));
         request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
         request.disableRemainingWeightHeuristic = c.asBoolean("disableRemainingWeightHeuristic", dft.disableRemainingWeightHeuristic);
-        request.driveOnRight = c.asBoolean("driveOnRight", dft.driveOnRight);
         request.elevatorBoardCost = c.asInt("elevatorBoardCost", dft.elevatorBoardCost);
         request.elevatorBoardTime = c.asInt("elevatorBoardTime", dft.elevatorBoardTime);
         request.elevatorHopCost = c.asInt("elevatorHopCost", dft.elevatorHopCost);
@@ -76,6 +79,7 @@ public class RoutingRequestMapper {
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
         request.transferCost = c.asInt("transferPenalty", dft.transferCost);
         request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
+        request.setTransitReluctanceForMode(c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble));
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useBikeRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useBikeRentalAvailabilityInformation);
         request.useRequestedDateTimeInMaxHours = c.asBoolean("useRequestedDateTimeInMaxHours", dft.useRequestedDateTimeInMaxHours);
@@ -89,6 +93,20 @@ public class RoutingRequestMapper {
         request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
         request.worstTime = c.asLong("worstTime", dft.worstTime);
 
+        mapTransferOptimization(
+            (TransferOptimizationRequest)request.transferOptimization,
+            c.path("transferOptimization")
+        );
+
         return request;
+    }
+
+    private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {
+        p.useOptimizeTransferCostFunction = c.asBoolean(
+            "adjustGeneralizedCost",
+            p.useOptimizeTransferCostFunction
+        );
+        p.minSafeWaitTimeFactor = c.asDouble("minSafeWaitTimeFactor", p.minSafeWaitTimeFactor);
+        p.inverseWaitReluctance = c.asDouble("inverseWaitReluctance", p.inverseWaitReluctance);
     }
 }

@@ -2,6 +2,9 @@ package org.opentripplanner.routing.spt;
 
 import java.util.LinkedList;
 
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -31,13 +34,11 @@ public class GraphPath {
      * Optionally re-traverses all edges backward in order to remove excess waiting time from the
      * final itinerary presented to the user. When planning with departure time, the edges will then
      * be re-traversed once more in order to move the waiting time forward in time, towards the end.
-     * 
-     * @param s
+     *  @param s
      *            - the state for which a path is requested
-     * @param optimize
-     *            - whether excess waiting time should be removed
+     *
      */
-    public GraphPath(State s, boolean optimize) {
+    public GraphPath(State s) {
         this.rctx = s.getContext();
         this.back = s.getOptions().arriveBy;
 
@@ -92,6 +93,14 @@ public class GraphPath {
         return (int) states.getLast().getElapsedTimeSeconds();
     }
 
+    /**
+     * Returns the total distance of all the edges in this path
+     * @return
+     */
+    public double getDistanceMeters() {
+        return edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    }
+
     public double getWeight() {
         return states.getLast().getWeight();
     }
@@ -102,6 +111,30 @@ public class GraphPath {
 
     public Vertex getEndVertex() {
         return states.getLast().getVertex();
+    }
+
+    /**
+     * Returns the geometry for the entire path
+     * @return
+     */
+    public LineString getGeometry() {
+        CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
+
+        for (Edge edge : edges) {
+            LineString geometry = edge.getGeometry();
+
+            if (geometry != null) {
+                if (coordinates.size() == 0) {
+                    coordinates.extend(geometry.getCoordinates());
+                }
+                else {
+                    // Avoid duplications
+                    coordinates.extend(geometry.getCoordinates(), 1);
+                }
+            }
+        }
+
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
     public String toString() {

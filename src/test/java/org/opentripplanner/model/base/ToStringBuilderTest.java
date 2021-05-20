@@ -20,8 +20,8 @@ public class ToStringBuilderTest {
 
   @Test
   public void addFieldIfTrue() {
-    assertEquals("ToStringBuilderTest{x}", subject().addFieldIfTrue("x", true).toString());
-    assertEquals("ToStringBuilderTest{}", subject().addFieldIfTrue("x", false).toString());
+    assertEquals("ToStringBuilderTest{x}", subject().addBoolIfTrue("x", true).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addBoolIfTrue("x", false).toString());
   }
 
   @Test
@@ -74,7 +74,9 @@ public class ToStringBuilderTest {
   @Test
   public void addEnum() {
     assertEquals("ToStringBuilderTest{a: A}", subject().addEnum("a", AEnum.A).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addEnum("a", AEnum.A, AEnum.A).toString());
     assertEquals("ToStringBuilderTest{}", subject().addEnum("b", null).toString());
+    assertEquals("ToStringBuilderTest{a: A}", subject().addEnum("a", AEnum.A, AEnum.B).toString());
   }
 
   @Test
@@ -159,11 +161,17 @@ public class ToStringBuilderTest {
 
   @Test
   public void addServiceTime() {
+    var EXPECTED = "ToStringBuilderTest{t: 2:30:04}";
     // 02:30:04 in seconds is:
     int seconds = TimeUtils.time("2:30:04");
+
+    assertEquals(EXPECTED, subject().addServiceTime("t", seconds, -1).toString());
+    assertEquals(EXPECTED, subject().addServiceTime("t", seconds).toString());
+
+    // Expect ignore value
     assertEquals(
-        "ToStringBuilderTest{t: 2:30:04}",
-        subject().addServiceTime("t", seconds, -1).toString()
+            "ToStringBuilderTest{}",
+            subject().addServiceTime("t", -1, -1).toString()
     );
   }
 
@@ -211,7 +219,8 @@ public class ToStringBuilderTest {
     return ToStringBuilder.of(ToStringBuilderTest.class);
   }
 
-  private enum AEnum { A }
+  private enum AEnum { A, B }
+
   private static class Foo {
     int a;
     String b;

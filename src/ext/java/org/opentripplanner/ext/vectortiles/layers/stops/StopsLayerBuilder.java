@@ -44,10 +44,4 @@ public class StopsLayerBuilder extends LayerBuilder<TransitStopVertex> {
       return point;
     }).collect(Collectors.toList());
   }
-
-  @Override
-  protected double getExpansionFactor() {
-    return 0.1;
-  }
-
 }

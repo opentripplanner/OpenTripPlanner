@@ -14,6 +14,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
@@ -65,7 +66,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
   public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
     double effectiveWalkDistance = 0.0;
     int distanceIndependentTime = 0;
-    GraphPath graphPath = new GraphPath(state, false);
+    GraphPath graphPath = new GraphPath(state);
     CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
     List<Edge> edges = new ArrayList<>();
     for (Edge edge : graphPath.edges) {
@@ -83,10 +84,11 @@ public class NearbyStop implements Comparable<NearbyStop> {
       edges.add(edge);
     }
     if (coordinates.size() < 2) {   // Otherwise the walk step generator breaks.
-      ArrayList<Coordinate> coordinateList = new ArrayList<Coordinate>(2);
-      coordinateList.add(graphPath.states.get(1).getVertex().getCoordinate());
-      State lastState = graphPath.states.getLast().getBackState();
+      ArrayList<Coordinate> coordinateList = new ArrayList<>(2);
+      State lastState = graphPath.states.getLast();
       coordinateList.add(lastState.getVertex().getCoordinate());
+      State backState = lastState.getBackState();
+      coordinateList.add(Objects.requireNonNullElse(backState, lastState).getVertex().getCoordinate());
       coordinates = new CoordinateArrayListSequence(coordinateList);
     }
     return new NearbyStop(

@@ -1,0 +1,16 @@
+{
+  "name": "legacy-graphql-generator",
+  "version": "1.0.0",
+  "description": "Generates Java code from GraphQL schema",
+  "scripts": {
+    "generate": "graphql-codegen -c graphql-codegen.yml"
+  },
+  "license": "LGPL-3.0",
+  "dependencies": {
+    "@graphql-codegen/add": "2.0.2",
+    "@graphql-codegen/cli": "1.21.4",
+    "@graphql-codegen/java": "1.17.9",
+    "@graphql-codegen/java-resolvers": "1.18.0",
+    "graphql": "15.5.0"
+  }
+}

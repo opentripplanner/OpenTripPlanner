@@ -13,6 +13,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 public final class RaptorCostConverter {
   private static final int NOT_SET = -1;
   private static final int PRECISION = 100;
+  private static final int HALF = PRECISION/2;
 
   /* private constructor to prevent instantiation of utility class. */
   private RaptorCostConverter() {}
@@ -22,13 +23,24 @@ public final class RaptorCostConverter {
    */
   public static int toOtpDomainCost(int raptorCost) {
     if(raptorCost == NOT_SET) { return NOT_SET; }
-    return (int) Math.round((double) raptorCost / PRECISION);
+    return (raptorCost + HALF) / PRECISION;
   }
 
   /**
    * Convert OTP domain model cost to Raptor internal cost.
    */
   public static int toRaptorCost(double domainCost) {
-    return (int) (domainCost * PRECISION);
+    return (int) (domainCost * PRECISION + 0.5d);
+  }
+
+  /**
+   * Convert an array of OTP domain values(doubles) into Raptor internal values {@code int}s.
+   */
+  public static int[] toRaptorCosts(double[] domainValues) {
+    int[] raptorCost = new int[domainValues.length];
+    for (int i = 0; i < domainValues.length; i++) {
+      raptorCost[i]  = toRaptorCost(domainValues[i]);
+    }
+    return raptorCost;
   }
 }

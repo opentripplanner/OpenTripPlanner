@@ -1,13 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator.testDummyCalculator;
+
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
 
@@ -26,7 +27,7 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
     private TripScheduleSearch<TestTripSchedule> subject;
 
     public void setup(boolean forward) {
-        TransitCalculator calculator = TransitCalculator.testDummyCalculator(forward);
+        TransitCalculator<TestTripSchedule> calculator = testDummyCalculator(forward);
         subject = calculator.createExactTripSearch(TIME_TABLE);
     }
 
@@ -39,19 +40,19 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
         int earliestDepartureTime;
 
         earliestDepartureTime = TRIP_TIME;
-        assertTrue(subject.search(earliestDepartureTime, STOP_POS_0));
+        assertNotNull(subject.search(earliestDepartureTime, STOP_POS_0));
 
         earliestDepartureTime = TRIP_TIME - ITERATION_STEP + 1;
-        assertTrue(subject.search(earliestDepartureTime, STOP_POS_0));
+        assertNotNull(subject.search(earliestDepartureTime, STOP_POS_0));
 
         earliestDepartureTime = TRIP_TIME + 1;
-        assertFalse(subject.search(earliestDepartureTime, STOP_POS_0));
+        assertNull(subject.search(earliestDepartureTime, STOP_POS_0));
 
         earliestDepartureTime = TRIP_TIME - ITERATION_STEP;
-        assertFalse(subject.search(earliestDepartureTime, STOP_POS_0));
+        assertNull(subject.search(earliestDepartureTime, STOP_POS_0));
 
         earliestDepartureTime = TRIP_TIME;
-        assertFalse(subject.search(earliestDepartureTime, STOP_POS_0, 0));
+        assertNull(subject.search(earliestDepartureTime, STOP_POS_0, 0));
     }
 
     @Test
@@ -60,36 +61,39 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
         int limit;
 
         limit = TRIP_TIME;
-        assertTrue(subject.search(limit, STOP_POS_0));
+        assertNotNull(subject.search(limit, STOP_POS_0));
 
         limit = TRIP_TIME + ITERATION_STEP - 1;
-        assertTrue(subject.search(limit, STOP_POS_0));
+        assertNotNull(subject.search(limit, STOP_POS_0));
 
         limit = TRIP_TIME - 1;
-        assertFalse(subject.search(limit, STOP_POS_0));
+        assertNull(subject.search(limit, STOP_POS_0));
 
         limit = TRIP_TIME + ITERATION_STEP;
-        assertFalse(subject.search(limit, STOP_POS_0));
+        assertNull(subject.search(limit, STOP_POS_0));
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
     public void getCandidateTrip() {
         setup(FORWARD);
-        subject.search(TRIP_TIME, STOP_POS_0);
-        assertEquals(TRIP_SCHEDULE, subject.getCandidateTrip());
+        var r = subject.search(TRIP_TIME, STOP_POS_0);
+        assertEquals(TRIP_SCHEDULE, r.getTrip());
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
     public void getCandidateTripIndex() {
         setup(FORWARD);
-        subject.search(TRIP_TIME, STOP_POS_0);
-        assertEquals(0, subject.getCandidateTripIndex());
+        var r = subject.search(TRIP_TIME, STOP_POS_0);
+        assertEquals(0, r.getTripIndex());
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
     public void getCandidateTripTime() {
         setup(FORWARD);
-        subject.search(TRIP_TIME, STOP_POS_0);
-        assertEquals(TRIP_TIME, subject.getCandidateTripTime());
+        var r = subject.search(TRIP_TIME, STOP_POS_0);
+        assertEquals(TRIP_TIME, r.getTime());
     }
 }

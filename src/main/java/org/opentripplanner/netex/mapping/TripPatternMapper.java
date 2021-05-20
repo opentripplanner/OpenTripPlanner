@@ -2,7 +2,13 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Stop;
@@ -23,13 +29,6 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern contain the same
@@ -59,13 +58,14 @@ class TripPatternMapper {
 
     private final Deduplicator deduplicator;
 
-    private Result result;
+    private TripPatternMapperResult result;
 
     TripPatternMapper(
             FeedScopedIdFactory idFactory,
             EntityById<Operator> operatorById,
             EntityById<Stop> stopsById,
             EntityById<FlexStopLocation> flexStopLocationsById,
+            EntityById<FlexLocationGroup> flexLocationGroupsById,
             EntityById<org.opentripplanner.model.Route> otpRouteById,
             Set<FeedScopedId> shapePointsIds,
             ReadOnlyHierarchicalMap<String, Route> routeById,
@@ -94,6 +94,7 @@ class TripPatternMapper {
             idFactory,
             stopsById,
             flexStopLocationsById,
+            flexLocationGroupsById,
             destinationDisplayById,
             quayIdByStopPointRef,
             flexibleStopPlaceIdByStopPointRef,
@@ -108,9 +109,9 @@ class TripPatternMapper {
         }
     }
 
-    Result mapTripPattern(JourneyPattern journeyPattern) {
+    TripPatternMapperResult mapTripPattern(JourneyPattern journeyPattern) {
         // Make sure the result is clean, by creating a new object.
-        result = new Result();
+        result = new TripPatternMapperResult();
         Collection<ServiceJourney> serviceJourneys = serviceJourniesByPatternId.get(journeyPattern.getId());
 
         if (serviceJourneys == null || serviceJourneys.isEmpty()) {
@@ -127,7 +128,7 @@ class TripPatternMapper {
             // Unable to map ServiceJourney, problem logged by the mapper above
             if(trip == null) { continue; }
 
-            StopTimesMapper.MappedStopTimes stopTimes = stopTimesMapper.mapToStopTimes(
+            StopTimesMapperResult stopTimes = stopTimesMapper.mapToStopTimes(
                     journeyPattern,
                     trip,
                     serviceJourney.getPassingTimes().getTimetabledPassingTime(),
@@ -137,6 +138,10 @@ class TripPatternMapper {
             // Unable to map StopTimes, problem logged by the mapper above
             if (stopTimes == null) { continue; }
 
+            result.scheduledStopPointsIndex.putAll(
+                    serviceJourney.getId(),
+                    stopTimes.scheduledStopPointIds
+            );
             result.tripStopTimes.put(trip, stopTimes.stopTimes);
             result.stopTimeByNetexId.putAll(stopTimes.stopTimeByNetexId);
 
@@ -149,10 +154,15 @@ class TripPatternMapper {
 
         // TODO OTP2 Trips containing FlexStopLocations are not added to StopPatterns until support
         //           for this is added.
-        if (result.tripStopTimes
-            .get(trips.get(0))
-            .stream()
-            .anyMatch(t -> t.getStop() instanceof FlexStopLocation)) {
+        if (
+            result.tripStopTimes
+                .get(trips.get(0))
+                .stream()
+                .anyMatch(t ->
+                    t.getStop() instanceof FlexStopLocation
+                    || t.getStop() instanceof FlexLocationGroup
+                )
+        ) {
             return result;
         }
 
@@ -199,7 +209,7 @@ class TripPatternMapper {
         }
     }
 
-    private String getHeadsign(List<StopTime> stopTimes) {
+    private static String getHeadsign(List<StopTime> stopTimes) {
         if (stopTimes != null && stopTimes.size() > 0) {
             return stopTimes.stream().findFirst().get().getStopHeadsign();
         } else {
@@ -207,13 +217,4 @@ class TripPatternMapper {
         }
     }
 
-    /**
-     * This mapper returnes two collections, so we need to use a simple wraper to be able to return the result
-     * from the mapping method.
-     */
-    static class Result {
-        final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
-        final List<TripPattern> tripPatterns = new ArrayList<>();
-        final Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
-    }
 }

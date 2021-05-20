@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * This filter remove all transit results witch have a generalized-cost higher than
  * the max-limit computed by the {@link #costLimitFunction}.
  * <p>
- * @see org.opentripplanner.routing.api.request.RoutingRequest#transitGeneralizedCostLimit
+ * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#transitGeneralizedCostLimit
  */
 public class TransitGeneralizedCostFilter implements ItineraryFilter {
   private final DoubleFunction<Double> costLimitFunction;

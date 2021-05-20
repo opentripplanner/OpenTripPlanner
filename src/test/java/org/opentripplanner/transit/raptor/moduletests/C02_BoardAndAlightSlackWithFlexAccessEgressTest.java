@@ -1,5 +1,14 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -10,15 +19,6 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -39,7 +39,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
       = "Flex 2m 1tx ~ 2 ~ "
       + "BUS R1 0:04 0:06 ~ 3 ~ "
       + "Flex 2m 1tx "
-      + "[00:00:30 00:09:10 8m40s]";
+      + "[0:00:30 0:09:10 8m40s]";
 
   @Before
   public void setup() {
@@ -48,7 +48,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
         defaultSlackProvider(D1m, D30s, D10s)
     );
 
-    data.add(
+    data.withRoute(
         // Pattern arrive at stop 2 at 0:03:00
         route(pattern("R1", STOP_B, STOP_C))
             .withTimetable(
@@ -74,8 +74,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
         .searchWindowInSeconds(D3m)
     ;
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test
@@ -98,7 +97,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
   @Test
   public void multiCriteria() {
     // Add cost to result string
-    String expected = EXPECTED_RESULT.replace("]", ", cost: 1840]");
+    String expected = EXPECTED_RESULT.replace("]", " $1840]");
     var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
     var response = raptorService.route(request, data);
     assertEquals(expected, pathsToString(response));

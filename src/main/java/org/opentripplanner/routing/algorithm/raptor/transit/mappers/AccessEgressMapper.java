@@ -38,10 +38,11 @@ public class AccessEgressMapper {
   }
 
   public Collection<AccessEgress> mapFlexAccessEgresses(
-      Collection<FlexAccessEgress> flexAccessEgresses
+          Collection<FlexAccessEgress> flexAccessEgresses,
+          boolean isEgress
   ) {
     return flexAccessEgresses.stream()
-        .map(flexAccessEgress -> new FlexAccessEgressAdapter(flexAccessEgress, stopIndex))
+        .map(flexAccessEgress -> new FlexAccessEgressAdapter(flexAccessEgress, isEgress, stopIndex))
         .collect(Collectors.toList());
   }
 
