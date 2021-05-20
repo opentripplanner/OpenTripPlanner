@@ -100,7 +100,7 @@ public class TransferStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "Walk { round: 1, stop: 102, arrival-time: 9:26, cost: 1100 }",
+                "Walk { round: 1, stop: 102, arrival-time: 9:26 $1100 }",
                 subject.toString()
         );
     }

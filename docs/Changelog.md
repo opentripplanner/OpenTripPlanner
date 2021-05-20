@@ -26,6 +26,7 @@
 - Import GTFS-Flex v2 Flexible trips [#3453](https://github.com/opentripplanner/OpenTripPlanner/pull/3453)
 - Add support for arriving at the destination with rented bicycles [#3459](https://github.com/opentripplanner/OpenTripPlanner/issues/3459)
 - Allow IntersectionTraversalCostModel to be specified in the WayPropertySet [#3472](https://github.com/opentripplanner/OpenTripPlanner/pull/3472)
+- ClassCastException when doing flex access search [#3448](https://github.com/opentripplanner/OpenTripPlanner/issues/3448)
 
 ## 2.0.0 (2020-11-27)
 

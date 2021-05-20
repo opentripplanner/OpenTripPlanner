@@ -10,7 +10,7 @@ public class Egress {
     private final int cost;
     private final ArrivalView<TestTripSchedule> previous;
 
-    Egress(int departureTime, int arrivalTime, int cost, ArrivalView<TestTripSchedule> previous) {
+    public Egress(int departureTime, int arrivalTime, int cost, ArrivalView<TestTripSchedule> previous) {
         this.arrivalTime = arrivalTime;
         this.durationInSeconds = Math.abs(arrivalTime - departureTime);
         this.cost = cost;
@@ -25,7 +25,7 @@ public class Egress {
     @Override
     public String toString() {
             return String.format(
-                    "Egress { round: %d, stop: %d, arrival-time: %s, cost: %d }",
+                    "Egress { round: %d, stop: %d, arrival-time: %s $%d }",
                     previous.round(),
                     previous.stop(),
                     TimeUtils.timeToStrCompact(arrivalTime),

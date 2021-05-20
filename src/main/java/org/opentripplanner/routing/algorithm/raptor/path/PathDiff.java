@@ -26,9 +26,9 @@ import org.opentripplanner.util.time.TimeUtils;
  * in both, but where the first path differ in cost:
  * <pre>
  * STATUS | TX | DURATION |  COST | WALK |   START  |    END   | PATH
- *  RIGHT |  1 |   21m26s | 22510 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s, cost: 22510]
- *  LEFT  |  1 |   21m26s |  4195 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s, cost: 4195]
- *   EQ   |  0 |    24m3s |  5085 |   0s | 14:09:07 | 14:33:10 | Walk 7m53s ~ 21251 ~ BUS 51 14:17 14:29 ~ 2341 ~ Walk 4m10s [14:09:07 14:33:10 24m3s, cost: 5085]
+ *  RIGHT |  1 |   21m26s | 22510 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s $22510]
+ *  LEFT  |  1 |   21m26s |  4195 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s $4195]
+ *   EQ   |  0 |    24m3s |  5085 |   0s | 14:09:07 | 14:33:10 | Walk 7m53s ~ 21251 ~ BUS 51 14:17 14:29 ~ 2341 ~ Walk 4m10s [14:09:07 14:33:10 24m3s $5085]
  * </pre>
  *
  * @param <T>

@@ -34,12 +34,12 @@ public class PathStringBuilder {
     }
 
     public PathStringBuilder walk(int duration) {
-        return append("Walk ").duration(duration);
+        return append("Walk").duration(duration);
     }
 
     public PathStringBuilder flex(int duration, int nRides) {
         // The 'tx' is short for eXtra Transfers added by the flex access/egress.
-        return append("Flex ").duration(duration).space().append(nRides).append("tx");
+        return append("Flex").duration(duration).space().append(nRides).append("tx");
     }
 
     public PathStringBuilder accessEgress(RaptorTransfer leg) {
@@ -61,6 +61,38 @@ public class PathStringBuilder {
         return append(mode.name()).space().time(fromTime, toTime);
     }
 
+    public PathStringBuilder timeAndCost(int fromTime, int toTime, int generalizedCost) {
+        return space().time(fromTime, toTime).cost(generalizedCost);
+    }
+
+    public PathStringBuilder cost(int generalizedCost) {
+        if(generalizedCost> 0) {
+            space().append("$").append(generalizedCost);
+        }
+        return this;
+    }
+
+    public PathStringBuilder space() {
+        return append(" ");
+    }
+
+    public PathStringBuilder duration(int duration) {
+      String durationStr = DurationUtils.durationToStr(duration);
+        return space().append(padDuration ? String.format("%5s", durationStr) : durationStr);
+    }
+
+    public PathStringBuilder time(int from, int to) {
+        return append(TimeUtils.timeToStrCompact(from))
+                .space()
+                .append(TimeUtils.timeToStrCompact(to));
+    }
+
+    public PathStringBuilder append(String text) {
+        buf.append(text);
+        return this;
+    }
+
+
     @Override
     public String toString() {
         return buf.toString();
@@ -68,30 +100,10 @@ public class PathStringBuilder {
 
     /* private helpers */
 
-    private PathStringBuilder space() {
-        return append(" ");
-    }
-
-    private PathStringBuilder duration(int duration) {
-      String durationStr = DurationUtils.durationToStr(duration);
-        return append(padDuration ? String.format("%5s", durationStr) : durationStr);
-    }
-
-    private PathStringBuilder time(int from, int to) {
-        return append(TimeUtils.timeToStrCompact(from))
-                .space()
-                .append(TimeUtils.timeToStrCompact(to));
-    }
-
     private PathStringBuilder time(Calendar from, Calendar to) {
         return append(TimeUtils.timeToStrCompact(from))
             .space()
             .append(TimeUtils.timeToStrCompact(to));
-    }
-
-    private PathStringBuilder append(String text) {
-        buf.append(text);
-        return this;
     }
 
     private PathStringBuilder append(int value) {

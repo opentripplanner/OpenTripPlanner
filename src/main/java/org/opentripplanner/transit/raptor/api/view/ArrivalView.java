@@ -133,7 +133,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     default String asString() {
         if(arrivedByAccess()) {
             return String.format(
-                "Access { stop: %d, duration: %s, arrival-time: %s, cost: %d }",
+                "Access { stop: %d, duration: %s, arrival-time: %s $%d }",
                 stop(), DurationUtils.durationToStr(accessPath().access().durationInSeconds()),
                 TimeUtils.timeToStrCompact(arrivalTime()),
                 cost()
@@ -141,7 +141,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         }
         if(arrivedByTransit()) {
             return String.format(
-                "Transit { round: %d, stop: %d, pattern: %s, arrival-time: %s, cost: %d }",
+                "Transit { round: %d, stop: %d, pattern: %s, arrival-time: %s $%d }",
                 round(),
                 stop(),
                 transitPath().trip().pattern().debugInfo(),
@@ -151,7 +151,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         }
         if(arrivedByTransfer()) {
             return String.format(
-                "Walk { round: %d, stop: %d, arrival-time: %s, cost: %d }",
+                "Walk { round: %d, stop: %d, arrival-time: %s $%d }",
                 round(),
                 stop(),
                 TimeUtils.timeToStrCompact(arrivalTime()),
@@ -160,7 +160,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         }
         if(arrivedAtDestination()) {
             return String.format(
-                "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s, cost: %d }",
+                "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s $%d }",
                 round(),
                 previous().stop(),
                 DurationUtils.durationToStr(egressPath().egress().durationInSeconds()),

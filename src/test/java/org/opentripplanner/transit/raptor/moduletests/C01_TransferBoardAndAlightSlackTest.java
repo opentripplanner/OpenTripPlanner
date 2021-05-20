@@ -43,7 +43,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
       + "BUS R1 0:02:11 0:03:01 ~ 3 ~ "
       + "BUS R2 0:04:41 0:05:01 ~ 4 ~ "
       + "Walk 20s "
-      + "[00:01:11 00:05:31 4m20s]";
+      + "[0:01:11 0:05:31 4m20s]";
 
   @Before
   public void setup() {
@@ -96,7 +96,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
   @Test
   public void multiCriteria() {
     // Add cost to result string
-    String expected = EXPECTED_RESULT.replace("]", ", cost: 1610]");
+    String expected = EXPECTED_RESULT.replace("]", " $1610]");
     var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
     var response = raptorService.route(request, data);
     assertEquals(expected, pathsToString(response));

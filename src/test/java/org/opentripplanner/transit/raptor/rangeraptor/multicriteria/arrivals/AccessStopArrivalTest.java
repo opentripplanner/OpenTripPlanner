@@ -71,7 +71,7 @@ public class AccessStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "Access { stop: 100, duration: 10m, arrival-time: 8:10, cost: 500 }",
+                "Access { stop: 100, duration: 10m, arrival-time: 8:10 $500 }",
                 subject.toString()
         );
     }
