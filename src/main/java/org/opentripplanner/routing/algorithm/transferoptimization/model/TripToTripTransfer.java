@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -41,4 +42,12 @@ public class TripToTripTransfer<T extends RaptorTripSchedule> {
     return transfer;
   }
 
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(TripToTripTransfer.class)
+            .addObj("from", from)
+            .addObj("to", to)
+            .addObj("transfer", transfer)
+            .toString();
+  }
 }

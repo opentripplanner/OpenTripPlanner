@@ -33,12 +33,11 @@ class T2TTransferDummy {
     };
   }
 
+  /** Transfer from trip & stop, walk, to stop & trip */
   static TripToTripTransfer<TestTripSchedule> tx(
-      int fromStop,
-      int toStop,
-      TestTripSchedule fromTrip,
-      TestTripSchedule toTrip,
-      int walk
+          TestTripSchedule fromTrip, int fromStop,
+          int walk,
+          int toStop, TestTripSchedule toTrip
   ) {
     return new TripToTripTransfer<>(
         arrival(fromTrip, fromTrip.pattern().findStopPositionAfter(0, fromStop)),
@@ -46,11 +45,13 @@ class T2TTransferDummy {
         fromStop == toStop ? null : walk(toStop, walk)
     );
   }
-  static TripToTripTransfer<TestTripSchedule> txSameStop(
+
+  /** Transfer from trip via stop to trip */
+  static TripToTripTransfer<TestTripSchedule> tx(
       TestTripSchedule fromTrip,
-      TestTripSchedule toTrip,
-      int sameStop
-      ) {
-    return tx(sameStop, sameStop, fromTrip, toTrip, D0s);
+      int sameStop,
+      TestTripSchedule toTrip
+  ) {
+    return tx(fromTrip, sameStop, D0s, sameStop, toTrip);
   }
 }
