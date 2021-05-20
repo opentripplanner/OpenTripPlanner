@@ -324,7 +324,7 @@ public abstract class GraphRoutingTest {
         // -- Car P+R
         public ParkAndRideVertex carPark(String id, double latitude, double longitude) {
             var vertex =
-                    new ParkAndRideVertex(graph, id, id, latitude, longitude, null);
+                    new ParkAndRideVertex(graph, id, id, longitude, latitude, null);
             new ParkAndRideEdge(vertex);
             return vertex;
         }
