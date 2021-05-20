@@ -71,7 +71,6 @@ public class TestParkAndRide extends TestCase {
 
         // or CAR+WALK (no P+R).
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.CAR));
-        options.freezeTraverseMode();
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(C, false);
@@ -87,7 +86,6 @@ public class TestParkAndRide extends TestCase {
         // But it is still impossible to get from A to C by WALK only
         // (AB is CAR only).
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
-        options.freezeTraverseMode();
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(C, false);
@@ -95,7 +93,6 @@ public class TestParkAndRide extends TestCase {
         
         // Or CAR only (BC is WALK only).
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.CAR));
-        options.freezeTraverseMode();
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(C, false);
@@ -148,7 +145,6 @@ public class TestParkAndRide extends TestCase {
         // Impossible to get from B to D in BIKE+WALK (no bike P+R).
         RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.TRANSIT));
         options.bikeParkAndRide = true;
-        options.freezeTraverseMode();
         options.setRoutingContext(graph, B, D);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(D, false);

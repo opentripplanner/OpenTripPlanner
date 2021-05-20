@@ -1,5 +1,8 @@
 package org.opentripplanner.routing;
 
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
 import lombok.experimental.Delegate;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -16,10 +19,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.standalone.server.Router;
-
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * This is the entry point of all API requests towards the OTP graph. A new instance of this class
@@ -50,18 +49,8 @@ public class RoutingService {
 
     // TODO We should probably not have the Router as a parameter here
     public RoutingResponse route(RoutingRequest request, Router router) {
-        RoutingResponse response = null;
-        try {
-            RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
-            response = worker.route(router);
-        } catch (Exception e) {
-            if (request != null) {
-                request.cleanup();
-            }
-            throw e;
-        }
-        request.cleanup();
-        return response;
+        RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
+        return worker.route(router);
     }
 
     /**

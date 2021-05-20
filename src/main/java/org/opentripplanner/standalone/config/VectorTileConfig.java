@@ -9,6 +9,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
   public static final int MIN_ZOOM = 9;
   public static final int MAX_ZOOM = 20;
   public static final int CACHE_MAX_SECONDS = -1;
+  public static final double EXPANSION_FACTOR = 0.25d;
 
   List<VectorTilesResource.LayerParameters> layers;
 
@@ -29,6 +30,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
     private final Integer maxZoom;
     private final Integer minZoom;
     private final Integer cacheMaxSeconds;
+    private final double expansionFactor;
 
     public Layer(NodeAdapter node) {
       name = node.asText("name");
@@ -37,6 +39,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
       maxZoom = node.asInt("maxZoom", MAX_ZOOM);
       minZoom = node.asInt("minZoom", MIN_ZOOM);
       cacheMaxSeconds = node.asInt("cacheMaxSeconds", CACHE_MAX_SECONDS);
+      expansionFactor = node.asDouble("expansionFactor", EXPANSION_FACTOR);
     }
 
     @Override public String name() { return name; }
@@ -45,5 +48,6 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
     @Override public int maxZoom() { return maxZoom; }
     @Override public int minZoom() { return minZoom; }
     @Override public int cacheMaxSeconds() {return cacheMaxSeconds; }
+    @Override public double expansionFactor() { return expansionFactor; }
   }
 }

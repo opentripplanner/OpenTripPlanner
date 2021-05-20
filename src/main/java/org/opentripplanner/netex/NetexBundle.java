@@ -1,5 +1,9 @@
 package org.opentripplanner.netex;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.List;
+import javax.xml.bind.JAXBException;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -16,11 +20,6 @@ import org.opentripplanner.standalone.config.NetexConfig;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.JAXBException;
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Loads/reads a NeTEx bundle of a data source(zip file/directory/cloud storage) and maps it into
@@ -139,7 +138,10 @@ public class NetexBundle implements Closeable {
      * An attempt to map each entry, when read, would lead to missing references, since
      * the order entries are read is not enforced in any way.
      */
-    private void loadFilesThenMapToOtpTransitModel(String fileDescription, Iterable<DataSource> entries) {
+    private void loadFilesThenMapToOtpTransitModel(
+            String fileDescription,
+            Iterable<DataSource> entries
+    ) {
         for (DataSource entry : entries) {
             // Load entry and store it in the index
             loadSingeFileEntry(fileDescription, entry);

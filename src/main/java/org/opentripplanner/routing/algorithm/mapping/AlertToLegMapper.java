@@ -40,6 +40,18 @@ public class AlertToLegMapper {
                 addAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
             }
 
+            if (leg.intermediateStops != null) {
+                for (StopArrival visit : leg.intermediateStops) {
+                    Place place = visit.place;
+                    if (place.stopId != null) {
+                        Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, place.stopId, routeId);
+                        Date stopArrival = visit.arrival.getTime();
+                        Date stopDepature = visit.departure.getTime();
+                        addAlertPatchesToLeg(leg, StopCondition.PASSING, alerts, requestedLocale, stopArrival, stopDepature);
+                    }
+                }
+            }
+
             FeedScopedId tripId = leg.getTrip().getId();
             if (fromStopId != null) {
                 Collection<TransitAlert> alerts = getAlertsForStopAndTrip(graph, fromStopId, tripId);

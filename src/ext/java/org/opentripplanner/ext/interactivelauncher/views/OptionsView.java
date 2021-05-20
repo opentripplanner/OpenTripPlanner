@@ -8,7 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -80,8 +83,10 @@ class OptionsView {
     addSectionSpace(panel);
     addComp(new JLabel("Debug logging"), panel);
     addSectionSpace(panel);
-    for (Entry<String, Boolean> e : model.getDebugLogging().entrySet()) {
-      JCheckBox dbox =  new JCheckBox(e.getKey(), e.getValue());
+    var entries = model.getDebugLogging();
+    List<String> keys = entries.keySet().stream().sorted().collect(Collectors.toList());
+    for (String name : keys) {
+      JCheckBox dbox =  new JCheckBox(name, entries.get(name));
       debugLoggingChks.add(dbox);
       addComp(dbox, panel);
     }

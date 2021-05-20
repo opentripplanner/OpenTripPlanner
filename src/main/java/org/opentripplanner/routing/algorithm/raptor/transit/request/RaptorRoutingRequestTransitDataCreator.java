@@ -25,6 +25,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 
+
 /**
  * This class is responsible for creating the internal data structure of
  * {@link RaptorRoutingRequestTransitData}. The code is messy so it is nice to NOT have it in
@@ -80,7 +81,6 @@ class RaptorRoutingRequestTransitDataCreator {
         )
       );
     }
-
     return tripPatternForDates;
   }
 
@@ -180,7 +180,7 @@ class RaptorRoutingRequestTransitDataCreator {
 
   List<List<RaptorTransfer>> calculateTransferDuration(double walkSpeed) {
     return transitLayer
-        .getTransferByStopIndex()
+        .getSimpleTransferByStopIndex()
         .stream()
         .map(t -> t
             .stream()

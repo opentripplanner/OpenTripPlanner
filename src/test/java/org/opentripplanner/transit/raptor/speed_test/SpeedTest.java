@@ -84,7 +84,7 @@ public class SpeedTest {
         this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams));
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         try {
             OtpStartupInfo.logInfo();
             // Given the following setup

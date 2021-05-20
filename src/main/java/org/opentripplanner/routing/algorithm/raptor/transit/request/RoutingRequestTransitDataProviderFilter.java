@@ -7,6 +7,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.util.EnumSet;
@@ -40,13 +41,16 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     this.bannedRoutes = bannedRoutes;
   }
 
-  public RoutingRequestTransitDataProviderFilter(RoutingRequest request) {
+  public RoutingRequestTransitDataProviderFilter(
+          RoutingRequest request,
+          GraphIndex graphIndex
+  ) {
     this(
         request.modes.directMode == StreetMode.BIKE,
         request.wheelchairAccessible,
         request.includePlannedCancellations,
         request.modes.transitModes,
-        request.rctx.bannedRoutes
+        request.getBannedRoutes(graphIndex.getAllRoutes())
     );
   }
 

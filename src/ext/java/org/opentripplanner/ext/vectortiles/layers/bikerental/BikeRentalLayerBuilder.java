@@ -49,9 +49,4 @@ public class BikeRentalLayerBuilder extends LayerBuilder<BikeRentalStation> {
         })
         .collect(Collectors.toList());
   }
-
-  @Override
-  protected double getExpansionFactor() {
-    return 0.1;
-  }
 }

@@ -26,8 +26,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
     private final boolean wheelchairAccessible;
 
     public StreetTransitEntityLink(StreetVertex fromv, T tov, boolean wheelchairAccessible) {
-    	super(fromv, tov);
-    	this.transitEntityVertex = tov;
+        super(fromv, tov);
+        this.transitEntityVertex = tov;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
@@ -52,7 +52,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
     }
 
     public LineString getGeometry() {
-        Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()};
+        Coordinate[] coordinates = new Coordinate[]{fromv.getCoordinate(), tov.getCoordinate()};
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
@@ -65,6 +65,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         return getName();
     }
 
+
     public State traverse(State s0) {
 
         // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
@@ -73,9 +74,9 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
         // if they are for the same stop.
         if (
-            s0.backEdge instanceof StreetTransitEntityLink &&
-                ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex
-                    == this.transitEntityVertex
+                s0.backEdge instanceof StreetTransitEntityLink &&
+                        ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex
+                                == this.transitEntityVertex
         ) {
             return null;
         }
@@ -87,11 +88,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
 
         if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
             // Forbid taking your own bike in the station if bike P+R activated.
-            return null;
-        }
-        if (s0.isBikeRenting()) {
-            // Forbid taking a rented bike on any transit.
-            // TODO Check this condition, does this always make sense?
             return null;
         }
 
@@ -107,9 +103,15 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
             if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
                 dropOffAfterDriving(s0, s1);
                 mode = TraverseMode.WALK;
-            } else {
+            } else if (s0.getCarPickupState() != null) {
                 return null;
             }
+        }
+
+        if (s0.isBikeRentingFromStation()
+                && s0.mayKeepRentedBicycleAtDestination()
+                && s0.getOptions().allowKeepingRentedBicycleAtDestination) {
+            s1.incrementWeight(s0.getOptions().keepingRentedBicycleAtDestinationCost);
         }
 
         s1.setBackMode(mode);
@@ -124,19 +126,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
 
     boolean isLeavingStreetNetwork(RoutingRequest req) {
         return (req.arriveBy ? fromv : tov) == getTransitEntityVertex();
-    }
-
-    public State optimisticTraverse(State s0) {
-        StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(STEL_TRAVERSE_COST);
-        return s1.makeState();
-    }
-
-    // anecdotally, the lower bound search is about 2x faster when you don't reach stops
-    // and therefore don't even consider boarding
-    @Override
-    public double weightLowerBound(RoutingRequest options) {
-        return options.transitAllowed() ? 0 : Double.POSITIVE_INFINITY;
     }
 
     public Vertex getFromVertex() {

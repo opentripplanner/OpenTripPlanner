@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -14,8 +19,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.Tra
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-
-import java.util.*;
 
 
 /**
@@ -35,7 +38,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     private final HeuristicsProvider<T> heuristics;
     private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
     private final CostCalculator<T> costCalculator;
-    private final TransitCalculator transitCalculator;
+    private final TransitCalculator<T> transitCalculator;
     private boolean firstRound;
 
     /**
@@ -47,7 +50,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
             DestinationArrivalPaths<T> paths,
             HeuristicsProvider<T> heuristics,
             CostCalculator<T> costCalculator,
-            TransitCalculator transitCalculator,
+            TransitCalculator<T> transitCalculator,
             WorkerLifeCycle lifeCycle
     ) {
         this.stops = stops;
@@ -76,12 +79,12 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         return stops.stopsTouchedIterator();
     }
 
-  @Override
-  public BitSet stopsTouchedPreviousRoundAsBitSet() {
+    @Override
+    public BitSet stopsTouchedPreviousRoundAsBitSet() {
     return stops.stopsTouched();
   }
 
-  @Override
+    @Override
     public IntIterator stopsTouchedByTransitCurrentRound() {
         return stops.stopsTouchedIterator();
     }
@@ -96,7 +99,8 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         addStopArrival(
             new AccessStopArrival<>(
                 departureTime,
-                costCalculator.walkCost(accessPath.durationInSeconds()), accessPath
+                costCalculator.walkCost(accessPath.durationInSeconds()),
+                accessPath
             )
         );
     }
@@ -147,6 +151,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
             ride.prevArrival.stop(),
             waitTime,
             alightTime - ride.boardTime,
+            ride.trip.transitReluctanceFactorIndex(),
             alightStop
         );
         arrivalsCache.add(

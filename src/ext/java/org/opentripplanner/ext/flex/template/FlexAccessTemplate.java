@@ -36,7 +36,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   ) {
     List<Edge> egressEdges = egress.edges;
 
-    Vertex flexToVertex = egressEdges.get(0).getFromVertex();
+    Vertex flexToVertex = egress.state.getVertex();
 
     if (!isRouteable(flexToVertex)) {
       return null;
@@ -88,7 +88,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     }
 
     Itinerary itinerary = GraphPathToItineraryMapper.generateItinerary(
-        new GraphPath(state, false),
+        new GraphPath(state),
         Locale.ENGLISH
     );
 

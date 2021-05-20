@@ -1,14 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+
+import org.junit.Test;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public class TransferStopArrivalTest {
 
@@ -35,7 +34,6 @@ public class TransferStopArrivalTest {
     private static final int TRANSFER_COST = 400;
 
 
-    private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(true);
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
         ACCESS_DEPARTURE_TIME,
         ACCESS_COST,
@@ -102,7 +100,7 @@ public class TransferStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "Walk { round: 1, stop: 102, arrival-time: 9:26, cost: 1100 }",
+                "Walk { round: 1, stop: 102, arrival-time: 9:26 $1100 }",
                 subject.toString()
         );
     }

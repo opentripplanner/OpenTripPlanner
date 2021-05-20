@@ -5,10 +5,10 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.TransferPathView;
 
-class Walk extends AbstractStopArrival {
+public class Walk extends AbstractStopArrival {
     private final RaptorTransfer transfer;
 
-    Walk(
+    public Walk(
         int round,
         int stop,
         int departureTime,

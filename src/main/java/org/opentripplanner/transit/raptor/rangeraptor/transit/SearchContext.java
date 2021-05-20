@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.forwardSlackProvider;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
+
+import java.util.Collection;
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.McCostParams;
@@ -24,12 +29,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
-import java.util.Collection;
-import java.util.function.ToIntFunction;
-
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.forwardSlackProvider;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
-
 /**
  * The search context is used to hold search scoped instances and to pass these
  * to who ever need them.
@@ -48,7 +47,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
      */
     protected final RaptorTransitDataProvider<T> transit;
 
-    private final TransitCalculator calculator;
+    private final TransitCalculator<T> calculator;
     private final CostCalculator<T> costCalculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
@@ -111,7 +110,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return transit;
     }
 
-    public TransitCalculator calculator() {
+    public TransitCalculator<T> calculator() {
         return calculator;
     }
 
@@ -121,7 +120,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
      * <p>
      * The {@code SlackProvider} is stateful, so this method create a new instance
      * every time it is called, so each consumer could have their own instance and
-     * not get surprised by the life-cycle update.
+     * not get surprised by the life-cycle update. Remember to call the
+     * {@link SlackProvider#setCurrentPattern(RaptorTripPattern)} before retriving
+     * slack values.
      */
     public SlackProvider slackProvider() {
         return createSlackProvider(request, lifeCycle());
@@ -188,20 +189,29 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return publisher;
     }
 
+    public boolean enableGuaranteedTransfers() {
+        if(profile().isOneOf(RaptorProfile.BEST_TIME, RaptorProfile.NO_WAIT_BEST_TIME)) {
+            return false;
+        }
+        return searchParams().guaranteedTransfersEnabled();
+    }
+
     /* private methods */
 
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static TransitCalculator createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
+    private static <T extends RaptorTripSchedule> TransitCalculator<T> createCalculator(
+            RaptorRequest<T> r, RaptorTuningParameters t
+    ) {
         SearchParams s = r.searchParams();
         return r.searchDirection().isForward()
-                ? new ForwardTransitCalculator(s, t)
-                : new ReverseTransitCalculator(s, t);
+                ? new ForwardTransitCalculator<>(s, t)
+                : new ReverseTransitCalculator<>(s, t);
     }
 
     private static DebugRequest debugRequest(
-        RaptorRequest<?> request
+            RaptorRequest<?> request
     ) {
         return request.searchDirection().isForward()
                 ? request.debug()
@@ -236,11 +246,12 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     private CostCalculator<T> createCostCalculator(int[] stopVisitCost, McCostParams f) {
         return new DefaultCostCalculator<T>(
-                stopVisitCost,
                 f.boardCost(),
                 f.transferCost(),
                 f.walkReluctanceFactor(),
-                f.waitReluctanceFactor()
+                f.waitReluctanceFactor(),
+                stopVisitCost,
+                f.transitReluctanceFactors()
         );
     }
 }

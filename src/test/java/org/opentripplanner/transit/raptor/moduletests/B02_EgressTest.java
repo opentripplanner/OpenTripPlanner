@@ -1,15 +1,5 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.opentripplanner.transit.raptor.RaptorService;
-import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor._data.api.PathUtils;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
@@ -17,6 +7,16 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
 import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.opentripplanner.transit.raptor.RaptorService;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.api.PathUtils;
+import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
@@ -32,7 +32,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
   @Before
   public void setup() {
-    data.add(
+    data.withRoute(
         route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G)
             .withTimetable(
                 schedule("0:10, 0:12, 0:14, 0:16, 0:18, 0:20")
@@ -51,8 +51,7 @@ public class B02_EgressTest implements RaptorTestConstants {
         .latestArrivalTime(T00_30)
     ;
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test
@@ -63,7 +62,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     // expect: one path with the latest departure time.
     assertEquals(
-        "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [00:09:40 00:19:00 9m20s]",
+        "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [0:09:40 0:19 9m20s]",
         PathUtils.pathsToString(response)
     );
   }
@@ -78,7 +77,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     // expect: one path with the latest departure time, same as found in the forward search.
     assertEquals(
-        "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [00:09:40 00:19:00 9m20s]",
+        "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [0:09:40 0:19 9m20s]",
         PathUtils.pathsToString(response)
     );
   }
@@ -91,9 +90,9 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     // expect: All pareto optimal paths
     assertEquals(""
-            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [00:09:40 00:19:00 9m20s, cost: 1760]\n"
-            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 2m [00:09:40 00:20:00 10m20s, cost: 1640]\n"
-            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:20 ~ 7 ~ Walk 1s [00:09:40 00:20:01 10m21s, cost: 1284]",
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Walk 3m [0:09:40 0:19 9m20s $1760]\n"
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 2m [0:09:40 0:20 10m20s $1640]\n"
+            + "Walk 20s ~ 2 ~ BUS R1 0:10 0:20 ~ 7 ~ Walk 1s [0:09:40 0:20:01 10m21s $1284]",
         PathUtils.pathsToString(response)
     );
   }

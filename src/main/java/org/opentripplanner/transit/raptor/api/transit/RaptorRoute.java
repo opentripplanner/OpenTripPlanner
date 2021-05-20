@@ -19,4 +19,14 @@ public interface RaptorRoute<T extends RaptorTripSchedule> {
      * Return the trip-pattern, the list of stops visited by this route.
      */
     RaptorTripPattern pattern();
+
+    /**
+     * Return a guaranteed transfer provider for the given route transferring TO the route.
+     */
+    RaptorGuaranteedTransferProvider<T> getGuaranteedTransfersTo();
+
+    /**
+     * Return a guaranteed transfer provider for the given route transferring FROM the route.
+     */
+    RaptorGuaranteedTransferProvider<T> getGuaranteedTransfersFrom();
 }

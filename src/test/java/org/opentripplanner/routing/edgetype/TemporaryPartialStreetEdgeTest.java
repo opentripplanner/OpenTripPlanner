@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -112,7 +112,7 @@ public class TemporaryPartialStreetEdgeTest {
 
         // All intersections take 10 minutes - we'll notice if one isn't counted.
         double turnDurationSecs = 10.0 * 60.0;  
-        options.traversalCostModel = (new DummyCostModel(turnDurationSecs));
+        graph.setIntersectionTraversalCostModel(new DummyCostModel(turnDurationSecs));
         options.turnReluctance = (1.0);
         
         State s0 = new State(options);
@@ -138,7 +138,7 @@ public class TemporaryPartialStreetEdgeTest {
         assertTrue(Math.abs(s3.getWeight() - partialS3.getWeight()) <= 1);
         
         // All intersections take 0 seconds now.
-        options.traversalCostModel = (new DummyCostModel(0.0));
+        graph.setIntersectionTraversalCostModel(new DummyCostModel(0.0));
 
         State s0NoCost = new State(options);
         State s1NoCost = e1.traverse(s0NoCost);

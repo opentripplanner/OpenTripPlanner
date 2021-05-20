@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TestTripPattern implements RaptorTripPattern {
@@ -52,6 +53,15 @@ public class TestTripPattern implements RaptorTripPattern {
 
   @Override
   public String debugInfo() { return "BUS " + name; }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(TestTripPattern.class)
+            .addStr("name", name)
+            .addInts("stops", stopIndexes)
+            .addInts("restrictions", restrictions)
+            .toString();
+  }
 
   private boolean isNotRestricted(int index, int mask) {
     return restrictions == null || (restrictions[index] & mask) == 0;

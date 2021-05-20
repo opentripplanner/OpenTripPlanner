@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
+import java.util.Collection;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * This interface define a superset of operations to maintain the stop arrivals state, and
@@ -38,6 +39,11 @@ public interface StopArrivalsState<T extends RaptorTripSchedule> {
     void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer);
 
     default void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {}
+
+    @Nullable
+    default TransitArrival<T> previousTransit(int boardStopIndex) {
+        return null;
+    }
 
     default Collection<Path<T>> extractPaths() { return List.of(); }
 }

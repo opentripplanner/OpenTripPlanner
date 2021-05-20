@@ -52,11 +52,13 @@ It can be hard to use on large graphs since, whole graph is displayed at once. A
  travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer also
  draws links from transit stops/bike rentals and P+R to graph. And also draws transit stops, bike rentals
   and P+R vertices with different color.
+- No thru traffic - streets are colored if the edge has thru traffic restrictions (car and bicycle = `red`, car only = `orange`, bicycle only = `blue`, and no-restriction = `light gray`)
 
 ### Interpretation Traversal permissions layer
 
 A sample traversal permissions layer looks like the following 
 ![screen shot 2015-06-26 at 11 45 22](https://cloud.githubusercontent.com/assets/4493762/8374829/df05c438-1bf8-11e5-8ead-c1dea41af122.png)
+
 * Yellow lines is the link between a stop and the street graph.
 * Grey lines are streets one can travel with the mode walk, bike, or car
 * Green lines are paths one can travel with the mode walk only
@@ -84,7 +86,37 @@ See [osmWayPropertySet config attribute](Configuration.md#Way-property-sets)
 
 OTP users in Helsinki have documented their best practices for coding railway platforms in OpenStreetMap. These guidelines are available [in the OSM Wiki.](https://wiki.openstreetmap.org/wiki/Digitransit#Editing_railway_platforms)
 
+## Debug logging
+
+OTP use [logback](http://logback.qos.ch/) and [slj4j](http://www.slf4j.org/) as a logging framework. Logging is configured in the _logback.xml_ file inside the OTP jar file. See these frameworks for more documentation on log configuration.
+
+For developers, starting OTP using the `InteractiveOtpMain` is an easy way to configure 
+debug logging.
+
+Some useful loggers
+- `TRANSFERS_EXPORT` Dump transfers to _transfers-debug.csv_ file.
+- `DATA_IMPORT_ISSUES` Write issues to debug lag as well as to the issue report.
+- `REQ_LOG` Router request log. Enable with `requestLogFile` config parameter in build config. 
+- `org.opentripplanner.transit.raptor.RaptorService` Debug Raptor request and response
+
+
+### Transit search
+
+The Raptor implementation support instrumentation of ACCEPT, REJECT, and DROP events for stop-arrivals and trip boardings. Use the SpeedTest to pass in a set of stops and/or a specific path to debug. This is useful when debugging why you do (not) get a particular result.
+
+### GTFS Transfers.txt and NeTEx Interchange import
+
+Transfers may have effects on the routing witch may be difficult to predict. OTP can dump all 
+imported transfers to file - _transfers-debug.csv_. This may help verify the result of the import
+or find special test cases. To turn on the export enable the slf4j logger:
+
+```
+  <logger name="TRANSFERS_EXPORT" level="info" />
+```
+
+
 ### Further information
+
 * [General information](https://github.com/opentripplanner/OpenTripPlanner/wiki/GraphBuilder#graph-concepts)
 * [Bicycle routing](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Bicycle_routing)
 * [Indoor mapping](https://github.com/opentripplanner/OpenTripPlanner/wiki/Indoor-mapping)

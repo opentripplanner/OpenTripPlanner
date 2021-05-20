@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -7,12 +10,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.Abs
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-
-import java.util.Arrays;
-
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator.testDummyCalculator;
 
 public class StopArrivalStateParetoSetTest {
     // 08:35 in seconds
@@ -22,7 +19,6 @@ public class StopArrivalStateParetoSetTest {
     private static final int ROUND_2 = 2;
     private static final int ROUND_3 = 3;
     private static final RaptorTripSchedule ANY_TRIP = null;
-    private static final TransitCalculator CALCULATOR = testDummyCalculator(true);
 
     // In this test each stop is used to identify the pareto vector - it is just one
     // ParetoSet "subject" with multiple "stops" in it. The stop have no effect on

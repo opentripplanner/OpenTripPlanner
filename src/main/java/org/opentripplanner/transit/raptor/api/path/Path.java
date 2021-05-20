@@ -1,14 +1,11 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 
 /**
@@ -16,7 +13,7 @@ import java.util.stream.Stream;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
+public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private final int iterationDepartureTime;
     private final int startTime;
     private final int endTime;
@@ -50,6 +47,19 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
         this.egressPathLeg = findEgressLeg(accessLeg);
         this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressPathLeg);
         this.endTime = egressPathLeg.toTime();
+    }
+
+    public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg) {
+        this(
+            iterationDepartureTime,
+            accessLeg,
+            accessLeg.stream().mapToInt(PathLeg::generalizedCost).sum()
+        );
+    }
+
+    /** Copy constructor */
+    protected Path(Path<T> original) {
+        this(original.iterationDepartureTime, original.accessLeg, original.generalizedCost);
     }
 
     /**
@@ -131,37 +141,6 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
             .collect(Collectors.toList());
     }
 
-    @Override
-    public String toString() {
-        PathStringBuilder buf = new PathStringBuilder();
-        if(accessLeg != null) {
-            buf.accessEgress(accessLeg.access());
-            for (PathLeg<T> leg : accessLeg.nextLeg().iterator()) {
-                buf.sep();
-                if (leg.isTransitLeg()) {
-                    TransitPathLeg<T> transitLeg = leg.asTransitLeg();
-                    buf.stop(transitLeg.fromStop()).sep().transit(
-                        transitLeg.trip().pattern().debugInfo(),
-                        transitLeg.fromTime(),
-                        transitLeg.toTime()
-                    );
-                }
-                else if (leg.isTransferLeg()) {
-                    buf.stop(leg.asTransferLeg().fromStop()).sep().walk(leg.duration());
-                }
-                // Egress
-                else {
-                    buf.stop(leg.fromStop()).sep().accessEgress(leg.asEgressLeg().egress());
-                }
-            }
-        }
-        return buf.toString() +
-                " [" + TimeUtils.timeToStrLong(startTime) +
-                " " + TimeUtils.timeToStrLong(endTime) +
-                " " + DurationUtils.durationToStr(endTime - startTime) +
-                (generalizedCost == 0 ? "" : ", cost: " + generalizedCost) + "]";
-    }
-
     /** Return the duration of time spent onBoard - excluding slack. */
     public int transitDuration() {
         return legStream()
@@ -170,12 +149,83 @@ public final class Path<T extends RaptorTripSchedule> implements Comparable<Path
             .sum();
     }
 
+    /**
+     * Aggregated wait-time in seconds. This method compute the total wait time for this path.
+     */
+    public int waitTime() {
+        return travelDurationInSeconds() - transitDuration();
+    }
+
     public Stream<PathLeg<T>> legStream() {
         return accessLeg.stream();
     }
 
     public Iterable<PathLeg<T>> legIterable() {
         return accessLeg.iterator();
+    }
+
+    public String toStringDetailed() {
+        return toString(true);
+    }
+
+    @Override
+    public String toString() {
+        return toString(false);
+    }
+
+    public String toString(boolean detailed) {
+        PathStringBuilder buf = new PathStringBuilder();
+        if(accessLeg != null) {
+            int prevToTime = 0;
+            for (PathLeg<T> leg : accessLeg.iterator()) {
+                if(leg == accessLeg) {
+                    buf.accessEgress(accessLeg.access());
+                    addWalkDetails(detailed, buf, leg);
+                }
+                else {
+                    buf.sep().stop(leg.fromStop());
+                    if(detailed) {
+                        buf.duration(leg.fromTime() - prevToTime);
+                    }
+                    buf.sep();
+                    if (leg.isTransitLeg()) {
+                        TransitPathLeg<T> transitLeg = leg.asTransitLeg();
+                        buf.transit(
+                                transitLeg.trip().pattern().debugInfo(),
+                                transitLeg.fromTime(),
+                                transitLeg.toTime()
+                        );
+                        if (detailed) {
+                            buf.duration(leg.duration());
+                            buf.cost(leg.generalizedCost());
+                        }
+                    }
+                    else if (leg.isTransferLeg()) {
+                        buf.walk(leg.duration());
+                        addWalkDetails(detailed, buf, leg);
+                    }
+                    // Access and Egress
+                    else if (leg.isEgressLeg()) {
+                        buf.accessEgress(leg.asEgressLeg().egress());
+                        addWalkDetails(detailed, buf, leg);
+                    }
+                }
+                prevToTime = leg.toTime();
+            }
+            buf.space();
+        }
+        return buf
+                .append("[")
+                .time(startTime, endTime)
+                .duration(endTime - startTime)
+                .cost(generalizedCost)
+                .append("]").toString();
+    }
+
+    private void addWalkDetails(boolean detailed, PathStringBuilder buf, PathLeg<T> leg) {
+        if(detailed) {
+            buf.timeAndCost(leg.fromTime(), leg.toTime(), leg.generalizedCost());
+        }
     }
 
     @Override

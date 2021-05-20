@@ -9,6 +9,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -112,7 +113,7 @@ public class FakeGraph {
         for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
             linker.linkVertexPermanently(
                 tStop,
-                TraverseMode.WALK,
+                new TraverseModeSet(TraverseMode.WALK),
                 LinkingDirection.BOTH_WAYS,
                 (vertex, streetVertex) -> List.of(
                     new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),

@@ -41,10 +41,10 @@ public final class BestTimes {
     /** Stops touched by transit or transfers in LAST round. */
     private BitSet reachedLastRound;
 
-    private final TransitCalculator calculator;
+    private final TransitCalculator<?> calculator;
 
 
-    public BestTimes(int nStops, TransitCalculator calculator, WorkerLifeCycle lifeCycle) {
+    public BestTimes(int nStops, TransitCalculator<?> calculator, WorkerLifeCycle lifeCycle) {
         this.calculator = calculator;
         this.times = intArray(nStops, calculator.unreachedTime());
         this.reachedCurrentRound = new BitSet(nStops);

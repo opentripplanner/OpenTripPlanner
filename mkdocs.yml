@@ -47,6 +47,7 @@ pages:
     - SIRI Updater: 'sandbox/SiriUpdator.md'
     - Bike Rental Service Directory API support: 'sandbox/BikeRentalServiceDirectory.md'
     - Mapbox Vector Tiles API: 'sandbox/MapboxVectorTilesApi.md'
+    - Report API: 'sandbox/ReportApi.md'
     - Interactive OTP Launcher: 'sandbox/InteractiveOtpMain.md'
     - Sandbox Extension Example: 'sandbox/Examples.md'
     - Park and Ride API: 'sandbox/ParkAndRideApi.md'

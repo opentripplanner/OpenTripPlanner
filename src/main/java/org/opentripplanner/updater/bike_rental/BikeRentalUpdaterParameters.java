@@ -5,20 +5,17 @@ import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalData
 
 public class BikeRentalUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String configRef;
-  private final String url;
   private final String networks;
   private final int frequencySec;
   private final BikeRentalDataSourceParameters source;
 
   public BikeRentalUpdaterParameters(
       String configRef,
-      String url,
       String networks,
       int frequencySec,
       BikeRentalDataSourceParameters source
   ) {
     this.configRef = configRef;
-    this.url = url;
     this.networks = networks;
     this.frequencySec = frequencySec;
     this.source = source;
@@ -26,10 +23,6 @@ public class BikeRentalUpdaterParameters implements PollingGraphUpdaterParameter
 
   // TODO OTP2 - What is the difference between this and the "network" in the source
   String getNetworks() { return networks; }
-
-  public String getUrl() {
-    return url;
-  }
 
   @Override
   public int getFrequencySec() {

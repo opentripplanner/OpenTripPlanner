@@ -20,4 +20,11 @@ public class RaptorCostConverterTest {
     assertEquals(100, RaptorCostConverter.toRaptorCost(1));
     assertEquals(3_000, RaptorCostConverter.toRaptorCost(30));
   }
+
+  @Test
+  public void toRaptorCosts() {
+    int[] expected = {100, 80};
+    int[] result = RaptorCostConverter.toRaptorCosts(new double[]{1.0, 0.8});
+    assertArrayEquals(expected, result);
+  }
 }

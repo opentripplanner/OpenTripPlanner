@@ -11,20 +11,29 @@ import org.opentripplanner.util.time.TimeUtils;
  * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }.
  */
 public class TestTripSchedule implements RaptorTripSchedule {
-    private static final int DEFAULT_DEPATURE_DELAY = 10;
+    private static final int DEFAULT_DEPARTURE_DELAY = 10;
     private final RaptorTripPattern pattern;
     private final int[] arrivalTimes;
     private final int[] departureTimes;
+    private final int transitReluctanceIndex;
 
 
     private TestTripSchedule(
         TestTripPattern pattern,
         int[] arrivalTimes,
-        int[] departureTimes
+        int[] departureTimes,
+        int transitReluctanceIndex
     ) {
         this.pattern = pattern;
         this.arrivalTimes = arrivalTimes;
         this.departureTimes = departureTimes;
+        this.transitReluctanceIndex = transitReluctanceIndex;
+    }
+
+    @Override
+    public int tripSortIndex() {
+        // We sort trips based on the departure from the first stop
+        return arrival(0);
     }
 
     @Override
@@ -44,6 +53,11 @@ public class TestTripSchedule implements RaptorTripSchedule {
 
     public int size() {
         return arrivalTimes.length;
+    }
+
+    @Override
+    public int transitReluctanceFactorIndex() {
+        return transitReluctanceIndex;
     }
 
     @Override
@@ -78,7 +92,8 @@ public class TestTripSchedule implements RaptorTripSchedule {
         private TestTripPattern pattern;
         private int[] arrivalTimes;
         private int[] departureTimes;
-        private int arrivalDepartureOffset = DEFAULT_DEPATURE_DELAY;
+        private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
+        private int transitReluctanceIndex = 0;
 
         public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
             this.pattern = pattern;
@@ -132,6 +147,16 @@ public class TestTripSchedule implements RaptorTripSchedule {
             return this;
         }
 
+        /**
+         * Set the transit-reluctance-index.
+         * <p>
+         * The default is 0.
+         */
+        public TestTripSchedule.Builder transitReluctanceIndex(int transitReluctanceIndex) {
+            this.transitReluctanceIndex = transitReluctanceIndex;
+            return this;
+        }
+
         public TestTripSchedule build() {
             if(arrivalTimes == null) {
                 arrivalTimes = copyWithOffset(departureTimes, -arrivalDepartureOffset);
@@ -157,7 +182,9 @@ public class TestTripSchedule implements RaptorTripSchedule {
                         + ", stops: " + pattern.numberOfStopsInPattern()
                 );
             }
-            return new TestTripSchedule(pattern, arrivalTimes, departureTimes);
+            return new TestTripSchedule(
+                    pattern, arrivalTimes, departureTimes, transitReluctanceIndex
+            );
         }
 
         private static int[] copyWithOffset(int[] source, int offset) {
