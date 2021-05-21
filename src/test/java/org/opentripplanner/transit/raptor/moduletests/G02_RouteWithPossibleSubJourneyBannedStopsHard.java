@@ -9,7 +9,6 @@ import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_B;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_C;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_D;
-import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_E;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.T00_30;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
@@ -31,32 +30,29 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
- * <p>
- * Raptor should return the path that does not have any banned stops for multiple banned stops even
- * if it is the slowest path.
+ *
+ * Raptor should be able to re-board a train later on the route that does not pass through the banned
+ * stop even if earlier on their is a banned stop.
  */
-public class G03_MultipleBannedStopsHardTest {
-
+public class G02_RouteWithPossibleSubJourneyBannedStopsHard {
     private final TestTransitData data = new TestTransitData();
-    private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-            new RaptorRequestBuilder<>();
-    private final RaptorService<TestTripSchedule> raptorService =
-            new RaptorService<>(RaptorConfig.defaultConfigForTest());
+    private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+    private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(RaptorConfig.defaultConfigForTest());
 
 
-    /**
-     * The expected result is tha same for all tests
-     */
+    /** The expected result is tha same for all tests */
     private static final String EXPECTED_RESULT
-            = "Walk 10s ~ 1 ~ BUS R3 0:03:30 0:05:40 ~ 3 ~ Walk 20s [0:02:50 0:06:10 3m20s]";
+            = "Walk 10s ~ 1 ~ BUS R1 0:04:11 0:05:01 ~ 4 ~ Walk 20s [0:03:31 0:05:31 2m]";
 
     /**
-     * Stop on route (stop indexes): R1:  1 - 2 - 3 R2:  1 - 4 - 3 R3:  1 - 5 - 3
-     * <p>
-     * Schedule: R1: 00:01:35, 00:02:11, 00:03:11 R2: 00:02:30, 00:03:50, 00:04:50 R3: 00:03:30,
-     * 00:04:50, 00:05:50
-     * <p>
-     * Hard Banned Stops: 2,4
+     * Stop on route (stop indexes):
+     *   R1:  1 - 2 - 3 - 1 - 4
+     *
+     * Schedule:
+     *   R1: 00:01:35, 00:02:11, 00:03:11, 00:04:11, 00:05:11
+     *
+     * Hard Banned Stops:
+     *    2
      */
     @Before
     public void setup() {
@@ -64,26 +60,16 @@ public class G03_MultipleBannedStopsHardTest {
                 defaultSlackProvider(D1m, D30s, D10s)
         );
         data.withRoute(
-                route(pattern("R1", STOP_A, STOP_B, STOP_C))
-                        .withTimetable(schedule().departures("00:01:35, 00:02:11, 00:03:11")
-                                .arrDepOffset(D10s))
-        );
-        data.withRoute(
-                route(pattern("R2", STOP_A, STOP_D, STOP_C))
-                        .withTimetable(schedule().departures("00:02:30, 00:03:50, 00:04:50")
-                                .arrDepOffset(D10s))
-        );
-        data.withRoute(
-                route(pattern("R3", STOP_A, STOP_E, STOP_C))
-                        .withTimetable(schedule().departures("00:03:30, 00:04:50, 00:05:50")
-                                .arrDepOffset(D10s))
+                route(pattern("R1",STOP_A,STOP_B, STOP_C, STOP_A, STOP_D))
+                        .withTimetable(schedule().departures("00:01:35, 00:02:11, 00:03:11, 00:04:11, 00:05:11").arrDepOffset(D10s))
         );
 
-        data.withBannedStop(STOP_B).withBannedStop(STOP_D);
+        data.withBannedStop(STOP_B);
+
 
         requestBuilder.searchParams()
                 .addAccessPaths(walk(STOP_A, D10s))
-                .addEgressPaths(walk(STOP_C, D20s))
+                .addEgressPaths(walk(STOP_D, D20s))
                 .earliestDepartureTime(T00_00)
                 .latestArrivalTime(T00_30)
                 .searchWindowInSeconds(D1m)
@@ -131,7 +117,7 @@ public class G03_MultipleBannedStopsHardTest {
         var response = raptorService.route(request, data);
 
         assertEquals(
-                EXPECTED_RESULT.replace("]", " $890]"),
+                EXPECTED_RESULT.replace("]", " $810]"),
                 pathsToString(response)
         );
 

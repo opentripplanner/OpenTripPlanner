@@ -33,7 +33,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  *
  * Raptor should return the path that does not include any hard banned stops even if it is slower.
  */
-public class G02_RouteWithNonBansChosenBannedStopsHardTest {
+public class G03_RouteWithNonBansChosenBannedStopsHardTest {
     private final TestTransitData data = new TestTransitData();
     private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
     private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(RaptorConfig.defaultConfigForTest());

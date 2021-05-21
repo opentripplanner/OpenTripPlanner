@@ -25,7 +25,7 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
  * Raptor should return a path that may have included a route which had a banned stop earlier
  * if it is able to to re-board that route again later down the line through a different route.
  */
-public class G04_ReboardPreviousIgnoredRouteWithBannedStopsHardTest {
+public class G05_ReboardPreviousIgnoredRouteWithBannedStopsHardTest {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();

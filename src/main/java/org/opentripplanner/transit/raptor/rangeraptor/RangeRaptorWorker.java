@@ -234,7 +234,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                     }
                     foundStopTouchedInPreviousRound = true;
                     if (transitData.isStopHardBanned(stopIndex)) {
-                        break;
+                        foundStopTouchedInPreviousRound = false;
+                        continue;
                     }
 
                     // attempt to alight if we're on board, this is done above the board search
