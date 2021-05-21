@@ -631,6 +631,10 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<VehicleParking> carPark();
 
+        public DataFetcher<Iterable<VehicleParking>> vehicleParkings();
+
+        public DataFetcher<VehicleParking> vehicleParking();
+
         public DataFetcher<Object> viewer();
 
         public DataFetcher<RoutingResponse> plan();

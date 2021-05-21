@@ -205,6 +205,34 @@ enum AlertSeverityLevelType {
     SEVERE
 }
 
+"""Bike park represents a location where bicycles can be parked."""
+type BikePark implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the bike park"""
+    bikeParkId: String
+
+    """Name of the bike park"""
+    name: String!
+
+    """Number of spaces available for bikes"""
+    spacesAvailable: Int
+
+    """
+    If true, value of `spacesAvailable` is updated from a real-time source.
+    """
+    realtime: Boolean
+
+    """Longitude of the bike park (WGS 84)"""
+    lon: Float
+
+    """Latitude of the bike park (WGS 84)"""
+    lat: Float
+}
+
 """Vehicle parking represents a location where bicycles or cars can be parked."""
 type VehicleParking implements Node & PlaceInterface {
     """
@@ -358,6 +386,37 @@ enum BikesAllowed {
 
     """No bicycles are allowed on this trip."""
     NOT_ALLOWED
+}
+
+"""Car park represents a location where cars can be parked."""
+type CarPark implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the car park"""
+    carParkId: String
+
+    """Name of the car park"""
+    name: String!
+
+    """Number of parking spaces at the car park"""
+    maxCapacity: Int
+
+    """Number of currently available parking spaces at the car park"""
+    spacesAvailable: Int
+
+    """
+    If true, value of `spacesAvailable` is updated from a real-time source.
+    """
+    realtime: Boolean
+
+    """Longitude of the car park (WGS 84)"""
+    lon: Float
+
+    """Latitude of the car park (WGS 84)"""
+    lat: Float
 }
 
 """Cluster is a list of stops grouped by name and proximity"""
@@ -1108,10 +1167,10 @@ type Place {
     bikeRentalStation: BikeRentalStation
 
     """The bike parking related to the place"""
-    bikePark: VehicleParking
+    bikePark: BikePark
 
     """The car parking related to the place"""
-    carPark: VehicleParking
+    carPark: CarPark
 }
 
 type placeAtDistance implements Node {
@@ -1545,12 +1604,12 @@ type QueryType {
     bikeRentalStation(id: String!): BikeRentalStation
 
     """Get all bike parks"""
-    bikeParks: [VehicleParking]
+    bikeParks: [BikePark]
 
     """
     Get a single bike park based on its ID, i.e. value of field `bikeParkId`
     """
-    bikePark(id: String!): VehicleParking
+    bikePark(id: String!): BikePark
 
     """Get all car parks"""
     carParks(
@@ -1559,10 +1618,25 @@ type QueryType {
         **Note:** if an id is invalid (or the car park service is unavailable) the returned list will contain `null` values.
         """
         ids: [String]
-    ): [VehicleParking]
+    ): [CarPark]
 
     """Get a single car park based on its ID, i.e. value of field `carParkId`"""
-    carPark(id: String!): VehicleParking
+    carPark(id: String!): CarPark
+
+    """Get all vehicle parkings"""
+    vehicleParkings(
+        """
+        Return vehicle parkings with these ids.
+        **Note:** if an id is invalid (or the vehicle parking service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [VehicleParking]
+
+    """
+    Get a single vehicle parking based on its ID
+    """
+    vehicleParking(id: String!): VehicleParking
 
     """Needed until https://github.com/facebook/relay/issues/112 is resolved"""
     viewer: QueryType

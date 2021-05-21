@@ -29,12 +29,13 @@ config:
     AlertCauseType: String
     AlertEffectType: String
     AlertSeverityLevelType: String
+    BikePark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     BikeRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace#VehicleRentalPlace
     BikeRentalStationUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
     BikesAllowed: String
     BookingInfo: org.opentripplanner.model.BookingInfo
     BookingTime: org.opentripplanner.model.BookingTime
-    CarPark: Object
+    CarPark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     ContactInfo: org.opentripplanner.model.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate

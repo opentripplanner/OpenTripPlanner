@@ -12,10 +12,8 @@ import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -586,14 +584,31 @@ public class LegacyGraphQLQueryTypeImpl
 
       if (vehicleParkingService == null) { return null; }
 
-      return vehicleParkingService.getCarParks().collect(Collectors.toList());
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeCarParksArgs(
+          environment.getArguments());
+
+      if (args.getLegacyGraphQLIds() != null) {
+        var idList = ((List<String>) args.getLegacyGraphQLIds());
+
+        if (!idList.isEmpty()) {
+          Map<String, VehicleParking> carParkMap = vehicleParkingService.getCarParks()
+                  .collect(Collectors.toMap(station -> station.getId().toString(), station -> station));
+
+          return idList.stream()
+              .map(carParkMap::get)
+              .collect(Collectors.toList());
+        }
+      }
+
+      return vehicleParkingService
+          .getCarParks().collect(Collectors.toList());
     };
   }
 
   @Override
   public DataFetcher<VehicleParking> carPark() {
     return environment -> {
-      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeParkArgs(environment.getArguments());
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeCarParkArgs(environment.getArguments());
 
       VehicleParkingService vehicleParkingService = getRoutingService(environment)
           .getVehicleParkingService();
@@ -604,6 +619,54 @@ public class LegacyGraphQLQueryTypeImpl
       return vehicleParkingService
           .getCarParks()
           .filter(carPark -> carPark.getId().equals(carParkId))
+          .findAny()
+          .orElse(null);
+    };
+  }
+
+  @Override
+  public DataFetcher<Iterable<VehicleParking>> vehicleParkings() {
+    return environment -> {
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
+
+      if (vehicleParkingService == null) { return null; }
+
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeVehicleParkingsArgs(
+          environment.getArguments());
+
+      if (args.getLegacyGraphQLIds() != null) {
+        var idList = ((List<String>) args.getLegacyGraphQLIds());
+
+        if (!idList.isEmpty()) {
+          Map<String, VehicleParking> vehicleParkingMap = vehicleParkingService.getVehicleParkings()
+                  .collect(Collectors.toMap(station -> station.getId().toString(), station -> station));
+
+          return idList.stream()
+              .map(vehicleParkingMap::get)
+              .collect(Collectors.toList());
+        }
+      }
+
+      return vehicleParkingService
+          .getVehicleParkings().collect(Collectors.toList());
+    };
+  }
+
+  @Override
+  public DataFetcher<VehicleParking> vehicleParking() {
+    return environment -> {
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeVehicleParkingArgs(environment.getArguments());
+
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
+
+      if (vehicleParkingService == null) { return null; }
+
+      var vehicleParkingId = FeedScopedId.parseId(args.getLegacyGraphQLId());
+      return vehicleParkingService
+          .getVehicleParkings()
+          .filter(vehicleParking -> vehicleParking.getId().equals(vehicleParkingId))
           .findAny()
           .orElse(null);
     };

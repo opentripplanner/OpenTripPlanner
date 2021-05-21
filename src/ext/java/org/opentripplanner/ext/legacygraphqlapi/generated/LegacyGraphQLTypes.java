@@ -1055,6 +1055,32 @@ public class LegacyGraphQLTypes {
         public String getLegacyGraphQLId() { return this._id; }
     }
 
+    public static class LegacyGraphQLQueryTypeVehicleParkingArgs {
+
+        private String _id;
+
+        public LegacyGraphQLQueryTypeVehicleParkingArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._id = (String) args.get("id");
+            }
+        }
+
+        public String getLegacyGraphQLId() { return this._id; }
+    }
+
+    public static class LegacyGraphQLQueryTypeVehicleParkingsArgs {
+
+        private Iterable<String> _ids;
+
+        public LegacyGraphQLQueryTypeVehicleParkingsArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._ids = (Iterable<String>) args.get("ids");
+            }
+        }
+
+        public Iterable<String> getLegacyGraphQLIds() { return this._ids; }
+    }
+
     public static class LegacyGraphQLQueryTypePlanArgs {
 
         private String _date;
