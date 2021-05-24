@@ -88,7 +88,7 @@ public class VectorTilesResource {
         mvtBuilder.addLayers(VectorTilesResource.layers
             .get(LayerType.valueOf(layerParameters.type()))
             .apply(router.graph, layerParameters)
-            .build(envelope));
+            .build(envelope, layerParameters));
       }
     }
 
@@ -188,5 +188,6 @@ public class VectorTilesResource {
     int maxZoom();
     int minZoom();
     int cacheMaxSeconds();
+    double expansionFactor();
   }
 }

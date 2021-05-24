@@ -1,9 +1,12 @@
 package org.opentripplanner.transit.raptor.rangeraptor.configure;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
@@ -12,12 +15,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
-import org.opentripplanner.transit.raptor.service.RaptorSearchWindowCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
+import org.opentripplanner.transit.raptor.service.RaptorSearchWindowCalculator;
 import org.opentripplanner.transit.raptor.service.WorkerPerformanceTimersCache;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -97,14 +97,17 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
                 workerState,
                 routingStrategy,
                 ctx.transit(),
+                ctx.slackProvider(),
                 ctx.accessPaths(),
                 ctx.roundProvider(),
                 ctx.calculator(),
                 ctx.createLifeCyclePublisher(),
-                ctx.timers()
+                ctx.timers(),
+                ctx.enableGuaranteedTransfers()
         );
     }
 
+    @Nullable
     private ExecutorService createNewThreadPool(int size) {
         return size > 0 ? Executors.newFixedThreadPool(size) : null;
     }

@@ -68,10 +68,11 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
     private static final int BACK_FLAG_INDEX = 0;
     private static final int ROUNDABOUT_FLAG_INDEX = 1;
     private static final int HASBOGUSNAME_FLAG_INDEX = 2;
-    private static final int NOTHRUTRAFFIC_FLAG_INDEX = 3;
+    private static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
     private static final int STAIRS_FLAG_INDEX = 4;
     private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
     private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
+    private static final int BICYCLE_NOTHRUTRAFFIC = 7;
 
     /** back, roundabout, stairs, ... */
     private byte flags;
@@ -192,7 +193,7 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
      * @return
      */
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
-        if (options.wheelchairAccessible) {
+        if (mode.isWalking() && options.wheelchairAccessible) {
             if (!isWheelchairAccessible()) {
                 return false;
             }
@@ -384,25 +385,8 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
         StateEditor s1 = s0.edit(this);
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
-
-        /* Handle no through traffic areas. */
-        if (this.isNoThruTraffic()) {
-            // Record transition into no-through-traffic area.
-            if (backEdge instanceof StreetEdge && !((StreetEdge)backEdge).isNoThruTraffic()) {
-                s1.setEnteredNoThroughTrafficArea();
-            }
-            // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
-            if (s1.hasEnteredNoThroughTrafficArea()) {
-                // Only Edges are marked as no-thru, but really we need to avoid creating dominant, pruned states
-                // on thru _Vertices_. This could certainly be improved somehow.
-                for (StreetEdge se : Iterables.filter(s1.getVertex().getOutgoing(), StreetEdge.class)) {
-                    if (!se.isNoThruTraffic()) {
-                        // This vertex has at least one through-traffic edge. We can't dominate it with a no-thru state.
-                        return null;
-                    }
-                }
-            }
-        }
+        if (handleMotorVehicleNoThroughTraffic(traverseMode, backEdge, s1)) return null;
+        if (handleBicycleNoThroughTraffic(traverseMode, backEdge, s1)) return null;
 
         int roundedTime = (int) Math.ceil(time);
 
@@ -478,21 +462,52 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
         return s1;
     }
 
-    private double calculateOverageWeight(double firstValue, double secondValue, double maxValue,
-            double softPenalty, double overageRate) {
-        // apply penalty if we stepped over the limit on this traversal
-        boolean applyPenalty = false;
-        double overageValue;
-
-        if(firstValue <= maxValue && secondValue > maxValue){
-            applyPenalty = true;
-            overageValue = secondValue - maxValue;
-        } else {
-            overageValue = secondValue - firstValue;
+    private boolean handleMotorVehicleNoThroughTraffic(TraverseMode traverseMode, Edge backEdge, StateEditor s1) {
+        /* Handle no through traffic areas. */
+        if (traverseMode.isDriving()) {
+            if (this.isMotorVehicleNoThruTraffic()) {
+                // Record transition into no-through-traffic area.
+                if (backEdge instanceof StreetEdge && !((StreetEdge) backEdge).isMotorVehicleNoThruTraffic()) {
+                    s1.setEnteredMotorVerhicleNoThroughTrafficArea();
+                }
+                // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
+                if (s1.hasEnteredMotorVehicleNoThroughTrafficArea()) {
+                    // Only Edges are marked as no-thru, but really we need to avoid creating dominant, pruned states
+                    // on thru _Vertices_. This could certainly be improved somehow.
+                    for (StreetEdge se : Iterables.filter(s1.getVertex().getOutgoing(), StreetEdge.class)) {
+                        if (!se.isMotorVehicleNoThruTraffic()) {
+                            // This vertex has at least one through-traffic edge. We can't dominate it with a no-thru state.
+                            return true;
+                        }
+                    }
+                }
+            }
         }
+        return false;
+    }
 
-        // apply overage and add penalty if necessary
-        return (overageRate * overageValue) + (applyPenalty ? softPenalty : 0.0);
+    private boolean handleBicycleNoThroughTraffic(TraverseMode traverseMode, Edge backEdge, StateEditor s1) {
+        /* Handle no through traffic areas. */
+        if (traverseMode.isCycling()) {
+            if (this.isBicycleNoThruTraffic()) {
+                // Record transition into no-through-traffic area.
+                if (backEdge instanceof StreetEdge && !((StreetEdge) backEdge).isBicycleNoThruTraffic()) {
+                    s1.setEnteredBicycleNoThroughTrafficArea();
+                }
+                // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
+                if (s1.hasEnteredBicycleNoThroughTrafficArea()) {
+                    // Only Edges are marked as no-thru, but really we need to avoid creating dominant, pruned states
+                    // on thru _Vertices_. This could certainly be improved somehow.
+                    for (StreetEdge se : Iterables.filter(s1.getVertex().getOutgoing(), StreetEdge.class)) {
+                        if (!se.isBicycleNoThruTraffic()) {
+                            // This vertex has at least one through-traffic edge. We can't dominate it with a no-thru state.
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -517,16 +532,6 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
             return calculateCarSpeed(options);
         }
         return options.getSpeed(traverseMode);
-    }
-
-    @Override
-    public double weightLowerBound(RoutingRequest options) {
-        return timeLowerBound(options) * options.walkReluctance;
-    }
-
-    @Override
-    public double timeLowerBound(RoutingRequest options) {
-        return this.getDistanceMeters() / options.getStreetSpeedUpperBound();
     }
 
     /**
@@ -688,13 +693,21 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
 	    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
 	}
 
-	public boolean isNoThruTraffic() {
-            return BitSetUtils.get(flags, NOTHRUTRAFFIC_FLAG_INDEX);
+	public boolean isMotorVehicleNoThruTraffic() {
+            return BitSetUtils.get(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC);
 	}
 
-	public void setNoThruTraffic(boolean noThruTraffic) {
-	    flags = BitSetUtils.set(flags, NOTHRUTRAFFIC_FLAG_INDEX, noThruTraffic);
+	public void setMotorVehicleNoThruTraffic(boolean noThruTraffic) {
+	    flags = BitSetUtils.set(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC, noThruTraffic);
 	}
+
+    public boolean isBicycleNoThruTraffic() {
+        return BitSetUtils.get(flags, BICYCLE_NOTHRUTRAFFIC);
+    }
+
+    public void setBicycleNoThruTraffic(boolean noThruTraffic) {
+        flags = BitSetUtils.set(flags, BICYCLE_NOTHRUTRAFFIC, noThruTraffic);
+    }
 
 	/**
 	 * This street is a staircase
@@ -832,13 +845,15 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
 
         if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
             e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
-            e1.setNoThruTraffic(this.isNoThruTraffic());
+                e1.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
+                e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
             e1.setStreetClass(this.getStreetClass());
             tempEdges.addEdge(e1);
         }
         if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
             e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
-            e2.setNoThruTraffic(this.isNoThruTraffic());
+                e2.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
+                e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
             e2.setStreetClass(this.getStreetClass());
             tempEdges.addEdge(e2);
         }

@@ -1,6 +1,15 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -11,15 +20,6 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
 /**
  * FEATURE UNDER TEST
@@ -37,7 +37,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
 
   @Before
   public void setup() {
-    data.add(
+    data.withRoute(
         route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
             .withTimetable(
                 schedule("0:10, 0:12, 0:14, 0:16, 0:18")
@@ -62,8 +62,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
         defaultSlackProvider(60, 0, 0)
     );
 
-    // Enable Raptor debugging by configuring the requestBuilder
-    // data.debugToStdErr(requestBuilder);
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   @Test
@@ -73,7 +72,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [00:10:00 00:19:00 9m]",
+        "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m]",
         pathsToString(response)
     );
   }
@@ -87,7 +86,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [00:10:00 00:19:00 9m]",
+        "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m]",
         pathsToString(response)
     );
   }
@@ -99,10 +98,10 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [00:10:00 00:19:00 9m, cost: 1860]\n"
-            + "Flex 2m 2tx ~ 3 ~ BUS R1 0:12 0:18 ~ 6 ~ Walk 1m [00:09:00 00:19:00 10m, cost: 1740]\n"
-            + "Flex 7m 1tx ~ 5 ~ BUS R1 0:16 0:18 ~ 6 ~ Walk 1m [00:08:00 00:19:00 11m, cost: 2700]\n"
-            + "Walk 10m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 1m [00:00:00 00:19:00 19m, cost: 3720]",
+            + "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m $1860]\n"
+            + "Flex 2m 2tx ~ 3 ~ BUS R1 0:12 0:18 ~ 6 ~ Walk 1m [0:09 0:19 10m $1740]\n"
+            + "Flex 7m 1tx ~ 5 ~ BUS R1 0:16 0:18 ~ 6 ~ Walk 1m [0:08 0:19 11m $2700]\n"
+            + "Walk 10m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 1m [0:00 0:19 19m $3720]",
         pathsToString(response)
     );
   }

@@ -26,7 +26,7 @@ public class HeuristicsAdapter implements Heuristics {
     private final BestTimes times;
     private final BestNumberOfTransfers transfers;
     private final Collection<RaptorTransfer> egressPaths;
-    private final TransitCalculator calculator;
+    private final TransitCalculator<?> calculator;
     private boolean aggregatedResultsCalculated = false;
 
     private int minJourneyTravelDuration = NOT_SET;
@@ -37,7 +37,7 @@ public class HeuristicsAdapter implements Heuristics {
             BestTimes times,
             BestNumberOfTransfers transfers,
             Collection<RaptorTransfer> egressPaths,
-            TransitCalculator calculator,
+            TransitCalculator<?> calculator,
             WorkerLifeCycle lifeCycle
     ) {
         this.times = times;
@@ -117,8 +117,8 @@ public class HeuristicsAdapter implements Heuristics {
     @Override
     public String toString() {
         return ToStringBuilder.of(Heuristics.class)
-            .addServiceTime("originDepartureTime(last iteration)", originDepartureTime, NOT_SET)
-            .addFieldIfTrue("resultsExist", aggregatedResultsCalculated)
+            .addServiceTime("originDepartureTime(last iteration)", originDepartureTime)
+            .addBoolIfTrue("resultsExist", aggregatedResultsCalculated)
             .addDurationSec("minJourneyTravelDuration", minJourneyTravelDuration, NOT_SET)
             .addDurationSec("minJourneyNumOfTransfers", minJourneyNumOfTransfers, NOT_SET)
             .addServiceTime("earliestArrivalTime", earliestArrivalTime, NOT_SET)

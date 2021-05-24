@@ -10,6 +10,7 @@ public interface RaptorTestConstants {
   int D10s = 10;
   int D20s = 20;
   int D30s = 30;
+  int D40s = 40;
   int D1m = duration("1m");
   int D2m = duration("2m");
   int D2m1s = duration("2m1s");
@@ -24,6 +25,8 @@ public interface RaptorTestConstants {
   int T00_04 = hm2time(0, 4);
   int T00_10 = hm2time(0, 10);
   int T00_30 = hm2time(0, 30);
+  int T01_00 = hm2time(1, 0);
+  int T48_00 = hm2time(48, 0);
 
   // Stop indexes - Note! There is no stop defined for index 0(zero)! You must
   // account for that in the test if you uses a stop index.
@@ -39,16 +42,9 @@ public interface RaptorTestConstants {
   // Stop position in pattern
   int STOP_POS_0 = 0;
   int STOP_POS_1 = 1;
-  int STOP_POS_2 = 2;
-  int STOP_POS_3 = 3;
-  int STOP_POS_4 = 4;
-  int STOP_POS_5 = 5;
-  int STOP_POS_6 = 6;
-  int STOP_POS_7 = 7;
 
-  // Trip indexes - Raptor do not use these. The indexes are
-  // only used locally in tests to index a set of patterns/trips.
-  int LINE_11 = 0;
-  int LINE_21 = 1;
-  int LINE_31 = 2;
+  // Slack
+  int BOARD_SLACK = 45;
+  int ALIGHT_SLACK = 15;
+  int TRANSFER_SLACK = 60;
 }

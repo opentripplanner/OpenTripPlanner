@@ -104,18 +104,18 @@ otp.util.Itin = {
         return false;
     },
 
-    includesBicycle : function(mode) {
-        var modeArr = mode.split(",");
-        for(var i = 0; i < modeArr.length; i++) {
-            if(modeArr[i] === "BICYCLE") return true;
-        }
-        return false;
-    },
-
     includesAnyBicycle : function(mode) {
         var modeArr = mode.split(",");
         for(var i = 0; i < modeArr.length; i++) {
             if(this.getUnqualifiedMode(modeArr[i]) === "BICYCLE") return true;
+        }
+        return false;
+    },
+
+    includesAnyCar : function(mode) {
+        var modeArr = mode.split(",");
+        for(var i = 0; i < modeArr.length; i++) {
+            if(this.getUnqualifiedMode(modeArr[i]) === "CAR") return true;
         }
         return false;
     },

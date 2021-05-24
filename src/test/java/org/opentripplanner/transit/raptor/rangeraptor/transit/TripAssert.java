@@ -2,10 +2,11 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Assert;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 class TripAssert {
     private final TripScheduleSearch<TestTripSchedule> subject;
-    private boolean success;
+    private RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> result;
     private int stopPosition;
 
 
@@ -19,7 +20,7 @@ class TripAssert {
      */
     TripAssert search(int arrivalTime, int stopPosition) {
         this.stopPosition = stopPosition;
-        success = subject.search(arrivalTime, stopPosition);
+        result = subject.search(arrivalTime, stopPosition);
         return this;
     }
 
@@ -30,31 +31,34 @@ class TripAssert {
      */
     TripAssert search(int arrivalTime, int stopPosition, int tripIndexLimit) {
         this.stopPosition = stopPosition;
-        success = subject.search(arrivalTime, stopPosition, tripIndexLimit);
+        result = subject.search(arrivalTime, stopPosition, tripIndexLimit);
         return this;
     }
 
     void assertNoTripFound() {
-        Assert.assertFalse("No trip expected, but trip found with index: " + subject.getCandidateTripIndex(), success);
+        Assert.assertNull(
+                "No trip expected, but trip found with index: " + result,
+                result
+        );
     }
 
     TripAssert assertTripFound() {
-        Assert.assertTrue("Trip expected, but trip found", success);
+        Assert.assertNotNull("Trip expected, but trip found", result);
         return this;
     }
 
     TripAssert withIndex(int expectedTripIndex) {
-        Assert.assertEquals("Trip index", expectedTripIndex, subject.getCandidateTripIndex());
+        Assert.assertEquals("Trip index", expectedTripIndex, result.getTripIndex());
         return this;
     }
 
     TripAssert withBoardTime(int expectedBoardTime) {
-        Assert.assertEquals("Board time", expectedBoardTime, subject.getCandidateTrip().departure(stopPosition));
+        Assert.assertEquals("Board time", expectedBoardTime, result.getTrip().departure(stopPosition));
         return this;
     }
 
     TripAssert withAlightTime(int expectedBoardTime) {
-        Assert.assertEquals("Board time", expectedBoardTime, subject.getCandidateTrip().arrival(stopPosition));
+        Assert.assertEquals("Board time", expectedBoardTime, result.getTrip().arrival(stopPosition));
         return this;
     }
 }

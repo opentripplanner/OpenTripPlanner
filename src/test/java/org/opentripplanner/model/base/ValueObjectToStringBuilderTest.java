@@ -63,8 +63,8 @@ public class ValueObjectToStringBuilderTest {
 
     @Test
     public void addLbl() {
-        assertEquals("abba", subject().addLbl("ab").addLbl("ba").toString());
-        assertEquals("a_2_b", subject().addLbl("a_").addNum(2).addLbl("_b").toString());
+        assertEquals("abba", subject().addText("ab").addText("ba").toString());
+        assertEquals("a_2_b", subject().addText("a_").addNum(2).addText("_b").toString());
     }
 
     @Test

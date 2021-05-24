@@ -1,5 +1,13 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import static java.lang.Boolean.TRUE;
+import static java.util.Collections.emptyList;
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MULTI_MODAL_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.filterPlaceTypeEnum;
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 import graphql.Scalars;
 import graphql.relay.DefaultConnection;
 import graphql.relay.DefaultPageInfo;
@@ -17,6 +25,17 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.collections.CollectionUtils;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
@@ -73,32 +92,14 @@ import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.lang.Boolean.TRUE;
-import static java.util.Collections.emptyList;
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MULTI_MODAL_MODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.filterPlaceTypeEnum;
-
 /**
  * Schema definition for the Transmodel GraphQL API.
  * <p>
- * Currently a simplified version of the IndexGraphQLSchema, with gtfs terminology replaced with corresponding terms from Transmodel.
+ * Currently a simplified version of the IndexGraphQLSchema, with gtfs terminology replaced with
+ * corresponding terms from Transmodel.
  */
 public class TransmodelGraphQLSchema {
+
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphQLSchema.class);
 
   private final DefaultRoutingRequestType routing;
@@ -117,7 +118,7 @@ public class TransmodelGraphQLSchema {
     return new TransmodelGraphQLSchema(defaultRequest, qglUtil).create();
   }
 
-    @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   private GraphQLSchema create() {
     /*
     multilingualStringType, validityPeriodType, infoLinkType, bookingArrangementType, systemNoticeType,
@@ -1074,6 +1075,23 @@ public class TransmodelGraphQLSchema {
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
+            .name("situation")
+            .description("Get a single situation based on its situationNumber")
+            .type(ptSituationElementType)
+            .argument(GraphQLArgument
+                .newArgument()
+                .name("situationNumber")
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                .build())
+            .dataFetcher(environment -> {
+              return GqlUtil
+                  .getRoutingService(environment)
+                  .getTransitAlertService()
+                  .getAlertById(environment.getArgument("situationNumber"));
+            })
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
             .name("serverInfo")
             .description("Get OTP server information")
             .type(new GraphQLNonNull(serverInfoType))
@@ -1100,11 +1118,6 @@ public class TransmodelGraphQLSchema {
 //        }
 //        return tripPattern.stopPattern.bookingArrangements[tripTimeShort.stopIndex];
 //    }
-
-    private List<FeedScopedId> toIdList(List<String> ids) {
-        if (ids == null) { return Collections.emptyList(); }
-        return ids.stream().map(id -> TransitIdMapper.mapIDToDomain(id)).collect(Collectors.toList());
-    }
 
     public GraphQLObjectType createPlanType(
         GraphQLOutputType bookingArrangementType,
@@ -1144,4 +1157,11 @@ public class TransmodelGraphQLSchema {
 
       return TripType.create(placeType, tripPatternType, tripMetadataType, gqlUtil);
     }
+
+    private List<FeedScopedId> toIdList(List<String> ids) {
+        if (ids == null) { return Collections.emptyList(); }
+        return ids.stream().map(TransitIdMapper::mapIDToDomain).collect(Collectors.toList());
+    }
+
+
 }

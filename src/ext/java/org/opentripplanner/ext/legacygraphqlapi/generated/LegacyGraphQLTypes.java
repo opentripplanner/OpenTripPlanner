@@ -1087,6 +1087,8 @@ public class LegacyGraphQLTypes {
         private Iterable<LegacyGraphQLTransportModeInput> _transportModes;
         private LegacyGraphQLInputModeWeightInput _modeWeight;
         private Boolean _allowBikeRental;
+        private Boolean _allowKeepingRentedBicycleAtDestination;
+        private Integer _keepingRentedBicycleAtDestinationCost;
         private Integer _boardSlack;
         private Integer _alightSlack;
         private Integer _minTransferTime;
@@ -1165,6 +1167,8 @@ public class LegacyGraphQLTypes {
                 this._modeWeight = new LegacyGraphQLInputModeWeightInput(
                         (Map<String, Object>) args.get("modeWeight"));
                 this._allowBikeRental = (Boolean) args.get("allowBikeRental");
+                this._allowKeepingRentedBicycleAtDestination = (Boolean) args.get("allowKeepingRentedBicycleAtDestination");
+                this._keepingRentedBicycleAtDestinationCost = (Integer) args.get("keepingRentedBicycleAtDestinationCost");
                 this._boardSlack = (Integer) args.get("boardSlack");
                 this._alightSlack = (Integer) args.get("alightSlack");
                 this._minTransferTime = (Integer) args.get("minTransferTime");
@@ -1258,6 +1262,10 @@ public class LegacyGraphQLTypes {
         public LegacyGraphQLInputModeWeightInput getLegacyGraphQLModeWeight() { return this._modeWeight; }
 
         public Boolean getLegacyGraphQLAllowBikeRental() { return this._allowBikeRental; }
+
+        public Boolean getLegacyGraphQLAllowKeepingRentedBicycleAtDestination() { return this._allowKeepingRentedBicycleAtDestination; }
+
+        public Integer getLegacyGraphQLKeepingRentedBicycleAtDestinationCost() { return this._keepingRentedBicycleAtDestinationCost; }
 
         public Integer getLegacyGraphQLBoardSlack() { return this._boardSlack; }
 

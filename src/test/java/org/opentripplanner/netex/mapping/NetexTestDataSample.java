@@ -1,5 +1,15 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
+import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
+import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
+
+import java.math.BigInteger;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.xml.bind.JAXBElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
@@ -25,16 +35,6 @@ import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
-
-import javax.xml.bind.JAXBElement;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
-import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
-import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
 class NetexTestDataSample {
     public static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
@@ -102,6 +102,7 @@ class NetexTestDataSample {
             String stopPointId = "RUT:StopPointInJourneyPattern:" + (i + 1);
             StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
                     .withId(stopPointId)
+                    .withOrder(BigInteger.valueOf(i+1))
                     .withScheduledStopPointRef(createScheduledStopPointRef(stopPointId));
 
             if(i==0) stopPoint.setDestinationDisplayRef(createDestinationDisplayRef(destinationBergen.getId()).getValue());
@@ -137,7 +138,7 @@ class NetexTestDataSample {
         // Setup stops
         for (int i = 0; i < NUM_OF_STOPS; i++) {
             String stopId = "NSR:Quay:" + (i + 1);
-            stopsById.add(Stop.stopForTest(stopId, 0.0, 0.0));
+            stopsById.add(Stop.stopForTest(stopId, 60.0, 10.0));
             quayIdByStopPointRef.add(pointsInLink.get(i).getId(), stopId);
         }
     }

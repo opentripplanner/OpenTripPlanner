@@ -48,7 +48,7 @@ public class ShortestPathTree {
         List<GraphPath> ret = new LinkedList<>();
         for (State s : stateList) {
             if (s.isFinal()) {
-                ret.add(new GraphPath(s, optimize));
+                ret.add(new GraphPath(s));
             }
         }
         return ret;
@@ -69,7 +69,7 @@ public class ShortestPathTree {
         if (s == null) {
             return null;
         } else {
-            return new GraphPath(s, optimize);
+            return new GraphPath(s);
         }
     }
 

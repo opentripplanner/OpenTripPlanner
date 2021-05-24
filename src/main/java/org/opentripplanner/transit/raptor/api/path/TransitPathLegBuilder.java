@@ -103,6 +103,7 @@ public class TransitPathLegBuilder<T extends RaptorTripSchedule> {
             boardStop(),
             waitTime,
             transitTime,
+            trip().transitReluctanceFactorIndex(),
             alightStop()
         )
     );

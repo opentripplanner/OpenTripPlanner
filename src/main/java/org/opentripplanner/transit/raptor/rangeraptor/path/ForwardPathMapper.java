@@ -9,6 +9,7 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
@@ -99,13 +100,31 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
     private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, PathLeg<T> nextLeg) {
         RaptorTransfer access = from.accessPath().access();
-        int boardSlack = slackProvider.boardSlack(nextLeg.asTransitLeg().trip().pattern());
-        int targetToTime = nextLeg.fromTime() - boardSlack;
 
-        if(access.hasRides()) {
-            targetToTime -= slackProvider.transferSlack();
-            targetToTime = access.latestArrivalTime(targetToTime);
+        // We need to calculate the access-arrival-time. There are 3 cases:
+        // 1) Normal case: Walk ~ boardSlack ~ transit (access can be time-shifted)
+        // 2) Flex and walk case: Flex ~ Walk (no slack in between)
+        // 3) Flex and transit case: Flex ~ (transferSlack + boardSlack) ~ transit
+        // Flex access may or may not be time-shifted
+
+
+        int targetToTime = nextLeg.fromTime();
+
+        // Remove board slack if next leg is transit. If the access arrived "on board" (FLEX),
+        // then the next leg could be a transfer, not a transit leg.
+        if(nextLeg.isTransitLeg()) {
+            RaptorTripPattern pattern = nextLeg.asTransitLeg().trip().pattern();
+            // Case 1 and 3
+            targetToTime -= slackProvider.boardSlack(pattern);
+
+            // Case 3
+            if(access.hasRides()) {
+                targetToTime -= slackProvider.transferSlack();
+            }
         }
+
+        // Time-shift the access
+        targetToTime = access.latestArrivalTime(targetToTime);
 
         int targetFromTime = targetToTime - access.durationInSeconds();
 

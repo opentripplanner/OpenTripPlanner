@@ -1,18 +1,17 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 
 public class TripScheduleAlightSearchTest implements RaptorTestConstants {
@@ -48,6 +47,11 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
     /** A time after all other times */
     private static final int TIME_LATE = 9999;
 
+    private static final int TRIP_A = 0;
+    private static final int TRIP_B = 1;
+    private static final int TRIP_C = 2;
+
+
     private final TestTripPattern pattern = pattern("R1", STOP_A, STOP_B);
 
     private RaptorRoute<TestTripSchedule> route = TestRoute
@@ -59,12 +63,13 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
             schedule().arrivals(TIME_C1, TIME_C2)
         );
 
-    private final TestTripSchedule tripA = route.timetable().getTripSchedule(LINE_11);
-    private final TestTripSchedule tripB = route.timetable().getTripSchedule(LINE_21);
-    private final TestTripSchedule tripC = route.timetable().getTripSchedule(LINE_31);
+    private final TestTripSchedule tripA = route.timetable().getTripSchedule(TRIP_A);
+    private final TestTripSchedule tripB = route.timetable().getTripSchedule(TRIP_B);
+    private final TestTripSchedule tripC = route.timetable().getTripSchedule(TRIP_C);
 
     // The service under test - the subject
-    private TripScheduleAlightSearch<TestTripSchedule> subject = new TripScheduleAlightSearch<>(
+    private TripScheduleAlightSearch<TestTripSchedule>
+            subject = new TripScheduleAlightSearch<>(
             TRIPS_BINARY_SEARCH_THRESHOLD, route.timetable()
     );
 
@@ -85,12 +90,12 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
     public void alightLastTripForAVeryLateTime() {
         searchForTrip(TIME_LATE, STOP_POS_0)
                 .assertTripFound()
-                .withIndex(LINE_31)
+                .withIndex(TRIP_C)
                 .withAlightTime(TIME_C1);
 
         searchForTrip(TIME_LATE, STOP_POS_1)
                 .assertTripFound()
-                .withIndex(LINE_31)
+                .withIndex(TRIP_C)
                 .withAlightTime(TIME_C2);
     }
 
@@ -99,13 +104,13 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
         // B matches B
         searchForTrip(TIME_B1, STOP_POS_0)
                 .assertTripFound()
-                .withIndex(LINE_21)
+                .withIndex(TRIP_B)
                 .withAlightTime(TIME_B1);
 
         // One second minus, give the previous trip
         searchForTrip(TIME_B1-1, STOP_POS_0)
                 .assertTripFound()
-                .withIndex(LINE_11)
+                .withIndex(TRIP_A)
                 .withAlightTime(TIME_A1);
     }
 
@@ -124,13 +129,13 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
         withTrips(tripA, tripB);
 
         // Then we expect to find trip B when 'tripIndexLowerBound' is A´s index
-        searchForTrip(TIME_LATE, STOP_POS_0, LINE_11)
+        searchForTrip(TIME_LATE, STOP_POS_0, TRIP_A)
                 .assertTripFound()
                 .withAlightTime(TIME_B1)
-                .withIndex(LINE_21);
+                .withIndex(TRIP_B);
 
         // An then no trip if 'tripIndexLowerBound' equals the last trip index (B´s index)
-        searchForTrip(TIME_LATE, STOP_POS_0, LINE_21)
+        searchForTrip(TIME_LATE, STOP_POS_0, TRIP_B)
                 .assertNoTripFound();
     }
 

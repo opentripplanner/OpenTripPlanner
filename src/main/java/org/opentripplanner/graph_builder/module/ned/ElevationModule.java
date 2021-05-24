@@ -731,7 +731,8 @@ public class ElevationModule implements GraphBuilderModule {
             if (Files.exists(cachedElevationsFile.toPath())) {
                 log.info("Cached elevations file found!");
             } else {
-                log.warn("No cached elevations file found or read access not allowed! Unable to load in cached elevations. This could take a while...");
+                log.warn("No cached elevations file found at {} or read access not allowed! Unable to load in cached elevations. This could take a while...", cachedElevationsFile.toPath()
+                        .toAbsolutePath());
             }
         } else {
             log.warn("Not using cached elevations! This could take a while...");

@@ -701,6 +701,11 @@ type Itinerary {
     How much elevation is lost, in total, over the course of the itinerary, in meters.
     """
     elevationLost: Float
+
+    """
+    Does the itinerary end without dropping off the rented bicycle:
+    """
+    arrivedAtDestinationWithRentedBicycle: Boolean
 }
 
 type Leg {
@@ -1707,6 +1712,18 @@ type QueryType {
 
         """Is bike rental allowed? Default value: false"""
         allowBikeRental: Boolean
+
+        """
+        Whether arriving at the destination with a rented (station) bicycle is allowed without
+        dropping it off. Default: false.
+        """
+        allowKeepingRentedBicycleAtDestination: Boolean
+
+        """
+        The cost of arriving at the destination with the rented bicycle, to discourage doing so.
+        Default value: 0.
+        """
+        keepingRentedBicycleAtDestinationCost: Int
 
         """
         Invariant: `boardSlack + alightSlack <= transferSlack`. Default value: 0

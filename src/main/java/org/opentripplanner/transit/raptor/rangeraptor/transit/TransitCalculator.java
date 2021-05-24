@@ -1,23 +1,45 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 
+import static org.opentripplanner.util.time.TimeUtils.hm2time;
+
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
-import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
  * <em>earliest boarding time</em> and time-shifting the access paths.
  * <p/>
- * The calculator is shared between the state, worker and path mapping code. This
- * make the calculations consistent and let us hide the request parameters. Hiding the
- * request parameters ensure that this calculator is used.
+ * The calculator is shared between the state, worker and path mapping code. This make the
+ * calculations consistent and let us hide the request parameters. Hiding the request parameters
+ * ensure that this calculator is used.
+ * <p>
+ * There is one calculator for FORWARD search and one for REVERSE search. The documentation and
+ * argument names uses a search-direction agnostic vocabulary. We try to use the terms "source" and
+ * "target", in stead of "from/to" and "board/alight".
+ * <ul>
+ * <li>
+ *     In a FORWARD search the "source" means "from" and "TARGET" means "to".
+ * </li>
+ * <li>
+ *     In a BACKWARD search the "source" means "to" and "TARGET" means "from". The traversal of the
+ *     graph happens from the destination towards the origin - backwards in time. The "from/to"
+ *     refer to the "natural way" we think about a journey, while "source/target" the destination
+ *     is the source and the origin is the target in a BACKWARD search.
+ * </li>
+ * </ul>
+ * "Source" and "target" may apply to stop-arrival, trip, board-/aligh-slack, and so on.
+ * <p>
+ * For a BACKWORD search the "source" means "from" (stop-arrival, trip, and so on).
+ *
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface TransitCalculator {
+public interface TransitCalculator<T extends RaptorTripSchedule> {
 
     /**
      * Use this constant to represent an uninitialized time value.
@@ -46,14 +68,13 @@ public interface TransitCalculator {
     int duration(int timeA, int timeB);
 
     /**
-     * For a normal search return the trip arrival time at stop position.
+     * For a normal search return the trip arrival time at stop position including alightSlack.
      * For a reverse search return the next trips departure time at stop position with the boardSlack added.
      *
      * @param onTrip the current boarded trip
      * @param stopPositionInPattern the stop position/index
-     * @param <T> The TripSchedule type defined by the user of the raptor API.
      */
-    <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack);
+    int stopArrivalTime(T onTrip, int stopPositionInPattern, int slack);
 
     /**
      * Stop the search when the time exceeds the latest-acceptable-arrival-time.
@@ -125,20 +146,22 @@ public interface TransitCalculator {
      * search into the worker (strategy design pattern).
      *
      * @param timeTable the trip time-table to search
-     * @param <T> The TripSchedule type defined by the user of the raptor API.
      * @return The trip search strategy implementation.
      */
-    <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            RaptorTimeTable<T> timeTable
-    );
+    TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable);
 
     /**
      * Same as {@link #createTripSearch(RaptorTimeTable)}, but create a
      * trip search that only accept exact trip timeLimit matches.
      */
-    <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            RaptorTimeTable<T> timeTable
-    );
+    TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
+
+    /**
+     * Return a guaranteed transfer provider for the given pattern. When searching forward the
+     * given {@code target} is the TO pattern/stop, while when searching in reverse the given
+     * target is the FROM pattern/stop.
+     */
+    RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route);
 
     /**
      * Return a calculator for test purpose. The following parameters are fixed:
@@ -150,16 +173,16 @@ public interface TransitCalculator {
      * </ul>
      * @param forward if true create a calculator for forward search, if false search
      */
-    static TransitCalculator testDummyCalculator(boolean forward) {
+    static <T extends RaptorTripSchedule> TransitCalculator<T> testDummyCalculator(boolean forward) {
         return forward
-                ? new ForwardTransitCalculator(
+                ? new ForwardTransitCalculator<>(
                         10,
                         hm2time(8,0),
                         2 * 60 * 60, // 2 hours
                         TIME_NOT_SET,
                         60
                 )
-                : new ReverseTransitCalculator(
+                : new ReverseTransitCalculator<>(
                         10,
                         hm2time(8,0),
                         2 * 60 * 60, // 2 hours

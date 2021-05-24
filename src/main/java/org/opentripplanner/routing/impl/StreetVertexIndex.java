@@ -98,7 +98,8 @@ public class StreetVertexIndex {
           lengthIn
       );
 
-      temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
+      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
+      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     }
@@ -113,7 +114,8 @@ public class StreetVertexIndex {
       );
 
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
-      temporaryPartialStreetEdge.setNoThruTraffic(street.isNoThruTraffic());
+      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
+      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     }
   }
@@ -167,7 +169,7 @@ public class StreetVertexIndex {
     List<Edge> edges = edgeTree.query(envelope);
     for (Iterator<Edge> ie = edges.iterator(); ie.hasNext(); ) {
       Edge e = ie.next();
-      Envelope eenv = e.getGeometry().getEnvelopeInternal();
+      Envelope eenv = edgeGeometryOrStraightLine(e).getEnvelopeInternal();
       //Envelope eenv = e.getEnvelope();
         if (!envelope.intersects(eenv)) { ie.remove(); }
     }
@@ -271,11 +273,11 @@ public class StreetVertexIndex {
     //It can be null in tests
     if (options != null) {
       TraverseModeSet modes = options.streetSubRequestModes;
-      if (modes.getCar()) {
-        // for park and ride we will start in car mode and walk to the end vertex
-        if (!endVertex && options.parkAndRide) {
-          nonTransitMode = TraverseMode.CAR;
-        }
+      // for park and ride we will start in car mode and walk to the end vertex
+      boolean parkAndRideDepart = modes.getCar() && options.parkAndRide && !endVertex;
+      boolean onlyCarAvailable = modes.getCar() && !(modes.getWalk() || modes.getBicycle());
+      if (onlyCarAvailable || parkAndRideDepart) {
+        nonTransitMode = TraverseMode.CAR;
       }
     }
     return nonTransitMode;
@@ -294,10 +296,7 @@ public class StreetVertexIndex {
        * rasterizing splitting long segments.
        */
       for (Edge e : gv.getOutgoing()) {
-        LineString geometry = e.getGeometry();
-        if (geometry == null) {
-          continue;
-        }
+        LineString geometry = edgeGeometryOrStraightLine(e);
         Envelope env = geometry.getEnvelopeInternal();
           if (edgeTree instanceof HashGridSpatialIndex) {
               ((HashGridSpatialIndex) edgeTree).insert(geometry, e);
@@ -394,5 +393,14 @@ public class StreetVertexIndex {
     }
     location.setWheelchairAccessible(wheelchairAccessible);
     return location;
+  }
+
+  private static LineString edgeGeometryOrStraightLine(Edge e) {
+    LineString geometry = e.getGeometry();
+    if (geometry == null) {
+      Coordinate[] coordinates = new Coordinate[]{e.getFromVertex().getCoordinate(), e.getToVertex().getCoordinate()};
+      geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
+    }
+    return geometry;
   }
 }

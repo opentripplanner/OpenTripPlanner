@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
@@ -69,12 +70,18 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitStops(Graph graph) {
     LOG.info("Linking transit stops to graph...");
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
+
+      // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
+      if (tStop.hasPathways()) {
+        continue;
+      }
+
       TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
 
       if (OTPFeature.FlexRouting.isOn()) {
         // If regular stops are used for flex trips, they also need to be connected to car routable
         // street edges.
-        if (graph.getAllFlexStops().contains(tStop.getStop())) {
+        if (graph.getAllFlexStopsFlat().contains(tStop.getStop())) {
           modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
         }
       }

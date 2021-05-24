@@ -1,6 +1,7 @@
 package org.opentripplanner.updater;
 
 import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
+import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
@@ -27,7 +28,6 @@ import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +52,9 @@ public abstract class GraphUpdaterConfigurator {
             createUpdatersFromConfig(updatersParameters)
         );
         updaters.addAll(
+            // Setup updaters using the BikeRentalServiceDirectoryFetcher(Sandbox)
             fetchBikeRentalServicesFromOnlineDirectory(
-                updatersParameters.bikeRentalServiceDirectoryUrl()
+                updatersParameters.getBikeRentalServiceDirectoryFetcherParameters()
             )
         );
 
@@ -95,9 +96,11 @@ public abstract class GraphUpdaterConfigurator {
     /**
      * Use the online UpdaterDirectoryService to fetch BikeRental updaters.
      */
-    private static List<GraphUpdater> fetchBikeRentalServicesFromOnlineDirectory(URI endpoint) {
-        if (endpoint == null) { return List.of(); }
-        return BikeRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(endpoint);
+    private static List<GraphUpdater> fetchBikeRentalServicesFromOnlineDirectory(
+        BikeRentalServiceDirectoryFetcherParameters parameters
+    ) {
+        if (parameters == null) { return List.of(); }
+        return BikeRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(parameters);
     }
 
     /**

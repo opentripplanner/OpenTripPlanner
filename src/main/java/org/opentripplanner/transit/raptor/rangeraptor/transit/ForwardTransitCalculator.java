@@ -3,6 +3,8 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -13,7 +15,7 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * Used to calculate times in a forward trip search.
  */
-final class ForwardTransitCalculator implements TransitCalculator {
+final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements TransitCalculator<T> {
     private final int tripSearchBinarySearchThreshold;
     private final int earliestDepartureTime;
     private final int searchWindowInSeconds;
@@ -62,7 +64,7 @@ final class ForwardTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {
+    public int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {
         return onTrip.arrival(stopPositionInPattern) + alightSlack;
     }
 
@@ -114,16 +116,17 @@ final class ForwardTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            RaptorTimeTable<T> timeTable
-    ) {
+    public RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route) {
+        return route.getGuaranteedTransfersTo();
+    }
+
+    @Override
+    public final TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
         return new TripScheduleBoardSearch<>(tripSearchBinarySearchThreshold, timeTable);
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            RaptorTimeTable<T> pattern
-    ) {
+    public final TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> pattern) {
         return new TripScheduleExactMatchSearch<>(
                 createTripSearch(pattern),
                 this,

@@ -1,104 +1,135 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.transfer;
 
+import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
+
 import java.io.Serializable;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.Trip;
+import java.util.Objects;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.base.ToStringBuilder;
 
 public final class Transfer implements Serializable {
 
+    /**
+     * Regular street transfers should be given this cost.
+     */
+    public static final int NEUTRAL_TRANSFER_COST = 0;
+
+    /**
+     * Regular street transfers should be given this cost.
+     */
+    public static final int MAX_WAIT_TIME_NOT_SET = -1;
+
     private static final long serialVersionUID = 1L;
 
-    private final Stop fromStop;
+    private final TransferPoint from;
 
-    private final Route fromRoute;
+    private final TransferPoint to;
 
-    private final Trip fromTrip;
+    private final TransferPriority priority;
 
-    private final Stop toStop;
+    private final boolean staySeated;
 
-    private final Route toRoute;
+    private final boolean guaranteed;
 
-    private final Trip toTrip;
-
-    private final TransferType transferType;
-
-    private final int minTransferTimeSeconds;
-
-    public Transfer(Transfer obj) {
-        this.fromStop = obj.fromStop;
-        this.fromRoute = obj.fromRoute;
-        this.fromTrip = obj.fromTrip;
-        this.toStop = obj.toStop;
-        this.toRoute = obj.toRoute;
-        this.toTrip = obj.toTrip;
-        this.transferType = obj.transferType;
-        this.minTransferTimeSeconds = obj.minTransferTimeSeconds;
-    }
+    private final int maxWaitTime;
 
     public Transfer(
-            Stop fromStop,
-            Stop toStop,
-            Route fromRoute,
-            Route toRoute,
-            Trip fromTrip,
-            Trip toTrip,
-            TransferType transferType,
-            int minTransferTimeSeconds
+            TransferPoint from,
+            TransferPoint to,
+            TransferPriority priority,
+            boolean staySeated,
+            boolean guaranteed,
+            int maxWaitTime
     ) {
-        this.fromStop = fromStop;
-        this.toStop = toStop;
-        this.fromRoute = fromRoute;
-        this.toRoute = toRoute;
-        this.fromTrip = fromTrip;
-        this.toTrip = toTrip;
-        this.transferType = transferType;
-        this.minTransferTimeSeconds = minTransferTimeSeconds;
+        this.from = from;
+        this.to = to;
+        this.priority = priority;
+        this.staySeated = staySeated;
+        this.guaranteed = guaranteed;
+        this.maxWaitTime = maxWaitTime;
     }
 
-    public Stop getFromStop() {
-        return fromStop;
+    /**
+     * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
+     * transfers. This cost should not be mixed with the path generalized-cost.
+     *
+     * @param t The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
+     *          street generated transfer.
+     * @see TransferPriority#cost(boolean, boolean)
+     */
+    public static int priorityCost(@Nullable Transfer t) {
+        return t == null ? NEUTRAL_TRANSFER_COST : t.priority.cost(t.staySeated, t.guaranteed);
     }
 
-    public Route getFromRoute() {
-        return fromRoute;
+    public TransferPoint getFrom() {
+        return from;
     }
 
-    public Trip getFromTrip() {
-        return fromTrip;
+    public TransferPoint getTo() {
+        return to;
     }
 
-    public Stop getToStop() {
-        return toStop;
+    public TransferPriority getPriority() {
+        return priority;
     }
 
-    public Route getToRoute() {
-        return toRoute;
+    public boolean isStaySeated() {
+        return staySeated;
     }
 
-    public Trip getToTrip() {
-        return toTrip;
+    public boolean isGuaranteed() {
+        return guaranteed;
     }
 
-    public TransferType getTransferType() {
-        return transferType;
+    /**
+     * Maximum time after scheduled departure time the connecting transport is guarantied to wait
+     * for the delayed trip.
+     */
+    public int getMaxWaitTime() {
+        return maxWaitTime;
     }
 
-    public int getMinTransferTimeSeconds() {
-        return minTransferTimeSeconds;
+    /**
+     * <a href="https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
+     * Specificity of a transfer
+     * </a>
+     */
+    public int getSpecificityRanking() {
+        return from.getSpecificityRanking() + to.getSpecificityRanking();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(from, to, priority, staySeated, guaranteed);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (!(o instanceof Transfer)) { return false; }
+        final Transfer transfer = (Transfer) o;
+        return staySeated == transfer.staySeated
+                && guaranteed == transfer.guaranteed
+                && priority == transfer.priority
+                && Objects.equals(from, transfer.from)
+                && Objects.equals(to, transfer.to);
     }
 
     public String toString() {
-        return "<Transfer"
-                + toStrOpt(" stop=", fromStop, toStop)
-                + toStrOpt(" route=", fromRoute, toRoute)
-                + toStrOpt(" trip=", fromTrip, toTrip)
-                + ">";
+        return ToStringBuilder.of(Transfer.class)
+                .addObj("from", from)
+                .addObj("to", to)
+                .addEnum("priority", priority, ALLOWED)
+                .addDurationSec("maxWaitTime", maxWaitTime, MAX_WAIT_TIME_NOT_SET)
+                .addBoolIfTrue("staySeated", staySeated)
+                .addBoolIfTrue("guaranteed", guaranteed)
+                .toString();
     }
 
-    private static String toStrOpt(String lbl, TransitEntity arg1, TransitEntity arg2) {
-        return  (arg1 == null ? "" : (lbl + arg1.getId() + ".." + arg2.getId()));
+    public boolean noConstraints() {
+        boolean prioritySet = priority != ALLOWED;
+        boolean maxWaitTimeSet = maxWaitTime != MAX_WAIT_TIME_NOT_SET;
+        return !(staySeated || guaranteed || prioritySet || maxWaitTimeSet);
     }
 }

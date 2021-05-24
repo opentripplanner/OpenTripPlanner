@@ -1,15 +1,13 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
 
 /**
@@ -67,15 +65,9 @@ public class StreetBikeRentalLink extends Edge {
 
         StateEditor s1 = s0.edit(this);
         //assume bike rental stations are more-or-less on-street
-        s1.incrementTimeInSeconds(1);
         s1.incrementWeight(1);
         s1.setBackMode(s0.getNonTransitMode());
         return s1.makeState();
-    }
-
-    @Override
-    public double weightLowerBound(RoutingRequest options) {
-        return options.streetSubRequestModes.contains(TraverseMode.BICYCLE) ? 0 : Double.POSITIVE_INFINITY;
     }
 
     public Vertex getFromVertex() {

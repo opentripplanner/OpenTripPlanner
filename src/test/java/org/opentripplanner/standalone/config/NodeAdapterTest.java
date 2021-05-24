@@ -230,8 +230,11 @@ public class NodeAdapterTest {
 
     @Test
     public void uri() {
-        NodeAdapter subject  = newNodeAdapterForTest("{ aUri : 'gs://bucket/path/a.obj' }");
-        assertEquals("gs://bucket/path/a.obj",  subject.asUri("aUri", null).toString());
+        var URL = "gs://bucket/a.obj";
+        NodeAdapter subject  = newNodeAdapterForTest("{ aUri : '" + URL + "' }");
+
+        assertEquals(URL,  subject.asUri("aUri").toString());
+        assertEquals(URL,  subject.asUri("aUri", null).toString());
         assertEquals("http://foo.bar/", subject.asUri("missingField", "http://foo.bar/").toString());
         assertNull(subject.asUri("missingField", null));
     }
@@ -248,6 +251,20 @@ public class NodeAdapterTest {
         }
     }
 
+    @Test
+    public void uriRequiredValueMissing() {
+        NodeAdapter subject  = newNodeAdapterForTest("{ }");
+        try {
+            subject.asUri("aUri");
+            fail("Expected an exception");
+        }
+        catch (OtpAppException e) {
+            assertTrue(
+                    e.getMessage(),
+                    e.getMessage().contains("Required parameter 'aUri' not found in 'Test'")
+            );
+        }
+    }
 
     @Test
     public void uris() {

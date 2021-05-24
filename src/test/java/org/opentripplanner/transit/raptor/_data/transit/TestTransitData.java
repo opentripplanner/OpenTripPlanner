@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import lombok.val;
 import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -7,18 +12,13 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+@SuppressWarnings("UnusedReturnValue")
 public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule> {
 
   private final List<List<RaptorTransfer>> transfersByStop = new ArrayList<>();
-  private final List<Set<RaptorRoute<TestTripSchedule>>> routesByStop = new ArrayList<>();
+  private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
+  private final List<TestRoute> routes = new ArrayList<>();
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfers(int fromStop) {
@@ -57,18 +57,38 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
         .logger(logger);
   }
 
-  public TestTransitData add(int fromStop, TestTransfer transfer) {
-    expandNumOfStops(Math.max(fromStop, transfer.stop()));
-    transfersByStop.get(fromStop).add(transfer);
-    return this;
-  }
-
-  public TestTransitData add(TestRoute route) {
-    RaptorTripPattern pattern = route.pattern();
+  public TestTransitData withRoute(TestRoute route) {
+    this.routes.add(route);
+    var pattern = route.pattern();
     for(int i=0; i< pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
       expandNumOfStops(stopIndex);
       routesByStop.get(stopIndex).add(route);
+    }
+    return this;
+  }
+
+  public TestTransitData withRoutes(TestRoute ... routes) {
+    for (TestRoute route : routes) {
+      withRoute(route);
+    }
+    return this;
+  }
+
+  public TestTransitData withGuaranteedTransfers(
+          TestTripSchedule fromTrip, int fromStopPos,
+          TestTripSchedule toTrip, int toStopPos
+  ) {
+    for (TestRoute route : routes) {
+      for (int i = 0; i < route.timetable().numberOfTripSchedules(); i++) {
+        var trip = route.timetable().getTripSchedule(i);
+        if(fromTrip == trip) {
+          route.addGuaranteedTxFrom(trip, i, fromStopPos, toTrip, toStopPos);
+        }
+        if(toTrip == trip) {
+          route.addGuaranteedTxTo(fromTrip, fromStopPos, trip, i, toStopPos);
+        }
+      }
     }
     return this;
   }

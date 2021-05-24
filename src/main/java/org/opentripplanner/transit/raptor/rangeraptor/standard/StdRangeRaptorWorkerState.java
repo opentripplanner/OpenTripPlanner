@@ -1,16 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 
+import java.util.Collection;
+import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 
 /**
@@ -51,13 +51,13 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     /**
      * The calculator is used to calculate transit related times/events like access arrival time.
      */
-    private final TransitCalculator calculator;
+    private final TransitCalculator<T> calculator;
 
     /**
      * create a BestTimes Range Raptor State for given context.
      */
     public StdRangeRaptorWorkerState(
-            TransitCalculator calculator,
+            TransitCalculator<T> calculator,
             BestTimes bestTimes,
             StopArrivalsState<T> stopArrivalsState,
             ArrivedAtDestinationCheck arrivedAtDestinationCheck
@@ -136,18 +136,23 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
      * Set the time at a transit stop iff it is optimal. This sets both the bestTime and the transitTime.
      */
     @Override
-    public final void transitToStop(int stop, int alightTime, int boardStop, int boardTime, T trip) {
-        if (exceedsTimeLimit(alightTime)) {
+    public final void transitToStop(int stop, int arrivalTime, int boardStop, int boardTime, T trip) {
+        if (exceedsTimeLimit(arrivalTime)) {
             return;
         }
 
-        if (newTransitBestTime(stop, alightTime)) {
+        if (newTransitBestTime(stop, arrivalTime)) {
             // transitTimes upper bounds bestTimes
-            final boolean newBestOverall = newOverallBestTime(stop, alightTime);
-            stopArrivalsState.setNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime, newBestOverall);
+            final boolean newBestOverall = newOverallBestTime(stop, arrivalTime);
+            stopArrivalsState.setNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime, newBestOverall);
         } else {
-            stopArrivalsState.rejectNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime);
+            stopArrivalsState.rejectNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime);
         }
+    }
+
+    @Override
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        return stopArrivalsState.previousTransit(boardStopIndex);
     }
 
     /**

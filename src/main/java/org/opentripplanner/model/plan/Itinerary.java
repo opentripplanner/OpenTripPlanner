@@ -1,16 +1,15 @@
 package org.opentripplanner.model.plan;
 
 
-import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -74,10 +73,26 @@ public class Itinerary {
     public int generalizedCost = -1;
 
     /**
+     * This is the wait-time-adjusted-generalized-cost. The aim is to distribute wait-time and
+     * adding a high penalty on short transfers. Do not use this to compare or filter itineraries.
+     * The filtering on this parameter is done on paths, before mapping to itineraries and is
+     * provided here as reference information.
+     * <p>
+     * -1 indicate that the cost is not set/computed.
+     */
+    public int waitTimeAdjustedGeneralizedCost = -1;
+
+    /**
      * This itinerary has a greater slope than the user requested (but there are no possible
      * itineraries with a good slope).
      */
     public boolean tooSloped = false;
+
+    /**
+     * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedBicycleAtDestination}
+     * is set than it is possible to end a trip without dropping off the rented bicycle.
+     */
+    public boolean arrivedAtDestinationWithRentedBicycle = false;
 
      /** TRUE if mode is WALK from start ot end (all legs are walking). */
     public final boolean walkOnly;

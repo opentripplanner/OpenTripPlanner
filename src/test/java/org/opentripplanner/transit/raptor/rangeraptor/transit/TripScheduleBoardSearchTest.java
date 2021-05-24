@@ -1,16 +1,15 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
@@ -48,6 +47,10 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
     private final TestTripPattern pattern = TestTripPattern.pattern("R1", STOP_A, STOP_B);
 
+    private static final int TRIP_A = 0;
+    private static final int TRIP_B = 1;
+    private static final int TRIP_C = 2;
+
     // Route with trip A, B, C.
     private TestRoute route = TestRoute.route(pattern)
         .withTimetable(
@@ -57,8 +60,8 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
         );
 
     // Trips in service
-    private final TestTripSchedule tripA = route.timetable().getTripSchedule(LINE_11);
-    private final TestTripSchedule tripB = route.timetable().getTripSchedule(LINE_21);
+    private final TestTripSchedule tripA = route.timetable().getTripSchedule(TRIP_A);
+    private final TestTripSchedule tripB = route.timetable().getTripSchedule(TRIP_B);
 
     // The service under test - the subject
     private TripScheduleBoardSearch<TestTripSchedule> subject = new TripScheduleBoardSearch<>(
@@ -83,12 +86,12 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
     public void boardFirstTrip() {
         searchForTrip(TIME_0, STOP_POS_0)
                 .assertTripFound()
-                .withIndex(LINE_11)
+                .withIndex(TRIP_A)
                 .withBoardTime(TIME_A1);
 
         searchForTrip(TIME_0, STOP_POS_1)
                 .assertTripFound()
-                .withIndex(LINE_11)
+                .withIndex(TRIP_A)
                 .withBoardTime(TIME_A2);
     }
 
@@ -96,19 +99,19 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
     public void boardFirstTripWithTheMinimumPossibleSlack() {
         searchForTrip(TIME_A1, STOP_POS_0)
                 .assertTripFound()
-                .withIndex(LINE_11)
+                .withIndex(TRIP_A)
                 .withBoardTime(TIME_A1);
 
         // Assert board next trip for: time + 1 second
-        searchForTrip(TIME_A1+1, STOP_POS_0).assertTripFound().withIndex(LINE_21);
+        searchForTrip(TIME_A1+1, STOP_POS_0).assertTripFound().withIndex(TRIP_B);
 
         searchForTrip(TIME_A2, STOP_POS_1)
                 .assertTripFound()
-                .withIndex(LINE_11)
+                .withIndex(TRIP_A)
                 .withBoardTime(TIME_A2);
 
         // Assert board next trip for: time + 1 second
-        searchForTrip(TIME_A2+1, STOP_POS_1).assertTripFound().withIndex(LINE_21);
+        searchForTrip(TIME_A2+1, STOP_POS_1).assertTripFound().withIndex(TRIP_B);
     }
 
     @Test

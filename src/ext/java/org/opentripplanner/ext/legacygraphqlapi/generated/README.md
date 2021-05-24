@@ -18,3 +18,10 @@ yarn generate
 ```
 npx -p @graphql-codegen/add -p @graphql-codegen/cli -p @graphql-codegen/java -p @graphql-codegen/java-resolvers -p graphql graphql-codegen -c graphql-codegen.yml 
 ```
+
+## Changelog
+
+### 2.1.0
+- Added ids parameter to bikeRentalStations query (https://github.com/opentripplanner/OpenTripPlanner/pull/3450)
+- Added capacity and allowOverloading fields to bike rental stations (not yet properly implemented) (https://github.com/opentripplanner/OpenTripPlanner/pull/3450)
+- Updated documentation and process for generating Java code from GraphQL schema definition (https://github.com/opentripplanner/OpenTripPlanner/pull/3450)

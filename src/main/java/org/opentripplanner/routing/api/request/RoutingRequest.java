@@ -2,7 +2,22 @@ package org.opentripplanner.routing.api.request;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import javax.annotation.Nonnull;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -15,11 +30,11 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -34,22 +49,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
@@ -69,17 +68,11 @@ import java.util.TimeZone;
  *           class, but we want to keep it in the RoutingResource as long as we support the
  *           REST API.
  */
-public class RoutingRequest implements Cloneable, Serializable {
+public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
-
-    /**
-     * The model that computes turn/traversal costs.
-     * TODO: move this to the Router or the Graph if it doesn't clutter the code too much
-     */
-    public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -333,6 +326,22 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     @Deprecated
     public int nonpreferredTransferCost = 180;
+
+
+    /** Configure the transfer optimization */
+    public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest(this);
+
+    /**
+     * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add
+     * a penalty to other modes (> 1.0). The type used here it the internal model
+     * {@link TransitMode} make sure to create a mapping for this before using it on the API.
+     * <p>
+     * If set, the alight-slack-for-mode override the default value {@code 1.0}.
+     * <p>
+     * This is a scalar multiplied with the time in second on board the transit vehicle. Default
+     * value is not-set(empty map).
+     */
+    private Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
@@ -595,10 +604,20 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useBikeRentalAvailabilityInformation = false;
 
     /**
-     * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
-     * driving occurs on the left.
+     * Whether arriving at the destination with a rented (station) bicycle is allowed without
+     * dropping it off.
+     *
+     * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
+     * @see org.opentripplanner.routing.bike_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
      */
-    public boolean driveOnRight = true;
+    public boolean allowKeepingRentedBicycleAtDestination = false;
+
+    /**
+     * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
+     *
+     * @see RoutingRequest#allowKeepingRentedBicycleAtDestination
+     */
+    public double keepingRentedBicycleAtDestinationCost = 0;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.
@@ -823,17 +842,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    /**
-     * only allow traversal by the specified mode; don't allow walking bikes. This is used during contraction to reduce the number of possible paths.
-     */
-    public void freezeTraverseMode() {
-        bikeWalkingOptions = clone();
-        bikeWalkingOptions.bikeWalkingOptions = new RoutingRequest(new TraverseModeSet());
+    public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
+        transitReluctanceForMode.clear();
+        transitReluctanceForMode.putAll(reluctanceForMode);
     }
 
-    /** Returns the model that computes the cost of intersection traversal. */
-    public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-        return traversalCostModel;
+    public Map<TransitMode, Double> transitReluctanceForMode() {
+        return Collections.unmodifiableMap(transitReluctanceForMode);
     }
 
     /** @return the (soft) maximum walk distance */
@@ -1085,6 +1100,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (streetMode != null) {
             switch (streetMode) {
                 case WALK:
+                case FLEXIBLE:
                     streetRequest.streetSubRequestModes.setWalk(true);
                     break;
                 case BIKE:
@@ -1242,6 +1258,11 @@ public class RoutingRequest implements Cloneable, Serializable {
             rctx.destroy();
             LOG.debug("routing context destroyed");
         }
+    }
+
+    @Override
+    public void close() {
+        cleanup();
     }
 
     /**
@@ -1436,7 +1457,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * @see RoutingRequest#isCloseToStartOrEnd(Vertex)
      * @see DominanceFunction#betterOrEqualAndComparable(State, State)
      */
-    private final int MAX_CLOSENESS_METERS = 500;
+    private static final int MAX_CLOSENESS_METERS = 500;
     private Envelope fromEnvelope;
     private Envelope toEnvelope;
 
@@ -1494,5 +1515,18 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
 
         return env;
+    }
+
+    /**
+     * This method is needed because we sometimes traverse edges with no graph. It returns a
+     * default intersection traversal model if no graph is present.
+     */
+    public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
+        if (this.rctx != null && this.rctx.graph != null) {
+            return this.rctx.graph.getIntersectionTraversalModel();
+        } else {
+            // This is only to maintain compatibility with existing tests
+            return Graph.DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
+        }
     }
 }

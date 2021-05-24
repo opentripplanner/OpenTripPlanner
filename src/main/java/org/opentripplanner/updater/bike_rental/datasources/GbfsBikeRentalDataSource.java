@@ -23,11 +23,6 @@ import java.util.Set;
 /**
  * Created by demory on 2017-03-14.
  *
- * Be aware that there are problems with the floating bike support. It therefore has to be
- * explicitly turned on by using OTPFeature.FloatingBike. Use at your own risk.
- *
- * See https://github.com/opentripplanner/OpenTripPlanner/issues/3316
- *
  * Leaving OTPFeature.FloatingBike turned off both prevents floating bike updaters added to
  * router-config.json from being used, but more importantly, floating bikes added by a
  * BikeRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be used.
@@ -35,8 +30,6 @@ import java.util.Set;
 class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
-
-    private static final String AUTO_DISCOVERY_FILENAME = "gbfs";
 
     private static final String DEFAULT_NETWORK_NAME = "GBFS";
 
@@ -67,27 +60,12 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
     }
 
     private void configureUrls(String url) {
-        String baseUrl = getBaseUrl(url);
-        GbfsAutoDiscoveryDataSource gbfsAutoDiscoveryDataSource = new GbfsAutoDiscoveryDataSource(baseUrl);
+        GbfsAutoDiscoveryDataSource gbfsAutoDiscoveryDataSource = new GbfsAutoDiscoveryDataSource(url);
         stationInformationSource.setUrl(gbfsAutoDiscoveryDataSource.stationInformationUrl);
         stationStatusSource.setUrl(gbfsAutoDiscoveryDataSource.stationStatusUrl);
         if (OTPFeature.FloatingBike.isOn()) {
             floatingBikeSource.setUrl(gbfsAutoDiscoveryDataSource.freeBikeStatusUrl);
         }
-    }
-
-    private String getBaseUrl(String url) {
-        String baseUrl = url;
-        if (baseUrl.endsWith("gbfs.json")) {
-            baseUrl = baseUrl.substring(0, url.length() - "gbfs.json".length());
-        }
-        if (baseUrl.endsWith("gbfs")) {
-            baseUrl = baseUrl.substring(0, url.length() - "gbfs".length());
-        }
-        if (!baseUrl.endsWith("/")) {
-            baseUrl += "/";
-        }
-        return baseUrl;
     }
 
     @Override
@@ -138,8 +116,7 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         private String stationStatusUrl;
         private String freeBikeStatusUrl;
 
-        public GbfsAutoDiscoveryDataSource(String baseUrl) {
-            String autoDiscoveryUrl = baseUrl + AUTO_DISCOVERY_FILENAME;
+        public GbfsAutoDiscoveryDataSource(String autoDiscoveryUrl) {
 
             try {
                 InputStream is = HttpUtils.getData(autoDiscoveryUrl);
@@ -168,14 +145,31 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
             } catch (IOException | IllegalArgumentException e) {
                 LOG.warn("Error reading auto discovery file at {}. Using default values.",
                     autoDiscoveryUrl, e);
+                // If the GBFS auto-discovery file (gbfs.json) can't be downloaded, fall back to the
+                // v1 logic of finding the files under the given base path.
+                var baseUrl = getBaseUrl(autoDiscoveryUrl);
                 stationInformationUrl = baseUrl + "station_information.json";
                 stationStatusUrl = baseUrl + "station_status.json";
                 freeBikeStatusUrl = baseUrl + "free_bike_status.json";
             }
         }
+
+        private String getBaseUrl(String url) {
+            String baseUrl = url;
+            if (baseUrl.endsWith("gbfs.json")) {
+                baseUrl = baseUrl.substring(0, url.length() - "gbfs.json".length());
+            }
+            if (baseUrl.endsWith("gbfs")) {
+                baseUrl = baseUrl.substring(0, url.length() - "gbfs".length());
+            }
+            if (!baseUrl.endsWith("/")) {
+                baseUrl += "/";
+            }
+            return baseUrl;
+        }
     }
 
-    class GbfsStationDataSource extends GenericJsonBikeRentalDataSource {
+    class GbfsStationDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
 
         public GbfsStationDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/stations");
@@ -188,12 +182,13 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
             brstation.x = stationNode.path("lon").asDouble();
             brstation.y = stationNode.path("lat").asDouble();
             brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
+            brstation.isKeepingBicycleRentalAtDestinationAllowed = config.allowKeepingRentedBicycleAtDestination();
             brstation.isCarStation = routeAsCar;
             return brstation;
         }
     }
 
-    class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource {
+    class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
 
         public GbfsStationStatusDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/stations");
@@ -205,13 +200,14 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
             brstation.id = stationNode.path("station_id").asText();
             brstation.bikesAvailable = stationNode.path("num_bikes_available").asInt();
             brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
+            brstation.isKeepingBicycleRentalAtDestinationAllowed = config.allowKeepingRentedBicycleAtDestination();
             brstation.isCarStation = routeAsCar;
             return brstation;
         }
     }
 
     // TODO This is not currently safe to use. See javadoc on GbfsBikeRentalDataSource class.
-    class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
+    class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
 
         public GbfsFloatingBikeDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/bikes");
@@ -219,17 +215,24 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
         @Override
         public BikeRentalStation makeStation(JsonNode stationNode) {
-            BikeRentalStation brstation = new BikeRentalStation();
-            brstation.id = stationNode.path("bike_id").asText();
-            brstation.name = new NonLocalizedString(stationNode.path("name").asText());
-            brstation.x = stationNode.path("lon").asDouble();
-            brstation.y = stationNode.path("lat").asDouble();
-            brstation.bikesAvailable = 1;
-            brstation.spacesAvailable = 0;
-            brstation.allowDropoff = false;
-            brstation.isFloatingBike = true;
-            brstation.isCarStation = routeAsCar;
-            return brstation;
+            if (stationNode.path("station_id").asText().isBlank() &&
+                    stationNode.has("lon") &&
+                    stationNode.has("lat")
+            ) {
+                BikeRentalStation brstation = new BikeRentalStation();
+                brstation.id = stationNode.path("bike_id").asText();
+                brstation.name = new NonLocalizedString(stationNode.path("name").asText());
+                brstation.x = stationNode.path("lon").asDouble();
+                brstation.y = stationNode.path("lat").asDouble();
+                brstation.bikesAvailable = 1;
+                brstation.spacesAvailable = 0;
+                brstation.allowDropoff = false;
+                brstation.isFloatingBike = true;
+                brstation.isCarStation = routeAsCar;
+                return brstation;
+            } else {
+                return null;
+            }
         }
     }
 

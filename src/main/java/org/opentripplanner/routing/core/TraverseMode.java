@@ -28,6 +28,10 @@ public enum TraverseMode {
         return this == CAR;
     }
 
+    public boolean isCycling() {
+        return this == BICYCLE;
+    }
+
     public boolean isWalking() {
         return this == WALK;
     }

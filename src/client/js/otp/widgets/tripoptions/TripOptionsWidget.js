@@ -453,7 +453,7 @@ otp.widgets.tripoptions.WheelChairSelector =
     isApplicableForMode : function(mode) {
         //wheelchair mode is shown on transit and walk trips that
         //doesn't include a bicycle
-        return (otp.util.Itin.includesTransit(mode)  || mode == "WALK") && !otp.util.Itin.includesBicycle(mode);
+        return (otp.util.Itin.includesTransit(mode) || mode === "WALK") && !otp.util.Itin.includesAnyBicycle(mode);
     }
 });
 
@@ -690,7 +690,7 @@ otp.widgets.tripoptions.MaxWalkSelector =
     },
 
     isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
+        return otp.util.Itin.includesWalk(mode) && !otp.util.Itin.includesAnyBicycle(mode) && !otp.util.Itin.includesAnyCar(mode);
     },
 
 });
@@ -713,10 +713,31 @@ otp.widgets.tripoptions.MaxBikeSelector =
     },
 
     isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesBicycle(mode);
+        return otp.util.Itin.includesAnyBicycle(mode);
     },
-
 });
+
+otp.widgets.tripoptions.MaxCarSelector =
+    otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
+
+        // miles (1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 100)
+        imperialPresets: [1609.34, 3218.68, 4828.0199999999995, 6437.36, 8046.7, 16093.4, 24140.1, 32186.8, 48280.2, 64373.6, 160934],
+
+        // meters
+        metricPresets      : [1_000, 1_500, 2_500, 5_000, 7_500, 10_000, 50_000, 100_000],
+
+        //TRANSLATORS: label for choosing how much should person's trip on bicycle be
+        label       : _tr("Maximum car")+":",
+
+        initialize : function(tripWidget) {
+            this.id = tripWidget.id+"-maxCarSelector";
+            otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
+        },
+
+        isApplicableForMode : function(mode) {
+            return otp.util.Itin.includesAnyCar(mode);
+        },
+    });
 
 //** PreferredRoutes **//
 
@@ -1025,7 +1046,7 @@ otp.widgets.tripoptions.BikeType =
     },
 
     isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesBicycle(mode) && otp.util.Itin.includesWalk(mode);
+        return otp.util.Itin.includesAnyBicycle(mode) && otp.util.Itin.includesWalk(mode);
     }
 
 });
