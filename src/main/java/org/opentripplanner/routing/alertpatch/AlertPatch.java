@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Consumer;
 
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.api.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -32,6 +32,8 @@ public class AlertPatch implements Serializable {
 
     private static final long serialVersionUID = 20140319L;
 
+    public static final int MISSING_INT_FIELD_VALUE = -1;
+
     private String id;
 
     private Alert alert;
@@ -47,11 +49,6 @@ public class AlertPatch implements Serializable {
     private FeedScopedId stop;
 
     /**
-     * The headsign of the alert
-     */
-    private String direction;
-
-    /**
      * The id of the feed this patch is intended for.
      */
     private String feedId;
@@ -59,7 +56,12 @@ public class AlertPatch implements Serializable {
     /**
      * Direction id of the GTFS trips this alert concerns, set to -1 if no direction.
      */
-    private int directionId = -1;
+    private int directionId = MISSING_INT_FIELD_VALUE;
+
+    /**
+     * Route type of the route(s) this alert concerns, set to -1 if no route type.
+     */
+    private int routeType = MISSING_INT_FIELD_VALUE;
 
     public Alert getAlert() {
         return alert;
@@ -84,7 +86,7 @@ public class AlertPatch implements Serializable {
         this.id = id;
     }
 
-    public void apply(Graph graph) {
+    public void applyOrRemove(Graph graph, Consumer<Edge> applyOrRemoveFn) {
         Agency agency = null;
         if (feedId != null) {
             Map<String, Agency> agencies = graph.index.agenciesForFeedId.get(feedId);
@@ -94,7 +96,7 @@ public class AlertPatch implements Serializable {
         Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
 
-        if (route != null || trip != null || agency != null) {
+        if (route != null || trip != null || agency != null || hasRouteType()) {
             Collection<TripPattern> tripPatterns = null;
 
             if (trip != null) {
@@ -104,7 +106,7 @@ public class AlertPatch implements Serializable {
                     tripPatterns.add(tripPattern);
                 }
             } else if (route != null) {
-               tripPatterns = graph.index.patternsForRoute.get(route);
+                tripPatterns = graph.index.patternsForRoute.get(route);
             } else {
                 // Find patterns for the feed.
                 tripPatterns = graph.index.patternsForFeedId.get(feedId);
@@ -112,16 +114,13 @@ public class AlertPatch implements Serializable {
 
             if (tripPatterns != null) {
                 for (TripPattern tripPattern : tripPatterns) {
-                    if (direction != null && !direction.equals(tripPattern.getDirection())) {
-                        continue;
-                    }
-                    if (directionId != -1 && directionId == tripPattern.directionId) {
+                    if (isNotApplicableTripPattern(tripPattern, agency)) {
                         continue;
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                            graph.addAlertPatch(tripPattern.boardEdges[i], this);
-                            graph.addAlertPatch(tripPattern.alightEdges[i], this);
+                            applyOrRemoveFn.accept(tripPattern.boardEdges[i]);
+                            applyOrRemoveFn.accept(tripPattern.alightEdges[i]);
                         }
                     }
                 }
@@ -131,79 +130,38 @@ public class AlertPatch implements Serializable {
 
             for (Edge edge : transitStop.getOutgoing()) {
                 if (edge instanceof PreBoardEdge) {
-                    graph.addAlertPatch(edge, this);
+                    applyOrRemoveFn.accept(edge);
                     break;
                 }
             }
 
             for (Edge edge : transitStop.getIncoming()) {
                 if (edge instanceof PreAlightEdge) {
-                    graph.addAlertPatch(edge, this);
+                    applyOrRemoveFn.accept(edge);
                     break;
                 }
             }
         }
     }
 
+    public void apply(Graph graph) {
+        applyOrRemove(graph, (Edge e) -> graph.addAlertPatch(e, this));
+    }
+
     public void remove(Graph graph) {
-        Agency agency = null;
-        if (feedId != null) {
-            Map<String, Agency> agencies = graph.index.agenciesForFeedId.get(feedId);
-            agency = this.agency != null ? agencies.get(this.agency) : null;
-        }
-        Route route = this.route != null ? graph.index.routeForId.get(this.route) : null;
-        Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
-        Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
+        applyOrRemove(graph, (Edge e) -> graph.removeAlertPatch(e, this));
+    }
 
-        if (route != null || trip != null || agency != null) {
-            Collection<TripPattern> tripPatterns = null;
-
-            if(trip != null) {
-                tripPatterns = new LinkedList<TripPattern>();
-                TripPattern tripPattern = graph.index.patternForTrip.get(trip);
-                if(tripPattern != null) {
-                    tripPatterns.add(tripPattern);
-                }
-            } else if (route != null) {
-               tripPatterns = graph.index.patternsForRoute.get(route);
-            } else {
-                // Find patterns for the feed.
-                tripPatterns = graph.index.patternsForFeedId.get(feedId);
-            }
-
-            if (tripPatterns != null) {
-                for (TripPattern tripPattern : tripPatterns) {
-                    if (direction != null && !direction.equals(tripPattern.getDirection())) {
-                        continue;
-                    }
-                    if (directionId != -1 && directionId != tripPattern.directionId) {
-                        continue;
-                    }
-                    for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
-                        if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                            graph.removeAlertPatch(tripPattern.boardEdges[i], this);
-                            graph.removeAlertPatch(tripPattern.alightEdges[i], this);
-                        }
-                    }
-                }
-            }
-        } else if (stop != null) {
-            TransitStop transitStop = graph.index.stopVertexForStop.get(stop);
-
-            for (Edge edge : transitStop.getOutgoing()) {
-                if (edge instanceof PreBoardEdge) {
-                    graph.removeAlertPatch(edge, this);
-                    break;
-                }
-            }
-
-            for (Edge edge : transitStop.getIncoming()) {
-                if (edge instanceof PreAlightEdge) {
-                    graph.removeAlertPatch(edge, this);
-                    break;
-                }
-            }
-        }
+    /**
+     * Returns true if the trip pattern would NOT be affected by this alert patch.
+     */
+    private boolean isNotApplicableTripPattern(TripPattern tripPattern, Agency alertAgency) {
+        // make sure direction ID matches
+        return (hasDirectionId() && directionId != tripPattern.directionId) ||
+            // make sure route type matches
+            (hasRouteType() && routeType != tripPattern.route.getType()) ||
+            // make sure agency matches
+            (alertAgency != null && !tripPattern.route.getAgency().equals(alertAgency));
     }
 
     public void setAlert(Alert alert) {
@@ -249,23 +207,16 @@ public class AlertPatch implements Serializable {
         this.trip = trip;
     }
 
-    public void setDirection(String direction) {
-        if (direction != null && direction.equals("")) {
-            direction = null;
-        }
-        this.direction = direction;
-    }
-
     public void setDirectionId(int direction) {
         this.directionId = direction;
     }
 
-    public String getDirection() {
-        return direction;
-    }
-
     public int getDirectionId() {
         return directionId;
+    }
+
+    public boolean hasDirectionId() {
+        return directionId != MISSING_INT_FIELD_VALUE;
     }
 
     public void setStop(FeedScopedId stop) {
@@ -284,20 +235,17 @@ public class AlertPatch implements Serializable {
         return trip != null;
     }
 
+    public void setRouteType(int routeType) { this.routeType = routeType; }
+
+    public boolean hasRouteType() { return routeType != MISSING_INT_FIELD_VALUE; }
+
+    public int getRouteType() { return routeType; }
+
     public boolean equals(Object o) {
         if (!(o instanceof AlertPatch)) {
             return false;
         }
         AlertPatch other = (AlertPatch) o;
-        if (direction == null) {
-            if (other.direction != null) {
-                return false;
-            }
-        } else {
-            if (!direction.equals(other.direction)) {
-                return false;
-            }
-        }
         if (directionId != other.directionId) {
             return false;
         }
@@ -373,17 +321,20 @@ public class AlertPatch implements Serializable {
                 return false;
             }
         }
+        if (routeType != other.routeType) {
+            return false;
+        }
         return true;
     }
 
     public int hashCode() {
-        return ((direction == null ? 0 : direction.hashCode()) +
-                directionId +
-                (agency == null ? 0 : agency.hashCode()) +
-                (trip == null ? 0 : trip.hashCode()) +
-                (stop == null ? 0 : stop.hashCode()) +
-                (route == null ? 0 : route.hashCode()) +
-                (alert == null ? 0 : alert.hashCode()) +
-                (feedId == null ? 0 : feedId.hashCode()));
+        return directionId +
+            (agency == null ? 0 : agency.hashCode()) +
+            (trip == null ? 0 : trip.hashCode()) +
+            (stop == null ? 0 : stop.hashCode()) +
+            (route == null ? 0 : route.hashCode()) +
+            routeType +
+            (alert == null ? 0 : alert.hashCode()) +
+            (feedId == null ? 0 : feedId.hashCode());
     }
 }

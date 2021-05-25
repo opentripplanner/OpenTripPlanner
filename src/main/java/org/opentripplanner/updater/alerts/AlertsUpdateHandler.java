@@ -20,6 +20,8 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TimeRange;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 
+import static org.opentripplanner.routing.alertpatch.AlertPatch.MISSING_INT_FIELD_VALUE;
+
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.
  * @author novalis
@@ -70,7 +72,7 @@ public class AlertsUpdateHandler {
                     bestStartTime = realStart;
                 }
                 final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : Long.MAX_VALUE;
-                if (end > lastEndTime) {
+                if (end < Long.MAX_VALUE && end > lastEndTime) {
                     lastEndTime = end;
                 }
                 periods.add(new TimePeriod(start, end));
@@ -97,14 +99,15 @@ public class AlertsUpdateHandler {
                 routeId = informed.getRouteId();
             }
 
-            int direction;
+            int directionId;
             if (informed.hasTrip() && informed.getTrip().hasDirectionId()) {
-                direction = informed.getTrip().getDirectionId();
+                directionId = informed.getTrip().getDirectionId();
+            } else if (informed.hasDirectionId()) {
+                directionId = informed.getDirectionId();
             } else {
-                direction = -1;
+                directionId = MISSING_INT_FIELD_VALUE;
             }
 
-            // TODO: The other elements of a TripDescriptor are ignored...
             String tripId = null;
             if (informed.hasTrip() && informed.getTrip().hasTripId()) {
                 tripId = informed.getTrip().getTripId();
@@ -119,13 +122,15 @@ public class AlertsUpdateHandler {
                 agencyId = informed.getAgencyId().intern();
             }
 
+            int routeType = informed.hasRouteType() ? informed.getRouteType() : MISSING_INT_FIELD_VALUE;
+
             AlertPatch patch = new AlertPatch();
             patch.setFeedId(feedId);
             if (routeId != null) {
                 patch.setRoute(new FeedScopedId(feedId, routeId));
                 // Makes no sense to set direction if we don't have a route
-                if (direction != -1) {
-                    patch.setDirectionId(direction);
+                if (directionId != MISSING_INT_FIELD_VALUE) {
+                    patch.setDirectionId(directionId);
                 }
             }
             if (tripId != null) {
@@ -136,6 +141,9 @@ public class AlertsUpdateHandler {
             }
             if (agencyId != null && routeId == null && tripId == null && stopId == null) {
                 patch.setAgencyId(agencyId);
+            }
+            if (routeType != MISSING_INT_FIELD_VALUE) {
+                patch.setRouteType(routeType);
             }
             patch.setTimePeriods(periods);
             patch.setAlert(alertText);
@@ -148,15 +156,20 @@ public class AlertsUpdateHandler {
     }
 
     private String createId(String id, EntitySelector informed) {
-        return id + " "
-            + (informed.hasAgencyId  () ? informed.getAgencyId  () : " null ") + " "
-            + (informed.hasRouteId   () ? informed.getRouteId   () : " null ") + " "
-            + (informed.hasTrip() && informed.getTrip().hasDirectionId() ?
-                informed.getTrip().hasDirectionId() : " null ") + " "
-            + (informed.hasRouteType () ? informed.getRouteType () : " null ") + " "
-            + (informed.hasStopId    () ? informed.getStopId    () : " null ") + " "
-            + (informed.hasTrip() && informed.getTrip().hasTripId() ?
-                informed.getTrip().getTripId() : " null ");
+        return String.join(
+            " ",
+            id,
+            (informed.hasAgencyId() ? informed.getAgencyId() : " null "),
+            (informed.hasRouteId() ? informed.getRouteId() : " null "),
+            (informed.hasDirectionId() ? String.valueOf(informed.getDirectionId()) : " null "),
+            (informed.hasTrip() && informed.getTrip().hasDirectionId()
+                ? String.valueOf(informed.getTrip().getDirectionId())
+                : " null "),
+            (informed.hasTrip() && informed.getTrip().hasRouteId() ? informed.getTrip().getRouteId() : " null "),
+            (informed.hasRouteType() ? String.valueOf(informed.getRouteType()) : " null "),
+            (informed.hasStopId() ? informed.getStopId() : " null "),
+            (informed.hasTrip() && informed.getTrip().hasTripId() ? informed.getTrip().getTripId() : " null ")
+        );
     }
 
     /**

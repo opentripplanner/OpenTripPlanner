@@ -230,7 +230,11 @@ public class TimetableSnapshotSource {
                     case CANCELED:
                         applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                         break;
-                    case MODIFIED:
+                    // Note (as of 2021-05-14): this was previously MODIFIED, but is now changed to REPLACEMENT after
+                    // updating to the latest GTFS-RT bindings. Both the MODIFIED and REPLACEMENT enums seem to have the
+                    // same underlying values, so this should still work. It might only be applicable to some GTFS-RT
+                    // feeds used in the Netherlands.
+                    case REPLACEMENT:
                         applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
                         break;
                 }
@@ -297,7 +301,11 @@ public class TimetableSnapshotSource {
 
             // If stops are modified, handle trip update like a modified trip
             if (hasModifiedStops) {
-                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.MODIFIED;
+                // Note (as of 2021-05-14): this was previously MODIFIED, but is now changed to REPLACEMENT after
+                // updating to the latest GTFS-RT bindings. Both the MODIFIED and REPLACEMENT enums seem to have the
+                // same underlying values, so this should still work. It might only be applicable to some GTFS-RT feeds
+                // used in the Netherlands.
+                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.REPLACEMENT;
             }
         }
 

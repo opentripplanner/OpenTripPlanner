@@ -334,7 +334,11 @@ public class TimetableSnapshotSourceTest {
             final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
             tripDescriptorBuilder.setTripId(modifiedTripId);
-            tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.MODIFIED);
+            // Note (as of 2021-05-14): this was previously MODIFIED, but is now changed to REPLACEMENT after updating
+            // to the latest GTFS-RT bindings. Both the MODIFIED and REPLACEMENT enums seem to have the same underlying
+            // values, so this should still work. It might only be applicable to some GTFS-RT feeds used in the
+            // Netherlands.
+            tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.REPLACEMENT);
             tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
 
             final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
@@ -425,7 +429,7 @@ public class TimetableSnapshotSourceTest {
 
         // WHEN
         updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
-        
+
         // THEN
         final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
 
