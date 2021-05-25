@@ -10,6 +10,14 @@ public class VehicleParkingWithEntrance {
     private final VehicleParkingEntrance entrance;
 
     /**
+     * True if the difference of visiting time for a  {@link org.opentripplanner.routing.vehicle_parking.VehicleParking
+     * VehicleParking} and the closing time is inside the request's {@link
+     * org.opentripplanner.routing.api.request.RoutingRequest#vehicleParkingClosesSoonSeconds
+     * RoutingRequest#vehicleParkingClosesSoonSeconds} interval.
+     */
+    public final boolean closesSoon;
+
+    /**
      * Was realtime data used when parking at this VehicleParking.
      */
     private final boolean realtime;
@@ -17,10 +25,12 @@ public class VehicleParkingWithEntrance {
     VehicleParkingWithEntrance(
             VehicleParking vehicleParking,
             VehicleParkingEntrance entrance,
+            boolean closesSoon,
             boolean realtime
     ) {
         this.vehicleParking = vehicleParking;
         this.entrance = entrance;
+        this.closesSoon = closesSoon;
         this.realtime = realtime;
     }
 
@@ -30,6 +40,10 @@ public class VehicleParkingWithEntrance {
 
     public VehicleParkingEntrance getEntrance() {
         return this.entrance;
+    }
+
+    public boolean isClosesSoon() {
+        return closesSoon;
     }
 
     public boolean isRealtime() {
@@ -44,6 +58,7 @@ public class VehicleParkingWithEntrance {
 
         private VehicleParking vehicleParking;
         private VehicleParkingEntrance entrance;
+        private boolean closesSoon;
         private boolean realtime;
 
         VehicleParkingWithEntranceBuilder() {}
@@ -62,6 +77,13 @@ public class VehicleParkingWithEntrance {
             return this;
         }
 
+        public VehicleParkingWithEntranceBuilder closesSoon(
+                boolean closesSoon
+        ) {
+            this.closesSoon = closesSoon;
+            return this;
+        }
+
         public VehicleParkingWithEntranceBuilder realtime(
                 boolean realtime
         ) {
@@ -70,7 +92,7 @@ public class VehicleParkingWithEntrance {
         }
 
         public VehicleParkingWithEntrance build() {
-            return new VehicleParkingWithEntrance(vehicleParking, entrance, realtime);
+            return new VehicleParkingWithEntrance(vehicleParking, entrance, closesSoon, realtime);
         }
     }
 }

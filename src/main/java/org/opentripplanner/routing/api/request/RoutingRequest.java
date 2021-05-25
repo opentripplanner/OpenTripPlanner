@@ -404,6 +404,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public boolean useVehicleParkingOpeningHours = true;
 
     /**
+     * If the visiting time for a {@link org.opentripplanner.routing.vehicle_parking.VehicleParking VehicleParking}
+     * is inside this interval, then the {@link org.opentripplanner.api.model.ApiVehicleParkingWithEntrance#closesSoon ApiVehicleParkingWithEntrance#closesSoon}
+     * flag will be marked true. Defaults to 30 minutes.
+     */
+    public int vehicleParkingClosesSoonSeconds = 30 * 60;
+
+    /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)
      */

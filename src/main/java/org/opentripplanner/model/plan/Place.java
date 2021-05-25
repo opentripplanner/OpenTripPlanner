@@ -206,7 +206,12 @@ public class Place {
         );
     }
 
-    public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, String name, RoutingRequest request) {
+    public static Place forVehicleParkingEntrance(
+            VehicleParkingEntranceVertex vertex,
+            String name,
+            boolean closesSoon,
+            RoutingRequest request
+    ) {
         TraverseMode traverseMode = null;
         if (request.streetSubRequestModes.getCar()) {
             traverseMode = TraverseMode.CAR;
@@ -228,6 +233,7 @@ public class Place {
                 VehicleParkingWithEntrance.builder()
                         .vehicleParking(vertex.getVehicleParking())
                         .entrance(vertex.getParkingEntrance())
+                        .closesSoon(closesSoon)
                         .realtime(realTime)
                         .build()
         );
