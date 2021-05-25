@@ -417,7 +417,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /**
      * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply
      * negative running or dwell times. We really don't want those being used in routing.
-     * This method check that all times are increasing, and logs errors if this is not the case.
+     * This method check that all times are increasing, and logs warnings if this is not the case.
      * @return whether the times were found to be increasing.
      */
     public boolean timesIncreasing() {
@@ -428,11 +428,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             final int dep = getDepartureTime(s);
 
             if (dep < arr) {
-                LOG.error("Negative dwell time in TripTimes at stop index {}.", s);
+                LOG.warn("Negative dwell time in TripTimes at stop index {}.", s);
                 return false;
             }
             if (prevDep > arr) {
-                LOG.error("Negative running time in TripTimes after stop index {}.", s);
+                LOG.warn("Negative running time in TripTimes after stop index {}.", s);
                 return false;
             }
             prevDep = dep;
