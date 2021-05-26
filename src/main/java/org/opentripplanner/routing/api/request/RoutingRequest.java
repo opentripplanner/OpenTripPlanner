@@ -106,16 +106,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public List<GenericLocation> intermediatePlaces;
 
     /**
-     * The maximum distance (in meters) the user is willing to walk for access/egress legs.
-     * Defaults to unlimited.
      *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-     *                       old functionality the same way, but we will try to map this parameter
-     *                       so it does work similar as before.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
-    @Deprecated
-    public double maxWalkDistance = Double.MAX_VALUE;
 
     /**
      * The maximum distance (in meters) the user is willing to walk for transfer legs.
@@ -810,7 +802,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             // walking alongside the bike. FIXME why are we only copying certain fields instead of cloning the request?
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.arriveBy);
-            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
             bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
@@ -825,7 +816,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         } else if (streetSubRequestModes.getCar()) {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.arriveBy);
-            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.streetSubRequestModes = streetSubRequestModes.clone();
             bikeWalkingOptions.streetSubRequestModes.setBicycle(false);
@@ -849,17 +839,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public Map<TransitMode, Double> transitReluctanceForMode() {
         return Collections.unmodifiableMap(transitReluctanceForMode);
-    }
-
-    /** @return the (soft) maximum walk distance */
-    // If transit is not to be used and this is a point to point search
-    // or one with soft walk limiting, disable walk limit.
-    public double getMaxWalkDistance() {
-        if (streetSubRequestModes.isTransit()) {
-            return maxWalkDistance;
-        } else {
-            return Double.MAX_VALUE;
-        }
     }
 
     public void setWalkBoardCost(int walkBoardCost) {
@@ -1032,7 +1011,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     public String toString(String sep) {
-        return from + sep + to + sep + getMaxWalkDistance() + sep + getDateTime() + sep
+        return from + sep + to + sep + getDateTime() + sep
                 + arriveBy + sep + optimize + sep + streetSubRequestModes.getAsStr() + sep
                 + getNumItineraries();
     }
@@ -1293,13 +1272,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             return bikeSpeed;
         }
         return walkSpeed;
-    }
-
-    public void setMaxWalkDistance(double maxWalkDistance) {
-        if (maxWalkDistance > 0) {
-            this.maxWalkDistance = maxWalkDistance;
-            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
-        }
     }
 
     public void setMaxPreTransitTime(int maxPreTransitTime) {

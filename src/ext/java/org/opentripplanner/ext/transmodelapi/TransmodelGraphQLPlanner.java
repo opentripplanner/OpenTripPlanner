@@ -108,7 +108,6 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
         callWith.argument("transitGeneralizedCostLimit", (DoubleFunction<Double> it) -> request.itineraryFilters.transitGeneralizedCostLimit = it);
-        callWith.argument("maximumWalkDistance", request::setMaxWalkDistance);
 //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
         callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
 //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
