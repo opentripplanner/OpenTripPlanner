@@ -196,13 +196,6 @@ public class AStar {
                             + v.getVertex());
                 }
 
-                // avoid enqueuing useless branches 
-                if (estimate > runState.options.maxWeight) {
-                    // too expensive to get here
-                    if (verbose)
-                        System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
-                    continue;
-                }
                 if (isWorstTimeExceeded(v, runState.options)) {
                     // too much time to get here
                     if (verbose)

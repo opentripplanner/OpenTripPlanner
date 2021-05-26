@@ -135,15 +135,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public long worstTime = Long.MAX_VALUE;
 
     /**
-     * The worst possible weight that we will accept when planning a trip.
-     *
-     * @deprecated TODO OTP2 This is not in use, and sub-optimal to prune a search on. It should
-     *                       be removed.
-     */
-    @Deprecated
-    public double maxWeight = Double.MAX_VALUE;
-
-    /**
      * The maximum duration of a returned itinerary, in hours.
      *
      * @deprecated TODO OTP2 This is not useful as a search parameter, but could be used as a
