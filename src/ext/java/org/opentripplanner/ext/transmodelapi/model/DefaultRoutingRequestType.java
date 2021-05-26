@@ -50,14 +50,6 @@ public class DefaultRoutingRequestType {
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
-                        .name("maxTransferWalkDistance")
-                        .description(
-                                "The maximum distance (in meters) the user is willing to walk for transfer legs.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(env -> request.maxTransferWalkDistance)
-                        .build())
-                .field(GraphQLFieldDefinition
-                        .newFieldDefinition()
                         .name("maxPreTransitTime")
                         .description(
                                 "The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride or kiss and ride).")

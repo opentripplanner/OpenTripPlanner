@@ -123,16 +123,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
-     * The maximum distance (in meters) the user is willing to walk for transfer legs.
-     * Defaults to unlimited. Currently set to be the same value as maxWalkDistance.
-     *
-     * @Deprecated TODO OTP2 This is replaced by a similar build parameter. This parameter do
-     *                       not exist in the REST API - so it can be removed safely from here.
-     */
-    @Deprecated
-    public double maxTransferWalkDistance = Double.MAX_VALUE;
-
-    /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). By default limited to 30 minutes driving, because if it's unlimited on
      * large graphs the search becomes very slow.

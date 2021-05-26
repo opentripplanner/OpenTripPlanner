@@ -61,7 +61,6 @@ public class RoutingRequestMapper {
         request.locale = c.asLocale("locale", dft.locale);
         request.maxHours = c.asDouble("maxHours", dft.maxHours);
         request.maxPreTransitTime = c.asInt("maxPreTransitTime", dft.maxPreTransitTime);
-        request.maxTransferWalkDistance = c.asDouble("maxTransferWalkDistance", dft.maxTransferWalkDistance);
         // 'maxTransfers' is configured in the Raptor tuning parameters, not here
         request.maxDirectStreetDurationSeconds = c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
         request.maxWeight = c.asDouble("maxWeight", dft.maxWeight);
