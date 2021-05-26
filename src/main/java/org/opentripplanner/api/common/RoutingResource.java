@@ -683,9 +683,6 @@ public abstract class RoutingResource {
         if (numItineraries != null)
             request.setNumItineraries(numItineraries);
 
-        if (maxPreTransitTime != null)
-            request.setMaxPreTransitTime(maxPreTransitTime);
-
         if (walkReluctance != null)
             request.setWalkReluctance(walkReluctance);
 

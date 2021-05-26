@@ -60,7 +60,6 @@ public class RoutingRequestMapper {
         request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
         request.locale = c.asLocale("locale", dft.locale);
         request.maxHours = c.asDouble("maxHours", dft.maxHours);
-        request.maxPreTransitTime = c.asInt("maxPreTransitTime", dft.maxPreTransitTime);
         // 'maxTransfers' is configured in the Raptor tuning parameters, not here
         request.maxDirectStreetDurationSeconds = c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
         request.maxWeight = c.asDouble("maxWeight", dft.maxWeight);

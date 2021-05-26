@@ -50,14 +50,6 @@ public class DefaultRoutingRequestType {
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
-                        .name("maxPreTransitTime")
-                        .description(
-                                "The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride or kiss and ride).")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(env -> request.maxPreTransitTime)
-                        .build())
-                .field(GraphQLFieldDefinition
-                        .newFieldDefinition()
                         .name("wheelChairAccessible")
                         .description("Whether the trip must be wheelchair accessible.")
                         .type(Scalars.GraphQLBoolean)

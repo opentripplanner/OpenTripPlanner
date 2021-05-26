@@ -123,17 +123,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
-     * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
-     * ride or kiss and ride). By default limited to 30 minutes driving, because if it's unlimited on
-     * large graphs the search becomes very slow.
-     *
-     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
-     */
-    @Deprecated
-    public int maxPreTransitTime = 30 * 60;
-
-    /**
      * The worst possible time (latest for depart-by and earliest for arrive-by) to accept
      *
      * @Deprecated TODO OTP2 This is a parameter specific to the AStar and work as a cut-off.
@@ -805,7 +794,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             // walking alongside the bike. FIXME why are we only copying certain fields instead of cloning the request?
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.arriveBy);
-            bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
             bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
             bikeWalkingOptions.optimize = optimize;
@@ -819,7 +807,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         } else if (streetSubRequestModes.getCar()) {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.arriveBy);
-            bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.streetSubRequestModes = streetSubRequestModes.clone();
             bikeWalkingOptions.streetSubRequestModes.setBicycle(false);
             bikeWalkingOptions.streetSubRequestModes.setWalk(true);
@@ -1275,13 +1262,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             return bikeSpeed;
         }
         return walkSpeed;
-    }
-
-    public void setMaxPreTransitTime(int maxPreTransitTime) {
-        if (maxPreTransitTime > 0) {
-            this.maxPreTransitTime = maxPreTransitTime;
-            bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
-        }
     }
 
     public void setWalkReluctance(double walkReluctance) {
