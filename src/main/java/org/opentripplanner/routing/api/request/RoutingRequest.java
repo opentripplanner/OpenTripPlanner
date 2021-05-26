@@ -106,8 +106,21 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public List<GenericLocation> intermediatePlaces;
 
     /**
+     * This is the maximum duration in seconds for a direct street search. This is a performance
+     * limit and should therefore be set high. Use filters to limit what is presented to the client.
      *
+     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
      */
+    public double maxDirectStreetDurationSeconds = Duration.ofHours(4).toSeconds();
+
+    /**
+     * This is the maximum duration in seconds for access/egress street searches. This is a
+     * performance limit and should therefore be set high. Use filters to limit what is presented
+     * to the client.
+     *
+     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
+     */
+    public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
      * The maximum distance (in meters) the user is willing to walk for transfer legs.

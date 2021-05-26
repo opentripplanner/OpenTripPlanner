@@ -12,6 +12,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -51,7 +52,7 @@ public class NearbyStopFinder {
 
     public  final boolean useStreets;
     private final Graph graph;
-    private final double radiusMeters;
+    private final double durationLimitInSeconds;
 
     /* Fields used when finding stops via the street network. */
     private AStar astar;
@@ -62,18 +63,18 @@ public class NearbyStopFinder {
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
      * network or straight line distance based on the presence of OSM street data in the graph.
      */
-    public NearbyStopFinder(Graph graph, double radiusMeters) {
-        this (graph, radiusMeters, graph.hasStreets);
+    public NearbyStopFinder(Graph graph, double durationLimitInSeconds) {
+        this (graph, durationLimitInSeconds, graph.hasStreets);
     }
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius.
      * @param useStreets if true, search via the street network instead of using straight-line distance.
      */
-    public NearbyStopFinder(Graph graph, double radiusMeters, boolean useStreets) {
+    public NearbyStopFinder(Graph graph, double durationLimitInSeconds, boolean useStreets) {
         this.graph = graph;
         this.useStreets = useStreets;
-        this.radiusMeters = radiusMeters;
+        this.durationLimitInSeconds = durationLimitInSeconds;
         if (useStreets) {
             astar = new AStar();
             // We need to accommodate straight line distance (in meters) but when streets are present we use an
@@ -133,8 +134,9 @@ public class NearbyStopFinder {
         if (useStreets) {
             return findNearbyStopsViaStreets(vertex, reverseDirection);
         }
+        double limitMeters = durationLimitInSeconds * new RoutingRequest(TraverseMode.WALK).walkSpeed;
         Coordinate c0 = vertex.getCoordinate();
-        return directGraphFinder.findClosestStops(c0.y, c0.x, radiusMeters);
+        return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
     }
 
 
@@ -157,18 +159,20 @@ public class NearbyStopFinder {
             boolean removeTempEdges,
             RoutingRequest routingRequest
     ) {
-        routingRequest.arriveBy = reverseDirection;
+        routingRequest.setArriveBy(reverseDirection);
         if (!reverseDirection) {
             routingRequest.setRoutingContext(graph, originVertices, null);
         } else {
             routingRequest.setRoutingContext(graph, null, originVertices);
         }
-        int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
-        routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
-        ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
+        ShortestPathTree spt = astar.getShortestPathTree(
+            routingRequest,
+            -1,
+            new DurationSearchTerminationStrategy(this.durationLimitInSeconds)
+        );
 
         List<NearbyStop> stopsFound = Lists.newArrayList();
 

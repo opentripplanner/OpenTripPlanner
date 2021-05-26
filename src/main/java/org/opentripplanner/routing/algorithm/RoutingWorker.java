@@ -172,8 +172,7 @@ public class RoutingWorker {
                 Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
                         accessRequest,
                         request.modes.accessMode,
-                        false,
-                        2000
+                        false
                 );
                 accessList = accessEgressMapper.mapNearbyStops(accessStops, false);
             }
@@ -197,8 +196,7 @@ public class RoutingWorker {
                 Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
                         egressRequest,
                         request.modes.egressMode,
-                        true,
-                        2000
+                        true
                 );
                 egressList = accessEgressMapper.mapNearbyStops(egressStops, true);
             }

@@ -269,7 +269,6 @@ public class Itinerary {
                 .addDurationSec("transitTime", transitTimeSeconds)
                 .addDurationSec("waitingTime", waitingTimeSeconds)
                 .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
-                .addBool("nonTransitLimitExceeded", nonTransitLimitExceeded)
                 .addBool("tooSloped", tooSloped)
                 .addNum("elevationLost", elevationLost, 0.0)
                 .addNum("elevationGained", elevationGained, 0.0)

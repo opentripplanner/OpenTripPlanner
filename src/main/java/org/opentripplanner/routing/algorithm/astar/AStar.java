@@ -266,7 +266,8 @@ public class AStar {
                     runState.rctx.fromVertices, runState.rctx.toVertices, runState.u, runState.spt, runState.options)) {
                     break;
                 }
-            }  else if (runState.rctx.toVertices != null
+            }
+            if (runState.rctx.toVertices != null
                     && runState.rctx.toVertices.contains(runState.u_vertex)
                     && runState.u.isFinal()) {
                 runState.targetAcceptedStates.add(runState.u);
