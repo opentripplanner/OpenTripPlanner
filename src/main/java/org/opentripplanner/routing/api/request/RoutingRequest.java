@@ -989,10 +989,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setBannedStopsHardFromString(String s) {
         if (!s.isEmpty()) {
-            String[] stops = s.split(",");
-            for (String stop : stops) {
-                bannedStopsHard.add(LocationStringParser.fromOldStyleString(stop).stopId);
-            }
+            bannedStopsHard = FeedScopedId.parseListOfIds(s);
         }
     }
 
