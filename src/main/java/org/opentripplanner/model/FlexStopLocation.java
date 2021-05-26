@@ -62,4 +62,15 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     Point centroid = geometry.getCentroid();
     return new WgsCoordinate(centroid.getY(), centroid.getX());
   }
+
+  @Override
+  public boolean isArea() {
+    return geometry.getArea() > 0;
+  }
+  
+  @Override
+  public boolean isLine() {
+    return geometry.getLength() > 0;
+  }
+
 }

@@ -1,66 +1,81 @@
 package org.opentripplanner.ext.flex;
 
+import java.util.TimeZone;
+
+import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Edge;
 
 public class FlexAccessEgress {
   public final Stop stop;
-  public final int preFlexTime;
-  public final int flexTime;
-  public final int postFlexTime;
   private final int fromStopIndex;
   private final int toStopIndex;
-  private final int differenceFromStartOfTime;
+  private final FlexServiceDate serviceDate;
   private final FlexTrip trip;
   public final State lastState;
   public final boolean directToStop;
 
   public FlexAccessEgress(
       Stop stop,
-      int preFlexTime,
-      int flexTime,
-      int postFlexTime,
       int fromStopIndex,
       int toStopIndex,
-      int differenceFromStartOfTime,
+      FlexServiceDate serviceDate,
       FlexTrip trip,
       State lastState,
       boolean directToStop
   ) {
     this.stop = stop;
-    this.preFlexTime = preFlexTime;
-    this.flexTime = flexTime;
-    this.postFlexTime = postFlexTime;
     this.fromStopIndex = fromStopIndex;
     this.toStopIndex = toStopIndex;
-    this.differenceFromStartOfTime = differenceFromStartOfTime;
+    this.serviceDate = serviceDate;
     this.trip = trip;
     this.lastState = lastState;
     this.directToStop = directToStop;
   }
 
+  public int getSafeTotalTime() {
+	  // I can't tell, is this a hack? (FIXME?)
+	  State s = this.lastState;
+	  Edge e = this.lastState.backEdge;
+	  while(s != null && !(e instanceof FlexTripEdge)) {
+		  e = s.backEdge;
+		  s = s.getBackState();
+	  }
+	  
+	  return this.trip.getSafeTotalTime(((FlexTripEdge)e).flexPath, this.fromStopIndex, this.toStopIndex);
+  }
+  
   public int earliestDepartureTime(int departureTime) {
-    int requestedTransitDepartureTime = departureTime + preFlexTime - differenceFromStartOfTime;
+	TimeZone tz = this.lastState.getOptions().getRoutingContext().graph.getTimeZone();
+	long serviceDateAsEpoch = this.serviceDate.serviceDate.getAsDate(tz).getTime();  
+		  
+	long differenceFromStartOfTime = lastState.getTimeSeconds() - serviceDateAsEpoch/1000;
+    int requestedTransitDepartureTime = departureTime + (int)differenceFromStartOfTime;
     int earliestAvailableTransitDepartureTime = trip.earliestDepartureTime(
         requestedTransitDepartureTime,
         fromStopIndex,
-        toStopIndex,
-        flexTime
+        toStopIndex
     );
     if (earliestAvailableTransitDepartureTime == -1) { return -1; }
-    return earliestAvailableTransitDepartureTime - preFlexTime + differenceFromStartOfTime;
+    return earliestAvailableTransitDepartureTime - (int)differenceFromStartOfTime;
   }
 
   public int latestArrivalTime(int arrivalTime) {
-    int requestedTransitArrivalTime = arrivalTime - postFlexTime - differenceFromStartOfTime;
+	TimeZone tz = this.lastState.getOptions().getRoutingContext().graph.getTimeZone();
+	long serviceDateAsEpoch = this.serviceDate.serviceDate.getAsDate(tz).getTime();  
+	  
+	long differenceFromStartOfTime = lastState.getTimeSeconds() - serviceDateAsEpoch/1000;
+    int requestedTransitArrivalTime = arrivalTime - (int)differenceFromStartOfTime;
     int latestAvailableTransitArrivalTime = trip.latestArrivalTime(
         requestedTransitArrivalTime,
         fromStopIndex,
-        toStopIndex,
-        flexTime
+        toStopIndex
     );
     if (latestAvailableTransitArrivalTime == -1) { return -1; }
-    return latestAvailableTransitArrivalTime + postFlexTime + differenceFromStartOfTime;
+    return latestAvailableTransitArrivalTime + (int)differenceFromStartOfTime;
   }
+  
 }

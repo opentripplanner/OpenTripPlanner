@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.flex.edgetype;
 
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
@@ -14,14 +12,11 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class FlexTripEdge extends Edge {
-
-  private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
 
   private static final long serialVersionUID = 1L;
 
@@ -44,24 +39,53 @@ public class FlexTripEdge extends Edge {
     this.flexTemplate = flexTemplate;
     this.fromv = v1;
     this.tov = v2;
-    this.flexPath = calculator.calculateFlexPath(fromv, tov, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
+    this.flexPath = calculator.calculateFlexPath(fromv, tov, s1, s2, 
+    		flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
   }
 
   @Override
   public State traverse(State s0) {
-    StateEditor editor = s0.edit(this);
+	// not routable
+	if(this.flexPath == null)
+		return null;
+	  
+	StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.BUS);
-    // TODO: decide good value
-    editor.incrementWeight(10 * 60);
-    int timeInSeconds = getTimeInSeconds();
-    editor.incrementTimeInSeconds(timeInSeconds);
-    editor.incrementWeight(timeInSeconds);
+
+    // add wait time, if any	  
+	TimeZone tz = s0.getOptions().getRoutingContext().graph.getTimeZone();
+    
+	long departureTime = (s0.getTimeInMillis() - 
+			flexTemplate.serviceDate.serviceDate.getAsDate(tz).getTime()) / 1000;
+	if(departureTime < 0)
+		return null; // trip doesn't cover request time
+		
+	int earliestDepartureTime = trip.earliestDepartureTime((int)departureTime, 
+    		flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
+
+	if(earliestDepartureTime < 0)
+		return null; // trip leaves in the past
+	
+	long initialWaitTimeSeconds = 
+			((s0.getTimeInMillis() - flexTemplate.serviceDate.serviceDate.getAsDate(tz).getTime()) / 1000)
+			- earliestDepartureTime;
+
+	if(initialWaitTimeSeconds > 0) {	
+		editor.incrementWeight((int)initialWaitTimeSeconds);
+	}
+	
+	// travel time
+    editor.incrementTimeInSeconds(getTripTimeInSeconds());
+    editor.incrementWeight(getTripTimeInSeconds());
+
     editor.resetEnteredMotorVerhicleNoThroughTrafficArea();
     return editor.makeState();
   }
 
-  public int getTimeInSeconds() {
-    return flexPath.durationSeconds;
+  // this method uses the "mean" time from flex v2 to best reflect the typical travel scenario
+  // in user-facing interfaces
+  public int getTripTimeInSeconds() {
+    return this.trip.getMeanTotalTime(flexPath, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
   }
 
   @Override

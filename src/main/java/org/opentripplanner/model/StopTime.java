@@ -51,6 +51,14 @@ public final class StopTime implements Comparable<StopTime> {
     // Disabled by default
     private int flexContinuousDropOff = MISSING_VALUE;
 
+    private int meanDurationFactor = MISSING_VALUE;
+
+    private int meanDurationOffset = MISSING_VALUE;
+
+    private int safeDurationFactor = MISSING_VALUE;
+
+    private int safeDurationOffset = MISSING_VALUE;
+    
     private BookingInfo bookingInfo;
 
     public StopTime() { }
@@ -72,6 +80,10 @@ public final class StopTime implements Comparable<StopTime> {
         this.flexWindowEnd = st.flexWindowEnd;
         this.flexContinuousPickup = st.flexContinuousPickup;
         this.flexContinuousDropOff = st.flexContinuousDropOff;
+        this.safeDurationFactor = st.safeDurationFactor;
+        this.safeDurationOffset = st.safeDurationFactor;
+        this.meanDurationFactor = st.meanDurationFactor;
+        this.meanDurationOffset = st.meanDurationFactor;
         this.bookingInfo = st.bookingInfo;
     }
 
@@ -269,6 +281,39 @@ public final class StopTime implements Comparable<StopTime> {
         return this.getStopSequence() - o.getStopSequence();
     }
 
+	public int getMeanDurationFactor() {
+		return this.meanDurationFactor;
+	}
+
+	public void setMeanDurationFactor(int meanDurationFactor) {
+		this.meanDurationFactor = meanDurationFactor;
+	}
+
+	public int getMeanDurationOffset() {
+		return this.meanDurationOffset;
+	}
+
+	public void setMeanDurationOffset(int meanDurationOffset) {
+		this.meanDurationOffset = meanDurationOffset;
+	}
+
+	public int getSafeDurationFactor() {
+		return this.safeDurationFactor;
+	}
+
+	public void setSafeDurationFactor(int safeDurationFactor) {
+		this.safeDurationFactor = safeDurationFactor;
+	}
+
+	public int getSafeDurationOffset() {
+		return this.safeDurationOffset;
+	}
+
+	public void setSafeDurationOffset(int safeDurationOffset) {
+		this.safeDurationOffset = safeDurationOffset;
+	}
+
+    
     @Override
     public String toString() {
       return "StopTime(seq=" + getStopSequence() + " stop=" + getStop().getId() + " trip="

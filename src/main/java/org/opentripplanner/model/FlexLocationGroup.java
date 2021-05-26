@@ -49,6 +49,16 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     return new WgsCoordinate(centroid.getY(), centroid.getX());
   }
 
+  @Override
+  public boolean isArea() {
+    return geometry.getArea() > 0;
+  }
+  
+  @Override
+  public boolean isLine() {
+    return geometry.getLength() > 0;
+  }
+  
   /**
    * Adds a new location to the location group.
    * This should ONLY be used during the graph build process.

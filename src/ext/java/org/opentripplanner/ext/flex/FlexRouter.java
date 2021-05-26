@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -82,7 +81,6 @@ public class FlexRouter {
       ServiceDate serviceDate = new ServiceDate(date);
       dates[index] = new FlexServiceDate(
           serviceDate,
-          DateMapper.secondsSinceStartOfTime(startOfTime, date),
           graph.index.getServiceCodesRunningForDate().get(serviceDate)
       );
     }
@@ -94,8 +92,6 @@ public class FlexRouter {
 
     Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
     streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
-
-    Set<StopLocation> egressStops = streetEgressByStop.keySet();
 
     Collection<Itinerary> itineraries = new ArrayList<>();
 
@@ -120,6 +116,7 @@ public class FlexRouter {
     return this.flexAccessTemplates
         .stream()
         .flatMap(template -> template.createFlexAccessEgressStream(graph))
+        .filter(e -> e != null)
         .collect(Collectors.toList());
   }
 
@@ -129,6 +126,7 @@ public class FlexRouter {
     return this.flexEgressTemplates
         .stream()
         .flatMap(template -> template.createFlexAccessEgressStream(graph))
+        .filter(e -> e != null)
         .collect(Collectors.toList());
   }
 

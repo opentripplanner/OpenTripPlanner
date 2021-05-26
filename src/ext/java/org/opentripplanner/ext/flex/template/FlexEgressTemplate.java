@@ -8,7 +8,6 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -39,24 +38,6 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
 
   protected Vertex getFlexVertex(Edge edge) {
     return edge.getToVertex();
-  }
-
-  protected boolean isRouteable(Vertex flexVertex) {
-    if (accessEgress.state.getVertex() == flexVertex) {
-      return false;
-    } else
-      return calculator.calculateFlexPath(flexVertex,
-          accessEgress.state.getVertex(),
-          fromStopIndex,
-          toStopIndex
-      ) != null;
-  };
-
-  protected int[] getFlexTimes(FlexTripEdge flexEdge, State state) {
-    int postFlexTime = (int) accessEgress.state.getElapsedTimeSeconds();
-    int edgeTimeInSeconds = flexEdge.getTimeInSeconds();
-    int preFlexTime = (int) state.getElapsedTimeSeconds() - postFlexTime - edgeTimeInSeconds;
-    return new int[]{ preFlexTime, edgeTimeInSeconds, postFlexTime };
   }
 
   protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop) {

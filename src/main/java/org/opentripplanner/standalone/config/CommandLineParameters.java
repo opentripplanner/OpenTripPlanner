@@ -98,6 +98,14 @@ public class CommandLineParameters implements Cloneable {
                     + "interfaces.")
     public String bindAddress = DEFAULT_BIND_ADDRESS;
 
+    @Parameter(names = {"--clientPath"},
+            description = "Path to serve local client files at.")
+    public String clientPath = null;
+
+    @Parameter(names = {"--disableNativeClient"},
+            description = "Disable native client.")
+    public boolean disableNativeClient = false;
+    
     @Parameter(names = {"--clientFiles"}, validateWith = ReadableDirectory.class,
             description = "Path to directory containing local client files to serve.")
     public File clientDirectory = null;

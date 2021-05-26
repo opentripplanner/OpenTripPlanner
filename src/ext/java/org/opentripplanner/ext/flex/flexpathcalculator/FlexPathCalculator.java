@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.graph.Vertex;
 
 import javax.annotation.Nullable;
@@ -10,6 +11,6 @@ import javax.annotation.Nullable;
 public interface FlexPathCalculator {
 
   @Nullable
-  FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex);
+  FlexPath calculateFlexPath(Vertex fromv, Vertex tov, StopLocation s1, StopLocation s2, int fromStopIndex, int toStopIndex);
 
 }

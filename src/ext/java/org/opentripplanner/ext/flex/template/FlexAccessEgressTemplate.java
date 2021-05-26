@@ -27,8 +27,7 @@ public abstract class FlexAccessEgressTemplate {
   public final int fromStopIndex;
   public final int toStopIndex;
   protected final StopLocation transferStop;
-  protected final int secondsFromStartOfTime;
-  public final ServiceDate serviceDate;
+  public final FlexServiceDate serviceDate;
   protected final FlexPathCalculator calculator;
 
   /**
@@ -55,8 +54,7 @@ public abstract class FlexAccessEgressTemplate {
     this.fromStopIndex = fromStopIndex;
     this.toStopIndex = toStopIndex;
     this.transferStop = transferStop;
-    this.secondsFromStartOfTime = date.secondsFromStartOfTime;
-    this.serviceDate = date.serviceDate;
+    this.serviceDate = date;
     this.calculator = calculator;
   }
 
@@ -95,34 +93,20 @@ public abstract class FlexAccessEgressTemplate {
   abstract protected Vertex getFlexVertex(Edge edge);
 
   /**
-   * Get the times in seconds, before during and after the flex ride.
-   */
-  abstract protected int[] getFlexTimes(FlexTripEdge flexEdge, State state);
-
-  /**
    * Get the FlexTripEdge for the flex ride.
    */
   abstract protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
-  /**
-   * Checks whether the routing is possible
-   */
-  abstract protected boolean isRouteable(Vertex flexVertex);
-
   public Stream<FlexAccessEgress> createFlexAccessEgressStream(Graph graph) {
     if (transferStop instanceof Stop) {
       TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
-      if (isRouteable(flexVertex)) {
-        return Stream.of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop));
-      }
-      return Stream.empty();
+      return Stream.of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop));
     }
     // transferStop is Location Area/Line
     else {
       return getTransfersFromTransferStop(graph)
           .stream()
           .filter(simpleTransfer -> getFinalStop(simpleTransfer) != null)
-          .filter(simpleTransfer -> isRouteable(getFlexVertex(getTransferEdges(simpleTransfer).get(0))))
           .map(simpleTransfer -> {
             List<Edge> edges = getTransferEdges(simpleTransfer);
             return getFlexAccessEgress(edges,
@@ -137,19 +121,19 @@ public abstract class FlexAccessEgressTemplate {
     FlexTripEdge flexEdge = getFlexEdge(flexVertex, transferStop);
 
     State state = flexEdge.traverse(accessEgress.state);
+    if(state == null)
+  	  return null;
+
     for (Edge e : transferEdges) {
       state = e.traverse(state);
+      if(state == null)
+    	  return null;
     }
-
-    int[] times = getFlexTimes(flexEdge, state);
 
     return new FlexAccessEgress(
         stop,
-        times[0],
-        times[1],
-        times[2],
         fromStopIndex,
-        toStopIndex, secondsFromStartOfTime,
+        toStopIndex, serviceDate,
         trip,
         state,
         transferEdges.isEmpty()

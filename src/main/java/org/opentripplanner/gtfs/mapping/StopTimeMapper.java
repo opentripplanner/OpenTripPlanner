@@ -70,6 +70,10 @@ class StopTimeMapper {
         lhs.setFlexWindowEnd(rhs.getEndPickupDropOffWindow());
         lhs.setFlexContinuousPickup(rhs.getContinuousPickup());
         lhs.setFlexContinuousDropOff(rhs.getContinuousDropOff());
+        lhs.setMeanDurationFactor(rhs.getMeanDurationFactor());
+        lhs.setMeanDurationOffset(rhs.getMeanDurationOffset());
+        lhs.setSafeDurationFactor(rhs.getSafeDurationFactor());
+        lhs.setSafeDurationOffset(rhs.getSafeDurationOffset());
 
         // Skip mapping of proxy
         // private transient StopTimeProxy proxy;

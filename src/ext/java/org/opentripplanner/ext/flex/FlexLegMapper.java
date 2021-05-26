@@ -22,7 +22,7 @@ public class FlexLegMapper {
       leg.intermediateStops = new ArrayList<>();
       leg.distanceMeters = flexTripEdge.getDistanceMeters();
 
-      leg.serviceDate = flexTripEdge.flexTemplate.serviceDate;
+      leg.serviceDate = flexTripEdge.flexTemplate.serviceDate.serviceDate;
       leg.headsign = flexTripEdge.getTrip().getTripHeadsign();
       leg.walkSteps = new ArrayList<>();
 

@@ -134,4 +134,14 @@ public final class Stop extends StationElement implements StopLocation {
   public Collection<FareZone> getFareZones() {
     return Collections.unmodifiableCollection(fareZones);
   }
+
+  @Override
+  public boolean isLine() {
+	return false;
+  }
+	
+  @Override
+  public boolean isArea() {
+	return false;
+  }
 }
