@@ -350,6 +350,10 @@ public abstract class GraphRoutingTest {
         }
 
         public void vehicleParking(String id, double x, double y, boolean bicyclePlaces, boolean carPlaces, List<VehicleParking.VehicleParkingEntranceCreator> entrances) {
+            vehicleParking(id, x, y, bicyclePlaces, carPlaces, false, entrances);
+        }
+
+        public void vehicleParking(String id, double x, double y, boolean bicyclePlaces, boolean carPlaces, boolean wheelchairAccessible, List<VehicleParking.VehicleParkingEntranceCreator> entrances) {
             var vehicleParking = VehicleParking.builder()
                 .id(new FeedScopedId(TEST_FEED_ID, id))
                 .x(x)
@@ -357,6 +361,7 @@ public abstract class GraphRoutingTest {
                 .bicyclePlaces(bicyclePlaces)
                 .carPlaces(carPlaces)
                 .entrances(entrances)
+                .wheelchairAccessibleCarPlaces(wheelchairAccessible)
                 .build();
 
             var vertices = VehicleParkingHelper.createVehicleParkingVertices(graph, vehicleParking);

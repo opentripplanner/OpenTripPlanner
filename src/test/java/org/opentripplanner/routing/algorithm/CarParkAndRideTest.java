@@ -50,7 +50,7 @@ public class CarParkAndRideTest extends ParkAndRideTest {
                         )
                 );
 
-                vehicleParking("CarPark #2", 47.530, 19.001, false, true,
+                vehicleParking("CarPark #2", 47.530, 19.001, false, true, true,
                         List.of(
                                 vehicleParkingEntrance(D, "CarPark #2 Entrance", true, true)
                         )
@@ -109,6 +109,24 @@ public class CarParkAndRideTest extends ParkAndRideTest {
                 "null (parked) - CarPark #1 Entrance A (256.54, 188)",
                 "null (parked) - CarPark #1 Entrance A (257.54, 188)",
                 "WALK (parked) - AB street (388.36, 254)"
+        );
+    }
+
+    @Test
+    public void wheelchairPlacesNotAvailableTest() {
+        assertEmptyPath(A, B, StreetMode.CAR_TO_PARK, true);
+    }
+
+    @Test
+    public void wheelchairPlacesAvailable() {
+        assertPath(
+                D, F, StreetMode.CAR_TO_PARK, true,
+                "null - null (0.00, 0)",
+                "null - CarPark #2 Entrance (1.00, 0)",
+                "null (parked) - CarPark #2 Entrance (241.00, 180)",
+                "null (parked) - CarPark #2 Entrance (242.00, 180)",
+                "WALK (parked) - DE street (372.83, 246)",
+                "WALK (parked) - EF street (503.65, 312)"
         );
     }
 }
