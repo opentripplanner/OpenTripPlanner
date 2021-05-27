@@ -627,6 +627,7 @@ public class LegacyGraphQLQueryTypeImpl
                               .collect(Collectors.toMap(e -> TransitMode.valueOf(e.getKey()),
                                       e -> (Double) e.getValue()
                               ))));
+      callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
       callWith.argument("arriveBy", request::setArriveBy);
       request.showIntermediateStops = true;
       callWith.argument("intermediatePlaces", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(LegacyGraphQLQueryTypeImpl::toGenericLocation).collect(Collectors.toList()));
