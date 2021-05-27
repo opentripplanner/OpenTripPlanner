@@ -35,7 +35,6 @@ public class AStar {
     private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
     // FIXME this is not really a factory, it's a way to fake a global variable. This should be stored at the OTPServer level.
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
-    private static final double OVERSEARCH_MULTIPLIER = 4.0;
 
     private boolean verbose = false;
 
@@ -246,14 +245,6 @@ public class AStar {
                 continue;
             }
             
-            /*
-             * Should we terminate the search?
-             */
-            // Don't search too far past the most recently found accepted path/state
-            if (runState.foundPathWeight != null &&
-                runState.u.getWeight() > runState.foundPathWeight * OVERSEARCH_MULTIPLIER ) {
-                break;
-            }
             if (runState.terminationStrategy != null) {
                 if (runState.terminationStrategy.shouldSearchTerminate (
                     runState.rctx.fromVertices, runState.rctx.toVertices, runState.u, runState.spt, runState.options)) {
