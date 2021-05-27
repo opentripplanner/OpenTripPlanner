@@ -21,7 +21,7 @@ public class DurationSearchTerminationStrategy implements SearchTerminationStrat
   }
 
   @Override
-  public boolean shouldSearchTerminate(
+  public boolean shouldStateTerminate(
       Set<Vertex> origin,
       Set<Vertex> target,
       State current,
