@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.impl;
 
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
@@ -102,7 +101,8 @@ public class GraphPathFinder {
         }
         // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
         // Use the maxDirectStreetDurationSeconds as the limit here, as this class is used for point-to-point routing
-        aStar.getShortestPathTree(options, timeout, new DurationSearchTerminationStrategy(options.maxDirectStreetDurationSeconds));
+        aStar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(options.maxDirectStreetDurationSeconds));
+        aStar.getShortestPathTree(options, timeout, null);
 
         List<GraphPath> paths = aStar.getPathsToTarget();
 

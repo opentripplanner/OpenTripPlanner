@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -12,19 +13,20 @@ import java.util.Set;
  * that we get all relevant results up to the specified duration, as the only criterion we optimize
  * on is generalized cost.
  */
-public class DurationSearchTerminationStrategy implements SearchTerminationStrategy {
+public class DurationSkipEdgeStrategy implements SkipEdgeStrategy {
 
   private final double durationInSeconds;
 
-  public DurationSearchTerminationStrategy(double durationInSeconds) {
+  public DurationSkipEdgeStrategy(double durationInSeconds) {
     this.durationInSeconds = durationInSeconds;
   }
 
   @Override
-  public boolean shouldStateTerminate(
-      Set<Vertex> origin,
-      Set<Vertex> target,
+  public boolean shouldSkipEdge(
+      Vertex origin,
+      Vertex target,
       State current,
+      Edge edge, 
       ShortestPathTree spt,
       RoutingRequest traverseOptions
   ) {

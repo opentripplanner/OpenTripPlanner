@@ -12,7 +12,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -168,11 +168,8 @@ public class NearbyStopFinder {
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
-        ShortestPathTree spt = astar.getShortestPathTree(
-            routingRequest,
-            -1,
-            new DurationSearchTerminationStrategy(this.durationLimitInSeconds)
-        );
+        astar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(durationLimitInSeconds));
+        ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         List<NearbyStop> stopsFound = Lists.newArrayList();
 

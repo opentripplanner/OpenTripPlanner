@@ -165,7 +165,7 @@ public class AStar {
         for (Edge edge : edges) {
 
             if (skipEdgeStrategy != null &&
-                    skipEdgeStrategy.shouldSkipEdge(null,null,null, edge,null,null)) {
+                    skipEdgeStrategy.shouldSkipEdge(null,null,runState.u, edge,null,null)) {
                 continue;
             }
 
