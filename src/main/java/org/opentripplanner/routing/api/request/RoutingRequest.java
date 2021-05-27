@@ -974,13 +974,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         setDateTime(dateObject);
     }
 
+    /**
+     * Currently only one itinerary is returned for a direct street search
+     */
     public int getNumItineraries() {
-        if (streetSubRequestModes.isTransit()) {
-            return numItineraries;
-        } else {
-            // If transit is not to be used, only search for one itinerary.
-            return 1;
-        }
+        return 1;
     }
 
     public void setNumItineraries(int numItineraries) {
