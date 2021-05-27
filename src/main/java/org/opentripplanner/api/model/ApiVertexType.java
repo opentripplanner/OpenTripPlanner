@@ -7,6 +7,6 @@ package org.opentripplanner.api.model;
  * @author mabu
  */
 public enum ApiVertexType {
-    NORMAL, BIKESHARE, VEHICLEPARK, TRANSIT
+    NORMAL, BIKESHARE, VEHICLEPARKING, TRANSIT
     
 }
