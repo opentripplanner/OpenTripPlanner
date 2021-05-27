@@ -42,9 +42,11 @@ public class DefaultRoutingRequestType {
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
-                        .name("maxDirectStreetCost")
+                        .name("maxDirectStreetDuration")
                         .description(
-                                "The maximum distance (in meters) the user is willing to walk for access/egress legs.")
+                                "This is the maximum duration in seconds for a direct street search. "
+                                    + "This is a performance limit and should therefore be set high. "
+                                    + "Use filters to limit what is presented to the client.")
                         .type(Scalars.GraphQLFloat)
                         .dataFetcher(env -> request.maxDirectStreetDurationSeconds)
                         .build())
