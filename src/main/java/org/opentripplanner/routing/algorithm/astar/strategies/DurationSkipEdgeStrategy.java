@@ -9,7 +9,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import java.util.Set;
 
 /**
- * Terminates the search when the specified number of seconds has elapsed. This does not guarantee
+ * Skips edges when the specified number of seconds has elapsed. This does not guarantee
  * that we get all relevant results up to the specified duration, as the only criterion we optimize
  * on is generalized cost.
  */
@@ -23,8 +23,8 @@ public class DurationSkipEdgeStrategy implements SkipEdgeStrategy {
 
   @Override
   public boolean shouldSkipEdge(
-      Vertex origin,
-      Vertex target,
+      Set<Vertex> origins,
+      Set<Vertex> targets,
       State current,
       Edge edge, 
       ShortestPathTree spt,

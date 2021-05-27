@@ -165,7 +165,14 @@ public class AStar {
         for (Edge edge : edges) {
 
             if (skipEdgeStrategy != null &&
-                    skipEdgeStrategy.shouldSkipEdge(null,null,runState.u, edge,null,null)) {
+                    skipEdgeStrategy.shouldSkipEdge(
+                        runState.rctx.fromVertices,
+                        runState.rctx.toVertices,
+                        runState.u,
+                        edge,runState.spt,
+                        runState.options
+                    )
+            ) {
                 continue;
             }
 
