@@ -73,7 +73,7 @@ public class StreetGraphFinder implements GraphFinder {
     rr.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
-    rr.worstTime = (rr.dateTime + (int) radius);
+    //rr.worstTime = (rr.dateTime + (int) radius);
     AStar astar = new AStar();
     rr.setNumItineraries(1);
     astar.setTraverseVisitor(visitor);

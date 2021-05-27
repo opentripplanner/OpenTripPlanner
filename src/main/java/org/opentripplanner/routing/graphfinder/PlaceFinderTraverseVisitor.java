@@ -166,7 +166,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
             furthestDistance = pad.distance;
           }
         }
-        traverseOptions.worstTime = (traverseOptions.dateTime + (int) furthestDistance);
+        //traverseOptions.worstTime = (traverseOptions.dateTime + (int) furthestDistance);
       }
       return false;
 

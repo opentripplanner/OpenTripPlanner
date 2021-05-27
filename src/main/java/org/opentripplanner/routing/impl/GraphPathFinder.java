@@ -104,16 +104,7 @@ public class GraphPathFinder {
         // Use the maxDirectStreetDurationSeconds as the limit here, as this class is used for point-to-point routing
         aStar.getShortestPathTree(options, timeout, new DurationSearchTerminationStrategy(options.maxDirectStreetDurationSeconds));
 
-        List<GraphPath> paths = aStar.getPathsToTarget().stream()
-                .filter(path -> {
-                    double duration = options.useRequestedDateTimeInMaxHours
-                        ? options.arriveBy
-                            ? options.dateTime - path.getStartTime()
-                            : path.getEndTime() - options.dateTime
-                        : path.getDuration();
-                    return duration < options.maxHours * 60 * 60;
-                })
-                .collect(Collectors.toList());
+        List<GraphPath> paths = aStar.getPathsToTarget();
 
         LOG.debug("we have {} paths", paths.size());
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);

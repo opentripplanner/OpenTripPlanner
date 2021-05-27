@@ -59,7 +59,6 @@ public class RoutingRequestMapper {
         request.ignoreRealtimeUpdates = c.asBoolean("ignoreRealtimeUpdates", dft.ignoreRealtimeUpdates);
         request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
         request.locale = c.asLocale("locale", dft.locale);
-        request.maxHours = c.asDouble("maxHours", dft.maxHours);
         // 'maxTransfers' is configured in the Raptor tuning parameters, not here
         request.maxDirectStreetDurationSeconds = c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
         request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
@@ -79,7 +78,6 @@ public class RoutingRequestMapper {
         request.setTransitReluctanceForMode(c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble));
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useBikeRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useBikeRentalAvailabilityInformation);
-        request.useRequestedDateTimeInMaxHours = c.asBoolean("useRequestedDateTimeInMaxHours", dft.useRequestedDateTimeInMaxHours);
         request.useUnpreferredRoutesPenalty = c.asInt("useUnpreferredRoutesPenalty", dft.useUnpreferredRoutesPenalty);
         request.waitAtBeginningFactor = c.asDouble("waitAtBeginningFactor", dft.waitAtBeginningFactor);
         request.waitReluctance = c.asDouble("waitReluctance", dft.waitReluctance);
@@ -88,7 +86,6 @@ public class RoutingRequestMapper {
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
         request.walkingBike = c.asBoolean("walkingBike", dft.walkingBike);
         request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
-        request.worstTime = c.asLong("worstTime", dft.worstTime);
 
         mapTransferOptimization(
             (TransferOptimizationRequest)request.transferOptimization,

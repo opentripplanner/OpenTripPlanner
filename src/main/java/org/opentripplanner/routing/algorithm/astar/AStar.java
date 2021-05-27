@@ -194,13 +194,6 @@ public class AStar {
                             + "(w) + " + remaining_w + "(heur) = " + estimate + " vert = "
                             + v.getVertex());
                 }
-
-                if (isWorstTimeExceeded(v, runState.options)) {
-                    // too much time to get here
-                    if (verbose)
-                        System.out.println("         too much time to reach, not enqueued. time = " + v.getTimeSeconds());
-                    continue;
-                }
                 
                 // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
                 if (runState.spt.add(v)) {
@@ -315,15 +308,6 @@ public class AStar {
             long memoryUsed = Runtime.getRuntime().totalMemory() -
                     Runtime.getRuntime().freeMemory();
             store.setLongMax("memoryUsed", memoryUsed);
-        }
-    }
-
-    private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
-        if (opt.arriveBy) {
-            return v.getTimeSeconds() < opt.worstTime;
-        }
-        else {
-            return v.getTimeSeconds() > opt.worstTime;
         }
     }
 

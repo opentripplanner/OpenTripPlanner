@@ -830,12 +830,6 @@ public abstract class RoutingResource {
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
 
-        if (maxHours != null)
-            request.maxHours = maxHours;
-
-        if (useRequestedDateTimeInMaxHours != null)
-            request.useRequestedDateTimeInMaxHours = useRequestedDateTimeInMaxHours;
-
         if (disableAlertFiltering != null)
             request.disableAlertFiltering = disableAlertFiltering;
 

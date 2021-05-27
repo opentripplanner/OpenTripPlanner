@@ -123,37 +123,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
-     * The worst possible time (latest for depart-by and earliest for arrive-by) to accept
-     *
-     * @Deprecated TODO OTP2 This is a parameter specific to the AStar and work as a cut-off.
-     *                       Raptor have a similar concept, the search window. This parameter
-     *                       do not belong in the request object, is should be pushed down into
-     *                       AStar and then we need to find a way to resolve the search time
-     *                       window. There is more than one strategy for this.
-     */
-    @Deprecated
-    public long worstTime = Long.MAX_VALUE;
-
-    /**
-     * The maximum duration of a returned itinerary, in hours.
-     *
-     * @deprecated TODO OTP2 This is not useful as a search parameter, but could be used as a
-     *                       post search filter to reduce number of itineraries down to an
-     *                       acceptable number, but there are probably better ways to do that.
-     */
-    @Deprecated
-    public double maxHours = Double.MAX_VALUE;
-
-    /**
-     * Whether maxHours limit should consider wait/idle time between the itinerary and the
-     * requested arrive/depart time.
-     *
-     * @deprecated see {@link #maxHours}
-     */
-    @Deprecated
-    public boolean useRequestedDateTimeInMaxHours = false;
-
-    /**
      * The access/egress/direct/transit modes allowed for this main request. The parameter
      * "streetSubRequestModes" below is used for a single A Star sub request.
      *
@@ -770,8 +739,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
         bikeWalkingOptions.arriveBy = arriveBy;
-        if (worstTime == Long.MAX_VALUE || worstTime == 0)
-            worstTime = arriveBy ? 0 : Long.MAX_VALUE;
     }
 
     public void setMode(TraverseMode mode) {
