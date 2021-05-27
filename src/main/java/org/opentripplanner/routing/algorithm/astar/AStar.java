@@ -60,7 +60,6 @@ public class AStar {
         private RoutingRequest options;
         private SearchTerminationStrategy terminationStrategy;
         public Vertex u_vertex;
-        Double foundPathWeight = null;
 
         public RunState(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
             this.options = options;
@@ -248,7 +247,6 @@ public class AStar {
                     && runState.rctx.toVertices.contains(runState.u_vertex)
                     && runState.u.isFinal()) {
                 runState.targetAcceptedStates.add(runState.u);
-                runState.foundPathWeight = runState.u.getWeight();
                 // new GraphPath(runState.u, false).dump();
 
                 /* Break out of the search if we've found the requested number of paths. */
