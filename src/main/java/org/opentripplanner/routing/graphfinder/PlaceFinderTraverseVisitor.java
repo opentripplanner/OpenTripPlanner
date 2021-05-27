@@ -152,6 +152,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
    * number of places has been found
    */
   public SearchTerminationStrategy getSearchTerminationStrategy() {
+
     return (origin, target, current, spt, traverseOptions) -> {
       // the first n stops the search visit may not be the nearest n
       // but when we have at least n stops found, we can update the
@@ -166,10 +167,13 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
             furthestDistance = pad.distance;
           }
         }
-        //traverseOptions.worstTime = (traverseOptions.dateTime + (int) furthestDistance);
-      }
-      return false;
 
+        // This comparison works because we are travelling at 1 m/s
+        return current.getElapsedTimeSeconds() > furthestDistance;
+      }
+      else {
+        return false;
+      }
     };
   }
 }
