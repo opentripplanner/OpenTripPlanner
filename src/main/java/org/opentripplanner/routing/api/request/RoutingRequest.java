@@ -427,6 +427,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     @Deprecated
     public double waitAtBeginningFactor = 0.4;
 
+    public Map<String, Double> surfaceReluctances;
+
     /**
      * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
      * addition to the cost of the transfer(walking) and waiting-time. It is also in addition to
@@ -1325,6 +1327,29 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
         if (waitAtBeginningFactor > 0) {
             this.waitAtBeginningFactor = waitAtBeginningFactor;
+        }
+    }
+
+    public void setSurfaceReluctances(String surfaceReluctances) throws ParameterException {
+        this.surfaceReluctances = new HashMap<>();
+        if (surfaceReluctances == null) {
+            return;
+        }
+        for (String reluctanceWithSurface : surfaceReluctances.split(";")) {
+            String[] surfaceAndReluctance = reluctanceWithSurface.split(",");
+            if (surfaceAndReluctance.length != 2) {
+                throw new ParameterException(Message.BOGUS_PARAMETER);
+            }
+            String surface = surfaceAndReluctance[0];
+            try {
+                double reluctance = Double.parseDouble(surfaceAndReluctance[1]);
+                if (reluctance < 1) {
+                    throw new ParameterException(Message.BOGUS_PARAMETER);
+                }
+                this.surfaceReluctances.put(surface, reluctance);
+            } catch (NumberFormatException ex) {
+                throw new ParameterException(Message.BOGUS_PARAMETER);
+            }
         }
     }
 
