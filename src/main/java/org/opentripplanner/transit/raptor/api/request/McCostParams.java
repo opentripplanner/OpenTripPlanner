@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.api.request;
 
 
+import java.util.Collections;
+import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
@@ -20,6 +22,7 @@ public class McCostParams {
     private final double[] transitReluctanceFactors;
     private final double walkReluctanceFactor;
     private final double waitReluctanceFactor;
+    private final Map<String, Double> surfaceReluctanceFactors;
 
     /**
      * Default constructor defines default values. These defaults are
@@ -31,6 +34,7 @@ public class McCostParams {
         this.transitReluctanceFactors = null;
         this.walkReluctanceFactor = 4.0;
         this.waitReluctanceFactor = 1.0;
+        this.surfaceReluctanceFactors = Map.of();
     }
 
     McCostParams(McCostParamsBuilder builder) {
@@ -39,6 +43,7 @@ public class McCostParams {
         this.transitReluctanceFactors = builder.transitReluctanceFactors();
         this.walkReluctanceFactor = builder.walkReluctanceFactor();
         this.waitReluctanceFactor = builder.waitReluctanceFactor();
+        this.surfaceReluctanceFactors = Collections.unmodifiableMap(builder.surfaceReluctanceFactors());
     }
 
     public int boardCost() {
@@ -77,6 +82,10 @@ public class McCostParams {
         return waitReluctanceFactor;
     }
 
+    public Map<String, Double> surfaceReluctanceFactors() {
+        return surfaceReluctanceFactors;
+    }
+
     @Override
     public String toString() {
         return "McCostParams{" +
@@ -84,6 +93,7 @@ public class McCostParams {
                 ", transferCost=" + transferCost +
                 ", transferReluctanceFactor=" + walkReluctanceFactor +
                 ", waitReluctanceFactor=" + waitReluctanceFactor +
+                ", surfaceReluctanceFactors=" + surfaceReluctanceFactors +
                 '}';
     }
 
@@ -94,12 +104,13 @@ public class McCostParams {
         McCostParams that = (McCostParams) o;
         return boardCost == that.boardCost &&
                 transferCost == that.transferCost &&
+                surfaceReluctanceFactors.equals(that.surfaceReluctanceFactors) &&
                 Double.compare(that.walkReluctanceFactor, walkReluctanceFactor) == 0 &&
                 Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(boardCost, transferCost, walkReluctanceFactor, waitReluctanceFactor);
+        return Objects.hash(boardCost, transferCost, walkReluctanceFactor, waitReluctanceFactor, surfaceReluctanceFactors);
     }
 }

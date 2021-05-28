@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.api.request;
 
 
+import java.util.Map;
+
 /**
  * Mutable version of the {@link McCostParams}.
  */
@@ -11,6 +13,7 @@ public class McCostParamsBuilder {
     private double[] transitReluctanceFactors;
     private double walkReluctanceFactor;
     private double waitReluctanceFactor;
+    private Map<String, Double> surfaceReluctanceFactors;
 
 
     McCostParamsBuilder(McCostParams defaults) {
@@ -19,6 +22,7 @@ public class McCostParamsBuilder {
         this.transitReluctanceFactors = defaults.transitReluctanceFactors();
         this.walkReluctanceFactor = defaults.walkReluctanceFactor();
         this.waitReluctanceFactor = defaults.waitReluctanceFactor();
+        this.surfaceReluctanceFactors = defaults.surfaceReluctanceFactors();
     }
 
     public int boardCost() {
@@ -63,6 +67,15 @@ public class McCostParamsBuilder {
 
     public McCostParamsBuilder waitReluctanceFactor(double waitReluctanceFactor) {
         this.waitReluctanceFactor = waitReluctanceFactor;
+        return this;
+    }
+
+    public Map<String, Double> surfaceReluctanceFactors() {
+        return surfaceReluctanceFactors;
+    }
+
+    public McCostParamsBuilder surfaceReluctanceFactors(Map<String,Double> surfaceReluctanceFactors) {
+        this.surfaceReluctanceFactors = surfaceReluctanceFactors;
         return this;
     }
 }
