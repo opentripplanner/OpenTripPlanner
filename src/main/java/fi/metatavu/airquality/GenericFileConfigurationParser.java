@@ -34,8 +34,8 @@ public class GenericFileConfigurationParser {
 			GenericFileConfiguration configuration = new Gson().fromJson(new InputStreamReader(dataSource.asInputStream()), GenericFileConfiguration.class);
 			RequestParameters[] requestParametersList = configuration.getRequestParameters();
 			if (!areIndexVariablesValid(Arrays.asList(configuration.getIndexVariables()))) {
-              throw new IllegalArgumentException("The settings file has incorrect index variables");
-            }
+				throw new IllegalArgumentException("The settings file has incorrect index variables");
+			}
 
 			if (!areRequestParamValid(Arrays.asList(requestParametersList))) {
 				throw new IllegalArgumentException("The settings file has incorrect request parameters");
@@ -62,7 +62,7 @@ public class GenericFileConfigurationParser {
 		return true;
 	}
 
-    /**
+	/**
 	 * Verifies that in the configuration there are exactly 2 corresponding request parameters per one variable name
 	 *
 	 * @param requestParametersList list of request parameters from json file
@@ -71,11 +71,11 @@ public class GenericFileConfigurationParser {
 	public static boolean areRequestParamValid(List<RequestParameters> requestParametersList) {
 		AtomicBoolean res = new AtomicBoolean(true);
 		requestParametersList.stream()
-						.collect(Collectors.groupingBy(RequestParameters::getVariable))
-						.forEach((k, v) -> {
-							if (v.size() != 2)
-								res.set(false);
-						});
+			.collect(Collectors.groupingBy(RequestParameters::getVariable))
+			.forEach((k, v) -> {
+				if (v.size() != 2)
+					res.set(false);
+			});
 		return res.get();
 	}
 
@@ -96,18 +96,18 @@ public class GenericFileConfigurationParser {
 		RequestParameters[] requestParameters = genericFileConfiguration.getRequestParameters();
 
 		Arrays.stream(requestParameters).collect(Collectors.groupingBy(RequestParameters::getVariable))
-            .forEach((k, v) -> {
-                RequestParameters penalty = null, threshold = null;
-                for (RequestParameters fittingParam : v) {
-                    if (fittingParam.getParameterType().equals(ParameterType.THRESHOLD)) {
-                        threshold = fittingParam;
-                    } else if (fittingParam.getParameterType().equals(ParameterType.PENALTY)) {
-                        penalty = fittingParam;
-                    }
+			.forEach((k, v) -> {
+				RequestParameters penalty = null, threshold = null;
+				for (RequestParameters fittingParam : v) {
+					if (fittingParam.getParameterType().equals(ParameterType.THRESHOLD)) {
+						threshold = fittingParam;
+					} else if (fittingParam.getParameterType().equals(ParameterType.PENALTY)) {
+						penalty = fittingParam;
+					}
 
-                    requestPairs.put(threshold, penalty);
-                }
-            });
-        return requestPairs;
+					requestPairs.put(threshold, penalty);
+				}
+			});
+		return requestPairs;
 	}
 }
