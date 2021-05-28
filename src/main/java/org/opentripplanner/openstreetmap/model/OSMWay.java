@@ -128,4 +128,15 @@ public class OSMWay extends OSMWithTags {
                 || (cyclewayLeft != null && cyclewayLeft.startsWith("opposite"))
                 || (cyclewayRight != null && cyclewayRight.startsWith("opposite"));
     }
+
+    /**
+     * The possible surface values' documentation can be <a
+     * href="https://wiki.openstreetmap.org/wiki/Key:surface">seen here</a>. And an enumeration of
+     * all existing values <a href="https://taginfo.openstreetmap.org/keys/surface#values">can be
+     * found here</a>.
+     * @return The value of the {@code surface} tag of this way.
+     */
+    public String getSurface() {
+        return getTag("surface");
+    }
 }
