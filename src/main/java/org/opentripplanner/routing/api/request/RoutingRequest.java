@@ -429,7 +429,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     @Deprecated
     public double waitAtBeginningFactor = 0.4;
 
-    public TObjectDoubleMap<String> surfaceReluctances;
+    public TObjectDoubleMap<String> surfaceReluctances = new TObjectDoubleHashMap<>(0);
 
     /**
      * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
@@ -1334,7 +1334,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setSurfaceReluctances(String surfaceReluctances) throws ParameterException {
         if (surfaceReluctances == null) {
-            this.surfaceReluctances = new TObjectDoubleHashMap<>(0);
             return;
         }
         String[] reluctanceSegments = surfaceReluctances.split(";");

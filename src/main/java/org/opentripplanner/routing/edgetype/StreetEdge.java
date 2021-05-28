@@ -117,6 +117,8 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
 
+    private String surface;
+
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
                       StreetTraversalPermission permission, boolean back) {
@@ -380,6 +382,13 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
         } else {
             // TODO: this is being applied even when biking or driving.
             weight *= options.walkReluctance;
+        }
+        for (String surfaceToCheck : options.surfaceReluctances.keys(new String[0])) {
+            if (surfaceToCheck.equals(this.surface)) {
+                weight *= options.surfaceReluctances.get(surfaceToCheck);
+                // only up to one surface can match
+                break;
+            }
         }
 
         StateEditor s1 = s0.edit(this);
@@ -735,6 +744,14 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
 	public void setSlopeOverride(boolean slopeOverride) {
 	    flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
 	}
+
+    public String getSurface() {
+        return surface;
+    }
+
+    public void setSurface(String surface) {
+        this.surface = surface;
+    }
 
     /**
      * Return the azimuth of the first segment in this edge in integer degrees clockwise from South.
