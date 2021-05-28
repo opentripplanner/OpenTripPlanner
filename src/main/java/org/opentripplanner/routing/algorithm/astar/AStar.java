@@ -247,7 +247,7 @@ public class AStar {
             if (runState.terminationStrategy != null) {
                 if (runState.terminationStrategy.shouldStateTerminate(
                     runState.rctx.fromVertices, runState.rctx.toVertices, runState.u, runState.spt, runState.options)) {
-                    continue;
+                    break;
                 }
             }
             if (runState.rctx.toVertices != null
