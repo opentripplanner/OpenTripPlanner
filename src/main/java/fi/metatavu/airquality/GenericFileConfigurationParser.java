@@ -47,20 +47,20 @@ public class GenericFileConfigurationParser {
 	}
 
 	/**
-     * Verifies that the index variables do not have repeating pollutant names
-     *
-     * @param indexVariables list of index variables from json settings file
-     * @return validity of index variables settings
-     */
-    private static boolean areIndexVariablesValid(List<IndexVariable> indexVariables) {
-      for (IndexVariable indexVariable : indexVariables) {
-        if (indexVariables.stream().filter( i -> indexVariable.getName().equals(i.getName())).count() > 1) {
-          return false;
-        }
-      }
+	 * Verifies that the index variables do not have repeating pollutant names
+	 *
+	 * @param indexVariables list of index variables from json settings file
+	 * @return validity of index variables settings
+	 */
+	private static boolean areIndexVariablesValid(List<IndexVariable> indexVariables) {
+		for (IndexVariable indexVariable : indexVariables) {
+			if (indexVariables.stream().filter( i -> indexVariable.getName().equals(i.getName())).count() > 1) {
+				return false;
+			}
+		}
 
-      return true;
-    }
+		return true;
+	}
 
     /**
 	 * Verifies that in the configuration there are exactly 2 corresponding request parameters per one variable name
