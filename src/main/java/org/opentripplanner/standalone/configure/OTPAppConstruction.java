@@ -124,7 +124,8 @@ public class OTPAppConstruction {
         if (this.configurations != null){
             return this.configurations;
         }
-        GenericFileConfiguration[] configurationsArray = GenericFileConfigurationParser.parse(store().getGenericDataSettings());
+
+        GenericFileConfiguration configurationsArray = GenericFileConfigurationParser.parse(store().getGenericDataSettings());
         Map<RequestParameters, RequestParameters> parametersMap = GenericFileConfigurationParser.parseConfParam(configurationsArray);
         return parametersMap;
     }

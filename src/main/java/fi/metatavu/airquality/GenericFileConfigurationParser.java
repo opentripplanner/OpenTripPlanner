@@ -2,6 +2,7 @@ package fi.metatavu.airquality;
 
 import com.google.gson.Gson;
 import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import fi.metatavu.airquality.configuration_parsing.IndexVariable;
 import fi.metatavu.airquality.configuration_parsing.ParameterType;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.datastore.DataSource;
@@ -26,22 +27,39 @@ public class GenericFileConfigurationParser {
 	 * Parses settings.json data source, verifies the contents and returns the parsed GenericFileConfiguration[]
 	 *
 	 * @param dataSource dataSource from settings.json file
-	 * @return GenericFileConfiguration[] json data parsed into GenericFileConfiguration[]
+	 * @return json data parsed into GenericFileConfiguration[]
 	 */
-	public static GenericFileConfiguration[] parse(DataSource dataSource) {
+	public static GenericFileConfiguration parse(DataSource dataSource) {
 		if (dataSource.exists()) {
-			GenericFileConfiguration[] configurations = new Gson().fromJson(new InputStreamReader(dataSource.asInputStream()),
-							GenericFileConfiguration[].class);
-			for (GenericFileConfiguration configuration : configurations){
-				RequestParameters[] requestParametersList = configuration.getRequestParameters();
-				if (!areRequestParamValid(Arrays.asList(requestParametersList))) {
-					throw new IllegalArgumentException("The settings file has incorrect request parameters");
-				}
-
+			GenericFileConfiguration configuration = new Gson().fromJson(new InputStreamReader(dataSource.asInputStream()), GenericFileConfiguration.class);
+			RequestParameters[] requestParametersList = configuration.getRequestParameters();
+			if (!areIndexVariablesValid(Arrays.asList(configuration.getIndexVariables()))) {
+				throw new IllegalArgumentException("The settings file has incorrect index variables");
 			}
-			return configurations;
+
+			if (!areRequestParamValid(Arrays.asList(requestParametersList))) {
+				throw new IllegalArgumentException("The settings file has incorrect request parameters");
+			}
+
+			return configuration;
 		}
 		return null;
+	}
+
+	/**
+	 * Verifies that the index variables do not have repeating pollutant names
+	 *
+	 * @param indexVariables list of index variables from json settings file
+	 * @return validity of index variables settings
+	 */
+	private static boolean areIndexVariablesValid(List<IndexVariable> indexVariables) {
+		for (IndexVariable indexVariable : indexVariables) {
+			if (indexVariables.stream().filter( i -> indexVariable.getName().equals(i.getName())).count() > 1) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -53,11 +71,11 @@ public class GenericFileConfigurationParser {
 	public static boolean areRequestParamValid(List<RequestParameters> requestParametersList) {
 		AtomicBoolean res = new AtomicBoolean(true);
 		requestParametersList.stream()
-						.collect(Collectors.groupingBy(RequestParameters::getVariable))
-						.forEach((k, v) -> {
-							if (v.size() != 2)
-								res.set(false);
-						});
+			.collect(Collectors.groupingBy(RequestParameters::getVariable))
+			.forEach((k, v) -> {
+				if (v.size() != 2)
+					res.set(false);
+			});
 		return res.get();
 	}
 
@@ -65,33 +83,31 @@ public class GenericFileConfigurationParser {
 	 * Parses the generic file configuration into pairs of RequestParameters, where key = threshold parameter,
 	 * value = penalty parameter. These parameters will be filled during request and routing process
 	 *
-	 * @param configurationsArray array of all settings from settings.json
+	 * @param genericFileConfiguration settings from settings.json
 	 * @return map of request parameters
 	 */
-	public static Map<RequestParameters, RequestParameters> parseConfParam(GenericFileConfiguration[] configurationsArray) {
+	public static Map<RequestParameters, RequestParameters> parseConfParam(GenericFileConfiguration genericFileConfiguration) {
 		Map<RequestParameters, RequestParameters> requestPairs = new HashMap<>();
-		if (configurationsArray == null) {
+		if (genericFileConfiguration == null) {
 			return null;
 		}
 
-		for (GenericFileConfiguration genericFileConfiguration : configurationsArray){
-			RequestParameters[] requestParameters = genericFileConfiguration.getRequestParameters();
 
-			Arrays.stream(requestParameters)
-							.collect(Collectors.groupingBy(RequestParameters::getVariable))
-							.forEach((k, v) -> {
-								RequestParameters penalty = null, threshold = null;
-								for (RequestParameters fittingParam : v) {
-									if (fittingParam.getParameterType().equals(ParameterType.THRESHOLD)) {
-										threshold = fittingParam;
-									} else if (fittingParam.getParameterType().equals(ParameterType.PENALTY)) {
-										penalty = fittingParam;
-									}
+		RequestParameters[] requestParameters = genericFileConfiguration.getRequestParameters();
 
-									requestPairs.put(threshold, penalty);
-								}
-							});
-		}
+		Arrays.stream(requestParameters).collect(Collectors.groupingBy(RequestParameters::getVariable))
+			.forEach((k, v) -> {
+				RequestParameters penalty = null, threshold = null;
+				for (RequestParameters fittingParam : v) {
+					if (fittingParam.getParameterType().equals(ParameterType.THRESHOLD)) {
+						threshold = fittingParam;
+					} else if (fittingParam.getParameterType().equals(ParameterType.PENALTY)) {
+						penalty = fittingParam;
+					}
+
+					requestPairs.put(threshold, penalty);
+				}
+			});
 		return requestPairs;
 	}
 }
