@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.request;
 
 
-import java.util.Map;
+import gnu.trove.map.TObjectDoubleMap;
 
 /**
  * Mutable version of the {@link McCostParams}.
@@ -13,7 +13,7 @@ public class McCostParamsBuilder {
     private double[] transitReluctanceFactors;
     private double walkReluctanceFactor;
     private double waitReluctanceFactor;
-    private Map<String, Double> surfaceReluctanceFactors;
+    private TObjectDoubleMap<String> surfaceReluctanceFactors;
 
 
     McCostParamsBuilder(McCostParams defaults) {
@@ -70,11 +70,11 @@ public class McCostParamsBuilder {
         return this;
     }
 
-    public Map<String, Double> surfaceReluctanceFactors() {
+    public TObjectDoubleMap<String> surfaceReluctanceFactors() {
         return surfaceReluctanceFactors;
     }
 
-    public McCostParamsBuilder surfaceReluctanceFactors(Map<String,Double> surfaceReluctanceFactors) {
+    public McCostParamsBuilder surfaceReluctanceFactors(TObjectDoubleMap<String> surfaceReluctanceFactors) {
         this.surfaceReluctanceFactors = surfaceReluctanceFactors;
         return this;
     }

@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.api.request;
 
 
-import java.util.Collections;
-import java.util.Map;
+import gnu.trove.TCollections;
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
@@ -22,7 +23,7 @@ public class McCostParams {
     private final double[] transitReluctanceFactors;
     private final double walkReluctanceFactor;
     private final double waitReluctanceFactor;
-    private final Map<String, Double> surfaceReluctanceFactors;
+    private final TObjectDoubleMap<String> surfaceReluctanceFactors;
 
     /**
      * Default constructor defines default values. These defaults are
@@ -34,7 +35,7 @@ public class McCostParams {
         this.transitReluctanceFactors = null;
         this.walkReluctanceFactor = 4.0;
         this.waitReluctanceFactor = 1.0;
-        this.surfaceReluctanceFactors = Map.of();
+        this.surfaceReluctanceFactors = new TObjectDoubleHashMap<>(0);
     }
 
     McCostParams(McCostParamsBuilder builder) {
@@ -43,7 +44,7 @@ public class McCostParams {
         this.transitReluctanceFactors = builder.transitReluctanceFactors();
         this.walkReluctanceFactor = builder.walkReluctanceFactor();
         this.waitReluctanceFactor = builder.waitReluctanceFactor();
-        this.surfaceReluctanceFactors = Collections.unmodifiableMap(builder.surfaceReluctanceFactors());
+        this.surfaceReluctanceFactors = TCollections.unmodifiableMap(builder.surfaceReluctanceFactors());
     }
 
     public int boardCost() {
@@ -82,7 +83,7 @@ public class McCostParams {
         return waitReluctanceFactor;
     }
 
-    public Map<String, Double> surfaceReluctanceFactors() {
+    public TObjectDoubleMap<String> surfaceReluctanceFactors() {
         return surfaceReluctanceFactors;
     }
 

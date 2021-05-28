@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -427,7 +429,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     @Deprecated
     public double waitAtBeginningFactor = 0.4;
 
-    public Map<String, Double> surfaceReluctances;
+    public TObjectDoubleMap<String> surfaceReluctances;
 
     /**
      * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
@@ -1331,11 +1333,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     public void setSurfaceReluctances(String surfaceReluctances) throws ParameterException {
-        this.surfaceReluctances = new HashMap<>();
         if (surfaceReluctances == null) {
+            this.surfaceReluctances = new TObjectDoubleHashMap<>(0);
             return;
         }
-        for (String reluctanceWithSurface : surfaceReluctances.split(";")) {
+        String[] reluctanceSegments = surfaceReluctances.split(";");
+        this.surfaceReluctances = new TObjectDoubleHashMap<>(reluctanceSegments.length);
+        for (String reluctanceWithSurface : reluctanceSegments) {
             String[] surfaceAndReluctance = reluctanceWithSurface.split(",");
             if (surfaceAndReluctance.length != 2) {
                 throw new ParameterException(Message.BOGUS_PARAMETER);
