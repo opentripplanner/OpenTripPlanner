@@ -134,6 +134,7 @@ public class NearbyStopFinder {
         if (useStreets) {
             return findNearbyStopsViaStreets(vertex, reverseDirection);
         }
+        // It make sense for the directGraphFinder to use meters as a limit, so we convert first
         double limitMeters = durationLimitInSeconds * new RoutingRequest(TraverseMode.WALK).walkSpeed;
         Coordinate c0 = vertex.getCoordinate();
         return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
