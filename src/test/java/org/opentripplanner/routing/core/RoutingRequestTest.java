@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import org.junit.Test;
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
@@ -12,6 +13,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 
 public class RoutingRequestTest {
@@ -27,36 +29,37 @@ public class RoutingRequestTest {
 
     @Test
     public void testRequest() {
-        RoutingRequest request = new RoutingRequest();
+        try (RoutingRequest request = new RoutingRequest()) {
+            request.addMode(CAR);
+            assertTrue(request.streetSubRequestModes.getCar());
+            request.removeMode(CAR);
+            assertFalse(request.streetSubRequestModes.getCar());
 
-        request.addMode(CAR);
-        assertTrue(request.streetSubRequestModes.getCar());
-        request.removeMode(CAR);
-        assertFalse(request.streetSubRequestModes.getCar());
-
-        request.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.WALK));
-        assertFalse(request.streetSubRequestModes.getCar());
-        assertTrue(request.streetSubRequestModes.getBicycle());
-        assertTrue(request.streetSubRequestModes.getWalk());
+            request.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.WALK));
+            assertFalse(request.streetSubRequestModes.getCar());
+            assertTrue(request.streetSubRequestModes.getBicycle());
+            assertTrue(request.streetSubRequestModes.getWalk());
+        }
     }
 
     @Test
     public void testIntermediatePlaces() {
-        RoutingRequest req = new RoutingRequest();
-        assertFalse(req.hasIntermediatePlaces());
+        try (RoutingRequest req = new RoutingRequest()) {
+            assertFalse(req.hasIntermediatePlaces());
 
-        req.clearIntermediatePlaces();
-        assertFalse(req.hasIntermediatePlaces());
+            req.clearIntermediatePlaces();
+            assertFalse(req.hasIntermediatePlaces());
 
-        req.addIntermediatePlace(randomLocation());
-        assertTrue(req.hasIntermediatePlaces());
-        
-        req.clearIntermediatePlaces();
-        assertFalse(req.hasIntermediatePlaces());
+            req.addIntermediatePlace(randomLocation());
+            assertTrue(req.hasIntermediatePlaces());
 
-        req.addIntermediatePlace(randomLocation());
-        req.addIntermediatePlace(randomLocation());
-        assertTrue(req.hasIntermediatePlaces());
+            req.clearIntermediatePlaces();
+            assertFalse(req.hasIntermediatePlaces());
+
+            req.addIntermediatePlace(randomLocation());
+            req.addIntermediatePlace(randomLocation());
+            assertTrue(req.hasIntermediatePlaces());
+        }
     }
 
     @Test
@@ -98,6 +101,44 @@ public class RoutingRequestTest {
         }
     }
 
+    @Test
+    public void testSurfaceReluctances() {
+        try (RoutingRequest req = new RoutingRequest()) {
+            assertTrue(req.surfaceReluctances.isEmpty());
+
+            try {
+                req.setSurfaceReluctances("asphalt,1.2;cobblestone,5");
+            } catch (Exception e) {
+                fail();
+            }
+
+            assertFalse(req.surfaceReluctances.isEmpty());
+            assertEquals(2, req.surfaceReluctances.size());
+            assertTrue(req.surfaceReluctances.containsKey("asphalt"));
+            assertTrue(req.surfaceReluctances.containsValue(1.2));
+            assertTrue(req.surfaceReluctances.containsKey("cobblestone"));
+            assertTrue(req.surfaceReluctances.containsValue(5.0));
+
+            try {
+                req.setSurfaceReluctances("asphalt;cobblestone,5");
+                fail();
+            } catch (ParameterException expected) {
+                // we expect it to throw the exception
+            }
+            try {
+                req.setSurfaceReluctances("asphalt,0.5;cobblestone,5");
+                fail();
+            } catch (ParameterException expected) {
+                // we expect it to throw the exception
+            }
+            try {
+                req.setSurfaceReluctances("asphalt,foo;cobblestone,5");
+                fail();
+            } catch (ParameterException expected) {
+                // we expect it to throw the exception
+            }
+        }
+    }
 
     private static class RoutePenaltyTC {
         final boolean prefAgency;
