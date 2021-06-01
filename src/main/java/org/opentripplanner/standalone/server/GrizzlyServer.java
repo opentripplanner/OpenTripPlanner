@@ -120,26 +120,19 @@ public class GrizzlyServer {
         httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 
         /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
-        if(params.disableNativeClient != true) {
-	        CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/client/");
-	        if (params.disableFileCache) {
-	            LOG.info("Disabling HTTP server static file cache.");
-	            staticHandler.setFileCacheEnabled(false);
-	        }
-	        httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
+        CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/client/");
+        if (params.disableFileCache) {
+            LOG.info("Disabling HTTP server static file cache.");
+            staticHandler.setFileCacheEnabled(false);
         }
-        
+        httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
+
         /* 3. A static content handler to serve local files from the filesystem, under the "local" path. */
         if (params.clientDirectory != null) {
-        	String path = "/local";
-        	if(params.clientPath != null) {
-        		path = params.clientPath;
-        	}
-        	
-        	StaticHttpHandler localHandler = new StaticHttpHandler(
+            StaticHttpHandler localHandler = new StaticHttpHandler(
                     params.clientDirectory.getAbsolutePath());
             localHandler.setFileCacheEnabled(false);
-            httpServer.getServerConfiguration().addHttpHandler(localHandler, path);
+            httpServer.getServerConfiguration().addHttpHandler(localHandler, "/local");
         }
 
         /* 3. Test alternate HTTP handling without Jersey. */
