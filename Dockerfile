@@ -14,4 +14,4 @@ RUN chmod -R 755 /opt
 
 EXPOSE 8080
 
-ENTRYPOINT [ "/opt/run-otp.sh" ]
+ENTRYPOINT [ "/bin/bash", "/opt/run-otp.sh" ]
