@@ -61,7 +61,7 @@ public class BikeRentalStation implements Serializable, Cloneable {
      *
      */
     @JsonIgnore
-    public Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
+    public transient Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
 
     /**
      * FIXME nonstandard definition of equals, relying on only the station field.

@@ -1,5 +1,13 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -44,15 +52,6 @@ import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.stream.Stream;
 
 // TODO OTP2 There is still a lot of transit-related logic here that should be removed. We also need
 //      to decide where real-time updates should be applied to the itinerary.
@@ -205,12 +204,17 @@ public abstract class GraphPathToItineraryMapper {
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
         for (int i = 1; i < states.length - 1; i++) {
-            TraverseMode backMode = states[i].getBackMode();
-            TraverseMode forwardMode = states[i + 1].getBackMode();
+            var backState = states[i];
+            var forwardState = states[i + 1];
+            var backMode = backState.getBackMode();
+            var forwardMode = forwardState.getBackMode();
 
-            if (backMode == null || forwardMode == null) continue;
+            var modeChange = backMode != forwardMode && backMode != null && forwardMode != null;
+            var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
+            var parkingChange = backState.isBikeParked() != forwardState.isBikeParked()
+                    || backState.isCarParked() != forwardState.isCarParked();
 
-            if (backMode != forwardMode) {
+            if (modeChange || rentalChange || parkingChange) {
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[] {i, states.length - 1};
@@ -226,9 +230,11 @@ public abstract class GraphPathToItineraryMapper {
         for (int i = 0; i < legsStates.length; i++) {
             legIndexPairs = legsIndexes.get(i);
             legsStates[i] = new State[legIndexPairs[1] - legIndexPairs[0] + 1];
-            for (int j = 0; j <= legIndexPairs[1] - legIndexPairs[0]; j++) {
-                legsStates[i][j] = states[legIndexPairs[0] + j];
-            }
+            if (legIndexPairs[1] - legIndexPairs[0] + 1 >= 0)
+                System.arraycopy(
+                        states, legIndexPairs[0], legsStates[i], 0,
+                        legIndexPairs[1] - legIndexPairs[0] + 1
+                );
         }
 
         return legsStates;
@@ -288,7 +294,7 @@ public abstract class GraphPathToItineraryMapper {
         // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
         leg.interlineWithPreviousLeg = false;
 
-        leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
+        leg.rentedBike = states[0].isBikeRenting();
 
         if (leg.rentedBike) {
             Set<String> bikeRentalNetworks = states[0].getBikeRentalNetworks();
@@ -505,17 +511,17 @@ public abstract class GraphPathToItineraryMapper {
 
         State onBikeRentalState = null, offBikeRentalState = null;
 
+        if (isRentalPickUp(states[states.length - 1])) {
+            onBikeRentalState = states[states.length - 1];
+        }
+        if (isRentalDropOff(states[0])) {
+            offBikeRentalState = states[0];
+        }
+
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];
             State forwardState = states[i + 1];
             Edge edge = forwardState.getBackEdge();
-
-            if (edge instanceof BikeRentalEdge && forwardState.bikeRentalNotStarted()) {
-                onBikeRentalState = forwardState;
-            }
-            if (edge instanceof BikeRentalEdge && !forwardState.bikeRentalNotStarted()) {
-                offBikeRentalState = forwardState;
-            }
 
             boolean createdNewStep = false, disableZagRemovalForThisStep = false;
             if (edge instanceof FreeEdge) {
@@ -783,14 +789,23 @@ public abstract class GraphPathToItineraryMapper {
         // add bike rental information if applicable
         if(onBikeRentalState != null && !steps.isEmpty()) {
             steps.get(steps.size()-1).bikeRentalOnStation = 
-                    new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
+                    new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getVertex());
         }
         if(offBikeRentalState != null && !steps.isEmpty()) {
             steps.get(0).bikeRentalOffStation = 
-                    new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
+                    new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getVertex());
         }
 
         return steps;
+    }
+
+    private static boolean isRentalPickUp(State state) {
+        return state.getBackEdge() instanceof BikeRentalEdge && (state.getBackState() == null || !state.getBackState()
+                .isBikeRenting());
+    }
+
+    private static boolean isRentalDropOff(State state) {
+        return state.getBackEdge() instanceof BikeRentalEdge && state.getBackState().isBikeRenting();
     }
 
     private static boolean isLink(Edge edge) {
