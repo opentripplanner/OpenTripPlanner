@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import com.esotericsoftware.minlog.Log;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingMethod;
+import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.model.ContactInfo;
 import org.rutebanken.netex.model.BookingArrangementsStructure;
 import org.rutebanken.netex.model.BookingMethodEnumeration;

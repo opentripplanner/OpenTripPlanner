@@ -56,6 +56,8 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final TripMapper tripMapper;
 
+    private final BookingRuleMapper bookingRuleMapper;
+
     private final StopTimeMapper stopTimeMapper;
 
     private final FrequencyMapper frequencyMapper;
@@ -80,7 +82,8 @@ public class GTFSToOtpTransitServiceMapper {
         agencyMapper = new AgencyMapper(feedId);
         routeMapper = new RouteMapper(agencyMapper);
         tripMapper = new TripMapper(routeMapper);
-        stopTimeMapper = new StopTimeMapper(stopMapper, locationMapper, locationGroupMapper, tripMapper);
+        bookingRuleMapper = new BookingRuleMapper();
+        stopTimeMapper = new StopTimeMapper(stopMapper, locationMapper, locationGroupMapper, tripMapper, bookingRuleMapper);
         frequencyMapper = new FrequencyMapper(tripMapper);
         fareRuleMapper = new FareRuleMapper(
             routeMapper, fareAttributeMapper
