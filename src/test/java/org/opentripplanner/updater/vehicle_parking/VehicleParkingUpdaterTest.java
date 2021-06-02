@@ -12,9 +12,9 @@ import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestBase;
-import org.opentripplanner.routing.vehicle_parking.VehicleSpaces;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphUpdater;
@@ -106,7 +106,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
 
   @Test
   public void updateVehicleParkingTest() {
-    var vehiclePlaces = VehicleSpaces.builder()
+    var vehiclePlaces = VehicleParkingSpaces.builder()
         .bicycleSpaces(1)
         .build();
 
@@ -123,7 +123,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
 
-    vehiclePlaces = VehicleSpaces.builder()
+    vehiclePlaces = VehicleParkingSpaces.builder()
         .bicycleSpaces(2)
         .build();
     vehicleParkings = List.of(
@@ -181,7 +181,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
 
   @Test
   public void updateNotOperatingVehicleParkingTest() {
-    var vehiclePlaces = VehicleSpaces.builder()
+    var vehiclePlaces = VehicleParkingSpaces.builder()
         .bicycleSpaces(1)
         .build();
 
@@ -198,7 +198,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
     assertEquals(vehiclePlaces, vehicleParkingService.getVehicleParkings().findFirst().orElseThrow().getAvailability());
     assertVehicleParkingNotLinked();
 
-    vehiclePlaces = VehicleSpaces.builder()
+    vehiclePlaces = VehicleParkingSpaces.builder()
         .bicycleSpaces(2)
         .build();
 

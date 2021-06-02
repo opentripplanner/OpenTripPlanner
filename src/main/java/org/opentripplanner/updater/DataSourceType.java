@@ -5,6 +5,9 @@ public enum DataSourceType {
   GBFS,
   SMOOVE,
 
+  // Vehicle Parking
+  KML,
+
   // GTFS RT
   GTFS_RT_HTTP,
   GTFS_RT_FILE;
