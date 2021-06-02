@@ -20,11 +20,8 @@ public class BikeRentalEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    private final Set<String> networks;
-
-    public BikeRentalEdge(BikeRentalStationVertex vertex, Set<String> networks) {
+    public BikeRentalEdge(BikeRentalStationVertex vertex) {
         super(vertex, vertex);
-        this.networks = networks;
     }
 
     public State traverse(State s0) {
@@ -34,6 +31,7 @@ public class BikeRentalEdge extends Edge {
         RoutingRequest options = s0.getOptions();
 
         BikeRentalStationVertex stationVertex = (BikeRentalStationVertex) tov;
+        var networks = stationVertex.getStation().networks;
 
         boolean pickedUp;
         if (options.arriveBy) {
@@ -44,12 +42,12 @@ public class BikeRentalEdge extends Edge {
                     if (options.useBikeRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
                         return null;
                     }
-                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), true);
+                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), networks, true);
                     pickedUp = false;
                     break;
                 case RENTING_FLOATING:
                     if (stationVertex.getStation().isFloatingBike) {
-                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), true);
+                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), networks, true);
                         pickedUp = true;
                     } else {
                         return null;
@@ -65,7 +63,7 @@ public class BikeRentalEdge extends Edge {
                         return null;
                     }
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
-                    s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), false, true);
+                    s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), networks, false, true);
                     pickedUp = true;
                     break;
                 default:
@@ -78,12 +76,14 @@ public class BikeRentalEdge extends Edge {
                         return null;
                     }
                     if (stationVertex.getStation().isFloatingBike) {
-                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), false);
+                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), networks,
+                                false);
                     } else {
                         var mayKeep =
                                 stationVertex.getStation().isKeepingBicycleRentalAtDestinationAllowed
                                         && options.allowKeepingRentedBicycleAtDestination;
-                        s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), mayKeep, false);
+                        s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), networks,
+                                mayKeep, false);
                     }
                     pickedUp = true;
                     break;
@@ -95,7 +95,7 @@ public class BikeRentalEdge extends Edge {
                     if (options.useBikeRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
                         return null;
                     }
-                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), false);
+                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), networks, false);
                     pickedUp = false;
                     break;
                 default:
@@ -105,8 +105,7 @@ public class BikeRentalEdge extends Edge {
 
         s1.incrementWeight(pickedUp ? options.bikeRentalPickupCost : options.bikeRentalDropoffCost);
         s1.incrementTimeInSeconds(pickedUp ? options.bikeRentalPickupTime : options.bikeRentalDropoffTime);
-        s1.setBikeRentalNetwork(networks);
-        s1.setBackMode(s0.getNonTransitMode());
+        s1.setBackMode(null);
         return s1.makeState();
     }
 

@@ -13,6 +13,7 @@
 *.iws
 *.swp
 *.DS_Store
+*.snap.debug
 dependency-reduced-pom.xml
 interactive_otp_main.json
 /otp

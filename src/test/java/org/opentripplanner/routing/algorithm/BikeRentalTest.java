@@ -111,7 +111,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FROM_STATION - BC street (540.19, 280)",
                 "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                "null - HAVE_RENTED - E1 (651.38, 333)"
         );
     }
 
@@ -125,13 +125,13 @@ public class BikeRentalTest extends GraphRoutingTest {
                         "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                         "WALK - BEFORE_RENTING - BC street (1,579.95, 790)",
                         "WALK - BEFORE_RENTING - CD street (1,655.14, 828)",
-                        "WALK - BEFORE_RENTING - E1 (1,656.14, 828)"
+                        "null - BEFORE_RENTING - E1 (1,656.14, 828)"
                 ),
                 List.of(
                         "WALK - HAVE_RENTED - AB street (76.19, 38)",
                         "WALK - HAVE_RENTED - BC street (1,579.95, 790)",
                         "WALK - HAVE_RENTED - CD street (1,655.14, 828)",
-                        "WALK - HAVE_RENTED - E1 (1,656.14, 828)"
+                        "null - HAVE_RENTED - E1 (1,656.14, 828)"
                 )
         );
     }
@@ -146,13 +146,13 @@ public class BikeRentalTest extends GraphRoutingTest {
                         "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                         "WALK - BEFORE_RENTING - BC street (1,579.95, 790)",
                         "WALK - BEFORE_RENTING - CD street (1,655.14, 828)",
-                        "WALK - BEFORE_RENTING - E1 (1,656.14, 828)"
+                        "null - BEFORE_RENTING - E1 (1,656.14, 828)"
                 ),
                 List.of(
                         "WALK - HAVE_RENTED - AB street (76.19, 38)",
                         "WALK - HAVE_RENTED - BC street (1,579.95, 790)",
                         "WALK - HAVE_RENTED - CD street (1,655.14, 828)",
-                        "WALK - HAVE_RENTED - E1 (1,656.14, 828)"
+                        "null - HAVE_RENTED - E1 (1,656.14, 828)"
                 )
         );
     }
@@ -167,13 +167,13 @@ public class BikeRentalTest extends GraphRoutingTest {
                         "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                         "WALK - BEFORE_RENTING - BC street (1,579.95, 790)",
                         "WALK - BEFORE_RENTING - CD street (1,655.14, 828)",
-                        "WALK - BEFORE_RENTING - E1 (1,656.14, 828)"
+                        "null - BEFORE_RENTING - E1 (1,656.14, 828)"
                 ),
                 List.of(
                         "WALK - HAVE_RENTED - AB street (76.19, 38)",
                         "WALK - HAVE_RENTED - BC street (1,579.95, 790)",
                         "WALK - HAVE_RENTED - CD street (1,655.14, 828)",
-                        "WALK - HAVE_RENTED - E1 (1,656.14, 828)"
+                        "null - HAVE_RENTED - E1 (1,656.14, 828)"
                 )
         );
     }
@@ -187,7 +187,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FROM_STATION - BC street (540.19, 280)",
                 "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                "null - HAVE_RENTED - E1 (651.38, 333)"
         );
     }
 
@@ -200,7 +200,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FROM_STATION - BC street (540.19, 280)",
                 "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                "null - HAVE_RENTED - E1 (651.38, 333)"
         );
     }
 
@@ -213,7 +213,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FLOATING - BC street (540.19, 280)",
                 "BICYCLE - RENTING_FLOATING - CD street (560.19, 290)",
-                "BICYCLE - RENTING_FLOATING - E1 (561.19, 290)"
+                "null - RENTING_FLOATING - E1 (561.19, 290)"
         );
 
         assertPath(
@@ -229,7 +229,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FLOATING - BC street (540.19, 280)",
                 "BICYCLE - RENTING_FLOATING - CD street (560.19, 290)",
-                "BICYCLE - RENTING_FLOATING - E1 (561.19, 290)"
+                "null - RENTING_FLOATING - E1 (561.19, 290)"
         );
     }
 
@@ -242,7 +242,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FROM_STATION - BC street (540.19, 280)",
                 "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                "null - HAVE_RENTED - E1 (651.38, 333)"
         );
 
         assertPath(
@@ -258,7 +258,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FROM_STATION - BC street (540.19, 280)",
                 "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                "null - HAVE_RENTED - E1 (651.38, 333)"
         );
     }
 
@@ -271,7 +271,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FROM_STATION (may keep) - BC street (540.19, 280)",
                 "BICYCLE - RENTING_FROM_STATION (may keep) - CD street (560.19, 290)",
-                "BICYCLE - RENTING_FROM_STATION (may keep) - E1 (601.19, 290)"
+                "null - RENTING_FROM_STATION (may keep) - E1 (601.19, 290)"
         );
 
         assertPath(
@@ -287,7 +287,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                 "BICYCLE - RENTING_FROM_STATION (may keep) - BC street (540.19, 280)",
                 "BICYCLE - RENTING_FROM_STATION (may keep) - CD street (560.19, 290)",
-                "BICYCLE - RENTING_FROM_STATION (may keep) - E1 (601.19, 290)"
+                "null - RENTING_FROM_STATION (may keep) - E1 (601.19, 290)"
         );
     }
 
@@ -302,13 +302,13 @@ public class BikeRentalTest extends GraphRoutingTest {
                         "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                         "BICYCLE - RENTING_FROM_STATION (may keep) - BC street (540.19, 280)",
                         "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                        "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                        "null - HAVE_RENTED - E1 (651.38, 333)"
                 ),
                 List.of(
                         "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                         "BICYCLE - RENTING_FROM_STATION - BC street (540.19, 280)",
                         "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                        "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                        "null - HAVE_RENTED - E1 (651.38, 333)"
                 )
         );
 
@@ -334,13 +334,13 @@ public class BikeRentalTest extends GraphRoutingTest {
                         "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                         "BICYCLE - RENTING_FROM_STATION (may keep) - BC street (540.19, 280)",
                         "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                        "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                        "null - HAVE_RENTED - E1 (651.38, 333)"
                 ),
                 List.of(
                         "WALK - BEFORE_RENTING - AB street (76.19, 38)",
                         "BICYCLE - RENTING_FROM_STATION - BC street (540.19, 280)",
                         "WALK - HAVE_RENTED - CD street (650.38, 333)",
-                        "WALK - HAVE_RENTED - E1 (651.38, 333)"
+                        "null - HAVE_RENTED - E1 (651.38, 333)"
                 )
         );
     }

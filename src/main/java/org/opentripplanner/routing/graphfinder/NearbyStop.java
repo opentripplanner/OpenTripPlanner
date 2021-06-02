@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.graphfinder;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -12,17 +15,13 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 /**
  * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
  * state of how to reach the stop from the search origin
  */
 public class NearbyStop implements Comparable<NearbyStop> {
 
-  private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+  private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
   public final StopLocation stop;
   public final double distance;
@@ -55,8 +54,33 @@ public class NearbyStop implements Comparable<NearbyStop> {
     return (int) (this.distance) - (int) (that.distance);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) { return true; }
+    if (o == null || getClass() != o.getClass()) { return false; }
+    final NearbyStop that = (NearbyStop) o;
+    return Double.compare(that.distance, distance) == 0
+            && distanceIndependentTime == that.distanceIndependentTime
+            && stop.equals(that.stop)
+            && Objects.equals(edges, that.edges)
+            && Objects.equals(geometry, that.geometry)
+            && Objects.equals(state, that.state);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(stop, distance, distanceIndependentTime, edges, geometry, state);
+  }
+
   public String toString() {
-    return String.format("stop %s at %.1f meters", stop, distance);
+    return String.format(
+            "stop %s at %.1f meters%s%s%s%s",
+            stop, distance,
+            distanceIndependentTime > 0 ? " +" + distanceIndependentTime + " seconds" : "",
+            edges != null ? " (" + edges.size() + " edges)" : "",
+            geometry != null ? " w/geometry" : "",
+            state != null ? " w/state" : ""
+    );
   }
 
   /**

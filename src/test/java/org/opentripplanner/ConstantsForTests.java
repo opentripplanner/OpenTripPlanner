@@ -12,7 +12,10 @@ import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
@@ -20,6 +23,8 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
@@ -69,8 +74,6 @@ public class ConstantsForTests {
 
     private Graph minNetexGraph = null;
 
-    private GtfsContext portlandContext = null;
-
     private ConstantsForTests() {
 
     }
@@ -80,13 +83,6 @@ public class ConstantsForTests {
             instance = new ConstantsForTests();
         }
         return instance;
-    }
-
-    public GtfsContext getPortlandContext() {
-        if (portlandGraph == null) {
-            setupPortland();
-        }
-        return portlandContext;
     }
 
     public Graph getPortlandGraph() {
@@ -117,30 +113,36 @@ public class ConstantsForTests {
             {
                 File osmFile = new File(PORTLAND_CENTRAL_OSM);
                 BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
-                OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
+                OpenStreetMapModule osmModule = new OpenStreetMapModule(List.of(osmProvider));
+                osmModule.staticBikeParkAndRide = true;
+                osmModule.staticParkAndRide = true;
+                osmModule.staticBikeRental = true;
                 osmModule.skipVisibility = true;
                 osmModule.buildGraph(portlandGraph, new HashMap<>());
             }
             // Add transit data from GTFS
             {
-                portlandContext = contextBuilder(ConstantsForTests.PORTLAND_GTFS)
-                        .withIssueStoreAndDeduplicator(portlandGraph)
-                        .build();
-                AddTransitModelEntitiesToGraph.addToGraph(portlandContext, portlandGraph);
-                GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(portlandContext);
-                factory.run(portlandGraph);
+                GtfsBundle gtfsBundle = new GtfsBundle(new File(PORTLAND_GTFS));
+                gtfsBundle.setFeedId(new GtfsFeedId.Builder().id("prt").build());
+                GtfsModule module = new GtfsModule(
+                        List.of(gtfsBundle),
+                        new ServiceDateInterval(new ServiceDate(2009, 9, 1), new ServiceDate(2010, 3, 1))
+                );
+                module.buildGraph(portlandGraph, new HashMap<>());
             }
             // Link transit stops to streets
             {
                 GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
                 streetTransitLinker.buildGraph(portlandGraph, new HashMap<>());
             }
-            // TODO: eliminate GTFSContext
-            // this is now making a duplicate calendarservicedata but it's oh so practical
-            portlandGraph.putService(
-                    CalendarServiceData.class,
-                    portlandContext.getCalendarServiceData()
-            );
+
+            portlandGraph.hasStreets = true;
+            portlandGraph.hasTransit = true;
+
+            portlandGraph.index();
+
+            portlandGraph.getBikerentalStationService().getBikeRentalStations()
+                    .forEach(bikeRentalStation -> bikeRentalStation.isKeepingBicycleRentalAtDestinationAllowed = true);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

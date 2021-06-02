@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.graphfinder;
 
 import com.beust.jcommander.internal.Lists;
+import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -11,8 +12,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-
-import java.util.List;
 
 /**
  * A Graph finder used in conjunction with a graph, which does not have a street network included.
@@ -37,7 +36,7 @@ public class DirectGraphFinder implements GraphFinder {
     List<NearbyStop> stopsFound = Lists.newArrayList();
     Coordinate coordinate = new Coordinate(lon, lat);
     for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
-      double distance = SphericalDistanceLibrary.distance(coordinate, it.getCoordinate());
+      double distance = Math.round(SphericalDistanceLibrary.distance(coordinate, it.getCoordinate()));
       if (distance < radiusMeters) {
         Coordinate coordinates[] = new Coordinate[] {coordinate, it.getCoordinate()};
         NearbyStop sd = new NearbyStop(
@@ -50,6 +49,9 @@ public class DirectGraphFinder implements GraphFinder {
         stopsFound.add(sd);
       }
     }
+
+    stopsFound.sort(NearbyStop::compareTo);
+
     return stopsFound;
   }
 
