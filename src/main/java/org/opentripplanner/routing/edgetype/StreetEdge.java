@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
@@ -385,8 +384,8 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
         StateEditor s1 = s0.edit(this);
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
-        if (handleMotorVehicleNoThroughTraffic(traverseMode, backEdge, s1)) return null;
-        if (handleBicycleNoThroughTraffic(traverseMode, backEdge, s1)) return null;
+
+        if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) return null;
 
         int roundedTime = (int) Math.ceil(time);
 
@@ -462,51 +461,35 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
         return s1;
     }
 
-    private boolean handleMotorVehicleNoThroughTraffic(TraverseMode traverseMode, Edge backEdge, StateEditor s1) {
-        /* Handle no through traffic areas. */
-        if (traverseMode.isDriving()) {
-            if (this.isMotorVehicleNoThruTraffic()) {
-                // Record transition into no-through-traffic area.
-                if (backEdge instanceof StreetEdge && !((StreetEdge) backEdge).isMotorVehicleNoThruTraffic()) {
-                    s1.setEnteredMotorVerhicleNoThroughTrafficArea();
-                }
-                // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
-                if (s1.hasEnteredMotorVehicleNoThroughTrafficArea()) {
-                    // Only Edges are marked as no-thru, but really we need to avoid creating dominant, pruned states
-                    // on thru _Vertices_. This could certainly be improved somehow.
-                    for (StreetEdge se : Iterables.filter(s1.getVertex().getOutgoing(), StreetEdge.class)) {
-                        if (!se.isMotorVehicleNoThruTraffic()) {
-                            // This vertex has at least one through-traffic edge. We can't dominate it with a no-thru state.
-                            return true;
-                        }
-                    }
-                }
+    private boolean isTraversalBlockedByNoThruTraffic(
+            TraverseMode traverseMode,
+            Edge backEdge,
+            State s0,
+            StateEditor s1
+    ) {
+        if (isNoThruTraffic(traverseMode)) {
+            // Record transition into no-through-traffic area.
+            if (backEdge instanceof StreetEdge
+                    && !((StreetEdge) backEdge).isNoThruTraffic(traverseMode)) {
+                s1.setEnteredNoThroughTrafficArea();
             }
+        } else if (s0.hasEnteredNoThruTrafficArea()) {
+            // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
+            return true;
         }
+
         return false;
     }
 
-    private boolean handleBicycleNoThroughTraffic(TraverseMode traverseMode, Edge backEdge, StateEditor s1) {
-        /* Handle no through traffic areas. */
+    public boolean isNoThruTraffic(TraverseMode traverseMode) {
         if (traverseMode.isCycling()) {
-            if (this.isBicycleNoThruTraffic()) {
-                // Record transition into no-through-traffic area.
-                if (backEdge instanceof StreetEdge && !((StreetEdge) backEdge).isBicycleNoThruTraffic()) {
-                    s1.setEnteredBicycleNoThroughTrafficArea();
-                }
-                // If we transitioned into a no-through-traffic area at some point, check if we are exiting it.
-                if (s1.hasEnteredBicycleNoThroughTrafficArea()) {
-                    // Only Edges are marked as no-thru, but really we need to avoid creating dominant, pruned states
-                    // on thru _Vertices_. This could certainly be improved somehow.
-                    for (StreetEdge se : Iterables.filter(s1.getVertex().getOutgoing(), StreetEdge.class)) {
-                        if (!se.isBicycleNoThruTraffic()) {
-                            // This vertex has at least one through-traffic edge. We can't dominate it with a no-thru state.
-                            return true;
-                        }
-                    }
-                }
-            }
+            return isBicycleNoThruTraffic();
         }
+
+        if (traverseMode.isDriving()) {
+            return isMotorVehicleNoThruTraffic();
+        }
+
         return false;
     }
 

@@ -621,12 +621,8 @@ public class State implements Cloneable {
         return reverse();
     }
 
-    boolean hasEnteredMotorVehicleNoThruTrafficArea() {
-        return stateData.enteredMotorVehicleNoThroughTrafficArea;
-    }
-
-    public boolean hasEnteredBicycleNoThruTrafficArea() {
-        return stateData.enteredBicycleNoThroughTrafficArea;
+    public boolean hasEnteredNoThruTrafficArea() {
+        return stateData.enteredNoThroughTrafficArea;
     }
 
     public boolean mayKeepRentedBicycleAtDestination() {

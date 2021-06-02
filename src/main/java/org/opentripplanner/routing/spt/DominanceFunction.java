@@ -64,6 +64,10 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        if (a.hasEnteredNoThruTrafficArea() != b.hasEnteredNoThruTrafficArea()) {
+            return false;
+        }
+
         /*
          * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
          * useless loops in the traversal leading to way faster processing time.
