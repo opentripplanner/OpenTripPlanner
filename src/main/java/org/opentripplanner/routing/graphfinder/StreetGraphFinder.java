@@ -31,8 +31,8 @@ public class StreetGraphFinder implements GraphFinder {
 
   @Override
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
-      StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor();
-      findClosestUsingStreets(lat, lon, radiusMeters, visitor, null);
+      StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(radiusMeters);
+      findClosestUsingStreets(lat, lon, visitor, visitor.getSearchTerminationStrategy());
       return visitor.stopsFound;
   }
 
@@ -50,17 +50,18 @@ public class StreetGraphFinder implements GraphFinder {
           filterByStops,
           filterByRoutes,
           filterByBikeRentalStations,
-          maxResults
+          maxResults,
+          radiusMeters
       );
       SearchTerminationStrategy terminationStrategy = visitor.getSearchTerminationStrategy();
-      findClosestUsingStreets(lat, lon, radiusMeters, visitor, terminationStrategy);
+      findClosestUsingStreets(lat, lon, visitor, terminationStrategy);
       List<PlaceAtDistance> results = visitor.placesFound;
       results.sort(Comparator.comparingDouble(pad -> pad.distance));
       return results.subList(0, min(results.size(), maxResults));
   }
 
   private void findClosestUsingStreets(
-      double lat, double lon, double radius, TraverseVisitor visitor, SearchTerminationStrategy terminationStrategy
+      double lat, double lon, TraverseVisitor visitor, SearchTerminationStrategy terminationStrategy
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests

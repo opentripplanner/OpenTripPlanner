@@ -41,6 +41,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   private final boolean includePatternAtStops;
   private final boolean includeBikeShares;
   private final int maxResults;
+  private final double radiusMeters;
 
   /**
    *
@@ -55,7 +56,8 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   public PlaceFinderTraverseVisitor(
       RoutingService routingService, List<TransitMode> filterByModes,
       List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
-      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations, int maxResults
+      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations, int maxResults,
+      double radiusMeters
   ) {
     this.routingService = routingService;
     this.filterByModes = toSet(filterByModes);
@@ -69,6 +71,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     includeBikeShares = filterByPlaceTypes == null
         || filterByPlaceTypes.contains(PlaceType.BICYCLE_RENT);
     this.maxResults = maxResults;
+    this.radiusMeters = radiusMeters;
   }
 
   private static <T> Set<T> toSet(List<T> list) {
@@ -159,21 +162,20 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
       // max distance to be the furthest of the places so far
       // and let the search terminate at that distance
       // and then return the first n
+
+      double furthestDistance = radiusMeters;
+
       if (PlaceFinderTraverseVisitor.this.placesFound.size()
           >= PlaceFinderTraverseVisitor.this.maxResults) {
-        double furthestDistance = 0;
+
         for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
           if (pad.distance > furthestDistance) {
             furthestDistance = pad.distance;
           }
         }
-
-        // This comparison works because we are travelling at 1 m/s
-        return current.getElapsedTimeSeconds() > furthestDistance;
       }
-      else {
-        return false;
-      }
+      // This comparison works because we are travelling at 1 m/s
+      return current.getElapsedTimeSeconds() > furthestDistance;
     };
   }
 }
