@@ -135,7 +135,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         assertEquals(
                 List.of(ns1, ps21, ps11, br1, ns2, ns3, br2),
                 graphFinder.findClosestPlaces(
-                        47.500, 19.000, 250.0, 100,
+                        47.500, 19.000, 200.0, 100,
                         null, null, null, null, null, null, null,
                         routingService
                 )
@@ -160,7 +160,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         assertEquals(
                 List.of(ns1, ns2, ns3),
                 graphFinder.findClosestPlaces(
-                        47.500, 19.000, 250.0, 100,
+                        47.500, 19.000, 200.0, 100,
                         null, List.of(PlaceType.STOP), null, null, null, null, null,
                         routingService
                 )
@@ -169,7 +169,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         assertEquals(
                 List.of(ns1, ns2),
                 graphFinder.findClosestPlaces(
-                        47.500, 19.000, 250.0, 100,
+                        47.500, 19.000, 200.0, 100,
                         List.of(TransitMode.BUS), List.of(PlaceType.STOP), null, null, null, null, null,
                         routingService
                 )
@@ -239,7 +239,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         assertEquals(
                 List.of(ns1, ps21, ps11, ns2, ns3),
                 graphFinder.findClosestPlaces(
-                        47.500, 19.000, 250.0, 100,
+                        47.500, 19.000, 200.0, 100,
                         null, List.of(PlaceType.STOP, PlaceType.PATTERN_AT_STOP), null, null, null, null, null,
                         routingService
                 )
@@ -248,7 +248,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         assertEquals(
                 List.of(ns1, ps21, ns2, ns3),
                 graphFinder.findClosestPlaces(
-                        47.500, 19.000, 250.0, 100,
+                        47.500, 19.000, 200.0, 100,
                         null, List.of(PlaceType.STOP, PlaceType.PATTERN_AT_STOP), null, List.of(R2.getId()), null, null, null,
                         routingService
                 )

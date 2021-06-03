@@ -6,7 +6,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -151,31 +151,29 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   }
 
   /**
-   * @return A SearchTerminationStrategy, which can be used to terminate the search after the max
-   * number of places has been found
+   * @return A SkipEdgeStrategy to be used with this TraverseVisitor. It skips edges when either
+   *          the maximum number of places or the furthest distance has been reached. However,
+   *          when the maximum number of places has been reached, it continues searching along
+   *          other paths until the distance of the place that is furthest away. This is to account
+   *          for the fact that the a star does not traverse edges ordered by distance.
    */
-  public SearchTerminationStrategy getSearchTerminationStrategy() {
+  public SkipEdgeStrategy getSkipEdgeStrategy() {
 
-    return (origin, target, current, spt, traverseOptions) -> {
-      // the first n stops the search visit may not be the nearest n
-      // but when we have at least n stops found, we can update the
-      // max distance to be the furthest of the places so far
-      // and let the search terminate at that distance
-      // and then return the first n
+    return (origin, target, current, edge, spt, traverseOptions) -> {
 
       double furthestDistance = radiusMeters;
 
       if (PlaceFinderTraverseVisitor.this.placesFound.size()
           >= PlaceFinderTraverseVisitor.this.maxResults) {
-
+        furthestDistance = 0;
         for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
           if (pad.distance > furthestDistance) {
             furthestDistance = pad.distance;
           }
         }
       }
-      // This comparison works because we are travelling at 1 m/s
-      return current.getElapsedTimeSeconds() > furthestDistance;
+
+      return current.getWalkDistance() > furthestDistance;
     };
   }
 }

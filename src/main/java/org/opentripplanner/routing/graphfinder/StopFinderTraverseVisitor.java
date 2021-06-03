@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.graphfinder;
 
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -10,6 +10,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO Seems like this should be merged with the PlaceFinderTraverseVisitor
 /**
  * A TraverseVisitor used in finding stops while walking the street graph.
  */
@@ -40,12 +41,12 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
   }
 
   /**
-   * @return A SearchTerminationStrategy, which can be used to terminate the search after the max
-   * number of places has been found
+   * @return A SkipEdgeStrategy that will stop exploring edges after the distance radius has been
+   *          reached.
    */
-  public SearchTerminationStrategy getSearchTerminationStrategy() {
+  public SkipEdgeStrategy getSkipEdgeStrategy() {
 
-    return (origin, target, current, spt, traverseOptions) ->
-        current.getElapsedTimeSeconds() > radiusMeters;
+    return (origin, target, current, edge, spt, traverseOptions) ->
+        current.getWalkDistance() > radiusMeters;
   }
 }
