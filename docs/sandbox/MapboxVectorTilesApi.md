@@ -53,7 +53,8 @@ The feature must be configured in `router-config.json` as follows
 }
 ```
 
-For each layer, the configuration includes,
+For each layer, the configuration includes:
+
  - `name` which is used in the url to fetch tiles, and as the layer name in the vector tiles.
  - `type` which tells the type of the layer. Currently `Stop`, `Station` and `BikeRental` are supported.
  - `mapper` which describes the mapper converting the properties from the OTP model entities to the vector tile properties. Currently `Digitransit` is supported for all layer types.
