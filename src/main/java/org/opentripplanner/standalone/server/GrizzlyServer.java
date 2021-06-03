@@ -120,7 +120,7 @@ public class GrizzlyServer {
         httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 
         /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
-        if(params.disableNativeClient != true) {
+        if(params.disableDebugClient != true) {
 	        CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/client/");
 	        if (params.disableFileCache) {
 	            LOG.info("Disabling HTTP server static file cache.");

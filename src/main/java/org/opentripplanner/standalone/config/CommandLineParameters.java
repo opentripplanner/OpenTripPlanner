@@ -102,9 +102,9 @@ public class CommandLineParameters implements Cloneable {
             description = "Path to serve local client files at.")
     public String clientPath = null;
 
-    @Parameter(names = {"--disableNativeClient"},
-            description = "Disable native client.")
-    public boolean disableNativeClient = false;
+    @Parameter(names = {"--disableDebugClient"},
+            description = "Disable embedded debug client that comes included with OTP.")
+    public boolean disableDebugClient = false;
     
     @Parameter(names = {"--clientFiles"}, validateWith = ReadableDirectory.class,
             description = "Path to directory containing local client files to serve.")
