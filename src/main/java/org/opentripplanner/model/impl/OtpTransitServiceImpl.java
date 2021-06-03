@@ -190,7 +190,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     @Override
     public List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId) {
-        return immutableList(shapePointsByShapeId.get(shapeId));
+        List<ShapePoint> shapePoints = shapePointsByShapeId.get(shapeId);
+        if (shapePoints == null) {
+            return List.of();
+        }
+        return immutableList(shapePoints);
     }
 
     @Override
