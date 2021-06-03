@@ -85,20 +85,6 @@ public class ConstantsForTests {
         return instance;
     }
 
-    public Graph getPortlandGraph() {
-        if (portlandGraph == null) {
-            setupPortland();
-        }
-        return portlandGraph;
-    }
-
-    public Graph getMinimalNetexGraph() {
-        if (minNetexGraph == null) {
-            setupMinNetex();
-        }
-        return minNetexGraph;
-    }
-
     public static NetexBundle createMinimalNetexBundle() {
         return NetexConfig.netexBundleForTest(
                 createNetexBuilderParameters(),
@@ -106,9 +92,32 @@ public class ConstantsForTests {
         );
     }
 
-    private void setupPortland() {
+    /**
+     * Returns a cached copy of the Minimal NeTEx graph, which may have been initialized.
+     */
+    public synchronized Graph getCachedMinimalNetexGraph() {
+        if (minNetexGraph == null) {
+            minNetexGraph = buildNewMinimalNetexGraph();
+        }
+        return minNetexGraph;
+    }
+
+    /**
+     * Returns a cached copy of the Portland graph, which may have been initialized.
+     */
+    public synchronized Graph getCachedPortlandGraph() {
+        if (portlandGraph == null) {
+            portlandGraph = buildNewPortlandGraph();
+        }
+        return portlandGraph;
+    }
+
+    /**
+     * Builds a new graph using the Portland test data.
+     */
+    public static Graph buildNewPortlandGraph() {
         try {
-            portlandGraph = new Graph();
+            Graph graph = new Graph();
             // Add street data from OSM
             {
                 File osmFile = new File(PORTLAND_CENTRAL_OSM);
@@ -118,7 +127,7 @@ public class ConstantsForTests {
                 osmModule.staticParkAndRide = true;
                 osmModule.staticBikeRental = true;
                 osmModule.skipVisibility = true;
-                osmModule.buildGraph(portlandGraph, new HashMap<>());
+                osmModule.buildGraph(graph, new HashMap<>());
             }
             // Add transit data from GTFS
             {
@@ -128,23 +137,24 @@ public class ConstantsForTests {
                         List.of(gtfsBundle),
                         new ServiceDateInterval(new ServiceDate(2009, 9, 1), new ServiceDate(2010, 3, 1))
                 );
-                module.buildGraph(portlandGraph, new HashMap<>());
+                module.buildGraph(graph, new HashMap<>());
             }
             // Link transit stops to streets
             {
                 GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
-                streetTransitLinker.buildGraph(portlandGraph, new HashMap<>());
+                streetTransitLinker.buildGraph(graph, new HashMap<>());
             }
 
-            portlandGraph.hasStreets = true;
-            portlandGraph.hasTransit = true;
+            graph.hasStreets = true;
+            graph.hasTransit = true;
 
-            portlandGraph.index();
+            graph.index();
 
-            portlandGraph.getBikerentalStationService().getBikeRentalStations()
+            graph.getBikerentalStationService().getBikeRentalStations()
                     .forEach(bikeRentalStation -> bikeRentalStation.isKeepingBicycleRentalAtDestinationAllowed = true);
+
+            return graph;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -188,9 +198,9 @@ public class ConstantsForTests {
         return graph;
     }
 
-    private void setupMinNetex() {
+    public static Graph buildNewMinimalNetexGraph() {
         try {
-            minNetexGraph = new Graph();
+            Graph graph = new Graph();
             // Add street data from OSM
             {
                 File osmFile = new File(OSLO_EAST_OSM);
@@ -198,22 +208,22 @@ public class ConstantsForTests {
                 BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
                 OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
                 osmModule.skipVisibility = true;
-                osmModule.buildGraph(minNetexGraph, new HashMap<>());
+                osmModule.buildGraph(graph, new HashMap<>());
             }
             // Add transit data from Netex
             {
                 BuildConfig buildParameters = createNetexBuilderParameters();
                 List<DataSource> dataSources = Collections.singletonList(NETEX_MINIMAL_DATA_SOURCE);
                 NetexModule module = NetexConfig.netexModule(buildParameters, dataSources);
-                module.buildGraph(minNetexGraph, null);
+                module.buildGraph(graph, null);
             }
             // Link transit stops to streets
             {
                 GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
-                streetTransitLinker.buildGraph(minNetexGraph, new HashMap<>());
+                streetTransitLinker.buildGraph(graph, new HashMap<>());
             }
+            return graph;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
