@@ -100,7 +100,7 @@ public class ItineraryFilterParameters {
     this.groupSimilarityKeepNumOfItineraries = 0.68;
     this.minSafeTransferTimeFactor = 0.0;
     this.bikeRentalDistanceRatio = 0.0;
-    this.parkAndRideDurationRatio = 0.3;
+    this.parkAndRideDurationRatio = 0.0;
     this.transitGeneralizedCostLimit =
         RequestFunctions.createLinearFunction(3600, 2);
     this.nonTransitGeneralizedCostLimit =
