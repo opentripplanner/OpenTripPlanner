@@ -1207,6 +1207,36 @@ otp.widgets.tripoptions.GroupTripOptions =
     }
 });
 
+otp.widgets.tripoptions.AdditionalTripParameters =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+        initialize : function(tripWidget, label) {
+            otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+            this.id = tripWidget.id+"-additionalParameters";
+            label = label || "Additional parameters: ";
+            var html = '<div class="notDraggable">'+label+'<input id="'+this.id+'-value" type="text" style="width:300px;" value="" />';
+            html += "</div>";
+
+            $(html).appendTo(this.$());
+        },
+
+        doAfterLayout : function() {
+            var this_ = this;
+            $('#'+this.id+'-value').change(function() {
+                var keyvalues = $('#'+this_.id+'-value').val().split(',');
+
+                var params = {};
+
+                keyvalues.forEach(function(keyvalue) {
+                    var split = keyvalue.split('=');
+                    params[split[0]] = split[1];
+                })
+
+                this_.tripWidget.module.additionalParameters = params;
+            });
+        },
+});
+
 /*otp.widgets.TW_GroupTripSubmit =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
 
