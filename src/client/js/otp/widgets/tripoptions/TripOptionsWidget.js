@@ -1220,7 +1220,9 @@ otp.widgets.tripoptions.AdditionalTripParameters =
                 + "\n# walkSpeed=1.7"
                 + "\n# numItineraries=25";
 
-            var html = '<div class="notDraggable">'+label+'<textarea id="'+this.id+'-value" style="width:300px;" rows="5" placeholder="'+placeholder+'"></textarea>';
+            var html = '<div class="notDraggable">'+label+': ';
+            html += '<textarea id="'+this.id+'-value" style="width:300px;" rows="5" placeholder="'+placeholder+'">'
+            html += '</textarea>';
             html += "</div>";
 
             $(html).appendTo(this.$());
