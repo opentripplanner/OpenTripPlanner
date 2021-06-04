@@ -10,6 +10,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveBikerentalWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
@@ -40,6 +41,7 @@ public class ItineraryFilterChainBuilder {
     private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
     private double bikeRentalDistanceRatio;
+    private double parkAndRideDurationRatio;
     private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
@@ -127,6 +129,16 @@ public class ItineraryFilterChainBuilder {
      */
     public ItineraryFilterChainBuilder withBikeRentalDistanceRatio(double value){
         this.bikeRentalDistanceRatio = value;
+        return this;
+    }
+
+    /**
+     * This is used to filter out park and ride itineraries that contain only driving and a
+     * very long walking leg.
+     * The value describes the amount of driving vs. walking to allow the itinerary.
+     */
+    public ItineraryFilterChainBuilder withParkAndRideDurationRatio(double value){
+        this.parkAndRideDurationRatio = value;
         return this;
     }
 
@@ -250,6 +262,10 @@ public class ItineraryFilterChainBuilder {
 
             if (bikeRentalDistanceRatio > 0) {
                 filters.add(new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio));
+            }
+
+            if (parkAndRideDurationRatio > 0) {
+                filters.add(new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio));
             }
         }
 
