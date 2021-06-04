@@ -706,6 +706,14 @@ type Itinerary {
     Does the itinerary end without dropping off the rented bicycle:
     """
     arrivedAtDestinationWithRentedBicycle: Boolean
+
+    """
+    A list of system notices. Contains debug information for itineraries.
+    One use-case is to run a routing search with 'debugItineraryFilter: true'.
+    This will then tag itineraries instead of removing them from the result.
+    This make it possible to inspect the itinerary-filter-chain.
+    """
+    systemNotices: [SystemNotice]!
 }
 
 type Leg {
@@ -1740,6 +1748,11 @@ type QueryType {
         """
         modeWeight: InputModeWeight
 
+        """
+        Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but does NOT delete them when this is enabled.
+        """
+        debugItineraryFilter: Boolean
+
         """Is bike rental allowed? Default value: false"""
         allowBikeRental: Boolean
 
@@ -2394,6 +2407,21 @@ type Trip implements Node {
 
     """List of alerts which have an effect on this trip"""
     alerts: [Alert]
+}
+
+"""
+A system notice is used to tag elements with system information for debugging
+or other system related purpose. One use-case is to run a routing search with
+'debugItineraryFilter: true'. This will then tag itineraries instead of removing
+them from the result. This make it possible to inspect the itinerary-filter-chain.
+A SystemNotice only has english text,
+because the primary user are technical staff, like testers and developers.
+"""
+type SystemNotice {
+    """Notice's tag"""
+    tag: String
+    """Notice's description"""
+    text: String
 }
 
 enum VertexType {

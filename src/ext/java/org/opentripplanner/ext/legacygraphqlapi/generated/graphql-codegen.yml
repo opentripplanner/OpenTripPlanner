@@ -70,3 +70,4 @@ config:
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.model.Trip#Trip
     VertexType: String
+    SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice
