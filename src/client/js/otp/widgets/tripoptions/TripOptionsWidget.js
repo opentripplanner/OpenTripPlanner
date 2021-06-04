@@ -1214,7 +1214,13 @@ otp.widgets.tripoptions.AdditionalTripParameters =
             otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
             this.id = tripWidget.id+"-additionalParameters";
             label = label || "Additional parameters: ";
-            var html = '<div class="notDraggable">'+label+'<input id="'+this.id+'-value" type="text" style="width:300px;" value="" />';
+            var placeholder = "searchWindow=366"
+                + "\n# timetableView=false"
+                + "\nwaitReluctance=0.5"
+                + "\n# walkSpeed=1.7"
+                + "\n# numItineraries=25";
+
+            var html = '<div class="notDraggable">'+label+'<textarea id="'+this.id+'-value" style="width:300px;" rows="5" placeholder="'+placeholder+'"></textarea>';
             html += "</div>";
 
             $(html).appendTo(this.$());
@@ -1223,13 +1229,15 @@ otp.widgets.tripoptions.AdditionalTripParameters =
         doAfterLayout : function() {
             var this_ = this;
             $('#'+this.id+'-value').change(function() {
-                var keyvalues = $('#'+this_.id+'-value').val().split(',');
+                var keyvalues = $('#'+this_.id+'-value').val().trim().split('\n');
 
                 var params = {};
 
                 keyvalues.forEach(function(keyvalue) {
-                    var split = keyvalue.split('=');
-                    params[split[0]] = split[1];
+                    var split = keyvalue.trim().split('=');
+                    if (!split[0].startsWith('#')) {
+                        params[split[0]] = split[1];
+                    }
                 })
 
                 this_.tripWidget.module.additionalParameters = params;
