@@ -157,6 +157,13 @@ public class RoutingWorker {
             accessRequest.setRoutingContext(router.graph);
             accessRequest.allowKeepingRentedBicycleAtDestination = false;
 
+            Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
+                    accessRequest,
+                    request.modes.accessMode,
+                    false
+            );
+            accessList = accessEgressMapper.mapNearbyStops(accessStops, false);
+
             // Special handling of flex accesses
             if (OTPFeature.FlexRouting.isOn() && request.modes.accessMode.equals(
                     StreetMode.FLEXIBLE)) {
@@ -165,21 +172,19 @@ public class RoutingWorker {
                                 accessRequest,
                                 false
                         );
-                accessList = accessEgressMapper.mapFlexAccessEgresses(flexAccessList, false);
-            }
-            // Regular access routing
-            else {
-                Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-                        accessRequest,
-                        request.modes.accessMode,
-                        false
-                );
-                accessList = accessEgressMapper.mapNearbyStops(accessStops, false);
+                accessList.addAll(accessEgressMapper.mapFlexAccessEgresses(flexAccessList, false));
             }
         }
 
         try (RoutingRequest egressRequest = request.getStreetSearchRequest(request.modes.egressMode)) {
             egressRequest.setRoutingContext(router.graph);
+
+            Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
+                    egressRequest,
+                    request.modes.egressMode,
+                    true
+            );
+            egressList = accessEgressMapper.mapNearbyStops(egressStops, true);
 
             // Special handling of flex egresses
             if (OTPFeature.FlexRouting.isOn() && request.modes.egressMode.equals(
@@ -189,16 +194,7 @@ public class RoutingWorker {
                                 egressRequest,
                                 true
                         );
-                egressList = accessEgressMapper.mapFlexAccessEgresses(flexEgressList, true);
-            }
-            // Regular egress routing
-            else {
-                Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
-                        egressRequest,
-                        request.modes.egressMode,
-                        true
-                );
-                egressList = accessEgressMapper.mapNearbyStops(egressStops, true);
+                egressList.addAll(accessEgressMapper.mapFlexAccessEgresses(flexEgressList, true));
             }
         }
 
