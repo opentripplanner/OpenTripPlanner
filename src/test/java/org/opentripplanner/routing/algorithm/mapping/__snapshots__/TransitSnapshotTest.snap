@@ -329,7 +329,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 4351,
+      "generalizedCost": 7331,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -347,7 +347,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 1436,
+          "generalizedCost": 2872,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 45,
@@ -586,7 +586,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 1544,
+          "generalizedCost": 3088,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 29,
@@ -716,7 +716,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 2326,
+      "generalizedCost": 2838,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -734,7 +734,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 96,
+          "generalizedCost": 192,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 4,
@@ -922,7 +922,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 416,
+          "generalizedCost": 832,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 13,
@@ -1035,7 +1035,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 4365,
+      "generalizedCost": 7345,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -1053,7 +1053,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 1436,
+          "generalizedCost": 2872,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 45,
@@ -1292,7 +1292,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 1544,
+          "generalizedCost": 3088,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 29,
@@ -1422,7 +1422,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 2396,
+      "generalizedCost": 2908,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -1440,7 +1440,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 96,
+          "generalizedCost": 192,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 4,
@@ -1628,7 +1628,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 416,
+          "generalizedCost": 832,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 13,
@@ -1745,7 +1745,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 3397,
+      "generalizedCost": 4093,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -1763,7 +1763,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison St. & SE 17th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 648,
+          "generalizedCost": 1296,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 14,
@@ -2079,7 +2079,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 48,
+          "generalizedCost": 96,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 7,
@@ -2133,7 +2133,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "systemNotices": [ ],
       "tooSloped": false,
       "transitTimeSeconds": 1264,
-      "waitTimeAdjustedGeneralizedCost": 225307,
+      "waitTimeAdjustedGeneralizedCost": 294907,
       "waitingTimeSeconds": 237,
       "walkOnly": false,
       "walkingAllTheWay": false
@@ -2428,7 +2428,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 2937,
+      "generalizedCost": 4505,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -2452,7 +2452,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 146,
+          "generalizedCost": 292,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 9,
@@ -2657,7 +2657,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 1422,
+          "generalizedCost": 2844,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 39,
@@ -2786,6 +2786,429 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
+      "durationSeconds": 2296,
+      "elevationGained": 0.0,
+      "elevationLost": 0.0,
+      "fare": {
+        "details": {
+          "regular": [
+            {
+              "fareId": {
+                "feedId": "prt",
+                "id": "8"
+              },
+              "price": {
+                "cents": 200,
+                "currency": {
+                  "value": "USD"
+                }
+              },
+              "routes": [
+                {
+                  "feedId": "prt",
+                  "id": "70"
+                },
+                {
+                  "feedId": "prt",
+                  "id": "77"
+                }
+              ]
+            }
+          ]
+        },
+        "fare": {
+          "regular": {
+            "cents": 200,
+            "currency": {
+              "value": "USD"
+            }
+          }
+        }
+      },
+      "generalizedCost": 4279,
+      "legs": [
+        {
+          "agencyTimeZoneOffset": -28800000,
+          "arrivalDelay": 0,
+          "bikeRentalNetworks": [ ],
+          "departureDelay": 0,
+          "distanceMeters": 20.74,
+          "endTime": "2009-11-17T18:01:00.000+0000",
+          "flexibleTrip": false,
+          "from": {
+            "coordinate": {
+              "latitude": 45.52337,
+              "longitude": -122.653725
+            },
+            "name": "NE 12th & Couch",
+            "stopCode": "6577",
+            "stopId": {
+              "feedId": "prt",
+              "id": "6577"
+            },
+            "vertexType": "TRANSIT",
+            "zoneId": "1"
+          },
+          "generalizedCost": 64,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 4,
+            "points": "ahztGxxrkV@Sb@??W"
+          },
+          "mode": "WALK",
+          "onStreetNonTransit": true,
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "scheduled": false,
+          "startTime": "2009-11-17T18:00:44.000+0000",
+          "streetNotes": [ ],
+          "to": {
+            "coordinate": {
+              "latitude": 45.52318,
+              "longitude": -122.653507
+            },
+            "name": "NE 12th & Sandy",
+            "stopCode": "6592",
+            "stopId": {
+              "feedId": "prt",
+              "id": "6592"
+            },
+            "stopIndex": 31,
+            "stopSequence": 32,
+            "vertexType": "TRANSIT",
+            "zoneId": "1"
+          },
+          "transitAlerts": [ ],
+          "transitLeg": false,
+          "walkSteps": [
+            {
+              "absoluteDirection": "SOUTH",
+              "angle": -3.1191187064694192,
+              "area": false,
+              "bogusName": false,
+              "distance": 20.74,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "DEPART",
+              "startLocation": {
+                "latitude": 45.52336838632084,
+                "longitude": -122.65362253301092
+              },
+              "stayOn": false,
+              "streetName": "Northeast 12th Avenue",
+              "streetNotes": [ ]
+            }
+          ],
+          "walkingLeg": true
+        },
+        {
+          "agencyTimeZoneOffset": 0,
+          "arrivalDelay": 0,
+          "bikeRentalNetworks": [ ],
+          "departureDelay": 0,
+          "distanceMeters": 1667.1475209896525,
+          "endTime": "2009-11-17T18:07:12.000+0000",
+          "flexibleTrip": false,
+          "from": {
+            "coordinate": {
+              "latitude": 45.52318,
+              "longitude": -122.653507
+            },
+            "name": "NE 12th & Sandy",
+            "stopCode": "6592",
+            "stopId": {
+              "feedId": "prt",
+              "id": "6592"
+            },
+            "stopIndex": 31,
+            "stopSequence": 32,
+            "vertexType": "TRANSIT",
+            "zoneId": "1"
+          },
+          "generalizedCost": 972,
+          "headsign": "Rose Qtr TC",
+          "intermediateStops": [ ],
+          "legGeometry": {
+            "length": 46,
+            "points": "{fztG`xrkVwA?mCAmC?oCA}C?sDC??aBAm@@k@AY?uABU@I@IBQFb@fC}@d@OFO@q@???Q?]?gGA??[??nJ???b@?vK?rA???tBCfD???^?nE?V@Z?PH\\Nb@`@~@Rf@"
+          },
+          "mode": "BUS",
+          "onStreetNonTransit": false,
+          "pathway": false,
+          "realTime": false,
+          "scheduled": true,
+          "serviceDate": {
+            "day": 17,
+            "minMax": false,
+            "month": 11,
+            "sequenceNumber": 20091117,
+            "year": 2009
+          },
+          "startTime": "2009-11-17T18:01:00.000+0000",
+          "streetNotes": [ ],
+          "to": {
+            "coordinate": {
+              "latitude": 45.531159,
+              "longitude": -122.66293
+            },
+            "name": "NE Multnomah & 3rd",
+            "stopCode": "11492",
+            "stopId": {
+              "feedId": "prt",
+              "id": "11492"
+            },
+            "stopIndex": 38,
+            "stopSequence": 39,
+            "vertexType": "TRANSIT",
+            "zoneId": "0"
+          },
+          "transitAlerts": [ ],
+          "transitLeg": true,
+          "trip": {
+            "alteration": "PLANNED",
+            "bikesAllowed": "UNKNOWN",
+            "blockId": "7001",
+            "direction": "OUTBOUND",
+            "id": {
+              "feedId": "prt",
+              "id": "700W1140"
+            },
+            "route": {
+              "agency": {
+                "fareUrl": "http://trimet.org/fares/index.htm",
+                "id": {
+                  "feedId": "prt",
+                  "id": "prt"
+                },
+                "lang": "en",
+                "name": "TriMet",
+                "phone": "503-238-7433",
+                "timezone": "America/Los_Angeles",
+                "url": "http://trimet.org"
+              },
+              "bikesAllowed": "UNKNOWN",
+              "id": {
+                "feedId": "prt",
+                "id": "70"
+              },
+              "longName": "12th Ave",
+              "mode": "BUS",
+              "shortName": "70",
+              "sortOrder": -999,
+              "sortOrderSet": false,
+              "type": 3,
+              "url": "http://trimet.org/schedules/r070.htm"
+            },
+            "serviceId": {
+              "feedId": "prt",
+              "id": "W"
+            },
+            "shapeId": {
+              "feedId": "prt",
+              "id": "70.0.1"
+            },
+            "wheelchairAccessible": 0
+          },
+          "walkSteps": [ ],
+          "walkingLeg": false
+        },
+        {
+          "agencyTimeZoneOffset": 0,
+          "arrivalDelay": 0,
+          "bikeRentalNetworks": [ ],
+          "departureDelay": 0,
+          "distanceMeters": 3248.2996826174576,
+          "endTime": "2009-11-17T18:34:55.000+0000",
+          "flexibleTrip": false,
+          "from": {
+            "coordinate": {
+              "latitude": 45.531159,
+              "longitude": -122.66293
+            },
+            "name": "NE Multnomah & 3rd",
+            "stopCode": "11492",
+            "stopId": {
+              "feedId": "prt",
+              "id": "11492"
+            },
+            "stopIndex": 83,
+            "stopSequence": 84,
+            "vertexType": "TRANSIT",
+            "zoneId": "0"
+          },
+          "generalizedCost": 2263,
+          "headsign": "Montgomery Park",
+          "intermediateStops": [ ],
+          "legGeometry": {
+            "length": 91,
+            "points": "kx{tG~qtkV`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ"
+          },
+          "mode": "BUS",
+          "onStreetNonTransit": false,
+          "pathway": false,
+          "realTime": false,
+          "scheduled": true,
+          "serviceDate": {
+            "day": 17,
+            "minMax": false,
+            "month": 11,
+            "sequenceNumber": 20091117,
+            "year": 2009
+          },
+          "startTime": "2009-11-17T18:23:09.000+0000",
+          "streetNotes": [ ],
+          "to": {
+            "coordinate": {
+              "latitude": 45.531308,
+              "longitude": -122.696445
+            },
+            "name": "NW Northrup & 22nd",
+            "stopCode": "10778",
+            "stopId": {
+              "feedId": "prt",
+              "id": "10778"
+            },
+            "stopIndex": 92,
+            "stopSequence": 93,
+            "vertexType": "TRANSIT",
+            "zoneId": "1"
+          },
+          "transitAlerts": [ ],
+          "transitLeg": true,
+          "trip": {
+            "alteration": "PLANNED",
+            "bikesAllowed": "UNKNOWN",
+            "blockId": "7736",
+            "direction": "INBOUND",
+            "id": {
+              "feedId": "prt",
+              "id": "771W1160"
+            },
+            "route": {
+              "agency": {
+                "fareUrl": "http://trimet.org/fares/index.htm",
+                "id": {
+                  "feedId": "prt",
+                  "id": "prt"
+                },
+                "lang": "en",
+                "name": "TriMet",
+                "phone": "503-238-7433",
+                "timezone": "America/Los_Angeles",
+                "url": "http://trimet.org"
+              },
+              "bikesAllowed": "UNKNOWN",
+              "id": {
+                "feedId": "prt",
+                "id": "77"
+              },
+              "longName": "Broadway/Halsey",
+              "mode": "BUS",
+              "shortName": "77",
+              "sortOrder": -999,
+              "sortOrderSet": false,
+              "type": 3,
+              "url": "http://trimet.org/schedules/r077.htm"
+            },
+            "serviceId": {
+              "feedId": "prt",
+              "id": "W"
+            },
+            "shapeId": {
+              "feedId": "prt",
+              "id": "77.1.3"
+            },
+            "wheelchairAccessible": 0
+          },
+          "walkSteps": [ ],
+          "walkingLeg": false
+        },
+        {
+          "agencyTimeZoneOffset": -28800000,
+          "arrivalDelay": 0,
+          "bikeRentalNetworks": [ ],
+          "departureDelay": 0,
+          "distanceMeters": 307.572,
+          "endTime": "2009-11-17T18:39:00.000+0000",
+          "flexibleTrip": false,
+          "from": {
+            "coordinate": {
+              "latitude": 45.531308,
+              "longitude": -122.696445
+            },
+            "name": "NW Northrup & 22nd",
+            "stopCode": "10778",
+            "stopId": {
+              "feedId": "prt",
+              "id": "10778"
+            },
+            "stopIndex": 92,
+            "stopSequence": 93,
+            "vertexType": "TRANSIT",
+            "zoneId": "1"
+          },
+          "generalizedCost": 980,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 13,
+            "points": "sy{tGxc{kV???LABF?B??RDbH@xA?D?P?RDpH"
+          },
+          "mode": "WALK",
+          "onStreetNonTransit": true,
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "scheduled": false,
+          "startTime": "2009-11-17T18:34:55.000+0000",
+          "streetNotes": [ ],
+          "to": {
+            "coordinate": {
+              "latitude": 45.531,
+              "longitude": -122.70029
+            },
+            "name": "NW Northrup St. & NW 24th Ave. (P3)",
+            "vertexType": "NORMAL"
+          },
+          "transitAlerts": [ ],
+          "transitLeg": false,
+          "walkSteps": [
+            {
+              "absoluteDirection": "WEST",
+              "angle": -1.3892041323260338,
+              "area": false,
+              "bogusName": false,
+              "distance": 307.572,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "DEPART",
+              "startLocation": {
+                "latitude": 45.53130187189895,
+                "longitude": -122.69644484256081
+              },
+              "stayOn": false,
+              "streetName": "Northwest Northrup Street",
+              "streetNotes": [ ]
+            }
+          ],
+          "walkingLeg": true
+        }
+      ],
+      "nTransfers": 1,
+      "nonTransitDistanceMeters": 328.312,
+      "nonTransitTimeSeconds": 261,
+      "onStreetAllTheWay": false,
+      "streetOnly": false,
+      "systemNotices": [ ],
+      "tooSloped": false,
+      "transitTimeSeconds": 1078,
+      "waitTimeAdjustedGeneralizedCost": 185592,
+      "waitingTimeSeconds": 957,
+      "walkOnly": false,
+      "walkingAllTheWay": false
+    },
+    {
+      "arrivedAtDestinationWithRentedBicycle": false,
       "durationSeconds": 1583,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -2821,7 +3244,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 2967,
+      "generalizedCost": 4535,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -2845,7 +3268,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 146,
+          "generalizedCost": 292,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 9,
@@ -3050,7 +3473,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 1422,
+          "generalizedCost": 2844,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 39,
@@ -3214,7 +3637,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 2937,
+      "generalizedCost": 4505,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -3238,7 +3661,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 146,
+          "generalizedCost": 292,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 9,
@@ -3443,7 +3866,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 1422,
+          "generalizedCost": 2844,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 39,
@@ -3611,7 +4034,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 2964,
+      "generalizedCost": 3358,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -3635,7 +4058,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 32,
+          "generalizedCost": 64,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 4,
@@ -3934,7 +4357,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 362,
+          "generalizedCost": 724,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 10,
@@ -4005,367 +4428,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "systemNotices": [ ],
       "tooSloped": false,
       "transitTimeSeconds": 1133,
-      "waitTimeAdjustedGeneralizedCost": 211540,
+      "waitTimeAdjustedGeneralizedCost": 250940,
       "waitingTimeSeconds": 237,
-      "walkOnly": false,
-      "walkingAllTheWay": false
-    },
-    {
-      "arrivedAtDestinationWithRentedBicycle": false,
-      "durationSeconds": 1941,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
-      "fare": {
-        "details": {
-          "regular": [
-            {
-              "fareId": {
-                "feedId": "prt",
-                "id": "8"
-              },
-              "price": {
-                "cents": 200,
-                "currency": {
-                  "value": "USD"
-                }
-              },
-              "routes": [
-                {
-                  "feedId": "prt",
-                  "id": "15"
-                }
-              ]
-            }
-          ]
-        },
-        "fare": {
-          "regular": {
-            "cents": 200,
-            "currency": {
-              "value": "USD"
-            }
-          }
-        }
-      },
-      "generalizedCost": 3278,
-      "legs": [
-        {
-          "agencyTimeZoneOffset": -28800000,
-          "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
-          "departureDelay": 0,
-          "distanceMeters": 718.722,
-          "endTime": "2009-11-17T19:02:00.000+0000",
-          "flexibleTrip": false,
-          "from": {
-            "coordinate": {
-              "latitude": 45.52337,
-              "longitude": -122.653725
-            },
-            "name": "NE 12th & Couch",
-            "stopCode": "6577",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6577"
-            },
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
-          },
-          "generalizedCost": 1112,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 24,
-            "points": "ahztGxxrkV@Sb@?`@@T?T@NBRIrA?lC@lC?R?zB@`C?J?J?J@tB?nC?|B?N@?R?|@Q?"
-          },
-          "mode": "WALK",
-          "onStreetNonTransit": true,
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "scheduled": false,
-          "startTime": "2009-11-17T18:52:44.000+0000",
-          "streetNotes": [ ],
-          "to": {
-            "coordinate": {
-              "latitude": 45.517299,
-              "longitude": -122.654067
-            },
-            "name": "SE Morrison & 12th",
-            "stopCode": "4014",
-            "stopId": {
-              "feedId": "prt",
-              "id": "4014"
-            },
-            "stopIndex": 52,
-            "stopSequence": 53,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
-          },
-          "transitAlerts": [ ],
-          "transitLeg": false,
-          "walkSteps": [
-            {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.1191187064694192,
-              "area": false,
-              "bogusName": false,
-              "distance": 51.525,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.52336838632084,
-                "longitude": -122.65362253301092
-              },
-              "stayOn": false,
-              "streetName": "Northeast 12th Avenue",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.0798698707609136,
-              "area": false,
-              "bogusName": false,
-              "distance": 634.751,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "CONTINUE",
-              "startLocation": {
-                "latitude": 45.5229051,
-                "longitude": -122.6536312
-              },
-              "stayOn": false,
-              "streetName": "Southeast 12th Avenue",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "WEST",
-              "angle": -1.5753805308488518,
-              "area": false,
-              "bogusName": false,
-              "distance": 32.446,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.5172031,
-                "longitude": -122.6536511
-              },
-              "stayOn": false,
-              "streetName": "Southeast Morrison Street",
-              "streetNotes": [ ]
-            }
-          ],
-          "walkingLeg": true
-        },
-        {
-          "agencyTimeZoneOffset": 0,
-          "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
-          "departureDelay": 0,
-          "distanceMeters": 4844.785407243491,
-          "endTime": "2009-11-17T19:22:04.000+0000",
-          "flexibleTrip": false,
-          "from": {
-            "coordinate": {
-              "latitude": 45.517299,
-              "longitude": -122.654067
-            },
-            "name": "SE Morrison & 12th",
-            "stopCode": "4014",
-            "stopId": {
-              "feedId": "prt",
-              "id": "4014"
-            },
-            "stopIndex": 52,
-            "stopSequence": 53,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
-          },
-          "generalizedCost": 1804,
-          "headsign": "NW 27th & Thurman",
-          "intermediateStops": [ ],
-          "legGeometry": {
-            "length": 126,
-            "points": "oaytG|zrkV?tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB??S?oCDmCDmCBo@@"
-          },
-          "mode": "BUS",
-          "onStreetNonTransit": false,
-          "pathway": false,
-          "realTime": false,
-          "scheduled": true,
-          "serviceDate": {
-            "day": 17,
-            "minMax": false,
-            "month": 11,
-            "sequenceNumber": 20091117,
-            "year": 2009
-          },
-          "startTime": "2009-11-17T19:02:00.000+0000",
-          "streetNotes": [ ],
-          "to": {
-            "coordinate": {
-              "latitude": 45.532159,
-              "longitude": -122.698634
-            },
-            "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
-            },
-            "stopIndex": 74,
-            "stopSequence": 75,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
-          },
-          "transitAlerts": [ ],
-          "transitLeg": true,
-          "trip": {
-            "alteration": "PLANNED",
-            "bikesAllowed": "UNKNOWN",
-            "blockId": "1550",
-            "direction": "OUTBOUND",
-            "id": {
-              "feedId": "prt",
-              "id": "150W1430"
-            },
-            "route": {
-              "agency": {
-                "fareUrl": "http://trimet.org/fares/index.htm",
-                "id": {
-                  "feedId": "prt",
-                  "id": "prt"
-                },
-                "lang": "en",
-                "name": "TriMet",
-                "phone": "503-238-7433",
-                "timezone": "America/Los_Angeles",
-                "url": "http://trimet.org"
-              },
-              "bikesAllowed": "UNKNOWN",
-              "id": {
-                "feedId": "prt",
-                "id": "15"
-              },
-              "longName": "Belmont/NW 23rd",
-              "mode": "BUS",
-              "shortName": "15",
-              "sortOrder": -999,
-              "sortOrderSet": false,
-              "type": 3,
-              "url": "http://trimet.org/schedules/r015.htm"
-            },
-            "serviceId": {
-              "feedId": "prt",
-              "id": "W"
-            },
-            "shapeId": {
-              "feedId": "prt",
-              "id": "15.0.23"
-            },
-            "wheelchairAccessible": 0
-          },
-          "walkSteps": [ ],
-          "walkingLeg": false
-        },
-        {
-          "agencyTimeZoneOffset": -28800000,
-          "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
-          "departureDelay": 0,
-          "distanceMeters": 231.459,
-          "endTime": "2009-11-17T19:25:05.000+0000",
-          "flexibleTrip": false,
-          "from": {
-            "coordinate": {
-              "latitude": 45.532159,
-              "longitude": -122.698634
-            },
-            "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
-            },
-            "stopIndex": 74,
-            "stopSequence": 75,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
-          },
-          "generalizedCost": 362,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 10,
-            "points": "}~{tGnq{kV?LVAF?J?L?rBCLA?RDpH"
-          },
-          "mode": "WALK",
-          "onStreetNonTransit": true,
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "scheduled": false,
-          "startTime": "2009-11-17T19:22:04.000+0000",
-          "streetNotes": [ ],
-          "to": {
-            "coordinate": {
-              "latitude": 45.531,
-              "longitude": -122.70029
-            },
-            "name": "NW Northrup St. & NW 24th Ave. (P3)",
-            "vertexType": "NORMAL"
-          },
-          "transitAlerts": [ ],
-          "transitLeg": false,
-          "walkSteps": [
-            {
-              "absoluteDirection": "SOUTH",
-              "angle": 3.117146926361324,
-              "area": false,
-              "bogusName": false,
-              "distance": 104.452,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.53215782420268,
-                "longitude": -122.69870264831422
-              },
-              "stayOn": false,
-              "streetName": "Northwest 23rd Avenue",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "WEST",
-              "angle": -1.576477897189337,
-              "area": false,
-              "bogusName": false,
-              "distance": 127.007,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.531218800000005,
-                "longitude": -122.69866750000001
-              },
-              "stayOn": false,
-              "streetName": "Northwest Northrup Street",
-              "streetNotes": [ ]
-            }
-          ],
-          "walkingLeg": true
-        }
-      ],
-      "nTransfers": 0,
-      "nonTransitDistanceMeters": 950.181,
-      "nonTransitTimeSeconds": 737,
-      "onStreetAllTheWay": false,
-      "streetOnly": false,
-      "systemNotices": [ ],
-      "tooSloped": false,
-      "transitTimeSeconds": 1204,
-      "waitTimeAdjustedGeneralizedCost": -999999,
-      "waitingTimeSeconds": 0,
       "walkOnly": false,
       "walkingAllTheWay": false
     }

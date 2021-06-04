@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 
@@ -158,14 +159,14 @@ class RaptorRoutingRequestTransitDataCreator {
         .collect(Collectors.toList());
   }
 
-  List<List<RaptorTransfer>> calculateTransferDuration(double walkSpeed) {
+  List<List<RaptorTransfer>> calculateTransferDuration(RoutingRequest transferRoutingRequest) {
     return transitLayer
         .getSimpleTransferByStopIndex()
         .stream()
-        .map(t -> t
-            .stream()
-            .map(s -> new TransferWithDuration(s, walkSpeed))
-            .collect(Collectors.<RaptorTransfer>toList()))
+        .map(t -> t.stream()
+            .flatMap(s -> s.asRaptorTransfer(transferRoutingRequest).stream())
+            .collect(toList())
+        )
         .collect(toList());
   }
 }

@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRout
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
+import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.AccessEgressMapper;
@@ -35,7 +36,9 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
@@ -144,7 +147,7 @@ public class RoutingWorker {
             ? router.graph.getTransitLayer()
             : router.graph.getRealtimeTransitLayer();
 
-        RaptorRoutingRequestTransitData requestTransitDataProvider = createRequestTransitDataProvider(transitLayer, router.graph.index);
+        RaptorRoutingRequestTransitData requestTransitDataProvider = createRequestTransitDataProvider(transitLayer, router.graph);
 
         this.debugTimingAggregator.finishedPatternFiltering();
 
@@ -275,15 +278,19 @@ public class RoutingWorker {
 
     private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
             TransitLayer transitLayer,
-            GraphIndex graphIndex
+            Graph graph
     ) {
-        return new RaptorRoutingRequestTransitData(
-                transitLayer,
-                request.getDateTime().toInstant(),
-                request.additionalSearchDaysAfterToday,
-                createRequestTransitDataProviderFilter(graphIndex),
-                request.walkSpeed
-        );
+        try (RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request)) {
+            transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
+
+            return new RaptorRoutingRequestTransitData(
+                    transitLayer,
+                    request.getDateTime().toInstant(),
+                    request.additionalSearchDaysAfterToday,
+                    createRequestTransitDataProviderFilter(graph.index),
+                    transferRoutingRequest
+            );
+        }
     }
 
     private TransitDataProviderFilter createRequestTransitDataProviderFilter(GraphIndex graphIndex) {

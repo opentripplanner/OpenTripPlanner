@@ -24,12 +24,12 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
@@ -280,13 +280,13 @@ public class RaptorPathToItineraryMapper {
         } else {
             // A RoutingRequest with a RoutingContext must be constructed so that the edges
             // may be re-traversed to create the leg(s) from the list of edges.
-            try (RoutingRequest traverseRequest = request.getStreetSearchRequest(StreetMode.WALK)) {
-                traverseRequest.setRoutingContext(graph);
+            try (RoutingRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request)) {
+                traverseRequest.setRoutingContext(graph, (Vertex) null, null);
                 traverseRequest.arriveBy = false;
 
                 StateEditor se = new StateEditor(traverseRequest, edges.get(0).getFromVertex());
-                se.setTimeSeconds(startOfTime.plusSeconds(pathLeg.fromTime()).toEpochSecond());
-                //se.setNonTransitOptionsFromState(states[0]);
+                se.setTimeSeconds(createCalendar(pathLeg.fromTime()).getTimeInMillis() / 1000);
+
                 State s = se.makeState();
                 ArrayList<State> transferStates = new ArrayList<>();
                 transferStates.add(s);
@@ -304,15 +304,6 @@ public class RaptorPathToItineraryMapper {
                 if (subItinerary.legs.isEmpty()) {
                     return List.of();
                 }
-
-                // TODO OTP2 - We use the duration initially calculated for use during routing because
-                //           - they do not always match up and we risk getting negative wait times
-                //           - Issue https://github.com/opentripplanner/OpenTripPlanner/issues/2955
-                if (subItinerary.legs.size() != 1) {
-                    throw new IllegalArgumentException("Sub itineraries should only contain one leg.");
-                }
-                subItinerary.legs.get(0).startTime = createCalendar(pathLeg.fromTime());
-                subItinerary.legs.get(0).endTime = createCalendar(pathLeg.toTime());
 
                 if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
                     applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, pathLeg);

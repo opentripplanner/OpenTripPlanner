@@ -6,6 +6,8 @@ import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -73,6 +75,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         int nTransfersTotal = 0;
         int nLinkableStops = 0;
 
+        RoutingRequest streetRequest = Transfer.prepareTransferRoutingRequest(new RoutingRequest());
+
         // This could be multi-threaded, in which case we'd need to be careful about the lifecycle of NearbyStopFinder instances.
         for (TransitStopVertex ts0 : stops) {
             Stop stop = ts0.getStop();
@@ -80,24 +84,24 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
             /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
             int n = 0;
-            for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, false)) {
+            for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, streetRequest, false)) {
                 // Skip the origin stop, loop transfers are not needed.
                 if (sd.stop == stop) { continue; }
                 graph.transfersByStop.put(
                     stop,
-                    new SimpleTransfer(stop, sd.stop, sd.distance, sd.distanceIndependentTime, sd.edges)
+                    new SimpleTransfer(ts0.getStop(), sd.stop, sd.distance, sd.edges)
                 );
                 n += 1;
             }
             if (OTPFeature.FlexRouting.isOn()) {
                 // This code is for finding transfers from FlexStopLocations to Stops, transfers
                 // from Stops to FlexStopLocations and between Stops are already covered above.
-                for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0,  true)) {
+                for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0,  streetRequest, true)) {
                     // Skip the origin stop, loop transfers are not needed.
                     if (sd.stop == ts0.getStop()) { continue; }
                     if (sd.stop instanceof Stop) { continue; }
                     graph.transfersByStop.put(sd.stop,
-                        new SimpleTransfer(sd.stop, ts0.getStop(), sd.distance, sd.distanceIndependentTime, sd.edges)
+                        new SimpleTransfer(sd.stop, ts0.getStop(), sd.distance, sd.edges)
                     );
                     n += 1;
                 }
