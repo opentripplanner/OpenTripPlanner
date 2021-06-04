@@ -63,9 +63,18 @@ public class ItineraryFilterParameters {
    * describes the ratio of the total itinerary that has to consist of bike rental to allow the
    * itinerary.
    *
-   * Default value is 0.3 (30%), use a value of 0 to turn off.
+   * Default value is off (0). If you want a minimum of 30% cycling, use a value of 0.3.
    */
   public double bikeRentalDistanceRatio;
+
+  /**
+   * This is used to filter out park and ride itineraries that contain only driving plus a very
+   * long walk. The value describes the ratio of the total itinerary duration that has to consist
+   * of driving to allow the itinerary.
+   *
+   * Default value is 0.3 (30%), use a value of 0 to turn off.
+   */
+  public double parkAndRideDurationRatio;
 
   /**
    * This is a a bit similar to {@link #transitGeneralizedCostLimit}, with
@@ -91,6 +100,7 @@ public class ItineraryFilterParameters {
     this.groupSimilarityKeepNumOfItineraries = 0.68;
     this.minSafeTransferTimeFactor = 0.0;
     this.bikeRentalDistanceRatio = 0.0;
+    this.parkAndRideDurationRatio = 0.0;
     this.transitGeneralizedCostLimit =
         RequestFunctions.createLinearFunction(3600, 2);
     this.nonTransitGeneralizedCostLimit =
@@ -108,7 +118,8 @@ public class ItineraryFilterParameters {
       double minSafeTransferTimeFactor,
       DoubleFunction<Double> transitGeneralizedCostLimit,
       DoubleFunction<Double> nonTransitGeneralizedCostLimit,
-      double bikeRentalDistanceRatio
+      double bikeRentalDistanceRatio,
+      double parkAndRideDurationRatio
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -117,5 +128,6 @@ public class ItineraryFilterParameters {
     this.transitGeneralizedCostLimit = transitGeneralizedCostLimit;
     this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;
     this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
+    this.parkAndRideDurationRatio = parkAndRideDurationRatio;
   }
 }

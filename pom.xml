@@ -534,6 +534,11 @@
             <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.github.origin-energy</groupId>
+            <artifactId>java-snapshot-testing-junit5</artifactId>
+            <version>2.3.0</version>
+        </dependency>
         <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Guava, Trove, and Kryo. -->
         <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
         <dependency>
@@ -563,6 +568,16 @@
         <dependency>
            <groupId>com.fasterxml.jackson.core</groupId>
            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         <!-- Jackson modules to serialize Jersey response objects to JSON. -->
@@ -701,4 +716,28 @@
             <version>3.1.0</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>clean-test-snapshots</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>${build.testSourceDirectory}</directory>
+                                    <includes>
+                                        <include>**/__snapshots__/*</include>
+                                        <include>**/__snapshots__</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

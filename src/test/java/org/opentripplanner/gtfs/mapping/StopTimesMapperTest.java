@@ -1,20 +1,19 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-
-import java.util.Collection;
-import java.util.Collections;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+import java.util.Collections;
+import org.junit.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Trip;
 
 public class StopTimesMapperTest {
     private static final String FEED_ID = "FEED";
@@ -69,6 +68,7 @@ public class StopTimesMapperTest {
     }
 
     private final StopMapper stopMapper = new StopMapper();
+    private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
     private final LocationMapper locationMapper = new LocationMapper();
     private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);
 
@@ -76,7 +76,8 @@ public class StopTimesMapperTest {
             stopMapper,
             locationMapper,
             locationGroupMapper,
-            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)))
+            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID))),
+            bookingRuleMapper
     );
 
     @Test

@@ -59,7 +59,9 @@ public final class StopTime implements Comparable<StopTime> {
 
     private int safeDurationOffset = MISSING_VALUE;
     
-    private BookingInfo bookingInfo;
+    private BookingInfo dropOffBookingInfo;
+
+    private BookingInfo pickupBookingInfo;
 
     public StopTime() { }
 
@@ -84,7 +86,8 @@ public final class StopTime implements Comparable<StopTime> {
         this.safeDurationOffset = st.safeDurationFactor;
         this.meanDurationFactor = st.meanDurationFactor;
         this.meanDurationOffset = st.meanDurationFactor;
-        this.bookingInfo = st.bookingInfo;
+        this.dropOffBookingInfo = st.dropOffBookingInfo;
+        this.pickupBookingInfo = st.pickupBookingInfo;
     }
 
     /**
@@ -269,12 +272,20 @@ public final class StopTime implements Comparable<StopTime> {
         this.flexContinuousDropOff = flexContinuousDropOff;
     }
 
-    public BookingInfo getBookingInfo() {
-        return bookingInfo;
+    public BookingInfo getDropOffBookingInfo() {
+        return dropOffBookingInfo;
     }
 
-    public void setBookingInfo(BookingInfo bookingInfo) {
-        this.bookingInfo = bookingInfo;
+    public void setDropOffBookingInfo(BookingInfo dropOffBookingInfo) {
+        this.dropOffBookingInfo = dropOffBookingInfo;
+    }
+
+    public BookingInfo getPickupBookingInfo() {
+        return pickupBookingInfo;
+    }
+
+    public void setPickupBookingInfo(BookingInfo pickupBookingInfo) {
+        this.pickupBookingInfo = pickupBookingInfo;
     }
 
     public int compareTo(StopTime o) {

@@ -1,14 +1,13 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
@@ -27,7 +26,7 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
 
   @Test
   public void name() {
-    assertEquals("bikerental-vs-walk-filter", subject.name());
+    Assertions.assertEquals("bikerental-vs-walk-filter", subject.name());
   }
 
   @Test
@@ -40,11 +39,11 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
     var input = List.of(w1, t1, t2, t3);
     var expected = List.of(w1, t1, t2);
 
-    assertEquals(Itinerary.toStr(expected), Itinerary.toStr(subject.filter(input)));
+    Assertions.assertEquals(Itinerary.toStr(expected), Itinerary.toStr(subject.filter(input)));
   }
 
   @Test
   public void removeItineraries() {
-    assertTrue(subject.removeItineraries());
+    Assertions.assertTrue(subject.removeItineraries());
   }
 }

@@ -14,11 +14,13 @@ public interface PlanTestConstants {
   int BOARD_COST = 120;
   float WALK_RELUCTANCE_FACTOR = 2.0f;
   float BICYCLE_RELUCTANCE_FACTOR = 1.0f;
+  float CAR_RELUCTANCE_FACTOR = 1.0f;
   float WAIT_RELUCTANCE_FACTOR = 0.8f;
   float WALK_SPEED = 1.4f;
   float BICYCLE_SPEED = 5.0f;
   float BUS_SPEED = 12.5f;
   float RAIL_SPEED = 25.0f;
+  float CAR_SPEED = 25.0f;
 
   // Time duration(D) constants, all values are in seconds
   int D1m = DurationUtils.duration("1m");

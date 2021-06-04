@@ -36,7 +36,8 @@ private static final long serialVersionUID = -8704964150428339679L;
 
 private final ScheduledDeviatedStopTime[] stopTimes;
 
-  private final BookingInfo[] bookingInfos;
+  private final BookingInfo[] dropOffBookingInfos;
+  private final BookingInfo[] pickupBookingInfos;
 
   public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof Stop);
@@ -55,11 +56,13 @@ private final ScheduledDeviatedStopTime[] stopTimes;
 
     int nStops = stopTimes.size();
     this.stopTimes = new ScheduledDeviatedStopTime[nStops];
-    this.bookingInfos = new BookingInfo[nStops];
+    this.dropOffBookingInfos = new BookingInfo[nStops];
+    this.pickupBookingInfos = new BookingInfo[nStops];
 
     for (int i = 0; i < nStops; i++) {
       this.stopTimes[i] = new ScheduledDeviatedStopTime(stopTimes.get(i));
-      this.bookingInfos[i] = stopTimes.get(i).getBookingInfo();
+      this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
+      this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
   }
 
@@ -132,8 +135,13 @@ private final ScheduledDeviatedStopTime[] stopTimes;
   }
 
   @Override
-  public BookingInfo getBookingInfo(int i) {
-    return bookingInfos[i];
+  public BookingInfo getDropOffBookingInfo(int i) {
+    return dropOffBookingInfos[i];
+  }
+
+  @Override
+  public BookingInfo getPickupBookingInfo(int i) {
+    return pickupBookingInfos[i];
   }
 
   private Collection<StopLocation> expandStops(StopLocation stop) {

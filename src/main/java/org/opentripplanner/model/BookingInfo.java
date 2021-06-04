@@ -1,7 +1,5 @@
 package org.opentripplanner.model;
 
-import org.opentripplanner.netex.mapping.BookingTime;
-
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;

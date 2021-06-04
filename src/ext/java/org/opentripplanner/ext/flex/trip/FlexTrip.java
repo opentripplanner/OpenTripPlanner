@@ -59,5 +59,7 @@ public abstract class FlexTrip extends TransitEntity {
     return trip;
   }
 
-  public abstract BookingInfo getBookingInfo(int i);
+  public abstract BookingInfo getDropOffBookingInfo(int i);
+
+  public abstract BookingInfo getPickupBookingInfo(int i);
 }

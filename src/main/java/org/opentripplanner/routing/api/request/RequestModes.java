@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opentripplanner.model.TransitMode;
 
 import java.util.Arrays;
@@ -37,5 +38,28 @@ public class RequestModes {
         streetMode.equals(accessMode)
             || streetMode.equals(egressMode)
             || streetMode.equals(directMode);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    RequestModes that = (RequestModes) o;
+
+    if (accessMode != that.accessMode) return false;
+    if (egressMode != that.egressMode) return false;
+    if (directMode != that.directMode) return false;
+    return transitModes != null ? transitModes.equals(that.transitModes) : that.transitModes == null;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+            .append("accessMode", accessMode)
+            .append("egressMode", egressMode)
+            .append("directMode", directMode)
+            .append("transitModes", transitModes)
+            .toString();
   }
 }
