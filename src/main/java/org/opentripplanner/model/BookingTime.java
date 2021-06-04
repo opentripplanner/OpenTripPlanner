@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.mapping;
+package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.time.LocalTime;

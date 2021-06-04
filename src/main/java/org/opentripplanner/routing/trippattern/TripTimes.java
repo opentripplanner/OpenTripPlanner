@@ -119,8 +119,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     int[] dropoffs;
 
-    List<BookingInfo> bookingInfos;
+    List<BookingInfo> dropOffBookingInfos;
 
+    List<BookingInfo> pickupBookingInfos;
 
     /**
      * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits
@@ -156,7 +157,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         timeShift = stopTimes.iterator().next().getArrivalTime();
         final int[] pickups   = new int[nStops];
         final int[] dropoffs   = new int[nStops];
-        final List<BookingInfo> bookingInfos = new ArrayList<>();
+        final List<BookingInfo> dropOffBookingInfos = new ArrayList<>();
+        final List<BookingInfo> pickupBookingInfos = new ArrayList<>();
         int s = 0;
         for (final StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
@@ -166,7 +168,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
             pickups[s] = st.getPickupType();
             dropoffs[s] = st.getDropOffType();
-            bookingInfos.add(st.getBookingInfo());
+            dropOffBookingInfos.add(st.getDropOffBookingInfo());
+            pickupBookingInfos.add(st.getPickupBookingInfo());
             s++;
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
@@ -175,7 +178,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
         this.pickups = deduplicator.deduplicateIntArray(pickups);
         this.dropoffs = deduplicator.deduplicateIntArray(dropoffs);
-        this.bookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, bookingInfos);
+        this.dropOffBookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, dropOffBookingInfos);
+        this.pickupBookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos);
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
         this.arrivalTimes = null;
@@ -199,7 +203,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.timepoints = object.timepoints;
         this.pickups = object.pickups;
         this.dropoffs = object.dropoffs;
-        this.bookingInfos = object.bookingInfos;
+        this.dropOffBookingInfos = object.dropOffBookingInfos;
+        this.pickupBookingInfos = object.pickupBookingInfos;
     }
 
     /**
@@ -372,8 +377,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return dropoffs[stop];
     }
 
-    public BookingInfo getBookingInfo(int stop) {
-        return bookingInfos.get(stop);
+    public BookingInfo getDropOffBookingInfo(int stop) {
+        return dropOffBookingInfos.get(stop);
+    }
+
+    public BookingInfo getPickupBookingInfo(int stop) {
+        return pickupBookingInfos.get(stop);
     }
 
     /**

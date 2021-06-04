@@ -821,6 +821,10 @@ type Leg {
     and passenger can stay inside the vehicle.
     """
     interlineWithPreviousLeg: Boolean
+
+    dropOffBookingInfo: BookingInfo
+
+    pickupBookingInfo: BookingInfo
 }
 
 """Identifies whether this stop represents a stop or station."""
@@ -999,6 +1003,32 @@ enum PickupDropoffType {
 
     """Must coordinate with driver to arrange pickup / drop off."""
     COORDINATE_WITH_DRIVER
+}
+
+type ContactInfo {
+    contactPerson: String
+    phoneNumber: String
+    eMail: String
+    faxNumber: String
+    infoUrl: String
+    bookingUrl: String
+    additionalDetails: String
+}
+
+type BookingTime {
+    time: String
+    daysPrior: Int
+}
+
+type BookingInfo {
+    contactInfo: ContactInfo
+    earliestBookingTime: BookingTime
+    latestBookingTime: BookingTime
+    minimumBookingNoticeSeconds: Long
+    maximumBookingNoticeSeconds: Long
+    message: String
+    pickupMessage: String
+    dropOffMessage: String
 }
 
 type Place {
