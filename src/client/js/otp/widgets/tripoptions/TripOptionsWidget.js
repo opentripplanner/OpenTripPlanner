@@ -1210,10 +1210,12 @@ otp.widgets.tripoptions.GroupTripOptions =
 otp.widgets.tripoptions.AdditionalTripParameters =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
 
-        initialize : function(tripWidget, label) {
+        initialize : function(tripWidget) {
             otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
             this.id = tripWidget.id+"-additionalParameters";
-            label = label || "Additional parameters: ";
+
+            var label = _tr("Additional parameters");
+
             var placeholder = "searchWindow=366"
                 + "\n# timetableView=false"
                 + "\nwaitReluctance=0.5"
