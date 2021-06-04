@@ -35,7 +35,8 @@ public class UnscheduledTrip extends FlexTrip {
 
   private final UnscheduledStopTime[] stopTimes;
 
-  private final BookingInfo[] bookingInfos;
+  private final BookingInfo[] dropOffBookingInfos;
+  private final BookingInfo[] pickupBookingInfos;
 
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> noExplicitTimes = Predicate.not(st -> st.isArrivalTimeSet() || st.isDepartureTimeSet());
@@ -54,11 +55,13 @@ public class UnscheduledTrip extends FlexTrip {
     }
 
     this.stopTimes = new UnscheduledStopTime[N_STOPS];
-    this.bookingInfos = new BookingInfo[N_STOPS];
+    this.dropOffBookingInfos = new BookingInfo[N_STOPS];
+    this.pickupBookingInfos = new BookingInfo[N_STOPS];
 
     for (int i = 0; i < N_STOPS; i++) {
       this.stopTimes[i] = new UnscheduledStopTime(stopTimes.get(i));
-      this.bookingInfos[i] = stopTimes.get(0).getBookingInfo();
+      this.dropOffBookingInfos[i] = stopTimes.get(0).getDropOffBookingInfo();
+      this.pickupBookingInfos[i] = stopTimes.get(0).getPickupBookingInfo();
     }
   }
 
@@ -135,8 +138,13 @@ public class UnscheduledTrip extends FlexTrip {
   }
 
   @Override
-  public BookingInfo getBookingInfo(int i) {
-    return bookingInfos[i];
+  public BookingInfo getDropOffBookingInfo(int i) {
+    return dropOffBookingInfos[i];
+  }
+
+  @Override
+  public BookingInfo getPickupBookingInfo(int i) {
+    return pickupBookingInfos[i];
   }
 
   private Collection<StopLocation> expandStops(StopLocation stop) {

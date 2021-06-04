@@ -37,6 +37,10 @@ public class BikeParkEdge extends Edge {
     @Override
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
+        if (!options.bikeParkAndRide) {
+            return null;
+        }
+
         if (options.arriveBy) {
             return traverseUnpark(s0);
         } else {

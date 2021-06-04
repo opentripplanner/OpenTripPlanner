@@ -29,6 +29,7 @@ public class FlexLegMapper {
       leg.boardRule = GraphPathToItineraryMapper.getBoardAlightMessage(2);
       leg.alightRule = GraphPathToItineraryMapper.getBoardAlightMessage(3);
 
-      leg.bookingInfo = flexTripEdge.getFlexTrip().getBookingInfo(leg.from.stopIndex);
+      leg.dropOffBookingInfo = flexTripEdge.getFlexTrip().getDropOffBookingInfo(leg.from.stopIndex);
+      leg.pickupBookingInfo = flexTripEdge.getFlexTrip().getPickupBookingInfo(leg.from.stopIndex);
   }
 }

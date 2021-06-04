@@ -103,6 +103,15 @@ comments that not only explain *what* you did but also *why you did it* while pr
 context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
 `@param` annotations with no description.
 
+### Itinerary and API Snapshot Tests
+
+To test the itinerary generation, and the API there are snapshot test which save the result of the
+requests as `*.snap` JSON-like files. These are stored in git so that it is possible to compare to
+the expected result when running the tests.
+
+If the snapshots need to be recreated than running `mvn clean -Pclean-test-snapshots` will remove
+the existing `*.snap` files so that the next time the tests are run the snapshots will be recreated.
+The updated files may be committed after checking that the changes in the files are expected.
 
 ### Documentation
 

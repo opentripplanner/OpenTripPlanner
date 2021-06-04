@@ -286,7 +286,7 @@ public class LegType {
             .newFieldDefinition()
             .name("bookingArrangements")
             .type(bookingArrangementType)
-            .dataFetcher(env -> leg(env).bookingInfo)
+            .dataFetcher(env -> leg(env).pickupBookingInfo)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()

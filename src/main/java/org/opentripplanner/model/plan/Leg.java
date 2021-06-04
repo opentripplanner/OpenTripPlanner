@@ -169,7 +169,9 @@ public class Leg {
 
    public String alightRule;
 
-   public BookingInfo bookingInfo = null;
+   public BookingInfo dropOffBookingInfo = null;
+
+   public BookingInfo pickupBookingInfo = null;
 
     public Transfer transferFromPrevLeg = null;
 

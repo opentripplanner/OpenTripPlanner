@@ -198,7 +198,8 @@ public class RaptorPathToItineraryMapper {
         leg.walkSteps = new ArrayList<>();
         leg.generalizedCost = pathLeg.generalizedCost();
 
-        leg.bookingInfo = tripTimes.getBookingInfo(boardStopIndexInPattern);
+        leg.dropOffBookingInfo = tripTimes.getDropOffBookingInfo(boardStopIndexInPattern);
+        leg.pickupBookingInfo = tripTimes.getPickupBookingInfo(boardStopIndexInPattern);
 
         if(optPath != null) {
             var transfer = optPath.getTransferTo(pathLeg);

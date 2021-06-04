@@ -479,7 +479,7 @@ public class IndexAPI {
     @Path("/patterns/{patternId}")
     public ApiPatternShort getPattern(@PathParam("patternId") String patternId) {
         TripPattern pattern = getTripPattern(createRoutingService(), patternId);
-        return TripPatternMapper.mapToApiShort(pattern);
+        return TripPatternMapper.mapToApiDetailed(pattern);
     }
 
     @GET

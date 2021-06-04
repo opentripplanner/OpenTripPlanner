@@ -9,6 +9,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.bike_park.BikePark;
@@ -60,7 +61,6 @@ public abstract class GraphRoutingTest {
             build();
             return graph;
         }
-
 
         public <T> T v(String label) {
             return vertex(label);
@@ -247,12 +247,14 @@ public abstract class GraphRoutingTest {
         public BikeRentalStation bikeRentalStationEntity(
                 String id,
                 double latitude,
-                double longitude
+                double longitude,
+                Set<String> networks
         ) {
             var bikeRentalStation = new BikeRentalStation();
             bikeRentalStation.id = id;
             bikeRentalStation.x = longitude;
             bikeRentalStation.y = latitude;
+            bikeRentalStation.networks = networks;
             bikeRentalStation.isKeepingBicycleRentalAtDestinationAllowed = false;
             return bikeRentalStation;
         }
@@ -265,9 +267,9 @@ public abstract class GraphRoutingTest {
         ) {
             var vertex = new BikeRentalStationVertex(
                     graph,
-                    bikeRentalStationEntity(id, latitude, longitude)
+                    bikeRentalStationEntity(id, latitude, longitude, networks)
             );
-            new BikeRentalEdge(vertex, networks);
+            new BikeRentalEdge(vertex);
             return vertex;
         }
 
@@ -324,7 +326,7 @@ public abstract class GraphRoutingTest {
         // -- Car P+R
         public ParkAndRideVertex carPark(String id, double latitude, double longitude) {
             var vertex =
-                    new ParkAndRideVertex(graph, id, id, latitude, longitude, null);
+                    new ParkAndRideVertex(graph, id, id, longitude, latitude, null);
             new ParkAndRideEdge(vertex);
             return vertex;
         }
@@ -339,6 +341,11 @@ public abstract class GraphRoutingTest {
 
         public List<ParkAndRideLinkEdge> biLink(StreetVertex from, ParkAndRideVertex to) {
             return List.of(link(from, to), link(to, from));
+        }
+
+        // Transit
+        public void tripPattern(TripPattern tripPattern) {
+            graph.tripPatternForId.put(tripPattern.getId(), tripPattern);
         }
     }
 }
