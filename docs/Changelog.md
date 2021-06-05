@@ -29,8 +29,8 @@
 - ClassCastException when doing flex access search [#3448](https://github.com/opentripplanner/OpenTripPlanner/issues/3448)
 - Fix for traveling back in time when optimize transfers [#3491](https://github.com/opentripplanner/OpenTripPlanner/pull/3491)
 - Transit reluctance per transit mode [#3440](https://github.com/opentripplanner/OpenTripPlanner/issues/3440)
+- Allow the removal of P+R results consisting only of driving of walking [#3515](https://github.com/opentripplanner/OpenTripPlanner/pull/3515)
 - Add reluctance to "walk" over certain surfaces (for wheelchairs) [#3524](https://github.com/opentripplanner/OpenTripPlanner/issues/3524)
-
 
 ## 2.0.0 (2020-11-27)
 

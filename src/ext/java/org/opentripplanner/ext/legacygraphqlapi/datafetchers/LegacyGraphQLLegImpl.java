@@ -6,6 +6,7 @@ import org.opentripplanner.api.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.plan.Leg;
@@ -182,6 +183,16 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<Boolean> interlineWithPreviousLeg() {
     return environment -> getSource(environment).interlineWithPreviousLeg;
+  }
+
+  @Override
+  public DataFetcher<BookingInfo> dropOffBookingInfo() {
+    return environment -> getSource(environment).dropOffBookingInfo;
+  }
+
+  @Override
+  public DataFetcher<BookingInfo> pickupBookingInfo() {
+    return environment -> getSource(environment).pickupBookingInfo;
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
