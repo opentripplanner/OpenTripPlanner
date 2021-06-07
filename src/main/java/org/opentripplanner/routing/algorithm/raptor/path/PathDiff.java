@@ -82,7 +82,7 @@ public class PathDiff<T extends RaptorTripSchedule> {
       tbl.addRow(
         e.status("OK", "DROPPED", "NEW"),
         it.path.numberOfTransfers(),
-        DurationUtils.durationToStr(it.path.travelDurationInSeconds()),
+        DurationUtils.durationToStr(it.path.durationInSeconds()),
         it.path.generalizedCost(),
         DurationUtils.durationToStr(it.walkDuration),
         TimeUtils.timeToStrCompact(it.path.startTime()),

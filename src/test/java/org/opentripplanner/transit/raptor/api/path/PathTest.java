@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.util.time.TimeUtils;
 
 
 public class PathTest {
@@ -33,7 +34,7 @@ public class PathTest {
 
     @Test
     public void totalTravelDurationInSeconds() {
-        assertEquals("2:00", timeToStrCompact(subject.travelDurationInSeconds()));
+        assertEquals("2:00", timeToStrCompact(subject.durationInSeconds()));
     }
 
     @Test
@@ -59,6 +60,11 @@ public class PathTest {
     @Test
     public void cost() {
         assertEquals(toOtpDomainCost(TOTAL_COST), subject.generalizedCost());
+    }
+
+    @Test
+    public void waitTime() {
+        assertEquals(TimeUtils.time("0:39:15"), subject.waitTime());
     }
 
     @Test

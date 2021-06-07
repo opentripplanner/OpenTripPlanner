@@ -55,7 +55,7 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Number of seconds to travel this leg. This does not include wait time.
+     * Number of seconds to travel this leg. This does not include slack/wait time.
      */
     default int duration() {
         return toTime() - fromTime();
@@ -67,6 +67,16 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
      * {@code -1} is returned if no cost is computed by raptor.
      */
     int generalizedCost();
+
+    /**
+     * The computed generalized-cost for this path leg plus all path-legs following this leg.
+     * <p>
+     * {@code -1} is returned if no cost is computed by raptor.
+     */
+    default int tailGeneralizedCost() {
+        if(generalizedCost() < 0) { return generalizedCost(); }
+        return stream().mapToInt(PathLeg::generalizedCost).sum();
+    }
 
     /**
      * @return {@code true} if transit leg, if not {@code false}.
@@ -86,7 +96,6 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
      * </pre>
      */
     default TransitPathLeg<T> asTransitLeg() {
-        //noinspection unchecked
         return (TransitPathLeg<T>) this;
     }
 
@@ -108,7 +117,6 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
      * </pre>
      */
     default TransferPathLeg<T> asTransferLeg() {
-        //noinspection unchecked
         return (TransferPathLeg<T>) this;
     }
 
@@ -183,7 +191,7 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
                 return currentLeg != null;
             }
             @Override public PathLeg<T> next() {
-                PathLeg<T> temp = currentLeg;
+                var temp = currentLeg;
                 currentLeg = currentLeg.isEgressLeg() ? null : currentLeg.nextLeg();
                 return temp;
             }

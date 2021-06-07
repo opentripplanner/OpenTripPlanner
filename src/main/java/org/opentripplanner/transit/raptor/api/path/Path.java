@@ -53,7 +53,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
         this(
             iterationDepartureTime,
             accessLeg,
-            accessLeg.stream().mapToInt(PathLeg::generalizedCost).sum()
+            accessLeg.tailGeneralizedCost()
         );
     }
 
@@ -98,7 +98,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     /**
      * The total journey duration in seconds.
      */
-    public final int travelDurationInSeconds() {
+    public final int durationInSeconds() {
         return endTime - startTime;
     }
 
@@ -141,27 +141,17 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             .collect(Collectors.toList());
     }
 
-    /** Return the duration of time spent onBoard - excluding slack. */
-    public int transitDuration() {
-        return legStream()
-            .filter(PathLeg::isTransitLeg)
-            .mapToInt(PathLeg::duration)
-            .sum();
-    }
-
     /**
      * Aggregated wait-time in seconds. This method compute the total wait time for this path.
      */
     public int waitTime() {
-        return travelDurationInSeconds() - transitDuration();
+        // Get the total duration for all legs exclusive slack/wait time.
+        int legsTotalDuration = legStream().mapToInt(PathLeg::duration).sum();
+        return durationInSeconds() - legsTotalDuration;
     }
 
     public Stream<PathLeg<T>> legStream() {
         return accessLeg.stream();
-    }
-
-    public Iterable<PathLeg<T>> legIterable() {
-        return accessLeg.iterator();
     }
 
     public String toStringDetailed() {
