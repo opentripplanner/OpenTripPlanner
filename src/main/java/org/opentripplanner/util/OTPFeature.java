@@ -30,6 +30,7 @@ public enum OTPFeature {
     FlexRouting(false),
     GoogleCloudStorage(false),
     ReportApi(false),
+    SandboxAPIGeocoder(false),
     SandboxAPILegacyGraphQLApi(false),
     SandboxAPIMapboxVectorTilesApi(false),
     SandboxAPITransmodelApi(false),
