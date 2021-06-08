@@ -96,13 +96,10 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
-        TraverseMode mode = s0.getBackMode() == null ? s0.getNonTransitMode() : s0.getBackMode();
-
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
             // For Kiss & Ride allow dropping of the passenger before entering the station
             if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
                 dropOffAfterDriving(s0, s1);
-                mode = TraverseMode.WALK;
             } else if (s0.getCarPickupState() != null) {
                 return null;
             }
@@ -114,7 +111,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
             s1.incrementWeight(s0.getOptions().keepingRentedBicycleAtDestinationCost);
         }
 
-        s1.setBackMode(mode);
+        s1.setBackMode(null);
 
         // We do not increase the time here, so that searching from the stop coordinates instead of
         // the stop id catch transit departing at that exact search time.

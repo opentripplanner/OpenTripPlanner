@@ -620,16 +620,14 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("allowKeepingRentedBicycleAtDestination", (Boolean v) -> request.allowKeepingRentedBicycleAtDestination = v);
       callWith.argument("keepingRentedBicycleAtDestinationCost", (Integer v) -> request.keepingRentedBicycleAtDestinationCost = v);
 
-      // callWith.argument("modeWeight.TRAM", (Double v) -> request.setModeWeight(TraverseMode.TRAM, v));
-      // callWith.argument("modeWeight.SUBWAY", (Double v) -> request.setModeWeight(TraverseMode.SUBWAY, v));
-      // callWith.argument("modeWeight.RAIL", (Double v) -> request.setModeWeight(TraverseMode.RAIL, v));
-      // callWith.argument("modeWeight.BUS", (Double v) -> request.setModeWeight(TraverseMode.BUS, v));
-      // callWith.argument("modeWeight.FERRY", (Double v) -> request.setModeWeight(TraverseMode.FERRY, v));
-      // callWith.argument("modeWeight.CABLE_CAR", (Double v) -> request.setModeWeight(TraverseMode.CABLE_CAR, v));
-      // callWith.argument("modeWeight.GONDOLA", (Double v) -> request.setModeWeight(TraverseMode.GONDOLA, v));
-      // callWith.argument("modeWeight.FUNICULAR", (Double v) -> request.setModeWeight(TraverseMode.FUNICULAR, v));
-      // callWith.argument("modeWeight.AIRPLANE", (Double v) -> request.setModeWeight(TraverseMode.AIRPLANE, v));
-
+      callWith.argument(
+              "modeWeight", (Map<String, Object> v) -> request.setTransitReluctanceForMode(
+                      v.entrySet()
+                              .stream()
+                              .collect(Collectors.toMap(e -> TransitMode.valueOf(e.getKey()),
+                                      e -> (Double) e.getValue()
+                              ))));
+      callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
       callWith.argument("arriveBy", request::setArriveBy);
       request.showIntermediateStops = true;
       callWith.argument("intermediatePlaces", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(LegacyGraphQLQueryTypeImpl::toGenericLocation).collect(Collectors.toList()));

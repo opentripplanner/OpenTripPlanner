@@ -6,6 +6,10 @@
 
 ## Changelog
 - Initial version of Legacy Graph QL API (September 2020)
+- Added ids parameter to bikeRentalStations query (May 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3450)
+- Added capacity and allowOverloading fields to bike rental stations (not yet properly implemented) (May 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3450)
+- Updated documentation and process for generating Java code from GraphQL schema definition (May 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3450)
+- Implemented modeWeight and added debugItineraryFilter to plan query. Added systemNotices to itineraries (May 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3503)
 
 ## Documentation
 

@@ -2,6 +2,9 @@
 package org.opentripplanner.ext.legacygraphqlapi.generated;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -30,6 +33,7 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
 import java.util.Map;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.SystemNotice;
 import graphql.schema.TypeResolver;
 import graphql.schema.DataFetcher;
 
@@ -211,6 +215,46 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Iterable<FareComponent>> components();
     }
 
+    public interface LegacyGraphQLBookingInfo {
+        public DataFetcher<ContactInfo> contactInfo();
+
+        public DataFetcher<BookingTime> earliestBookingTime();
+
+        public DataFetcher<BookingTime> latestBookingTime();
+
+        public DataFetcher<Long> minimumBookingNoticeSeconds();
+
+        public DataFetcher<Long> maximumBookingNoticeSeconds();
+
+        public DataFetcher<String> message();
+
+        public DataFetcher<String> pickupMessage();
+
+        public DataFetcher<String> dropOffMessage();
+    }
+
+    public interface LegacyGraphQLContactInfo {
+        public DataFetcher<String> contactPerson();
+
+        public DataFetcher<String> phoneNumber();
+
+        public DataFetcher<String> eMail();
+
+        public DataFetcher<String> faxNumber();
+
+        public DataFetcher<String> infoUrl();
+
+        public DataFetcher<String> bookingUrl();
+
+        public DataFetcher<String> additionalDetails();
+    }
+
+    public interface LegacyGraphQLBookingTime {
+        public DataFetcher<String> time();
+
+        public DataFetcher<Integer> daysPrior();
+    }
+
     /**
      * Component of the fare (i.e. ticket) for a part of the itinerary
      */
@@ -268,6 +312,8 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Double> elevationLost();
 
         public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle();
+
+        public DataFetcher<Iterable<SystemNotice>> systemNotices();
     }
 
     public interface LegacyGraphQLLeg {
@@ -323,6 +369,10 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<String> dropoffType();
 
         public DataFetcher<Boolean> interlineWithPreviousLeg();
+
+        public DataFetcher<BookingInfo> dropOffBookingInfo();
+
+        public DataFetcher<BookingInfo> pickupBookingInfo();
     }
 
     /**
@@ -848,6 +898,20 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<EncodedPolylineBean> tripGeometry();
 
         public DataFetcher<Iterable<TransitAlert>> alerts();
+    }
+
+    /**
+     * A system notice is used to tag elements with system information for debugging or other system
+     * related purpose. One use-case is to run a routing search with 'debugItineraryFilter: true'.
+     * This will then tag itineraries instead of removing them from the result. This make it
+     * possible to inspect the itinerary-filter-chain. A SystemNotice only has english text, because
+     * the primary user are technical staff, like testers and developers.
+     */
+    public interface LegacyGraphQLSystemNotice {
+
+        public DataFetcher<String> tag();
+
+        public DataFetcher<String> text();
     }
 
     /**

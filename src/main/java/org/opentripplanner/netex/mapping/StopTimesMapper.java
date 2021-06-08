@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
+
+import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
@@ -130,11 +132,14 @@ class StopTimesMapper {
                 return null;
             }
 
-            stopTime.setBookingInfo(BookingInfoMapper.map(
-                stopPoint,
-                serviceJourney,
-                lookUpFlexibleLine(serviceJourney, journeyPattern)
-            ));
+
+            BookingInfo bookingInfo = BookingInfoMapper.map(
+                    stopPoint,
+                    serviceJourney,
+                    lookUpFlexibleLine(serviceJourney, journeyPattern)
+            );
+            stopTime.setDropOffBookingInfo(bookingInfo);
+            stopTime.setPickupBookingInfo(bookingInfo);
 
             result.addStopTime(currentPassingTime.getId(), stopTime);
         }

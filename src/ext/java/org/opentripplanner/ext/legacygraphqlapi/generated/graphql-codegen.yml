@@ -32,7 +32,10 @@ config:
     BikePark: org.opentripplanner.routing.bike_park.BikePark#BikePark
     BikeRentalStation: org.opentripplanner.routing.bike_rental.BikeRentalStation#BikeRentalStation
     BikesAllowed: String
+    BookingInfo: org.opentripplanner.model.BookingInfo
+    BookingTime: org.opentripplanner.model.BookingTime
     CarPark: Object
+    ContactInfo: org.opentripplanner.model.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
@@ -67,3 +70,4 @@ config:
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.model.Trip#Trip
     VertexType: String
+    SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice

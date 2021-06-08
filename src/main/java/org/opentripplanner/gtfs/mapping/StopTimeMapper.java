@@ -21,19 +21,22 @@ class StopTimeMapper {
     private final LocationGroupMapper locationGroupMapper;
 
     private final TripMapper tripMapper;
+    private final BookingRuleMapper bookingRuleMapper;
 
     private final Map<org.onebusaway.gtfs.model.StopTime, StopTime> mappedStopTimes = new HashMap<>();
 
     StopTimeMapper(
-        StopMapper stopMapper,
-        LocationMapper locationMapper,
-        LocationGroupMapper locationGroupMapper,
-        TripMapper tripMapper
+            StopMapper stopMapper,
+            LocationMapper locationMapper,
+            LocationGroupMapper locationGroupMapper,
+            TripMapper tripMapper,
+            BookingRuleMapper bookingRuleMapper
     ) {
         this.stopMapper = stopMapper;
         this.locationMapper = locationMapper;
         this.locationGroupMapper = locationGroupMapper;
         this.tripMapper = tripMapper;
+        this.bookingRuleMapper = bookingRuleMapper;
     }
 
     Collection<StopTime> map(Collection<org.onebusaway.gtfs.model.StopTime> times) {
@@ -70,6 +73,8 @@ class StopTimeMapper {
         lhs.setFlexWindowEnd(rhs.getEndPickupDropOffWindow());
         lhs.setFlexContinuousPickup(rhs.getContinuousPickup());
         lhs.setFlexContinuousDropOff(rhs.getContinuousDropOff());
+        lhs.setPickupBookingInfo(bookingRuleMapper.map(rhs.getPickupBookingRule()));
+        lhs.setDropOffBookingInfo(bookingRuleMapper.map(rhs.getDropOffBookingRule()));
 
         // Skip mapping of proxy
         // private transient StopTimeProxy proxy;
