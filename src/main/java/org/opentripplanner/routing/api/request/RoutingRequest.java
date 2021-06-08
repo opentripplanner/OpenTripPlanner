@@ -107,7 +107,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /**
      * This is the maximum duration in seconds for a direct street search. This is a performance
-     * limit and should therefore be set high. Use filters to limit what is presented to the client.
+     * limit and should therefore be set high. Results close to the limit are not guaranteed to be
+     * optimal. Use filters to limit what is presented to the client.
      *
      * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
      */
@@ -115,8 +116,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /**
      * This is the maximum duration in seconds for access/egress street searches. This is a
-     * performance limit and should therefore be set high. Use filters to limit what is presented
-     * to the client.
+     * performance limit and should therefore be set high. Results close to the limit are not
+     * guaranteed to be optimal. Use filters to limit what is presented to the client.
      *
      * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
      */
