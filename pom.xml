@@ -31,13 +31,14 @@
         <junit.version>5.7.1</junit.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
     </properties>
 
     <distributionManagement>
         <repository>
             <id>github</id>
             <name>OpenTripPlanner Maven Repository on Github Packages</name>
-            <url>https://maven.pkg.github.com/opentripplanner/OpenTripPlanner/</url>
+            <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
         </repository>
     </distributionManagement>
 
