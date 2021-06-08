@@ -1587,12 +1587,16 @@ type QueryType {
         transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get
         an itinerary which has (useless) back and forth public transport legs to
         avoid walking too long distances.
+
+        DEPRECATED - Use walkReluctance instead
         """
         maxWalkDistance: Float
 
         """
         The maximum time (in seconds) of pre-transit travel when using
         drive-to-transit (park and ride or kiss and ride). Default value: 1800.
+
+        DEPRECATED - Use walkReluctance or future reluctance parameters for other modes
         """
         maxPreTransitTime: Int
 
