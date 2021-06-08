@@ -55,9 +55,6 @@ public class NearbyStopFinder {
     private final Graph graph;
     private final double durationLimitInSeconds;
 
-    /* Fields used when finding stops via the street network. */
-    private AStar astar;
-
     private DirectGraphFinder directGraphFinder;
 
     /**
@@ -76,12 +73,11 @@ public class NearbyStopFinder {
         this.graph = graph;
         this.useStreets = useStreets;
         this.durationLimitInSeconds = durationLimitInSeconds;
-        if (useStreets) {
-            astar = new AStar();
+
+        if (!useStreets) {
             // We need to accommodate straight line distance (in meters) but when streets are present we use an
             // earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
             // but we don't have much of a choice here. Use the default walking speed to convert.
-        } else {
             this.directGraphFinder = new DirectGraphFinder(graph);
         }
     }
@@ -190,6 +186,8 @@ public class NearbyStopFinder {
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
+
+        var astar = new AStar();
         astar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(durationLimitInSeconds));
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 

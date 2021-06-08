@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import gnu.trove.set.hash.TIntHashSet;
@@ -249,7 +250,7 @@ public class Graph implements Serializable {
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
 
     /** Pre-generated transfers between all stops. */
-    public final Multimap<StopLocation, SimpleTransfer> transfersByStop = HashMultimap.create();
+    public final Multimap<StopLocation, SimpleTransfer> transfersByStop = Multimaps.synchronizedMultimap(HashMultimap.create());
 
     public Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
 

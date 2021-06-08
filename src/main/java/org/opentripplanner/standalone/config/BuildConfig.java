@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
@@ -16,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is an object representation of the 'build-config.json'.
@@ -297,6 +300,8 @@ public class BuildConfig {
      */
     public final StorageConfig storage;
 
+    public final List<RoutingRequest> transferRequests;
+
     /**
      * Visibility calculations for an area will not be done if there are more nodes than this limit.
      */
@@ -355,6 +360,17 @@ public class BuildConfig {
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
         netex = new NetexConfig(c.path("netex"));
         storage = new StorageConfig(c.path("storage"));
+
+        if (c.path("transferRequests") != null && !c.path("transferRequests").asList().isEmpty()) {
+            transferRequests = c
+                .path("transferRequests")
+                .asList()
+                .stream()
+                .map(RoutingRequestMapper::mapRoutingRequest)
+                .collect(Collectors.toUnmodifiableList());
+        } else {
+            transferRequests = List.of(new RoutingRequest());
+        }
 
         if(logUnusedParams) {
             c.logAllUnusedParameters(LOG);

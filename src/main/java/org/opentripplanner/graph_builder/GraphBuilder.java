@@ -216,7 +216,7 @@ public class GraphBuilder implements Runnable {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! config.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds));
+                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds, config.transferRequests));
             }
             // Analyze routing between stops to generate report
             if (OTPFeature.TransferAnalyzer.isOn()) {
