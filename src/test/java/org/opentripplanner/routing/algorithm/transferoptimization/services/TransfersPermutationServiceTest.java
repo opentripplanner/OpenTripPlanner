@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.dummyT2TTransferService;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.tx;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
@@ -9,7 +9,7 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.p
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathBuilder;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
@@ -79,7 +79,7 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
     // When
     var result = subject.findAllTransitPathPermutations(original);
 
-    assertEquals(result.toString(), 1, result.size());
+    assertEquals(1, result.size(), result.toString());
     assertEquals(original.toString(), result.get(0).toString());
   }
 
@@ -108,7 +108,7 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
     // When
     var result = subject.findAllTransitPathPermutations(original);
 
-    assertEquals(result.toString(), 1, result.size());
+    assertEquals(1, result.size(), result.toString());
     assertEquals(original.toString(), result.get(0).toString());
   }
 
@@ -132,7 +132,7 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
     // When
     var result = subject.findAllTransitPathPermutations(original);
 
-    assertEquals(result.toString(), 1, result.size());
+    assertEquals(1, result.size(), result.toString());
     assertEquals(original.toString(), result.get(0).toString());
   }
 
@@ -171,8 +171,8 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
     );
 
     for(int i=0; i<expected.size() && i< result.size(); ++i) {
-      assertEquals("#" + i, expected.get(i), result.get(i).toString());
+      assertEquals(expected.get(i), result.get(i).toString(), "#" + i);
     }
-    assertEquals(result.toString(), expected.size(), result.size());
+    assertEquals(expected.size(), result.size(), result.toString());
   }
 }

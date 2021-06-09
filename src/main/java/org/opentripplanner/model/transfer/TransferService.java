@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Stop;
@@ -76,6 +77,7 @@ public class TransferService implements Serializable {
         return guaranteedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
     }
 
+    @Nullable
     public Transfer findTransfer(
             Stop fromStop,
             Stop toStop,

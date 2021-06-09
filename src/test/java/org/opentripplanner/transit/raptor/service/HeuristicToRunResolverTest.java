@@ -2,10 +2,10 @@ package org.opentripplanner.transit.raptor.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 import org.junit.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -57,8 +57,8 @@ public class HeuristicToRunResolverTest {
         RaptorRequestBuilder<TestTripSchedule> b = new RaptorRequestBuilder<>();
         b.profile(RaptorProfile.NO_WAIT_BEST_TIME);
         // Add some dummy legs
-        b.searchParams().accessPaths().add(dummyPath());
-        b.searchParams().egressPaths().add(dummyPath());
+        b.searchParams().accessPaths().add(dummyAccessEgress());
+        b.searchParams().egressPaths().add(dummyAccessEgress());
         b.searchParams().earliestDepartureTime(10_000);
 
         resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters(
@@ -74,8 +74,8 @@ public class HeuristicToRunResolverTest {
         RaptorRequestBuilder<TestTripSchedule> b = new RaptorRequestBuilder<>();
         b.profile(RaptorProfile.MULTI_CRITERIA);
         // Add some dummy legs
-        b.searchParams().accessPaths().add(dummyPath());
-        b.searchParams().egressPaths().add(dummyPath());
+        b.searchParams().accessPaths().add(dummyAccessEgress());
+        b.searchParams().egressPaths().add(dummyAccessEgress());
         msg = "Params:";
 
         if (dest) {
@@ -120,12 +120,7 @@ public class HeuristicToRunResolverTest {
         reverse = true;
     }
 
-    private RaptorTransfer dummyPath() {
-        return new RaptorTransfer() {
-            @Override public int stop() { return 1; }
-            @Override public int durationInSeconds() { return 10; }
-            @Override public int generalizedCost() { return walkCost(durationInSeconds()); }
-            @Override public String toString() { return asString(); }
-        };
+    private RaptorTransfer dummyAccessEgress() {
+        return TestTransfer.walk(1, 10);
     }
 }

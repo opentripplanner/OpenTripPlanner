@@ -86,8 +86,6 @@ public class RaptorPathToItineraryMapper {
         // Map access leg
         legs.addAll(mapAccessLeg(path.accessLeg()));
 
-        // TODO: Add back this code when PathLeg interface contains object references
-
         PathLeg<TripSchedule> pathLeg = path.accessLeg().nextLeg();
 
         boolean firstLeg = true;
@@ -162,7 +160,8 @@ public class RaptorPathToItineraryMapper {
         Leg leg = new Leg(tripTimes.trip);
 
         // Find stop positions in pattern where this leg boards and alights.
-        // We cannot assume every stop appears only once in a pattern, so we match times instead of stops.
+        // We cannot assume every stop appears only once in a pattern, so we
+        // have to match stop and time.
         int boardStopIndexInPattern = tripSchedule.findDepartureStopPosition(
             pathLeg.fromTime(), pathLeg.fromStop()
         );

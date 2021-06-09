@@ -86,6 +86,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
     private static final int VERY_EARLY = time("00:00");
     private static final int VERY_LATE = time("23:59");
 
+    public static final int RAPTOR_ITERATION_START_TIME = time("09:00");
+
     // Access (Walk 3m15s ~ A)
     public static final int ACCESS_START = time("10:00");
     public static final int ACCESS_END = time("10:03:15");
@@ -242,7 +244,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
         AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
             ACCESS, STOP_A, ACCESS_START, ACCESS_END, toOtpDomainCost(ACCESS_COST), leg2.asTransitLeg()
         );
-        return new Path<>(1, leg1, toOtpDomainCost(TOTAL_COST));
+        return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, toOtpDomainCost(TOTAL_COST));
     }
 
     public static List<Integer> basicTripStops() {

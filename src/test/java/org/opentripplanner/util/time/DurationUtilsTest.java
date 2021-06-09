@@ -1,11 +1,12 @@
 package org.opentripplanner.util.time;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.api.parallel.Resources;
 
 public class DurationUtilsTest {
   private final int D9h31m = durationSec(9, 31, 0);
@@ -51,6 +52,7 @@ public class DurationUtilsTest {
   }
 
   @Test
+  @ResourceLock(Resources.LOCALE)
   public void msToSecondsStr() {
     Locale defaultLocale = Locale.getDefault();
     try {
