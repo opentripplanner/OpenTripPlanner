@@ -38,9 +38,12 @@ public class FlexRouter {
   private final FlexPathCalculator accessFlexPathCalculator;
   private final FlexPathCalculator egressFlexPathCalculator;
 
-  /* Request data */
+  /* "Start of Time" refers to the service date (midnight) of the date of the request */
   private final ZonedDateTime startOfTime;
+
+  /* this is the number of seconds since startOfTime/the service date */
   private final int departureTime;
+  
   private final boolean arriveBy;
 
   private final FlexServiceDate[] dates;
@@ -72,12 +75,12 @@ public class FlexRouter {
     this.arriveBy = arriveBy;
 
     int totalDays = additionalPastSearchDays + 1 + additionalFutureSearchDays;
-
     this.dates = new FlexServiceDate[totalDays];
 
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
       int index = d + additionalPastSearchDays;
+      
       ServiceDate serviceDate = new ServiceDate(date);
       dates[index] = new FlexServiceDate(
           serviceDate,

@@ -72,7 +72,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop access, FlexServiceDate serviceDate, FlexPathCalculator calculator
   ) {
     int fromIndex = getFromIndex(access);
 
@@ -82,7 +82,7 @@ public class UnscheduledTrip extends FlexTrip {
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
     for (StopLocation stop : expandStops(stopTimes[1].stop)) {
-      res.add(new FlexAccessTemplate(access, this, fromIndex, 1, stop, date, calculator));
+      res.add(new FlexAccessTemplate(access, this, fromIndex, 1, stop, serviceDate, calculator));
     }
 
     return res.stream();
@@ -90,7 +90,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop egress, FlexServiceDate serviceDate, FlexPathCalculator calculator
   ) {
     int toIndex = getToIndex(egress);
 
@@ -100,16 +100,18 @@ public class UnscheduledTrip extends FlexTrip {
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
     for (StopLocation stop : expandStops(stopTimes[0].stop)) {
-      res.add(new FlexEgressTemplate(egress, this, 0, toIndex, stop, date, calculator));
+      res.add(new FlexEgressTemplate(egress, this, 0, toIndex, stop, serviceDate, calculator));
     }
 
     return res.stream();
   }
 
-  @Override
-  // this method ignores the travel time in evaluation of the Flex window,
+  // Note: This method ignores the travel time in evaluation of the Flex window,
   // assuming that onece you've boarded, the vehicle will finish its trip
-  // to drop you off, even if after the flexWindow
+  // to drop you off, even if after the flexWindow.
+
+  // Note 2: departureTime is in seconds after midnight/service date
+  @Override
   public int earliestDepartureTime(
       int departureTime, int fromStopIndex, int toStopIndex
   ) {
@@ -123,10 +125,12 @@ public class UnscheduledTrip extends FlexTrip {
     return Math.max(departureTime, fromStopTime.flexWindowStart);
   }
 
-  @Override
-  // this method ignores the travel time in evaluation of the Flex window,
+  // Note: This method ignores the travel time in evaluation of the Flex window,
   // assuming that onece you've boarded, the vehicle will finish its trip
   // to drop you off, even if after the flexWindow
+
+  // Note 2: departureTime is in seconds after midnight/service date
+  @Override
   public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex) {
 	UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
     UnscheduledStopTime toStopTime = stopTimes[toStopIndex];

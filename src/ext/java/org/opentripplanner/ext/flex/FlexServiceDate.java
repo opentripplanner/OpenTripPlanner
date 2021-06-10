@@ -1,13 +1,15 @@
 package org.opentripplanner.ext.flex;
 
 import gnu.trove.set.TIntSet;
+
+import java.util.TimeZone;
+
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
- * This class contains information used in a flex router, and depends on the date the search was
- * made on.
+ * A lightweight wrapper around a serviceDate to hold a services index
  */
 public class FlexServiceDate {
 
@@ -17,9 +19,7 @@ public class FlexServiceDate {
   /** Which services are running on the date.*/
   public final TIntSet servicesRunning;
 
-  FlexServiceDate(
-      ServiceDate serviceDate, TIntSet servicesRunning
-  ) {
+  FlexServiceDate(ServiceDate serviceDate, TIntSet servicesRunning) {
     this.serviceDate = serviceDate;
     this.servicesRunning = servicesRunning;
   }
@@ -28,4 +28,8 @@ public class FlexServiceDate {
     return servicesRunning != null
         && servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()));
   }  
+  
+  public int getAsEpochSeconds(TimeZone tz) {
+	return (int)(serviceDate.getAsDate(tz).getTime()/1000);
+  }
 }

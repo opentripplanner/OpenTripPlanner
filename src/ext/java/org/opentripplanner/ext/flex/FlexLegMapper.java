@@ -12,6 +12,7 @@ public class FlexLegMapper {
 
   static public void fixFlexTripLeg(Leg leg, FlexTripEdge flexTripEdge) {
       leg.from.stopId = flexTripEdge.s1.getId();
+      
       // TODO: Should flex be of its own type
       leg.from.vertexType = flexTripEdge.s1 instanceof Stop ? VertexType.TRANSIT : VertexType.NORMAL;
       leg.from.stopIndex = flexTripEdge.flexTemplate.fromStopIndex;

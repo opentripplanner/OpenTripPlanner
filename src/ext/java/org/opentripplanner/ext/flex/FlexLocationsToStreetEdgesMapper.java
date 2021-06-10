@@ -33,6 +33,7 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
     ProgressTracker progress = ProgressTracker.track("Add flex locations to street vertices", 1, graph.locationsById.size());
 
     LOG.info(progress.startMessage());
+    
     // TODO: Make this into a parallel stream, first calculate vertices per location and then add them.
     for (FlexStopLocation flexStopLocation : graph.locationsById.values()) {
       for (Vertex vertx : streetIndex.getVerticesForEnvelope(flexStopLocation

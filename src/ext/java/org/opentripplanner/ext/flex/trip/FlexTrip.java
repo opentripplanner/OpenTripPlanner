@@ -7,7 +7,6 @@ import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -32,25 +31,25 @@ public abstract class FlexTrip extends TransitEntity {
   }
 
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop access, FlexServiceDate servicedate, FlexPathCalculator calculator
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop egress, FlexServiceDate servicedate, FlexPathCalculator calculator
   );
 
-  // the 95% CI for travel time on this trip. Use this for connections and other things that 
-  // need more certainty about the arrival/departure time
+  // The 95% CI for travel time on this trip. Use this for connections and other things that 
+  // need more certainty about the arrival/departure time.
   public abstract int getSafeTotalTime(FlexPath streetPath, int fromStopIndex, int toStopIndex);
 
-  // the "usual" for travel time on this trip. Use this for display and other things that 
-  // are supposed to be more the norm vs. the "worst case" scenario
+  // The "usual" for travel time on this trip. Use this for display and other things that 
+  // are supposed to be more the norm vs. the "worst case" scenario.
   public abstract int getMeanTotalTime(FlexPath streetPath, int fromStopIndex, int toStopIndex);
 
-  // this method returns seconds since midnight
+  // Note: This method returns seconds since midnight. departureTime is also seconds since midnight/service date
   public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex);
 
-  // this method returns seconds since midnight
+  // Note: This method returns seconds since midnight. departureTime is also seconds since midnight/service date
   public abstract int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex);
 
   public abstract Collection<StopLocation> getStops();

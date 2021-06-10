@@ -8,7 +8,6 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -22,12 +21,16 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public abstract class FlexAccessEgressTemplate {
+
   protected final NearbyStop accessEgress;
   protected final FlexTrip trip;
+  
   public final int fromStopIndex;
   public final int toStopIndex;
   protected final StopLocation transferStop;
+  
   public final FlexServiceDate serviceDate;
+  
   protected final FlexPathCalculator calculator;
 
   /**
@@ -37,7 +40,7 @@ public abstract class FlexAccessEgressTemplate {
    * @param fromStopIndex Stop sequence index where this FlexTrip is boarded
    * @param toStopIndex   The stop where this FlexTrip alights
    * @param transferStop  The stop location where this FlexTrip alights
-   * @param date          The service date of this FlexTrip
+   * @param serviceDate   The service date of this FlexTrip
    * @param calculator    Calculates the path and duration of the FlexTrip
    */
   FlexAccessEgressTemplate(
@@ -46,7 +49,7 @@ public abstract class FlexAccessEgressTemplate {
       int fromStopIndex,
       int toStopIndex,
       StopLocation transferStop,
-      FlexServiceDate date,
+      FlexServiceDate serviceDate,
       FlexPathCalculator calculator
   ) {
     this.accessEgress = accessEgress;
@@ -54,7 +57,7 @@ public abstract class FlexAccessEgressTemplate {
     this.fromStopIndex = fromStopIndex;
     this.toStopIndex = toStopIndex;
     this.transferStop = transferStop;
-    this.serviceDate = date;
+    this.serviceDate = serviceDate;
     this.calculator = calculator;
   }
 
@@ -92,6 +95,11 @@ public abstract class FlexAccessEgressTemplate {
    */
   abstract protected Vertex getFlexVertex(Edge edge);
 
+  /**
+   * Get the times in seconds, before, during and after the flex ride.
+   */
+  abstract protected int[] getFlexTimes(FlexTripEdge flexEdge, State state);
+  
   /**
    * Get the FlexTripEdge for the flex ride.
    */
@@ -132,8 +140,9 @@ public abstract class FlexAccessEgressTemplate {
 
     return new FlexAccessEgress(
         stop,
+        getFlexTimes(flexEdge, state),
         fromStopIndex,
-        toStopIndex, serviceDate,
+        toStopIndex, 
         trip,
         state,
         transferEdges.isEmpty()

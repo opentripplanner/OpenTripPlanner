@@ -12,7 +12,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -22,20 +21,20 @@ public class FlexTripEdge extends Edge {
 
   public StopLocation s1;
   public StopLocation s2;
-  private FlexTrip trip;
+  
   public FlexAccessEgressTemplate flexTemplate;
   public FlexPath flexPath;
 
   public FlexTripEdge(
-      Vertex v1, Vertex v2, StopLocation s1, StopLocation s2, FlexTrip trip,
+      Vertex v1, Vertex v2, StopLocation s1, StopLocation s2,
       FlexAccessEgressTemplate flexTemplate, FlexPathCalculator calculator
   ) {
     // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
     // The first parameter in Vertex constructor is graph. If it is null, the vertex isn't added to it.
     super(new Vertex(null, null, 0.0, 0.0) {}, new Vertex(null, null, 0.0, 0.0) {});
+    
     this.s1 = s1;
     this.s2 = s2;
-    this.trip = trip;
     this.flexTemplate = flexTemplate;
     this.fromv = v1;
     this.tov = v2;
@@ -45,34 +44,31 @@ public class FlexTripEdge extends Edge {
 
   @Override
   public State traverse(State s0) {
-	// not routable
 	if(this.flexPath == null)
-		return null;
+		return null; // not routable
 	  
 	StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.BUS);
 
-    // add wait time, if any	  
-	TimeZone tz = s0.getOptions().getRoutingContext().graph.getTimeZone();
-    
-	long departureTime = (s0.getTimeInMillis() - 
-			flexTemplate.serviceDate.serviceDate.getAsDate(tz).getTime()) / 1000;
-	if(departureTime < 0)
-		return null; // trip doesn't cover request time
+    // wait time
+    TimeZone tz = s0.getOptions().getRoutingContext().graph.getTimeZone();    
+	long serviceDateAsEpoch = flexTemplate.serviceDate.getAsEpochSeconds(tz);
+	long pickupTime = (s0.getTimeInMillis()/1000) - serviceDateAsEpoch;
+	
+	if(pickupTime < 0 || pickupTime > 60 * 60 * 24)
+		return null; // current time isn't in this service day
 		
-	int earliestDepartureTime = trip.earliestDepartureTime((int)departureTime, 
+	int earliestPickupTime = flexTemplate.getFlexTrip().earliestDepartureTime((int)pickupTime, 
     		flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
 
-	if(earliestDepartureTime < 0)
-		return null; // trip leaves in the past
+	if(earliestPickupTime < 0)
+		return null; // trip occurs outside the planning window
 	
-	long initialWaitTimeSeconds = 
-			((s0.getTimeInMillis() - flexTemplate.serviceDate.serviceDate.getAsDate(tz).getTime()) / 1000)
-			- earliestDepartureTime;
-
-	if(initialWaitTimeSeconds > 0) {	
-		editor.incrementWeight((int)initialWaitTimeSeconds);
-	}
+	long initialWaitTimeSeconds = earliestPickupTime - pickupTime;
+	if(initialWaitTimeSeconds < 0)
+		return null; // we missed this trip
+		
+	editor.incrementWeight((int)initialWaitTimeSeconds);
 	
 	// travel time
     editor.incrementTimeInSeconds(getTripTimeInSeconds());
@@ -82,10 +78,10 @@ public class FlexTripEdge extends Edge {
     return editor.makeState();
   }
 
-  // this method uses the "mean" time from flex v2 to best reflect the typical travel scenario
-  // in user-facing interfaces
+  // This method uses the "mean" time from flex v2 to best reflect the typical travel scenario
+  // in user-facing interfaces.
   public int getTripTimeInSeconds() {
-    return this.trip.getMeanTotalTime(flexPath, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
+    return getFlexTrip().getMeanTotalTime(flexPath, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
   }
 
   @Override
@@ -99,21 +95,21 @@ public class FlexTripEdge extends Edge {
   }
 
   @Override
+  public Trip getTrip() {
+    return getFlexTrip().getTrip();
+  }
+
+  public FlexTrip getFlexTrip() {
+    return flexTemplate.getFlexTrip();
+  }
+
+  @Override
   public String getName() {
-    return null;
+    return getTrip().getId().toString();
   }
 
   @Override
   public String getName(Locale locale) {
-    return this.getName();
-  }
-
-  @Override
-  public Trip getTrip() {
-    return trip.getTrip();
-  }
-
-  public FlexTrip getFlexTrip() {
-    return trip;
+ 	return getName();
   }
 }
