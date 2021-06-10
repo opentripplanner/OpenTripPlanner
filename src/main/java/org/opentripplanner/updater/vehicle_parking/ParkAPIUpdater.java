@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_parking;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +23,17 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     private static final String JSON_PARSE_PATH = "lots";
 
     private final String feedId;
+    private final Collection<String> staticTags;
 
     public ParkAPIUpdater(
             String url,
             String feedId,
-            Map<String, String> httpHeaders
+            Map<String, String> httpHeaders,
+            Collection<String> staticTags
     ) {
         super(url, JSON_PARSE_PATH, httpHeaders);
         this.feedId = feedId;
+        this.staticTags = staticTags;
     }
 
     @Override
@@ -71,6 +75,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
                 : VehicleParkingState.OPERATIONAL;
 
         var tags = parseTags(jsonNode, "lot_type", "address", "forecast", "state");
+        tags.addAll(staticTags);
 
         return VehicleParking.builder()
                 .id(vehicleParkId)

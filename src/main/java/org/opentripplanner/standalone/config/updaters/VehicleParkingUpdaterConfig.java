@@ -1,12 +1,12 @@
 package org.opentripplanner.standalone.config.updaters;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class VehicleParkingUpdaterConfig {
 
@@ -35,6 +35,7 @@ public class VehicleParkingUpdaterConfig {
         c.asInt("frequencySec", 60),
         c.asBoolean("zip", false),
         c.asMap("headers", NodeAdapter::asText),
+        new ArrayList<>(c.asTextSet("tags", null)),
         mapStringToSourceType(c.asText("sourceType"))
     );
   }

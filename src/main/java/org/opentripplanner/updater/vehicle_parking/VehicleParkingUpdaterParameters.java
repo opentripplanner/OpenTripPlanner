@@ -1,5 +1,7 @@
 package org.opentripplanner.updater.vehicle_parking;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.updater.DataSourceType;
@@ -15,6 +17,7 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
   private final boolean zip;
   private final DataSourceType sourceType;
   private final Map<String, String> httpHeaders;
+  private final List<String> tags;
 
 
   public VehicleParkingUpdaterParameters(
@@ -26,6 +29,7 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
       boolean zip,
       @NotNull
       Map<String, String> httpHeaders,
+      List<String> tags,
       DataSourceType sourceType
   ) {
     this.configRef = configRef;
@@ -36,6 +40,7 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
     this.zip = zip;
     this.httpHeaders = httpHeaders;
     this.sourceType = sourceType;
+    this.tags = tags;
   }
 
   @Override
@@ -71,5 +76,9 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
 
   public boolean isZip() {
     return zip;
+  }
+
+  public Collection<String> getTags() {
+    return tags;
   }
 }

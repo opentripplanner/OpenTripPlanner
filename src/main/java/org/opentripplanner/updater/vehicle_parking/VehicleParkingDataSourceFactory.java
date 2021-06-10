@@ -10,8 +10,8 @@ public class VehicleParkingDataSourceFactory {
   public static DataSource<VehicleParking> create(VehicleParkingUpdaterParameters source) {
     switch (source.getSourceType()) {
       case KML:               return new KmlBikeParkDataSource(source.getUrl(), source.getFeedId(), source.getNamePrefix(), source.isZip());
-      case PARK_API:          return new CarParkAPIUpdater(source.getUrl(), source.getFeedId(), source.getHttpHeaders());
-      case BICYCLE_PARK_API:  return new BicycleParkAPIUpdater(source.getUrl(), source.getFeedId(), source.getHttpHeaders());
+      case PARK_API:          return new CarParkAPIUpdater(source.getUrl(), source.getFeedId(), source.getHttpHeaders(), source.getTags());
+      case BICYCLE_PARK_API:  return new BicycleParkAPIUpdater(source.getUrl(), source.getFeedId(), source.getHttpHeaders(), source.getTags());
     }
     throw new IllegalArgumentException(
         "Unknown vehicle parking source type: " + source.getSourceType()

@@ -34,7 +34,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);
     when(dataSource.update()).thenReturn(true);
 
-    var parameters = new VehicleParkingUpdaterParameters(null, null, null, null, -1, false, null, null);
+    var parameters = new VehicleParkingUpdaterParameters(null, null, null, null, -1, false, null, null, null);
     vehicleParkingUpdater = new VehicleParkingUpdater(parameters, dataSource);
     vehicleParkingUpdater.setup(graph);
   }
