@@ -20,6 +20,10 @@ import java.util.Set;
 public class AlertToLegMapper {
 
     public static void addAlertPatchesToLeg(Graph graph, Leg leg, boolean isFirstLeg, Locale requestedLocale) {
+
+        // Alert patches are only relevant for transit legs
+        if (!leg.isTransitLeg()) { return; }
+
         Set<StopCondition> departingStopConditions = isFirstLeg
                 ? StopCondition.DEPARTURE
                 : StopCondition.FIRST_DEPARTURE;
@@ -29,7 +33,7 @@ public class AlertToLegMapper {
         FeedScopedId fromStopId = leg.from==null ? null : leg.from.stopId;
         FeedScopedId toStopId = leg.to==null ? null : leg.to.stopId;
 
-        if (leg.isTransitLeg()) {
+        {
             FeedScopedId routeId = leg.getRoute().getId();
             if (fromStopId != null) {
                 Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, fromStopId, routeId);
@@ -96,7 +100,7 @@ public class AlertToLegMapper {
             addAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
         }
 
-        if(leg.isTransitLeg()) {
+        {
             Collection<TransitAlert> patches;
 
             // trips
