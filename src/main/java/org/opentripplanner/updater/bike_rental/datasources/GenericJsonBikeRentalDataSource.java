@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -28,8 +29,7 @@ abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSourcePar
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
     protected final T config;
     private String url;
-    private String headerName;
-    private String headerValue;
+    private Map<String, String> headers;
 
     private final String jsonParsePath;
 
@@ -49,28 +49,24 @@ abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSourcePar
         this.config = config;
         url = config.getUrl();
         jsonParsePath = jsonPath;
-        headerName = "Default";
-        headerValue = null;
+        headers = config.getHttpHeaders();
     }
 
     /**
      *
      * @param jsonPath path to get from enclosing elements to nested rental list.
      *        Separate path levels with '/' For example "d/list"
-     * @param headerName header name
-     * @param headerValue header value
+     * @param headers http headers
      */
     public GenericJsonBikeRentalDataSource(
         T config,
         String jsonPath,
-        String headerName,
-        String headerValue
+        Map<String, String> headers
     ) {
         this.config = config;
         this.url = config.getUrl();
         this.jsonParsePath = jsonPath;
-        this.headerName = headerName;
-        this.headerValue = headerValue;
+        this.headers = headers;
     }
 
     @Override
@@ -84,7 +80,7 @@ abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSourcePar
         	
             String proto = url2.getProtocol();
             if (proto.equals("http") || proto.equals("https")) {
-            	data = HttpUtils.getData(URI.create(url), headerName, headerValue);
+            	data = HttpUtils.getData(URI.create(url), headers);
             } else {
                 // Local file probably, try standard java
                 data = url2.openStream();

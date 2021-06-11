@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -271,7 +272,11 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             LOG.info("Fetching initial data from " + dataInitializationUrl);
             final long t1 = System.currentTimeMillis();
 
-            final InputStream data = HttpUtils.getData(dataInitializationUrl, "Content-Type", "application/x-protobuf", 30000);
+            final InputStream data = HttpUtils.getData(
+                dataInitializationUrl,
+                Map.of("Content-Type", "application/x-protobuf"),
+                30000
+            );
             ByteString value = ByteString.readFrom(data);
 
             final long t2 = System.currentTimeMillis();

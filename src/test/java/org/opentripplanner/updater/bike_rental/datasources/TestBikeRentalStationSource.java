@@ -5,6 +5,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 
 import java.util.List;
+import java.util.Map;
 
 public class TestBikeRentalStationSource extends TestCase {
 
@@ -15,7 +16,8 @@ public class TestBikeRentalStationSource extends TestCase {
                 null,
                 "file:src/test/resources/bike/keolis-rennes.xml",
                 null,
-                null
+                null,
+                Map.of()
             )
         );
         assertTrue(rennesSource.update());
@@ -41,7 +43,8 @@ public class TestBikeRentalStationSource extends TestCase {
                 null,
                 "file:src/test/resources/bike/smoove.json",
                 null,
-                null
+                null,
+                Map.of()
             )
         );
         assertTrue(source.update());
