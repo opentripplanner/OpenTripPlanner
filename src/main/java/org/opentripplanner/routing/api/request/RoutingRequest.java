@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -426,6 +428,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * */
     @Deprecated
     public double waitAtBeginningFactor = 0.4;
+
+    public TObjectDoubleMap<String> surfaceReluctances = new TObjectDoubleHashMap<>(0);
 
     /**
      * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
@@ -1325,6 +1329,30 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
         if (waitAtBeginningFactor > 0) {
             this.waitAtBeginningFactor = waitAtBeginningFactor;
+        }
+    }
+
+    public void setSurfaceReluctances(String surfaceReluctances) throws ParameterException {
+        if (surfaceReluctances == null) {
+            return;
+        }
+        String[] reluctanceSegments = surfaceReluctances.split(";");
+        this.surfaceReluctances = new TObjectDoubleHashMap<>(reluctanceSegments.length);
+        for (String reluctanceWithSurface : reluctanceSegments) {
+            String[] surfaceAndReluctance = reluctanceWithSurface.split(",");
+            if (surfaceAndReluctance.length != 2) {
+                throw new ParameterException(Message.BOGUS_PARAMETER);
+            }
+            String surface = surfaceAndReluctance[0];
+            try {
+                double reluctance = Double.parseDouble(surfaceAndReluctance[1]);
+                if (reluctance < 1) {
+                    throw new ParameterException(Message.BOGUS_PARAMETER);
+                }
+                this.surfaceReluctances.put(surface, reluctance);
+            } catch (NumberFormatException ex) {
+                throw new ParameterException(Message.BOGUS_PARAMETER);
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.Iterables;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
+import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -1174,6 +1175,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 street.setHasBogusName(true);
             }
             street.setStairs(steps);
+            Optional.ofNullable(way.getSurface()).ifPresent(street::setSurface);
 
             /* TODO: This should probably generalized somehow? */
             if (!ignoreWheelchairAccessibility

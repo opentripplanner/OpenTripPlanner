@@ -1,7 +1,9 @@
 package org.opentripplanner.api.resource;
 
+import javax.ws.rs.WebApplicationException;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.Message;
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.mapping.TripPlanMapper;
@@ -91,6 +93,12 @@ public class PlannerResource extends RoutingResource {
             response.elevationMetadata.geoidElevation = request.geoidElevation;
 
             response.debugOutput = res.getDebugAggregator().finishedRendering();
+        }
+        catch (ParameterException ex) {
+            // probably shouldn't log it, since it is a user/parameter error, just report it back
+            PlannerError error = new PlannerError();
+            error.setMsg(ex.message);
+            response.setError(error);
         }
         catch (Exception e) {
             LOG.error("System error", e);

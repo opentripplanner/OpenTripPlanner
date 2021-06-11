@@ -191,6 +191,15 @@ public abstract class RoutingResource {
     @QueryParam("waitAtBeginningFactor")
     protected Double waitAtBeginningFactor;
 
+    /**
+     * How should different road/surface types be preferred? Each "surfaceReluctance" would be a
+     * comma-separated pair, of "surface_key" * (as detailed at
+     * https://wiki.openstreetmap.org/wiki/Key:surface) and the reluctance factor (>1). Each
+     * "surfaceReluctance" pair should be separated by a semi-colon (;).
+     */
+    @QueryParam("surfaceReluctances")
+    protected String surfaceReluctances;
+
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
     @QueryParam("walkSpeed")
     protected Double walkSpeed;
@@ -699,6 +708,9 @@ public abstract class RoutingResource {
 
         if (waitAtBeginningFactor != null)
             request.setWaitAtBeginningFactor(waitAtBeginningFactor);
+
+        if (surfaceReluctances != null)
+            request.setSurfaceReluctances(surfaceReluctances);
 
         if (walkSpeed != null)
             request.walkSpeed = walkSpeed;

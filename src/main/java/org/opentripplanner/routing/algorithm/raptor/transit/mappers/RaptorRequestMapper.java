@@ -66,6 +66,7 @@ public class RaptorRequestMapper {
         }
 
         builder.mcCostFactors()
+                .surfaceReluctanceFactors(request.surfaceReluctances)
                 .waitReluctanceFactor(request.waitReluctance);
 
         if(request.modes.accessMode == StreetMode.WALK) {
