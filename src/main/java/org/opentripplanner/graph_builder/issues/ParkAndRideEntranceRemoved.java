@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 
 public class ParkAndRideEntranceRemoved implements DataImportIssue {
 
@@ -10,7 +10,7 @@ public class ParkAndRideEntranceRemoved implements DataImportIssue {
   private final String entranceId;
   private final String streetVertexName;
 
-  public ParkAndRideEntranceRemoved(VehicleParking.VehicleParkingEntrance vehicleParkingEntrance){
+  public ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEntrance){
     this.entranceId = vehicleParkingEntrance.getEntranceId().toString();
     this.streetVertexName = vehicleParkingEntrance.getVertex().getName();
   }

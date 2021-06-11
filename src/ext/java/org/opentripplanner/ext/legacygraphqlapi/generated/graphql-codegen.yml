@@ -71,7 +71,7 @@ config:
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.model.Trip#Trip
     VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
-    VehiclePlaces: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking.VehiclePlaces
-    VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking.VehicleParkingState
+    VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces
+    VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState
     VertexType: String
     SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice

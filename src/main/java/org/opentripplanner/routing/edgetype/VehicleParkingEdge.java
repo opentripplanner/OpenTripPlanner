@@ -115,7 +115,7 @@ public class VehicleParkingEdge extends Edge {
             case BICYCLE:
                 return vehicleParking.hasBicyclePlaces();
             case CAR:
-                return wheelchairAccessible ? vehicleParking.hasWheelchairAccessibleCarPlaces() : vehicleParking.hasCarPlaces();
+                return wheelchairAccessible ? vehicleParking.hasWheelchairAccessibledCarPlaces() : vehicleParking.hasCarPlaces();
             default:
                 return false;
         }

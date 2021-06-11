@@ -116,7 +116,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
                     verticesByPark.put(updatedVehicleParking, vehicleParkingVertices);
                     tempEdgesByPark.put(updatedVehicleParking, disposableEdgeCollectionsForVertex);
                 } else {
-                    oldVehicleParkings.get(updatedVehicleParking.getId()).updateVehiclePlaces(updatedVehicleParking.getAvailability());
+                    oldVehicleParkings.get(updatedVehicleParking.getId()).updateAvailability(updatedVehicleParking.getAvailability());
                 }
             }
             /* Remove existing parks that were not present in the update */

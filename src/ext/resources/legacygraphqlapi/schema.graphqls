@@ -257,14 +257,31 @@ type VehicleParking implements Node & PlaceInterface {
     """Latitude of the bike park (WGS 84)"""
     lat: Float
 
+    """
+    URL which contains details of this vehicle parking.
+    """
     detailsUrl: String
 
+    """
+    URL of an image which may be displayed to the user showing the vehicle parking.
+    """
     imageUrl: String
 
+    """
+    Source specific tags of the vehicle parking, which describe the available features. For example
+    park_and_ride, bike_lockers, or static_osm_data.
+    """
     tags: [String]
 
+    """
+    A short translatable note containing details of this vehicle parking.
+    """
     note: String
 
+    """
+    The state of this vehicle parking.
+    Only ones in an OPERATIONAL state may be used for Park and Ride.
+    """
     state: VehicleParkingState
 
     bicyclePlaces: Boolean
@@ -273,18 +290,21 @@ type VehicleParking implements Node & PlaceInterface {
 
     wheelchairAccessibleCarPlaces: Boolean
 
-    capacity: VehiclePlaces
+    capacity: VehicleParkingSpaces
 
-    availability: VehiclePlaces
+    availability: VehicleParkingSpaces
 }
 
 enum VehicleParkingState {
+    """May be used for park and ride."""
     OPERATIONAL
+    """Can't be used for park and ride."""
     TEMPORARILY_CLOSED
+    """Can't be used for park and ride."""
     CLOSED
 }
 
-type VehiclePlaces {
+type VehicleParkingSpaces {
     bicycleSpaces: Int
 
     carSpaces: Int

@@ -15,6 +15,8 @@ import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.common.model.P2;
 import java.util.Map;
 import org.opentripplanner.routing.core.FareComponent;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -952,15 +954,15 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> imageUrl();
     public DataFetcher<Iterable<String>> tags();
     public DataFetcher<String> note();
-    public DataFetcher<VehicleParking.VehicleParkingState> state();
+    public DataFetcher<VehicleParkingState> state();
     public DataFetcher<Boolean> bicyclePlaces();
     public DataFetcher<Boolean> carPlaces();
     public DataFetcher<Boolean> wheelchairAccessibleCarPlaces();
-    public DataFetcher<VehicleParking.VehiclePlaces> capacity();
-    public DataFetcher<VehicleParking.VehiclePlaces> availability();
+    public DataFetcher<VehicleParkingSpaces> capacity();
+    public DataFetcher<VehicleParkingSpaces> availability();
   }
   
-  public interface LegacyGraphQLVehiclePlaces {
+  public interface LegacyGraphQLVehicleSpaces {
     public DataFetcher<Integer> bicycleSpaces();
     public DataFetcher<Integer> carSpaces();
     public DataFetcher<Integer> wheelchairAccessibleCarSpaces();

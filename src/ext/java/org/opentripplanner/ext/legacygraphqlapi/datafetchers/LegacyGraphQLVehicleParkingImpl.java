@@ -5,6 +5,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 
 public class LegacyGraphQLVehicleParkingImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLVehicleParking {
     @Override
@@ -62,7 +64,7 @@ public class LegacyGraphQLVehicleParkingImpl implements LegacyGraphQLDataFetcher
     }
 
     @Override
-    public DataFetcher<VehicleParking.VehicleParkingState> state() {
+    public DataFetcher<VehicleParkingState> state() {
         return environment -> getSource(environment).getState();
     }
 
@@ -78,16 +80,16 @@ public class LegacyGraphQLVehicleParkingImpl implements LegacyGraphQLDataFetcher
 
     @Override
     public DataFetcher<Boolean> wheelchairAccessibleCarPlaces() {
-        return environment -> getSource(environment).hasWheelchairAccessibleCarPlaces();
+        return environment -> getSource(environment).hasWheelchairAccessibledCarPlaces();
     }
 
     @Override
-    public DataFetcher<VehicleParking.VehiclePlaces> capacity() {
+    public DataFetcher<VehicleParkingSpaces> capacity() {
         return environment -> getSource(environment).getCapacity();
     }
 
     @Override
-    public DataFetcher<VehicleParking.VehiclePlaces> availability() {
+    public DataFetcher<VehicleParkingSpaces> availability() {
         return environment -> getSource(environment).getAvailability();
     }
 

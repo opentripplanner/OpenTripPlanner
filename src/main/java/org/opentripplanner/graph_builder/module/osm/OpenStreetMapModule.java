@@ -62,6 +62,7 @@ import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
@@ -529,32 +530,32 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 I18NString creativeName,
                 List<VehicleParking.VehicleParkingEntranceCreator> entrances
         ) {
-            OptionalInt bicycleCapacity, carCapacity, wheelchairAccessibleCapacity;
+            OptionalInt bicycleCapacity, carCapacity, wheelchairAccessibleCarCapacity;
             if (isCarParkAndRide) {
                 carCapacity = parseCapacity(entity);
                 bicycleCapacity = parseCapacity(entity, "capacity:bike");
-                wheelchairAccessibleCapacity = parseCapacity(entity, "capacity:disabled");
+                wheelchairAccessibleCarCapacity = parseCapacity(entity, "capacity:disabled");
             } else {
                 bicycleCapacity = parseCapacity(entity);
                 carCapacity = OptionalInt.empty();
-                wheelchairAccessibleCapacity = OptionalInt.empty();
+                wheelchairAccessibleCarCapacity = OptionalInt.empty();
             }
 
-            VehicleParking.VehiclePlaces vehiclePlaces = null;
-            if (bicycleCapacity.isPresent() || carCapacity.isPresent() || wheelchairAccessibleCapacity.isPresent()) {
-                vehiclePlaces = VehicleParking.VehiclePlaces.builder()
+            VehicleParkingSpaces vehicleParkingSpaces = null;
+            if (bicycleCapacity.isPresent() || carCapacity.isPresent() || wheelchairAccessibleCarCapacity.isPresent()) {
+                vehicleParkingSpaces = VehicleParkingSpaces.builder()
                     .bicycleSpaces(bicycleCapacity.isPresent() ? bicycleCapacity.getAsInt() : null)
                     .carSpaces(carCapacity.isPresent() ? carCapacity.getAsInt() : null)
-                    .wheelchairAccessibleCarSpaces(wheelchairAccessibleCapacity.isPresent() ? wheelchairAccessibleCapacity.getAsInt() : null)
+                    .wheelchairAccessibleCarSpaces(wheelchairAccessibleCarCapacity.isPresent() ? wheelchairAccessibleCarCapacity.getAsInt() : null)
                     .build();
             }
 
             var bicyclePlaces = !isCarParkAndRide || bicycleCapacity.orElse(0) > 0;
             var carPlaces = (
                     isCarParkAndRide &&
-                            wheelchairAccessibleCapacity.isEmpty() && carCapacity.isEmpty()
+                            wheelchairAccessibleCarCapacity.isEmpty() && carCapacity.isEmpty()
             ) || carCapacity.orElse(0) > 0;
-            var wheelchairAccessibleCarPlaces = wheelchairAccessibleCapacity.orElse(0) > 0;
+            var wheelchairAccessibleCarPlaces = wheelchairAccessibleCarCapacity.orElse(0) > 0;
 
             var id = new FeedScopedId(
                     VEHICLE_PARKING_OSM_FEED_ID,
@@ -569,7 +570,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     .bicyclePlaces(bicyclePlaces)
                     .carPlaces(carPlaces)
                     .wheelchairAccessibleCarPlaces(wheelchairAccessibleCarPlaces)
-                    .capacity(vehiclePlaces)
+                    .capacity(vehicleParkingSpaces)
                     .entrances(entrances)
                     .build();
         }

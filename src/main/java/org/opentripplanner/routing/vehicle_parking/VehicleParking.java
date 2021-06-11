@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.Locale;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -27,10 +24,13 @@ import org.opentripplanner.util.I18NString;
 public class VehicleParking implements Serializable {
 
   /**
-   * The id of the vehicle parking, prefixed by the source(=feedId) so that it is unique.
+   * The id of this vehicle parking, prefixed by the source(=feedId) so that it is unique.
    */
   private final FeedScopedId id;
 
+  /**
+   * The name of this vehicle parking, which may be translated when displaying to the user.
+   */
   private final I18NString name;
 
   /**
@@ -38,8 +38,14 @@ public class VehicleParking implements Serializable {
    */
   private final double x, y;
 
+  /**
+   * URL which contains details of this vehicle parking.
+   */
   private final String detailsUrl;
 
+  /**
+   * URL of an image which may be displayed to the user showing the vehicle parking.
+   */
   private final String imageUrl;
 
   /**
@@ -48,75 +54,62 @@ public class VehicleParking implements Serializable {
    */
   private final List<String> tags;
 
-  // TODO: this would need to be parsed from the OSM format
-  private final RepeatingTimePeriod openingHours;
-
-  private final RepeatingTimePeriod feeHours;
-
+  /**
+   * A short translatable note containing details of this vehicle parking.
+   */
   private final I18NString note;
 
+  /**
+   * The state of this vehicle parking. Only ones in an OPERATIONAL state may be used for Park and Ride.
+   */
   @Builder.Default
   private final VehicleParkingState state = VehicleParkingState.OPERATIONAL;
 
+  /**
+   * Does this vehicle parking have spaces (capacity) for bicycles.
+   */
   @Getter(AccessLevel.NONE)
   private final boolean bicyclePlaces;
 
+  /**
+   * Does this vehicle parking have spaces (capacity) for cars.
+   */
   @Getter(AccessLevel.NONE)
   private final boolean carPlaces;
 
+  /**
+   * Does this vehicle parking have disabled (wheelchair accessible) car spaces (capacity).
+   */
   @Getter(AccessLevel.NONE)
   private final boolean wheelchairAccessibleCarPlaces;
 
-  @EqualsAndHashCode.Exclude
-  private VehiclePlaces capacity;
+  /**
+   * The capacity (maximum available spaces) of this vehicle parking.
+   */
+  private final VehicleParkingSpaces capacity;
 
+  /**
+   * The currently available spaces at this vehicle parking.
+   */
   @EqualsAndHashCode.Exclude
-  private VehiclePlaces availability;
+  private VehicleParkingSpaces availability;
 
   @Builder.Default
   private final List<VehicleParkingEntrance> entrances = new ArrayList<>();
-
-  public String toString() {
-    return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
-  }
-
-  /**
-   * The number of spaces by type. {@code null} if unknown.
-   */
-  @Data
-  @Builder
-  public static class VehiclePlaces implements Serializable {
-
-    private final Integer bicycleSpaces;
-
-    private final Integer carSpaces;
-
-    private final Integer wheelchairAccessibleCarSpaces;
-  }
-
-  /**
-   * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that
-   * they may be represented differently to the user.
-   */
-  public enum VehicleParkingState {
-    OPERATIONAL,
-    TEMPORARILY_CLOSED,
-    CLOSED
-  }
 
   public boolean hasBicyclePlaces() {
     return bicyclePlaces;
   }
 
   public boolean hasAnyCarPlaces() {
-    return hasCarPlaces() || hasWheelchairAccessibleCarPlaces();
+    return hasCarPlaces() || hasWheelchairAccessibledCarPlaces();
   }
 
   public boolean hasCarPlaces() {
     return carPlaces;
   }
 
-  public boolean hasWheelchairAccessibleCarPlaces() {
+  public boolean hasWheelchairAccessibledCarPlaces() {
     return wheelchairAccessibleCarPlaces;
   }
 
@@ -124,9 +117,8 @@ public class VehicleParking implements Serializable {
     return availability != null;
   }
 
-  public void updateVehiclePlaces(VehiclePlaces vehiclePlaces) {
-    this.availability = vehiclePlaces;
-    this.capacity = vehiclePlaces;
+  public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {
+    this.availability = vehicleParkingSpaces;
   }
 
   private void addEntrance(VehicleParkingEntranceCreator creator) {
@@ -137,33 +129,8 @@ public class VehicleParking implements Serializable {
     entrances.add(entrance);
   }
 
-  @Getter
-  @Builder
-  @EqualsAndHashCode
-  public static class VehicleParkingEntrance implements Serializable {
-
-    @EqualsAndHashCode.Exclude
-    private final VehicleParking vehicleParking;
-
-    private final FeedScopedId entranceId;
-
-    private final double x, y;
-
-    private final I18NString name;
-
-    // Used to explicitly specify the intersection to link to instead of using (x, y)
-    @EqualsAndHashCode.Exclude
-    private transient StreetVertex vertex;
-
-    // If this entrance should be linked to car accessible streets
-    private final boolean carAccessible;
-
-    // If this entrance should be linked to walk/bike accessible streets
-    private final boolean walkAccessible;
-
-    void clearVertex() {
-      vertex = null;
-    }
+  public String toString() {
+    return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
   }
 
   @FunctionalInterface
