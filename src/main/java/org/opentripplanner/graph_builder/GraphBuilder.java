@@ -124,6 +124,7 @@ public class GraphBuilder implements Runnable {
             osmModule.staticParkAndRide = config.staticParkAndRide;
             osmModule.banDiscouragedWalking = config.banDiscouragedWalking;
             osmModule.banDiscouragedBiking = config.banDiscouragedBiking;
+            osmModule.maxAreaNodes = config.maxAreaNodes;
             graphBuilder.addModule(osmModule);
             PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
             pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
