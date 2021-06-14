@@ -20,7 +20,7 @@ class SmooveBikeRentalDataSourceTest {
                 )
         );
         assertTrue(source.update());
-        List<VehicleRentalPlace> rentalStations = source.getStations();
+        List<VehicleRentalPlace> rentalStations = source.getUpdates();
 
         // Invalid station without coordinates shoulf be ignored, so only 3
         assertEquals(4, rentalStations.size());
@@ -86,7 +86,7 @@ class SmooveBikeRentalDataSourceTest {
                 )
         );
         assertTrue(source.update());
-        List<VehicleRentalPlace> rentalStations = source.getStations();
+        List<VehicleRentalPlace> rentalStations = source.getUpdates();
 
         VehicleRentalPlace hamn = rentalStations.get(0);
         assertEquals(11, hamn.getSpacesAvailable());

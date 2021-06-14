@@ -26,7 +26,7 @@ public class TestKmlBikeParkSource extends TestCase {
       }
     });
     assertTrue(kmlDataSource.update());
-    List<VehicleParking> bikeParks = kmlDataSource.getVehicleParkings();
+    List<VehicleParking> bikeParks = kmlDataSource.getUpdates();
     assertEquals(5, bikeParks.size());
     VehicleParking alkmaar = bikeParks.get(0);
     VehicleParking zwolle = bikeParks.get(4);
@@ -55,7 +55,7 @@ public class TestKmlBikeParkSource extends TestCase {
           }
       });
     assertTrue(kmlDataSource.update());
-    List<VehicleParking> bikeParks = kmlDataSource.getVehicleParkings();
+    List<VehicleParking> bikeParks = kmlDataSource.getUpdates();
     assertEquals(5, bikeParks.size());
     VehicleParking alkmaar = bikeParks.get(0);
     VehicleParking almere = bikeParks.get(4);

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * @author laurent
  * @author GoAbout
  */
-class KmlBikeParkDataSource implements VehicleParkingDataSource {
+class KmlBikeParkDataSource implements DataSource<VehicleParking> {
 
     private static final Logger LOG = LoggerFactory.getLogger(KmlBikeParkDataSource.class);
 
@@ -101,7 +102,7 @@ class KmlBikeParkDataSource implements VehicleParkingDataSource {
     }
 
     @Override
-    public synchronized List<VehicleParking> getVehicleParkings() {
+    public synchronized List<VehicleParking> getUpdates() {
         return bikeParks;
     }
 

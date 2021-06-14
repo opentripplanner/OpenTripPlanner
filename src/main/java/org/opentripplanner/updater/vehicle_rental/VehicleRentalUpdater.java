@@ -24,6 +24,7 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -44,7 +45,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
 
-    private final VehicleRentalDataSource source;
+    private final DataSource<VehicleRentalPlace> source;
 
     private VertexLinker linker;
 
@@ -55,7 +56,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         // Configure updater
         LOG.info("Setting up vehicle rental updater.");
 
-        VehicleRentalDataSource source = VehicleRentalDataSourceFactory.create(parameters.sourceParameters());
+        DataSource<VehicleRentalPlace> source = VehicleRentalDataSourceFactory.create(parameters.sourceParameters());
 
         this.source = source;
         if (pollingPeriodSeconds <= 0) {
@@ -87,7 +88,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             LOG.debug("No updates");
             return;
         }
-        List<VehicleRentalPlace> stations = source.getStations();
+        List<VehicleRentalPlace> stations = source.getUpdates();
 
         // Create graph writer runnable to apply these stations to the graph
         VehicleRentalGraphWriterRunnable graphWriterRunnable = new VehicleRentalGraphWriterRunnable(stations);
