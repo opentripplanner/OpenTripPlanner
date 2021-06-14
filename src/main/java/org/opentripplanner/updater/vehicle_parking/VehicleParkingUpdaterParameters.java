@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_parking;
 
+import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
 public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParameters {
@@ -10,22 +11,25 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
   private final int frequencySec;
   private final String namePrefix;
   private final boolean zip;
+  private final DataSourceType sourceType;
 
 
   public VehicleParkingUpdaterParameters(
       String configRef,
-      String feedId,
       String url,
+      String feedId,
       String namePrefix,
       int frequencySec,
-      boolean zip
+      boolean zip,
+      DataSourceType sourceType
   ) {
     this.configRef = configRef;
-    this.feedId = feedId;
     this.url = url;
+    this.feedId = feedId;
     this.frequencySec = frequencySec;
     this.namePrefix = namePrefix;
     this.zip = zip;
+    this.sourceType = sourceType;
   }
 
   @Override
@@ -39,12 +43,23 @@ public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParam
     return configRef;
   }
 
-  KmlBikeParkDataSource.Parameters sourceParameters() {
-    return new KmlBikeParkDataSource.Parameters() {
-      @Override public String getUrl() { return url; }
-      @Override public String getFeedId() { return feedId; }
-      @Override public String getNamePrefix() { return namePrefix; }
-      @Override public boolean zip() { return zip; }
-    };
+  public DataSourceType getSourceType() {
+    return sourceType;
+  }
+
+  public String getFeedId() {
+    return feedId;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public String getNamePrefix() {
+    return namePrefix;
+  }
+
+  public boolean isZip() {
+    return zip;
   }
 }

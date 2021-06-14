@@ -11,20 +11,12 @@ public class TestKmlBikeParkSource extends TestCase {
 
   public void testKML() {
 
-    KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new KmlBikeParkDataSource.Parameters() {
-      @Override public String getNamePrefix() {
-        return null;
-      }
-      @Override public String getFeedId() {
-        return TEST_FEED_ID;
-      }
-      @Override public boolean zip() {
-        return false;
-      }
-      @Override public String getUrl() {
-        return "file:src/test/resources/bike/NSFietsenstallingen.kml";
-      }
-    });
+    KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(
+        "file:src/test/resources/bike/NSFietsenstallingen.kml",
+        TEST_FEED_ID,
+        null,
+        false
+    );
     assertTrue(kmlDataSource.update());
     List<VehicleParking> bikeParks = kmlDataSource.getUpdates();
     assertEquals(5, bikeParks.size());
@@ -40,20 +32,12 @@ public class TestKmlBikeParkSource extends TestCase {
 
   public void testKMLWithFolder() {
 
-      KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new KmlBikeParkDataSource.Parameters() {
-          @Override public String getNamePrefix() {
-              return null;
-          }
-        @Override public String getFeedId() {
-          return TEST_FEED_ID;
-        }
-          @Override public boolean zip() {
-              return false;
-          }
-          @Override public String getUrl() {
-              return "file:src/test/resources/bike/NSFietsenstallingen_folder.kml";
-          }
-      });
+      KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(
+          "file:src/test/resources/bike/NSFietsenstallingen_folder.kml",
+          TEST_FEED_ID,
+          null,
+          false
+      );
     assertTrue(kmlDataSource.update());
     List<VehicleParking> bikeParks = kmlDataSource.getUpdates();
     assertEquals(5, bikeParks.size());

@@ -7,35 +7,23 @@ import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestBase;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 
-public class VehicleParkingLinkingTest {
-
-  private Graph graph;
-  private IntersectionVertex A, B;
+public class VehicleParkingLinkingTest extends VehicleParkingTestBase {
 
   @BeforeEach
   public void setup() {
-    graph = new Graph();
-    graph.hasStreets = true;
-
-    A = new IntersectionVertex(graph, "A", 0, 0);
-    B = new IntersectionVertex(graph, "B", 0.01, 0);
-
-    street(A, B, StreetTraversalPermission.PEDESTRIAN);
+    initGraph();
   }
 
   @Test
@@ -103,16 +91,6 @@ public class VehicleParkingLinkingTest {
     assertEquals(4, streetLinks.size());
 
     streetLinks.forEach(e -> assertTrue(e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex)));
-  }
-
-  private static void street(StreetVertex from, StreetVertex to, StreetTraversalPermission permissions) {
-    new StreetEdge(from, to,
-        GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-        String.format("%s%s street", from.getName(), to.getName()),
-        1,
-        permissions,
-        false
-    );
   }
 
   @Test

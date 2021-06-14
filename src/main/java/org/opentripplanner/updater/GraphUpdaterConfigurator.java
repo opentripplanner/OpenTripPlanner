@@ -23,6 +23,7 @@ import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
@@ -138,7 +139,8 @@ public abstract class GraphUpdaterConfigurator {
             updaters.add(new MqttGtfsRealtimeUpdater(configItem));
         }
         for (VehicleParkingUpdaterParameters configItem : config.getVehicleParkingUpdaterParameters()) {
-            updaters.add(new VehicleParkingUpdater(configItem));
+            var source = VehicleParkingDataSourceFactory.create(configItem);
+            updaters.add(new VehicleParkingUpdater(configItem, source));
         }
         for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
             updaters.add(new WinkkiPollingGraphUpdater(configItem));
