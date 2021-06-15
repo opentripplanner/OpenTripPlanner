@@ -7,12 +7,12 @@
 ## Changelog
 
 - Initial version (June 2021)
+- Updated to use Lucene (March 2022)
 
 ## Documentation
 
-This adds the required `geocode` API required for Stop and From/To searches in the debug client. A
-simple search algorithim is used which may cause problems with large data, and so is disabled by
-default.
+This adds the required `geocode` API required for Stop and From/To searches in the debug client
+using Lucene to index and search.
 
 To enable this you need to add the feature `SandboxAPIGeocoder` in `otp-config.json`.
 

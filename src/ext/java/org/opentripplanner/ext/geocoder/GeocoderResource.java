@@ -1,13 +1,10 @@
 package org.opentripplanner.ext.geocoder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -18,7 +15,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -97,16 +93,8 @@ public class GeocoderResource {
             String query,
             boolean autocomplete
     ) {
-        return Stream.concat(
-                router.graph
-                        .getAllFlexStopsFlat()
-                        .stream(),
-                router.graph
-                        .index
-                        .getAllStops()
-                        .stream()
-        )
-                .filter(sl -> filter(query, autocomplete, Objects.toString(sl.getName()), sl.getCode()))
+        return LuceneIndex.forServer(router)
+                .queryStopLocations(query, autocomplete)
                 .map(sl -> new SearchResult(
                         sl.getCoordinate().latitude(),
                         sl.getCoordinate().longitude(),
@@ -117,19 +105,8 @@ public class GeocoderResource {
     }
 
     private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
-        return Stream.concat(
-                router.graph
-                        .stationById
-                        .values()
-                        .stream()
-                        .map(s -> (StopCollection) s),
-                router.graph
-                        .multiModalStationById
-                        .values()
-                        .stream()
-                        .map(s -> (StopCollection) s)
-        )
-                .filter(sl -> filter(query, autocomplete, Objects.toString(sl.getName())))
+        return LuceneIndex.forServer(router)
+                .queryStopCollections(query, autocomplete)
                 .map(sc -> new SearchResult(
                         sc.getCoordinate().latitude(),
                         sc.getCoordinate().longitude(),
@@ -140,12 +117,8 @@ public class GeocoderResource {
     }
 
     private Collection<? extends SearchResult> queryCorners(String query, boolean autocomplete) {
-        return router.graph
-                .getVertices()
-                .stream()
-                .filter(v -> v instanceof StreetVertex)
-                .map(v -> (StreetVertex) v)
-                .filter(v -> filter(query, autocomplete, Objects.toString(v.getName()), Objects.toString(v.getIntersectionName())))
+        return LuceneIndex.forServer(router)
+                .queryStreetVertices(query, autocomplete)
                 .map(v -> new SearchResult(
                         v.getLat(),
                         v.getLon(),
@@ -153,16 +126,6 @@ public class GeocoderResource {
                         v.getLabel()
                 ))
                 .collect(Collectors.toList());
-    }
-
-    private boolean filter(String sourceQuery, boolean autocomplete, String... values) {
-        var query = sourceQuery.toLowerCase(Locale.ROOT);
-        return Arrays.stream(values)
-                .filter(Objects::nonNull)
-                .map(v -> v.toLowerCase(Locale.ROOT))
-                .anyMatch(value ->
-                        autocomplete ? value.startsWith(query) : value.contains(query)
-                );
     }
 
     private String stringifyStreetVertex(StreetVertex v) {

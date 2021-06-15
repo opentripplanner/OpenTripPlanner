@@ -31,6 +31,7 @@
         <micrometer.version>1.8.3</micrometer.version>
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
+        <lucene.version>9.1.0</lucene.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -440,6 +441,23 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools.version}</version>
+        </dependency>
+
+        <!-- Lucene is used by the Debug Client Geocode API -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+             <groupId>org.apache.lucene</groupId>
+             <artifactId>lucene-queryparser</artifactId>
+             <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+             <groupId>org.apache.lucene</groupId>
+             <artifactId>lucene-suggest</artifactId>
+             <version>${lucene.version}</version>
         </dependency>
 
         <dependency>
