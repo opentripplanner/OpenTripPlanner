@@ -1,5 +1,6 @@
-package org.opentripplanner.routing.algorithm.astar.strategies;
+package org.opentripplanner.routing.algorithm;
 
+import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
