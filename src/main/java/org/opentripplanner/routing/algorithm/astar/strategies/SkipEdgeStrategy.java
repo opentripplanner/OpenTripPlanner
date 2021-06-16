@@ -10,7 +10,9 @@ import java.util.Set;
 
 /**
  * Strategy interface to provide additional logic to decide if a given edge should not be considered
- * for traversal.
+ * for traversal. This can also be used to limit the search, for example by duration or distance.
+ * For limiting purposes it is preferable to {@link SearchTerminationStrategy} as it only terminates
+ * the current path, but continues searching along other paths until they also are terminated.
  * 
  * @author bdferris
  * 
