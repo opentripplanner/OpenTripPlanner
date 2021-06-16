@@ -78,6 +78,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         modeSelector.refreshModeControls();
 
         this.optionsWidget.addSeparator();
+        this.optionsWidget.addControl("additionalParameters", new otp.widgets.tripoptions.AdditionalTripParameters(this.optionsWidget))
+
+        this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));
 
         this.optionsWidget.applyQueryParams(this.defaultQueryParams);

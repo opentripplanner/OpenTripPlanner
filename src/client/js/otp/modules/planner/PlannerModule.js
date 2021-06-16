@@ -368,6 +368,10 @@ otp.modules.planner.PlannerModule =
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;
             }
+
+            if(this.additionalParameters) {
+                _.extend(queryParams, this.additionalParameters);
+            }
         }
         $('#otp-spinner').show();
 

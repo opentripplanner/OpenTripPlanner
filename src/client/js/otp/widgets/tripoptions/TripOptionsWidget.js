@@ -1041,6 +1041,48 @@ otp.widgets.tripoptions.GroupTripOptions =
     }
 });
 
+otp.widgets.tripoptions.AdditionalTripParameters =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+        initialize : function(tripWidget) {
+            otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+            this.id = tripWidget.id+"-additionalParameters";
+
+            var label = _tr("Additional parameters");
+
+            var placeholder = "searchWindow=366"
+                + "\n# timetableView=false"
+                + "\nwaitReluctance=0.5"
+                + "\n# walkSpeed=1.7"
+                + "\n# numItineraries=25";
+
+            var html = '<div class="notDraggable">'+label+': ';
+            html += '<textarea id="'+this.id+'-value" style="width:300px;" rows="5" placeholder="'+placeholder+'">'
+            html += '</textarea>';
+            html += "</div>";
+
+            $(html).appendTo(this.$());
+        },
+
+        doAfterLayout : function() {
+            var this_ = this;
+            $('#'+this.id+'-value').change(function() {
+                var keyvalues = $('#'+this_.id+'-value').val().trim().split('\n');
+
+                var params = {};
+
+                keyvalues.forEach(function(keyvalue) {
+                    var split = keyvalue.trim().split('=');
+                    if (!split[0].startsWith('#')) {
+                        params[split[0]] = split[1];
+                    }
+                })
+
+                this_.tripWidget.module.additionalParameters = params;
+            });
+        },
+});
+
 /*otp.widgets.TW_GroupTripSubmit =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
 
