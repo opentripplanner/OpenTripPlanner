@@ -37,7 +37,7 @@ public class TransferStopArrivalTest {
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
         ACCESS_DEPARTURE_TIME,
         ACCESS_COST,
-        walk(ACCESS_TO_STOP, ACCESS_DURATION)
+        walk(ACCESS_TO_STOP, ACCESS_DURATION, ACCESS_COST)
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
@@ -50,7 +50,7 @@ public class TransferStopArrivalTest {
 
     private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
             TRANSIT_ARRIVAL,
-            walk(TRANSFER_TO_STOP, TRANSFER_LEG_DURATION),
+            walk(TRANSFER_TO_STOP, TRANSFER_LEG_DURATION, TRANSFER_COST),
             TRANSFER_ALIGHT_TIME,
             TRANSFER_COST
     );

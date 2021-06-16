@@ -58,6 +58,8 @@ public class BikeRentalSnapshotTest
              */
             arriveBy.legs.get(1).endTime = departAt.legs.get(1).endTime;
             arriveBy.legs.get(2).startTime = departAt.legs.get(2).startTime;
+
+            handleGeneralizedCost(departAt, arriveBy);
         });
     }
 
@@ -76,6 +78,8 @@ public class BikeRentalSnapshotTest
              */
             arriveBy.legs.get(1).endTime = departAt.legs.get(1).endTime;
             arriveBy.legs.get(2).startTime = departAt.legs.get(2).startTime;
+
+            handleGeneralizedCost(departAt, arriveBy);
         });
     }
 
@@ -98,6 +102,6 @@ public class BikeRentalSnapshotTest
         request.from = p3;
         request.to = p1;
 
-        expectArriveByToMatchDepartAtAndSnapshot(request);
+        expectArriveByToMatchDepartAtAndSnapshot(request, SnapshotTestBase::handleGeneralizedCost);
     }
 }

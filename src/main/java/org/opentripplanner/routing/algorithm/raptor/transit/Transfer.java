@@ -10,6 +10,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class Transfer {
@@ -54,9 +55,11 @@ public class Transfer {
 
     public Optional<RaptorTransfer> asRaptorTransfer(RoutingRequest routingRequest) {
         if (edges == null || edges.isEmpty()) {
+            int durationSeconds = (int) Math.ceil(distanceMeters / routingRequest.walkSpeed);
             return Optional.of(new TransferWithDuration(
                     this,
-                    (int) Math.ceil(distanceMeters / routingRequest.walkSpeed)
+                    durationSeconds,
+                    RaptorCostConverter.toRaptorCost((int) Math.ceil(durationSeconds * routingRequest.walkReluctance))
             ));
         }
 
@@ -73,7 +76,8 @@ public class Transfer {
 
         return Optional.of(new TransferWithDuration(
             this,
-            (int) s.getElapsedTimeSeconds()
+            (int) s.getElapsedTimeSeconds(),
+            RaptorCostConverter.toRaptorCost(s.getWeight())
         ));
     }
 

@@ -130,7 +130,6 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     return new DefaultCostCalculator<>(
         p.boardCost(),
         p.transferCost(),
-        p.walkReluctanceFactor(),
         p.waitReluctanceFactor(),
         transitDataProvider.stopBoarAlightCost(),
         p.transitReluctanceFactors()

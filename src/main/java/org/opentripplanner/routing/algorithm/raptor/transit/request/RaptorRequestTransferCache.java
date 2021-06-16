@@ -56,7 +56,7 @@ public class RaptorRequestTransferCache {
                 .collect(toMap(
                     RaptorTransfer::stop,
                     Function.identity(),
-                    (a, b) -> a.durationInSeconds() < b.durationInSeconds() ? a : b
+                    (a, b) -> a.generalizedCost() < b.generalizedCost() ? a : b
                 ))
                 .values()))
             .collect(toList());

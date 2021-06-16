@@ -143,8 +143,6 @@ public class RaptorPathToItineraryMapper {
 
         subItinerary.timeShiftToStartAt(createCalendar(accessPathLeg.fromTime()));
 
-        applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, accessPathLeg);
-
         return subItinerary.legs;
     }
 
@@ -255,8 +253,6 @@ public class RaptorPathToItineraryMapper {
 
         subItinerary.timeShiftToStartAt(createCalendar(egressPathLeg.fromTime()));
 
-        applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, egressPathLeg);
-
         return subItinerary;
     }
 
@@ -306,7 +302,6 @@ public class RaptorPathToItineraryMapper {
                 }
 
                 if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
-                    applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, pathLeg);
                     return subItinerary.legs;
                 }
             }
@@ -400,24 +395,5 @@ public class RaptorPathToItineraryMapper {
             distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
         }
         return distance;
-    }
-
-    /**
-     * Add the cost to the first leg, and set all others to 0(zero) - we compute the cost for the
-     * entire street section as a hole, so there is no way to break it down to each individual
-     * sub-section. There might be more than on sub-section in the future. An access/egress/transfer
-     * raptor path is converted into a list of legs with zero to N elements. Cost is generated for
-     * the entire collection of sub-sections.
-     * <p>
-     * TODO OTP2 - Break cost down on sub-section legs.
-     *           - Issue https://github.com/opentripplanner/OpenTripPlanner/issues/3215
-     *
-     * @param legs the legs representing one raptor access/transfer/egress
-     * @param raptorLeg the cost taken from the RaptorPathLeg.
-     */
-    private static void applyCostFromRaptorPathToAccessEgressTransfer(List<Leg> legs, PathLeg<?> raptorLeg) {
-        if(legs.isEmpty()) { return; }
-        legs.forEach(l -> l.generalizedCost = 0);
-        legs.get(0).generalizedCost = raptorLeg.generalizedCost();
     }
 }

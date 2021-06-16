@@ -1,11 +1,12 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 /**
  * Simple implementation for {@link RaptorTransfer} for use in unit-tests.
@@ -18,6 +19,7 @@ public class TestTransfer implements RaptorTransfer {
     public static final boolean STOP_REACHED_ON_FOOT = false;
     private final int stop;
     private final int durationInSeconds;
+    private final int cost;
     private final int numberOfRides;
     private final boolean stopReachedOnBoard;
     private final Integer opening;
@@ -26,15 +28,17 @@ public class TestTransfer implements RaptorTransfer {
     private TestTransfer(
         int stop,
         int durationInSeconds,
+        int cost,
         int numberOfRides,
         boolean stopReachedOnBoard
     ) {
-        this(stop, durationInSeconds, numberOfRides, stopReachedOnBoard, null, null);
+        this(stop, durationInSeconds, cost, numberOfRides, stopReachedOnBoard, null, null);
     }
 
     private TestTransfer(
             int stop,
             int durationInSeconds,
+            int cost,
             int numberOfRides,
             boolean stopReachedOnBoard,
             Integer opening,
@@ -42,6 +46,7 @@ public class TestTransfer implements RaptorTransfer {
     ) {
         this.stop = stop;
         this.durationInSeconds = durationInSeconds;
+        this.cost = cost;
         this.numberOfRides = numberOfRides;
         this.stopReachedOnBoard = stopReachedOnBoard;
         this.opening = opening;
@@ -50,11 +55,15 @@ public class TestTransfer implements RaptorTransfer {
 
     /** Only use this to override this class, use factory methods to create instances. */
     protected TestTransfer(int stop, int durationInSeconds) {
-        this(stop, durationInSeconds, DEFAULT_NUMBER_OF_LEGS, STOP_REACHED_ON_FOOT);
+        this(stop, durationInSeconds, walkCost(durationInSeconds), DEFAULT_NUMBER_OF_LEGS, STOP_REACHED_ON_FOOT);
     }
 
     public static TestTransfer walk(int stop, int durationInSeconds) {
-        return new TestTransfer(stop, durationInSeconds, DEFAULT_NUMBER_OF_LEGS, STOP_REACHED_ON_FOOT, null, null);
+        return new TestTransfer(stop, durationInSeconds, walkCost(durationInSeconds), DEFAULT_NUMBER_OF_LEGS, STOP_REACHED_ON_FOOT, null, null);
+    }
+
+    public static TestTransfer walk(int stop, int durationInSeconds, int cost) {
+        return new TestTransfer(stop, durationInSeconds, cost, DEFAULT_NUMBER_OF_LEGS, STOP_REACHED_ON_FOOT, null, null);
     }
 
     /**
@@ -64,40 +73,54 @@ public class TestTransfer implements RaptorTransfer {
      * 08:00 and 16:00 every day.
      */
     public static TestTransfer walk(int stop, int durationInSeconds, int opening, int closing) {
-        return new TestTransfer(stop, durationInSeconds, DEFAULT_NUMBER_OF_LEGS, STOP_REACHED_ON_FOOT, opening, closing);
+        return new TestTransfer(stop, durationInSeconds, walkCost(durationInSeconds), DEFAULT_NUMBER_OF_LEGS, STOP_REACHED_ON_FOOT, opening, closing);
+    }
+
+    public static TestTransfer walk(int stop, int durationInSeconds, int cost, int opening, int closing) {
+        return new TestTransfer(stop, durationInSeconds, cost, DEFAULT_NUMBER_OF_LEGS, STOP_REACHED_ON_FOOT, opening, closing);
     }
 
     /** Create a new flex access and arrive stop onBoard with 1 ride/extra transfer. */
     public static TestTransfer flex(int stop, int durationInSeconds) {
-        return flex(stop, durationInSeconds, 1);
+        return flex(stop, durationInSeconds, 1, walkCost(durationInSeconds));
+    }
+
+    /** Create a new flex access and arrive stop onBoard with 1 ride/extra transfer. */
+    public static TestTransfer flex(int stop, int durationInSeconds, int cost) {
+        return flex(stop, durationInSeconds, 1, cost);
     }
 
     /** Create a new flex access and arrive stop onBoard. */
-    public static TestTransfer flex(int stop, int durationInSeconds, int nRides) {
+    public static TestTransfer flex(int stop, int durationInSeconds, int nRides, int cost) {
         assert nRides > DEFAULT_NUMBER_OF_LEGS;
-        return new TestTransfer(stop, durationInSeconds, nRides, STOP_REACHED_ON_BOARD);
+        return new TestTransfer(stop, durationInSeconds, cost, nRides, STOP_REACHED_ON_BOARD);
     }
 
     /** Create a flex access arriving at given stop by walking with 1 ride/extra transfer. */
     public static TestTransfer flexAndWalk(int stop, int durationInSeconds) {
-        return flexAndWalk(stop, durationInSeconds, 1);
+        return flexAndWalk(stop, durationInSeconds, 1, walkCost(durationInSeconds));
+    }
+
+    /** Create a flex access arriving at given stop by walking with 1 ride/extra transfer. */
+    public static TestTransfer flexAndWalk(int stop, int durationInSeconds, int cost) {
+        return flexAndWalk(stop, durationInSeconds, 1, cost);
     }
 
     /** Create a flex access arriving at given stop by walking. */
-    public static TestTransfer flexAndWalk(int stop, int durationInSeconds, int nRides) {
+    public static TestTransfer flexAndWalk(int stop, int durationInSeconds, int nRides, int cost) {
         assert nRides > DEFAULT_NUMBER_OF_LEGS;
-        return new TestTransfer(stop, durationInSeconds, nRides, STOP_REACHED_ON_FOOT);
+        return new TestTransfer(stop, durationInSeconds, cost, nRides, STOP_REACHED_ON_FOOT);
     }
 
     /** Set opening and closing hours and return a new object. */
     public TestTransfer openingHours(int opening, int closing) {
-        return new TestTransfer(stop, durationInSeconds, numberOfRides, stopReachedOnBoard, opening, closing);
+        return new TestTransfer(stop, durationInSeconds, cost, numberOfRides, stopReachedOnBoard, opening, closing);
     }
 
     public static Collection<RaptorTransfer> transfers(int ... stopTimes) {
         List<RaptorTransfer> legs = new ArrayList<>();
         for (int i = 0; i < stopTimes.length; i+=2) {
-            legs.add(walk(stopTimes[i], stopTimes[i+1]));
+            legs.add(walk(stopTimes[i], stopTimes[i+1], walkCost(stopTimes[i+1])));
         }
         return legs;
     }
@@ -105,6 +128,11 @@ public class TestTransfer implements RaptorTransfer {
     @Override
     public int stop() {
         return stop;
+    }
+
+    @Override
+    public int generalizedCost() {
+        return cost;
     }
 
     @Override

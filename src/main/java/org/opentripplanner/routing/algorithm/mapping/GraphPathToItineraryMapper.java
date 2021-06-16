@@ -274,6 +274,8 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
 
+        leg.generalizedCost = (int) (states[states.length - 1].getWeight() - states[0].getWeight());
+
         // Interlining information is now in a separate field in Graph, not in edges.
         // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
         leg.interlineWithPreviousLeg = false;
