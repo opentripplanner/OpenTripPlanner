@@ -64,6 +64,8 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        // Since a Vertex may be arrived at using a no-thru restricted path and one without such
+        // restrictions, treat the two as separate so one doesn't dominate the other.
         if (a.hasEnteredNoThruTrafficArea() != b.hasEnteredNoThruTrafficArea()) {
             return false;
         }
