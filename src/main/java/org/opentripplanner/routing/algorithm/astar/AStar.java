@@ -257,6 +257,7 @@ public class AStar {
                 // new GraphPath(runState.u, false).dump();
 
                 /* Break out of the search if we've found the requested number of paths. */
+                // TODO Refactor. This check for getNumItineraries always returns 1
                 if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
                     break;
