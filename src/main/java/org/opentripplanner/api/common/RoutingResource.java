@@ -683,14 +683,6 @@ public abstract class RoutingResource {
         if (numItineraries != null)
             request.setNumItineraries(numItineraries);
 
-        if (maxWalkDistance != null) {
-            request.setMaxWalkDistance(maxWalkDistance);
-            request.maxTransferWalkDistance = maxWalkDistance;
-        }
-
-        if (maxPreTransitTime != null)
-            request.setMaxPreTransitTime(maxPreTransitTime);
-
         if (walkReluctance != null)
             request.setWalkReluctance(walkReluctance);
 
@@ -837,12 +829,6 @@ public abstract class RoutingResource {
 
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
-
-        if (maxHours != null)
-            request.maxHours = maxHours;
-
-        if (useRequestedDateTimeInMaxHours != null)
-            request.useRequestedDateTimeInMaxHours = useRequestedDateTimeInMaxHours;
 
         if (disableAlertFiltering != null)
             request.disableAlertFiltering = disableAlertFiltering;

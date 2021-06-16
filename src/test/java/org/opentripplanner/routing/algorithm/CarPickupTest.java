@@ -174,7 +174,6 @@ public class CarPickupTest extends GraphRoutingTest {
     ) {
         var options = new RoutingRequest();
         options.arriveBy = arriveBy;
-        options.worstTime = arriveBy ? Long.MIN_VALUE : Long.MAX_VALUE;
 
         var carPickupOptions = options.getStreetSearchRequest(StreetMode.CAR_PICKUP);
         carPickupOptions.setRoutingContext(graph, fromVertex, toVertex);

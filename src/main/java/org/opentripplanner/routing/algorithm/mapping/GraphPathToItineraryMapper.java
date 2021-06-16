@@ -76,26 +76,10 @@ public abstract class GraphPathToItineraryMapper {
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.locale);
             if (itinerary.legs.isEmpty()) { continue; }
-            itinerary = adjustItinerary(request, itinerary);
             itineraries.add(itinerary);
         }
 
         return itineraries;
-    }
-
-    /**
-     * Check whether itinerary needs adjustments based on the request.
-     * @param itinerary is the itinerary
-     * @param request is the request containing the original trip planning options
-     * @return the (adjusted) itinerary
-     */
-    private static Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
-        // Check walk limit distance
-        if (itinerary.nonTransitDistanceMeters > request.maxWalkDistance) {
-            itinerary.nonTransitLimitExceeded = true;
-        }
-        // Return itinerary
-        return itinerary;
     }
 
     /**

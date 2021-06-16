@@ -120,7 +120,6 @@ public class RaptorPathToItineraryMapper {
 
         // Map general itinerary fields
         itinerary.generalizedCost = path.generalizedCost();
-        itinerary.nonTransitLimitExceeded = itinerary.nonTransitDistanceMeters > request.maxWalkDistance;
         itinerary.arrivedAtDestinationWithRentedBicycle = mapped != null && mapped.arrivedAtDestinationWithRentedBicycle;
 
         if(optimizedPath != null) {

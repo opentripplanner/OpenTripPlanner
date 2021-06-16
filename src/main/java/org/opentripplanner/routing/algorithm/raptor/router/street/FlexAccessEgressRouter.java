@@ -21,15 +21,13 @@ public class FlexAccessEgressRouter {
     Collection<NearbyStop> accessStops = !isEgress ? AccessEgressRouter.streetSearch(
         request,
         StreetMode.WALK,
-        false,
-        2000
+        false
     ) : List.of();
 
     Collection<NearbyStop> egressStops = isEgress ? AccessEgressRouter.streetSearch(
         request,
         StreetMode.WALK,
-        true,
-        2000
+        true
     ) : List.of();
 
     FlexRouter flexRouter = new FlexRouter(

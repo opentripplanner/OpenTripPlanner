@@ -4,6 +4,8 @@ import static java.util.Collections.emptySet;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
 import java.util.Set;
+
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -105,41 +107,25 @@ public class TransitSnapshotTest
     }
 
     @Test
-    public void test_trip_planning_with_transit_max_walk() {
-        RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
-
-        request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
-                Set.of(TransitMode.values())
-        );
-        request.maxWalkDistance = 1000;
-        request.from = p1;
-        request.to = p2;
-
-        expectArriveByToMatchDepartAtAndSnapshot(request);
-    }
-
-    @Test
     public void test_trip_planning_with_transit_stop() {
         RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
                 Set.of(TransitMode.values())
         );
-        request.maxWalkDistance = 1000;
         request.from = ps;
         request.to = p3;
 
         expectArriveByToMatchDepartAtAndSnapshot(request);
     }
 
-    @Test
+    @Ignore
     public void test_trip_planning_with_transit_stop_collection() {
         RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
                 Set.of(TransitMode.values())
         );
-        request.maxWalkDistance = 1000;
         request.from = ptc;
         request.to = p3;
 

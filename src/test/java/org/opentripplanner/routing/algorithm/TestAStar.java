@@ -73,7 +73,6 @@ public class TestAStar extends TestCase {
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
         options.dateTime = startTime;
         // one hour is more than enough time
-        options.worstTime = startTime + 60 * 60; 
         options.setRoutingContext(graph, start, end);
 
         ShortestPathTree spt = aStar.getShortestPathTree(options);
@@ -81,7 +80,6 @@ public class TestAStar extends TestCase {
         assertNotNull(path);
         
         // but one minute is not enough
-        options.worstTime = startTime + 60; 
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(end, true);
         assertNull(path);        

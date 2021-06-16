@@ -604,9 +604,7 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("wheelchair", request::setWheelchairAccessible);
       callWith.argument("numItineraries", request::setNumItineraries);
       callWith.argument("searchWindow", (Long m) -> request.searchWindow = Duration.ofSeconds(m));
-      callWith.argument("maxWalkDistance", request::setMaxWalkDistance);
       // callWith.argument("maxSlope", request::setMaxSlope);
-      callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
       // callWith.argument("carParkCarLegWeight", request::setCarParkCarLegWeight);
       // callWith.argument("itineraryFiltering", request::setItineraryFiltering);
       callWith.argument("walkReluctance", request::setWalkReluctance);

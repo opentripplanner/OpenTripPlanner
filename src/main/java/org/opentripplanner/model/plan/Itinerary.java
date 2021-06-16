@@ -45,11 +45,6 @@ public class Itinerary {
     public final double nonTransitDistanceMeters;
 
     /**
-     * Indicates that the walk/bike/drive limit distance has been exceeded for this itinerary.
-     */
-    public boolean nonTransitLimitExceeded = false;
-
-    /**
      * How much elevation is lost, in total, over the course of the trip, in meters. As an example,
      * a trip that went from the top of Mount Everest straight down to sea level, then back up K2,
      * then back down again would have an elevationLost of Everest + K2.
@@ -274,7 +269,6 @@ public class Itinerary {
                 .addDurationSec("transitTime", transitTimeSeconds)
                 .addDurationSec("waitingTime", waitingTimeSeconds)
                 .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
-                .addBool("nonTransitLimitExceeded", nonTransitLimitExceeded)
                 .addBool("tooSloped", tooSloped)
                 .addNum("elevationLost", elevationLost, 0.0)
                 .addNum("elevationGained", elevationGained, 0.0)

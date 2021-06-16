@@ -20,14 +20,6 @@ public class DirectStreetRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(DirectStreetRouter.class);
 
-  /**
-   * To avoid long searches witch might degrade the performance we use an upper limit
-   * to the distance for none transit what we would allow.
-   */
-  private static final double MAX_WALK_DISTANCE_METERS =  50_000;
-  private static final double MAX_BIKE_DISTANCE_METERS = 150_000;
-  private static final double MAX_CAR_DISTANCE_METERS  = 500_000;
-
   public static List<Itinerary> route(Router router, RoutingRequest request) {
     if (request.modes.directMode == null) {
       return Collections.emptyList();
@@ -36,7 +28,7 @@ public class DirectStreetRouter {
     try (RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode)) {
       directRequest.setRoutingContext(router.graph);
 
-      if(!streetDistanceIsReasonable(directRequest)) { return Collections.emptyList(); }
+      if(!straightLineDistanceIsWithinLimit(directRequest)) { return Collections.emptyList(); }
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(router);
@@ -52,7 +44,7 @@ public class DirectStreetRouter {
     }
   }
 
-  private static boolean streetDistanceIsReasonable(RoutingRequest request) {
+  private static boolean straightLineDistanceIsWithinLimit(RoutingRequest request) {
     // TODO This currently only calculates the distances between the first fromVertex
     //      and the first toVertex
     double distance = SphericalDistanceLibrary.distance(
@@ -65,33 +57,30 @@ public class DirectStreetRouter {
     return distance < calculateDistanceMaxLimit(request);
   }
 
+  /**
+   * Calculates the maximum distance in meters based on the maxDirectStreetDurationSeconds and
+   * the fastest mode available. This assumes that it is not possible to exceed the speed defined
+   * in the RoutingRequest.
+   */
   private static double calculateDistanceMaxLimit(RoutingRequest request) {
-    double limit = request.maxWalkDistance * 2;
-    boolean isCarRequest = request.modes.directMode == StreetMode.CAR ||
-            request.modes.directMode == StreetMode.CAR_TO_PARK ||
-            request.streetSubRequestModes.getCar();
-    double maxLimit = isCarRequest
-        ? MAX_CAR_DISTANCE_METERS
-        : (request.streetSubRequestModes.getBicycle() ? MAX_BIKE_DISTANCE_METERS : MAX_WALK_DISTANCE_METERS);
 
-    // Handle overflow and default setting is set to Double MAX_VALUE
-    // Everything above Long.MAX_VALUE is treated as Infinite
-    if(limit< 0 || limit > Long.MAX_VALUE) {
-      LOG.warn(
-          "The max walk/bike/car distance is reduced to {} km from Infinite",
-          (long)maxLimit/1000
-      );
-      return maxLimit;
+    double distanceLimit;
+    double durationLimit = request.maxDirectStreetDurationSeconds;
+    StreetMode mode = request.modes.directMode;
+
+    if (mode.includesDriving()) {
+      distanceLimit = durationLimit * request.carSpeed;
+    }
+    else if (mode.includesBiking()) {
+      distanceLimit = durationLimit * request.bikeSpeed;
+    }
+    else if (mode.includesWalking()) {
+      distanceLimit = durationLimit * request.walkSpeed;
+    }
+    else {
+      throw new IllegalStateException("Could not set max limit for StreetMode");
     }
 
-    if (limit > maxLimit) {
-      LOG.warn(
-          "The max walk/bike/car distance is reduced to {} km from {} km",
-          (long)maxLimit/1000, (long)limit/1000
-      );
-      return maxLimit;
-    }
-
-    return limit;
+    return distanceLimit;
   }
 }

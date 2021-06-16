@@ -1364,7 +1364,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
         // there should be a ui element for walk distance and optimize type
         options.setOptimize( getSelectedOptimizeType() );
-        options.setMaxWalkDistance(Integer.parseInt(maxWalkField.getText()));
         options.setDateTime(when);
         options.setFromString(from);
         options.setToString(to);

@@ -225,13 +225,12 @@ public abstract class SnapshotTestBase {
                 .collect(Collectors.joining(","));
 
         return String.format(
-                "http://localhost:8080/?module=planner&fromPlace=%s&toPlace=%s&date=%s&time=%s&mode=%s&maxWalkDistance=%s&arriveBy=%s&wheelchair=%s",
+                "http://localhost:8080/?module=planner&fromPlace=%s&toPlace=%s&date=%s&time=%s&mode=%s&arriveBy=%s&wheelchair=%s",
                 formatPlace(request.from),
                 formatPlace(request.to),
                 dateTime.toLocalDate().format(apiDateFormatter),
                 dateTime.toLocalTime().format(apiTimeFormatter),
                 modes,
-                request.maxWalkDistance,
                 request.arriveBy,
                 request.wheelchairAccessible
         );

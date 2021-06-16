@@ -78,7 +78,6 @@ public class TraversalRequirements {
         req.modes = options.streetSubRequestModes.clone();
         req.wheelchairAccessible = options.wheelchairAccessible;
         req.maxWheelchairSlope = options.maxWheelchairSlope;
-        req.maxWalkDistance = options.maxWalkDistance;
     }
 
     /**
