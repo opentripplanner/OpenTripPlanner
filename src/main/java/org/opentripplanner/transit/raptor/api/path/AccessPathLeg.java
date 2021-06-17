@@ -58,6 +58,11 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
         return access.generalizedCost();
     }
 
+    @Override
+    public boolean isAccessLeg() {
+        return true;
+    }
+
     public RaptorTransfer access() {
         return access;
     }

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
 
+import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.transit.raptor.api.path.Path;
 
 /**
@@ -9,10 +10,16 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 public interface TransferOptimizationParameters {
 
   /**
-   * This enable the optimize transfer cost function. If not enabled the {@link
-   * Path#generalizedCost()} function is used instead.
+   * I enabled all paths will be optimized with respect to the transfer point to minimise
+   * the {@link org.opentripplanner.model.transfer.Transfer#priorityCost(Transfer)}.
    */
-  boolean useOptimizeTransferCostFunction();
+  boolean optimizeTransferPriority();
+
+  /**
+   * This enable the transfer wait-time optimization. If not enabled the {@link
+   * Path#generalizedCost()} function is used to pick the optimal transfer point.
+   */
+  boolean optimizeTransferWaitTime();
 
   /**
    * This is the wait-reluctance used during the Raptor search. It is used by the transfer

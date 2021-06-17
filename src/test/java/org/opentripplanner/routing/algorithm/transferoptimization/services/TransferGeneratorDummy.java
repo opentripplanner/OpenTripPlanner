@@ -6,29 +6,26 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 
 /**
- * Mock the TripToTripTransfersService
+ * Mock the TransferGenerator
  */
-class T2TTransferDummy {
+class TransferGeneratorDummy {
   private static final int D0s = 0;
 
   @SafeVarargs
-  static StandardTransferGenerator<TestTripSchedule> dummyT2TTransferService(
-      final TripToTripTransfer<TestTripSchedule> ... transfers
+  static TransferGenerator<TestTripSchedule> dummyTransferGenerator(
+      final List<TripToTripTransfer<TestTripSchedule>> ... transfers
   ) {
-    return new StandardTransferGenerator<>(null, null) {
+    return new TransferGenerator<>(null, null, null) {
       @Override
-      public List<TripToTripTransfer<TestTripSchedule>> findTransfers(
-          TestTripSchedule fromTrip, StopTime fromTripDeparture, TestTripSchedule toTrip
+      public List<List<TripToTripTransfer<TestTripSchedule>>> findAllPossibleTransfers(
+              List<TransitPathLeg<TestTripSchedule>> transitLegs
       ) {
-        return Arrays.stream(transfers)
-            .filter(tx -> tx.from().trip().equals(fromTrip) && tx.to().trip().equals(toTrip))
-            .collect(Collectors.toList());
+        return Arrays.asList(transfers);
       }
     };
   }

@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.api.path;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 

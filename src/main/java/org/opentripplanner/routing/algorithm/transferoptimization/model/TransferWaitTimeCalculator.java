@@ -1,7 +1,6 @@
-package org.opentripplanner.routing.algorithm.transferoptimization.services;
+package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 
@@ -116,8 +115,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
  *   </li>
  * </ol>
  */
-public class OptimizeTransferCostCalculator {
-
+public class TransferWaitTimeCalculator {
   private final double n;
   private final double waitFactorCombined;
   private int t0 = -1;
@@ -135,7 +133,7 @@ public class OptimizeTransferCostCalculator {
    * @param inverseWaitReluctance This factor is used to calculate a cost, with should balance the
    *                              wait time against extra transit time and less walking.
    */
-  public OptimizeTransferCostCalculator(
+  public TransferWaitTimeCalculator(
       double waitReluctanceRouting,
       double inverseWaitReluctance,
       double minSafeWaitTimeFactor
@@ -152,16 +150,12 @@ public class OptimizeTransferCostCalculator {
     this.a = (Math.E - 1.0) / minSafeTransferTime;
   }
 
-  public int cost(Path<?> path) {
-    // We use the path generalized-cost as a starting point minus the cost of waiting.
-    // We want to maximize the waiting, but balance it toward walking and time spent on-board.
-    int cost = path.generalizedCost() - RaptorCostConverter.toRaptorCost(waitFactorCombined * path.waitTime());
+  public int cost(PathLeg<?> leg) {
+    int waitCost = 0;
 
-    // We ignore the fact that a flex leg might have rides, because we are not considering
-    // transfers between FLEX and regular transit here. That would require more knowledge about
-    // the FLEX ride
-    PathLeg<?> prev = path.accessLeg().nextLeg();
+    PathLeg<?> prev = leg;
     PathLeg<?> curr = prev.nextLeg();
+    int totalWaitTime = 0;
 
     while (!curr.isEgressLeg()) {
       // Wait time including slack
@@ -172,12 +166,31 @@ public class OptimizeTransferCostCalculator {
         curr = curr.nextLeg();
         waitTime += curr.fromTime() - prev.toTime();
       }
-      cost += calculateOptimizedWaitCost(waitTime);
+      totalWaitTime += waitTime;
+
+      // Do not add any cost for the wait-time after a regular walk/bike access leg,
+      // it can be time-shifted and is not considered.
+      //
+      // Also, we ignore the fact that a flex leg might have rides, because we are not considering
+      // transfers between FLEX and regular transit here. That would require more knowledge about
+      // the FLEX ride
+      if(!prev.isAccessLeg() || prev.asAccessLeg().access().hasRides()) {
+        waitCost += calculateOptimizedWaitCost(waitTime);
+      }
 
       prev = curr;
       curr = curr.nextLeg();
     }
-    return cost;
+
+    // Add slack before egress
+    totalWaitTime += curr.fromTime() - prev.toTime();
+
+    int linearWaitCostDiff = RaptorCostConverter.toRaptorCost(
+            waitFactorCombined * totalWaitTime
+    );
+    // We use the path generalized-cost as a starting point minus the cost of waiting.
+    // We want to maximize the waiting, but balance it toward walking and time spent on-board.
+    return leg.generalizedCostTotal() - linearWaitCostDiff + waitCost;
   }
 
   int calculateOptimizedWaitCost(int waitTime) {
