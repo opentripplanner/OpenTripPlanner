@@ -243,6 +243,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public double bikeSpeed;
 
+    public double bikeWalkingSpeed;
+
     public double carSpeed;
 
     public Locale locale = new Locale("en", "US");
@@ -295,6 +297,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      *  observation should in no way be taken as scientific or definitive. Your mileage may vary.
      */
     public double walkReluctance = 2.0;
+
+    public double bikeWalkingReluctance = 5.0;
+
+    public double bikeReluctance = 2.0;
+
+    public double carReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
@@ -547,9 +555,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /** For the bike triangle, how important safety is */
     public double bikeTriangleSafetyFactor;
 
-    /** Options specifically for the case that you are walking a bicycle. */
-    public RoutingRequest bikeWalkingOptions;
-
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
@@ -637,8 +642,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     @Deprecated
     public FeedScopedId startingTransitTripId;
 
-    public boolean walkingBike;
-
     /*
       Additional flags affecting mode transitions.
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
@@ -702,10 +705,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         // http://en.wikipedia.org/wiki/Walking
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
+        bikeWalkingSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         // http://en.wikipedia.org/wiki/Speed_limit
         carSpeed = 40; // 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide
         // Default to walk for access/egress/direct modes and all transit modes
-        bikeWalkingOptions = this;
 
         // So that they are never null.
         from = new GenericLocation(null, null);
@@ -744,7 +747,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
-        bikeWalkingOptions.arriveBy = arriveBy;
     }
 
     public void setMode(TraverseMode mode) {
@@ -753,33 +755,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setStreetSubRequestModes(TraverseModeSet streetSubRequestModes) {
         this.streetSubRequestModes = streetSubRequestModes;
-        if (streetSubRequestModes.getBicycle()) {
-            // This alternate routing request is used when we get off a bike to take a shortcut and are
-            // walking alongside the bike. FIXME why are we only copying certain fields instead of cloning the request?
-            bikeWalkingOptions = new RoutingRequest();
-            bikeWalkingOptions.setArriveBy(this.arriveBy);
-            bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
-            bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
-            bikeWalkingOptions.optimize = optimize;
-            bikeWalkingOptions.streetSubRequestModes = streetSubRequestModes.clone();
-            bikeWalkingOptions.streetSubRequestModes.setBicycle(false);
-            bikeWalkingOptions.streetSubRequestModes.setWalk(true);
-            bikeWalkingOptions.walkingBike = true;
-            bikeWalkingOptions.bikeSwitchTime = bikeSwitchTime;
-            bikeWalkingOptions.bikeSwitchCost = bikeSwitchCost;
-            bikeWalkingOptions.stairsReluctance = stairsReluctance * 5; // carrying bikes on stairs is awful
-        } else if (streetSubRequestModes.getCar()) {
-            bikeWalkingOptions = new RoutingRequest();
-            bikeWalkingOptions.setArriveBy(this.arriveBy);
-            bikeWalkingOptions.streetSubRequestModes = streetSubRequestModes.clone();
-            bikeWalkingOptions.streetSubRequestModes.setBicycle(false);
-            bikeWalkingOptions.streetSubRequestModes.setWalk(true);
-        }
     }
 
     public void setOptimize(BicycleOptimizeType optimize) {
         this.optimize = optimize;
-        bikeWalkingOptions.optimize = optimize;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
@@ -1008,17 +987,14 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
         this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
-        bikeWalkingOptions.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
     }
 
     public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
         this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
-        bikeWalkingOptions.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
     }
 
     public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
         this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
-        bikeWalkingOptions.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
     }
 
 
@@ -1032,37 +1008,32 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             switch (streetMode) {
                 case WALK:
                 case FLEXIBLE:
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK));
                     break;
                 case BIKE:
-                    streetRequest.streetSubRequestModes.setBicycle(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE));
                     break;
                 case BIKE_TO_PARK:
-                    streetRequest.streetSubRequestModes.setBicycle(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
                     streetRequest.bikeParkAndRide = true;
                     break;
                 case BIKE_RENTAL:
-                    streetRequest.streetSubRequestModes.setBicycle(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
                     streetRequest.bikeRental = true;
                     break;
                 case CAR:
-                    streetRequest.streetSubRequestModes.setCar(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
                     break;
                 case CAR_TO_PARK:
-                    streetRequest.streetSubRequestModes.setCar(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
                     streetRequest.parkAndRide = true;
                     break;
                 case CAR_PICKUP:
-                    streetRequest.streetSubRequestModes.setCar(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
                     streetRequest.carPickup = true;
                     break;
                 case CAR_RENTAL:
-                    streetRequest.streetSubRequestModes.setCar(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
             }
         }
 
@@ -1099,12 +1070,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
 
-            if (this.bikeWalkingOptions != this) {
-                clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
-            }
-            else {
-                clone.bikeWalkingOptions = clone;
-            }
             return clone;
         } catch (CloneNotSupportedException e) {
             /* this will never happen since our super is the cloneable object */
@@ -1197,21 +1162,35 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     /**
-     * @param mode
-     * @return The road speed for a specific traverse mode.
+     * The road speed for a specific traverse mode.
      */
-    public double getSpeed(TraverseMode mode) {
+    public double getReluctance(TraverseMode mode, boolean walkingBike) {
+        switch (mode) {
+            case WALK:
+                return walkingBike ? bikeWalkingReluctance : walkReluctance;
+            case BICYCLE:
+                return bikeReluctance;
+            case CAR:
+                return carReluctance;
+            default:
+                throw new IllegalArgumentException("getReluctance(): Invalid mode " + mode);
+        }
+    }
+
+    /**
+     * The road speed for a specific traverse mode.
+     */
+    public double getSpeed(TraverseMode mode, boolean walkingBike) {
         switch (mode) {
         case WALK:
-            return walkSpeed;
+            return walkingBike ? bikeWalkingSpeed : walkSpeed;
         case BICYCLE:
             return bikeSpeed;
         case CAR:
             return carSpeed;
         default:
-            break;
+            throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
         }
-        throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
     }
 
     /** @return The highest speed for all possible road-modes. */
@@ -1226,10 +1205,36 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return walkSpeed;
     }
 
+    public void setBikeReluctance(double bikeReluctance) {
+        if (bikeReluctance > 0) {
+            this.bikeReluctance = bikeReluctance;
+        }
+    }
+
+    public void setBikeWalkingReluctance(double bikeWalkingReluctance) {
+        if (bikeWalkingReluctance > 0) {
+            this.bikeWalkingReluctance = bikeWalkingReluctance;
+        }
+    }
+
+    public void setCarReluctance(double carReluctance) {
+        if (carReluctance > 0) {
+            this.carReluctance = carReluctance;
+        }
+    }
+
     public void setWalkReluctance(double walkReluctance) {
         if (walkReluctance > 0) {
             this.walkReluctance = walkReluctance;
-            // Do not set bikeWalkingOptions.walkReluctance here, because that needs a higher value.
+        }
+    }
+
+    public void setNonTransitReluctance(double nonTransitReluctance) {
+        if (nonTransitReluctance > 0) {
+            this.bikeReluctance = nonTransitReluctance;
+            this.walkReluctance = nonTransitReluctance;
+            this.carReluctance = nonTransitReluctance;
+            this.bikeWalkingReluctance = nonTransitReluctance * 2.7;
         }
     }
 

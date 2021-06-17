@@ -104,4 +104,13 @@ public class BikeRentalSnapshotTest
 
         expectArriveByToMatchDepartAtAndSnapshot(request, SnapshotTestBase::handleGeneralizedCost);
     }
+
+    @Override
+    protected RoutingRequest createTestRequest(
+            int year, int month, int day, int hour, int minute, int second
+    ) {
+        var routingRequest = super.createTestRequest(year, month, day, hour, minute, second);
+        routingRequest.setBikeWalkingReluctance(2.0);
+        return routingRequest;
+    }
 }

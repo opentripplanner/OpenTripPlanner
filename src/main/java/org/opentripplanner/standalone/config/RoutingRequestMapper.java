@@ -30,6 +30,7 @@ public class RoutingRequestMapper {
         request.bikeParkAndRide = c.asBoolean("bikeParkAndRide", dft.bikeParkAndRide);
         request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
         request.bikeParkCost = c.asInt("bikeParkCost", dft.bikeParkCost);
+        request.bikeReluctance = c.asDouble("bikeReluctance", dft.bikeReluctance);
         request.bikeRentalDropoffCost = c.asInt("bikeRentalDropoffCost", dft.bikeRentalDropoffCost);
         request.bikeRentalDropoffTime = c.asInt("bikeRentalDropoffTime", dft.bikeRentalDropoffTime);
         request.bikeRentalPickupCost = c.asInt("bikeRentalPickupCost", dft.bikeRentalPickupCost);
@@ -40,6 +41,8 @@ public class RoutingRequestMapper {
         request.bikeTriangleTimeFactor = c.asDouble("bikeTriangleTimeFactor", dft.bikeTriangleTimeFactor);
         request.bikeSwitchTime = c.asInt("bikeSwitchTime", dft.bikeSwitchTime);
         request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
+        request.bikeWalkingReluctance = c.asDouble("bikeWalkingReluctance", dft.bikeWalkingReluctance);
+        request.bikeWalkingSpeed = c.asDouble("bikeWalkingSpeed", dft.bikeWalkingSpeed);
         request.allowKeepingRentedBicycleAtDestination = c.asBoolean("allowKeepingRentedBicycleAtDestination", dft.allowKeepingRentedBicycleAtDestination);
         request.keepingRentedBicycleAtDestinationCost = c.asDouble("keepingRentedBicycleAtDestinationCost", dft.keepingRentedBicycleAtDestinationCost);
         request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
@@ -49,6 +52,7 @@ public class RoutingRequestMapper {
         request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
         request.carPickupCost = c.asInt("carPickupCost", dft.carPickupCost);
         request.carPickupTime = c.asInt("carPickupTime", dft.carPickupTime);
+        request.carReluctance = c.asDouble("carReluctance", dft.carReluctance);
         request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
         request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"));
         request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
@@ -86,7 +90,6 @@ public class RoutingRequestMapper {
         request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
         request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
-        request.walkingBike = c.asBoolean("walkingBike", dft.walkingBike);
         request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
 
         mapTransferOptimization(

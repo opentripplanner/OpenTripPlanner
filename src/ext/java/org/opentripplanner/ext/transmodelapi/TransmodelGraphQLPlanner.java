@@ -112,7 +112,7 @@ public class TransmodelGraphQLPlanner {
 //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
 //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
-        callWith.argument("walkReluctance", request::setWalkReluctance);
+        callWith.argument("walkReluctance", request::setNonTransitReluctance);
         callWith.argument("waitReluctance", request::setWaitReluctance);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
 //        callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
