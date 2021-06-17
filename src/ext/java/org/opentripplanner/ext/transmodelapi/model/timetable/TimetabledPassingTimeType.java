@@ -116,9 +116,8 @@ public class TimetabledPassingTimeType {
             .name("notices")
             .type(new GraphQLNonNull(new GraphQLList(noticeType)))
             .dataFetcher(environment -> {
-              // TODO OTP2 - fix this
-              // TripTimeShort tripTimeShort = environment.getSource();
-              return null; //index.getNoticesByEntity(tripTimeShort.);
+              TripTimeShort tripTimeShort = environment.getSource();
+              return GqlUtil.getRoutingService(environment).getNoticesByEntity(tripTimeShort.getStopTimeKey());
             })
             .build())
         .field(GraphQLFieldDefinition
