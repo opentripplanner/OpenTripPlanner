@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.flex.edgetype;
 
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
@@ -56,7 +54,7 @@ public class FlexTripEdge extends Edge {
     int timeInSeconds = getTimeInSeconds();
     editor.incrementTimeInSeconds(timeInSeconds);
     editor.incrementWeight(timeInSeconds);
-    editor.resetEnteredMotorVerhicleNoThroughTrafficArea();
+    editor.resetEnteredNoThroughTrafficArea();
     return editor.makeState();
   }
 

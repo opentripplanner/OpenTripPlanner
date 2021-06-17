@@ -180,16 +180,22 @@ public class StateEditor {
 
     /* Basic Setters */
 
-    public void setEnteredMotorVerhicleNoThroughTrafficArea() {
-        child.stateData.enteredMotorVehicleNoThroughTrafficArea = true;
+    public void resetEnteredNoThroughTrafficArea() {
+        if (!child.stateData.enteredNoThroughTrafficArea) {
+            return;
+        }
+
+        cloneStateDataAsNeeded();
+        child.stateData.enteredNoThroughTrafficArea = false;
     }
 
-    public void resetEnteredMotorVerhicleNoThroughTrafficArea() {
-        child.stateData.enteredMotorVehicleNoThroughTrafficArea = true;
-    }
+    public void setEnteredNoThroughTrafficArea() {
+        if (child.stateData.enteredNoThroughTrafficArea) {
+            return;
+        }
 
-    public void setEnteredBicycleNoThroughTrafficArea() {
-        child.stateData.enteredBicycleNoThroughTrafficArea = true;
+        cloneStateDataAsNeeded();
+        child.stateData.enteredNoThroughTrafficArea = true;
     }
 
     public void setBackMode(TraverseMode mode) {
@@ -379,13 +385,5 @@ public class StateEditor {
     public void setBikeRentalNetwork(Set<String> networks) {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalNetworks = networks;
-    }
-
-    public boolean hasEnteredMotorVehicleNoThroughTrafficArea() {
-        return child.hasEnteredMotorVehicleNoThruTrafficArea();
-    }
-
-    public boolean hasEnteredBicycleNoThroughTrafficArea() {
-        return child.hasEnteredBicycleNoThruTrafficArea();
     }
 }
