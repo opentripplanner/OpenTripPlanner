@@ -66,12 +66,12 @@ public abstract class SnapshotTestBase {
     protected Router router;
 
     public static void loadGraphBeforeClass() {
-        ConstantsForTests.getInstance().getPortlandGraph();
+        ConstantsForTests.getInstance().getCachedPortlandGraph();
     }
 
     protected Router getRouter() {
         if (router == null) {
-            Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
+            Graph graph = ConstantsForTests.getInstance().getCachedPortlandGraph();
 
             router = new Router(graph, RouterConfig.DEFAULT);
             router.startup();

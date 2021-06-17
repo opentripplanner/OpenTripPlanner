@@ -64,7 +64,7 @@ public class TestAStar extends TestCase {
 
     public void testMaxTime() {
 
-        Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
+        Graph graph = ConstantsForTests.getInstance().getCachedPortlandGraph();
         String feedId = graph.getFeedIds().iterator().next();
         Vertex start = graph.getVertex(feedId + ":8371");
         Vertex end = graph.getVertex(feedId + ":8374");
