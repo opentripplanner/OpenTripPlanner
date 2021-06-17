@@ -33,26 +33,24 @@ public class AlertToLegMapper {
         FeedScopedId fromStopId = leg.from==null ? null : leg.from.stopId;
         FeedScopedId toStopId = leg.to==null ? null : leg.to.stopId;
 
-        {
-            FeedScopedId routeId = leg.getRoute().getId();
-            if (fromStopId != null) {
-                Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, fromStopId, routeId);
-                addAlertPatchesToLeg(leg, departingStopConditions, alerts, requestedLocale, legStartTime, legEndTime);
-            }
-            if (toStopId != null) {
-                Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, toStopId, routeId);
-                addAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
-            }
+        FeedScopedId routeId = leg.getRoute().getId();
+        if (fromStopId != null) {
+            Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, fromStopId, routeId);
+            addAlertPatchesToLeg(leg, departingStopConditions, alerts, requestedLocale, legStartTime, legEndTime);
+        }
+        if (toStopId != null) {
+            Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, toStopId, routeId);
+            addAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
+        }
 
-            if (leg.intermediateStops != null) {
-                for (StopArrival visit : leg.intermediateStops) {
-                    Place place = visit.place;
-                    if (place.stopId != null) {
-                        Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, place.stopId, routeId);
-                        Date stopArrival = visit.arrival.getTime();
-                        Date stopDepature = visit.departure.getTime();
-                        addAlertPatchesToLeg(leg, StopCondition.PASSING, alerts, requestedLocale, stopArrival, stopDepature);
-                    }
+        if (leg.intermediateStops != null) {
+            for (StopArrival visit : leg.intermediateStops) {
+                Place place = visit.place;
+                if (place.stopId != null) {
+                    Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, place.stopId, routeId);
+                    Date stopArrival = visit.arrival.getTime();
+                    Date stopDepature = visit.departure.getTime();
+                    addAlertPatchesToLeg(leg, StopCondition.PASSING, alerts, requestedLocale, stopArrival, stopDepature);
                 }
             }
 
@@ -100,21 +98,19 @@ public class AlertToLegMapper {
             addAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
         }
 
-        {
-            Collection<TransitAlert> patches;
+        Collection<TransitAlert> patches;
 
-            // trips
-            patches = alertPatchService(graph).getTripAlerts(leg.getTrip().getId());
-            addAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
+        // trips
+        patches = alertPatchService(graph).getTripAlerts(leg.getTrip().getId());
+        addAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
 
-            // route
-            patches = alertPatchService(graph).getRouteAlerts(leg.getRoute().getId());
-            addAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
+        // route
+        patches = alertPatchService(graph).getRouteAlerts(leg.getRoute().getId());
+        addAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
 
-            // agency
-            patches = alertPatchService(graph).getAgencyAlerts(leg.getAgency().getId());
-            addAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
-        }
+        // agency
+        patches = alertPatchService(graph).getAgencyAlerts(leg.getAgency().getId());
+        addAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
 
         // Filter alerts when there are multiple timePeriods for each alert
         leg.transitAlerts.removeIf(alertPatch ->  !alertPatch.displayDuring(leg.startTime.getTimeInMillis()/1000, leg.endTime.getTimeInMillis()/1000));
