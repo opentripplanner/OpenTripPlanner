@@ -22,7 +22,7 @@ class StationMapper {
         stopPlace.getName() == null ? "N/A" : stopPlace.getName().getValue(),
         WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid()),
         null,
-        null,
+        stopPlace.getDescription() != null ? stopPlace.getDescription().getValue() : null,
         null,
         null,
         TransferPriorityMapper.mapToDomain(stopPlace.getWeighting())

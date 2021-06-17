@@ -41,7 +41,7 @@ class StopMapper {
         idFactory.createId(quay.getId()),
         parentStation.getName(),
         quay.getPublicCode(),
-        null,
+        quay.getDescription() != null ? quay.getDescription().getValue() : null,
         WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
         null,
         null,
