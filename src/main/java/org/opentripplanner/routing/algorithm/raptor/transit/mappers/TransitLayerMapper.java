@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.OTPFeature;
@@ -81,6 +82,7 @@ public class TransitLayerMapper {
             );
         }
 
+        var transferCache = new RaptorRequestTransferCache(tuningParameters.transferCacheMaxSize());
 
         LOG.info("Mapping complete.");
 
@@ -89,7 +91,8 @@ public class TransitLayerMapper {
             transferByStopIndex,
             graph.getTransferService(),
             stopIndex,
-            graph.getTimeZone().toZoneId()
+            graph.getTimeZone().toZoneId(),
+            transferCache
         );
     }
 

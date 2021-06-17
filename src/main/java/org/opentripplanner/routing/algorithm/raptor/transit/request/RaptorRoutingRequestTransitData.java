@@ -59,7 +59,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
         filter
     );
 
-    this.transfers = RaptorRequestTransferCache.get(transitLayer, routingRequest);
+    this.transfers = transitLayer.getRaptorTransfersForRequest(routingRequest);
   }
 
   /**
