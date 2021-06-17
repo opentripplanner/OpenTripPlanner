@@ -181,16 +181,18 @@ public class StateEditor {
     /* Basic Setters */
 
     public void resetEnteredNoThroughTrafficArea() {
-        if (!child.stateData.enteredNoThroughTrafficArea)
+        if (!child.stateData.enteredNoThroughTrafficArea) {
             return;
+        }
 
         cloneStateDataAsNeeded();
         child.stateData.enteredNoThroughTrafficArea = false;
     }
 
     public void setEnteredNoThroughTrafficArea() {
-        if (child.stateData.enteredNoThroughTrafficArea)
+        if (child.stateData.enteredNoThroughTrafficArea) {
             return;
+        }
 
         cloneStateDataAsNeeded();
         child.stateData.enteredNoThroughTrafficArea = true;

@@ -385,7 +385,9 @@ public class StreetEdge extends Edge implements Cloneable, CarPickupableEdge {
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
 
-        if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) return null;
+        if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) {
+            return null;
+        }
 
         int roundedTime = (int) Math.ceil(time);
 
