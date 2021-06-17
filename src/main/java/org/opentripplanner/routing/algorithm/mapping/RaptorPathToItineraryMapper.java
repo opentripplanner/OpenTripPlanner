@@ -219,7 +219,7 @@ public class RaptorPathToItineraryMapper {
         // leg.alightRule = <Assign here>;
         // leg.boardRule =  <Assign here>;
 
-        AlertToLegMapper.addAlertPatchesToLeg(
+        AlertToLegMapper.addTransitAlertPatchesToLeg(
             graph,
             leg,
             firstLeg,

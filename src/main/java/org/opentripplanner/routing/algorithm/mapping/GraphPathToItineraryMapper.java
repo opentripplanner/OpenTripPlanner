@@ -113,7 +113,7 @@ public abstract class GraphPathToItineraryMapper {
 
         boolean first = true;
         for (Leg leg : legs) {
-            AlertToLegMapper.addAlertPatchesToLeg(graph, leg, first, requestedLocale);
+            AlertToLegMapper.addTransitAlertPatchesToLeg(graph, leg, first, requestedLocale);
             first = false;
         }
 
@@ -289,7 +289,7 @@ public abstract class GraphPathToItineraryMapper {
             }
         }
 
-        addAlerts(graph, leg, states);
+        addStreetNotes(graph, leg, states);
 
         if (flexEdge != null) {
             FlexLegMapper.fixFlexTripLeg(leg, flexEdge);
@@ -410,7 +410,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addAlerts(Graph graph, Leg leg, State[] states) {
+    private static void addStreetNotes(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
             Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
 
