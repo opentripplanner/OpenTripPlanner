@@ -389,8 +389,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         StateEditor s1 = s0.edit(this);
         if (walkingBike != backWalkingBike) {
             if (walkingBike) {
-                boolean hadPreviousBiking = backMode == TraverseMode.BICYCLE;
-                switchToWalkingBike(s0.getOptions(), s1, hadPreviousBiking);
+                switchToWalkingBike(s0.getOptions(), s1);
             } else {
                 switchToBiking(s0.getOptions(), s1);
             }

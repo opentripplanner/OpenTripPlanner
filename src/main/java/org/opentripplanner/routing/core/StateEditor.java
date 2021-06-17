@@ -388,4 +388,8 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalNetworks = networks;
     }
+
+    public State getBackState() {
+        return child.getBackState();
+    }
 }

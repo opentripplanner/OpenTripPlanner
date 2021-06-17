@@ -14,11 +14,14 @@ public interface BikeWalkableEdge {
 
     default void switchToWalkingBike(
             RoutingRequest options,
-            StateEditor editor,
-            boolean includeCostAndTime
+            StateEditor editor
     ) {
+        // If this is the first traversed edge than the bikeSwitch cost doesn't need to be applied
+        var parentState = editor.getBackState();
+        var shouldIncludeCost = !parentState.isBackWalkingBike() && hadBackModeSet(parentState);
+
         editor.setBackWalkingBike(true);
-        if (includeCostAndTime) {
+        if (shouldIncludeCost) {
             editor.incrementWeight(options.bikeSwitchCost);
             editor.incrementTimeInSeconds(options.bikeSwitchTime);
         }
@@ -38,9 +41,7 @@ public interface BikeWalkableEdge {
         }
         else if (state.getNonTransitMode() == TraverseMode.BICYCLE) {
             if (canSwitchToWalkingBike(state)) {
-                // If this is the first traversed edge than the bikeSwitch cost doesn't need to be applied
-                var shouldIncludeCost = !state.isBackWalkingBike() && hadBackModeSet(state);
-                switchToWalkingBike(state.getOptions(), editor, shouldIncludeCost);
+                switchToWalkingBike(state.getOptions(), editor);
             }
             else {
                 return null;
@@ -58,7 +59,7 @@ public interface BikeWalkableEdge {
     default boolean hadBackModeSet(State state) {
         do {
             if (state.getBackMode() != null) {
-                return true;
+                return state.getBackMode().isOnStreetNonTransit();
             }
             state = state.getBackState();
         } while (state != null);
