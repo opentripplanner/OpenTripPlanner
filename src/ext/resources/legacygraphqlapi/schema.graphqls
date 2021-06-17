@@ -864,11 +864,17 @@ enum Mode {
     """CAR"""
     CAR
 
+    """COACH"""
+    COACH
+
     """FERRY"""
     FERRY
 
     """Enables flexible transit for access and egress legs"""
-    FLEXIBLE
+    FLEX
+
+    """Enables flexible transit for access and egress legs"""
+    FLEXIBLE   @deprecated(reason: "Use FLEX instead")
 
     """FUNICULAR"""
     FUNICULAR
@@ -1179,7 +1185,7 @@ enum Qualifier {
     ~~HAVE~~
     **Currently not used**
     """
-    HAVE
+    HAVE    @deprecated(reason: "Currently not used")
 
     """
     The vehicle used must be left to a parking area before continuing the journey.
@@ -1194,13 +1200,22 @@ enum Qualifier {
     ~~KEEP~~
     **Currently not used**
     """
-    KEEP
+    KEEP    @deprecated(reason: "Currently not used")
 
     """The user can be picked up by someone else riding a vehicle"""
     PICKUP
 
     """The user can be dropped off by someone else riding a vehicle"""
     DROPOFF
+
+    """The mode is used for the access part of the search."""
+    ACCESS,
+
+    """The mode is used for the egress part of the search."""
+    EGRESS,
+
+    """The mode is used for the direct street search."""
+    DIRECT
 }
 
 type QueryType {
