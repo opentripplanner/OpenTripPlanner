@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor._data;
 
+import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.util.time.DurationUtils.duration;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
@@ -47,4 +48,14 @@ public interface RaptorTestConstants {
   int BOARD_SLACK = 45;
   int ALIGHT_SLACK = 15;
   int TRANSFER_SLACK = 60;
+
+  double WALK_RELUCTANCE = 4.0;
+
+  static int walkCost(int durationInSeconds) {
+    return toRaptorCost(durationInSeconds * WALK_RELUCTANCE);
+  }
+
+  static int walkCost(int durationInSeconds, double walkReluctance) {
+    return toRaptorCost(durationInSeconds * walkReluctance);
+  }
 }

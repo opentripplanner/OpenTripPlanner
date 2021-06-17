@@ -199,6 +199,7 @@ public class TransmodelGraphQLPlanner {
 
             request.modes = new RequestModes(
                 accessMode.get(),
+                accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK,
                 egressMode.get(),
                 directMode.get(),
                 new HashSet<>(transitModes.get())

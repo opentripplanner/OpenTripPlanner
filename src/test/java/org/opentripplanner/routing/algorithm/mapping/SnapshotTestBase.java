@@ -342,4 +342,17 @@ public abstract class SnapshotTestBase {
             return SerializerType.JSON.name();
         }
     }
+
+    /**
+     * The generalizedCost for non-transit legs may differ for departAt / arriveBy searches,
+     * depending on where the costs were applied.
+     */
+    public static void handleGeneralizedCost(Itinerary departAt, Itinerary arriveBy) {
+        departAt.legs.stream()
+                .filter(l -> !l.mode.isTransit())
+                .forEach(l -> l.generalizedCost = 0);
+        arriveBy.legs.stream()
+                .filter(l -> !l.mode.isTransit())
+                .forEach(l -> l.generalizedCost = 0);
+    }
 }

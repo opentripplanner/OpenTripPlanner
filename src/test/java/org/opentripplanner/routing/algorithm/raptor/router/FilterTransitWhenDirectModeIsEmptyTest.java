@@ -10,7 +10,7 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsExistAndIsNotWalking() {
-    var modes = new RequestModes(null,null, StreetMode.BIKE,null);
+    var modes = new RequestModes(null, null, null, StreetMode.BIKE, null);
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 
@@ -21,7 +21,7 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsExistAndIsWalking() {
-    var modes = new RequestModes(null,null, StreetMode.WALK,null);
+    var modes = new RequestModes(null, null, null, StreetMode.WALK, null);
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 
@@ -32,7 +32,7 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsEmpty() {
-    var modes = new RequestModes(null,null, null,null);
+    var modes = new RequestModes(null, null, null, null, null);
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 

@@ -10,6 +10,7 @@ import java.util.Set;
 public class RequestModes {
 
   public StreetMode accessMode;
+  public StreetMode transferMode;
   public StreetMode egressMode;
   public StreetMode directMode;
   public Set<TransitMode> transitModes;
@@ -18,16 +19,19 @@ public class RequestModes {
       StreetMode.WALK,
       StreetMode.WALK,
       StreetMode.WALK,
+      StreetMode.WALK,
       new HashSet<>(Arrays.asList(TransitMode.values()))
   );
 
   public RequestModes(
       StreetMode accessMode,
+      StreetMode transferMode,
       StreetMode egressMode,
       StreetMode directMode,
       Set<TransitMode> transitModes
   ) {
     this.accessMode = (accessMode != null && accessMode.access) ? accessMode : null;
+    this.transferMode = (transferMode != null && transferMode.transfer) ? transferMode : null;
     this.egressMode = (egressMode != null && egressMode.egress) ? egressMode : null;
     this.directMode = directMode;
     this.transitModes = transitModes;

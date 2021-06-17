@@ -120,7 +120,7 @@ public class LegacyGraphQLQueryTypeImpl
           Stop stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
 
           // TODO: Add geometry
-          return new NearbyStop(stop, Integer.parseInt(parts[0]), 0, null, null, null);
+          return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null, null);
         }
         case "TicketType":
           return null; //TODO

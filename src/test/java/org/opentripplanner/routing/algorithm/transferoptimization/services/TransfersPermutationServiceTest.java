@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.dummyT2TTransferService;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.tx;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.tx;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.util.time.TimeUtils.time;
@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathBuilder;
+import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
@@ -90,15 +91,16 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
   @Test
   public void testTripWithOneTransfer() {
     // Given
+    var walkCost = walkCost(D1m, BasicPathTestCase.WALK_RELUCTANCE);
     var original = pathBuilder
-        .access(START_TIME_T1, D1m, STOP_A)
+        .access(START_TIME_T1, D1m, STOP_A, walkCost)
         .bus(TRIP_1, STOP_B)
-        .walk(D1m, STOP_C)
+        .walk(D1m, STOP_C, walkCost)
         .bus(TRIP_2, STOP_D)
-        .egress(D1m);
+        .egress(D1m, walkCost);
     var transfers = dummyT2TTransferService(
         // Original transfer
-        tx(TRIP_1, STOP_B, D1m, STOP_C, TRIP_2)
+        tx(TRIP_1, STOP_B, D1m, walkCost(D1m, BasicPathTestCase.WALK_RELUCTANCE), STOP_C, TRIP_2)
     );
 
     var subject = new TransfersPermutationService<>(transfers, COST_CALCULATOR, SLACK_PROVIDER);
@@ -146,11 +148,11 @@ public class TransfersPermutationServiceTest implements RaptorTestConstants {
             .egress(0);
     var transfers = dummyT2TTransferService(
             tx(TRIP_1, STOP_B, TRIP_2),
-            tx(TRIP_1, STOP_B, D30s, STOP_C, TRIP_2),
+            tx(TRIP_1, STOP_B, D30s, walkCost(D30s, BasicPathTestCase.WALK_RELUCTANCE), STOP_C, TRIP_2),
             tx(TRIP_1, STOP_D, TRIP_2),
             tx(TRIP_1, STOP_G, TRIP_2),
             tx(TRIP_1, STOP_G, TRIP_3),
-            tx(TRIP_2, STOP_D, D30s, STOP_E, TRIP_3),
+            tx(TRIP_2, STOP_D, D30s, walkCost(D30s, BasicPathTestCase.WALK_RELUCTANCE), STOP_E, TRIP_3),
             tx(TRIP_2, STOP_F, TRIP_3),
             tx(TRIP_2, STOP_G, TRIP_3)
     );

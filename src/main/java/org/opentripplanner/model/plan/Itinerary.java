@@ -227,15 +227,15 @@ public class Itinerary {
 
     public void timeShiftToStartAt(Calendar afterTime) {
         Calendar startTimeFirstLeg = firstLeg().startTime;
-        int adjustmentMilliSeconds =
-            (int)(afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis());
+        long adjustmentMilliSeconds =
+            afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis();
         timeShift(adjustmentMilliSeconds);
     }
 
-    private void timeShift(int adjustmentMilliSeconds) {
+    private void timeShift(long adjustmentMilliSeconds) {
         for (Leg leg : this.legs) {
-            leg.startTime.add(Calendar.MILLISECOND, adjustmentMilliSeconds);
-            leg.endTime.add(Calendar.MILLISECOND, adjustmentMilliSeconds);
+            leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + adjustmentMilliSeconds);
+            leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + adjustmentMilliSeconds);
         }
     }
 

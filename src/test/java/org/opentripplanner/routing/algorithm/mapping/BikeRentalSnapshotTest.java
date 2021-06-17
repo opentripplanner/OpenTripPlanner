@@ -48,7 +48,7 @@ public class BikeRentalSnapshotTest
     public void directBikeRental() {
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
 
-        request.modes = new RequestModes(null, null, StreetMode.BIKE_RENTAL, Set.of());
+        request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
         request.from = p1;
         request.to = p2;
 
@@ -58,6 +58,8 @@ public class BikeRentalSnapshotTest
              */
             arriveBy.legs.get(1).endTime = departAt.legs.get(1).endTime;
             arriveBy.legs.get(2).startTime = departAt.legs.get(2).startTime;
+
+            handleGeneralizedCost(departAt, arriveBy);
         });
     }
 
@@ -65,7 +67,7 @@ public class BikeRentalSnapshotTest
     @Test public void directBikeRentalArrivingAtDestination() {
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
 
-        request.modes = new RequestModes(null, null, StreetMode.BIKE_RENTAL, Set.of());
+        request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
         request.allowKeepingRentedBicycleAtDestination = true;
         request.from = p1;
         request.to = p2;
@@ -76,6 +78,8 @@ public class BikeRentalSnapshotTest
              */
             arriveBy.legs.get(1).endTime = departAt.legs.get(1).endTime;
             arriveBy.legs.get(2).startTime = departAt.legs.get(2).startTime;
+
+            handleGeneralizedCost(departAt, arriveBy);
         });
     }
 
@@ -83,7 +87,7 @@ public class BikeRentalSnapshotTest
     @Test public void accessBikeRental() {
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 14, 0);
 
-        request.modes = new RequestModes(StreetMode.BIKE_RENTAL, StreetMode.WALK, null, Set.of(TransitMode.values()));
+        request.modes = new RequestModes(StreetMode.BIKE_RENTAL, StreetMode.WALK,  StreetMode.WALK, null, Set.of(TransitMode.values()));
         request.from = p1;
         request.to = p3;
 
@@ -94,10 +98,10 @@ public class BikeRentalSnapshotTest
     @Test public void egressBikeRental() {
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
 
-        request.modes = new RequestModes(StreetMode.WALK, StreetMode.BIKE_RENTAL, null, Set.of(TransitMode.values()));
+        request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.BIKE_RENTAL, null, Set.of(TransitMode.values()));
         request.from = p3;
         request.to = p1;
 
-        expectArriveByToMatchDepartAtAndSnapshot(request);
+        expectArriveByToMatchDepartAtAndSnapshot(request, SnapshotTestBase::handleGeneralizedCost);
     }
 }
