@@ -49,4 +49,8 @@ public abstract class FlexTrip extends TransitEntity {
   public abstract BookingInfo getDropOffBookingInfo(int i);
 
   public abstract BookingInfo getPickupBookingInfo(int i);
+
+  public abstract boolean isBoardingPossible(NearbyStop stop);
+
+  public abstract boolean isAlightingPossible(NearbyStop stop);
 }

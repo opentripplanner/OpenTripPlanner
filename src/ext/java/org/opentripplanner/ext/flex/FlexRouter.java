@@ -136,7 +136,7 @@ public class FlexRouter {
     if (this.flexAccessTemplates != null) { return; }
 
     // Fetch the closest flexTrips reachable from the access stops
-    this.flexAccessTemplates = getClosestFlexTrips(streetAccesses)
+    this.flexAccessTemplates = getClosestFlexTrips(streetAccesses, true)
         // For each date the router has data for
         .flatMap(t2 -> Arrays.stream(dates)
             // Discard if service is not running on date
@@ -154,7 +154,7 @@ public class FlexRouter {
     if (this.flexEgressTemplates != null) { return; }
 
     // Fetch the closest flexTrips reachable from the egress stops
-    this.flexEgressTemplates = getClosestFlexTrips(streetEgresses)
+    this.flexEgressTemplates = getClosestFlexTrips(streetEgresses, false)
         // For each date the router has data for
         .flatMap(t2 -> Arrays.stream(dates)
             // Discard if service is not running on date
@@ -168,12 +168,13 @@ public class FlexRouter {
         .collect(Collectors.toList());;
   }
 
-  private Stream<T2<NearbyStop, FlexTrip>> getClosestFlexTrips(Collection<NearbyStop> nearbyStops) {
+  private Stream<T2<NearbyStop, FlexTrip>> getClosestFlexTrips(Collection<NearbyStop> nearbyStops, boolean pickup) {
     // Find all trips reachable from the nearbyStops
     Stream<T2<NearbyStop, FlexTrip>> flexTripsReachableFromNearbyStops = nearbyStops
         .stream()
         .flatMap(accessEgress -> flexIndex
             .getFlexTripsByStop(accessEgress.stop)
+            .filter(flexTrip -> pickup ? flexTrip.isBoardingPossible(accessEgress) : flexTrip.isAlightingPossible(accessEgress))
             .map(flexTrip -> new T2<>(accessEgress, flexTrip)));
 
     // Group all (NearbyStop, FlexTrip) tuples by flexTrip
