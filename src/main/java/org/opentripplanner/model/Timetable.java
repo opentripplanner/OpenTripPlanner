@@ -5,29 +5,22 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.trippattern.TripTimes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more than
  * one Timetable when stop time updates are being applied: one for the scheduled stop times, one for
  * each snapshot of updated stop times, another for a working buffer of updated stop times, etc.
- *
- *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *            - after as Entur NeTEx PRs are merged.
- *            - Also consider moving its dependencies in: org.opentripplanner.routing
- *            - The NEW Timetable should not have any dependencies to
  */
 public class Timetable implements Serializable {
 
@@ -38,8 +31,10 @@ public class Timetable implements Serializable {
 
     private final List<TripTimes> tripTimes = Lists.newArrayList();
 
-    private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
-
+    /**
+     * The ServiceDate for which this (updated) timetable is valid. If null,
+     * then it is valid for all dates.
+     */
     private final ServiceDate serviceDate;
 
     /** 
@@ -95,22 +90,12 @@ public class Timetable implements Serializable {
     public void finish() {
         int nStops = pattern.getStopPattern().getSize();
 
-        // Concatenate raw TripTimes and those referenced from FrequencyEntries
-        List<TripTimes> allTripTimes = Lists.newArrayList(tripTimes);
-        for (FrequencyEntry freq : frequencyEntries) allTripTimes.add(freq.tripTimes);
-
         /* Find the time range over which this timetable is active. Allows departure search optimizations. */
         minTime = Integer.MAX_VALUE;
         maxTime = Integer.MIN_VALUE;
         for (TripTimes tt : tripTimes) {
             minTime = Math.min(minTime, tt.getDepartureTime(0));
             maxTime = Math.max(maxTime, tt.getArrivalTime(nStops - 1));
-        }
-        // Slightly repetitive code.
-        // Again it seems reasonable to have a shared interface between FrequencyEntries and normal TripTimes.
-        for (FrequencyEntry freq : frequencyEntries) {
-            minTime = Math.min(minTime, freq.getMinDeparture());
-            maxTime = Math.max(maxTime, freq.getMaxArrival());
         }
     }
 
@@ -342,14 +327,6 @@ public class Timetable implements Serializable {
         tripTimes.add(tt);
     }
 
-    /**
-     * Add a frequency entry to this Timetable. See addTripTimes method. Maybe Frequency Entries should
-     * just be TripTimes for simplicity.
-     */
-    public void addFrequencyEntry(FrequencyEntry freq) {
-        frequencyEntries.add(freq);
-    }
-
     public boolean isValidFor(ServiceDate serviceDate) {
         return this.serviceDate == null || this.serviceDate.equals(serviceDate);
     }
@@ -358,11 +335,6 @@ public class Timetable implements Serializable {
     // TODO maybe put this is a more appropriate place
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
         for (TripTimes tt : this.tripTimes) {
-            tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
-        }
-        // Repeated code... bad sign...
-        for (FrequencyEntry freq : this.frequencyEntries) {
-            TripTimes tt = freq.tripTimes;
             tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
         }
     }
@@ -380,13 +352,6 @@ public class Timetable implements Serializable {
      */
     public List<TripTimes> getTripTimes() {
         return tripTimes;
-    }
-
-    /**
-     * Contains one FrequencyEntry object for each block of frequency-based trips.
-     */
-    public List<FrequencyEntry> getFrequencyEntries() {
-        return frequencyEntries;
     }
 
     /**

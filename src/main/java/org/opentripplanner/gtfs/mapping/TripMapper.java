@@ -27,8 +27,8 @@ class TripMapper {
         return MapUtils.mapToList(trips, this::map);
     }
 
-    Trip map(org.onebusaway.gtfs.model.Trip orginal) {
-        return orginal == null ? null : mappedTrips.computeIfAbsent(orginal, this::doMap);
+    Trip map(org.onebusaway.gtfs.model.Trip original) {
+        return original == null ? null : mappedTrips.computeIfAbsent(original, this::doMap);
     }
 
     Collection<Trip> mappedTrips() {

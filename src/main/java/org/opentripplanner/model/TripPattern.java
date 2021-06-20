@@ -13,7 +13,6 @@ import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -249,23 +248,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         if (this.route != tt.getTrip().getRoute()) {
             LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.",
                 tt.getTrip(), tt.getTrip().getRoute(),
-                route
-            );
-        }
-    }
-
-    /**
-     * Add the given FrequencyEntry to this pattern's scheduled timetable, recording the corresponding
-     * trip as one of the scheduled trips on this pattern.
-     * TODO possible improvements: combine freq entries and TripTimes. Do not keep trips list in TripPattern
-     * since it is redundant.
-     */
-    public void add(FrequencyEntry freq) {
-        getTrips().add(freq.tripTimes.getTrip());
-        scheduledTimetable.addFrequencyEntry(freq);
-        if (this.getRoute() != freq.tripTimes.getTrip().getRoute()) {
-            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.",
-                freq.tripTimes.getTrip(),
                 route
             );
         }

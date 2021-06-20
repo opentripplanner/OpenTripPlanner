@@ -102,7 +102,6 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getFareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
         builder.getFareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
         builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
-        builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         for (ShapePoint shapePoint : shapePointMapper.map(data.getAllShapePoints())) {
             builder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
@@ -115,6 +114,7 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
+        builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
 
         mapAndAddTransfersToBuilder();
     }

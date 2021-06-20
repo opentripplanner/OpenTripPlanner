@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StreetNote;
@@ -31,6 +32,10 @@ public class Leg {
   public final TraverseMode mode;
 
   private final Trip trip;
+
+    public Frequency tripFrequency;
+
+    public int tripFrequencyStartTime;
 
   /**
    * The date and time this leg begins.
@@ -72,13 +77,6 @@ public class Leg {
    * Is this a frequency-based trip with non-strict departure times?
    */
   public Boolean isNonExactFrequency = null;
-
-  /**
-   * The best estimate of the time between two arriving vehicles. This is particularly important
-   * for non-strict frequency trips, but could become important for real-time trips, strict
-   * frequency trips, and scheduled trips with empirical headways.
-   */
-  public Integer headway = null;
 
   /**
    * The distance traveled while traversing the leg in meters.
@@ -316,7 +314,6 @@ public class Leg {
                 .addNum("arrivalDelay", arrivalDelay, 0)
                 .addBool("realTime", realTime)
                 .addBool("isNonExactFrequency", isNonExactFrequency)
-                .addNum("headway", headway)
                 .addEnum("mode", mode)
                 .addNum("distance", distanceMeters, "m")
                 .addNum("cost", generalizedCost)
@@ -327,6 +324,8 @@ public class Leg {
                 .addEntityId("agencyId", getAgency())
                 .addEntityId("routeId", getRoute())
                 .addEntityId("tripId", trip)
+                .addObj("tripFrequency", tripFrequency)
+                .addServiceTime("tripFrequencyStartTime", tripFrequencyStartTime)
                 .addStr("headsign", headsign)
                 .addBool("interlineWithPreviousLeg", interlineWithPreviousLeg)
                 .addObj("serviceDate", serviceDate)

@@ -1,17 +1,17 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+import java.util.Collections;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Trip;
-
-import java.util.Collection;
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class FrequencyMapperTest {
     private static final String FEED_ID = "FEED";
@@ -46,8 +46,9 @@ public class FrequencyMapperTest {
         FREQUENCY.setTrip(TRIP);
     }
 
-    private FrequencyMapper subject = new FrequencyMapper(
-            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID))));
+    private final FrequencyMapper subject = new FrequencyMapper(
+            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)))
+    );
 
     @Test
     public void testMapCollection() throws Exception {
@@ -62,7 +63,7 @@ public class FrequencyMapperTest {
 
         assertEquals(START_TIME, result.getStartTime());
         assertEquals(END_TIME, result.getEndTime());
-        assertEquals(EXACT_TIMES, result.getExactTimes());
+        assertTrue(result.isExactHeadway());
         assertEquals(HEADWAY_SECS, result.getHeadwaySecs());
         assertEquals(LABEL_ONLY, result.getLabelOnly());
         assertNotNull(result.getTrip());
@@ -74,7 +75,7 @@ public class FrequencyMapperTest {
 
         assertEquals(0, result.getStartTime());
         assertEquals(0, result.getEndTime());
-        assertEquals(0, result.getExactTimes());
+        assertFalse(result.isExactHeadway());
         assertEquals(0, result.getHeadwaySecs());
         assertEquals(0, result.getLabelOnly());
         assertNull(result.getTrip());
@@ -86,7 +87,7 @@ public class FrequencyMapperTest {
         org.opentripplanner.model.Frequency result1 = subject.map(FREQUENCY);
         org.opentripplanner.model.Frequency result2 = subject.map(FREQUENCY);
 
-        assertTrue(result1 == result2);
+        assertEquals(result1, result2);
     }
 
 }

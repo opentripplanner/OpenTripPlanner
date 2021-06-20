@@ -9,9 +9,11 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -37,6 +39,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     /** The trips whose arrivals and departures are represented by this TripTimes */
     private final Trip trip;
 
+    /**
+     * The trip frequency instance if the trip is frequency based. A trip can have more than one
+     * frequency, so knowing the trip and depature times is not enough to determine the frequency
+     * instance. For regular trips this is null.
+     */
+    @Nullable
+    public final Frequency frequency;
+
+    /** The code for the service on which this trip runs. For departure search optimizations. */
     // not final because these are set later, after TripTimes construction.
     private int serviceCode = -1;
 
@@ -152,6 +163,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
             pickupBookingInfos.add(st.getPickupBookingInfo());
             s++;
         }
+        this.frequency = null;
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
         this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
@@ -172,6 +184,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     public TripTimes(final TripTimes object) {
         this.timeShift = object.timeShift;
         this.trip = object.trip;
+        this.frequency = object.frequency;
         this.serviceCode = object.serviceCode;
         this.headsigns = object.headsigns;
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
@@ -189,6 +202,25 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
     public void setServiceCode(int serviceCode) {
         this.serviceCode = serviceCode;
+    }
+
+    public TripTimes(TripTimes base, Frequency frequency, int timeShift) {
+        this.timeShift = timeShift;
+        this.trip = base.trip;
+        this.frequency = frequency;
+        this.serviceCode = base.serviceCode;
+        this.headsigns = base.headsigns;
+        this.scheduledArrivalTimes = base.scheduledArrivalTimes;
+        this.scheduledDepartureTimes = base.scheduledDepartureTimes;
+        this.arrivalTimes = base.arrivalTimes;
+        this.departureTimes = base.departureTimes;
+        this.recordedStops = base.recordedStops;
+        this.predictionInaccurateOnStops = base.predictionInaccurateOnStops;
+        this.pickupBookingInfos = base.pickupBookingInfos;
+        this.dropOffBookingInfos = base.dropOffBookingInfos;
+        this.originalGtfsStopSequence = base.originalGtfsStopSequence;
+        this.realTimeState = base.realTimeState;
+        this.timepoints = base.timepoints;
     }
 
     /**

@@ -1,13 +1,12 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.api.model.ApiLeg;
-import org.opentripplanner.model.plan.Leg;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import org.opentripplanner.api.model.ApiAlert;
+import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.model.plan.Leg;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;
@@ -50,8 +49,6 @@ public class LegMapper {
         api.departureDelay = domain.departureDelay;
         api.arrivalDelay = domain.arrivalDelay;
         api.realTime = domain.realTime;
-        api.isNonExactFrequency = domain.isNonExactFrequency;
-        api.headway = domain.headway;
         api.distance = domain.distanceMeters;
         api.generalizedCost = domain.generalizedCost;
         api.pathway = domain.pathway;
@@ -79,6 +76,10 @@ public class LegMapper {
             api.tripId = FeedScopedIdMapper.mapToApi(trip.getId());
             api.tripShortName = trip.getTripShortName();
             api.tripBlockId = trip.getBlockId();
+            if(domain.tripFrequency != null) {
+                api.headway = domain.tripFrequency.getHeadwaySecs();
+                api.isNonExactFrequency = !domain.tripFrequency.isExactHeadway();
+            }
         }
         else if (domain.pathway) {
             api.route = FeedScopedIdMapper.mapToApi(domain.pathwayId);

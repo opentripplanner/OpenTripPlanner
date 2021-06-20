@@ -1,8 +1,12 @@
 package org.opentripplanner.gtfs;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
@@ -17,16 +21,9 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class is responsible for generating trip patterns when loading GTFS data.
@@ -42,7 +39,7 @@ public class GenerateTripPatternsOperation {
     private final Set<FeedScopedId> calendarServiceIds;
 
     private final Multimap<StopPattern, TripPattern> tripPatterns;
-    private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
+    private final Map<Trip, List<Frequency>> frequenciesForTrip;
 
     private int tripCount = 0;
     private int freqCount = 0;
@@ -57,11 +54,12 @@ public class GenerateTripPatternsOperation {
         this.deduplicator = deduplicator;
         this.calendarServiceIds = calendarServiceIds;
         this.tripPatterns = transitDaoBuilder.getTripPatterns();
+        this.frequenciesForTrip = transitDaoBuilder.getFrequencies()
+                .stream()
+                .collect(Collectors.groupingBy(Frequency::getTrip));
     }
 
     public void run() {
-        collectFrequencyByTrip();
-
         final Collection<Trip> trips = transitDaoBuilder.getTripsById().values();
         final int tripsSize = trips.size();
 
@@ -84,18 +82,6 @@ public class GenerateTripPatternsOperation {
 
     public boolean hasScheduledTrips() {
         return scheduledCount > 0;
-    }
-
-    /**
-     * First, record which trips are used by one or more frequency entries.
-     * These trips will be ignored for the purposes of non-frequency routing, and
-     * all the frequency entries referencing the same trip can be added at once to the same
-     * Timetable/TripPattern.
-     */
-    private void collectFrequencyByTrip() {
-        for(Frequency freq : transitDaoBuilder.getFrequencies()) {
-            frequenciesForTrip.put(freq.getTrip(), freq);
-        }
     }
 
     private void buildTripPatternForTrip(Trip trip) {
@@ -131,21 +117,37 @@ public class GenerateTripPatternsOperation {
         // Create a TripTimes object for this list of stoptimes, which form one trip.
         TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
 
-        // If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry.
-        List<Frequency> frequencies = frequenciesForTrip.get(trip);
-        if (frequencies != null && !(frequencies.isEmpty())) {
+        var frequencies = frequenciesForTrip.get(trip);
+        // If trip was not frequency-based, add TripTimes directly to the TripPattern's scheduled
+        // timetable.
+        if(frequencies == null) {
+            tripPattern.add(tripTimes);
+            scheduledCount++;
+        }
+        // If trip is referenced by one or more lines in frequencies.txt, then expand the
+        // trip-pattern with new TripTimes for each depature
+        else {
             for (Frequency freq : frequencies) {
-                tripPattern.add(new FrequencyEntry(freq, tripTimes));
+                int timeShift = timeShiftForFrequencyBasedTrip(tripTimes, freq);
+                while (timeShift < freq.getEndTime()) {
+                    tripPattern.add(new TripTimes(tripTimes, freq, timeShift));
+                    timeShift += freq.getHeadwaySecs();
+                }
                 freqCount++;
             }
             // TODO replace: createGeometry(graph, trip, stopTimes, hops);
         }
+    }
 
-        // This trip was not frequency-based. Add the TripTimes directly to the TripPattern's scheduled timetable.
-        else {
-            tripPattern.add(tripTimes);
-            scheduledCount++;
-        }
+    /**
+     * According to the GTFS specification, the first trip depart at the frequency
+     * start-time and the trip-pattern time-shift is the time of the first stop
+     * arrival. So, we compute the delta between the arrival and departure and
+     * subtract that from the frequency start-time to get the initial time-shift value.
+     */
+    private int timeShiftForFrequencyBasedTrip(TripTimes tripTimes, Frequency frequency) {
+        int delta = tripTimes.getDepartureTime(0) - tripTimes.getArrivalTime(0);
+        return frequency.getStartTime() - delta;
     }
 
     private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, Direction direction) {

@@ -1,5 +1,11 @@
 package org.opentripplanner.model.impl;
 
+import static java.util.Comparator.comparing;
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
+import java.io.IOException;
+import java.util.Collection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -14,13 +20,6 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-
-import java.io.IOException;
-import java.util.Collection;
-
-import static java.util.Comparator.comparing;
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)
@@ -60,7 +59,7 @@ public class OtpTransitServiceBuilderTest {
 
         assertEquals(2, frequencies.size());
         assertEquals(
-                "<Frequency trip=agency:15.1 start=06:00:00 end=10:00:01>",
+                "Frequency{trip: agency:15.1, start: 14:00, end: 18:00:01, headway: 1h, exactHeadway: true}",
                 first(frequencies).toString()
         );
     }

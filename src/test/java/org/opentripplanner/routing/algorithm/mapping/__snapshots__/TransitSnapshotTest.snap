@@ -52,6 +52,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -396,6 +397,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -610,6 +612,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -677,6 +680,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -851,6 +855,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1014,6 +1019,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -1081,6 +1087,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1238,6 +1245,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1452,6 +1460,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -1519,6 +1528,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1693,6 +1703,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1856,6 +1867,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -1923,6 +1935,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2084,6 +2097,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -2264,6 +2278,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -2408,6 +2423,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -2475,6 +2491,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -2593,6 +2610,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2909,6 +2927,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3089,6 +3108,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -3156,6 +3176,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -3387,6 +3408,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3567,6 +3589,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -3634,6 +3657,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -3865,6 +3889,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4045,6 +4070,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -4112,6 +4138,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -4347,6 +4374,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4510,6 +4538,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -4654,6 +4683,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -4721,6 +4751,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4901,6 +4932,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -5098,6 +5130,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "tripFrequencyStartTime": 0,
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -5165,6 +5198,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -5362,6 +5396,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "NORTH",
@@ -5752,6 +5787,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -6036,6 +6072,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "tripFrequencyStartTime": 0,
           "walkSteps": [
             {
               "absoluteDirection": "NORTHWEST",
