@@ -10,6 +10,7 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.WrappedCurrency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,9 @@ public class PdxFareServiceImpl extends DefaultFareServiceImpl {
 
     public PdxFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
         addFareRules(FareType.regular, regularFareRules);
+        addFareRules(FareType.senior, regularFareRules);
+        addFareRules(FareType.special, regularFareRules);
+        addFareRules(FareType.youth, regularFareRules);
     }
 
     private static final long serialVersionUID = 20120229L;
@@ -32,6 +36,10 @@ public class PdxFareServiceImpl extends DefaultFareServiceImpl {
     @Override
     protected boolean populateFare(Fare fare, Currency currency, FareType fareType, List<Ride> rides,
                                    Collection<FareRuleSet> fareRules) {
+        fare.addFare(FareType.regular, new WrappedCurrency(currency),0);
+        fare.addFare(FareType.senior, new WrappedCurrency(currency),0);
+        fare.addFare(FareType.special, new WrappedCurrency(currency),0);
+        fare.addFare(FareType.youth, new WrappedCurrency(currency),0);
         float lowestCost = getLowestCost(fareType, rides, fareRules);
         float cost = 0;
         for (Ride ride : rides) {
