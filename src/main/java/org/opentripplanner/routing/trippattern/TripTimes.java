@@ -94,7 +94,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * trip level. An effort is made to re-use the sequence number arrays when they are the same
      * across different trips in the same pattern.
      */
-    private final int[] stopSequences;
+    private final int[] gtfsStopSequences;
 
     private final int[] continuousPickup;
 
@@ -184,7 +184,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
-        this.stopSequences = deduplicator.deduplicateIntArray(sequences);
+        this.gtfsStopSequences = deduplicator.deduplicateIntArray(sequences);
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
@@ -215,7 +215,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.headsigns = object.headsigns;
         this.scheduledDepartureTimes = object.scheduledDepartureTimes;
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
-        this.stopSequences = object.stopSequences;
+        this.gtfsStopSequences = object.gtfsStopSequences;
         this.timepoints = object.timepoints;
         this.continuousPickup = object.continuousPickup;
         this.continuousDropOff = object.continuousDropOff;
@@ -559,8 +559,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     }
 
     /** Just to create uniform getter-syntax across the whole public interface of TripTimes. */
-    public int getStopSequence(final int stop) {
-        return stopSequences[stop];
+    public int getGtfsStopSequence(final int stop) {
+        return gtfsStopSequences[stop];
     }
 
     /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */
