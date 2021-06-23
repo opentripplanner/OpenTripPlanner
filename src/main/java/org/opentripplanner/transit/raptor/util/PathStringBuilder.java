@@ -10,6 +10,7 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * Create a path like: {@code Walk 5m - 101 - Transit 10:07 10:35 - 2111 - Walk 4m }
  */
+@SuppressWarnings("UnusedReturnValue")
 public class PathStringBuilder {
     private final StringBuilder buf = new StringBuilder();
     private final boolean padDuration;
@@ -42,7 +43,7 @@ public class PathStringBuilder {
 
     public PathStringBuilder flex(int duration, int nRides) {
         // The 'tx' is short for eXtra Transfers added by the flex access/egress.
-        return start().append("Flex").duration(duration).space().append(nRides).append("tx").end();
+        return start().append("Flex").duration(duration).space().append(nRides).append("x").end();
     }
 
     public PathStringBuilder accessEgress(RaptorTransfer leg) {

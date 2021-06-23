@@ -73,7 +73,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m]",
+        "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m]",
         pathsToString(response)
     );
   }
@@ -87,7 +87,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m]",
+        "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m]",
         pathsToString(response)
     );
   }
@@ -99,9 +99,9 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Flex 3m 2tx ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m $1860]\n"
-            + "Flex 2m 2tx ~ 3 ~ BUS R1 0:12 0:18 ~ 6 ~ Walk 1m [0:09 0:19 10m $1740]\n"
-            + "Flex 7m 1tx ~ 5 ~ BUS R1 0:16 0:18 ~ 6 ~ Walk 1m [0:08 0:19 11m $2700]\n"
+            + "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m $1860]\n"
+            + "Flex 2m 2x ~ 3 ~ BUS R1 0:12 0:18 ~ 6 ~ Walk 1m [0:09 0:19 10m $1740]\n"
+            + "Flex 7m 1x ~ 5 ~ BUS R1 0:16 0:18 ~ 6 ~ Walk 1m [0:08 0:19 11m $2700]\n"
             + "Walk 10m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 1m [0:00 0:19 19m $3720]",
         pathsToString(response)
     );
