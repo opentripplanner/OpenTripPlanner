@@ -29,11 +29,7 @@ public class PriorityBasedTransfersCostCalculator<T extends RaptorTripSchedule> 
   }
 
   public OptimizedPath<T> decorateWithTransfers(OptimizedPath<T> path) {
-    var legs = path
-            .legStream()
-            .filter(PathLeg::isTransitLeg)
-            .map(PathLeg::asTransitLeg)
-            .collect(Collectors.toList());
+    var legs = path.transitLegs().collect(Collectors.toList());
 
     Map<PathLeg<T>, Transfer> transfers = new HashMap<>();
     for (int i=1; i< legs.size(); ++i) {

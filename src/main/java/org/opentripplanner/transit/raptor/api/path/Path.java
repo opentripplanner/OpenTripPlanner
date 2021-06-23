@@ -171,6 +171,15 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
         return accessLeg.stream();
     }
 
+    /**
+     * Stream all transit legs in the path
+     */
+    public Stream<TransitPathLeg<T>> transitLegs() {
+        return legStream()
+                .filter(PathLeg::isTransitLeg)
+                .map(PathLeg::asTransitLeg);
+    }
+
     public String toStringDetailed() {
         return toString(true);
     }
