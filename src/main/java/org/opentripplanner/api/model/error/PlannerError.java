@@ -2,9 +2,9 @@ package org.opentripplanner.api.model.error;
 
 import org.opentripplanner.api.common.LocationNotAccessible;
 import org.opentripplanner.api.common.Message;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.standalone.BugsnagReporter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,8 +12,6 @@ import java.util.Map;
 
 /** This API response element represents an error in trip planning. */
 public class PlannerError {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PlannerError.class);
     private static Map<Class<? extends Exception>, Message> messages;
     static {
         messages = new HashMap<Class<? extends Exception>, Message> ();
@@ -38,12 +36,12 @@ public class PlannerError {
         noPath = true;
     }
 
-    public PlannerError(Exception e) {
+    public PlannerError(RoutingRequest req, Exception e) {
         this();
         message = messages.get(e.getClass());
         if (message == null) {
-            LOG.error("exception planning trip: ", e);
             message = Message.SYSTEM_ERROR;
+            BugsnagReporter.reportErrorToBugsnag("Unhandled exception while planning trip", req, e);
         }
         this.setMsg(message);
         if (e instanceof VertexNotFoundException)

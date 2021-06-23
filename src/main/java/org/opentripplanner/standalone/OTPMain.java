@@ -68,6 +68,8 @@ public class OTPMain {
             System.exit(-1);
         }
 
+        BugsnagReporter.initializeBugsnagErrorReporting(params);
+
         OTPMain main = new OTPMain(params);
         if (!main.run()) {
             System.exit(-1);

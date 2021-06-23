@@ -138,6 +138,20 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = { "--enableScriptingWebService" }, description = "enable scripting through a web-service (Warning! Very unsafe for public facing servers)")
     boolean enableScriptingWebService = false;
 
+    @Parameter(names = {"--bugsnagKey"},
+        description = "A Bugsnag project notifier key that will be used to report unhandled exceptions and trip planning errors.")
+    public String bugsnagKey = null;
+
+    @Parameter(names = {"--bugsnagReleaseStage"},
+        description = "A Bugsang release stage to use when reporting errors."
+    )
+    public String bugsnagReleaseStage;
+
+    @Parameter(names = {"--bugsnagAppType"},
+        description = "A Bugsang app type to use when reporting errors."
+    )
+    public String bugsnagAppType;
+
     /** Set some convenience parameters based on other parameters' values. */
     public void infer() {
         server |= (inMemory || preFlight || port != null);
