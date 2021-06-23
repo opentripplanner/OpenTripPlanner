@@ -13,6 +13,7 @@ import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.util.time.DurationUtils;
@@ -99,10 +100,10 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
             .schedule(pattern(LINE_B, STOP_B, STOP_C))
             .times(L1_START, L1_END)
             .build();
-    private static final int TOT_COST_A = 2514;
-    private static final int TOT_COST_W_OPENING_HOURS_A = 3462;
-    private static final int TOT_COST_B = 2874;
-    private static final int TOT_COST_W_OPENING_HOURS_B = 3678;
+    private static final int TOT_COST_A = 251400;
+    private static final int TOT_COST_W_OPENING_HOURS_A = 346200;
+    private static final int TOT_COST_B = 287400;
+    private static final int TOT_COST_W_OPENING_HOURS_B = 367800;
 
 
     /* TEST CASES WITH EXPECTED TO-STRING TEXTS */
@@ -112,7 +113,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseAForwardSearchAsText() {
-        return flexCaseAText(630, 888);
+        return flexCaseAText(63000, 88800);
     }
 
     public static DestinationArrival<TestTripSchedule> flexCaseBForwardSearch() {
@@ -120,7 +121,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseBForwardSearchAsText() {
-        return flexCaseBText(630, 888);
+        return flexCaseBText(63000, 88800);
     }
 
     public static DestinationArrival<TestTripSchedule> flexCaseAWithOpeningHoursForwardSearch() {
@@ -128,7 +129,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseAWithOpeningHoursForwardSearchAsText() {
-        return flexCaseAWithOpeningHours(630, 1524, 1308);
+        return flexCaseAWithOpeningHours(63000, 152400, 130800);
     }
 
     public static DestinationArrival<TestTripSchedule> flexCaseBWithOpeningHoursForwardSearch() {
@@ -136,7 +137,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseBWithOpeningHoursForwardSearchAsText() {
-        return flexCaseBWithOpeningHours(630, 1476, 1212);
+        return flexCaseBWithOpeningHours(63000, 147600, 121200);
     }
 
     public static DestinationArrival<TestTripSchedule> flexCaseAReverseSearch() {
@@ -144,7 +145,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseAReverseSearchAsText() {
-        return flexCaseAText(798, 720);
+        return flexCaseAText(79800, 72000);
     }
 
     public static DestinationArrival<TestTripSchedule> flexCaseBReverseSearch() {
@@ -152,7 +153,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseBReverseSearchAsText() {
-        return flexCaseBText(798, 720);
+        return flexCaseBText(79800, 72000);
     }
 
     public static DestinationArrival<TestTripSchedule> flexCaseAWithOpeningHoursReverseSearch() {
@@ -160,7 +161,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseAWithOpeningHoursReverseSearchAsText() {
-        return flexCaseAWithOpeningHours(1326, 1416, 720);
+        return flexCaseAWithOpeningHours(132600, 141600, 72000);
     }
 
     public static DestinationArrival<TestTripSchedule> flexCaseBWithOpeningHoursReverseSearch() {
@@ -168,7 +169,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseBWithOpeningHoursReverseSearchAsText() {
-        return flexCaseBWithOpeningHours(1278, 1320, 720);
+        return flexCaseBWithOpeningHours(127800, 132000, 72000);
     }
 
     @Test
@@ -198,50 +199,60 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     /* PRIVATE METHODS */
 
     private static String flexCaseAText(int accessCost, int egressCost) {
-        assertEquals(TOT_COST_A, accessCost + 996 + egressCost);
+        assertEquals(TOT_COST_A, accessCost + 99600 + egressCost);
         return String.format(
-                "Flex 5m15s 1tx 10:01 10:06:15 $%d ~ 1 1m45s ~ "
-                        + "BUS A 10:08 10:20 12m $996 ~ 4 1m15s ~ "
-                        + "Flex 6m 1tx 10:21:15 10:27:15 $%d "
-                        + "[10:01 10:27:15 26m15s $%d]",
-                accessCost, egressCost, TOT_COST_A
+                "Flex 5m15s 1tx 10:01 10:06:15 %s ~ 1 1m45s ~ "
+                        + "BUS A 10:08 10:20 12m $996.00 ~ 4 1m15s ~ "
+                        + "Flex 6m 1tx 10:21:15 10:27:15 %s "
+                        + "[10:01 10:27:15 26m15s %s]",
+                RaptorCostConverter.toString(accessCost),
+                RaptorCostConverter.toString(egressCost),
+                RaptorCostConverter.toString(TOT_COST_A)
         );
     }
 
     private static String flexCaseAWithOpeningHours(int accessCost, int busCost, int egressCost) {
         assertEquals(TOT_COST_W_OPENING_HOURS_A, accessCost + busCost + egressCost);
         return String.format(
-                "Flex 5m15s 1tx 9:50 9:55:15 $%d ~ 1 12m45s ~ "
-                        + "BUS A 10:08 10:20 12m $%d ~ 4 10m ~ "
-                        + "Flex 6m 1tx 10:30 10:36 $%d "
-                        + "[9:50 10:36 46m $%d]",
-                accessCost, busCost, egressCost, TOT_COST_W_OPENING_HOURS_A
+                "Flex 5m15s 1tx 9:50 9:55:15 %s ~ 1 12m45s ~ "
+                        + "BUS A 10:08 10:20 12m %s ~ 4 10m ~ "
+                        + "Flex 6m 1tx 10:30 10:36 %s "
+                        + "[9:50 10:36 46m %s]",
+                RaptorCostConverter.toString(accessCost),
+                RaptorCostConverter.toString(busCost),
+                RaptorCostConverter.toString(egressCost),
+                RaptorCostConverter.toString(TOT_COST_W_OPENING_HOURS_A)
         );
     }
 
     private static String flexCaseBText(int accessCost, int egressCost) {
-        assertEquals(TOT_COST_B, accessCost + 120 + 996 + 240 + egressCost);
+        assertEquals(TOT_COST_B, accessCost + 12000 + 99600 + 24000 + egressCost);
         return String.format(
-                "Flex 5m15s 1tx 10:00 10:05:15 $%d ~ 1 0s ~ "
-                        + "Walk 1m 10:05:15 10:06:15 $120 ~ 2 1m45s ~ "
-                        + "BUS B 10:08 10:20 12m $996 ~ 3 15s ~ "
-                        + "Walk 2m 10:20:15 10:22:15 $240 ~ 4 1m ~ "
-                        + "Flex 6m 1tx 10:23:15 10:29:15 $%d"
-                        + " [10:00 10:29:15 29m15s $%d]",
-                accessCost, egressCost, TOT_COST_B
+                "Flex 5m15s 1tx 10:00 10:05:15 %s ~ 1 0s ~ "
+                        + "Walk 1m 10:05:15 10:06:15 $120.00 ~ 2 1m45s ~ "
+                        + "BUS B 10:08 10:20 12m $996.00 ~ 3 15s ~ "
+                        + "Walk 2m 10:20:15 10:22:15 $240.00 ~ 4 1m ~ "
+                        + "Flex 6m 1tx 10:23:15 10:29:15 %s"
+                        + " [10:00 10:29:15 29m15s %s]",
+                RaptorCostConverter.toString(accessCost),
+                RaptorCostConverter.toString(egressCost),
+                RaptorCostConverter.toString(TOT_COST_B)
         );
     }
 
     private static String flexCaseBWithOpeningHours(int accessCost, int busCost, int egressCost) {
         //assertEquals(TOT_COST_W_OPENING_HOURS_B, accessCost + 120 + busCost + 240 + egressCost);
         return String.format(
-                "Flex 5m15s 1tx 9:50 9:55:15 $%d ~ 1 0s ~ "
-                        + "Walk 1m 9:55:15 9:56:15 $120 ~ 2 11m45s ~ "
-                        + "BUS B 10:08 10:20 12m $%d ~ 3 15s ~ "
-                        + "Walk 2m 10:20:15 10:22:15 $240 ~ 4 7m45s ~ "
-                        + "Flex 6m 1tx 10:30 10:36 $%d"
-                        + " [9:50 10:36 46m $%d]",
-                accessCost, busCost, egressCost, TOT_COST_W_OPENING_HOURS_B
+                "Flex 5m15s 1tx 9:50 9:55:15 %s ~ 1 0s ~ "
+                        + "Walk 1m 9:55:15 9:56:15 $120.00 ~ 2 11m45s ~ "
+                        + "BUS B 10:08 10:20 12m %s ~ 3 15s ~ "
+                        + "Walk 2m 10:20:15 10:22:15 $240.00 ~ 4 7m45s ~ "
+                        + "Flex 6m 1tx 10:30 10:36 %s"
+                        + " [9:50 10:36 46m %s]",
+                RaptorCostConverter.toString(accessCost),
+                RaptorCostConverter.toString(busCost),
+                RaptorCostConverter.toString(egressCost),
+                RaptorCostConverter.toString(TOT_COST_W_OPENING_HOURS_B)
         );
     }
 

@@ -60,7 +60,6 @@ public class RaptorPathToItineraryMapper {
     /**
      * Constructs an itinerary mapper for a request and a set of results
      *
-     * @param graph
      * @param transitLayer the currently active transit layer (may have real-time data applied)
      * @param startOfTime the point in time all times in seconds are counted from
      * @param request the current routing request
@@ -117,7 +116,7 @@ public class RaptorPathToItineraryMapper {
         Itinerary itinerary = new Itinerary(legs);
 
         // Map general itinerary fields
-        itinerary.generalizedCost = path.generalizedCost();
+        itinerary.generalizedCost = path.otpDomainCost();
         itinerary.arrivedAtDestinationWithRentedBicycle = mapped != null && mapped.arrivedAtDestinationWithRentedBicycle;
 
         if(optimizedPath != null) {
@@ -192,7 +191,7 @@ public class RaptorPathToItineraryMapper {
 
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
-        leg.generalizedCost = pathLeg.generalizedCost();
+        leg.generalizedCost = pathLeg.otpDomainCost();
 
         leg.dropOffBookingInfo = tripTimes.getDropOffBookingInfo(boardStopIndexInPattern);
         leg.pickupBookingInfo = tripTimes.getPickupBookingInfo(boardStopIndexInPattern);
@@ -267,7 +266,7 @@ public class RaptorPathToItineraryMapper {
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
             leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();
-            leg.generalizedCost = pathLeg.generalizedCost();
+            leg.generalizedCost = pathLeg.otpDomainCost();
 
             if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
                 return List.of(leg);

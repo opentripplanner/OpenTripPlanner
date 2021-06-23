@@ -1,16 +1,18 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.WAIT_TIME_L11_L21;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.WAIT_TIME_L21_L31;
 import static org.opentripplanner.util.time.DurationUtils.duration;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 
 public class OptimizeTransferCostCalculatorTest {
   private static final double WAIT_RELUCTANCE = 0.5;
-  private static final double EPSILON = 0.01;
+  private static final double EPSILON = 0.1;
 
   final int d12s = duration("12s");
   final int d24s = duration("24s");
@@ -46,8 +48,13 @@ public class OptimizeTransferCostCalculatorTest {
         subject.setMinSafeTransferTime(t0);
         String testCase = String.format("t0=%d, n=%.1f", t0, n);
 
-        assertEquals("f(0) with " + testCase, n * t0, subject.calculateOptimizedWaitCost(zero), EPSILON);
-        assertEquals("f(t0) with " + testCase, t0, subject.calculateOptimizedWaitCost(t0), EPSILON);
+        int expectedT = RaptorCostConverter.toRaptorCost(t0);
+
+        assertEquals(n * expectedT, subject.calculateOptimizedWaitCost(zero), EPSILON, "f(0) with " + testCase);
+        assertEquals(
+                expectedT,
+                subject.calculateOptimizedWaitCost(t0), EPSILON, "f(t0) with " + testCase
+        );
       }
     }
   }
@@ -57,13 +64,13 @@ public class OptimizeTransferCostCalculatorTest {
     subject = new OptimizeTransferCostCalculator(WAIT_RELUCTANCE, 1.0, 2.0);
     subject.setMinSafeTransferTime(d2m);
 
-    assertEquals(236.64, subject.calculateOptimizedWaitCost(1), EPSILON);
-    assertEquals(207.15, subject.calculateOptimizedWaitCost(d12s), EPSILON);
-    assertEquals(185.27, subject.calculateOptimizedWaitCost(d24s), EPSILON);
-    assertEquals(148.14, subject.calculateOptimizedWaitCost(d1m), EPSILON);
-    assertEquals(96.39, subject.calculateOptimizedWaitCost(d4m), EPSILON);
-    assertEquals( 73.60, subject.calculateOptimizedWaitCost(d10m), EPSILON);
-    assertEquals( 24.67, subject.calculateOptimizedWaitCost(d5d), EPSILON);
+    assertEquals(23664.0, subject.calculateOptimizedWaitCost(1), EPSILON);
+    assertEquals(20715.0, subject.calculateOptimizedWaitCost(d12s), EPSILON);
+    assertEquals(18527.0, subject.calculateOptimizedWaitCost(d24s), EPSILON);
+    assertEquals(14814.0, subject.calculateOptimizedWaitCost(d1m), EPSILON);
+    assertEquals(9639.0, subject.calculateOptimizedWaitCost(d4m), EPSILON);
+    assertEquals( 7360.0, subject.calculateOptimizedWaitCost(d10m), EPSILON);
+    assertEquals( 2467.0, subject.calculateOptimizedWaitCost(d5d), EPSILON);
   }
 
   @Test
@@ -71,19 +78,21 @@ public class OptimizeTransferCostCalculatorTest {
     subject = new OptimizeTransferCostCalculator(WAIT_RELUCTANCE, 1.0, 5.0);
     subject.setMinSafeTransferTime(d10m);
 
-    assertEquals(2966.07, subject.calculateOptimizedWaitCost(1), EPSILON);
-    assertEquals(1835.69, subject.calculateOptimizedWaitCost(d1m), EPSILON);
-    assertEquals(1375.15, subject.calculateOptimizedWaitCost(d2m), EPSILON);
-    assertEquals(861.96, subject.calculateOptimizedWaitCost(d5m), EPSILON);
-    assertEquals(431.06, subject.calculateOptimizedWaitCost(d20m), EPSILON);
-    assertEquals(298.70, subject.calculateOptimizedWaitCost(d50m), EPSILON);
-    assertEquals(101.74, subject.calculateOptimizedWaitCost(d5d), EPSILON);
+    assertEquals(296607.0, subject.calculateOptimizedWaitCost(1), EPSILON);
+    assertEquals(183569.0, subject.calculateOptimizedWaitCost(d1m), EPSILON);
+    assertEquals(137515.0, subject.calculateOptimizedWaitCost(d2m), EPSILON);
+    assertEquals(86196.0, subject.calculateOptimizedWaitCost(d5m), EPSILON);
+    assertEquals(43106.0, subject.calculateOptimizedWaitCost(d20m), EPSILON);
+    assertEquals(29870.0, subject.calculateOptimizedWaitCost(d50m), EPSILON);
+    assertEquals(10174.0, subject.calculateOptimizedWaitCost(d5d), EPSILON);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void calculateTxCostWithNoMinSafeTxTimeThrowsException() {
-    var subject = new OptimizeTransferCostCalculator(WAIT_RELUCTANCE, 1.0, 2.0);
-    subject.calculateOptimizedWaitCost(d20m);
+    assertThrows(IllegalStateException.class, () -> {
+      var subject = new OptimizeTransferCostCalculator(WAIT_RELUCTANCE, 1.0, 2.0);
+      subject.calculateOptimizedWaitCost(d20m);
+    });
   }
 
   @Test
@@ -98,8 +107,10 @@ public class OptimizeTransferCostCalculatorTest {
     subject.setMinSafeTransferTime(99999999);
 
     // Then: expect the cost to be equal to the original cost minus cost of waiting
-    int expectedCost = aPath.generalizedCost() - (int)((WAIT_RELUCTANCE + inverseWaitReluctance) * waitTime);
-    assertEquals(expectedCost, subject.cost(aPath)/100);
+    int expectedCost = aPath.generalizedCost()
+            - RaptorCostConverter.toRaptorCost((WAIT_RELUCTANCE + inverseWaitReluctance) * waitTime);
+
+    assertEquals(expectedCost, subject.cost(aPath));
   }
 
   @Test
@@ -115,15 +126,11 @@ public class OptimizeTransferCostCalculatorTest {
     // Set to 6.67% (15/100) of 120m = 1080s
     subject.setMinSafeTransferTime(1080);
 
-    System.out.println(subject.calculateOptimizedWaitCost(WAIT_TIME_L11_L21));
-    System.out.println(subject.calculateOptimizedWaitCost(WAIT_TIME_L21_L31));
-
     // Then: expect the cost to be equal to the original cost plus the wait-time cost
-    double expectedCost = 100.0 * (
-        aPath.generalizedCost()
+    double expectedCost = aPath.generalizedCost()
         + subject.calculateOptimizedWaitCost(WAIT_TIME_L11_L21)
         + subject.calculateOptimizedWaitCost(WAIT_TIME_L21_L31)
-    );
+    ;
 
     assertEquals(expectedCost, subject.cost(aPath), 1.0);
   }

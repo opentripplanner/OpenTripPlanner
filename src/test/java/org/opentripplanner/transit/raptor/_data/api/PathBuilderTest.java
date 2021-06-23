@@ -22,14 +22,12 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_DURATION;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
 import static org.opentripplanner.util.time.DurationUtils.duration;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 
 
 /**
@@ -56,7 +54,7 @@ public class PathBuilderTest implements RaptorTestConstants {
             true, STOP_A, waitTime, transitDuration, TRANSIT_RELUCTANCE_INDEX, STOP_B
     );
 
-    assertEquals(toOtpDomainCost(accessCost + egressCost + transitCost), path.generalizedCost());
+    assertEquals(accessCost + egressCost + transitCost, path.generalizedCost());
     assertEquals(
         "Walk 1m ~ 1 ~ BUS L1 10:02 10:07 ~ 2 ~ Walk 2m [10:00:15 10:09:15 9m $798]",
         path.toString()
@@ -73,6 +71,6 @@ public class PathBuilderTest implements RaptorTestConstants {
         .bus(LINE_31, L31_START, L31_DURATION, STOP_E)
         .egress(EGRESS_DURATION, EGRESS_COST);
     assertEquals(BASIC_PATH_AS_STRING, path.toString());
-    assertEquals(RaptorCostConverter.toOtpDomainCost(TOTAL_COST), path.generalizedCost());
+    assertEquals(TOTAL_COST, path.generalizedCost());
   }
 }

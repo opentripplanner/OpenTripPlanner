@@ -14,7 +14,6 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -130,9 +129,7 @@ public class TransfersPermutationService<T extends RaptorTripSchedule> {
                 departureTime,
                 tx.to().stop(),
                 arrivalTime,
-                RaptorCostConverter.toOtpDomainCost(
-                    tx.generalizedCost()
-                ),
+                tx.generalizedCost(),
                 tx.getTransfer(),
                 p
             )

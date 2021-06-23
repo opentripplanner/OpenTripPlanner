@@ -1,18 +1,17 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_START;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_STRING;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.EGRESS_END;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.basicTripStops;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toOtpDomainCost;
 import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;
@@ -59,7 +58,7 @@ public class PathTest {
 
     @Test
     public void cost() {
-        assertEquals(toOtpDomainCost(TOTAL_COST), subject.generalizedCost());
+        assertEquals(TOTAL_COST, subject.generalizedCost());
     }
 
     @Test
@@ -74,16 +73,7 @@ public class PathTest {
 
     @Test
     public void testToStringDetailed() {
-        assertEquals(
-                "Walk 3m15s 10:00 10:03:15 $390 ~ 1 45s ~ "
-                        + "BUS L11 10:04 10:35 31m $1998 ~ 2 15s ~ "
-                        + "Walk 3m45s 10:35:15 10:39 $450 ~ 3 21m ~ "
-                        + "BUS L21 11:00 11:23 23m $2640 ~ 4 17m ~ "
-                        + "BUS L31 11:40 11:52 12m $1776 ~ 5 15s ~ "
-                        + "Walk 7m45s 11:52:15 12:00 $930 "
-                        + "[10:00 12:00 2h $8184]",
-                subject.toStringDetailed()
-        );
+        assertEquals(BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING, subject.toStringDetailed());
     }
     @Test
     public void equals() {

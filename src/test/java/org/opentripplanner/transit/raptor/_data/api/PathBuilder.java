@@ -186,20 +186,20 @@ public class PathBuilder {
       var durationInSeconds = toTime - fromTime;
       return new AccessPathLeg<>(
           TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
-          toStop, fromTime, toTime, domainCost(), next
+          toStop, fromTime, toTime, raptorCost, next
       );
     }
 
     TransitPathLeg<TestTripSchedule> transitLeg(PathLeg<TestTripSchedule> next) {
       return new TransitPathLeg<>(
-          fromStop, fromTime, toStop, toTime, domainCost(), trip, next
+          fromStop, fromTime, toStop, toTime, raptorCost, trip, next
       );
     }
 
     TransferPathLeg<TestTripSchedule> transferLeg(PathLeg<TestTripSchedule> next) {
       var durationInSeconds = toTime - fromTime;
       return new TransferPathLeg<>(
-          fromStop, fromTime, toStop, toTime, domainCost(),
+          fromStop, fromTime, toStop, toTime, raptorCost,
           TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
           next
       );
@@ -209,7 +209,7 @@ public class PathBuilder {
       var durationInSeconds = toTime - fromTime;
       return new EgressPathLeg<>(
           TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
-          fromStop, fromTime, toTime, domainCost()
+          fromStop, fromTime, toTime, raptorCost
       );
     }
 

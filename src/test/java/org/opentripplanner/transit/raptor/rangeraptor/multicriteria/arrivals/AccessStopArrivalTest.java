@@ -1,14 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public class AccessStopArrivalTest {
 
@@ -16,12 +18,13 @@ public class AccessStopArrivalTest {
     private static final int DEPARTURE_TIME = 8 * 60 * 60;
     private static final int ACCESS_DURATION = 10 * 60;
     private static final int ALIGHT_TIME = DEPARTURE_TIME + ACCESS_DURATION;
-    private static final int COST = 500;
+    private static final TestTransfer WALK = walk(ALIGHT_STOP, ACCESS_DURATION);
+    private static final int COST = WALK.generalizedCost();
 
     private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
         DEPARTURE_TIME,
         COST,
-        walk(ALIGHT_STOP, ACCESS_DURATION)
+        WALK
     );
 
     @Test
@@ -57,21 +60,21 @@ public class AccessStopArrivalTest {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void equalsThrowsExceptionByDesign() {
-        subject.equals(null);
+        assertThrows(IllegalStateException.class, () ->  subject.equals(null));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void hashCodeThrowsExceptionByDesign() {
-        subject.hashCode();
+        assertThrows(IllegalStateException.class, subject::hashCode);
     }
 
     @Test
     public void testToString() {
         assertEquals(
-                "Access { stop: 100, duration: 10m, arrival-time: 8:10 $500 }",
+                "Access { stop: 100, duration: 10m, arrival-time: 8:10 $2400.00 }",
                 subject.toString()
         );
     }
@@ -93,9 +96,8 @@ public class AccessStopArrivalTest {
     @Test
     public void timeShiftNotAllowed() {
         AbstractStopArrival<RaptorTripSchedule> original, result;
-        TestTransfer access = new TestTransfer(ALIGHT_STOP, ACCESS_DURATION) {
-            @Override public int latestArrivalTime(int time) { return -1; }
-        };
+        RaptorTransfer access = transfer(-1);
+
         original = new AccessStopArrival<>(DEPARTURE_TIME, COST, access);
 
         final int dTime = 60;
@@ -110,13 +112,26 @@ public class AccessStopArrivalTest {
         AbstractStopArrival<RaptorTripSchedule> original, result;
 
         // Allow time-shift, but only by dTime
-        TestTransfer access = new TestTransfer(ALIGHT_STOP, ACCESS_DURATION) {
-            @Override public int latestArrivalTime(int time) { return ALIGHT_TIME + dTime; }
-        };
+        RaptorTransfer access = transfer(ALIGHT_TIME + dTime);
+
         original = new AccessStopArrival<>(DEPARTURE_TIME, COST, access);
 
         result = original.timeShiftNewArrivalTime(ALIGHT_TIME + 7200);
 
         assertEquals(ALIGHT_TIME + dTime, result.arrivalTime());
+    }
+
+    private static RaptorTransfer transfer(final int latestArrivalTime) {
+        return new RaptorTransfer() {
+            @Override public int stop() { return 0; }
+            @Override public int generalizedCost() { return 0; }
+            @Override public int durationInSeconds() { return 0; }
+            @Override public int earliestDepartureTime(int t) { return t; }
+
+            @Override
+            public int latestArrivalTime(int requestedArrivalTime) {
+                return latestArrivalTime;
+            }
+        };
     }
 }

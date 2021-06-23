@@ -285,9 +285,17 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return null; }
 
-        earliestBoardTime = calculator.minusDuration(sourceStopArrival.arrivalTime(), slackProvider.alightSlack());
+        this.earliestBoardTime = calculator.minusDuration(
+                sourceStopArrival.arrivalTime(),
+                slackProvider.alightSlack()
+        );
 
-        return txService.find(timetable, sourceStopArrival.trip(), sourceStopArrival.stop(), earliestBoardTime);
+        return txService.find(
+                timetable,
+                sourceStopArrival.trip(),
+                sourceStopArrival.stop(),
+                earliestBoardTime
+        );
     }
 
     private void transfersForRound() {

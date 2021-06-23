@@ -8,7 +8,6 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -51,7 +50,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         return new Path<>(
                 iterationDepartureTime,
                 accessLeg,
-                RaptorCostConverter.toOtpDomainCost(destinationArrival.cost())
+                destinationArrival.cost()
         );
     }
 
@@ -68,7 +67,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
                 prevArrival.stop(),
                 departureTime,
                 arrivalTime,
-                domainCost(destArrival),
+                legCost(destArrival),
                 mapNextLeg(prevArrival, arrivalTime)
         );
     }
@@ -99,14 +98,14 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         int arrivalTime = r.alightTime() + slackProvider.alightSlack(trip.pattern());
 
         return new TransitPathLeg<>(
-            fromStop,
-            r.boardTime(),
-            toStop,
-            r.alightTime(),
-            domainCost(fromStopArrival),
-            trip,
-            // Recursive call to map next leg
-            mapNextLeg(toStopArrival, arrivalTime)
+                fromStop,
+                r.boardTime(),
+                toStop,
+                r.alightTime(),
+                legCost(fromStopArrival),
+                trip,
+                // Recursive call to map next leg
+                mapNextLeg(toStopArrival, arrivalTime)
         );
     }
 
@@ -122,7 +121,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
                 prevStopArrivalTime,
                 toStopArrival.stop(),
                 arrivalTime,
-                domainCost(fromStopArrival),
+                legCost(fromStopArrival),
                 fromStopArrival.transferPath().transfer(),
                 mapNextLeg(toStopArrival, arrivalTime)
         );
@@ -142,16 +141,16 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
 
         // No need to time-shift the egress leg, this is done when stopArrival is created
         return new EgressPathLeg<>(
-            egress,
-            accessArrival.stop(),
-            targetFromTime,
-            targetToTime,
-            RaptorCostConverter.toOtpDomainCost(accessArrival.cost())
+                egress,
+                accessArrival.stop(),
+                targetFromTime,
+                targetToTime,
+                accessArrival.cost()
         );
     }
 
-    private int domainCost(ArrivalView<T> from) {
+    private static int legCost(ArrivalView<?> from) {
         if(from.cost() == -1) { return -1; }
-        return RaptorCostConverter.toOtpDomainCost(from.cost() - from.previous().cost());
+        return from.cost() - from.previous().cost();
     }
 }

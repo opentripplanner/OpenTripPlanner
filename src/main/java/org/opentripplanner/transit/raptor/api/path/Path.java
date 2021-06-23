@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -53,11 +54,12 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
         this(
             iterationDepartureTime,
             accessLeg,
-            accessLeg.tailGeneralizedCost()
+            accessLeg.generalizedCostTotal()
         );
     }
 
     /** Copy constructor */
+    @SuppressWarnings("CopyConstructorMissesField")
     protected Path(Path<T> original) {
         this(original.iterationDepartureTime, original.accessLeg, original.generalizedCost);
     }
@@ -110,10 +112,25 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     }
 
     /**
-     * The total cost computed for this path. This is for debugging and filtering purposes.
+     * The total Raptor cost computed for this path. This is for debugging and filtering purposes.
+     * <p>
+     * {@code -1} is returned if no cost exist.
+     * <p>
+     * The unit is centi-seconds
      */
     public int generalizedCost() {
         return generalizedCost;
+    }
+
+    /**
+     * The computed generalized-cost for this path leg.
+     * <p>
+     * {@code -1} is returned if no cost exist.
+     * <p>
+     * The unit is seconds (OTP Domain/AStar unit)
+     */
+    public int otpDomainCost() {
+        return RaptorCostConverter.toOtpDomainCost(generalizedCost());
     }
 
     /**
@@ -187,7 +204,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                         );
                         if (detailed) {
                             buf.duration(leg.duration());
-                            buf.cost(leg.generalizedCost());
+                            buf.costCentiSec(leg.generalizedCost());
                         }
                     }
                     else if (leg.isTransferLeg()) {
@@ -204,17 +221,21 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             }
             buf.space();
         }
-        return buf
-                .append("[")
-                .time(startTime, endTime)
-                .duration(endTime - startTime)
-                .cost(generalizedCost)
-                .append("]").toString();
+        // Add summary info
+        {
+            buf.append("[").time(startTime, endTime).duration(endTime - startTime);
+
+            if (detailed) { buf.costCentiSec(generalizedCost); }
+            else { buf.costSec(generalizedCost); }
+
+            buf.append("]");
+        }
+        return buf.toString();
     }
 
     private void addWalkDetails(boolean detailed, PathStringBuilder buf, PathLeg<T> leg) {
         if(detailed) {
-            buf.timeAndCost(leg.fromTime(), leg.toTime(), leg.generalizedCost());
+            buf.timeAndCostCentiSec(leg.fromTime(), leg.toTime(), leg.generalizedCost());
         }
     }
 

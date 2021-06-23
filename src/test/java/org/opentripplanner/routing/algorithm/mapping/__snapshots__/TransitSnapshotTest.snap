@@ -1745,7 +1745,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 3374,
+      "generalizedCost": 3375,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -2133,7 +2133,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "systemNotices": [ ],
       "tooSloped": false,
       "transitTimeSeconds": 1264,
-      "waitTimeAdjustedGeneralizedCost": 292607,
+      "waitTimeAdjustedGeneralizedCost": 292691,
       "waitingTimeSeconds": 237,
       "walkOnly": false,
       "walkingAllTheWay": false
@@ -4005,7 +4005,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "systemNotices": [ ],
       "tooSloped": false,
       "transitTimeSeconds": 1133,
-      "waitTimeAdjustedGeneralizedCost": 250240,
+      "waitTimeAdjustedGeneralizedCost": 250211,
       "waitingTimeSeconds": 237,
       "walkOnly": false,
       "walkingAllTheWay": false
