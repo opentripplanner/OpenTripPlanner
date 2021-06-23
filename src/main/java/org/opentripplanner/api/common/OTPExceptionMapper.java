@@ -10,7 +10,6 @@ import javax.ws.rs.ext.Provider;
 public class OTPExceptionMapper implements ExceptionMapper<Exception> {
 
     public Response toResponse(Exception ex) {
-        // Show the exception in the server log
         BugsnagReporter.reportErrorToBugsnag("Unhandled server exception", ex);
 
         // Return the short form message to the client
