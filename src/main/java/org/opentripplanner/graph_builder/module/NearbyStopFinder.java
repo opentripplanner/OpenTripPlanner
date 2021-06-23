@@ -4,6 +4,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.Comparator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -223,9 +224,7 @@ public class NearbyStopFinder {
                 Collection<State> states = locationStates.getValue();
                 // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
                 // the minimum walking distance
-                State min = Collections.min(states,
-                    (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance)
-                );
+                State min = Collections.min(states, Comparator.comparing(State::getWeight));
 
                 // If the best state for this FlexStopLocation is a SplitterVertex, we want to get the
                 // TemporaryStreetLocation instead. This allows us to reach SplitterVertices in both
