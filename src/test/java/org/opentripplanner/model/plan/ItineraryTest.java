@@ -1,14 +1,14 @@
 package org.opentripplanner.model.plan;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import java.util.GregorianCalendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
@@ -159,7 +159,8 @@ public class ItineraryTest implements PlanTestConstants {
 
     private void assertSameLocation(Place expected, Place actual) {
         assertTrue(
-            "Same location? Expected: " + expected + ", actual: " + actual,
-            expected.sameLocation(actual));
+                expected.sameLocation(actual),
+                "Same location? Expected: " + expected + ", actual: " + actual
+        );
     }
 }
