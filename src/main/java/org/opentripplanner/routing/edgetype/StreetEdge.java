@@ -386,16 +386,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             weight *= options.getReluctance(traverseMode, walkingBike);
         }
 
-        StateEditor s1 = s0.edit(this);
-        if (walkingBike != backWalkingBike) {
-            if (walkingBike) {
-                switchToWalkingBike(s0.getOptions(), s1);
-            } else {
-                switchToBiking(s0.getOptions(), s1);
-            }
-        }
-
-        s1.setBackMode(traverseMode);
+        var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
         if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) {
             return null;

@@ -64,7 +64,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
             return null;
         }
 
-        StateEditor s1 = createElevatorStateEditor(s0, this);
+        StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
         s1.incrementWeight(
             this.travelTime > 0 ? this.travelTime : (options.elevatorHopCost * this.levels)
         );

@@ -40,7 +40,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
     
     @Override
     public State traverse(State s0) {
-        StateEditor s1 = createElevatorStateEditor(s0, this);
+        StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
         if (s1 == null) {
             return null;
         }
