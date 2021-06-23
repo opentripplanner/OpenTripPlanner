@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.bike_rental;
 
+import static java.util.Locale.ENGLISH;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.ResourceBundleSingleton;
-
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 // TODO OTP2 - This class is used both for internal and external API representation,
 //           - a external API version should be created to decouple the internal model
@@ -80,7 +81,7 @@ public class BikeRentalStation implements Serializable, Cloneable {
     }
     
     public String toString () {
-        return String.format(Locale.US, "Bike rental station %s at %.6f, %.6f", name, y, x); 
+        return String.format(ENGLISH, "Bike rental station %s at %.6f, %.6f", name, y, x);
     }
 
     @Override

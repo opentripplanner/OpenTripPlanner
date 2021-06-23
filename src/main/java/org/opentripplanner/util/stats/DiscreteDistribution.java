@@ -1,10 +1,11 @@
 package org.opentripplanner.util.stats;
 
-import java.text.MessageFormat;
+import static java.util.Locale.ENGLISH;
 
 import com.google.common.collect.Multiset;
 import com.google.common.collect.SortedMultiset;
 import com.google.common.collect.TreeMultiset;
+import java.text.MessageFormat;
 
 interface Quantifiable<K extends Quantifiable<K>> extends Comparable<K> {
 
@@ -102,7 +103,7 @@ public class DiscreteDistribution<K extends Quantifiable<?>> {
         public String toString() {
             double min = Math.exp(log / mult);
             double max = Math.exp((log + 1) / mult);
-            return String.format("%.2f-%.2f", min, max);
+            return String.format(ENGLISH, "%.2f-%.2f", min, max);
         }
     }
 

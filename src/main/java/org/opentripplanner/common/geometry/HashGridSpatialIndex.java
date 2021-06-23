@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.locationtech.jts.geom.Coordinate;
@@ -225,9 +226,10 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     }
 
     public String toString() {
-        return String
-                .format("HashGridSpatialIndex %f x %f, %d bins allocated, %d objs, %d entries (avg %.2f entries/bin, %.2f entries/object)",
-                        this.xBinSize, this.yBinSize, this.nBins, this.nObjects, this.nEntries,
-                        this.nEntries * 1.0 / this.nBins, this.nEntries * 1.0 / this.nObjects);
+        return String.format(
+                Locale.ENGLISH,
+                "HashGridSpatialIndex %f x %f, %d bins allocated, %d objs, %d entries (avg %.2f entries/bin, %.2f entries/object)",
+                this.xBinSize, this.yBinSize, this.nBins, this.nObjects, this.nEntries,
+                this.nEntries * 1.0 / this.nBins, this.nEntries * 1.0 / this.nObjects);
     }
 }

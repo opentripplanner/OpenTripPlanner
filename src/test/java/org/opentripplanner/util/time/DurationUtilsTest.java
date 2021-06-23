@@ -56,20 +56,20 @@ public class DurationUtilsTest {
   public void msToSecondsStr() {
     Locale defaultLocale = Locale.getDefault();
     try {
+      // Setting the default locale should have no effect
       Locale.setDefault(Locale.FRANCE);
       assertEquals("0 seconds", DurationUtils.msToSecondsStr(0));
-      assertEquals("0,001 seconds", DurationUtils.msToSecondsStr(1));
-      assertEquals("0,099 seconds", DurationUtils.msToSecondsStr(99));
-      assertEquals("0,10 seconds", DurationUtils.msToSecondsStr(100));
-      assertEquals("0,99 seconds", DurationUtils.msToSecondsStr(994));
-      assertEquals("1,0 seconds", DurationUtils.msToSecondsStr(995));
-      assertEquals("1,0 seconds", DurationUtils.msToSecondsStr(999));
+      assertEquals("0.001 seconds", DurationUtils.msToSecondsStr(1));
+      assertEquals("0.099 seconds", DurationUtils.msToSecondsStr(99));
+      assertEquals("0.10 seconds", DurationUtils.msToSecondsStr(100));
+      assertEquals("0.99 seconds", DurationUtils.msToSecondsStr(994));
+      assertEquals("1.0 seconds", DurationUtils.msToSecondsStr(995));
+      assertEquals("1.0 seconds", DurationUtils.msToSecondsStr(999));
       assertEquals("1 second", DurationUtils.msToSecondsStr(1000));
-      assertEquals("1,0 seconds", DurationUtils.msToSecondsStr(1001));
-      assertEquals("9,9 seconds", DurationUtils.msToSecondsStr(9_949));
+      assertEquals("1.0 seconds", DurationUtils.msToSecondsStr(1001));
+      assertEquals("9.9 seconds", DurationUtils.msToSecondsStr(9_949));
       assertEquals("10 seconds", DurationUtils.msToSecondsStr(9_950));
-      assertEquals("-0,456 seconds", DurationUtils.msToSecondsStr(-456));
-    }
+      assertEquals("-0.456 seconds", DurationUtils.msToSecondsStr(-456));    }
     finally {
       Locale.setDefault(defaultLocale);
     }

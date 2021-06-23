@@ -1,9 +1,10 @@
 package org.opentripplanner.util.time;
 
-import org.opentripplanner.model.calendar.ServiceDate;
+import static java.util.Locale.ENGLISH;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 
 /**
@@ -78,9 +79,9 @@ public class DurationUtils {
   public static String msToSecondsStr(long timeMs) {
     if(timeMs == 0) { return "0 seconds"; }
     if(timeMs == 1000) { return "1 second"; }
-    if(timeMs < 100) { return String.format ("%.3f seconds",  timeMs/1000.0); }
-    if(timeMs < 995) { return String.format ("%.2f seconds",  timeMs/1000.0); }
-    if(timeMs < 9950) { return String.format ("%.1f seconds",  timeMs/1000.0); }
-    else { return String.format ("%.0f seconds",  timeMs/1000.0); }
+    if(timeMs < 100) { return String.format (ENGLISH, "%.3f seconds",  timeMs/1000.0); }
+    if(timeMs < 995) { return String.format (ENGLISH, "%.2f seconds",  timeMs/1000.0); }
+    if(timeMs < 9950) { return String.format (ENGLISH, "%.1f seconds",  timeMs/1000.0); }
+    else { return String.format (ENGLISH, "%.0f seconds",  timeMs/1000.0); }
   }
 }

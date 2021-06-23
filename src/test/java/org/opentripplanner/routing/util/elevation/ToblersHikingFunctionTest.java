@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.util.elevation;
 
-import org.junit.Test;
-
+import static java.util.Locale.ENGLISH;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.routing.util.elevation.ToblersHikingFunctionTest.TestCase.tc;
+
+import org.junit.Test;
 
 public class ToblersHikingFunctionTest {
 
@@ -59,7 +60,11 @@ public class ToblersHikingFunctionTest {
         }
 
         String describe() {
-            return String.format("Multiplier at %.1f%% slope angle with dx %.1f and dh %.1f.", slopeAnglePercentage, dx, dh);
+            return String.format(
+                    ENGLISH,
+                    "Multiplier at %.1f%% slope angle with dx %.1f and dh %.1f.",
+                    slopeAnglePercentage, dx, dh
+            );
         }
     }
 }
