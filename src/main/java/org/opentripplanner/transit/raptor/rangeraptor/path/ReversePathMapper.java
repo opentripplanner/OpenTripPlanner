@@ -67,7 +67,6 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
                 prevArrival.stop(),
                 departureTime,
                 arrivalTime,
-                legCost(destArrival),
                 mapNextLeg(prevArrival, arrivalTime)
         );
     }
@@ -121,7 +120,6 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
                 prevStopArrivalTime,
                 toStopArrival.stop(),
                 arrivalTime,
-                legCost(fromStopArrival),
                 fromStopArrival.transferPath().transfer(),
                 mapNextLeg(toStopArrival, arrivalTime)
         );
@@ -144,8 +142,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
                 egress,
                 accessArrival.stop(),
                 targetFromTime,
-                targetToTime,
-                accessArrival.cost()
+                targetToTime
         );
     }
 

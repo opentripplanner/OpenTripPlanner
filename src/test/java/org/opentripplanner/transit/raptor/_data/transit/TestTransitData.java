@@ -78,10 +78,19 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     return this;
   }
 
-  public TestTransitData withGuaranteedTransfers(
-          TestTripSchedule fromTrip, int fromStopPos,
-          TestTripSchedule toTrip, int toStopPos
+  public TestTransitData withTransfer(int fromStop, TestTransfer transfer) {
+    expandNumOfStops(fromStop);
+    transfersByStop.get(fromStop).add(transfer);
+    return this;
+  }
+
+  public TestTransitData withGuaranteedTransfer(
+          TestTripSchedule fromTrip, int fromStop,
+          TestTripSchedule toTrip, int toStop
   ) {
+    int fromStopPos = fromTrip.pattern().findStopPositionAfter(0, fromStop);
+    int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStop);
+
     for (TestRoute route : routes) {
       for (int i = 0; i < route.timetable().numberOfTripSchedules(); i++) {
         var trip = route.timetable().getTripSchedule(i);

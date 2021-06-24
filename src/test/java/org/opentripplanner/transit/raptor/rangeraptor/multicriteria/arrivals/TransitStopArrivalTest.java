@@ -36,11 +36,8 @@ public class TransitStopArrivalTest {
             .arrivals(TRANSIT_ALIGHT_TIME)
             .build();
 
-    private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            ACCESS_DEPARTURE_TIME,
-            ACCESS_COST,
-            ACCESS_WALK
-    );
+    private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL
+            = new AccessStopArrival<>(ACCESS_DEPARTURE_TIME, ACCESS_WALK);
 
     private final TransitStopArrival<RaptorTripSchedule> subject = new TransitStopArrival<>(
             ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),

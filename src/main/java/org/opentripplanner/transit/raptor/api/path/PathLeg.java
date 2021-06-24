@@ -95,6 +95,25 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
     }
 
     /**
+     * @return {@code true} if access leg, if not {@code false}.
+     */
+    default boolean isAccessLeg() {
+        return false;
+    }
+
+    /**
+     * Utility method performing a cast to {@link AccessPathLeg}, use with care:
+     * <pre>
+     * if(it.isAccessLeg()} {
+     *     AccessPathLeg&lt;T&gt; transit = it.asAccessLeg();
+     *     ...
+     * </pre>
+     */
+    default AccessPathLeg<T> asAccessLeg() {
+        return (AccessPathLeg<T>) this;
+    }
+
+    /**
      * @return {@code true} if transit leg, if not {@code false}.
      */
     default boolean isTransitLeg() {

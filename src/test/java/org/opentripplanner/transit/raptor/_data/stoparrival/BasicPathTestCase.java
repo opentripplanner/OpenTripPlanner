@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walkCost;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
@@ -10,8 +9,9 @@ import static org.opentripplanner.util.time.TimeUtils.time;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
@@ -76,7 +76,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
     private static final double[] TRANSIT_RELUCTANCE = new double[] { 1.0 };
     public static final int TRANSIT_RELUCTANCE_INDEX = 0;
     private static final double WAIT_RELUCTANCE = 0.8;
-    public static final double WALK_RELUCTANCE = 2.0;
 
     /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
     private static final int[] STOP_COSTS = {0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0};
@@ -91,7 +90,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
     public static final int ACCESS_START = time("10:00");
     public static final int ACCESS_END = time("10:03:15");
     public static final int ACCESS_DURATION = ACCESS_END - ACCESS_START;
-    public static final int ACCESS_COST = walkCost(ACCESS_DURATION, WALK_RELUCTANCE);
+    public static final RaptorTransfer ACCESS_TRANSFER = TestTransfer.walk(STOP_A, ACCESS_DURATION);
+    public static final int ACCESS_COST = ACCESS_TRANSFER.generalizedCost();
 
     // Trip 1 (A ~ BUS L11 10:04 10:35 ~ B)
     public static final int L11_START = time("10:04");
@@ -105,7 +105,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
     private static final int TX_START = time("10:35:15");
     private static final int TX_END = time("10:39:00");
     public static final int TX_DURATION = TX_END - TX_START;
-    public static final int TX_COST = toRaptorCost(TX_DURATION * WALK_RELUCTANCE);
+    public static final RaptorTransfer TX_TRANSFER = TestTransfer.walk(STOP_C, TX_DURATION);
+    public static final int TX_COST = TX_TRANSFER.generalizedCost();
 
     // Trip 2 (C ~ BUS L21 11:00 11:23 ~ D)
     public static final int L21_START = time("11:00");
@@ -127,7 +128,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
     public static final int EGRESS_START = time("11:52:15");
     public static final int EGRESS_END = time("12:00");
     public static final int EGRESS_DURATION = EGRESS_END - EGRESS_START;
-    public static final int EGRESS_COST = walkCost(EGRESS_DURATION, WALK_RELUCTANCE);
+    public static final RaptorTransfer EGRESS_TRANSFER = TestTransfer.walk(STOP_E, EGRESS_DURATION);
+    public static final int EGRESS_COST = EGRESS_TRANSFER.generalizedCost();
 
     public static final int TRIP_DURATION = EGRESS_END - ACCESS_START;
 
@@ -187,7 +189,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
         prevArrival = new Bus(3, STOP_E, L31_END, LINE_31_COST, TRIP_3, prevArrival);
         Egress egress = new Egress(EGRESS_START, EGRESS_END, EGRESS_COST, prevArrival);
         return new DestinationArrival<>(
-                walk(egress.previous().stop(), egress.durationInSeconds(), walkCost(egress.durationInSeconds(), WALK_RELUCTANCE)),
+                walk(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
                 egress.arrivalTime(),
                 egress.additionalCost()
@@ -208,7 +210,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
         nextArrival = new Bus(3, STOP_A, L11_START, LINE_11_COST, TRIP_1, nextArrival);
         Egress egress = new Egress(ACCESS_END, ACCESS_START, ACCESS_COST, nextArrival);
         return new DestinationArrival<>(
-                walk(egress.previous().stop(), egress.durationInSeconds(), walkCost(egress.durationInSeconds(), WALK_RELUCTANCE)),
+                walk(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
                 egress.arrivalTime(),
                 egress.additionalCost()
@@ -221,7 +223,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
      */
     public static Path<TestTripSchedule> basicTripAsPath() {
         PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
-                EGRESS, STOP_E, EGRESS_START, EGRESS_END, EGRESS_COST
+                EGRESS, STOP_E, EGRESS_START, EGRESS_END
         );
         TransitPathLeg<TestTripSchedule> leg5 = new TransitPathLeg<>(
             STOP_D, L31_START, STOP_E, L31_END, LINE_31_COST, TRIP_3, leg6
@@ -229,19 +231,15 @@ public class BasicPathTestCase implements RaptorTestConstants {
         TransitPathLeg<TestTripSchedule> leg4 = new TransitPathLeg<>(
             STOP_C, L21_START, STOP_D, L21_END, LINE_21_COST, TRIP_2, leg5
         );
-        var transfer = new RaptorTransfer() {
-            @Override public int stop() { return STOP_C; }
-            @Override public int durationInSeconds() { return TX_END - TX_START; }
-            @Override public int generalizedCost() { return walkCost(durationInSeconds()); }
-        };
+        var transfer = TestTransfer.walk(STOP_C, TX_END - TX_START);
         PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
-            STOP_B, TX_START, STOP_C, TX_END, TX_COST, transfer, leg4.asTransitLeg()
+            STOP_B, TX_START, STOP_C, TX_END, transfer, leg4.asTransitLeg()
         );
         TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
             STOP_A, L11_START, STOP_B, L11_END, LINE_11_COST, TRIP_1, leg3
         );
         AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
-            ACCESS, STOP_A, ACCESS_START, ACCESS_END, ACCESS_COST, leg2.asTransitLeg()
+            ACCESS, STOP_A, ACCESS_START, ACCESS_END, leg2.asTransitLeg()
         );
         return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
     }
@@ -257,6 +255,15 @@ public class BasicPathTestCase implements RaptorTestConstants {
         assertEquals(BOARD_SLACK + ALIGHT_SLACK, L11_WAIT_DURATION);
         assertEquals(L31_END + ALIGHT_SLACK, EGRESS_START);
         assertEquals(
+            durationToStr(TRIP_DURATION),
+            durationToStr(
+                ACCESS_DURATION
+                    + L11_DURATION + L11_WAIT_DURATION
+                    + TX_DURATION
+                    + L21_DURATION + L21_WAIT_DURATION
+                    + L31_DURATION + L31_WAIT_DURATION
+                    + EGRESS_DURATION
+            ),
             "Access: " + durationToStr(ACCESS_DURATION)
                 + ", Line 11: " + durationToStr(L11_DURATION)
                 + " (wait " + durationToStr(L11_WAIT_DURATION) + ")"
@@ -266,16 +273,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
                 + ", Line 31: " + durationToStr(L31_DURATION)
                 + " (wait " + durationToStr(L31_WAIT_DURATION) + ")"
                 + ", Egress: " + durationToStr(EGRESS_DURATION)
-            ,
-            durationToStr(TRIP_DURATION),
-            durationToStr(
-                ACCESS_DURATION
-                    + L11_DURATION + L11_WAIT_DURATION
-                    + TX_DURATION
-                    + L21_DURATION + L21_WAIT_DURATION
-                    + L31_DURATION + L31_WAIT_DURATION
-                    + EGRESS_DURATION
-            )
         );
 
         // The calculator is not under test here, so we assert everything is as expected
@@ -298,9 +295,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
             )
         );
 
-        assertEquals(
-            BASIC_PATH_AS_STRING,
-            basicTripAsPath().toString()
-        );
+        assertEquals(BASIC_PATH_AS_STRING, basicTripAsPath().toString());
+
+        assertEquals(BASIC_PATH_AS_DETAILED_STRING, basicTripAsPath().toStringDetailed());
     }
 }

@@ -27,45 +27,26 @@ public class TestTransfer implements RaptorTransfer {
     private final Integer opening;
     private final Integer closing;
 
-    private TestTransfer(
-        int stop,
-        int durationInSeconds,
-        int cost,
-        int numberOfRides,
-        boolean stopReachedOnBoard
-    ) {
-        this(stop, durationInSeconds, cost, numberOfRides, stopReachedOnBoard, null, null);
-    }
-
-    private TestTransfer(
-            int stop,
-            int durationInSeconds,
-            int cost,
-            int numberOfRides,
-            boolean stopReachedOnBoard,
-            Integer opening,
-            Integer closing
-    ) {
-        this.stop = stop;
-        this.durationInSeconds = durationInSeconds;
-        this.cost = cost;
-        this.numberOfRides = numberOfRides;
-        this.stopReachedOnBoard = stopReachedOnBoard;
-        this.opening = opening;
-        this.closing = closing;
-    }
-
-    /** Only use this to override this class, use factory methods to create instances. */
-    protected TestTransfer(int stop, int durationInSeconds) {
-        this(stop, durationInSeconds, walkCost(durationInSeconds), DEFAULT_NUMBER_OF_RIDES, STOP_REACHED_ON_FOOT);
+    private TestTransfer(Builder builder) {
+        this.stop = builder.stop;
+        this.durationInSeconds = builder.durationInSeconds;
+        this.cost = builder.cost;
+        this.numberOfRides = builder.numberOfRides;
+        this.stopReachedOnBoard = builder.stopReachedOnBoard;
+        this.opening = builder.opening;
+        this.closing = builder.closing;
     }
 
     public static TestTransfer walk(int stop, int durationInSeconds) {
-        return new TestTransfer(stop, durationInSeconds, walkCost(durationInSeconds), DEFAULT_NUMBER_OF_RIDES, STOP_REACHED_ON_FOOT, null, null);
+        return new Builder(stop, durationInSeconds).build();
+    }
+
+    public static TestTransfer walk(int stop, int durationInSeconds, double walkReluctance) {
+        return walk(stop, durationInSeconds, walkCost(durationInSeconds, walkReluctance));
     }
 
     public static TestTransfer walk(int stop, int durationInSeconds, int cost) {
-        return new TestTransfer(stop, durationInSeconds, cost, DEFAULT_NUMBER_OF_RIDES, STOP_REACHED_ON_FOOT, null, null);
+        return new Builder(stop, durationInSeconds).withCost(cost).build();
     }
 
     /**
@@ -75,11 +56,14 @@ public class TestTransfer implements RaptorTransfer {
      * 08:00 and 16:00 every day.
      */
     public static TestTransfer walk(int stop, int durationInSeconds, int opening, int closing) {
-        return new TestTransfer(stop, durationInSeconds, walkCost(durationInSeconds), DEFAULT_NUMBER_OF_RIDES, STOP_REACHED_ON_FOOT, opening, closing);
+        return new Builder(stop, durationInSeconds).withOpeningHours(opening, closing).build();
     }
 
     public static TestTransfer walk(int stop, int durationInSeconds, int cost, int opening, int closing) {
-        return new TestTransfer(stop, durationInSeconds, cost, DEFAULT_NUMBER_OF_RIDES, STOP_REACHED_ON_FOOT, opening, closing);
+        return new Builder(stop, durationInSeconds)
+                .withCost(cost)
+                .withOpeningHours(opening, closing)
+                .build();
     }
 
     /** Create a new flex access and arrive stop onBoard with 1 ride/extra transfer. */
@@ -88,14 +72,18 @@ public class TestTransfer implements RaptorTransfer {
     }
 
     /** Create a new flex access and arrive stop onBoard with 1 ride/extra transfer. */
-    public static TestTransfer flex(int stop, int durationInSeconds, int cost) {
-        return flex(stop, durationInSeconds, 1, cost);
+    public static TestTransfer flex(int stop, int durationInSeconds, int nRides) {
+        return flex(stop, durationInSeconds, nRides, walkCost(durationInSeconds));
     }
 
     /** Create a new flex access and arrive stop onBoard. */
     public static TestTransfer flex(int stop, int durationInSeconds, int nRides, int cost) {
         assert nRides > DEFAULT_NUMBER_OF_RIDES;
-        return new TestTransfer(stop, durationInSeconds, cost, nRides, STOP_REACHED_ON_BOARD);
+        return new Builder(stop, durationInSeconds)
+                .stopReachedOnBoard()
+                .withNRides(nRides)
+                .withCost(cost)
+                .build();
     }
 
     /** Create a flex access arriving at given stop by walking with 1 ride/extra transfer. */
@@ -104,25 +92,28 @@ public class TestTransfer implements RaptorTransfer {
     }
 
     /** Create a flex access arriving at given stop by walking with 1 ride/extra transfer. */
-    public static TestTransfer flexAndWalk(int stop, int durationInSeconds, int cost) {
-        return flexAndWalk(stop, durationInSeconds, 1, cost);
+    public static TestTransfer flexAndWalk(int stop, int durationInSeconds, int nRides) {
+        return flexAndWalk(stop, durationInSeconds, nRides, walkCost(durationInSeconds));
     }
 
     /** Create a flex access arriving at given stop by walking. */
     public static TestTransfer flexAndWalk(int stop, int durationInSeconds, int nRides, int cost) {
         assert nRides > DEFAULT_NUMBER_OF_RIDES;
-        return new TestTransfer(stop, durationInSeconds, cost, nRides, STOP_REACHED_ON_FOOT);
+        return new Builder(stop, durationInSeconds)
+                .withNRides(nRides)
+                .withCost(cost)
+                .build();
     }
 
     /** Set opening and closing hours and return a new object. */
     public TestTransfer openingHours(int opening, int closing) {
-        return new TestTransfer(stop, durationInSeconds, cost, numberOfRides, stopReachedOnBoard, opening, closing);
+        return new Builder(this).withOpeningHours(opening, closing).build();
     }
 
     public static Collection<RaptorTransfer> transfers(int ... stopTimes) {
         List<RaptorTransfer> legs = new ArrayList<>();
         for (int i = 0; i < stopTimes.length; i+=2) {
-            legs.add(walk(stopTimes[i], stopTimes[i+1], walkCost(stopTimes[i+1])));
+            legs.add(walk(stopTimes[i], stopTimes[i+1]));
         }
         return legs;
     }
@@ -206,4 +197,59 @@ public class TestTransfer implements RaptorTransfer {
         return asString();
     }
 
+    /**
+     * Do not use the builder, use the static factory methods. Only use the builder if you
+     * need to override the {@link TestTransfer class}.
+     */
+    protected static class Builder {
+        int stop;
+        int durationInSeconds;
+        int cost;
+        int numberOfRides = DEFAULT_NUMBER_OF_RIDES;
+        boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
+        Integer opening = null;
+        Integer closing = null;
+
+        Builder(int stop, int durationInSeconds) {
+            this.stop = stop;
+            this.durationInSeconds = durationInSeconds;
+            this.cost = walkCost(durationInSeconds);
+        }
+
+        Builder(TestTransfer transfer) {
+            this.stop = transfer.stop;
+            this.durationInSeconds = transfer.durationInSeconds;
+            this.cost = transfer.cost;
+            this.numberOfRides = transfer.numberOfRides;
+            this.stopReachedOnBoard = transfer.stopReachedOnBoard;
+            this.opening = transfer.opening;
+            this.closing = transfer.closing;
+        }
+
+
+        Builder withCost(int cost) {
+            this.cost = cost;
+            return this;
+        }
+
+        Builder withNRides(int numberOfRides) {
+            this.numberOfRides = numberOfRides;
+            return this;
+        }
+
+        Builder stopReachedOnBoard() {
+            this.stopReachedOnBoard = STOP_REACHED_ON_BOARD;
+            return this;
+        }
+
+        Builder withOpeningHours(int opening, int closing) {
+            this.opening = opening;
+            this.closing = closing;
+            return this;
+        }
+
+        TestTransfer build() {
+            return new TestTransfer(this);
+        }
+    }
 }

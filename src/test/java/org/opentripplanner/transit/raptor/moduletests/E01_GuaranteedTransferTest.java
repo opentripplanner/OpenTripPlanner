@@ -54,13 +54,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
         var tripB = r2.timetable().getTripSchedule(0);
 
         data.withRoutes(r1, r2);
-
-
-        // Transfer at stop B for both trips
-        final int TRIP_A_TX_POS = tripA.pattern().findStopPositionAfter(0, STOP_B);
-        final int TRIP_B_TX_POS = tripB.pattern().findStopPositionAfter(0, STOP_B);
-
-        data.withGuaranteedTransfers(tripA, TRIP_A_TX_POS, tripB, TRIP_B_TX_POS);
+        data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_B);
 
         requestBuilder.searchParams()
                 .guaranteedTransfersEnabled(true)

@@ -22,9 +22,7 @@ public class AccessStopArrivalTest {
     private static final int COST = WALK.generalizedCost();
 
     private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
-        DEPARTURE_TIME,
-        COST,
-        WALK
+        DEPARTURE_TIME, WALK
     );
 
     @Test
@@ -98,7 +96,7 @@ public class AccessStopArrivalTest {
         AbstractStopArrival<RaptorTripSchedule> original, result;
         RaptorTransfer access = transfer(-1);
 
-        original = new AccessStopArrival<>(DEPARTURE_TIME, COST, access);
+        original = new AccessStopArrival<>(DEPARTURE_TIME,  access);
 
         final int dTime = 60;
         result = original.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
@@ -114,7 +112,7 @@ public class AccessStopArrivalTest {
         // Allow time-shift, but only by dTime
         RaptorTransfer access = transfer(ALIGHT_TIME + dTime);
 
-        original = new AccessStopArrival<>(DEPARTURE_TIME, COST, access);
+        original = new AccessStopArrival<>(DEPARTURE_TIME, access);
 
         result = original.timeShiftNewArrivalTime(ALIGHT_TIME + 7200);
 

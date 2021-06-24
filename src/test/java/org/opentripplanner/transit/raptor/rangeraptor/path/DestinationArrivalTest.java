@@ -35,9 +35,7 @@ public class DestinationArrivalTest {
      * Setup a simple journey with an access leg, one transit and a egress leg.
      */
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            ACCESS_DEPARTURE_TIME,
-            ACCESS_COST,
-            ACCESS_WALK
+            ACCESS_DEPARTURE_TIME, ACCESS_WALK
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(

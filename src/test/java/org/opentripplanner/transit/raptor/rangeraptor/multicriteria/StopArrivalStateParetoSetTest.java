@@ -109,11 +109,7 @@ public class StopArrivalStateParetoSetTest {
     }
 
     private static AccessStopArrival<RaptorTripSchedule> newAccessStopState(int stop, int accessDurationInSeconds) {
-        return new AccessStopArrival<>(
-            A_TIME,
-            ANY,
-            walk(stop, accessDurationInSeconds)
-        );
+        return new AccessStopArrival<>(A_TIME, walk(stop, accessDurationInSeconds));
     }
 
     private static TransitStopArrival<RaptorTripSchedule> newMcTransitStopState(int round, int stop, int arrivalTime) {
@@ -121,7 +117,7 @@ public class StopArrivalStateParetoSetTest {
     }
 
     private static TransferStopArrival<RaptorTripSchedule> newTransferStopState(int round, int stop, int arrivalTime, int cost) {
-        return new TransferStopArrival<>(prev(round), walk(stop, ANY), arrivalTime, cost);
+        return new TransferStopArrival<>(prev(round), walk(stop, ANY, cost), arrivalTime);
     }
 
     private static AbstractStopArrival<RaptorTripSchedule> prev(int round) {

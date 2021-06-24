@@ -38,11 +38,8 @@ public class TransferStopArrivalTest {
 
     private static final int EXPECTED_COST = ACCESS_COST + TRANSIT_COST + TRANSFER_COST;
 
-    private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-        ACCESS_DEPARTURE_TIME,
-        ACCESS_COST,
-        ACCESS_WALK
-    );
+    private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL
+            = new AccessStopArrival<>(ACCESS_DEPARTURE_TIME, ACCESS_WALK);
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
             ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
@@ -52,13 +49,8 @@ public class TransferStopArrivalTest {
             TRANSIT_TRIP
     );
 
-    private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
-            TRANSIT_ARRIVAL,
-            TRANSFER_WALK,
-            TRANSFER_ALIGHT_TIME,
-            TRANSFER_COST
-    );
-
+    private final TransferStopArrival<RaptorTripSchedule> subject
+            = new TransferStopArrival<>(TRANSIT_ARRIVAL, TRANSFER_WALK, TRANSFER_ALIGHT_TIME);
 
     @Test
     public void arrivedByTransfer() {

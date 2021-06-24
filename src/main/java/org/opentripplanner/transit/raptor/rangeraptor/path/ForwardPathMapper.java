@@ -66,8 +66,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
             egress,
             destinationArrival.previous().stop(),
             departureTime,
-            destinationArrival.arrivalTime(),
-            legCost(destinationArrival)
+            destinationArrival.arrivalTime()
         );
     }
 
@@ -79,7 +78,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
                 r.boardTime(),
                 arrival.stop(),
                 r.alightTime(),
-                legCost(arrival),
+                transitCost(arrival),
                 arrival.transitPath().trip(),
                 lastLeg
         );
@@ -93,7 +92,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
                 departureTime,
                 arrival.stop(),
                 arrival.arrivalTime(),
-                legCost(arrival),
                 arrival.transferPath().transfer(),
                 nextLeg
         );
@@ -134,12 +132,11 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
             from.stop(),
             targetFromTime,
             targetToTime,
-            from.cost(),
             nextLeg
         );
     }
 
-    private static int legCost(ArrivalView<?> curr) {
+    private static int transitCost(ArrivalView<?> curr) {
         if(curr.cost() == -1) { return -1; }
         return curr.cost() - curr.previous().cost();
     }

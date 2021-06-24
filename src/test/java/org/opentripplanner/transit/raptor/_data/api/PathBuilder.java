@@ -1,9 +1,8 @@
 package org.opentripplanner.transit.raptor._data.api;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walkCost;
-
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
@@ -19,7 +18,8 @@ import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
- * Utility to help build paths for testing
+ * Utility to help build paths for testing. The path builder is "reusable",
+ * every time the {@code access(...)} methods are called the builder reset it self.
  */
 public class PathBuilder {
   private static final int NOT_SET = -1;
@@ -31,37 +31,27 @@ public class PathBuilder {
   private final List<Leg> legs = new ArrayList<>();
   private int startTime;
 
-  /**
-   * This is true until the first transit leg is added, also remember to set this to false
-   * if a flex access leg is added.
-   */
-  private boolean firstTransit = true;
-
   public PathBuilder(int alightSlack, CostCalculator<TestTripSchedule> costCalculator) {
     this.alightSlack = alightSlack;
     this.costCalculator = costCalculator;
   }
 
   public PathBuilder access(int startTime, int duration, int toStop) {
-    return access(startTime, duration, toStop, walkCost(duration));
+    return access(startTime, TestTransfer.walk(toStop, duration));
   }
 
-  public PathBuilder access(int startTime, int duration, int toStop, int cost) {
-    start(startTime);
-    int toTime = startTime + duration;
-    return leg(NOT_SET, startTime, toStop, toTime, cost, null);
+  public PathBuilder access(int startTime, TestTransfer transfer) {
+    reset(startTime);
+    legs.add(new Leg(startTime, NOT_SET, transfer));
+    return this;
   }
 
   public PathBuilder walk(int duration, int toStop) {
-    return walk(duration, toStop, walkCost(duration));
+    return transfer(TestTransfer.walk(toStop, duration));
   }
 
   public PathBuilder walk(int duration, int toStop, int cost) {
-    int fromStop = prev().toStop;
-    int fromTime = prev().toTime + alightSlack;
-    int toTime = fromTime + duration;
-
-    return leg(fromStop, fromTime, toStop, toTime, cost, null);
+    return transfer(TestTransfer.walk(toStop, duration, cost));
   }
 
   public PathBuilder bus(TestTripSchedule trip, int toStop) {
@@ -69,20 +59,12 @@ public class PathBuilder {
     int fromTime = trip.departure(trip.pattern().findStopPositionAfter(0, fromStop));
     int toTime = trip.arrival(trip.pattern().findStopPositionAfter(0, toStop));
 
-    int waitTime = currentTransitWaitTime(fromTime);
-    int transitTime = toTime - fromTime;
-
-    int cost  = costCalculator.transitArrivalCost(
-        firstTransit(), fromStop, waitTime, transitTime, trip.transitReluctanceFactorIndex(), toStop
-    );
-
-    return leg(fromStop, fromTime, toStop, toTime, cost, trip);
+    return transit(fromStop, fromTime, toStop, toTime, trip);
   }
 
   public PathBuilder bus(String patternName, int fromTime, int duration, int toStop) {
     int fromStop = prev().toStop;
     int toTime = fromTime + duration;
-    int waitTime = currentTransitWaitTime(fromTime);
 
     TestTripSchedule trip = TestTripSchedule
         .schedule(TestTripPattern.pattern(patternName, fromStop, toStop))
@@ -90,34 +72,22 @@ public class PathBuilder {
         .departures(fromTime, toTime + BOARD_ALIGHT_OFFSET)
         .build();
 
-    int cost  = costCalculator.transitArrivalCost(
-        firstTransit(), fromStop, waitTime, duration, trip.transitReluctanceFactorIndex(), toStop
-    );
-
-    return leg(fromStop, fromTime, toStop, toTime, cost, trip);
+    return transit(fromStop, fromTime, toStop, toTime, trip);
   }
 
   public Path<TestTripSchedule> egress(int duration) {
-    return egress(duration, walkCost(duration));
+    return egress(TestTransfer.walk(prev().toStop, duration));
   }
 
-  public Path<TestTripSchedule> egress(int duration, int cost) {
-    return walk(duration, NOT_SET, cost).build();
+  public Path<TestTripSchedule> egress(TestTransfer transfer) {
+    return transfer(transfer).build();
   }
-
 
   /* private methods */
 
-  private boolean firstTransit() {
-    boolean temp = firstTransit;
-    firstTransit = false;
-    return temp;
-  }
-
-  private void start(int startTime) {
+  private void reset(int startTime) {
     this.startTime = startTime;
     this.legs.clear();
-    this.firstTransit = true;
   }
 
   private Path<TestTripSchedule> build() {
@@ -131,35 +101,53 @@ public class PathBuilder {
     return legs.get(legs.size()-1);
   }
 
-  int currentTransitWaitTime(int fromTime) {
-    if(prev().isTransit()) {
-      // We can ignore alight-slack here, because the it should be added to the
-      // previous toTime to find stop-arrival-time, and then the stop-arrival-time is
-      // subtracted from the current fromTime plus alight-slack.
-      return fromTime - prev().toTime;
-    }
-    return (fromTime - prev().toTime) + alightSlack;
-  }
-
   private PathLeg<TestTripSchedule> leg(int index) {
     Leg leg = legs.get(index);
 
     if(index == legs.size()-1) {
       return leg.egressLeg();
     }
-    else if(leg.trip != null) {
-      return leg.transitLeg(leg(index+1));
+    else if(leg.isTransit()) {
+      int waitTime = transitWaitTime(index);
+      boolean firstTransit = index == 1 && !legs.get(0).transfer.hasRides();
+      @SuppressWarnings("ConstantConditions")
+      int cost  = costCalculator.transitArrivalCost(
+              firstTransit, leg.fromStop, waitTime, leg.duration(),
+              leg.trip.transitReluctanceFactorIndex(),
+              leg.toStop
+      );
+      return leg.transitLeg(leg(index+1), cost);
     }
     else {
       return leg.transferLeg(leg(index+1));
     }
   }
 
-  private PathBuilder leg(
-      int fromStop, int fromTime, int toStop, int toTime, int cost, TestTripSchedule trip
-  ) {
-    legs.add(new Leg(fromTime, fromStop, toTime, toStop, cost, trip));
+  private PathBuilder transfer(TestTransfer transfer) {
+    int fromStop = prev().toStop;
+    int fromTime = prev().toTime + alightSlack;
+    legs.add(new Leg(fromTime, fromStop, transfer));
     return this;
+  }
+
+  private PathBuilder transit(
+          int fromStop, int fromTime, int toStop, int toTime, @NotNull TestTripSchedule trip
+  ) {
+    legs.add(new Leg(fromTime, fromStop, toTime, toStop, trip));
+    return this;
+  }
+
+  private int transitWaitTime(int index) {
+    Leg curr = legs.get(index);
+    Leg prev = legs.get(index-1);
+
+    if(prev.isTransit()) {
+      // We can ignore alight-slack here, because the it should be added to the
+      // previous toTime to find stop-arrival-time, and then the stop-arrival-time is
+      // subtracted from the current fromTime plus alight-slack.
+      return curr.fromTime - prev.toTime;
+    }
+    return (curr.fromTime - prev.toTime) + alightSlack;
   }
 
   private static class Leg {
@@ -167,39 +155,54 @@ public class PathBuilder {
     final int fromStop;
     final int toTime;
     final int toStop;
-    final int raptorCost;
     final TestTripSchedule trip;
+    final TestTransfer transfer;
 
     Leg(
-        int fromTime, int fromStop, int toTime, int toStop, int raptorCost, TestTripSchedule trip
+        int fromTime,
+        int fromStop,
+        TestTransfer transfer
+    ) {
+      this.fromTime = fromTime;
+      this.fromStop = fromStop;
+      this.toTime = fromTime + transfer.durationInSeconds();
+      this.toStop = transfer.stop();
+      this.transfer = transfer;
+      this.trip = null;
+    }
+
+    Leg(
+        int fromTime, int fromStop,
+        int toTime, int toStop,
+        TestTripSchedule trip
     ) {
       this.fromTime = fromTime;
       this.fromStop = fromStop;
       this.toTime = toTime;
       this.toStop = toStop;
-      this.raptorCost = raptorCost;
+      this.transfer = null;
       this.trip = trip;
     }
 
     AccessPathLeg<TestTripSchedule> accessLeg(PathLeg<TestTripSchedule> next) {
       var durationInSeconds = toTime - fromTime;
       return new AccessPathLeg<>(
-          TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
-          toStop, fromTime, toTime, raptorCost, next
+          TestTransfer.walk(toStop, durationInSeconds),
+          toStop, fromTime, toTime, next
       );
     }
 
-    TransitPathLeg<TestTripSchedule> transitLeg(PathLeg<TestTripSchedule> next) {
+    TransitPathLeg<TestTripSchedule> transitLeg(PathLeg<TestTripSchedule> next, int cost) {
       return new TransitPathLeg<>(
-          fromStop, fromTime, toStop, toTime, raptorCost, trip, next
+          fromStop, fromTime, toStop, toTime, cost, trip, next
       );
     }
 
     TransferPathLeg<TestTripSchedule> transferLeg(PathLeg<TestTripSchedule> next) {
       var durationInSeconds = toTime - fromTime;
       return new TransferPathLeg<>(
-          fromStop, fromTime, toStop, toTime, raptorCost,
-          TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
+          fromStop, fromTime, toStop, toTime,
+          TestTransfer.walk(toStop, durationInSeconds),
           next
       );
     }
@@ -207,10 +210,12 @@ public class PathBuilder {
     EgressPathLeg<TestTripSchedule> egressLeg() {
       var durationInSeconds = toTime - fromTime;
       return new EgressPathLeg<>(
-          TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
-          fromStop, fromTime, toTime, raptorCost
+          TestTransfer.walk(toStop, durationInSeconds),
+          fromStop, fromTime, toTime
       );
     }
+
+    int duration() { return toTime - fromTime; }
 
     boolean isTransit() {
       return trip != null;
@@ -225,7 +230,10 @@ public class PathBuilder {
       if(trip != null) {
         text.addObj("trip", trip.pattern().debugInfo());
       }
-      return text.addNum("cost", raptorCost, 0).toString();
+      if(transfer != null) {
+        text.addObj("transfer", transfer);
+      }
+      return text.toString();
     }
   }
 }

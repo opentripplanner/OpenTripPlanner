@@ -1,9 +1,8 @@
 package org.opentripplanner.transit.raptor.api.path;
 
+import java.util.Objects;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
-import java.util.Objects;
 
 /**
  * Represent a egress leg in a path. The egress leg is the last leg arriving at the destination. The previous leg
@@ -16,14 +15,12 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     private final int fromStop;
     private final int fromTime;
     private final int toTime;
-    private final int cost;
 
-    public EgressPathLeg(RaptorTransfer egress, int fromStop, int fromTime, int toTime, int cost) {
+    public EgressPathLeg(RaptorTransfer egress, int fromStop, int fromTime, int toTime) {
         this.egress = egress;
         this.fromStop = fromStop;
         this.fromTime = fromTime;
         this.toTime = toTime;
-        this.cost = cost;
     }
 
     /**
@@ -46,7 +43,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public int generalizedCost() {
-        return cost;
+        return egress.generalizedCost();
     }
 
     public RaptorTransfer egress() {

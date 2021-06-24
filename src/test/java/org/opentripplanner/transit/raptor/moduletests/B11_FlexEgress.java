@@ -79,21 +79,21 @@ public class B11_FlexEgress implements RaptorTestConstants {
 
     assertEquals(
         "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2x [0:09 0:18 9m]",
-        pathsToString(response)
+            pathsToString(response)
     );
   }
 
   @Test
   public void standardReverse() {
     requestBuilder
-        .profile(RaptorProfile.STANDARD)
-        .searchDirection(SearchDirection.REVERSE);
+            .profile(RaptorProfile.STANDARD)
+            .searchDirection(SearchDirection.REVERSE);
 
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
         "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2x [0:09 0:18 9m]",
-        pathsToString(response)
+            pathsToString(response)
     );
   }
 
@@ -108,7 +108,7 @@ public class B11_FlexEgress implements RaptorTestConstants {
             + "Walk 1m ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Flex 1m59s 2x [0:09 0:18:59 9m59s $1378]\n"
             + "Walk 1m ~ 2 ~ BUS R1 0:10 0:12 ~ 3 ~ Flex 7m 1x [0:09 0:20 11m $1740]\n"
             + "Walk 1m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 10m [0:09 0:28 19m $2400]",
-        pathsToString(response)
+            pathsToString(response)
     );
   }
 }

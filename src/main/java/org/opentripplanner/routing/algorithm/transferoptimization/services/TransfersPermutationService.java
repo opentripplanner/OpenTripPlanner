@@ -121,6 +121,7 @@ public class TransfersPermutationService<T extends RaptorTripSchedule> {
     int arrivalTime = departureTime + tx.transferDuration();
     List<TransitPathLeg<T>> paths = findTransitPaths(arrivalTime, tx.to(), nextLeg, false);
 
+    //noinspection ConstantConditions
     return paths.stream().map( p ->
         tx.sameStop()
             ? p
@@ -129,7 +130,6 @@ public class TransfersPermutationService<T extends RaptorTripSchedule> {
                 departureTime,
                 tx.to().stop(),
                 arrivalTime,
-                tx.generalizedCost(),
                 tx.getTransfer(),
                 p
             )
