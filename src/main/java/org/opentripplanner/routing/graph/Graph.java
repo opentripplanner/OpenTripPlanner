@@ -674,7 +674,14 @@ public class Graph implements Serializable {
         FeedScopedId serviceId = ((CalendarServiceImpl)getCalendarService()).getOrCreateServiceIdForDate(serviceDate);
 
         if (!serviceCodes.containsKey(serviceId)) {
-            serviceCodes.put(serviceId, serviceCodes.size());
+            // Calculating new unique serviceCode based on size (!)
+            final int serviceCode = serviceCodes.size();
+            serviceCodes.put(serviceId, serviceCode);
+
+            if (index.getServiceCodesRunningForDate().containsKey(serviceDate)) {
+                // Need to add to serviceCodeRunningForDate-index so it is included in trip-requests
+                index.getServiceCodesRunningForDate().get(serviceDate).add(serviceCode);
+            }
         }
         return serviceId;
     }
