@@ -168,8 +168,7 @@ public class RoutingWorker {
             accessList = accessEgressMapper.mapNearbyStops(accessStops, false);
 
             // Special handling of flex accesses
-            if (OTPFeature.FlexRouting.isOn() && request.modes.accessMode.equals(
-                    StreetMode.FLEXIBLE)) {
+            if (OTPFeature.FlexRouting.isOn() && request.modes.accessMode == StreetMode.FLEXIBLE) {
                 Collection<FlexAccessEgress> flexAccessList =
                         FlexAccessEgressRouter.routeAccessEgress(
                                 accessRequest,
@@ -190,8 +189,7 @@ public class RoutingWorker {
             egressList = accessEgressMapper.mapNearbyStops(egressStops, true);
 
             // Special handling of flex egresses
-            if (OTPFeature.FlexRouting.isOn() && request.modes.egressMode.equals(
-                    StreetMode.FLEXIBLE)) {
+            if (OTPFeature.FlexRouting.isOn() && request.modes.egressMode == StreetMode.FLEXIBLE) {
                 Collection<FlexAccessEgress> flexEgressList =
                         FlexAccessEgressRouter.routeAccessEgress(
                                 egressRequest,
