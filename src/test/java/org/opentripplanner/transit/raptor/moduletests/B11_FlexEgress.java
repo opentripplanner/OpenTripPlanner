@@ -20,6 +20,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.util.time.DurationUtils;
 
 /**
  * FEATURE UNDER TEST
@@ -30,39 +31,41 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  */
 public class B11_FlexEgress implements RaptorTestConstants {
 
-  private static final int FLEX_COST_FACTOR = 400;
+  private static final int D1m59s = DurationUtils.duration("1m59s");
+
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+          new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-      RaptorConfig.defaultConfigForTest()
+          RaptorConfig.defaultConfigForTest()
   );
 
   @BeforeEach
   public void setup() {
     data.withRoute(
-        route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-            .withTimetable(
-                schedule("0:10, 0:12, 0:14, 0:16, 0:18")
-            )
+            route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
+                    .withTimetable(
+                            schedule("0:10, 0:12, 0:14, 0:16, 0:18")
+                    )
     );
     requestBuilder.searchParams()
-        .addAccessPaths(
-            walk(STOP_B, D1m)
-        )
-        // All egress paths are all pareto-optimal (McRaptor).
-        .addEgressPaths(
-            flexAndWalk(STOP_C, D7m),     // best on combination of transfers and time
-            flex(STOP_D, D3m, 2, flexCost(D3m)),         // earliest arrival time
-            flexAndWalk(STOP_E, D2m1s, 2, flexCost(D2m1s)),  // lowest cost
-            walk(STOP_F, D10m)            // lowest num-of-transfers (0)
-        );
+            .addAccessPaths(
+                    walk(STOP_B, D1m)
+            )
+            // All egress paths are all pareto-optimal (McRaptor).
+            .addEgressPaths(
+                    flexAndWalk(STOP_C, D7m),              // best combination of transfers and time
+                    flex(STOP_D, D3m, TWO_RIDES),          // earliest arrival time
+                    flexAndWalk(STOP_E, D1m59s, TWO_RIDES), // lowest cost
+                    walk(STOP_F, D10m)                     // lowest num-of-transfers (0)
+            );
     requestBuilder.searchParams()
-        .earliestDepartureTime(T00_00)
-        .latestArrivalTime(T00_30);
+            .earliestDepartureTime(T00_00)
+            .latestArrivalTime(T00_30);
 
     // We will test board- and alight-slack in a separate test
     requestBuilder.slackProvider(
-        defaultSlackProvider(60, 0, 0)
+            defaultSlackProvider(60, 0, 0)
     );
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
@@ -101,15 +104,11 @@ public class B11_FlexEgress implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2x [0:09 0:18 9m $1860]\n"
-            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Flex 2m1s 2x [0:09 0:19:01 10m1s $1744]\n"
-            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:12 ~ 3 ~ Flex 7m 1x [0:09 0:20 11m $2700]\n"
-            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 10m [0:09 0:28 19m $3720]",
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:14 ~ 4 ~ Flex 3m 2x [0:09 0:18 9m $1380]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:16 ~ 5 ~ Flex 1m59s 2x [0:09 0:18:59 9m59s $1378]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:12 ~ 3 ~ Flex 7m 1x [0:09 0:20 11m $1740]\n"
+            + "Walk 1m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 10m [0:09 0:28 19m $2400]",
         pathsToString(response)
     );
-  }
-
-  private static int flexCost(int durationInSeconds) {
-    return FLEX_COST_FACTOR * durationInSeconds;
   }
 }

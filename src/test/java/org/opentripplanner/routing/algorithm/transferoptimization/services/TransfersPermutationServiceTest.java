@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.dummyT2TTransferService;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.T2TTransferDummy.tx;
-import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walkCost;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.util.time.TimeUtils.time;
 

@@ -78,7 +78,7 @@ public class DestinationArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-            "Egress { round: 1, from-stop: 101, duration: 50s, arrival-time: 8:14:50 $1628.00 }",
+            "Egress { round: 1, from-stop: 101, duration: 50s, arrival-time: 8:14:50 $1484.00 }",
             subject.toString()
         );
     }

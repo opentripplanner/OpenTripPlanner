@@ -19,6 +19,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
@@ -29,7 +30,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  * access walking, but only get accepted when they are better on time and/or cost.
  */
 public class B10_FlexAccess implements RaptorTestConstants {
-  private static final int FLEX_COST_FACTOR = 400;
+  private static final int TRANSFER_SLACK = 60;
+  private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
+  private static final int COST_TRANSFER_SLACK = RaptorCostConverter.toRaptorCost(TRANSFER_SLACK);
+  private static final int COST_ONE_SEC = RaptorCostConverter.toRaptorCost(1);
+
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -41,16 +46,20 @@ public class B10_FlexAccess implements RaptorTestConstants {
     data.withRoute(
         route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
             .withTimetable(
-                schedule("0:10, 0:12, 0:14, 0:16, 0:18")
+                schedule("0:10, 0:12, 0:14, 0:16, 0:20")
             )
     );
     requestBuilder.searchParams()
         // All access paths are all pareto-optimal (McRaptor).
         .addAccessPaths(
-            walk(STOP_B, D10m),           // lowest num-of-transfers (0)
-            flexAndWalk(STOP_C, D2m, 2, D2m*400),  // lowest cost
-            flex(STOP_D, D3m, 2, D3m*400),         // latest departure time
-            flexAndWalk(STOP_E, D7m)      // best on combination of transfers and time
+            // lowest num-of-transfers (0)
+            walk(STOP_B, D10m, COST_ONE_STOP + COST_TRANSFER_SLACK),
+            // lowest cost
+            flexAndWalk(STOP_C, D2m, TWO_RIDES, 2*COST_ONE_STOP - COST_ONE_SEC),
+            // latest departure time
+            flex(STOP_D, D3m, TWO_RIDES, 3*COST_ONE_STOP),
+            // best on combination of transfers and time
+            flexAndWalk(STOP_E, D7m, ONE_RIDE, 4*COST_ONE_STOP)
         )
         .addEgressPaths(walk(STOP_F, D1m));
 
@@ -60,7 +69,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
 
     // We will test board- and alight-slack in a separate test
     requestBuilder.slackProvider(
-        defaultSlackProvider(60, 0, 0)
+        defaultSlackProvider(TRANSFER_SLACK, 0, 0)
     );
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
@@ -73,7 +82,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m]",
+        "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1m [0:10 0:21 11m]",
         pathsToString(response)
     );
   }
@@ -87,7 +96,7 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m]",
+        "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1m [0:10 0:21 11m]",
         pathsToString(response)
     );
   }
@@ -99,15 +108,11 @@ public class B10_FlexAccess implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:18 ~ 6 ~ Walk 1m [0:10 0:19 9m $1860]\n"
-            + "Flex 2m 2x ~ 3 ~ BUS R1 0:12 0:18 ~ 6 ~ Walk 1m [0:09 0:19 10m $1740]\n"
-            + "Flex 7m 1x ~ 5 ~ BUS R1 0:16 0:18 ~ 6 ~ Walk 1m [0:08 0:19 11m $2700]\n"
-            + "Walk 10m ~ 2 ~ BUS R1 0:10 0:18 ~ 6 ~ Walk 1m [0:00 0:19 19m $3720]",
+            + "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1m [0:10 0:21 11m $1500]\n"  // ldt
+            + "Flex 2m 2x ~ 3 ~ BUS R1 0:12 0:20 ~ 6 ~ Walk 1m [0:09 0:21 12m $1499]\n" // cost
+            + "Flex 7m 1x ~ 5 ~ BUS R1 0:16 0:20 ~ 6 ~ Walk 1m [0:08 0:21 13m $1500]\n" // tx+time
+            + "Walk 10m ~ 2 ~ BUS R1 0:10 0:20 ~ 6 ~ Walk 1m [0:00 0:21 21m $1500]",    // tx
         pathsToString(response)
     );
-  }
-
-  private static int flexCost(int durationInSeconds) {
-    return FLEX_COST_FACTOR * durationInSeconds;
   }
 }

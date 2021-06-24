@@ -65,9 +65,9 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
     );
     requestBuilder.searchParams()
         // Start walking 1m before: 30s walk + 30s board-slack
-        .addAccessPaths(flexAndWalk(STOP_B, D2m))
+        .addAccessPaths(flexAndWalk(STOP_B, D2m, ONE_RIDE, 40_000))
         // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
-        .addEgressPaths(flex(STOP_C, D2m))
+        .addEgressPaths(flex(STOP_C, D2m, ONE_RIDE, 56_000))
         .earliestDepartureTime(T00_00)
         .latestArrivalTime(T00_10)
         // Only one iteration is needed - the access should be time-shifted

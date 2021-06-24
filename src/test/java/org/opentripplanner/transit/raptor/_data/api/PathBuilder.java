@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor._data.api;
 
-import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walkCost;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.util.time.TimeUtils;
 
 
@@ -227,10 +226,6 @@ public class PathBuilder {
         text.addObj("trip", trip.pattern().debugInfo());
       }
       return text.addNum("cost", raptorCost, 0).toString();
-    }
-
-    private int domainCost() {
-      return RaptorCostConverter.toOtpDomainCost(raptorCost);
     }
   }
 }

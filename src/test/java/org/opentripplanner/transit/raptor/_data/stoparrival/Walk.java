@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
-import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walkCost;
 
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;

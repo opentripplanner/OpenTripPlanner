@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.raptor._data.api;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class PathUtils {
   /** Util class, private constructor */
@@ -16,6 +15,10 @@ public class PathUtils {
   }
 
   public static String pathsToString(RaptorResponse<TestTripSchedule> response) {
-    return pathsSorted(response).stream().map(Object::toString).collect(Collectors.joining("\n"));
+    return pathsSorted(response).stream().map(Path::toString).collect(Collectors.joining("\n"));
+  }
+
+  public static String pathsToStringDetailed(RaptorResponse<TestTripSchedule> response) {
+    return pathsSorted(response).stream().map(Path::toStringDetailed).collect(Collectors.joining("\n"));
   }
 }

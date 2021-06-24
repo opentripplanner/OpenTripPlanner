@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walkCost;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.util.time.TimeUtils.time;

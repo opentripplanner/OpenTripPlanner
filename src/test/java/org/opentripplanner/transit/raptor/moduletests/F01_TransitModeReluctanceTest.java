@@ -66,7 +66,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
     var response = raptorService.route(request, data);
 
     // Verify R1 is preferred and the cost is correct
-    assertEquals(expected("R1", 899), pathsToString(response));
+    assertEquals(expected("R1", 799), pathsToString(response));
   }
 
   @Test
@@ -75,7 +75,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
     var request = requestBuilder.build();
     var response = raptorService.route(request, data);
 
-    assertEquals(expected("R2", 889), pathsToString(response));
+    assertEquals(expected("R2", 789), pathsToString(response));
   }
 
   private static String expected(String route, int cost) {
