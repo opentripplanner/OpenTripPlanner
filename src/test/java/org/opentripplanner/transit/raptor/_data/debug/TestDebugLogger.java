@@ -101,7 +101,7 @@ public class TestDebugLogger implements DebugLogger {
         }
 
         Path<?> p = e.element();
-      System.err.println(
+        System.err.println(
             pathTableFormatter.printRow(
                 e.action().toString(),
                 p.numberOfTransfers(),
@@ -110,7 +110,7 @@ public class TestDebugLogger implements DebugLogger {
                 TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
                 TimeUtils.timeToStrLong(p.egressLeg().toTime()),
                 DurationUtils.durationToStr(p.durationInSeconds()),
-                numFormat.format(p.generalizedCost()),
+                numFormat.format(p.otpDomainCost()),
                 details(e.action().toString(), e.reason(), e.element().toString())
             )
         );
@@ -181,7 +181,11 @@ public class TestDebugLogger implements DebugLogger {
     }
 
     private static String path(ArrivalView<?> a) {
-        return path(a, new PathStringBuilder()).toString()  + " (cost: " + a.cost() + ")";
+        return path(a, new PathStringBuilder())
+                .space().space().append("[ ")
+                .costCentiSec(a.cost())
+                .append(" ]")
+                .toString();
     }
 
     private static PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {

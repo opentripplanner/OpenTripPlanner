@@ -1,24 +1,25 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 /**
  * Mutable version of {@link DebugRequest}.
  */
 public class DebugRequestBuilder {
-    private final List<Integer> stops = new ArrayList<>();
+    private final Set<Integer> stops = new HashSet<>();
     private final List<Integer> path = new ArrayList<>();
     private int debugPathFromStopIndex;
     private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
@@ -37,9 +38,9 @@ public class DebugRequestBuilder {
         this.logger = debug.logger();
     }
 
-
+    /** Read-only view to stops added sorted in ascending order.  */
     public List<Integer> stops() {
-        return stops;
+        return stops.stream().sorted().collect(Collectors.toList());
     }
 
     public DebugRequestBuilder addStops(Collection<Integer> stops) {
@@ -56,7 +57,7 @@ public class DebugRequestBuilder {
     }
 
     public DebugRequestBuilder addPath(Collection<Integer> path) {
-        if(!path.isEmpty()) {
+        if(!this.path.isEmpty()) {
             throw new IllegalStateException("The API support only one debug path. Existing: " + this.path + ", new: " + path);
         }
         this.path.addAll(path);

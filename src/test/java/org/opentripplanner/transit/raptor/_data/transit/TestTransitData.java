@@ -47,10 +47,13 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request) {
-    List<Integer> stops = new ArrayList<>();
-    for (int i = 0; i < numberOfStops(); i++) { stops.add(i); }
+    var debug = request.debug();
+
+    if(debug.stops().isEmpty()) {
+      debug.addStops(stopsVisited());
+    }
     val logger = new TestDebugLogger(true);
-    request.debug().addStops(stops)
+    debug
         .stopArrivalListener(logger::stopArrivalLister)
         .patternRideDebugListener(logger::patternRideLister)
         .pathFilteringListener(logger::pathFilteringListener)
@@ -99,4 +102,15 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
       routesByStop.add(new HashSet<>());
     }
   }
+
+  private List<Integer> stopsVisited() {
+    final List<Integer> stops = new ArrayList<>();
+    for (int i = 0; i < routesByStop.size(); i++) {
+       if(!routesByStop.get(i).isEmpty()) {
+         stops.add(i);
+       }
+    }
+    return stops;
+  }
+
 }
