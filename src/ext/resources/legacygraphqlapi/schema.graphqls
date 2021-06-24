@@ -1639,6 +1639,24 @@ type QueryType {
         itineraryFiltering: Float
 
         """
+        A multiplier for how bad biking is, compared to being in transit for equal
+        lengths of time. Default value: 2.0
+        """
+        bikeReluctance: Float
+
+        """
+        A multiplier for how bad walking with a bike is, compared to being in transit for equal
+        lengths of time. Default value: 5.0
+        """
+        bikeWalkingReluctance: Float
+
+        """
+        A multiplier for how bad driving is, compared to being in transit for equal
+        lengths of time. Default value: 3.0
+        """
+        carReluctance: Float
+
+        """
         A multiplier for how bad walking is, compared to being in transit for equal
         lengths of time.Empirically, values between 10 and 20 seem to correspond
         well to the concept of not wanting to walk too much without asking for

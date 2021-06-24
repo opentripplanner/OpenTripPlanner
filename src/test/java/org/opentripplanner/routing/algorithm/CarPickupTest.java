@@ -121,8 +121,8 @@ public class CarPickupTest extends GraphRoutingTest {
         // and the path can't be traversed by car.
         assertPath(
                 A, B,
-                "null - IN_CAR - null, WALK - WALK_FROM_DROP_OFF - AB street",
-                "null - WALK_TO_PICKUP - null, WALK - WALK_TO_PICKUP - AB street"
+                "null - WALK_TO_PICKUP - null, WALK - WALK_TO_PICKUP - AB street",
+                "null - WALK_FROM_DROP_OFF - null, WALK - WALK_FROM_DROP_OFF - AB street"
         );
     }
 

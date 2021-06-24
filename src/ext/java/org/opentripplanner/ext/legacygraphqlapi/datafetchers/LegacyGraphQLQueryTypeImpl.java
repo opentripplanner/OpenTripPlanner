@@ -610,11 +610,15 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("maxSlope", request::setMaxSlope);
       // callWith.argument("carParkCarLegWeight", request::setCarParkCarLegWeight);
       // callWith.argument("itineraryFiltering", request::setItineraryFiltering);
+      callWith.argument("bikeReluctance", request::setBikeReluctance);
+      callWith.argument("bikeWalkingReluctance", request::setBikeWalkingReluctance);
+      callWith.argument("carReluctance", request::setCarReluctance);
       callWith.argument("walkReluctance", request::setWalkReluctance);
       // callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
       callWith.argument("waitReluctance", request::setWaitReluctance);
       callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
       callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);
+      callWith.argument("bikeWalkingSpeed", (Double v) -> request.bikeWalkingSpeed = v);
       callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
       callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
       callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);

@@ -1,16 +1,15 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-
+import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
+import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 
 
 /**
@@ -18,7 +17,7 @@ import java.util.Locale;
  * @author mattwigway
  *
  */
-public class ElevatorBoardEdge extends Edge implements ElevatorEdge {
+public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
@@ -29,7 +28,7 @@ public class ElevatorBoardEdge extends Edge implements ElevatorEdge {
      */
     private LineString the_geom;
 
-    public ElevatorBoardEdge(Vertex from, Vertex to) {
+    public ElevatorBoardEdge(ElevatorOffboardVertex from, ElevatorOnboardVertex to) {
         super(from, to);
 
         // set up the geometry
@@ -40,14 +39,16 @@ public class ElevatorBoardEdge extends Edge implements ElevatorEdge {
     }
     
     @Override
-    public State traverse(State s0) { 
-        RoutingRequest options = s0.getOptions();
+    public State traverse(State s0) {
+        StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
+        if (s1 == null) {
+            return null;
+        }
 
-        StateEditor s1 = s0.edit(this);
-        // We always walk in elevators, even when we have a bike with us
-        s1.setBackMode(TraverseMode.WALK);
+        RoutingRequest options = s0.getOptions();
         s1.incrementWeight(options.elevatorBoardCost);
         s1.incrementTimeInSeconds(options.elevatorBoardTime);
+
         return s1.makeState();
     }
 

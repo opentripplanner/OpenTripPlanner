@@ -16,11 +16,6 @@ public class TraversalRequirements {
     public TraverseModeSet modes = TraverseModeSet.allModes();
 
     /**
-     * The maximum distance (meters) the user is willing to walk. Defaults to 1/2 mile.
-     */
-    private double maxWalkDistance = 800;
-
-    /**
      * If true, trip must be wheelchair accessible.
      */
     private boolean wheelchairAccessible = false;
@@ -31,11 +26,6 @@ public class TraversalRequirements {
      * ADA max wheelchair ramp slope is a good default.
      */
     private double maxWheelchairSlope = 0.0833333333333;
-
-    /**
-     * Specific requirements for walking a bicycle.
-     */
-    private TraversalRequirements bikeWalkingRequirements;
 
     /**
      * Default constructor.
@@ -59,13 +49,6 @@ public class TraversalRequirements {
 
         // Initialize self.
         initFromRoutingRequest(this, options);
-
-        // Initialize walking requirements if any given.
-        RoutingRequest bikeWalkOptions = options.bikeWalkingOptions;
-        if (bikeWalkOptions != null) {
-            bikeWalkingRequirements = new TraversalRequirements();
-            initFromRoutingRequest(bikeWalkingRequirements, bikeWalkOptions);
-        }
     }
 
     /**
@@ -78,15 +61,6 @@ public class TraversalRequirements {
         req.modes = options.streetSubRequestModes.clone();
         req.wheelchairAccessible = options.wheelchairAccessible;
         req.maxWheelchairSlope = options.maxWheelchairSlope;
-    }
-
-    /**
-     * Returns true if bike walking requirements are defined.
-     * 
-     * @return
-     */
-    public boolean hasBikeWalkingRequirements() {
-        return bikeWalkingRequirements != null;
     }
 
     /** Returns true if this StreetEdge can be traversed. */
@@ -108,9 +82,6 @@ public class TraversalRequirements {
      */
     public boolean canBeTraversed(StreetEdge e) {
         if (canBeTraversedInternal(e)) {
-            return true;
-        } else if (hasBikeWalkingRequirements()
-                && bikeWalkingRequirements.canBeTraversedInternal(e)) {
             return true;
         }
         return false;

@@ -37,7 +37,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
-      "generalizedCost": 2057,
+      "generalizedCost": 2087,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -160,7 +160,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 21,
+          "generalizedCost": 51,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 2,
@@ -1754,7 +1754,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
-      "generalizedCost": 2057,
+      "generalizedCost": 2087,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -1877,7 +1877,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 21,
+          "generalizedCost": 51,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 2,
@@ -2310,7 +2310,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
-      "generalizedCost": 2057,
+      "generalizedCost": 2087,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -2433,7 +2433,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 21,
+          "generalizedCost": 51,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 2,
@@ -2844,7 +2844,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 885,
+      "generalizedCost": 915,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -2968,7 +2968,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 21,
+          "generalizedCost": 51,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 2,
@@ -3209,7 +3209,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 622,
+      "generalizedCost": 652,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -3333,7 +3333,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 21,
+          "generalizedCost": 51,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 2,
@@ -3533,7 +3533,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
-      "generalizedCost": 1968,
+      "generalizedCost": 1998,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -3924,7 +3924,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "corner of way -102328 from 0 and Northwest Irving Street",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 81,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 2,
@@ -4897,7 +4897,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
-      "generalizedCost": 1968,
+      "generalizedCost": 1998,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -5288,7 +5288,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "corner of way -102328 from 0 and Northwest Irving Street",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 81,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 2,

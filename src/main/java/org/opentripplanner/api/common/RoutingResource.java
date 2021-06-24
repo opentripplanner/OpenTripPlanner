@@ -163,6 +163,13 @@ public abstract class RoutingResource {
     protected Integer maxPreTransitTime;
 
     /**
+     * A multiplier for how bad walking with a bike is, compared to being in transit for equal
+     * lengths of time. Defaults to 3.
+     */
+    @QueryParam("bikeWalkingReluctance")
+    protected Double bikeWalkingReluctance;
+
+    /**
      * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      * Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
      * of not wanting to walk too much without asking for totally ridiculous itineraries, but this
@@ -170,6 +177,12 @@ public abstract class RoutingResource {
      */
     @QueryParam("walkReluctance")
     protected Double walkReluctance;
+
+    @QueryParam("bikeReluctance")
+    protected Double bikeReluctance;
+
+    @QueryParam("carReluctance")
+    protected Double carReluctance;
 
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
@@ -198,6 +211,10 @@ public abstract class RoutingResource {
     /** The user's biking speed in meters/second. Defaults to approximately 11 MPH, or 9.5 for bikeshare. */
     @QueryParam("bikeSpeed")
     protected Double bikeSpeed;
+
+    /** The user's bike walking speed in meters/second. Defaults to approximately 3 MPH. */
+    @QueryParam("bikeWalkingSpeed")
+    protected Double bikeWalkingSpeed;
 
     /** The time it takes the user to fetch their bike and park it again in seconds.
      *  Defaults to 0. */
@@ -683,6 +700,15 @@ public abstract class RoutingResource {
         if (numItineraries != null)
             request.setNumItineraries(numItineraries);
 
+        if (bikeReluctance != null)
+            request.setBikeReluctance(bikeReluctance);
+
+        if (bikeWalkingReluctance != null)
+            request.setBikeWalkingReluctance(bikeWalkingReluctance);
+
+        if (carReluctance != null)
+            request.setCarReluctance(carReluctance);
+
         if (walkReluctance != null)
             request.setWalkReluctance(walkReluctance);
 
@@ -697,6 +723,9 @@ public abstract class RoutingResource {
 
         if (bikeSpeed != null)
             request.bikeSpeed = bikeSpeed;
+
+        if (bikeWalkingSpeed != null)
+            request.bikeWalkingSpeed = bikeWalkingSpeed;
 
         if (bikeSwitchTime != null)
             request.bikeSwitchTime = bikeSwitchTime;

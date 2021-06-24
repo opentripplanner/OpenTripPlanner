@@ -89,7 +89,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                 StreetMode.BIKE
         );
 
-        assertEquals(List.of("WALK - null - BC street (1,503.76, 752)"), descriptor);
+        assertEquals(List.of("WALK - null - BC street (3,759.40, 752)"), descriptor);
     }
 
     // This tests exists to test if the cost of biking changes

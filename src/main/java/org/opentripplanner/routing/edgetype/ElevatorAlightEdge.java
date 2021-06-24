@@ -1,16 +1,14 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Locale;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
 
 /**
  * A relatively low cost edge for alighting from an elevator.
@@ -19,7 +17,7 @@ import java.util.Locale;
  * @author mattwigway
  *
  */
-public class ElevatorAlightEdge extends Edge implements ElevatorEdge {
+public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
@@ -51,9 +49,8 @@ public class ElevatorAlightEdge extends Edge implements ElevatorEdge {
     
     @Override
     public State traverse(State s0) {
-        StateEditor s1 = s0.edit(this);
+        StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
         s1.incrementWeight(1);
-        s1.setBackMode(TraverseMode.WALK);
         return s1.makeState();
     }
 
