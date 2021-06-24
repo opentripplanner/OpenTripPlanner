@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.bike_rental.datasources;
 
-import static java.util.Locale.ENGLISH;
+import static java.util.Locale.ROOT;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -69,7 +69,7 @@ class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
         brStation.x = Double.parseDouble(coords[0]);
         brStation.y = Double.parseDouble(coords[1]);
         // There is no ID in KML, assume unique names and location
-        brStation.id = String.format(ENGLISH, "%s[%.3f-%.3f]", brStation.name.toString().replace(" ", "_"),
+        brStation.id = String.format(ROOT, "%s[%.3f-%.3f]", brStation.name.toString().replace(" ", "_"),
                 brStation.x, brStation.y);
         brStation.realTimeData = false;
         brStation.bikesAvailable = 1; // Unknown, always 1

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import static java.util.Locale.ENGLISH;
+import static java.util.Locale.ROOT;
 import static org.opentripplanner.transit.raptor.api.debug.DebugTopic.STOP_ARRIVALS_STATISTICS;
 
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
@@ -77,8 +77,8 @@ class DebugStopArrivalsStatistics {
 
     private static String toStr(double number) {
         if(number > 10) {
-            return String.format(ENGLISH, "%.0f", number);
+            return String.format(ROOT, "%.0f", number);
         }
-        return String.format(ENGLISH, "%.1f", number);
+        return String.format(ROOT, "%.1f", number);
     }
 }

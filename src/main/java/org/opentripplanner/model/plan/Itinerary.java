@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan;
 
 
-import static java.util.Locale.ENGLISH;
+import static java.util.Locale.ROOT;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -323,7 +323,7 @@ public class Itinerary {
             buf.stop(leg.to.name);
         }
 
-        buf.space().append(String.format(ENGLISH, "[ $%d ]", generalizedCost));
+        buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));
 
         return buf.toString();
     }

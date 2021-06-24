@@ -1,6 +1,6 @@
 package org.opentripplanner.util.time;
 
-import static java.util.Locale.ENGLISH;
+import static java.util.Locale.ROOT;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -79,9 +79,13 @@ public class DurationUtils {
   public static String msToSecondsStr(long timeMs) {
     if(timeMs == 0) { return "0 seconds"; }
     if(timeMs == 1000) { return "1 second"; }
-    if(timeMs < 100) { return String.format (ENGLISH, "%.3f seconds",  timeMs/1000.0); }
-    if(timeMs < 995) { return String.format (ENGLISH, "%.2f seconds",  timeMs/1000.0); }
-    if(timeMs < 9950) { return String.format (ENGLISH, "%.1f seconds",  timeMs/1000.0); }
-    else { return String.format (ENGLISH, "%.0f seconds",  timeMs/1000.0); }
+    if(timeMs < 100) { return msToSecondsStr("%.3f",  timeMs); }
+    if(timeMs < 995) { return msToSecondsStr( "%.2f",  timeMs); }
+    if(timeMs < 9950) { return msToSecondsStr( "%.1f",  timeMs); }
+    else { return msToSecondsStr( "%.0f",  timeMs); }
+  }
+
+  private static String msToSecondsStr(String formatSeconds, double timeMs) {
+    return String.format (ROOT, formatSeconds, timeMs/1000.0) + " seconds";
   }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.common;
 
-import static java.util.Locale.ENGLISH;
+import java.util.Locale;
 
 /**
  * Utility functions for logging output.
@@ -8,11 +8,23 @@ import static java.util.Locale.ENGLISH;
 public class LoggingUtil {
 
     public static String fileSizeToString(long n) {
-        if (n >= 1_000_000_000) { return String.format(ENGLISH, "%.1f GB", n/1_000_000_000.0); }
-        if (n >= 1_000_000) { return String.format(ENGLISH, "%.1f MB", n/1_000_000.0); }
-        if (n >= 1_000) { return String.format(ENGLISH, "%d kb", n/1_000); }
-        if (n == 1) { return String.format(ENGLISH, "%d byte", n); }
-        else return String.format(ENGLISH, "%d bytes", n);
+        if (n >= 1_000_000_000) {
+            return String.format(Locale.ROOT, "%.1f GB", n/1_000_000_000.0);
+        }
+        if (n >= 1_000_000) {
+            return String.format(Locale.ROOT, "%.1f MB", n/1_000_000.0);
+        }
+        if (n >= 1_000) {
+            return String.format(Locale.ROOT, "%d kb", n/1_000);
+        }
+        if (n == 1) {
+            return String.format(Locale.ROOT, "%d byte", n);
+        }
+        else {
+            return String.format(Locale.ROOT, "%d bytes", n);
+        }
     }
+
+    /* private methods */
 
 }

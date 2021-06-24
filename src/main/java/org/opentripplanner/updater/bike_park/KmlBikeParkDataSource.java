@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.bike_park;
 
-import static java.util.Locale.ENGLISH;
+import static java.util.Locale.ROOT;
 
 import java.util.List;
 import org.opentripplanner.routing.bike_park.BikePark;
@@ -58,7 +58,7 @@ class KmlBikeParkDataSource implements BikeParkDataSource {
             bikePark.x = Double.parseDouble(coords[0]);
             bikePark.y = Double.parseDouble(coords[1]);
             // There is no ID in KML, assume unique names and location.
-            bikePark.id = String.format(ENGLISH, "%s[%.3f-%.3f]",
+            bikePark.id = String.format(ROOT, "%s[%.3f-%.3f]",
                     bikePark.name.replace(" ", "_"), bikePark.x, bikePark.y);
             return bikePark;
         });

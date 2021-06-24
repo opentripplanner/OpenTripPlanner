@@ -32,7 +32,7 @@ public final class RaptorCostConverter {
    * Convert Raptor internal cost to a string with format $###.## (in seconds)
    */
   public static String toString(int raptorCost) {
-    return String.format(Locale.ENGLISH, "$%.2f",  raptorCost / (double) PRECISION);
+    return String.format(Locale.ROOT, "$%.2f",  raptorCost / (double) PRECISION);
   }
 
   /**

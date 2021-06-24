@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.bike_rental;
 
-import static java.util.Locale.ENGLISH;
+import static java.util.Locale.ROOT;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -81,7 +81,7 @@ public class BikeRentalStation implements Serializable, Cloneable {
     }
     
     public String toString () {
-        return String.format(ENGLISH, "Bike rental station %s at %.6f, %.6f", name, y, x);
+        return String.format(ROOT, "Bike rental station %s at %.6f, %.6f", name, y, x);
     }
 
     @Override

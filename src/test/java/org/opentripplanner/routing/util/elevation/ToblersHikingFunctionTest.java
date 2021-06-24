@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.util.elevation;
 
-import static java.util.Locale.ENGLISH;
+import static java.util.Locale.ROOT;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.routing.util.elevation.ToblersHikingFunctionTest.TestCase.tc;
 
@@ -61,7 +61,7 @@ public class ToblersHikingFunctionTest {
 
         String describe() {
             return String.format(
-                    ENGLISH,
+                    ROOT,
                     "Multiplier at %.1f%% slope angle with dx %.1f and dh %.1f.",
                     slopeAnglePercentage, dx, dh
             );

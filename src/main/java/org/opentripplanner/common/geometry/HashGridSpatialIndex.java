@@ -227,7 +227,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
 
     public String toString() {
         return String.format(
-                Locale.ENGLISH,
+                Locale.ROOT,
                 "HashGridSpatialIndex %f x %f, %d bins allocated, %d objs, %d entries (avg %.2f entries/bin, %.2f entries/object)",
                 this.xBinSize, this.yBinSize, this.nBins, this.nObjects, this.nEntries,
                 this.nEntries * 1.0 / this.nBins, this.nEntries * 1.0 / this.nObjects);
