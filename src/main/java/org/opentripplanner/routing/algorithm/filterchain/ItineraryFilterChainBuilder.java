@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.AddMinSafeTransferCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.CarLegsGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupBySimilarLegsFilter;
@@ -43,6 +44,7 @@ public class ItineraryFilterChainBuilder {
     private double bikeRentalDistanceRatio;
     private double parkAndRideDurationRatio;
     private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
+    private DoubleFunction<Double> carLegsGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
@@ -119,6 +121,22 @@ public class ItineraryFilterChainBuilder {
      */
     public ItineraryFilterChainBuilder withNonTransitGeneralizedCostLimit(DoubleFunction<Double> value){
         this.nonTransitGeneralizedCostLimit = value;
+        return this;
+    }
+
+    /**
+     * This function is used to compute a max-limit for the generalized cost of only the car legs
+     * of an itinerary. This max limit is then used to filter out only itineraries containing car legs.
+     * <p>
+     * The smallest generalized-cost value of car legs is used as input to the function.
+     * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
+     * {@code 5000}, then all itineraries containing car legs that add up to a total cost larger than
+     * {@code 1800 + 2 * 5000 = 11 800} is dropped.
+     *
+     * The default is {@code 600 + 2x} - 10 minutes plus 2 times the lowest cost.
+     */
+    public ItineraryFilterChainBuilder withCarLegsGeneralizedCostFilter(DoubleFunction<Double> value){
+        this.carLegsGeneralizedCostLimit = value;
         return this;
     }
 
@@ -236,6 +254,11 @@ public class ItineraryFilterChainBuilder {
         // Filter non-transit itineraries on generalized-cost
         if(nonTransitGeneralizedCostLimit != null) {
             filters.add(new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit));
+        }
+
+        // Filter non-transit itineraries on generalized-cost
+        if(carLegsGeneralizedCostLimit != null) {
+            filters.add(new CarLegsGeneralizedCostFilter(carLegsGeneralizedCostLimit));
         }
 
         // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that

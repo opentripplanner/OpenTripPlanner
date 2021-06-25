@@ -93,6 +93,19 @@ public class ItineraryFilterParameters {
    */
   public DoubleFunction<Double> nonTransitGeneralizedCostLimit;
 
+  /**
+   * This function is used to compute a max-limit for the generalized cost of only the car legs
+   * of an itinerary. This max limit is then used to filter out only itineraries containing car legs.
+   * <p>
+   * The smallest generalized-cost value of car legs is used as input to the function.
+   * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
+   * {@code 5000}, then all itineraries containing car legs that add up to a total cost larger than
+   * {@code 1800 + 2 * 5000 = 11 800} is dropped.
+   *
+   * The default is {@code 600 + 2x} - 10 minutes plus 2 times the lowest cost.
+   */
+  public DoubleFunction<Double> carLegsGeneralizedCostLimit;
+
 
   private ItineraryFilterParameters() {
     this.debug = false;
@@ -105,6 +118,8 @@ public class ItineraryFilterParameters {
         RequestFunctions.createLinearFunction(3600, 2);
     this.nonTransitGeneralizedCostLimit =
         RequestFunctions.createLinearFunction(3600, 2);
+    this.carLegsGeneralizedCostLimit =
+        RequestFunctions.createLinearFunction(600, 1.5);
   }
 
   public static ItineraryFilterParameters createDefault() {
@@ -118,6 +133,7 @@ public class ItineraryFilterParameters {
       double minSafeTransferTimeFactor,
       DoubleFunction<Double> transitGeneralizedCostLimit,
       DoubleFunction<Double> nonTransitGeneralizedCostLimit,
+      DoubleFunction<Double> carLegsGeneralizedCostLimit,
       double bikeRentalDistanceRatio,
       double parkAndRideDurationRatio
   ) {
@@ -127,6 +143,7 @@ public class ItineraryFilterParameters {
     this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
     this.transitGeneralizedCostLimit = transitGeneralizedCostLimit;
     this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;
+    this.carLegsGeneralizedCostLimit = carLegsGeneralizedCostLimit;
     this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
   }
