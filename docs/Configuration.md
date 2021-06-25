@@ -670,6 +670,46 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
+
+### Tuning transfer optimization
+
+The main purpose of the transfer optimization is to make sure all paths returned do the transfer at the best possible location. OTP post-process all paths returned by the router. We can apply sophisticated calculations that is too slow or not algorithmically valid in Raptor with this strategy. The paths are optimized before the intinerary filter chain.  
+
+For a detailed description of the design and the optimization calculations see the [design documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md) (dev-2.x latest).
+
+#### Transfer optimization configuration
+
+To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers`(default is on). 
+You should leave this on unless you there is a critical issue with it. The OTPFeature `GuaranteedTransfers` will toggle on and off the priority optimization (part of optimize transfers).
+
+The order for the transfer priority is:
+
+1. STAY SEATED
+2. GUARANTIED
+3. PREFERRED
+4. RECOMMENDED
+5. ALLOWED
+6. NOT_ALLOWED
+
+If to paths have the same priority cost then the wait-time is optimized to maximize the wait time and avoid very little time to do the transfer. This is balanced with the generalized-cost. The cost is adjusted with a new cost for the wait-time. The new wait-time cost follow a inverse logarithmic describing cost function(See design doc). 
+
+The defaults should work fine, but if you have results with "back-travel" try increasing the two parameters `minSafeWaitTimeFactor` and `inverseWaitReluctance`.
+
+```JSON
+// router-config.json
+{
+  "routingDefaults": {
+    "transferOptimization": {
+      "optimizeTransferWaitTime": true,
+      "minSafeWaitTimeFactor": 5.0,
+      "inverseWaitReluctance": 1.0
+    }
+  }
+}
+```
+See the [TransferOptimizationParameters](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/api/TransferOptimizationParameters.java) (dev-2.x latest) for a description on these parameters.
+
+
 ### Tuning itinerary filtering
 Nested inside `routingDefaults { itineraryFilters{...} }` in `router-config.json`.
 
