@@ -128,7 +128,6 @@ public class TransfersPermutationService<T extends RaptorTripSchedule> {
             : new TransferPathLeg<>(
                 tx.from().stop(),
                 departureTime,
-                tx.to().stop(),
                 arrivalTime,
                 tx.getTransfer(),
                 p

@@ -19,12 +19,11 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> extends Interme
     public TransferPathLeg(
             int fromStop,
             int fromTime,
-            int toStop,
             int toTime,
             RaptorTransfer transfer,
             PathLeg<T> next
     ) {
-        super(fromStop, fromTime, toStop, toTime, transfer.generalizedCost());
+        super(fromStop, fromTime, transfer.stop(), toTime, transfer.generalizedCost());
         this.transfer = transfer;
         this.next = next;
     }
