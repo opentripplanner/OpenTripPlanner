@@ -38,6 +38,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.util.PolylineEncoder;
 
 /**
@@ -120,7 +121,9 @@ public class RaptorPathToItineraryMapper {
         itinerary.arrivedAtDestinationWithRentedBicycle = mapped != null && mapped.arrivedAtDestinationWithRentedBicycle;
 
         if(optimizedPath != null) {
-            itinerary.waitTimeAdjustedGeneralizedCost = optimizedPath.getWaitTimeOptimizedCost();
+            itinerary.waitTimeAdjustedGeneralizedCost = RaptorCostConverter.toOtpDomainCost(
+                    optimizedPath.getWaitTimeOptimizedCost()
+            );
         }
 
         return itinerary;
