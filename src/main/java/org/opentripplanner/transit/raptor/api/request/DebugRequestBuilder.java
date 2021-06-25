@@ -52,11 +52,14 @@ public class DebugRequestBuilder {
         return addStops(Arrays.stream(stops).boxed().collect(Collectors.toList()));
     }
 
+    /**
+     * The list of stops for a given path to debug.
+     */
     public List<Integer> path() {
         return path;
     }
 
-    public DebugRequestBuilder addPath(Collection<Integer> path) {
+    public DebugRequestBuilder addPath(List<Integer> path) {
         if(!this.path.isEmpty()) {
             throw new IllegalStateException("The API support only one debug path. Existing: " + this.path + ", new: " + path);
         }

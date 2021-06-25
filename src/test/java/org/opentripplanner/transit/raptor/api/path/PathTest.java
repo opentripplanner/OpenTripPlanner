@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_START;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_STRING;
@@ -66,6 +67,22 @@ public class PathTest {
     @Test
     public void transitLegs() {
         assertEquals(3, subject.transitLegs().count());
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void nextTransitLeg() {
+        TransitPathLeg<?> leg = subject.accessLeg().nextTransitLeg();
+        assertEquals("BUS L11 10:04-10:35(31m) ~ 2", leg.toString());
+
+        leg = leg.nextTransitLeg();
+        assertEquals("BUS L21 11:00-11:23(23m) ~ 4", leg.toString());
+
+        leg = leg.nextTransitLeg();
+        assertEquals("BUS L31 11:40-11:52(12m) ~ 5", leg.toString());
+
+        leg = leg.nextTransitLeg();
+        assertNull(leg);
     }
 
     @Test

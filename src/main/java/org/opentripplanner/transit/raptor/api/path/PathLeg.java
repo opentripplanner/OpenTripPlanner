@@ -196,8 +196,6 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
     }
 
     /**
-     * TODO TGR: REMOVE THIS IS VERY UC SPESIFIC
-     *
      * Return the next transit leg in the path after this one, if no more
      * transit exist before reaching the destination {@code null} is returned.
      */
