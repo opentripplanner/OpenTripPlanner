@@ -273,10 +273,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             final long t1 = System.currentTimeMillis();
 
             final InputStream data = HttpUtils.getData(
-                dataInitializationUrl,
-                Map.of("Content-Type", "application/x-protobuf"),
-                30000
-            );
+                dataInitializationUrl, 30000, Map.of("Content-Type", "application/x-protobuf"));
             ByteString value = ByteString.readFrom(data);
 
             final long t2 = System.currentTimeMillis();

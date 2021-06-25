@@ -29,7 +29,9 @@ public class HttpUtils {
         return getData(URI.create(uri));
     }
 
-    public static InputStream getData(URI uri, Map<String, String> requestHeaderValues, long timeout) throws IOException {
+    public static InputStream getData(
+        URI uri, long timeout, Map<String, String> requestHeaderValues
+    ) throws IOException {
         HttpGet httpget = new HttpGet(uri);
         if (requestHeaderValues != null) {
             for (Map.Entry<String, String> entry : requestHeaderValues.entrySet()) {
@@ -50,7 +52,7 @@ public class HttpUtils {
     }
 
     public static InputStream getData(URI uri, Map<String, String> requestHeaderValues) throws IOException {
-        return getData(uri, requestHeaderValues, TIMEOUT_CONNECTION);
+        return getData(uri, TIMEOUT_CONNECTION, requestHeaderValues);
     }
 
     public static void testUrl(String url) throws IOException {
