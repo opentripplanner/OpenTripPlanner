@@ -87,6 +87,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
 
         StateEditor s1 = s0.edit(this);
 
+        if (s0.getNonTransitMode() == null) { return null; }
+
         switch (s0.getNonTransitMode()) {
             case BICYCLE:
                 // Forbid taking your own bike in the station if bike P+R activated.
