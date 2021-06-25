@@ -110,6 +110,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             if (n == 0) {
                 issueStore.add(new StopNotLinkedForTransfers(ts0));
             }
+            else {
+                nLinkableStops++;
+            }
             //Keep lambda! A method-ref would causes incorrect class and line number to be logged
             //noinspection Convert2MethodRef
             progress.step(m -> LOG.info(m));
