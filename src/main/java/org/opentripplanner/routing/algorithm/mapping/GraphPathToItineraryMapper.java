@@ -291,6 +291,8 @@ public abstract class GraphPathToItineraryMapper {
         // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
         leg.interlineWithPreviousLeg = false;
 
+        leg.walkingBike = states[states.length - 1].isBackWalkingBike();
+
         leg.rentedBike = states[0].isBikeRenting();
 
         if (leg.rentedBike) {
