@@ -686,7 +686,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             || nodes.subList(0, i).contains(nodes.get(i))
                             || osmEndNode.hasTag("ele")
                             || osmEndNode.isStop()
-                            || osmEndNode.isBollard()) {
+                            || osmEndNode.isBarrier()) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
 
                         geometry = GeometryUtils.getGeometryFactory().createLineString(
@@ -1286,7 +1286,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     }
                 }
 
-                if (node.isBollard()) {
+                if (node.isBarrier()) {
                     BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
                     bv.setBarrierPermissions(OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions));
                     iv = bv;

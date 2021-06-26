@@ -61,6 +61,7 @@ public class ConstantsForTests {
     public static final String VVS_BUS_764_ONLY = "src/test/resources/germany/vvs-bus-764-only.gtfs.zip";
     public static final String VVS_BUS_751_ONLY = "src/test/resources/germany/vvs-bus-751-only.gtfs.zip";
     public static final String HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = "src/test/resources/germany/herrenberg-hindenburgstr-under-construction.osm.pbf";
+    public static final String HERRENBERG_BARRIER_GATES_OSM = "src/test/resources/germany/herrenberg-barrier-gates.osm.pbf";
     public static final String HERRENBERG_OSM = "src/test/resources/germany/herrenberg-minimal.osm.pbf";
 
     private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
