@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
+
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -25,6 +27,11 @@ public class Walk extends AbstractStopArrival {
 
             @Override public int durationInSeconds() {
                 return Math.abs(arrivalTime - departureTime);
+            }
+
+            @Override
+            public int generalizedCost() {
+                return walkCost(durationInSeconds());
             }
         };
     }

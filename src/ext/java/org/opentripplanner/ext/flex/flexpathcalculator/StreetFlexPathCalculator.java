@@ -2,6 +2,7 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -75,16 +76,15 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     routingRequest.arriveBy = reverseDirection;
     if (reverseDirection) {
       routingRequest.setRoutingContext(graph, null, vertex);
-      routingRequest.worstTime = routingRequest.dateTime - MAX_FLEX_TRIP_DURATION_SECONDS;
     } else {
       routingRequest.setRoutingContext(graph, vertex, null);
-      routingRequest.worstTime = routingRequest.dateTime + MAX_FLEX_TRIP_DURATION_SECONDS;
     }
     routingRequest.disableRemainingWeightHeuristic = true;
     routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
     routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
     routingRequest.oneToMany = true;
     AStar search = new AStar();
+    search.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(MAX_FLEX_TRIP_DURATION_SECONDS));
     ShortestPathTree spt = search.getShortestPathTree(routingRequest);
     routingRequest.cleanup();
     return spt;

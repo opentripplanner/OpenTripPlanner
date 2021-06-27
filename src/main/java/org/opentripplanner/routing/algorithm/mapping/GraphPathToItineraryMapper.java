@@ -76,26 +76,10 @@ public abstract class GraphPathToItineraryMapper {
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.locale);
             if (itinerary.legs.isEmpty()) { continue; }
-            itinerary = adjustItinerary(request, itinerary);
             itineraries.add(itinerary);
         }
 
         return itineraries;
-    }
-
-    /**
-     * Check whether itinerary needs adjustments based on the request.
-     * @param itinerary is the itinerary
-     * @param request is the request containing the original trip planning options
-     * @return the (adjusted) itinerary
-     */
-    private static Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
-        // Check walk limit distance
-        if (itinerary.nonTransitDistanceMeters > request.maxWalkDistance) {
-            itinerary.nonTransitLimitExceeded = true;
-        }
-        // Return itinerary
-        return itinerary;
     }
 
     /**
@@ -129,7 +113,7 @@ public abstract class GraphPathToItineraryMapper {
 
         boolean first = true;
         for (Leg leg : legs) {
-            AlertToLegMapper.addAlertPatchesToLeg(graph, leg, first, requestedLocale);
+            AlertToLegMapper.addTransitAlertPatchesToLeg(graph, leg, first, requestedLocale);
             first = false;
         }
 
@@ -203,13 +187,18 @@ public abstract class GraphPathToItineraryMapper {
         int[] legIndexPairs = {0, states.length - 1};
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
+        TraverseMode lastMode = null;
         for (int i = 1; i < states.length - 1; i++) {
             var backState = states[i];
             var forwardState = states[i + 1];
             var backMode = backState.getBackMode();
             var forwardMode = forwardState.getBackMode();
 
-            var modeChange = backMode != forwardMode && backMode != null && forwardMode != null;
+            if (backMode != null) {
+                lastMode = backMode;
+            }
+
+            var modeChange = lastMode != forwardMode && lastMode != null && forwardMode != null;
             var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
             var parkingChange = backState.isBikeParked() != forwardState.isBikeParked()
                     || backState.isCarParked() != forwardState.isCarParked();
@@ -218,6 +207,12 @@ public abstract class GraphPathToItineraryMapper {
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[] {i, states.length - 1};
+            }
+
+            if (rentalChange || parkingChange) {
+                /* Clear the lastMode, so that switching modes doesn't re-trigger a mode change
+                 * a few states latter. */
+                lastMode = null;
             }
         }
 
@@ -290,6 +285,8 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
 
+        leg.generalizedCost = (int) (states[states.length - 1].getWeight() - states[0].getWeight());
+
         // Interlining information is now in a separate field in Graph, not in edges.
         // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
         leg.interlineWithPreviousLeg = false;
@@ -303,7 +300,7 @@ public abstract class GraphPathToItineraryMapper {
             }
         }
 
-        addAlerts(graph, leg, states);
+        addStreetNotes(graph, leg, states);
 
         if (flexEdge != null) {
             FlexLegMapper.fixFlexTripLeg(leg, flexEdge);
@@ -424,7 +421,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addAlerts(Graph graph, Leg leg, State[] states) {
+    private static void addStreetNotes(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
             Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
 

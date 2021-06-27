@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.raptor.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
+import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
+
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
@@ -7,10 +12,6 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 public class HeuristicToRunResolverTest {
 
@@ -123,6 +124,7 @@ public class HeuristicToRunResolverTest {
         return new RaptorTransfer() {
             @Override public int stop() { return 1; }
             @Override public int durationInSeconds() { return 10; }
+            @Override public int generalizedCost() { return walkCost(durationInSeconds()); }
             @Override public String toString() { return asString(); }
         };
     }

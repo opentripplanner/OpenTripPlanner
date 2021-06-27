@@ -43,11 +43,6 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
     );
 
     /**
-     * Calculate the value when arriving by transfer.
-     */
-    int walkCost(int walkTimeInSeconds);
-
-    /**
      * Calculate the value, when waiting between the last transit and egress paths
      */
     int waitCost(int waitTimeInSeconds);

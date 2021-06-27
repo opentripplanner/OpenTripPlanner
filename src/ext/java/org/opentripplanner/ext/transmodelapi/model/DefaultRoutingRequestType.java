@@ -42,27 +42,13 @@ public class DefaultRoutingRequestType {
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
-                        .name("maxWalkDistance")
+                        .name("maxDirectStreetDuration")
                         .description(
-                                "The maximum distance (in meters) the user is willing to walk for access/egress legs.")
+                                "This is the maximum duration in seconds for a direct street search. "
+                                    + "This is a performance limit and should therefore be set high. "
+                                    + "Use filters to limit what is presented to the client.")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(env -> request.maxWalkDistance)
-                        .build())
-                .field(GraphQLFieldDefinition
-                        .newFieldDefinition()
-                        .name("maxTransferWalkDistance")
-                        .description(
-                                "The maximum distance (in meters) the user is willing to walk for transfer legs.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(env -> request.maxTransferWalkDistance)
-                        .build())
-                .field(GraphQLFieldDefinition
-                        .newFieldDefinition()
-                        .name("maxPreTransitTime")
-                        .description(
-                                "The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride or kiss and ride).")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(env -> request.maxPreTransitTime)
+                        .dataFetcher(env -> request.maxDirectStreetDurationSeconds)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()

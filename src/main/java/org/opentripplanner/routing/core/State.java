@@ -50,7 +50,7 @@ public class State implements Cloneable {
     public static Collection<State> getInitialStates(RoutingRequest request) {
         Collection<State> states = new ArrayList<>();
         for (Vertex vertex : request.rctx.fromVertices) {
-            /* carPickup searches may end in two states (see isFinal()): IN_CAR and WALK_FROM_DROP_OFF/WALK_TO_PICKUP
+            /* carPickup searches may end in two distinct states: IN_CAR and WALK_FROM_DROP_OFF/WALK_TO_PICKUP
                for forward/reverse searches to be symmetric both initial states need to be created. */
             if (request.carPickup) {
                 states.add(
@@ -330,21 +330,16 @@ public class State implements Cloneable {
         boolean bikeRentingOk;
         boolean bikeParkAndRideOk;
         boolean carParkAndRideOk;
-        boolean pickedUpByCar;
         if (stateData.opt.arriveBy) {
             bikeRentingOk = !stateData.opt.bikeRental || !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
-            // Checks that taxi has actually been used
-            pickedUpByCar = getCarPickupState() != CarPickupState.WALK_FROM_DROP_OFF;
         } else {
             bikeRentingOk = !stateData.opt.bikeRental || (bikeRentalNotStarted() || bikeRentalIsFinished());
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
-            // Checks that taxi has actually been used
-            pickedUpByCar = getCarPickupState() != CarPickupState.WALK_TO_PICKUP;
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && pickedUpByCar;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
     }
 
     public double getWalkDistance() {
@@ -621,12 +616,8 @@ public class State implements Cloneable {
         return reverse();
     }
 
-    boolean hasEnteredMotorVehicleNoThruTrafficArea() {
-        return stateData.enteredMotorVehicleNoThroughTrafficArea;
-    }
-
-    public boolean hasEnteredBicycleNoThruTrafficArea() {
-        return stateData.enteredBicycleNoThroughTrafficArea;
+    public boolean hasEnteredNoThruTrafficArea() {
+        return stateData.enteredNoThroughTrafficArea;
     }
 
     public boolean mayKeepRentedBicycleAtDestination() {

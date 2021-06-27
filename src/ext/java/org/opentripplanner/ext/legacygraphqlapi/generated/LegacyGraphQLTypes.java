@@ -417,7 +417,9 @@ public class LegacyGraphQLTypes {
         Bus("BUS"),
         CableCar("CABLE_CAR"),
         Car("CAR"),
+        Coach("COACH"),
         Ferry("FERRY"),
+        Flex("FLEX"),
         Flexible("FLEXIBLE"),
         Funicular("FUNICULAR"),
         Gondola("GONDOLA"),
@@ -527,7 +529,10 @@ public class LegacyGraphQLTypes {
         Park("PARK"),
         Keep("KEEP"),
         Pickup("PICKUP"),
-        Dropoff("DROPOFF");
+        Dropoff("DROPOFF"),
+        Access("ACCESS"),
+        Egress("EGRESS"),
+        Direct("DIRECT");
 
         public final String label;
 

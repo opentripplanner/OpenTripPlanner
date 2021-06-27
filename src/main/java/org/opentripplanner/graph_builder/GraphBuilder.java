@@ -21,6 +21,7 @@ import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.S3BucketConfig;
@@ -217,11 +218,13 @@ public class GraphBuilder implements Runnable {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! config.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDistance));
+                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds));
             }
             // Analyze routing between stops to generate report
             if (OTPFeature.TransferAnalyzer.isOn()) {
-                graphBuilder.addModule(new DirectTransferAnalyzer(config.maxTransferDistance));
+                graphBuilder.addModule(new DirectTransferAnalyzer(
+                    config.maxTransferDurationSeconds * new RoutingRequest().walkSpeed)
+                );
             }
         }
 

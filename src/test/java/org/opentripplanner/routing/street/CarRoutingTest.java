@@ -97,6 +97,18 @@ public class CarRoutingTest {
         );
     }
 
+    @Test
+    public void planningFromNoThroughTrafficPlaceTest() {
+        var noThroughTrafficPlace = new GenericLocation(48.59634, 8.87020);
+        var destination = new GenericLocation(48.59463, 8.87218);
+
+        var polyline1 = computePolyline(herrenbergGraph, noThroughTrafficPlace, destination);
+        assertThatPolylinesAreEqual(polyline1, "corgHkncu@OEYUOMH?J?LINMNMHTDO@YMm@HS`A}BPGRWLYDEt@HJ@b@?Fc@DONm@t@OXCBz@B\\");
+
+        var polyline2 = computePolyline(herrenbergGraph, destination, noThroughTrafficPlace);
+        assertThatPolylinesAreEqual(polyline2, "scrgH_zcu@C]C{@YBu@NOl@ENGb@c@?KAu@IEDMXSVQFaA|BIRLl@AXENIUOLOLMHK?I?NLXTND");
+    }
+
     private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
         RoutingRequest request = new RoutingRequest();
         request.dateTime = dateTime;

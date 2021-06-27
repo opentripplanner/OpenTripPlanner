@@ -864,11 +864,17 @@ enum Mode {
     """CAR"""
     CAR
 
+    """COACH"""
+    COACH
+
     """FERRY"""
     FERRY
 
     """Enables flexible transit for access and egress legs"""
-    FLEXIBLE
+    FLEX
+
+    """Enables flexible transit for access and egress legs"""
+    FLEXIBLE   @deprecated(reason: "Use FLEX instead")
 
     """FUNICULAR"""
     FUNICULAR
@@ -1179,7 +1185,7 @@ enum Qualifier {
     ~~HAVE~~
     **Currently not used**
     """
-    HAVE
+    HAVE    @deprecated(reason: "Currently not used")
 
     """
     The vehicle used must be left to a parking area before continuing the journey.
@@ -1194,13 +1200,22 @@ enum Qualifier {
     ~~KEEP~~
     **Currently not used**
     """
-    KEEP
+    KEEP    @deprecated(reason: "Currently not used")
 
     """The user can be picked up by someone else riding a vehicle"""
     PICKUP
 
     """The user can be dropped off by someone else riding a vehicle"""
     DROPOFF
+
+    """The mode is used for the access part of the search."""
+    ACCESS,
+
+    """The mode is used for the egress part of the search."""
+    EGRESS,
+
+    """The mode is used for the direct street search."""
+    DIRECT
 }
 
 type QueryType {
@@ -1595,12 +1610,16 @@ type QueryType {
         transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get
         an itinerary which has (useless) back and forth public transport legs to
         avoid walking too long distances.
+
+        DEPRECATED - Use walkReluctance instead
         """
         maxWalkDistance: Float
 
         """
         The maximum time (in seconds) of pre-transit travel when using
         drive-to-transit (park and ride or kiss and ride). Default value: 1800.
+
+        DEPRECATED - Use walkReluctance or future reluctance parameters for other modes
         """
         maxPreTransitTime: Int
 
@@ -1618,6 +1637,24 @@ type QueryType {
         argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).
         """
         itineraryFiltering: Float
+
+        """
+        A multiplier for how bad biking is, compared to being in transit for equal
+        lengths of time. Default value: 2.0
+        """
+        bikeReluctance: Float
+
+        """
+        A multiplier for how bad walking with a bike is, compared to being in transit for equal
+        lengths of time. Default value: 5.0
+        """
+        bikeWalkingReluctance: Float
+
+        """
+        A multiplier for how bad driving is, compared to being in transit for equal
+        lengths of time. Default value: 3.0
+        """
+        carReluctance: Float
 
         """
         A multiplier for how bad walking is, compared to being in transit for equal

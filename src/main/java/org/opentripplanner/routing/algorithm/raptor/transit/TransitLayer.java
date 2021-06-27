@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRequestTransferCache;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class TransitLayer {
 
@@ -38,6 +41,8 @@ public class TransitLayer {
 
   private final ZoneId transitDataZoneId;
 
+  private final RaptorRequestTransferCache transferCache;
+
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
    * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace
@@ -49,7 +54,8 @@ public class TransitLayer {
         transitLayer.simpleTransfersByStopIndex,
         transitLayer.transferService,
         transitLayer.stopIndex,
-        transitLayer.transitDataZoneId
+        transitLayer.transitDataZoneId,
+        transitLayer.transferCache
     );
   }
 
@@ -58,13 +64,15 @@ public class TransitLayer {
       List<List<Transfer>> simpleTransfers,
       TransferService transferService,
       StopIndexForRaptor stopIndex,
-      ZoneId transitDataZoneId
+      ZoneId transitDataZoneId,
+      RaptorRequestTransferCache transferCache
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.simpleTransfersByStopIndex = simpleTransfers;
     this.transferService = transferService;
     this.stopIndex = stopIndex;
     this.transitDataZoneId = transitDataZoneId;
+    this.transferCache = transferCache;
   }
 
   public int getIndexByStop(Stop stop) {
@@ -120,6 +128,10 @@ public class TransitLayer {
 
   public TransferService getTransferService() {
     return transferService;
+  }
+
+  public List<List<RaptorTransfer>> getRaptorTransfersForRequest(RoutingRequest routingRequest) {
+    return transferCache.get(simpleTransfersByStopIndex, routingRequest);
   }
 
   /**
