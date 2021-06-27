@@ -66,6 +66,10 @@ import java.util.Set;
  * Anyway, since we're not going to run an O(N^3) algorithm at runtime just to give people who don't
  * understand Snell's Law weird paths that they can complain about, this should be just fine.
  * </p>
+ *
+ * TODO this approach could be replaced by building a walkable grid of edges for an area, so the
+ * number of edges for an area wouldn't be determined by the nodes. The current approach can lead
+ * to an excessive number of edges, or to no edges at all if maxAreaNodes is surpassed.
  * 
  */
 public class WalkableAreaBuilder {
