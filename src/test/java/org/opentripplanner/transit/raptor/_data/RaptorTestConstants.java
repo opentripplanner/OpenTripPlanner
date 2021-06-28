@@ -15,10 +15,12 @@ public interface RaptorTestConstants {
   int D2m = duration("2m");
   int D2m1s = duration("2m1s");
   int D3m = duration("3m");
+  int D4m = duration("4m");
   int D5m = duration("5m");
   int D6m = duration("6m");
   int D7m = duration("7m");
   int D10m = duration("10m");
+  int D20m = duration("20m");
 
   // Time constants, all values are in seconds
   int T00_00 = hm2time(0, 0);
@@ -47,4 +49,8 @@ public interface RaptorTestConstants {
   int BOARD_SLACK = 45;
   int ALIGHT_SLACK = 15;
   int TRANSFER_SLACK = 60;
+
+  // FLEX
+  int ONE_RIDE = 1;
+  int TWO_RIDES = 2;
 }

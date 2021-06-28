@@ -66,12 +66,12 @@ public abstract class SnapshotTestBase {
     protected Router router;
 
     public static void loadGraphBeforeClass() {
-        ConstantsForTests.getInstance().getPortlandGraph();
+        ConstantsForTests.getInstance().getCachedPortlandGraph();
     }
 
     protected Router getRouter() {
         if (router == null) {
-            Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
+            Graph graph = ConstantsForTests.getInstance().getCachedPortlandGraph();
 
             router = new Router(graph, RouterConfig.DEFAULT);
             router.startup();
@@ -225,13 +225,12 @@ public abstract class SnapshotTestBase {
                 .collect(Collectors.joining(","));
 
         return String.format(
-                "http://localhost:8080/?module=planner&fromPlace=%s&toPlace=%s&date=%s&time=%s&mode=%s&maxWalkDistance=%s&arriveBy=%s&wheelchair=%s",
+                "http://localhost:8080/?module=planner&fromPlace=%s&toPlace=%s&date=%s&time=%s&mode=%s&arriveBy=%s&wheelchair=%s",
                 formatPlace(request.from),
                 formatPlace(request.to),
                 dateTime.toLocalDate().format(apiDateFormatter),
                 dateTime.toLocalTime().format(apiTimeFormatter),
                 modes,
-                request.maxWalkDistance,
                 request.arriveBy,
                 request.wheelchairAccessible
         );
@@ -342,5 +341,18 @@ public abstract class SnapshotTestBase {
         public String getOutputFormat() {
             return SerializerType.JSON.name();
         }
+    }
+
+    /**
+     * The generalizedCost for non-transit legs may differ for departAt / arriveBy searches,
+     * depending on where the costs were applied.
+     */
+    public static void handleGeneralizedCost(Itinerary departAt, Itinerary arriveBy) {
+        departAt.legs.stream()
+                .filter(l -> !l.mode.isTransit())
+                .forEach(l -> l.generalizedCost = 0);
+        arriveBy.legs.stream()
+                .filter(l -> !l.mode.isTransit())
+                .forEach(l -> l.generalizedCost = 0);
     }
 }

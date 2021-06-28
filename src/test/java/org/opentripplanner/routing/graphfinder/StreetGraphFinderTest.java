@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.graphfinder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.graphfinder.DirectGraphFinderTest.linestring;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -99,8 +98,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
 
     @Test
     void findClosestStops() {
-        var ns1 = new NearbyStop(S1, 0, null, linestring(47.500, 19.000, 47.500, 19.001), null);
-        var ns2 = new NearbyStop(S2, 100, null, linestring(47.500, 19.000, 47.510, 19.000, 47.510, 19.001), null);
+        var ns1 = new NearbyStop(S1.getStop(), 0, null, null, null);
+        var ns2 = new NearbyStop(S2.getStop(), 100, null, null, null);
 
         assertEquals(
                 List.of(ns1),
@@ -294,7 +293,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
     private List<NearbyStop> simplify(List<NearbyStop> closestStops) {
         return closestStops.stream().map(
                 ns -> new NearbyStop(
-                        ns.stop, ns.distance, ns.distanceIndependentTime, null, ns.geometry, null
+                        ns.stop, ns.distance, null, null, null
                 )
         )
                 .collect(Collectors.toList());

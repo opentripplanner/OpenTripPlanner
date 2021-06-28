@@ -1,11 +1,15 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
+import java.util.Locale;
 import java.util.Set;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -13,8 +17,11 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 @ExtendWith(SnapshotExtension.class)
+@ResourceLock(Resources.LOCALE)
 public class BikeRentalSnapshotTest
         extends SnapshotTestBase {
+
+    private static final Locale DEFAULT_LOCALE = Locale.getDefault();
 
     static GenericLocation p1 = new GenericLocation("SW Johnson St. & NW 24th Ave. (P1)", null,
             45.52832, -122.70059);
@@ -27,7 +34,13 @@ public class BikeRentalSnapshotTest
 
     @BeforeAll
     public static void beforeClass() {
+        Locale.setDefault(Locale.US);
         loadGraphBeforeClass();
+    }
+
+    @AfterAll
+    public static void afterClass() {
+        Locale.setDefault(DEFAULT_LOCALE);
     }
 
     @DisplayName("Direct BIKE_RENTAL")
@@ -35,7 +48,7 @@ public class BikeRentalSnapshotTest
     public void directBikeRental() {
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
 
-        request.modes = new RequestModes(null, null, StreetMode.BIKE_RENTAL, Set.of());
+        request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
         request.from = p1;
         request.to = p2;
 
@@ -45,6 +58,8 @@ public class BikeRentalSnapshotTest
              */
             arriveBy.legs.get(1).endTime = departAt.legs.get(1).endTime;
             arriveBy.legs.get(2).startTime = departAt.legs.get(2).startTime;
+
+            handleGeneralizedCost(departAt, arriveBy);
         });
     }
 
@@ -52,7 +67,7 @@ public class BikeRentalSnapshotTest
     @Test public void directBikeRentalArrivingAtDestination() {
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
 
-        request.modes = new RequestModes(null, null, StreetMode.BIKE_RENTAL, Set.of());
+        request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
         request.allowKeepingRentedBicycleAtDestination = true;
         request.from = p1;
         request.to = p2;
@@ -63,6 +78,8 @@ public class BikeRentalSnapshotTest
              */
             arriveBy.legs.get(1).endTime = departAt.legs.get(1).endTime;
             arriveBy.legs.get(2).startTime = departAt.legs.get(2).startTime;
+
+            handleGeneralizedCost(departAt, arriveBy);
         });
     }
 
@@ -70,7 +87,7 @@ public class BikeRentalSnapshotTest
     @Test public void accessBikeRental() {
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 14, 0);
 
-        request.modes = new RequestModes(StreetMode.BIKE_RENTAL, StreetMode.WALK, null, Set.of(TransitMode.values()));
+        request.modes = new RequestModes(StreetMode.BIKE_RENTAL, StreetMode.WALK,  StreetMode.WALK, null, Set.of(TransitMode.values()));
         request.from = p1;
         request.to = p3;
 
@@ -81,10 +98,10 @@ public class BikeRentalSnapshotTest
     @Test public void egressBikeRental() {
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
 
-        request.modes = new RequestModes(StreetMode.WALK, StreetMode.BIKE_RENTAL, null, Set.of(TransitMode.values()));
+        request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.BIKE_RENTAL, null, Set.of(TransitMode.values()));
         request.from = p3;
         request.to = p1;
 
-        expectArriveByToMatchDepartAtAndSnapshot(request);
+        expectArriveByToMatchDepartAtAndSnapshot(request, SnapshotTestBase::handleGeneralizedCost);
     }
 }

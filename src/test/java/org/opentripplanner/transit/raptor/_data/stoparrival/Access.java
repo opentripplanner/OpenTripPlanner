@@ -1,20 +1,20 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.AccessPathView;
-
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class Access extends AbstractStopArrival {
 
     private final RaptorTransfer access;
 
     public Access(int stop, int departureTime, int arrivalTime, int cost) {
-        this(stop, arrivalTime, cost, walk(stop, Math.abs(arrivalTime - departureTime)));
+        this(stop, arrivalTime, walk(stop, Math.abs(arrivalTime - departureTime), cost));
     }
 
-    public Access(int stop, int arrivalTime, int cost, RaptorTransfer path) {
-        super(0, stop, arrivalTime, cost, null);
+    public Access(int stop, int arrivalTime, RaptorTransfer path) {
+        super(0, stop, arrivalTime, path.generalizedCost(), null);
         this.access = path;
     }
 

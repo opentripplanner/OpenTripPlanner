@@ -155,7 +155,7 @@ public class OptimizeTransferCostCalculator {
   public int cost(Path<?> path) {
     // We use the path generalized-cost as a starting point minus the cost of waiting.
     // We want to maximize the waiting, but balance it toward walking and time spent on-board.
-    double cost = path.generalizedCost() - waitFactorCombined * path.waitTime();
+    int cost = path.generalizedCost() - RaptorCostConverter.toRaptorCost(waitFactorCombined * path.waitTime());
 
     // We ignore the fact that a flex leg might have rides, because we are not considering
     // transfers between FLEX and regular transit here. That would require more knowledge about
@@ -177,12 +177,12 @@ public class OptimizeTransferCostCalculator {
       prev = curr;
       curr = curr.nextLeg();
     }
-    return RaptorCostConverter.toRaptorCost(cost);
+    return cost;
   }
 
-  double calculateOptimizedWaitCost(int waitTime) {
+  int calculateOptimizedWaitCost(int waitTime) {
     assertMinSafeTransferTimeSet();
-    return n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime));
+    return RaptorCostConverter.toRaptorCost(n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime)));
   }
 
   private void assertMinSafeTransferTimeSet() {

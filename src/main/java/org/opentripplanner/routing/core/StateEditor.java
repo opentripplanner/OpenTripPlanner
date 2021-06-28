@@ -180,16 +180,22 @@ public class StateEditor {
 
     /* Basic Setters */
 
-    public void setEnteredMotorVerhicleNoThroughTrafficArea() {
-        child.stateData.enteredMotorVehicleNoThroughTrafficArea = true;
+    public void resetEnteredNoThroughTrafficArea() {
+        if (!child.stateData.enteredNoThroughTrafficArea) {
+            return;
+        }
+
+        cloneStateDataAsNeeded();
+        child.stateData.enteredNoThroughTrafficArea = false;
     }
 
-    public void resetEnteredMotorVerhicleNoThroughTrafficArea() {
-        child.stateData.enteredMotorVehicleNoThroughTrafficArea = true;
-    }
+    public void setEnteredNoThroughTrafficArea() {
+        if (child.stateData.enteredNoThroughTrafficArea) {
+            return;
+        }
 
-    public void setEnteredBicycleNoThroughTrafficArea() {
-        child.stateData.enteredBicycleNoThroughTrafficArea = true;
+        cloneStateDataAsNeeded();
+        child.stateData.enteredNoThroughTrafficArea = true;
     }
 
     public void setBackMode(TraverseMode mode) {
@@ -265,6 +271,7 @@ public class StateEditor {
             child.stateData.bikeRentalState = BikeRentalState.HAVE_RENTED;
             child.stateData.currentMode = TraverseMode.WALK;
             child.stateData.bikeRentalNetworks = null;
+            child.stateData.backWalkingBike = false;
         }
     }
 
@@ -313,6 +320,7 @@ public class StateEditor {
         child.stateData.carPickupState = state.stateData.carPickupState;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
+        child.stateData.backWalkingBike = state.stateData.backWalkingBike;
     }
 
     public void setNonTransitOptionsFromState(State state) {
@@ -381,11 +389,7 @@ public class StateEditor {
         child.stateData.bikeRentalNetworks = networks;
     }
 
-    public boolean hasEnteredMotorVehicleNoThroughTrafficArea() {
-        return child.hasEnteredMotorVehicleNoThruTrafficArea();
-    }
-
-    public boolean hasEnteredBicycleNoThroughTrafficArea() {
-        return child.hasEnteredBicycleNoThruTrafficArea();
+    public State getBackState() {
+        return child.getBackState();
     }
 }

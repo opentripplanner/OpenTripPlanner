@@ -56,8 +56,8 @@ public interface TransferPoint {
 
   /**
    * If the given transfer point is a {@link TripTransferPoint}, this method return the stop
-   * position in the trip pattern. If this transfer point is just a stop or a stop+rout this method
-   * return {@link #NOT_AVAILABLE}.
+   * position in the trip pattern. If this transfer point is just a stop or a stop+route this
+   * method return {@link #NOT_AVAILABLE}.
    */
   default int getStopPosition() {
     return NOT_AVAILABLE;

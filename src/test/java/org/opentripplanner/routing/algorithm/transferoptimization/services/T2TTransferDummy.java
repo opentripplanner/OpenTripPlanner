@@ -36,13 +36,13 @@ class T2TTransferDummy {
   /** Transfer from trip & stop, walk, to stop & trip */
   static TripToTripTransfer<TestTripSchedule> tx(
           TestTripSchedule fromTrip, int fromStop,
-          int walk,
+          int walkDuration,
           int toStop, TestTripSchedule toTrip
   ) {
     return new TripToTripTransfer<>(
         arrival(fromTrip, fromTrip.pattern().findStopPositionAfter(0, fromStop)),
         departure(toTrip, toTrip.pattern().findStopPositionAfter(0, toStop)),
-        fromStop == toStop ? null : walk(toStop, walk)
+        fromStop == toStop ? null : walk(toStop, walkDuration)
     );
   }
 

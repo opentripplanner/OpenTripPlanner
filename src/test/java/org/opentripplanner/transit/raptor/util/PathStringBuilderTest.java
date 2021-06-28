@@ -34,8 +34,8 @@ public class PathStringBuilderTest {
 
     @Test
     public void flex() {
-        assertEquals("Flex 0s 0tx", new PathStringBuilder().flex(0, 0).toString());
-        assertEquals("Flex 5m12s 2tx", new PathStringBuilder().flex(D_5_12, 2).toString());
+        assertEquals("Flex 0s 0x", new PathStringBuilder().flex(0, 0).toString());
+        assertEquals("Flex 5m12s 2x", new PathStringBuilder().flex(D_5_12, 2).toString());
     }
 
     @Test
@@ -60,10 +60,10 @@ public class PathStringBuilderTest {
         assertEquals(
                 "227 ~ BUS 10:46:05 10:55 ~ 112",
                 new PathStringBuilder()
-                        .accessEgress(TestTransfer.walk(227, 0)).sep()
+                        .accessEgress(TestTransfer.walk(227, 0, 0)).sep()
                         .stop(227).sep()
                         .transit(MODE, T_10_46_05, T_10_55).sep().stop(112).sep()
-                        .accessEgress(TestTransfer.walk(112, 0))
+                        .accessEgress(TestTransfer.walk(112, 0, 0))
                         .toString()
         );
     }

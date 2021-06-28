@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.request;
 
 
 import javax.annotation.Nullable;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import java.util.Objects;
@@ -18,7 +19,6 @@ public class McCostParams {
     private final int boardCost;
     private final int transferCost;
     private final double[] transitReluctanceFactors;
-    private final double walkReluctanceFactor;
     private final double waitReluctanceFactor;
 
     /**
@@ -29,7 +29,6 @@ public class McCostParams {
         this.boardCost = 600;
         this.transferCost = 0;
         this.transitReluctanceFactors = null;
-        this.walkReluctanceFactor = 4.0;
         this.waitReluctanceFactor = 1.0;
     }
 
@@ -37,7 +36,6 @@ public class McCostParams {
         this.boardCost = builder.boardCost();
         this.transferCost = builder.transferCost();
         this.transitReluctanceFactors = builder.transitReluctanceFactors();
-        this.walkReluctanceFactor = builder.walkReluctanceFactor();
         this.waitReluctanceFactor = builder.waitReluctanceFactor();
     }
 
@@ -65,26 +63,18 @@ public class McCostParams {
         return transitReluctanceFactors;
     }
 
-    /**
-     * A walk reluctance factor of 100 regarded as neutral. 400 means the rider
-     * would rater sit 4 minutes extra on a buss, than walk 1 minute extra.
-     */
-    public double walkReluctanceFactor() {
-        return walkReluctanceFactor;
-    }
-
     public double waitReluctanceFactor() {
         return waitReluctanceFactor;
     }
 
     @Override
     public String toString() {
-        return "McCostParams{" +
-                "boardCost=" + boardCost +
-                ", transferCost=" + transferCost +
-                ", transferReluctanceFactor=" + walkReluctanceFactor +
-                ", waitReluctanceFactor=" + waitReluctanceFactor +
-                '}';
+        return ToStringBuilder.of(McCostParams.class)
+                .addNum("boardCost", boardCost, 0)
+                .addNum("transferCost", transferCost, 0)
+                .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
+                .addDoubles("transitReluctanceFactors",  transitReluctanceFactors, 1.0)
+                .toString();
     }
 
     @Override
@@ -94,12 +84,11 @@ public class McCostParams {
         McCostParams that = (McCostParams) o;
         return boardCost == that.boardCost &&
                 transferCost == that.transferCost &&
-                Double.compare(that.walkReluctanceFactor, walkReluctanceFactor) == 0 &&
                 Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(boardCost, transferCost, walkReluctanceFactor, waitReluctanceFactor);
+        return Objects.hash(boardCost, transferCost, waitReluctanceFactor);
     }
 }

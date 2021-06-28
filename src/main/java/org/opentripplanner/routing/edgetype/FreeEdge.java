@@ -27,7 +27,7 @@ public class FreeEdge extends Edge {
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(1);
-        // do not change mode, which means it may be null at the start of a trip
+        s1.setBackMode(null);
         return s1.makeState();
     }
 

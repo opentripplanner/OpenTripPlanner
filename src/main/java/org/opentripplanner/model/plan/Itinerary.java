@@ -1,6 +1,8 @@
 package org.opentripplanner.model.plan;
 
 
+import static java.util.Locale.ROOT;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -43,11 +45,6 @@ public class Itinerary {
      * How far the user has to walk, bike and/or drive, in meters.
      */
     public final double nonTransitDistanceMeters;
-
-    /**
-     * Indicates that the walk/bike/drive limit distance has been exceeded for this itinerary.
-     */
-    public boolean nonTransitLimitExceeded = false;
 
     /**
      * How much elevation is lost, in total, over the course of the trip, in meters. As an example,
@@ -232,15 +229,15 @@ public class Itinerary {
 
     public void timeShiftToStartAt(Calendar afterTime) {
         Calendar startTimeFirstLeg = firstLeg().startTime;
-        int adjustmentMilliSeconds =
-            (int)(afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis());
+        long adjustmentMilliSeconds =
+            afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis();
         timeShift(adjustmentMilliSeconds);
     }
 
-    private void timeShift(int adjustmentMilliSeconds) {
+    private void timeShift(long adjustmentMilliSeconds) {
         for (Leg leg : this.legs) {
-            leg.startTime.add(Calendar.MILLISECOND, adjustmentMilliSeconds);
-            leg.endTime.add(Calendar.MILLISECOND, adjustmentMilliSeconds);
+            leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + adjustmentMilliSeconds);
+            leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + adjustmentMilliSeconds);
         }
     }
 
@@ -274,7 +271,6 @@ public class Itinerary {
                 .addDurationSec("transitTime", transitTimeSeconds)
                 .addDurationSec("waitingTime", waitingTimeSeconds)
                 .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
-                .addBool("nonTransitLimitExceeded", nonTransitLimitExceeded)
                 .addBool("tooSloped", tooSloped)
                 .addNum("elevationLost", elevationLost, 0.0)
                 .addNum("elevationGained", elevationGained, 0.0)
@@ -326,6 +322,9 @@ public class Itinerary {
             buf.sep();
             buf.stop(leg.to.name);
         }
-        return buf.toString() + " [cost: " + generalizedCost + "]";
+
+        buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));
+
+        return buf.toString();
     }
 }

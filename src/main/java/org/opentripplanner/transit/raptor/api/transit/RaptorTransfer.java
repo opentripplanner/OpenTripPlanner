@@ -23,6 +23,17 @@ public interface RaptorTransfer {
     int stop();
 
     /**
+     * The generalized cost of this transfer in centi-seconds. The value is used to compare with
+     * riding transit, and will be one component of a full itinerary.
+     *
+     * This methods is called many times, so care needs to be taken that the value is stored, not
+     * calculated for each invocation.
+     *
+     * @see RaptorCostConverter#toRaptorCost(double)
+     */
+    int generalizedCost();
+
+    /**
      * The time duration to walk or travel the path in seconds. This is not the entire duration
      * from the journey origin, but just:
      * <ul>
@@ -121,7 +132,7 @@ public interface RaptorTransfer {
     default String asString() {
       String duration = DurationUtils.durationToStr(durationInSeconds());
         return hasRides()
-            ? String.format("Flex %s %dtx ~ %d", duration, numberOfRides(), stop())
+            ? String.format("Flex %s %dx ~ %d", duration, numberOfRides(), stop())
             : String.format("Walk %s ~ %d", duration, stop());
     }
 }

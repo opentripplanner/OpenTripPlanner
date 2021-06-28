@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -55,7 +56,7 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Number of seconds to travel this leg. This does not include wait time.
+     * Number of seconds to travel this leg. This does not include slack/wait time.
      */
     default int duration() {
         return toTime() - fromTime();
@@ -64,9 +65,53 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
     /**
      * The computed generalized-cost for this path leg.
      * <p>
-     * {@code -1} is returned if no cost is computed by raptor.
+     * {@code -1} is returned if no cost exist.
+     * <p>
+     * The unit is centi-seconds (Raptor cost unit)
      */
     int generalizedCost();
+
+    /**
+     * The computed generalized-cost for this path leg.
+     * <p>
+     * {@code -1} is returned if no cost exist.
+     * <p>
+     * The unit is seconds (OTP Domain/AStar unit)
+     */
+    default int otpDomainCost() {
+        return RaptorCostConverter.toOtpDomainCost(generalizedCost());
+    }
+
+    /**
+     * The computed generalized-cost for this leg plus all legs following it.
+     * <p>
+     * {@code -1} is returned if no cost is computed by raptor.
+     * <p>
+     * The unit is centi-seconds (Raptor cost unit)
+     */
+    default int generalizedCostTotal() {
+        if(generalizedCost() < 0) { return generalizedCost(); }
+        return stream().mapToInt(PathLeg::generalizedCost).sum();
+    }
+
+    /**
+     * @return {@code true} if access leg, if not {@code false}.
+     */
+    default boolean isAccessLeg() {
+        return false;
+    }
+
+    /**
+     * Utility method performing a cast to {@link AccessPathLeg}, use with care:
+     * <pre>
+     * if(it.isAccessLeg()} {
+     *     AccessPathLeg&lt;T&gt; transit = it.asAccessLeg();
+     *     ...
+     * </pre>
+     */
+    default AccessPathLeg<T> asAccessLeg() {
+        return (AccessPathLeg<T>) this;
+    }
 
     /**
      * @return {@code true} if transit leg, if not {@code false}.
@@ -81,12 +126,9 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
      * if(it.isTransitLeg()} {
      *     TransitPathLeg&lt;T&gt; transit = it.asTransitLeg();
      *     ...
-     *
-     * }
      * </pre>
      */
     default TransitPathLeg<T> asTransitLeg() {
-        //noinspection unchecked
         return (TransitPathLeg<T>) this;
     }
 
@@ -103,12 +145,9 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
      * if(it.isTransferLeg()} {
      *     TransferPathLeg&lt;T&gt; transfer = it.asTransferLeg();
      *     ...
-     *
-     * }
      * </pre>
      */
     default TransferPathLeg<T> asTransferLeg() {
-        //noinspection unchecked
         return (TransferPathLeg<T>) this;
     }
 
@@ -125,8 +164,6 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
      * if(it.isEgressLeg()} {
      *     EgressPathLeg&lt;T&gt; egress = it.asEgressLeg();
      *     ...
-     *
-     * }
      * </pre>
      */
     default EgressPathLeg<T> asEgressLeg() {
@@ -183,7 +220,7 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
                 return currentLeg != null;
             }
             @Override public PathLeg<T> next() {
-                PathLeg<T> temp = currentLeg;
+                var temp = currentLeg;
                 currentLeg = currentLeg.isEgressLeg() ? null : currentLeg.nextLeg();
                 return temp;
             }

@@ -573,172 +573,6 @@ otp.widgets.tripoptions.ModeSelector =
 
 });
 
-
-//** MaxWalkSelector **//
-
-otp.widgets.tripoptions.MaxDistanceSelector =
-    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-
-    id           :  null,
-    presets      : null,
-    distSuffix   : null,
-
-    /**
-    * As we want nice presets in both metric and imperial scale, we can't just do a transformation here, we just declare both
-    */
-
-    imperialDistanceSuffix: 'mi.',
-    metricDistanceSuffix: 'm.',
-
-    initialize : function(tripWidget) {
-        var presets;
-
-        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
-
-        // Set it up the system correctly ones, so we don't need to later on
-        if (otp.config.metric) {
-            this.presets = presets = this.metricPresets;
-            this.distSuffix = this.metricDistanceSuffix;
-        } else {
-            this.presets = this.imperialPresets;
-            this.distSuffix = this.imperialDistanceSuffix;
-            presets = [];
-            // Transform the presets to miles/meters depending on the metric setting
-            for (var i = 0; i < this.presets.length; i++) {
-                presets.push((otp.util.Imperial.metersToMiles(this.presets[i])).toFixed(2));
-            }
-        }
-        this.id = tripWidget.id+"-maxWalkSelector";
-
-        // currentMaxDistance is used to compare against the title string of the option element, to select the correct one
-        var currentMaxDistance = otp.util.Geo.distanceString(this.tripWidget.module.maxWalkDistance);
-
-        ich['otp-tripOptions-maxDistance']({
-            widgetId : this.id,
-            presets : presets,
-            label : this.label,
-            //TRANSLATORS: default value for preset values of maximum walk
-            //distances in Trip Options
-            presets_label : _tr("Presets"),
-            distSuffix: this.distSuffix,
-            currentMaxDistance: parseFloat(currentMaxDistance)
-        }).appendTo(this.$());
-
-    },
-
-    doAfterLayout : function() {
-        var this_ = this;
-
-        $('#'+this.id+'-value').change(function() {
-            var meters = parseFloat($(this).val());
-
-            // If inputed in miles transform to meters to change the value
-            if (!otp.config.metric) { meters = otp.util.Imperial.milesToMeters(meters); } // input field was in miles
-
-            this_.setDistance(meters);
-        });
-
-        $('#'+this.id+'-presets').change(function() {
-            var presetVal = this_.presets[this.selectedIndex-1];
-
-            // Save the distance in meters
-            this_.setDistance(presetVal);
-
-            if (!otp.config.metric) { presetVal = otp.util.Imperial.metersToMiles(presetVal); } // Output in miles
-
-            // Show the value in miles/meters
-            $('#'+this_.id+'-value').val(presetVal.toFixed(2));
-            $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);
-        });
-    },
-
-    restorePlan : function(data) {
-        if(!data.queryParams.maxWalkDistance) return;
-
-        var meters = parseFloat(data.queryParams.maxWalkDistance);
-        if (isNaN(meters)) { return; }
-
-        if (!otp.config.metric) { meters = otp.util.Imperial.metersToMiles(meters); }
-
-        $('#'+this.id+'-value').val(meters.toFixed(2));
-        this.tripWidget.module.maxWalkDistance = parseFloat(data.queryParams.maxWalkDistance);
-    },
-
-    setDistance : function(distance) {
-        this.tripWidget.inputChanged({
-            maxWalkDistance : distance,
-        });
-    },
-
-});
-
-otp.widgets.tripoptions.MaxWalkSelector =
-    otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
-
-    // miles (0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)
-    imperialPresets: [160.9344, 321.8688, 402.336, 482.8032, 643.7376, 804.672, 1207.008, 1609.344, 2414.016, 3218.688, 4023.36, 4828.032, 5632.704, 6437.376, 7242.048000000001, 8046.72],
-
-    // meters
-    metricPresets      : [100, 200, 300, 400, 500, 750, 1000, 1500, 2000, 2500, 5000, 7500, 10000],
-
-    //TRANSLATORS: label for choosing how much should person's trip on foot be
-    label       : _tr("Maximum walk")+":",
-
-    initialize : function(tripWidget) {
-        this.id = tripWidget.id+"-maxWalkSelector";
-        otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
-    },
-
-    isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesWalk(mode) && !otp.util.Itin.includesAnyBicycle(mode) && !otp.util.Itin.includesAnyCar(mode);
-    },
-
-});
-
-otp.widgets.tripoptions.MaxBikeSelector =
-    otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
-
-    // miles (0.1, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 100)
-    imperialPresets: [160.934, 402.335, 804.67, 1207.0049999999999, 1609.34, 3218.68, 4828.0199999999995, 6437.36, 8046.7, 16093.4, 24140.1, 32186.8, 48280.2, 64373.6, 160934],
-
-    // meters
-    metricPresets      : [100, 300, 750, 1000, 1500, 2500, 5000, 7500, 10000],
-
-    //TRANSLATORS: label for choosing how much should person's trip on bicycle be
-    label       : _tr("Maximum bike")+":",
-
-    initialize : function(tripWidget) {
-        this.id = tripWidget.id+"-maxBikeSelector";
-        otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
-    },
-
-    isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesAnyBicycle(mode);
-    },
-});
-
-otp.widgets.tripoptions.MaxCarSelector =
-    otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
-
-        // miles (1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 100)
-        imperialPresets: [1609.34, 3218.68, 4828.0199999999995, 6437.36, 8046.7, 16093.4, 24140.1, 32186.8, 48280.2, 64373.6, 160934],
-
-        // meters
-        metricPresets      : [1_000, 1_500, 2_500, 5_000, 7_500, 10_000, 50_000, 100_000],
-
-        //TRANSLATORS: label for choosing how much should person's trip on bicycle be
-        label       : _tr("Maximum car")+":",
-
-        initialize : function(tripWidget) {
-            this.id = tripWidget.id+"-maxCarSelector";
-            otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
-        },
-
-        isApplicableForMode : function(mode) {
-            return otp.util.Itin.includesAnyCar(mode);
-        },
-    });
-
 //** PreferredRoutes **//
 
 otp.widgets.tripoptions.PreferredRoutes =
@@ -1205,6 +1039,48 @@ otp.widgets.tripoptions.GroupTripOptions =
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesTransit(mode);
     }
+});
+
+otp.widgets.tripoptions.AdditionalTripParameters =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+        initialize : function(tripWidget) {
+            otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+            this.id = tripWidget.id+"-additionalParameters";
+
+            var label = _tr("Additional parameters");
+
+            var placeholder = "searchWindow=366"
+                + "\n# timetableView=false"
+                + "\nwaitReluctance=0.5"
+                + "\n# walkSpeed=1.7"
+                + "\n# numItineraries=25";
+
+            var html = '<div class="notDraggable">'+label+': ';
+            html += '<textarea id="'+this.id+'-value" style="width:300px;" rows="5" placeholder="'+placeholder+'">'
+            html += '</textarea>';
+            html += "</div>";
+
+            $(html).appendTo(this.$());
+        },
+
+        doAfterLayout : function() {
+            var this_ = this;
+            $('#'+this.id+'-value').change(function() {
+                var keyvalues = $('#'+this_.id+'-value').val().trim().split('\n');
+
+                var params = {};
+
+                keyvalues.forEach(function(keyvalue) {
+                    var split = keyvalue.trim().split('=');
+                    if (!split[0].startsWith('#')) {
+                        params[split[0]] = split[1];
+                    }
+                })
+
+                this_.tripWidget.module.additionalParameters = params;
+            });
+        },
 });
 
 /*otp.widgets.TW_GroupTripSubmit =

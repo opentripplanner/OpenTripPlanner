@@ -445,20 +445,6 @@ otp.widgets.ItinerariesWidget =
             alerts = [ "This itinerary departs on a different day than the one searched for"];
         }
 
-        // check for max walk exceedance
-        var maxWalkExceeded = false;
-        for(var i=0; i<itin.itinData.legs.length; i++) {
-            var leg = itin.itinData.legs[i];
-            if(leg.mode === "WALK" && leg.distance > itin.tripPlan.queryParams.maxWalkDistance) {
-                maxWalkExceeded = false;
-                break;
-            }
-        }
-        if(maxWalkExceeded) {
-            //TRANSLATORS: Shown as alert text before showing itinerary.
-            alerts.push(_tr("Total walk distance for this trip exceeds specified maximum"));
-        }
-
         for(var i = 0; i < alerts.length; i++) {
             itinDiv.append("<div class='otp-itinAlertRow'>"+alerts[i]+"</div>");
         }

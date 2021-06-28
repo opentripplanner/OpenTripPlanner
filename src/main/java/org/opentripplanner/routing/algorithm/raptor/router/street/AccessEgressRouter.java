@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * This uses a street search to find paths to all the access/egress stop within range
  */
 public class AccessEgressRouter {
-    private static Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
 
     private AccessEgressRouter() {}
 
@@ -24,14 +24,10 @@ public class AccessEgressRouter {
      * @param rr the current routing request
      * @param fromTarget whether to route from or towards the point provided in the routing request
      *                   (access or egress)
-     * @param distanceMeters the maximum street distance to search for access/egress stops
      * @return Transfer objects by access/egress stop
      */
-    public static Collection<NearbyStop> streetSearch (
-        RoutingRequest rr,
-        StreetMode streetMode,
-        boolean fromTarget,
-        int distanceMeters
+    public static Collection<NearbyStop> streetSearch(
+        RoutingRequest rr, StreetMode streetMode, boolean fromTarget
     ) {
         // TODO OTP2 This has to be done because we have not separated the main RoutingRequest from
         //      the subrequest for street searches. From/to vertices are already set based on the main
@@ -45,7 +41,11 @@ public class AccessEgressRouter {
         // findNearbyStopsViaStreets() will call cleanup() on the created routing request.
         RoutingRequest nearbyRequest = rr.getStreetSearchRequest(streetMode);
 
-        NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
+        NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
+            rr.rctx.graph,
+            rr.maxAccessEgressDurationSeconds,
+            true
+        );
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
             vertices,
             fromTarget,

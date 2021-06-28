@@ -16,17 +16,18 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> extends Interme
 
     private final RaptorTransfer transfer;
 
-    public TransferPathLeg(int fromStop, int fromTime, int toStop, int toTime, int cost, RaptorTransfer transfer, PathLeg<T> next) {
-        super(fromStop, fromTime, toStop, toTime, cost);
+    public TransferPathLeg(
+            int fromStop,
+            int fromTime,
+            int toStop,
+            int toTime,
+            RaptorTransfer transfer,
+            PathLeg<T> next
+    ) {
+        super(fromStop, fromTime, toStop, toTime, transfer.generalizedCost());
         this.transfer = transfer;
         this.next = next;
     }
-
-    /** Create new access leg with a different tail */
-    public TransferPathLeg(@Nonnull TransferPathLeg<T> o, @Nonnull PathLeg<T> tail) {
-        this(o.fromStop(), o.fromTime(), o.toStop(), o.toTime(), o.generalizedCost(), o.transfer, tail);
-    }
-
 
     public final RaptorTransfer transfer() {
         return transfer;

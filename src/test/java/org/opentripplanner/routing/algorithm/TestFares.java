@@ -60,7 +60,7 @@ public class TestFares extends TestCase {
 
     public void testPortland() throws Exception {
 
-        Graph gg = ConstantsForTests.getInstance().getPortlandGraph();
+        Graph gg = ConstantsForTests.getInstance().getCachedPortlandGraph();
         String feedId = gg.getFeedIds().iterator().next();
         RoutingRequest options = new RoutingRequest();
         ShortestPathTree spt;

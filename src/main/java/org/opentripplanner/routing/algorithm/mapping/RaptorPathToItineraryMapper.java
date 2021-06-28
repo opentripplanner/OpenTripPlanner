@@ -24,12 +24,12 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
@@ -38,6 +38,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.util.PolylineEncoder;
 
 /**
@@ -60,7 +61,6 @@ public class RaptorPathToItineraryMapper {
     /**
      * Constructs an itinerary mapper for a request and a set of results
      *
-     * @param graph
      * @param transitLayer the currently active transit layer (may have real-time data applied)
      * @param startOfTime the point in time all times in seconds are counted from
      * @param request the current routing request
@@ -85,8 +85,6 @@ public class RaptorPathToItineraryMapper {
 
         // Map access leg
         legs.addAll(mapAccessLeg(path.accessLeg()));
-
-        // TODO: Add back this code when PathLeg interface contains object references
 
         PathLeg<TripSchedule> pathLeg = path.accessLeg().nextLeg();
 
@@ -119,12 +117,13 @@ public class RaptorPathToItineraryMapper {
         Itinerary itinerary = new Itinerary(legs);
 
         // Map general itinerary fields
-        itinerary.generalizedCost = path.generalizedCost();
-        itinerary.nonTransitLimitExceeded = itinerary.nonTransitDistanceMeters > request.maxWalkDistance;
+        itinerary.generalizedCost = path.otpDomainCost();
         itinerary.arrivedAtDestinationWithRentedBicycle = mapped != null && mapped.arrivedAtDestinationWithRentedBicycle;
 
         if(optimizedPath != null) {
-            itinerary.waitTimeAdjustedGeneralizedCost = optimizedPath.getWaitTimeOptimizedCost();
+            itinerary.waitTimeAdjustedGeneralizedCost = RaptorCostConverter.toOtpDomainCost(
+                    optimizedPath.getWaitTimeOptimizedCost()
+            );
         }
 
         return itinerary;
@@ -143,8 +142,6 @@ public class RaptorPathToItineraryMapper {
         if (subItinerary.legs.isEmpty()) { return List.of(); }
 
         subItinerary.timeShiftToStartAt(createCalendar(accessPathLeg.fromTime()));
-
-        applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, accessPathLeg);
 
         return subItinerary.legs;
     }
@@ -165,7 +162,8 @@ public class RaptorPathToItineraryMapper {
         Leg leg = new Leg(tripTimes.trip);
 
         // Find stop positions in pattern where this leg boards and alights.
-        // We cannot assume every stop appears only once in a pattern, so we match times instead of stops.
+        // We cannot assume every stop appears only once in a pattern, so we
+        // have to match stop and time.
         int boardStopIndexInPattern = tripSchedule.findDepartureStopPosition(
             pathLeg.fromTime(), pathLeg.fromStop()
         );
@@ -196,7 +194,7 @@ public class RaptorPathToItineraryMapper {
 
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
-        leg.generalizedCost = pathLeg.generalizedCost();
+        leg.generalizedCost = pathLeg.otpDomainCost();
 
         leg.dropOffBookingInfo = tripTimes.getDropOffBookingInfo(boardStopIndexInPattern);
         leg.pickupBookingInfo = tripTimes.getPickupBookingInfo(boardStopIndexInPattern);
@@ -222,7 +220,7 @@ public class RaptorPathToItineraryMapper {
         // leg.alightRule = <Assign here>;
         // leg.boardRule =  <Assign here>;
 
-        AlertToLegMapper.addAlertPatchesToLeg(
+        AlertToLegMapper.addTransitAlertPatchesToLeg(
             graph,
             leg,
             firstLeg,
@@ -256,8 +254,6 @@ public class RaptorPathToItineraryMapper {
 
         subItinerary.timeShiftToStartAt(createCalendar(egressPathLeg.fromTime()));
 
-        applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, egressPathLeg);
-
         return subItinerary;
     }
 
@@ -273,7 +269,7 @@ public class RaptorPathToItineraryMapper {
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
             leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();
-            leg.generalizedCost = pathLeg.generalizedCost();
+            leg.generalizedCost = pathLeg.otpDomainCost();
 
             if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
                 return List.of(leg);
@@ -281,13 +277,13 @@ public class RaptorPathToItineraryMapper {
         } else {
             // A RoutingRequest with a RoutingContext must be constructed so that the edges
             // may be re-traversed to create the leg(s) from the list of edges.
-            try (RoutingRequest traverseRequest = request.getStreetSearchRequest(StreetMode.WALK)) {
-                traverseRequest.setRoutingContext(graph);
+            try (RoutingRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request)) {
+                traverseRequest.setRoutingContext(graph, (Vertex) null, null);
                 traverseRequest.arriveBy = false;
 
                 StateEditor se = new StateEditor(traverseRequest, edges.get(0).getFromVertex());
-                se.setTimeSeconds(startOfTime.plusSeconds(pathLeg.fromTime()).toEpochSecond());
-                //se.setNonTransitOptionsFromState(states[0]);
+                se.setTimeSeconds(createCalendar(pathLeg.fromTime()).getTimeInMillis() / 1000);
+
                 State s = se.makeState();
                 ArrayList<State> transferStates = new ArrayList<>();
                 transferStates.add(s);
@@ -306,17 +302,7 @@ public class RaptorPathToItineraryMapper {
                     return List.of();
                 }
 
-                // TODO OTP2 - We use the duration initially calculated for use during routing because
-                //           - they do not always match up and we risk getting negative wait times
-                //           - Issue https://github.com/opentripplanner/OpenTripPlanner/issues/2955
-                if (subItinerary.legs.size() != 1) {
-                    throw new IllegalArgumentException("Sub itineraries should only contain one leg.");
-                }
-                subItinerary.legs.get(0).startTime = createCalendar(pathLeg.fromTime());
-                subItinerary.legs.get(0).endTime = createCalendar(pathLeg.toTime());
-
                 if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
-                    applyCostFromRaptorPathToAccessEgressTransfer(subItinerary.legs, pathLeg);
                     return subItinerary.legs;
                 }
             }
@@ -410,24 +396,5 @@ public class RaptorPathToItineraryMapper {
             distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
         }
         return distance;
-    }
-
-    /**
-     * Add the cost to the first leg, and set all others to 0(zero) - we compute the cost for the
-     * entire street section as a hole, so there is no way to break it down to each individual
-     * sub-section. There might be more than on sub-section in the future. An access/egress/transfer
-     * raptor path is converted into a list of legs with zero to N elements. Cost is generated for
-     * the entire collection of sub-sections.
-     * <p>
-     * TODO OTP2 - Break cost down on sub-section legs.
-     *           - Issue https://github.com/opentripplanner/OpenTripPlanner/issues/3215
-     *
-     * @param legs the legs representing one raptor access/transfer/egress
-     * @param raptorLeg the cost taken from the RaptorPathLeg.
-     */
-    private static void applyCostFromRaptorPathToAccessEgressTransfer(List<Leg> legs, PathLeg<?> raptorLeg) {
-        if(legs.isEmpty()) { return; }
-        legs.forEach(l -> l.generalizedCost = 0);
-        legs.get(0).generalizedCost = raptorLeg.generalizedCost();
     }
 }
