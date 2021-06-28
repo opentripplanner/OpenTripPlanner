@@ -120,7 +120,7 @@ public class LegacyGraphQLQueryTypeImpl
           Stop stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
 
           // TODO: Add geometry
-          return new NearbyStop(stop, Integer.parseInt(parts[0]), 0, null, null, null);
+          return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null, null);
         }
         case "TicketType":
           return null; //TODO
@@ -267,8 +267,11 @@ public class LegacyGraphQLQueryTypeImpl
 
       List<TransitMode> filterByModes = args.getLegacyGraphQLFilterByModes() != null ? StreamSupport
           .stream(args.getLegacyGraphQLFilterByModes().spliterator(), false)
-          .map(mode -> mode.label)
-          .map(TransitMode::valueOf)
+          .map(mode -> {
+            try { return TransitMode.valueOf(mode.label); }
+            catch (IllegalArgumentException ignored) { return null; }
+          })
+          .filter(Objects::nonNull)
           .collect(Collectors.toList()) : null;
       List<PlaceType> filterByPlaceTypes =
           args.getLegacyGraphQLFilterByPlaceTypes() != null ? StreamSupport
@@ -604,16 +607,18 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("wheelchair", request::setWheelchairAccessible);
       callWith.argument("numItineraries", request::setNumItineraries);
       callWith.argument("searchWindow", (Long m) -> request.searchWindow = Duration.ofSeconds(m));
-      callWith.argument("maxWalkDistance", request::setMaxWalkDistance);
       // callWith.argument("maxSlope", request::setMaxSlope);
-      callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
       // callWith.argument("carParkCarLegWeight", request::setCarParkCarLegWeight);
       // callWith.argument("itineraryFiltering", request::setItineraryFiltering);
+      callWith.argument("bikeReluctance", request::setBikeReluctance);
+      callWith.argument("bikeWalkingReluctance", request::setBikeWalkingReluctance);
+      callWith.argument("carReluctance", request::setCarReluctance);
       callWith.argument("walkReluctance", request::setWalkReluctance);
       // callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
       callWith.argument("waitReluctance", request::setWaitReluctance);
       callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
       callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);
+      callWith.argument("bikeWalkingSpeed", (Double v) -> request.bikeWalkingSpeed = v);
       callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
       callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
       callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);

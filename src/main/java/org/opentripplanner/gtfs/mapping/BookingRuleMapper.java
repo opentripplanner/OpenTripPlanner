@@ -34,8 +34,8 @@ class BookingRuleMapper {
                 minimumBookingNotice(rule),
                 maximumBookingNotice(rule),
                 message(rule),
-                dropOffMessage(rule),
-                pickupMessage(rule)
+                pickupMessage(rule),
+                dropOffMessage(rule)
 
         ));
     }

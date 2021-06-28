@@ -211,9 +211,8 @@ public class EstimatedCallType {
                     .name("notices")
                     .type(new GraphQLNonNull(new GraphQLList(noticeType)))
                     .dataFetcher(environment -> {
-                        // TODO OTP2 - Fix it!
-                        //TripTimeShort tripTimeShort = environment.getSource();
-                        return Collections.emptyList(); //index.getNoticesByEntity(tripTimeShort.stopTimeId);
+                        TripTimeShort tripTimeShort = environment.getSource();
+                        return GqlUtil.getRoutingService(environment).getNoticesByEntity(tripTimeShort.getStopTimeKey());
                     })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()

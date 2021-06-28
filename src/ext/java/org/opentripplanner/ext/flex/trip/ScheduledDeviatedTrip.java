@@ -146,6 +146,16 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     return pickupBookingInfos[i];
   }
 
+  @Override
+  public boolean isBoardingPossible(NearbyStop stop) {
+    return getFromIndex(stop) != -1;
+  }
+
+  @Override
+  public boolean isAlightingPossible(NearbyStop stop) {
+    return getToIndex(stop) != -1;
+  }
+
   private Collection<StopLocation> expandStops(StopLocation stop) {
     return stop instanceof FlexLocationGroup
         ? ((FlexLocationGroup) stop).getLocations()

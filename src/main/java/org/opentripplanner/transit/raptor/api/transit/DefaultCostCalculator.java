@@ -13,7 +13,6 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 public final class DefaultCostCalculator<T extends RaptorTripSchedule> implements CostCalculator<T> {
     private final int boardCostOnly;
     private final int boardAndTransferCost;
-    private final int walkFactor;
     private final int waitFactor;
     private final FactorStrategy transitFactors;
     private final int[] stopVisitCost;
@@ -29,7 +28,6 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
     public DefaultCostCalculator(
             int boardCost,
             int transferCost,
-            double walkReluctanceFactor,
             double waitReluctanceFactor,
             @Nullable int[] stopVisitCost,
             @Nullable double[] transitReluctanceFactors
@@ -37,7 +35,6 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
         this.stopVisitCost = stopVisitCost;
         this.boardCostOnly = RaptorCostConverter.toRaptorCost(boardCost);
         this.boardAndTransferCost = RaptorCostConverter.toRaptorCost(transferCost) + boardCostOnly;
-        this.walkFactor = RaptorCostConverter.toRaptorCost(walkReluctanceFactor);
         this.waitFactor = RaptorCostConverter.toRaptorCost(waitReluctanceFactor);
 
         this.transitFactors = transitReluctanceFactors == null
@@ -87,11 +84,6 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
             cost += stopVisitCost[fromStop] + stopVisitCost[toStop];
         }
         return cost;
-    }
-
-    @Override
-    public final int walkCost(int walkTimeInSeconds) {
-        return walkFactor * walkTimeInSeconds;
     }
 
     @Override

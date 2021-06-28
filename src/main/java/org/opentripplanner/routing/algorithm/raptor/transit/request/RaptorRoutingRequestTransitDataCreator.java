@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
 import java.time.Instant;
@@ -18,7 +17,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 
 /**
@@ -156,16 +154,5 @@ class RaptorRoutingRequestTransitDataCreator {
         .map(p -> p.newWithFilteredTripTimes(filter::tripTimesPredicate))
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
-  }
-
-  List<List<RaptorTransfer>> calculateTransferDuration(double walkSpeed) {
-    return transitLayer
-        .getSimpleTransferByStopIndex()
-        .stream()
-        .map(t -> t
-            .stream()
-            .map(s -> new TransferWithDuration(s, walkSpeed))
-            .collect(Collectors.<RaptorTransfer>toList()))
-        .collect(toList());
   }
 }

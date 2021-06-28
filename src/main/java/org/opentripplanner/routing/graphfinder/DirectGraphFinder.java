@@ -3,8 +3,6 @@ package org.opentripplanner.routing.graphfinder;
 import com.beust.jcommander.internal.Lists;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
@@ -19,9 +17,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  */
 public class DirectGraphFinder implements GraphFinder {
 
-  private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-
-  private StreetVertexIndex streetIndex;
+  private final StreetVertexIndex streetIndex;
 
   public DirectGraphFinder(Graph graph) {
     this.streetIndex = graph.getStreetIndex();
@@ -38,12 +34,10 @@ public class DirectGraphFinder implements GraphFinder {
     for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
       double distance = Math.round(SphericalDistanceLibrary.distance(coordinate, it.getCoordinate()));
       if (distance < radiusMeters) {
-        Coordinate coordinates[] = new Coordinate[] {coordinate, it.getCoordinate()};
         NearbyStop sd = new NearbyStop(
             it,
             distance,
             null,
-            geometryFactory.createLineString(coordinates),
             null
         );
         stopsFound.add(sd);

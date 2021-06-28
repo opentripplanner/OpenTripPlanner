@@ -24,7 +24,6 @@ public class AccessEgressMapper {
     if (!(nearbyStop.stop instanceof Stop)) { return null; }
     return new AccessEgress(
         stopIndex.indexByStop.get(nearbyStop.stop),
-        (int) nearbyStop.state.getElapsedTimeSeconds(),
         isEgress ? nearbyStop.state.reverse() : nearbyStop.state
     );
   }

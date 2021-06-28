@@ -12,6 +12,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -51,7 +52,7 @@ public class NearbyStopFinder {
 
     public  final boolean useStreets;
     private final Graph graph;
-    private final double radiusMeters;
+    private final double durationLimitInSeconds;
 
     /* Fields used when finding stops via the street network. */
     private AStar astar;
@@ -62,18 +63,18 @@ public class NearbyStopFinder {
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
      * network or straight line distance based on the presence of OSM street data in the graph.
      */
-    public NearbyStopFinder(Graph graph, double radiusMeters) {
-        this (graph, radiusMeters, graph.hasStreets);
+    public NearbyStopFinder(Graph graph, double durationLimitInSeconds) {
+        this (graph, durationLimitInSeconds, graph.hasStreets);
     }
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius.
      * @param useStreets if true, search via the street network instead of using straight-line distance.
      */
-    public NearbyStopFinder(Graph graph, double radiusMeters, boolean useStreets) {
+    public NearbyStopFinder(Graph graph, double durationLimitInSeconds, boolean useStreets) {
         this.graph = graph;
         this.useStreets = useStreets;
-        this.radiusMeters = radiusMeters;
+        this.durationLimitInSeconds = durationLimitInSeconds;
         if (useStreets) {
             astar = new AStar();
             // We need to accommodate straight line distance (in meters) but when streets are present we use an
@@ -90,7 +91,7 @@ public class NearbyStopFinder {
      * This is intentional: we don't want to return the next stop down the line for trip patterns that pass through the
      * origin vertex.
      */
-    public Set<NearbyStop> findNearbyStopsConsideringPatterns(Vertex vertex, boolean reverseDirection) {
+    public Set<NearbyStop> findNearbyStopsConsideringPatterns(Vertex vertex, RoutingRequest routingRequest, boolean reverseDirection) {
 
         /* Track the closest stop on each pattern passing nearby. */
         MinMap<TripPattern, NearbyStop> closestStopForPattern = new MinMap<TripPattern, NearbyStop>();
@@ -99,7 +100,7 @@ public class NearbyStopFinder {
         MinMap<FlexTrip, NearbyStop> closestStopForFlexTrip = new MinMap<>();
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
-        for (NearbyStop nearbyStop : findNearbyStops(vertex, reverseDirection)) {
+        for (NearbyStop nearbyStop : findNearbyStops(vertex, routingRequest.clone(), reverseDirection)) {
             StopLocation ts1 = nearbyStop.stop;
 
             if (ts1 instanceof Stop){
@@ -129,12 +130,16 @@ public class NearbyStopFinder {
      * If the origin vertex is a StopVertex, the result will include it; this characteristic is essential for
      * associating the correct stop with each trip pattern in the vicinity.
      */
-    public List<NearbyStop> findNearbyStops(Vertex vertex, boolean reverseDirection) {
+    public List<NearbyStop> findNearbyStops(
+        Vertex vertex, RoutingRequest routingRequest, boolean reverseDirection
+    ) {
         if (useStreets) {
-            return findNearbyStopsViaStreets(vertex, reverseDirection);
+            return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, true, routingRequest);
         }
+        // It make sense for the directGraphFinder to use meters as a limit, so we convert first
+        double limitMeters = durationLimitInSeconds * new RoutingRequest(TraverseMode.WALK).walkSpeed;
         Coordinate c0 = vertex.getCoordinate();
-        return directGraphFinder.findClosestStops(c0.y, c0.x, radiusMeters);
+        return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
     }
 
 
@@ -157,17 +162,16 @@ public class NearbyStopFinder {
             boolean removeTempEdges,
             RoutingRequest routingRequest
     ) {
-        routingRequest.arriveBy = reverseDirection;
+        routingRequest.setArriveBy(reverseDirection);
         if (!reverseDirection) {
             routingRequest.setRoutingContext(graph, originVertices, null);
         } else {
             routingRequest.setRoutingContext(graph, null, originVertices);
         }
-        int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
-        routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
+        astar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(durationLimitInSeconds));
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         List<NearbyStop> stopsFound = Lists.newArrayList();
@@ -226,7 +230,6 @@ public class NearbyStopFinder {
                         (TransitStopVertex) vertex,
                         0,
                         Collections.emptyList(),
-                        null,
                         new State(vertex, routingRequest)
                     ));
             }
@@ -249,17 +252,6 @@ public class NearbyStopFinder {
             reverseDirection,
             removeTempEdges,
             routingRequest
-        );
-    }
-
-    public List<NearbyStop> findNearbyStopsViaStreets(
-        Vertex originVertex,
-        boolean reverseDirection
-    ) {
-        return findNearbyStopsViaStreets(
-                Collections.singleton(originVertex),
-                reverseDirection,
-                true
         );
     }
 

@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
@@ -45,13 +46,13 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final int TRANSFER_COST_SEC = 120;
     // The COST_CALCULATOR is not under test, so we use it to calculate correct cost values.
     public static final DefaultCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
-            BOARD_COST_SEC, TRANSFER_COST_SEC, WALK_RELUCTANCE, WAIT_RELUCTANCE, null, null
+            BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, null, null
     );
     // FLEX Access 5m tx 1 ~ A. Note! The actual times might get time-shifted.
     public static final int ACCESS_DURATION = DurationUtils.duration("5m15s");
     // Using transfer reluctance is incorrect, we should use the cost from the access path
-    public static final int ACCESS_COST = COST_CALCULATOR.walkCost(ACCESS_DURATION);
-    public static final TestTransfer ACCESS = flex(STOP_A, ACCESS_DURATION);
+    public static final int ACCESS_COST = walkCost(ACCESS_DURATION, WALK_RELUCTANCE);
+    public static final TestTransfer ACCESS = flex(STOP_A, ACCESS_DURATION, ACCESS_COST);
     // Alternative Flex access with restricted opening hours: 09:00 - 09:50
     public static final int ACCESS_OPEN = time("09:00");
     public static final int ACCESS_CLOSE = time("09:50");
@@ -61,7 +62,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final int TX1_START = time("10:05:15");
     public static final int TX1_END = time("10:06:15");
     public static final int TX1_DURATION = TX1_END - TX1_START;
-    public static final int TX1_COST = COST_CALCULATOR.walkCost(TX1_DURATION);
+    public static final int TX1_COST = walkCost(TX1_DURATION, WALK_RELUCTANCE);
     // Trip A (B ~ BUS L11 10:08 10:20 ~ C)
     public static final int L1_START = time("10:08");
     public static final int L1_END = time("10:20");
@@ -78,14 +79,14 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final int TX2_START = time("10:20:15");
     public static final int TX2_END = time("10:22:15");
     public static final int TX2_DURATION = TX2_END - TX2_START;
-    public static final int TX2_COST = COST_CALCULATOR.walkCost(TX2_DURATION);
+    public static final int TX2_COST = walkCost(TX2_DURATION, WALK_RELUCTANCE);
 
     // Wait 15s (ALIGHT_SLACK)
     // D ~ FLEX Egress 6m tx 1 . Note! The actual times might get time-shifted.
     public static final int EGRESS_DURATION = DurationUtils.duration("6m");
     // Using transfer reluctance is incorrect, we should use the cost from the egress path
-    public static final int EGRESS_COST = COST_CALCULATOR.walkCost(EGRESS_DURATION);
-    public static final TestTransfer EGRESS = flex(STOP_D, EGRESS_DURATION);
+    public static final int EGRESS_COST = walkCost(EGRESS_DURATION, WALK_RELUCTANCE);
+    public static final TestTransfer EGRESS = flex(STOP_D, EGRESS_DURATION, EGRESS_COST);
     public static final TestTransfer EGRESS_W_OPENING_HOURS =
             EGRESS.openingHours(TimeUtils.time("10:30"), TimeUtils.time("11:00"));
     public static final String LINE_A = "A";
@@ -173,7 +174,6 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     @Test
     public void testSetup() {
         // Assert test data is configured correct
-        int cost;
 
         // Assert all durations
         assertEquals(TX1_END - TX1_START, TX1_DURATION);

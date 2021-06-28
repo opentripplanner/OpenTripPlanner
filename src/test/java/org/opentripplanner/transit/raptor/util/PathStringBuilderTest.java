@@ -60,10 +60,10 @@ public class PathStringBuilderTest {
         assertEquals(
                 "227 ~ BUS 10:46:05 10:55 ~ 112",
                 new PathStringBuilder()
-                        .accessEgress(TestTransfer.walk(227, 0)).sep()
+                        .accessEgress(TestTransfer.walk(227, 0, 0)).sep()
                         .stop(227).sep()
                         .transit(MODE, T_10_46_05, T_10_55).sep().stop(112).sep()
-                        .accessEgress(TestTransfer.walk(112, 0))
+                        .accessEgress(TestTransfer.walk(112, 0, 0))
                         .toString()
         );
     }

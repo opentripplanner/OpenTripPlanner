@@ -28,15 +28,21 @@ class TransfersMapper {
             transferByStopIndex.add(list);
 
             for (SimpleTransfer simpleTransfer : transfersByStop.get(stop)) {
-                double effectiveDistance = simpleTransfer.getEffectiveWalkDistance();
                 if (simpleTransfer.to instanceof Stop) {
                     int toStopIndex = stopIndex.indexByStop.get(simpleTransfer.to);
-                    Transfer transfer = new Transfer(
-                        toStopIndex,
-                        (int) effectiveDistance,
-                        simpleTransfer.getDistanceIndependentTime(),
-                        simpleTransfer.getEdges()
-                    );
+                    Transfer transfer;
+                    if (simpleTransfer.getEdges() != null) {
+                        transfer = new Transfer(
+                            toStopIndex,
+                            simpleTransfer.getEdges()
+                        );
+                    }
+                    else {
+                        transfer = new Transfer(
+                            toStopIndex,
+                            (int) Math.ceil(simpleTransfer.getDistanceMeters())
+                        );
+                    }
 
                     list.add(transfer);
                 }

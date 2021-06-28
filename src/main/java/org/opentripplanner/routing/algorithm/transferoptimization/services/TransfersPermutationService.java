@@ -131,7 +131,7 @@ public class TransfersPermutationService<T extends RaptorTripSchedule> {
                 tx.to().stop(),
                 arrivalTime,
                 RaptorCostConverter.toOtpDomainCost(
-                    costCalculator.walkCost(tx.transferDuration())
+                    tx.generalizedCost()
                 ),
                 tx.getTransfer(),
                 p

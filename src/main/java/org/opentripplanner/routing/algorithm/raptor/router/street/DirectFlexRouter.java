@@ -29,14 +29,12 @@ public class DirectFlexRouter {
       Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
               directRequest,
               StreetMode.WALK,
-              false,
-              2000
+              false
       );
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
               directRequest,
               StreetMode.WALK,
-              true,
-              2000
+              true
       );
 
       FlexRouter flexRouter = new FlexRouter(

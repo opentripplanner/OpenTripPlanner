@@ -291,8 +291,14 @@ public class WalkableAreaBuilder {
         }
 
         @Override
-        public boolean shouldSkipEdge(Vertex origin, Vertex target, State current, Edge edge,
-                ShortestPathTree spt, RoutingRequest traverseOptions) {
+        public boolean shouldSkipEdge(
+            Set<Vertex> origins,
+            Set<Vertex> targets,
+            State current,
+            Edge edge,
+            ShortestPathTree spt,
+            RoutingRequest traverseOptions
+        ) {
             return !edges.contains(edge);
         }
     }

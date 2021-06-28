@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -34,7 +35,6 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
    */
   private final List<List<RaptorTransfer>> transfers;
 
-
   private final ZonedDateTime startOfTime;
 
   public RaptorRoutingRequestTransitData(
@@ -42,7 +42,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       Instant departureTime,
       int additionalFutureSearchDays,
       TransitDataProviderFilter filter,
-      double walkSpeed
+      RoutingRequest routingRequest
   ) {
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at
@@ -58,7 +58,8 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
         additionalFutureSearchDays,
         filter
     );
-    this.transfers = creator.calculateTransferDuration(walkSpeed);
+
+    this.transfers = transitLayer.getRaptorTransfersForRequest(routingRequest);
   }
 
   /**

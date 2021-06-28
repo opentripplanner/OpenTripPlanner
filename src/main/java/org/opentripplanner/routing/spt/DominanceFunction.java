@@ -64,6 +64,12 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        // Since a Vertex may be arrived at using a no-thru restricted path and one without such
+        // restrictions, treat the two as separate so one doesn't dominate the other.
+        if (a.hasEnteredNoThruTrafficArea() != b.hasEnteredNoThruTrafficArea()) {
+            return false;
+        }
+
         /*
          * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
          * useless loops in the traversal leading to way faster processing time.

@@ -26,6 +26,8 @@ public interface TransitTuningParameters {
       }
       throw new IllegalArgumentException("Unknown key: " + key);
     }
+
+    @Override public int transferCacheMaxSize() { return 5; }
   };
 
   /**
@@ -39,4 +41,11 @@ public interface TransitTuningParameters {
    * boarding and alighting all stops with the given priority.
    */
   Integer stopTransferCost(StopTransferPriority key);
+
+  /**
+   * The maximum number of transfer RoutingRequests for which the pre-calculated transfers should be
+   * cached. If too small, the average request may be slower due to the required re-calculating. If
+   * too large, more memory may be used than needed.
+   */
+  int transferCacheMaxSize();
 }

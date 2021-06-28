@@ -15,7 +15,7 @@ import java.util.Locale;
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends Edge {
+public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
     private static final long serialVersionUID = -3311099256178798982L;
 
@@ -80,10 +80,6 @@ public class PathwayEdge extends Edge {
         return traversalTime;
     }
 
-    public TraverseMode getMode() {
-       return TraverseMode.WALK;
-    }
-
     public LineString getGeometry() {
         Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(),
                 getToVertex().getCoordinate() };
@@ -107,6 +103,11 @@ public class PathwayEdge extends Edge {
     public FeedScopedId getId( ){ return id; }
 
     public State traverse(State s0) {
+        StateEditor s1 = createEditorForWalking(s0, this);
+        if (s1 == null) {
+            return null;
+        }
+
         /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
@@ -117,6 +118,7 @@ public class PathwayEdge extends Edge {
                 return null;
             }
         }
+
         if (time == 0) {
             if (distance > 0) {
                 time = (int) (distance * s0.getOptions().walkSpeed);
@@ -126,10 +128,15 @@ public class PathwayEdge extends Edge {
                 time = (int) (0.4 * Math.abs(steps) * s0.getOptions().walkSpeed);
             }
         }
-        StateEditor s1 = s0.edit(this);
+
+        if (time <= 0) {
+            return null;
+        }
+
+        double weight = time * s0.getOptions().getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
+
         s1.incrementTimeInSeconds(time);
-        s1.incrementWeight(time);
-        s1.setBackMode(getMode());
+        s1.incrementWeight(weight);
         return s1.makeState();
     }
 }

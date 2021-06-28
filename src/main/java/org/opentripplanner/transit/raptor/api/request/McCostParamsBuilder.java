@@ -9,7 +9,6 @@ public class McCostParamsBuilder {
     private int boardCost;
     private int transferCost;
     private double[] transitReluctanceFactors;
-    private double walkReluctanceFactor;
     private double waitReluctanceFactor;
 
 
@@ -17,7 +16,6 @@ public class McCostParamsBuilder {
         this.boardCost = defaults.boardCost();
         this.transferCost = defaults.transferCost();
         this.transitReluctanceFactors = defaults.transitReluctanceFactors();
-        this.walkReluctanceFactor = defaults.walkReluctanceFactor();
         this.waitReluctanceFactor = defaults.waitReluctanceFactor();
     }
 
@@ -45,15 +43,6 @@ public class McCostParamsBuilder {
 
     public McCostParamsBuilder transitReluctanceFactors(double[] transitReluctanceFactors) {
         this.transitReluctanceFactors = transitReluctanceFactors;
-        return this;
-    }
-
-    public double walkReluctanceFactor() {
-        return walkReluctanceFactor;
-    }
-
-    public McCostParamsBuilder walkReluctanceFactor(double walkReluctanceFactor) {
-        this.walkReluctanceFactor = walkReluctanceFactor;
         return this;
     }
 

@@ -200,4 +200,8 @@ public class TripTimeShort {
     public int getDropoffType() {
         return dropoffType;
     }
+
+    public StopTimeKey getStopTimeKey() {
+        return new StopTimeKey(trip.getId(), stopIndex);
+    }
 }

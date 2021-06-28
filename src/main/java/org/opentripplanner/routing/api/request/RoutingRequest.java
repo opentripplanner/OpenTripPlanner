@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,12 +32,12 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -106,77 +106,22 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public List<GenericLocation> intermediatePlaces;
 
     /**
-     * The maximum distance (in meters) the user is willing to walk for access/egress legs.
-     * Defaults to unlimited.
+     * This is the maximum duration in seconds for a direct street search. This is a performance
+     * limit and should therefore be set high. Results close to the limit are not guaranteed to be
+     * optimal. Use filters to limit what is presented to the client.
      *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-     *                       old functionality the same way, but we will try to map this parameter
-     *                       so it does work similar as before.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
      */
-    @Deprecated
-    public double maxWalkDistance = Double.MAX_VALUE;
+    public double maxDirectStreetDurationSeconds = Duration.ofHours(4).toSeconds();
 
     /**
-     * The maximum distance (in meters) the user is willing to walk for transfer legs.
-     * Defaults to unlimited. Currently set to be the same value as maxWalkDistance.
+     * This is the maximum duration in seconds for access/egress street searches. This is a
+     * performance limit and should therefore be set high. Results close to the limit are not
+     * guaranteed to be optimal. Use filters to limit what is presented to the client.
      *
-     * @Deprecated TODO OTP2 This is replaced by a similar build parameter. This parameter do
-     *                       not exist in the REST API - so it can be removed safely from here.
+     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
      */
-    @Deprecated
-    public double maxTransferWalkDistance = Double.MAX_VALUE;
-
-    /**
-     * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
-     * ride or kiss and ride). By default limited to 30 minutes driving, because if it's unlimited on
-     * large graphs the search becomes very slow.
-     *
-     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
-     */
-    @Deprecated
-    public int maxPreTransitTime = 30 * 60;
-
-    /**
-     * The worst possible time (latest for depart-by and earliest for arrive-by) to accept
-     *
-     * @Deprecated TODO OTP2 This is a parameter specific to the AStar and work as a cut-off.
-     *                       Raptor have a similar concept, the search window. This parameter
-     *                       do not belong in the request object, is should be pushed down into
-     *                       AStar and then we need to find a way to resolve the search time
-     *                       window. There is more than one strategy for this.
-     */
-    @Deprecated
-    public long worstTime = Long.MAX_VALUE;
-
-    /**
-     * The worst possible weight that we will accept when planning a trip.
-     *
-     * @deprecated TODO OTP2 This is not in use, and sub-optimal to prune a search on. It should
-     *                       be removed.
-     */
-    @Deprecated
-    public double maxWeight = Double.MAX_VALUE;
-
-    /**
-     * The maximum duration of a returned itinerary, in hours.
-     *
-     * @deprecated TODO OTP2 This is not useful as a search parameter, but could be used as a
-     *                       post search filter to reduce number of itineraries down to an
-     *                       acceptable number, but there are probably better ways to do that.
-     */
-    @Deprecated
-    public double maxHours = Double.MAX_VALUE;
-
-    /**
-     * Whether maxHours limit should consider wait/idle time between the itinerary and the
-     * requested arrive/depart time.
-     *
-     * @deprecated see {@link #maxHours}
-     */
-    @Deprecated
-    public boolean useRequestedDateTimeInMaxHours = false;
+    public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
      * The access/egress/direct/transit modes allowed for this main request. The parameter
@@ -188,7 +133,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        Collections.emptySet()
+        StreetMode.WALK,
+        EnumSet.allOf(TransitMode.class)
     );
 
     /**
@@ -297,6 +243,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public double bikeSpeed;
 
+    public double bikeWalkingSpeed;
+
     public double carSpeed;
 
     public Locale locale = new Locale("en", "US");
@@ -349,6 +297,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      *  observation should in no way be taken as scientific or definitive. Your mileage may vary.
      */
     public double walkReluctance = 2.0;
+
+    public double bikeWalkingReluctance = 5.0;
+
+    public double bikeReluctance = 2.0;
+
+    public double carReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
@@ -405,6 +359,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * (time to park, switch off, pick your stuff, lock the car, etc...)
      */
     public int carDropoffTime = 120;
+
+    /** Time of getting in/out of a carPickup (taxi) */
+    public int carPickupTime = 60;
+
+    /** Cost of getting in/out of a carPickup (taxi) */
+    public int carPickupCost = 120;
 
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle
@@ -595,9 +555,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /** For the bike triangle, how important safety is */
     public double bikeTriangleSafetyFactor;
 
-    /** Options specifically for the case that you are walking a bicycle. */
-    public RoutingRequest bikeWalkingOptions;
-
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
@@ -685,8 +642,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     @Deprecated
     public FeedScopedId startingTransitTripId;
 
-    public boolean walkingBike;
-
     /*
       Additional flags affecting mode transitions.
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
@@ -750,12 +705,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         // http://en.wikipedia.org/wiki/Walking
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
+        bikeWalkingSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         // http://en.wikipedia.org/wiki/Speed_limit
         carSpeed = 40; // 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide
         // Default to walk for access/egress/direct modes and all transit modes
-        this.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, new HashSet<>(
-            Arrays.asList(TransitMode.values())));
-        bikeWalkingOptions = this;
 
         // So that they are never null.
         from = new GenericLocation(null, null);
@@ -794,9 +747,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
-        bikeWalkingOptions.arriveBy = arriveBy;
-        if (worstTime == Long.MAX_VALUE || worstTime == 0)
-            worstTime = arriveBy ? 0 : Long.MAX_VALUE;
     }
 
     public void setMode(TraverseMode mode) {
@@ -805,37 +755,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setStreetSubRequestModes(TraverseModeSet streetSubRequestModes) {
         this.streetSubRequestModes = streetSubRequestModes;
-        if (streetSubRequestModes.getBicycle()) {
-            // This alternate routing request is used when we get off a bike to take a shortcut and are
-            // walking alongside the bike. FIXME why are we only copying certain fields instead of cloning the request?
-            bikeWalkingOptions = new RoutingRequest();
-            bikeWalkingOptions.setArriveBy(this.arriveBy);
-            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
-            bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
-            bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
-            bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
-            bikeWalkingOptions.optimize = optimize;
-            bikeWalkingOptions.streetSubRequestModes = streetSubRequestModes.clone();
-            bikeWalkingOptions.streetSubRequestModes.setBicycle(false);
-            bikeWalkingOptions.streetSubRequestModes.setWalk(true);
-            bikeWalkingOptions.walkingBike = true;
-            bikeWalkingOptions.bikeSwitchTime = bikeSwitchTime;
-            bikeWalkingOptions.bikeSwitchCost = bikeSwitchCost;
-            bikeWalkingOptions.stairsReluctance = stairsReluctance * 5; // carrying bikes on stairs is awful
-        } else if (streetSubRequestModes.getCar()) {
-            bikeWalkingOptions = new RoutingRequest();
-            bikeWalkingOptions.setArriveBy(this.arriveBy);
-            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
-            bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
-            bikeWalkingOptions.streetSubRequestModes = streetSubRequestModes.clone();
-            bikeWalkingOptions.streetSubRequestModes.setBicycle(false);
-            bikeWalkingOptions.streetSubRequestModes.setWalk(true);
-        }
     }
 
     public void setOptimize(BicycleOptimizeType optimize) {
         this.optimize = optimize;
-        bikeWalkingOptions.optimize = optimize;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
@@ -849,17 +772,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public Map<TransitMode, Double> transitReluctanceForMode() {
         return Collections.unmodifiableMap(transitReluctanceForMode);
-    }
-
-    /** @return the (soft) maximum walk distance */
-    // If transit is not to be used and this is a point to point search
-    // or one with soft walk limiting, disable walk limit.
-    public double getMaxWalkDistance() {
-        if (streetSubRequestModes.isTransit()) {
-            return maxWalkDistance;
-        } else {
-            return Double.MAX_VALUE;
-        }
     }
 
     public void setWalkBoardCost(int walkBoardCost) {
@@ -1014,13 +926,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         setDateTime(dateObject);
     }
 
+    /**
+     * Currently only one itinerary is returned for a direct street search
+     */
     public int getNumItineraries() {
-        if (streetSubRequestModes.isTransit()) {
-            return numItineraries;
-        } else {
-            // If transit is not to be used, only search for one itinerary.
-            return 1;
-        }
+        return 1;
     }
 
     public void setNumItineraries(int numItineraries) {
@@ -1032,7 +942,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     public String toString(String sep) {
-        return from + sep + to + sep + getMaxWalkDistance() + sep + getDateTime() + sep
+        return from + sep + to + sep + getDateTime() + sep
                 + arriveBy + sep + optimize + sep + streetSubRequestModes.getAsStr() + sep
                 + getNumItineraries();
     }
@@ -1077,17 +987,14 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
         this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
-        bikeWalkingOptions.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
     }
 
     public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
         this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
-        bikeWalkingOptions.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
     }
 
     public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
         this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
-        bikeWalkingOptions.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
     }
 
 
@@ -1101,37 +1008,32 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             switch (streetMode) {
                 case WALK:
                 case FLEXIBLE:
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK));
                     break;
                 case BIKE:
-                    streetRequest.streetSubRequestModes.setBicycle(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE));
                     break;
                 case BIKE_TO_PARK:
-                    streetRequest.streetSubRequestModes.setBicycle(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
                     streetRequest.bikeParkAndRide = true;
                     break;
                 case BIKE_RENTAL:
-                    streetRequest.streetSubRequestModes.setBicycle(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
                     streetRequest.bikeRental = true;
                     break;
                 case CAR:
-                    streetRequest.streetSubRequestModes.setCar(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
                     break;
                 case CAR_TO_PARK:
-                    streetRequest.streetSubRequestModes.setCar(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
                     streetRequest.parkAndRide = true;
                     break;
                 case CAR_PICKUP:
-                    streetRequest.streetSubRequestModes.setCar(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
                     streetRequest.carPickup = true;
                     break;
                 case CAR_RENTAL:
-                    streetRequest.streetSubRequestModes.setCar(true);
-                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
             }
         }
 
@@ -1168,12 +1070,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
 
-            if (this.bikeWalkingOptions != this) {
-                clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
-            }
-            else {
-                clone.bikeWalkingOptions = clone;
-            }
             return clone;
         } catch (CloneNotSupportedException e) {
             /* this will never happen since our super is the cloneable object */
@@ -1266,21 +1162,35 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     /**
-     * @param mode
-     * @return The road speed for a specific traverse mode.
+     * The road speed for a specific traverse mode.
      */
-    public double getSpeed(TraverseMode mode) {
+    public double getReluctance(TraverseMode mode, boolean walkingBike) {
+        switch (mode) {
+            case WALK:
+                return walkingBike ? bikeWalkingReluctance : walkReluctance;
+            case BICYCLE:
+                return bikeReluctance;
+            case CAR:
+                return carReluctance;
+            default:
+                throw new IllegalArgumentException("getReluctance(): Invalid mode " + mode);
+        }
+    }
+
+    /**
+     * The road speed for a specific traverse mode.
+     */
+    public double getSpeed(TraverseMode mode, boolean walkingBike) {
         switch (mode) {
         case WALK:
-            return walkSpeed;
+            return walkingBike ? bikeWalkingSpeed : walkSpeed;
         case BICYCLE:
             return bikeSpeed;
         case CAR:
             return carSpeed;
         default:
-            break;
+            throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
         }
-        throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
     }
 
     /** @return The highest speed for all possible road-modes. */
@@ -1295,24 +1205,36 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return walkSpeed;
     }
 
-    public void setMaxWalkDistance(double maxWalkDistance) {
-        if (maxWalkDistance > 0) {
-            this.maxWalkDistance = maxWalkDistance;
-            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
+    public void setBikeReluctance(double bikeReluctance) {
+        if (bikeReluctance > 0) {
+            this.bikeReluctance = bikeReluctance;
         }
     }
 
-    public void setMaxPreTransitTime(int maxPreTransitTime) {
-        if (maxPreTransitTime > 0) {
-            this.maxPreTransitTime = maxPreTransitTime;
-            bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
+    public void setBikeWalkingReluctance(double bikeWalkingReluctance) {
+        if (bikeWalkingReluctance > 0) {
+            this.bikeWalkingReluctance = bikeWalkingReluctance;
+        }
+    }
+
+    public void setCarReluctance(double carReluctance) {
+        if (carReluctance > 0) {
+            this.carReluctance = carReluctance;
         }
     }
 
     public void setWalkReluctance(double walkReluctance) {
         if (walkReluctance > 0) {
             this.walkReluctance = walkReluctance;
-            // Do not set bikeWalkingOptions.walkReluctance here, because that needs a higher value.
+        }
+    }
+
+    public void setNonTransitReluctance(double nonTransitReluctance) {
+        if (nonTransitReluctance > 0) {
+            this.bikeReluctance = nonTransitReluctance;
+            this.walkReluctance = nonTransitReluctance;
+            this.carReluctance = nonTransitReluctance;
+            this.bikeWalkingReluctance = nonTransitReluctance * 2.7;
         }
     }
 

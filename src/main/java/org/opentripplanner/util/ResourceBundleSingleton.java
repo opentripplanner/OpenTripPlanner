@@ -3,6 +3,7 @@ package org.opentripplanner.util;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.ResourceBundle.Control;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +16,11 @@ public enum ResourceBundleSingleton {
 
     private final static Logger LOG = LoggerFactory.getLogger(ResourceBundleSingleton.class);
 
-    //TODO: this is not the only place default is specified
-    //It is also specified in RoutingResource and RoutingRequest
-    private final Locale defaultLocale = new Locale("en");
+    final static ResourceBundle.Control noFallbackControl = Control.getNoFallbackControl(Control.FORMAT_PROPERTIES);
 
-    public Locale getDefaultLocale() {
-        return defaultLocale;
-    }
+    // The default locale to use if none is provided. This avoids using the system locale, which
+    // would lead to nondeterministic results.
+    private final static Locale defaultLocale = Locale.ENGLISH;
 
     //in singleton because resurce bundles are cached based on calling class
     //http://java2go.blogspot.com/2010/03/dont-be-smart-never-implement-resource.html
@@ -30,14 +29,14 @@ public enum ResourceBundleSingleton {
             return null;
         }
         if (locale == null) {
-            locale = getDefaultLocale();
+            locale = Locale.ROOT;
         }
         try {
             ResourceBundle resourceBundle = null;
             if (key.equals("corner") || key.equals("unnamedStreet")) {
-                resourceBundle = ResourceBundle.getBundle("internals", locale);
+                resourceBundle = ResourceBundle.getBundle("internals", locale, noFallbackControl);
             } else {
-                resourceBundle = ResourceBundle.getBundle("WayProperties", locale);
+                resourceBundle = ResourceBundle.getBundle("WayProperties", locale, noFallbackControl);
             }
             String retval = resourceBundle.getString(key);
             //LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
@@ -61,22 +60,17 @@ public enum ResourceBundleSingleton {
         }
         //TODO: This should probably use Locale.forLanguageTag
         //but format is little (IETF language tag) different - instead of _
-        Locale locale;
         String[] localeSpecParts = localeSpec.split("_");
         switch (localeSpecParts.length) {
             case 1:
-                locale = new Locale(localeSpecParts[0]);
-                break;
+                return new Locale(localeSpecParts[0]);
             case 2:
-                locale = new Locale(localeSpecParts[0]);
-                break;
+                return new Locale(localeSpecParts[0]);
             case 3:
-                locale = new Locale(localeSpecParts[0]);
-                break;
+                return new Locale(localeSpecParts[0]);
             default:
-                LOG.debug("Bogus locale " + localeSpec + ", defaulting to " + defaultLocale.toLanguageTag());
-                locale = defaultLocale;
+                LOG.debug("Bogus locale " + localeSpec + ", using default");
+                return defaultLocale;
         }
-        return locale;
     }
 }

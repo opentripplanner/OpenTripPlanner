@@ -87,7 +87,7 @@ public class TriangleInequalityTest {
         
         // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
         prototypeOptions.stairsReluctance = (1.0);
-        prototypeOptions.setWalkReluctance(1.0);
+        prototypeOptions.setNonTransitReluctance(1.0);
         prototypeOptions.turnReluctance = (1.0);
         prototypeOptions.carSpeed = 1.0;
         prototypeOptions.walkSpeed = 1.0;

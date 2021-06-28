@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor._data.api;
 
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
@@ -42,17 +44,25 @@ public class PathBuilder {
   }
 
   public PathBuilder access(int startTime, int duration, int toStop) {
+    return access(startTime, duration, toStop, walkCost(duration));
+  }
+
+  public PathBuilder access(int startTime, int duration, int toStop, int cost) {
     start(startTime);
     int toTime = startTime + duration;
-    return leg(NOT_SET, startTime, toStop, toTime, costCalculator.walkCost(duration), null);
+    return leg(NOT_SET, startTime, toStop, toTime, cost, null);
   }
 
   public PathBuilder walk(int duration, int toStop) {
+    return walk(duration, toStop, walkCost(duration));
+  }
+
+  public PathBuilder walk(int duration, int toStop, int cost) {
     int fromStop = prev().toStop;
     int fromTime = prev().toTime + alightSlack;
     int toTime = fromTime + duration;
 
-    return leg(fromStop, fromTime, toStop, toTime, costCalculator.walkCost(duration), null);
+    return leg(fromStop, fromTime, toStop, toTime, cost, null);
   }
 
   public PathBuilder bus(TestTripSchedule trip, int toStop) {
@@ -89,7 +99,11 @@ public class PathBuilder {
   }
 
   public Path<TestTripSchedule> egress(int duration) {
-    return walk(duration, NOT_SET).build();
+    return egress(duration, walkCost(duration));
+  }
+
+  public Path<TestTripSchedule> egress(int duration, int cost) {
+    return walk(duration, NOT_SET, cost).build();
   }
 
 
@@ -169,8 +183,9 @@ public class PathBuilder {
     }
 
     AccessPathLeg<TestTripSchedule> accessLeg(PathLeg<TestTripSchedule> next) {
+      var durationInSeconds = toTime - fromTime;
       return new AccessPathLeg<>(
-          TestTransfer.walk(toStop, toTime - fromTime),
+          TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
           toStop, fromTime, toTime, domainCost(), next
       );
     }
@@ -182,16 +197,18 @@ public class PathBuilder {
     }
 
     TransferPathLeg<TestTripSchedule> transferLeg(PathLeg<TestTripSchedule> next) {
+      var durationInSeconds = toTime - fromTime;
       return new TransferPathLeg<>(
           fromStop, fromTime, toStop, toTime, domainCost(),
-          TestTransfer.walk(toStop, toTime-fromStop),
+          TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
           next
       );
     }
 
     EgressPathLeg<TestTripSchedule> egressLeg() {
+      var durationInSeconds = toTime - fromTime;
       return new EgressPathLeg<>(
-          TestTransfer.walk(toStop, toTime - fromTime),
+          TestTransfer.walk(toStop, durationInSeconds, walkCost(durationInSeconds)),
           fromStop, fromTime, toTime, domainCost()
       );
     }

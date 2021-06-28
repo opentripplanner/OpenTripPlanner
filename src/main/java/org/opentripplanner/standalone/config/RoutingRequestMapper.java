@@ -30,6 +30,7 @@ public class RoutingRequestMapper {
         request.bikeParkAndRide = c.asBoolean("bikeParkAndRide", dft.bikeParkAndRide);
         request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
         request.bikeParkCost = c.asInt("bikeParkCost", dft.bikeParkCost);
+        request.bikeReluctance = c.asDouble("bikeReluctance", dft.bikeReluctance);
         request.bikeRentalDropoffCost = c.asInt("bikeRentalDropoffCost", dft.bikeRentalDropoffCost);
         request.bikeRentalDropoffTime = c.asInt("bikeRentalDropoffTime", dft.bikeRentalDropoffTime);
         request.bikeRentalPickupCost = c.asInt("bikeRentalPickupCost", dft.bikeRentalPickupCost);
@@ -40,6 +41,8 @@ public class RoutingRequestMapper {
         request.bikeTriangleTimeFactor = c.asDouble("bikeTriangleTimeFactor", dft.bikeTriangleTimeFactor);
         request.bikeSwitchTime = c.asInt("bikeSwitchTime", dft.bikeSwitchTime);
         request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
+        request.bikeWalkingReluctance = c.asDouble("bikeWalkingReluctance", dft.bikeWalkingReluctance);
+        request.bikeWalkingSpeed = c.asDouble("bikeWalkingSpeed", dft.bikeWalkingSpeed);
         request.allowKeepingRentedBicycleAtDestination = c.asBoolean("allowKeepingRentedBicycleAtDestination", dft.allowKeepingRentedBicycleAtDestination);
         request.keepingRentedBicycleAtDestinationCost = c.asDouble("keepingRentedBicycleAtDestinationCost", dft.keepingRentedBicycleAtDestinationCost);
         request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
@@ -47,6 +50,9 @@ public class RoutingRequestMapper {
         request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
         request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
         request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
+        request.carPickupCost = c.asInt("carPickupCost", dft.carPickupCost);
+        request.carPickupTime = c.asInt("carPickupTime", dft.carPickupTime);
+        request.carReluctance = c.asDouble("carReluctance", dft.carReluctance);
         request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
         request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"));
         request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
@@ -59,12 +65,8 @@ public class RoutingRequestMapper {
         request.ignoreRealtimeUpdates = c.asBoolean("ignoreRealtimeUpdates", dft.ignoreRealtimeUpdates);
         request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
         request.locale = c.asLocale("locale", dft.locale);
-        request.maxHours = c.asDouble("maxHours", dft.maxHours);
-        request.maxPreTransitTime = c.asInt("maxPreTransitTime", dft.maxPreTransitTime);
-        request.maxTransferWalkDistance = c.asDouble("maxTransferWalkDistance", dft.maxTransferWalkDistance);
         // 'maxTransfers' is configured in the Raptor tuning parameters, not here
-        request.maxWalkDistance = c.asDouble("maxWalkDistance", dft.maxWalkDistance);
-        request.maxWeight = c.asDouble("maxWeight", dft.maxWeight);
+        request.maxDirectStreetDurationSeconds = c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
         request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
         request.modes = RequestModes.defaultRequestModes; // TODO Map default modes from config
         request.nonpreferredTransferCost = c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
@@ -82,16 +84,13 @@ public class RoutingRequestMapper {
         request.setTransitReluctanceForMode(c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble));
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useBikeRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useBikeRentalAvailabilityInformation);
-        request.useRequestedDateTimeInMaxHours = c.asBoolean("useRequestedDateTimeInMaxHours", dft.useRequestedDateTimeInMaxHours);
         request.useUnpreferredRoutesPenalty = c.asInt("useUnpreferredRoutesPenalty", dft.useUnpreferredRoutesPenalty);
         request.waitAtBeginningFactor = c.asDouble("waitAtBeginningFactor", dft.waitAtBeginningFactor);
         request.waitReluctance = c.asDouble("waitReluctance", dft.waitReluctance);
         request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
         request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
-        request.walkingBike = c.asBoolean("walkingBike", dft.walkingBike);
         request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
-        request.worstTime = c.asLong("worstTime", dft.worstTime);
 
         mapTransferOptimization(
             (TransferOptimizationRequest)request.transferOptimization,
