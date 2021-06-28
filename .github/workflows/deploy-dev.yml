@@ -3,7 +3,7 @@ name: Deploy to dev
 on:
   workflow_dispatch:
   push:
-    branches: [$default-branch]
+    branches: [master]
 
 jobs:
   deploy-dev:
