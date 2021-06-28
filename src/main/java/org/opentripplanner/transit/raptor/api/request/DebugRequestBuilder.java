@@ -20,7 +20,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
  */
 public class DebugRequestBuilder {
     private final Set<Integer> stops = new HashSet<>();
-    private final List<Integer> path = new ArrayList<>();
+    private List<Integer> path = new ArrayList<>();
     private int debugPathFromStopIndex;
     private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
     private Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener;
@@ -59,11 +59,14 @@ public class DebugRequestBuilder {
         return path;
     }
 
-    public DebugRequestBuilder addPath(List<Integer> path) {
-        if(!this.path.isEmpty()) {
-            throw new IllegalStateException("The API support only one debug path. Existing: " + this.path + ", new: " + path);
+    public DebugRequestBuilder setPath(List<Integer> stopsInPath) {
+        if(!path.isEmpty()) {
+            throw new IllegalStateException(
+                    "The API support only one debug path. "
+                    + "Existing: " + path + ", new: " + stopsInPath
+            );
         }
-        this.path.addAll(path);
+        this.path = new ArrayList<>(stopsInPath);
         return this;
     }
 

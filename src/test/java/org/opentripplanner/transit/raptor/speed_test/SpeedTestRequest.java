@@ -183,7 +183,7 @@ public class SpeedTestRequest {
                 .stopArrivalListener(logger::stopArrivalLister)
                 .pathFilteringListener(logger::pathFilteringListener)
                 .logger(logger)
-                .addPath(path)
+                .setPath(path)
                 .debugPathFromStopIndex(opts.debugPathFromStopIndex())
                 .addStops(stops);
 
