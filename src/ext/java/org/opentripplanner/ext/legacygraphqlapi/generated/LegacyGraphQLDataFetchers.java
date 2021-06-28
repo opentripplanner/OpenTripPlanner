@@ -344,6 +344,8 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Boolean> transitLeg();
 
+        public DataFetcher<Boolean> walkingBike();
+
         public DataFetcher<Boolean> rentedBike();
 
         public DataFetcher<StopArrival> from();

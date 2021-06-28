@@ -770,6 +770,9 @@ type Leg {
     """Whether this leg is a transit leg or not."""
     transitLeg: Boolean
 
+    "Whether this leg is walking with a bike."
+    walkingBike: Boolean
+
     """Whether this leg is traversed with a rented bike."""
     rentedBike: Boolean
 
