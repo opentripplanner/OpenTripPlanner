@@ -1,0 +1,36 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 http://maven.apache.org/xsd/settings-1.2.0.xsd">
+  <mirrors>
+    <mirror>
+      <id>onebusaway-releases</id>
+      <mirrorOf>onebusaway-releases</mirrorOf>
+      <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
+      <blocked>false</blocked>
+    </mirror>
+    <mirror>
+      <id>public.onebusaway.org</id>
+      <mirrorOf>public.onebusaway.org</mirrorOf>
+      <url>http://nexus.onebusaway.org/content/groups/public/</url>
+      <blocked>false</blocked>
+    </mirror>
+    <mirror>
+      <id>obaweb</id>
+      <mirrorOf>obaweb</mirrorOf>
+      <url>http://repo.obaweb.org:8080/archiva/repository/releases/</url>
+      <blocked>false</blocked>
+    </mirror>
+    <mirror>
+      <id>releases.developer.onebusaway.org</id>
+      <mirrorOf>releases.developer.onebusaway.org</mirrorOf>
+      <url>http://developer.onebusaway.org/maven/repository/</url>
+      <blocked>false</blocked>
+    </mirror>
+    <mirror>
+      <id>snapshots.developer.onebusaway.org</id>
+      <mirrorOf>snapshots.developer.onebusaway.org</mirrorOf>
+      <url>http://developer.onebusaway.org/maven/snapshot-repository/</url>
+      <blocked>false</blocked>
+    </mirror>
+  </mirrors>
+</settings>

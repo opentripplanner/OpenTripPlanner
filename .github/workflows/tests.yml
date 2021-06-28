@@ -1,0 +1,39 @@
+name: Run Tests
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  tests:
+    name: Run OTP tests
+    runs-on: ubuntu-latest
+    env:
+      SETTINGS_PATH: ${{ github.workspace }}/OTP/mbta/ci-maven-settings.xml
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/OTP
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 8
+          settings-path: ${{ github.workspace }}/OTP/mbta
+      
+      - uses: actions/checkout@v2
+        with:
+          repository: mbta/onebusaway-gtfs-modules
+          path: ${{ github.workspace }}/onebusaway-gtfs-modules
+          fetch-depth: 1
+
+      - name: Install onebusaway-gtfs-modules
+        run: |
+          mvn clean install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true -Dlicense.skip=true -s $SETTINGS_PATH
+        working-directory: ${{ github.workspace }}/onebusaway-gtfs-modules
+
+      - name: Run OTP tests
+        run: |
+          mvn test -Dgpg.skip -Dmaven.javadoc.skip=true -s $SETTINGS_PATH
+        working-directory: ${{ github.workspace }}/OTP

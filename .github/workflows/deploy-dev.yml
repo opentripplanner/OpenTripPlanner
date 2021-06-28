@@ -1,0 +1,74 @@
+name: Deploy to dev
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [$default-branch]
+
+jobs:
+  deploy-dev:
+    name: Deploy master to dev server
+    runs-on: ubuntu-latest
+    environment: dev
+    concurrency: dev
+    env:
+      SETTINGS_PATH: ${{ github.workspace }}/OTP/mbta/ci-maven-settings.xml
+    
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/OTP
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 8
+          settings-path: ${{ github.workspace }}/OTP/mbta
+      
+      - uses: actions/checkout@v2
+        with:
+          repository: mbta/onebusaway-gtfs-modules
+          path: ${{ github.workspace }}/onebusaway-gtfs-modules
+          fetch-depth: 1
+
+      - name: Install onebusaway-gtfs-modules
+        run: |
+          mvn clean install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true -Dlicense.skip=true -s $SETTINGS_PATH
+        working-directory: ${{ github.workspace }}/onebusaway-gtfs-modules
+
+      - name: Update PBF
+        run: ./mbta/update_pbf.sh
+        working-directory: ${{ github.workspace }}/OTP
+
+      - name: Update GTFS
+        run: ./mbta/update_gtfs.sh
+        working-directory: ${{ github.workspace }}/OTP
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/OTP
+        run: |
+          mvn clean install -U -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true -s $SETTINGS_PATH
+          cp ./target/otp-1.4.0-SNAPSHOT-shaded.jar .
+          java -Xmx8G -jar otp-1.4.0-SNAPSHOT-shaded.jar --build var/graphs/mbta/ --basePath var/
+
+      - name: Make deploy
+        working-directory: ${{ github.workspace }}/OTP
+        run: ./mbta/make_deploy.sh
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+      
+      - name: Deploy
+        env:
+          AWS_REGION: us-east-1
+          EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
+          EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+        run: ./mbta/semaphore/deploy.sh
+        working-directory: ${{ github.workspace }}/OTP
+      
+      - uses: mbta/actions/notify-slack-deploy@v1
+        if: ${{ !cancelled() }}
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          job-status: ${{ job.status }}
