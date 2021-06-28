@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
@@ -8,8 +8,9 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
 import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
 
-import org.junit.Before;
-import org.junit.Test;
+import java.time.Duration;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathUtils;
@@ -17,6 +18,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.util.time.DurationUtils;
 
 /**
  * FEATURE UNDER TEST
@@ -30,27 +32,29 @@ public class B01_AccessTest implements RaptorTestConstants {
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(RaptorConfig.defaultConfigForTest());
 
-  @Before
+  @BeforeEach
   public void setup() {
     data.withRoute(
-        route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G)
+        route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
             .withTimetable(
-                schedule("0:10, 0:12, 0:14, 0:16, 0:18, 0:20")
+                schedule("0:10 0:14 0:18 0:22 0:25")
             )
     );
 
     requestBuilder.searchParams()
         .addAccessPaths(
             walk(STOP_B, D1s),    // Lowest cost
-            walk(STOP_C, D2m),    // Best compromise of cost and time
-            walk(STOP_D, D3m),    // Latest departure time
-            walk(STOP_E, D7m)     // Not optimal
+            walk(STOP_C, D4m),    // Best compromise of cost and time
+            walk(STOP_D, DurationUtils.duration("7m")),    // Latest departure time
+            walk(STOP_E, DurationUtils.duration("13m"))     // Not optimal
         )
         .addEgressPaths(
-            walk(STOP_G, D1s)
+            walk(STOP_F, D1s)
         )
         .earliestDepartureTime(T00_00)
         .latestArrivalTime(T00_30)
+        // Removing the search-window should not have any effect, but it does.
+        .searchWindow(Duration.ofMinutes(20))
     ;
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
@@ -64,7 +68,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     // expect: one path with the latest departure time.
     assertEquals(
-        "Walk 3m ~ 4 ~ BUS R1 0:14 0:20 ~ 7 ~ Walk 1s [0:11 0:20:01 9m1s]",
+        "Walk 7m ~ 4 ~ BUS R1 0:18 0:25 ~ 6 ~ Walk 1s [0:11 0:25:01 14m1s]",
         PathUtils.pathsToString(response)
     );
   }
@@ -79,7 +83,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     // expect: one path with the latest departure time, same as found in the forward search.
     assertEquals(
-        "Walk 3m ~ 4 ~ BUS R1 0:14 0:20 ~ 7 ~ Walk 1s [0:11 0:20:01 9m1s]",
+        "Walk 7m ~ 4 ~ BUS R1 0:18 0:25 ~ 6 ~ Walk 1s [0:11 0:25:01 14m1s]",
         PathUtils.pathsToString(response)
     );
   }
@@ -93,10 +97,10 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     // expect: All pareto optimal paths
     assertEquals(""
-            + "Walk 3m ~ 4 ~ BUS R1 0:14 0:20 ~ 7 ~ Walk 1s [0:11 0:20:01 9m1s $1684]\n"
-            + "Walk 2m ~ 3 ~ BUS R1 0:12 0:20 ~ 7 ~ Walk 1s [0:10 0:20:01 10m1s $1564]\n"
-            + "Walk 1s ~ 2 ~ BUS R1 0:10 0:20 ~ 7 ~ Walk 1s [0:09:59 0:20:01 10m2s $1208]",
-        PathUtils.pathsToString(response)
+            + "Walk 7m 0:11 0:18 $840.00 ~ 4 0s ~ BUS R1 0:18 0:25 7m $1020.00 ~ 6 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:11 0:25:01 14m1s $1862.00]\n"
+            + "Walk 4m 0:10 0:14 $480.00 ~ 3 0s ~ BUS R1 0:14 0:25 11m $1260.00 ~ 6 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:10 0:25:01 15m1s $1742.00]\n"
+            + "Walk 1s 0:09:59 0:10 $2.00 ~ 2 0s ~ BUS R1 0:10 0:25 15m $1500.00 ~ 6 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:09:59 0:25:01 15m2s $1504.00]",
+        PathUtils.pathsToStringDetailed(response)
     );
   }
 }

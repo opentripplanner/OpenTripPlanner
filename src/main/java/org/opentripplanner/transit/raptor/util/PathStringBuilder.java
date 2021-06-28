@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.util;
 
 import java.util.Calendar;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -9,6 +10,7 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * Create a path like: {@code Walk 5m - 101 - Transit 10:07 10:35 - 2111 - Walk 4m }
  */
+@SuppressWarnings("UnusedReturnValue")
 public class PathStringBuilder {
     private final StringBuilder buf = new StringBuilder();
     private final boolean padDuration;
@@ -41,7 +43,7 @@ public class PathStringBuilder {
 
     public PathStringBuilder flex(int duration, int nRides) {
         // The 'tx' is short for eXtra Transfers added by the flex access/egress.
-        return start().append("Flex").duration(duration).space().append(nRides).append("tx").end();
+        return start().append("Flex").duration(duration).space().append(nRides).append("x").end();
     }
 
     public PathStringBuilder accessEgress(RaptorTransfer leg) {
@@ -69,14 +71,19 @@ public class PathStringBuilder {
         return start().append(mode.name()).space().time(fromTime, toTime).end();
     }
 
-    public PathStringBuilder timeAndCost(int fromTime, int toTime, int generalizedCost) {
-        return space().time(fromTime, toTime).cost(generalizedCost);
+    public PathStringBuilder timeAndCostCentiSec(int fromTime, int toTime, int generalizedCost) {
+        return space().time(fromTime, toTime).costCentiSec(generalizedCost);
     }
 
-    public PathStringBuilder cost(int generalizedCost) {
-        if(generalizedCost> 0) {
-            space().append("$").append(generalizedCost);
-        }
+    public PathStringBuilder costSec(int generalizedCost) {
+        if(generalizedCost <= 0) { return this; }
+        space().append("$").append(RaptorCostConverter.toOtpDomainCost(generalizedCost));
+        return this;
+    }
+
+    public PathStringBuilder costCentiSec(int generalizedCost) {
+        if(generalizedCost <= 0) { return this; }
+        space().append(RaptorCostConverter.toString(generalizedCost));
         return this;
     }
 

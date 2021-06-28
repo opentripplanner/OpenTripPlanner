@@ -90,13 +90,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
 
     @Override
     public void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
-        addStopArrival(
-            new AccessStopArrival<>(
-                departureTime,
-                accessPath.generalizedCost(),
-                accessPath
-            )
-        );
+        addStopArrival(new AccessStopArrival<>(departureTime, accessPath));
     }
 
     /**
@@ -179,13 +173,12 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
 
     private void transferToStop(Iterable<? extends AbstractStopArrival<T>> fromArrivals, RaptorTransfer transfer) {
         final int transferTimeInSeconds = transfer.durationInSeconds();
-        final int transferCost = transfer.generalizedCost();
 
         for (AbstractStopArrival<T> it : fromArrivals) {
             int arrivalTime = it.arrivalTime() + transferTimeInSeconds;
 
             if (!exceedsTimeLimit(arrivalTime)) {
-                arrivalsCache.add(new TransferStopArrival<>(it, transfer, arrivalTime, transferCost));
+                arrivalsCache.add(new TransferStopArrival<>(it, transfer, arrivalTime));
             }
         }
     }

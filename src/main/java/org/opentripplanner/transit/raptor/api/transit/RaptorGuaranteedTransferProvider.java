@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
  */
 public interface RaptorGuaranteedTransferProvider<T extends RaptorTripSchedule> {
 
-
     /**
      * Check if the current pattern have any guaranteed transfers for the given stop position in
      * pattern. If not, then Raptor will fall back to a regular trip search.

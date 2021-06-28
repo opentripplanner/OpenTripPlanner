@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-import org.junit.Test;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class RaptorCostConverterTest {
   @Test
@@ -27,4 +28,10 @@ public class RaptorCostConverterTest {
     int[] result = RaptorCostConverter.toRaptorCosts(new double[]{1.0, 0.8});
     assertArrayEquals(expected, result);
   }
+
+  @Test
+  public void testToString() {
+    assertEquals("$120.00", RaptorCostConverter.toString(12_000));
+  }
+
 }

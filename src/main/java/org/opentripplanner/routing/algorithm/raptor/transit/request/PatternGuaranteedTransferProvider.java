@@ -78,7 +78,7 @@ public final class PatternGuaranteedTransferProvider
             Trip sourceTrip,
             int sourceStopPos
     ) {
-    for (Transfer tx : currentTransfers) {
+        for (Transfer tx : currentTransfers) {
             var sourcePoint = translator.source(tx);
             if(sourcePoint.matches(sourceTrip, sourceStopPos)) {
                 return translator.target(tx);

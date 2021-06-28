@@ -1,16 +1,15 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
 
 
 /**
@@ -70,8 +69,8 @@ public class DebugRequest {
     }
 
     DebugRequest(DebugRequestBuilder builder) {
-        this.stops = Collections.unmodifiableList(builder.stops());
-        this.path = Collections.unmodifiableList(builder.path());
+        this.stops = List.copyOf(builder.stops());
+        this.path = List.copyOf(builder.path());
         this.debugPathFromStopIndex = builder.debugPathFromStopIndex();
         this.stopArrivalListener = builder.stopArrivalListener();
         this.patternRideDebugListener = builder.patternRideDebugListener();

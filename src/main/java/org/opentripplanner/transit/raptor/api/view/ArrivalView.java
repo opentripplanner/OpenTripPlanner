@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.view;
 
 
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.util.time.DurationUtils;
@@ -133,39 +134,39 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     default String asString() {
         if(arrivedByAccess()) {
             return String.format(
-                "Access { stop: %d, duration: %s, arrival-time: %s $%d }",
+                "Access { stop: %d, duration: %s, arrival-time: %s %s }",
                 stop(), DurationUtils.durationToStr(accessPath().access().durationInSeconds()),
                 TimeUtils.timeToStrCompact(arrivalTime()),
-                cost()
+                RaptorCostConverter.toString(cost())
             );
         }
         if(arrivedByTransit()) {
             return String.format(
-                "Transit { round: %d, stop: %d, pattern: %s, arrival-time: %s $%d }",
+                "Transit { round: %d, stop: %d, pattern: %s, arrival-time: %s %s }",
                 round(),
                 stop(),
                 transitPath().trip().pattern().debugInfo(),
                 TimeUtils.timeToStrCompact(arrivalTime()),
-                cost()
+                RaptorCostConverter.toString(cost())
             );
         }
         if(arrivedByTransfer()) {
             return String.format(
-                "Walk { round: %d, stop: %d, arrival-time: %s $%d }",
+                "Walk { round: %d, stop: %d, arrival-time: %s %s }",
                 round(),
                 stop(),
                 TimeUtils.timeToStrCompact(arrivalTime()),
-                cost()
+                RaptorCostConverter.toString(cost())
             );
         }
         if(arrivedAtDestination()) {
             return String.format(
-                "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s $%d }",
+                "Egress { round: %d, from-stop: %d, duration: %s, arrival-time: %s %s }",
                 round(),
                 previous().stop(),
                 DurationUtils.durationToStr(egressPath().egress().durationInSeconds()),
                 TimeUtils.timeToStrCompact(arrivalTime()),
-                cost()
+                RaptorCostConverter.toString(cost())
             );
         }
         throw new IllegalStateException("Unknown type of stop-arrival: " + getClass());

@@ -25,13 +25,11 @@ import org.opentripplanner.util.time.TimeUtils;
  * or pass in a logger to print the diff. Here is an example with two set with the to same paths
  * in both, but where the first path differ in cost:
  * <pre>
- * STATUS | TX | DURATION |  COST | WALK |   START  |    END   | PATH
- *  RIGHT |  1 |   21m26s | 22510 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s $22510]
- *  LEFT  |  1 |   21m26s |  4195 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s $4195]
- *   EQ   |  0 |    24m3s |  5085 |   0s | 14:09:07 | 14:33:10 | Walk 7m53s ~ 21251 ~ BUS 51 14:17 14:29 ~ 2341 ~ Walk 4m10s [14:09:07 14:33:10 24m3s $5085]
+ * STATUS  | TX | DURATION |  COST | WALK |   START  |    END   | PATH
+ * DROPPED |  1 |   21m26s | 22510 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s $22510]
+ *   NEW   |  1 |   21m26s |  4195 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s $4195]
+ *   BOTH  |  0 |    24m3s |  5085 |   0s | 14:09:07 | 14:33:10 | Walk 7m53s ~ 21251 ~ BUS 51 14:17 14:29 ~ 2341 ~ Walk 4m10s [14:09:07 14:33:10 24m3s $5085]
  * </pre>
- *
- * @param <T>
  */
 public class PathDiff<T extends RaptorTripSchedule> {
 
@@ -52,9 +50,8 @@ public class PathDiff<T extends RaptorTripSchedule> {
         .mapToInt(l -> l.asTransferLeg().duration())
         .sum();
     this.routes.addAll(
-        path.legStream()
-            .filter(PathLeg::isTransitLeg)
-            .map(l -> l.asTransitLeg().trip().pattern().debugInfo())
+        path.transitLegs()
+            .map(l -> l.trip().pattern().debugInfo())
             .collect(Collectors.toList())
     );
     this.stops.addAll(path.listStops());
@@ -80,9 +77,9 @@ public class PathDiff<T extends RaptorTripSchedule> {
       if(skipEquals && e.isEqual()) { continue; }
       PathDiff<? extends T> it = e.element();
       tbl.addRow(
-        e.status("OK", "DROPPED", "NEW"),
+        e.status("EQ", "DROPPED", "NEW"),
         it.path.numberOfTransfers(),
-        DurationUtils.durationToStr(it.path.travelDurationInSeconds()),
+        DurationUtils.durationToStr(it.path.durationInSeconds()),
         it.path.generalizedCost(),
         DurationUtils.durationToStr(it.walkDuration),
         TimeUtils.timeToStrCompact(it.path.startTime()),

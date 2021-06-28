@@ -9,6 +9,7 @@ import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
@@ -102,6 +103,12 @@ public class ToStringBuilder {
 
     public ToStringBuilder addInts(String name, int[] intArray) {
         return addIfNotNull(name, intArray, Arrays::toString);
+    }
+
+    public ToStringBuilder addDoubles(String name, double[] value, double ignoreValue) {
+        if(value == null) { return addIt(name, "null"); }
+        if(Arrays.stream(value).allMatch(it -> Objects.equals(it, ignoreValue))) { return this; }
+        return addIt(name, Arrays.toString(value));
     }
 
     public ToStringBuilder addCol(String name, Collection<?> c) {
@@ -233,8 +240,9 @@ public class ToStringBuilder {
     }
 
     private <T> ToStringBuilder addIfNotIgnored(String name, T value, T ignoreValue, Function<T, String> mapToString) {
-        if(value == ignoreValue) { return this; }
-        if(ignoreValue != null && ignoreValue.equals(value)) { return this; }
+        // 'ignoreValue' should be the first argument here to avoid calling equals when
+        // 'ignoreValue=null' and the type do not support equals(..).
+        if(Objects.equals(ignoreValue, value)) { return this; }
         if(value == null) { return addIt(name, NULL_VALUE); }
         return addIt(name, mapToString.apply(value));
     }

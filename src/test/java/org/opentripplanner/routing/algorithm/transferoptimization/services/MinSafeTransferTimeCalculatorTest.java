@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.SLACK_PROVIDER;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathBuilder;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
@@ -19,9 +19,9 @@ public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
   private static final int D2m = DurationUtils.duration("2m");
   private static final int TRANSIT_TIME = 2000 - (BOARD_SLACK + ALIGHT_SLACK);
 
-  private final PathBuilder pathBuilder = new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+  private static final PathBuilder PATH_BUILDER = new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
 
-  Path<TestTripSchedule> path_1_bus_leg = pathBuilder
+  Path<TestTripSchedule> path_1_bus_leg = PATH_BUILDER
       .access(time("10:00:15"), D2m, STOP_A)
       .bus("L11", time("10:03"), TRANSIT_TIME, STOP_B)
       .egress(D2m);

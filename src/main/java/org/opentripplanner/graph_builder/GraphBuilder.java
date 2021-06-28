@@ -1,13 +1,23 @@
 package org.opentripplanner.graph_builder;
 
+import static org.opentripplanner.datastore.FileType.DEM;
+import static org.opentripplanner.datastore.FileType.GTFS;
+import static org.opentripplanner.datastore.FileType.NETEX;
+import static org.opentripplanner.datastore.FileType.OSM;
+import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
+
 import com.google.common.collect.Lists;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
@@ -28,17 +38,6 @@ import org.opentripplanner.standalone.config.S3BucketConfig;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
 
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.

@@ -109,6 +109,23 @@ public class ToStringBuilderTest {
   }
 
   @Test
+  public void addDoubleArray() {
+    assertEquals(
+            "ToStringBuilderTest{a: null}",
+            subject().addDoubles("a", null, 1.0).toString()
+    );
+    assertEquals(
+            "ToStringBuilderTest{b: [1.0, 3.0]}",
+            subject().addDoubles("b", new double[] {1.0, 3.0}, 1.0).toString()
+    );
+    assertEquals(
+            "ToStringBuilderTest{}",
+            subject().addDoubles("c", new double[] {1.0, 1.0}, 1.0).toString()
+    );
+  }
+
+
+  @Test
   public void addCollection() {
     assertEquals(
         "ToStringBuilderTest{c: [1, 3.0, true]}",

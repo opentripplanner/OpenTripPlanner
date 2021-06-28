@@ -1,6 +1,8 @@
 package org.opentripplanner.model.plan;
 
 
+import static java.util.Locale.ROOT;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -320,6 +322,9 @@ public class Itinerary {
             buf.sep();
             buf.stop(leg.to.name);
         }
-        return buf.toString() + " [cost: " + generalizedCost + "]";
+
+        buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));
+
+        return buf.toString();
     }
 }

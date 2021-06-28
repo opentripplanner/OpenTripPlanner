@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
+import static org.opentripplanner.routing.core.TraverseMode.WALK;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -16,12 +21,6 @@ import org.opentripplanner.transit.raptor.speed_test.SpeedTestRequest;
 import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.model.Leg;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 public class ItineraryMapper {
     private SpeedTestRequest request;
@@ -71,7 +70,7 @@ public class ItineraryMapper {
         itinerary.walkDistance = 0.0;
         itinerary.transitTime = 0;
         itinerary.waitingTime = 0;
-        itinerary.weight = path.generalizedCost();
+        itinerary.weight = path.otpDomainCost();
 
         int numberOfTransits = 0;
 

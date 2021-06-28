@@ -38,6 +38,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.util.PolylineEncoder;
 
 /**
@@ -60,7 +61,6 @@ public class RaptorPathToItineraryMapper {
     /**
      * Constructs an itinerary mapper for a request and a set of results
      *
-     * @param graph
      * @param transitLayer the currently active transit layer (may have real-time data applied)
      * @param startOfTime the point in time all times in seconds are counted from
      * @param request the current routing request
@@ -85,8 +85,6 @@ public class RaptorPathToItineraryMapper {
 
         // Map access leg
         legs.addAll(mapAccessLeg(path.accessLeg()));
-
-        // TODO: Add back this code when PathLeg interface contains object references
 
         PathLeg<TripSchedule> pathLeg = path.accessLeg().nextLeg();
 
@@ -119,11 +117,13 @@ public class RaptorPathToItineraryMapper {
         Itinerary itinerary = new Itinerary(legs);
 
         // Map general itinerary fields
-        itinerary.generalizedCost = path.generalizedCost();
+        itinerary.generalizedCost = path.otpDomainCost();
         itinerary.arrivedAtDestinationWithRentedBicycle = mapped != null && mapped.arrivedAtDestinationWithRentedBicycle;
 
         if(optimizedPath != null) {
-            itinerary.waitTimeAdjustedGeneralizedCost = optimizedPath.getWaitTimeOptimizedCost();
+            itinerary.waitTimeAdjustedGeneralizedCost = RaptorCostConverter.toOtpDomainCost(
+                    optimizedPath.getWaitTimeOptimizedCost()
+            );
         }
 
         return itinerary;
@@ -162,7 +162,8 @@ public class RaptorPathToItineraryMapper {
         Leg leg = new Leg(tripTimes.trip);
 
         // Find stop positions in pattern where this leg boards and alights.
-        // We cannot assume every stop appears only once in a pattern, so we match times instead of stops.
+        // We cannot assume every stop appears only once in a pattern, so we
+        // have to match stop and time.
         int boardStopIndexInPattern = tripSchedule.findDepartureStopPosition(
             pathLeg.fromTime(), pathLeg.fromStop()
         );
@@ -193,7 +194,7 @@ public class RaptorPathToItineraryMapper {
 
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
-        leg.generalizedCost = pathLeg.generalizedCost();
+        leg.generalizedCost = pathLeg.otpDomainCost();
 
         leg.dropOffBookingInfo = tripTimes.getDropOffBookingInfo(boardStopIndexInPattern);
         leg.pickupBookingInfo = tripTimes.getPickupBookingInfo(boardStopIndexInPattern);
@@ -268,7 +269,7 @@ public class RaptorPathToItineraryMapper {
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
             leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();
-            leg.generalizedCost = pathLeg.generalizedCost();
+            leg.generalizedCost = pathLeg.otpDomainCost();
 
             if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
                 return List.of(leg);

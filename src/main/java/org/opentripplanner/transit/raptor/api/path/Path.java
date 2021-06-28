@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -53,11 +54,12 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
         this(
             iterationDepartureTime,
             accessLeg,
-            accessLeg.stream().mapToInt(PathLeg::generalizedCost).sum()
+            accessLeg.generalizedCostTotal()
         );
     }
 
     /** Copy constructor */
+    @SuppressWarnings("CopyConstructorMissesField")
     protected Path(Path<T> original) {
         this(original.iterationDepartureTime, original.accessLeg, original.generalizedCost);
     }
@@ -98,7 +100,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     /**
      * The total journey duration in seconds.
      */
-    public final int travelDurationInSeconds() {
+    public final int durationInSeconds() {
         return endTime - startTime;
     }
 
@@ -110,10 +112,25 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     }
 
     /**
-     * The total cost computed for this path. This is for debugging and filtering purposes.
+     * The total Raptor cost computed for this path. This is for debugging and filtering purposes.
+     * <p>
+     * {@code -1} is returned if no cost exist.
+     * <p>
+     * The unit is centi-seconds
      */
     public int generalizedCost() {
         return generalizedCost;
+    }
+
+    /**
+     * The computed generalized-cost for this path leg.
+     * <p>
+     * {@code -1} is returned if no cost exist.
+     * <p>
+     * The unit is seconds (OTP Domain/AStar unit)
+     */
+    public int otpDomainCost() {
+        return RaptorCostConverter.toOtpDomainCost(generalizedCost());
     }
 
     /**
@@ -141,27 +158,26 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             .collect(Collectors.toList());
     }
 
-    /** Return the duration of time spent onBoard - excluding slack. */
-    public int transitDuration() {
-        return legStream()
-            .filter(PathLeg::isTransitLeg)
-            .mapToInt(PathLeg::duration)
-            .sum();
-    }
-
     /**
      * Aggregated wait-time in seconds. This method compute the total wait time for this path.
      */
     public int waitTime() {
-        return travelDurationInSeconds() - transitDuration();
+        // Get the total duration for all legs exclusive slack/wait time.
+        int legsTotalDuration = legStream().mapToInt(PathLeg::duration).sum();
+        return durationInSeconds() - legsTotalDuration;
     }
 
     public Stream<PathLeg<T>> legStream() {
         return accessLeg.stream();
     }
 
-    public Iterable<PathLeg<T>> legIterable() {
-        return accessLeg.iterator();
+    /**
+     * Stream all transit legs in the path
+     */
+    public Stream<TransitPathLeg<T>> transitLegs() {
+        return legStream()
+                .filter(PathLeg::isTransitLeg)
+                .map(PathLeg::asTransitLeg);
     }
 
     public String toStringDetailed() {
@@ -197,7 +213,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                         );
                         if (detailed) {
                             buf.duration(leg.duration());
-                            buf.cost(leg.generalizedCost());
+                            buf.costCentiSec(leg.generalizedCost());
                         }
                     }
                     else if (leg.isTransferLeg()) {
@@ -214,17 +230,21 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             }
             buf.space();
         }
-        return buf
-                .append("[")
-                .time(startTime, endTime)
-                .duration(endTime - startTime)
-                .cost(generalizedCost)
-                .append("]").toString();
+        // Add summary info
+        {
+            buf.append("[").time(startTime, endTime).duration(endTime - startTime);
+
+            if (detailed) { buf.costCentiSec(generalizedCost); }
+            else { buf.costSec(generalizedCost); }
+
+            buf.append("]");
+        }
+        return buf.toString();
     }
 
     private void addWalkDetails(boolean detailed, PathStringBuilder buf, PathLeg<T> leg) {
         if(detailed) {
-            buf.timeAndCost(leg.fromTime(), leg.toTime(), leg.generalizedCost());
+            buf.timeAndCostCentiSec(leg.fromTime(), leg.toTime(), leg.generalizedCost());
         }
     }
 
