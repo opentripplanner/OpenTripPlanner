@@ -58,12 +58,16 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.6'
+
+      - name: Show file tree
+        run: find -maxdepth 2
       
       - name: Deploy
         env:
           AWS_REGION: us-east-1
           EB_APP_NAME: ${{ secrets.EB_APP_NAME }}
           EB_ENV_NAME: ${{ secrets.EB_ENV_NAME }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
         run: ./mbta/semaphore/deploy.sh
         working-directory: ${{ github.workspace }}/OTP
       
