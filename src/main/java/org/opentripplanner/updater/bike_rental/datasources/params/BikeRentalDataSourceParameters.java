@@ -18,6 +18,7 @@ public class BikeRentalDataSourceParameters {
       String url,
       String network,
       String apiKey,
+      @NotNull
       Map<String, String> httpHeaders
   ) {
     this.sourceType = sourceType;
@@ -50,6 +51,7 @@ public class BikeRentalDataSourceParameters {
     return apiKey;
   }
 
+  @NotNull
   public Map<String, String> getHttpHeaders() {
     return httpHeaders;
   }
