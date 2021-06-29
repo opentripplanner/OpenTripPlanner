@@ -64,7 +64,7 @@ public class BikeRentalSourceFactory {
             network(),
             routeAsCar(),
             allowKeepingBicycleRentalsAtDestination(),
-            c.asMap("headers", NodeAdapter::asText)
+            headers()
         );
       case KML:
         return new GenericKmlBikeRentalDataSourceParameters(url(), namePrefix());
@@ -74,9 +74,13 @@ public class BikeRentalSourceFactory {
             url(),
             network(),
             apiKey(),
-            c.asMap("headers", NodeAdapter::asText)
+            headers()
         );
     }
+  }
+
+  private Map<String, String> headers() {
+    return c.asMap("headers", NodeAdapter::asText);
   }
 
   private String url() {
