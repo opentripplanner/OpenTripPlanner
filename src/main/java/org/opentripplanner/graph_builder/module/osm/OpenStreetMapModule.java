@@ -144,6 +144,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
 
+    public int maxAreaNodes = 500;
+
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
     }
@@ -447,7 +449,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
             WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(graph, osmdb,
-                    wayPropertySet, edgeFactory, this, issueStore
+                    wayPropertySet, edgeFactory, this, issueStore, maxAreaNodes
             );
             if (skipVisibility) {
                 for (AreaGroup group : areaGroups) {
