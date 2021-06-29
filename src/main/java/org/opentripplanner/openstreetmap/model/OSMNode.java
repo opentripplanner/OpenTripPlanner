@@ -68,4 +68,17 @@ public class OSMNode extends OSMWithTags {
     public boolean isBollard() {
         return isTag("barrier", "bollard");
     }
+
+    /**
+     * Checks if this node blocks traversal in any way
+     * @return true if it does
+     */
+    public boolean isBarrier() {
+        return (isBollard()
+                || isPedestrianExplicitlyDenied()
+                || isBicycleExplicitlyDenied()
+                || isMotorcarExplicitlyDenied()
+                || isMotorVehicleExplicitlyDenied()
+                || isGeneralAccessDenied());
+    }
 }

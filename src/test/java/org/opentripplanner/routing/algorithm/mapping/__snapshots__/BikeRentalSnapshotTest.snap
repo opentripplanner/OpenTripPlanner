@@ -139,6 +139,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -203,6 +204,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": true,
           "walkingLeg": true
         },
         {
@@ -267,6 +269,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": false
         },
         {
@@ -360,6 +363,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -540,6 +544,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -730,6 +735,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -961,6 +967,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -1151,6 +1158,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -1382,6 +1390,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -1521,6 +1530,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -1701,6 +1711,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -1856,6 +1867,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -1920,6 +1932,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": true,
           "walkingLeg": true
         },
         {
@@ -1984,6 +1997,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": false
         },
         {
@@ -2077,6 +2091,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -2257,6 +2272,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -2412,6 +2428,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -2476,6 +2493,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": true,
           "walkingLeg": true
         },
         {
@@ -2540,6 +2558,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": false
         },
         {
@@ -2633,6 +2652,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -2813,6 +2833,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -2947,6 +2968,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -3011,6 +3033,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": true,
           "walkingLeg": true
         },
         {
@@ -3075,6 +3098,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": false
         },
         {
@@ -3178,6 +3202,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -3312,6 +3337,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -3376,6 +3402,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": true,
           "walkingLeg": true
         },
         {
@@ -3474,6 +3501,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": false
         }
       ],
@@ -3636,6 +3664,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -3840,6 +3869,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -3904,6 +3934,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": false
         },
         {
@@ -3968,6 +3999,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -4070,6 +4102,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -4226,6 +4259,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -4457,6 +4491,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -4630,6 +4665,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -4844,6 +4880,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -5000,6 +5037,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -5204,6 +5242,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -5268,6 +5307,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": false
         },
         {
@@ -5332,6 +5372,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -5434,6 +5475,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -5590,6 +5632,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -5821,6 +5864,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -5994,6 +6038,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -6208,6 +6253,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
