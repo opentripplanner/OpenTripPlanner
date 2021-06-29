@@ -276,6 +276,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -449,6 +450,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -663,6 +665,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -785,6 +788,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -982,6 +986,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -1155,6 +1160,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -1369,6 +1375,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -1491,6 +1498,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -1688,6 +1696,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -1831,6 +1840,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -2122,6 +2132,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -2375,6 +2386,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -2520,6 +2532,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -2768,6 +2781,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -2913,6 +2927,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -3161,6 +3176,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -3306,6 +3322,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -3554,6 +3571,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -3686,6 +3704,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -3994,6 +4013,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -4156,6 +4176,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         },
         {
@@ -4353,6 +4374,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -4719,6 +4741,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -4972,6 +4995,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],
@@ -5310,6 +5334,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             }
           ],
+          "walkingBike": false,
           "walkingLeg": true
         }
       ],

@@ -144,6 +144,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
 
+    public int maxAreaNodes = 500;
+
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
     }
@@ -447,7 +449,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
             WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(graph, osmdb,
-                    wayPropertySet, edgeFactory, this, issueStore
+                    wayPropertySet, edgeFactory, this, issueStore, maxAreaNodes
             );
             if (skipVisibility) {
                 for (AreaGroup group : areaGroups) {
@@ -686,7 +688,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             || nodes.subList(0, i).contains(nodes.get(i))
                             || osmEndNode.hasTag("ele")
                             || osmEndNode.isStop()
-                            || osmEndNode.isBollard()) {
+                            || osmEndNode.isBarrier()) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
 
                         geometry = GeometryUtils.getGeometryFactory().createLineString(
@@ -1286,7 +1288,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     }
                 }
 
-                if (node.isBollard()) {
+                if (node.isBarrier()) {
                     BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
                     bv.setBarrierPermissions(OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions));
                     iv = bv;

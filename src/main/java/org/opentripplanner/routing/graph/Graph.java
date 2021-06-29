@@ -12,6 +12,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
+import gnu.trove.set.hash.TIntHashSet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -35,6 +36,7 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -660,21 +662,40 @@ public class Graph implements Serializable {
 
     /**
      * Get or create a serviceId for a given date. This method is used when a new trip is
-     * added from a realtime data update.
+     * added from a realtime data update. It make sure the date is in the existing transit service
+     * period.
      *
      * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
      *           - this when doing the issue #3030.
      *
      * @param serviceDate service date for the added service id
+     *
+     * @return service-id for date if it exist or is created. If the given service date is outside
+     * the service period {@code null} is returned.
      */
+    @Nullable
     public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+
+        // Start of day
+        long time = serviceDate.toZonedDateTime(getTimeZone().toZoneId(), 0).toEpochSecond();
+
+        if(time < transitServiceStarts || time >= transitServiceEnds) {
+            return null;
+        }
+
         // We make an explicit cast here to avoid adding the 'getOrCreateServiceIdForDate(..)'
         // method to the {@link CalendarService} interface. We do not want to expose it because it
         // is not thread-safe - and we want to limit the usage. See JavaDoc above as well.
         FeedScopedId serviceId = ((CalendarServiceImpl)getCalendarService()).getOrCreateServiceIdForDate(serviceDate);
 
         if (!serviceCodes.containsKey(serviceId)) {
-            serviceCodes.put(serviceId, serviceCodes.size());
+            // Calculating new unique serviceCode based on size (!)
+            final int serviceCode = serviceCodes.size();
+            serviceCodes.put(serviceId, serviceCode);
+
+            index.getServiceCodesRunningForDate()
+                    .computeIfAbsent(serviceDate, (ignored) -> new TIntHashSet())
+                    .add(serviceCode);
         }
         return serviceId;
     }

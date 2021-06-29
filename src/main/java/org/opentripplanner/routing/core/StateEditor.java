@@ -247,6 +247,7 @@ public class StateEditor {
             child.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
             child.stateData.currentMode = TraverseMode.WALK;
             child.stateData.bikeRentalNetworks = null;
+            child.stateData.backWalkingBike = false;
         } else {
             child.stateData.mayKeepRentedBicycleAtDestination = mayKeep;
             child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;

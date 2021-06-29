@@ -1,22 +1,23 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.graph_builder.module.osm.WalkableAreaBuilder;
 
 public class AreaTooComplicated implements DataImportIssue {
 
-        public static final String FMT = "Area %s is too complicated (%s > " + WalkableAreaBuilder.MAX_AREA_NODES + ")";
+        public static final String FMT = "Area %s is too complicated (%s > %s )";
 
         final long areaId;
         final int nbNodes;
+        final int maxAreaNodes;
 
-        public AreaTooComplicated(long areaId, int nbNodes) {
+        public AreaTooComplicated(long areaId, int nbNodes, int maxAreaNodes) {
                 this.areaId = areaId;
                 this.nbNodes = nbNodes;
+                this.maxAreaNodes = maxAreaNodes;
         }
 
         @Override
         public String getMessage() {
-                return String.format(FMT, areaId, nbNodes);
+                return String.format(FMT, areaId, nbNodes, maxAreaNodes);
         }
 }
