@@ -124,6 +124,20 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
+     * Limits the number of closest stops to use for access/egress searches when using {@link
+     * StreetMode#CAR_PICKUP}. This is for both for performance reasons and because we want car
+     * to be used as a last resort and not replace large parts of a transit trip.
+     */
+    public int maxCarPickupAccessEgressStops = 5;
+
+    /**
+     * Limits the number of closest stops to use for access/egress searches when using {@link
+     * StreetMode#CAR_TO_PARK}. This is for both for performance reasons and because we want car
+     * to be used as a last resort and not replace large parts of a transit trip.
+     */
+    public int maxCarParkAccessEgressStops = 5;
+
+    /**
      * The access/egress/direct/transit modes allowed for this main request. The parameter
      * "streetSubRequestModes" below is used for a single A Star sub request.
      *

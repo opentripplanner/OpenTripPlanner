@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.router.street;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -46,12 +45,14 @@ public class AccessEgressRouter {
             rr.maxAccessEgressDurationSeconds,
             true
         );
-        List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
+        Collection<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
             vertices,
             fromTarget,
             true,
             nearbyRequest
         );
+
+        nearbyStopList = AccessEgressFilter.filter(nearbyStopList, streetMode, rr);
 
         LOG.debug("Found {} {} stops", nearbyStopList.size(), fromTarget ? "egress" : "access");
 
