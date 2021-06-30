@@ -3,16 +3,22 @@ package org.opentripplanner.routing.api.request;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opentripplanner.model.TransitMode;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class RequestModes {
 
+  @Nonnull
   public StreetMode accessMode;
+  @Nonnull
   public StreetMode transferMode;
+  @Nonnull
   public StreetMode egressMode;
+  @Nonnull
   public StreetMode directMode;
+  @Nonnull
   public Set<TransitMode> transitModes;
 
   public static RequestModes defaultRequestModes = new RequestModes(
@@ -30,11 +36,11 @@ public class RequestModes {
       StreetMode directMode,
       Set<TransitMode> transitModes
   ) {
-    this.accessMode = (accessMode != null && accessMode.access) ? accessMode : null;
-    this.transferMode = (transferMode != null && transferMode.transfer) ? transferMode : null;
-    this.egressMode = (egressMode != null && egressMode.egress) ? egressMode : null;
-    this.directMode = directMode;
-    this.transitModes = transitModes;
+    this.accessMode = (accessMode != null && accessMode.access) ? accessMode : StreetMode.NOT_SET;
+    this.transferMode = (transferMode != null && transferMode.transfer) ? transferMode : StreetMode.NOT_SET;
+    this.egressMode = (egressMode != null && egressMode.egress) ? egressMode : StreetMode.NOT_SET;
+    this.directMode = directMode != null ? directMode : StreetMode.NOT_SET;
+    this.transitModes = transitModes != null ? transitModes : Set.of();
   }
 
   public boolean contains(StreetMode streetMode) {
@@ -54,7 +60,7 @@ public class RequestModes {
     if (accessMode != that.accessMode) return false;
     if (egressMode != that.egressMode) return false;
     if (directMode != that.directMode) return false;
-    return transitModes != null ? transitModes.equals(that.transitModes) : that.transitModes == null;
+    return transitModes.equals(that.transitModes);
   }
 
   @Override
