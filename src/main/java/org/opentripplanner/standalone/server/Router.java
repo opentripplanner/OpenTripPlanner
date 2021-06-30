@@ -5,7 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
-import fi.metatavu.airquality.configuration_parsing.RequestParameters;
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -23,8 +23,6 @@ import org.opentripplanner.util.WorldEnvelope;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 /**
  * Represents the configuration of a single router (a single graph for a specific geographic area)
  * in an OTP server.
@@ -35,7 +33,7 @@ public class Router {
     public final Graph graph;
     public final RouterConfig routerConfig;
     public final RaptorConfig<TripSchedule> raptorConfig;
-    public Map<RequestParameters, RequestParameters> genericFileConfigurations;
+    public GenericFileConfiguration genericFileConfiguration;
 
     /**
      *  Separate logger for incoming requests. This should be handled with a Logback logger
@@ -71,11 +69,11 @@ public class Router {
      *
      * @param graph graph
      * @param routerConfig router configuration
-     * @param genericFileConfigurations map of request parameters to be applied to extraData of StreetEdge
+     * @param genericFileConfiguration configuration for .nc file data
      */
-    public Router(Graph graph, RouterConfig routerConfig, Map<RequestParameters, RequestParameters> genericFileConfigurations) {
+    public Router(Graph graph, RouterConfig routerConfig, GenericFileConfiguration genericFileConfiguration) {
         this(graph, routerConfig);
-        this.genericFileConfigurations = genericFileConfigurations;
+        this.genericFileConfiguration = genericFileConfiguration;
     }
 
     /*

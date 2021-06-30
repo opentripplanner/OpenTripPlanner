@@ -2,11 +2,8 @@ package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import com.google.gson.Gson;
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -19,8 +16,6 @@ import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import java.io.InputStreamReader;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
@@ -162,7 +157,7 @@ public class OTPMain {
         // publishing the config version info make it available to the APIs
         app.setOtpConfigVersionsOnServerInfo();
 
-        Router router = new Router(graph, app.config().routerConfig(), app.genericFileParameters());
+        Router router = new Router(graph, app.config().routerConfig(), app.getGenFileConfiguration());
         router.startup();
 
         /* Start visualizer if requested. */
