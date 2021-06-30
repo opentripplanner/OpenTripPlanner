@@ -15,7 +15,7 @@ import java.util.Map;
 public class Fare {
 
     public static enum FareType implements Serializable {
-        regular, student, senior, tram, special, youth
+        regular, student, senior, tram, special, youth, orcaRegular, orcaYouth, orcaReduced
     }
 
     /**
