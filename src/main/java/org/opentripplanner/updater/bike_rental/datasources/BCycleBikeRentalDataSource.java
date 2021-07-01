@@ -6,6 +6,7 @@ import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalData
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.HashSet;
+import java.util.Map;
 
 
 /**
@@ -18,7 +19,11 @@ class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
     private final String networkName;
 
     BCycleBikeRentalDataSource(BikeRentalDataSourceParameters config) {
-        super(config, "", "ApiKey", config.getApiKey());
+        super(
+            config,
+            "",
+            config.getApiKey() != null ? Map.of("ApiKey", config.getApiKey()) : Map.of()
+        );
         networkName = config.getNetwork("B-Cycle");
     }
 

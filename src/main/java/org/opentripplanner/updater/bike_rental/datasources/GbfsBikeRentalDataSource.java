@@ -55,12 +55,12 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
             ? new GbfsFloatingBikeDataSource(parameters)
             : null;
 
-        configureUrls(parameters.getUrl());
+        configureUrls(parameters.getUrl(), parameters.getHttpHeaders());
         this.networkName = parameters.getNetwork(DEFAULT_NETWORK_NAME);
     }
 
-    private void configureUrls(String url) {
-        GbfsAutoDiscoveryDataSource gbfsAutoDiscoveryDataSource = new GbfsAutoDiscoveryDataSource(url);
+    private void configureUrls(String url, Map<String, String> headers) {
+        GbfsAutoDiscoveryDataSource gbfsAutoDiscoveryDataSource = new GbfsAutoDiscoveryDataSource(url, headers);
         stationInformationSource.setUrl(gbfsAutoDiscoveryDataSource.stationInformationUrl);
         stationStatusSource.setUrl(gbfsAutoDiscoveryDataSource.stationStatusUrl);
         if (OTPFeature.FloatingBike.isOn()) {
@@ -116,10 +116,10 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         private String stationStatusUrl;
         private String freeBikeStatusUrl;
 
-        public GbfsAutoDiscoveryDataSource(String autoDiscoveryUrl) {
+        public GbfsAutoDiscoveryDataSource(String autoDiscoveryUrl, Map<String, String> headers) {
 
             try {
-                InputStream is = HttpUtils.getData(autoDiscoveryUrl);
+                InputStream is = HttpUtils.getData(autoDiscoveryUrl, headers);
                 JsonNode node = (new ObjectMapper()).readTree(is);
                 JsonNode languages = node.get("data");
 

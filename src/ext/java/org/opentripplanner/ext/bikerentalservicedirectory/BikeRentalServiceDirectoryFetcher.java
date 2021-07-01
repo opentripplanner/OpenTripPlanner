@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -21,8 +23,6 @@ public class BikeRentalServiceDirectoryFetcher {
   private static final Logger LOG = LoggerFactory.getLogger(BikeRentalServiceDirectoryFetcher.class);
 
   private static final int DEFAULT_FREQUENCY_SEC = 15;
-
-  private static final String GBFS_JSON_FILENAME = "gbfs.json";
 
   public static List<GraphUpdater> createUpdatersFromEndpoint(
       BikeRentalServiceDirectoryFetcherParameters parameters
@@ -61,7 +61,11 @@ public class BikeRentalServiceDirectoryFetcher {
         BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(
             "bike-rental-service-directory:" + network,
             DEFAULT_FREQUENCY_SEC,
-            new GbfsDataSourceParameters(updaterUrl.asText(), network.asText())
+            new GbfsDataSourceParameters(
+                updaterUrl.asText(),
+                network.asText(),
+                parameters.getHeaders()
+            )
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 

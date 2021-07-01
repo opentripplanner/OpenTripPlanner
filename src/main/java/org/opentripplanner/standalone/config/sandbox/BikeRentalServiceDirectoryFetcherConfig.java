@@ -12,7 +12,8 @@ public class BikeRentalServiceDirectoryFetcherConfig {
         c.asUri("url"),
         c.asText("sourcesName", "systems"),
         c.asText("updaterUrlName", "url"),
-        c.asText("updaterNetworkName", "id")
+        c.asText("updaterNetworkName", "id"),
+        c.asMap("headers", NodeAdapter::asText)
     );
   }
 }
