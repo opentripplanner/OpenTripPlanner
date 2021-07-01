@@ -38,6 +38,6 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
     assertEquals(StreetMode.WALK, subject.resolveDirectMode());
     assertTrue(subject.removeWalkAllTheWayResults());
-    assertNull(subject.originalDirectMode());
+    assertEquals(StreetMode.NOT_SET, subject.originalDirectMode());
   }
 }
