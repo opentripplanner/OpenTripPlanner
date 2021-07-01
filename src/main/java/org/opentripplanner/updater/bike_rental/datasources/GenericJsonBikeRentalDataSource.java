@@ -29,7 +29,7 @@ abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSourcePar
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
     protected final T config;
     private String url;
-    private Map<String, String> headers;
+    private final Map<String, String> headers;
 
     private final String jsonParsePath;
 

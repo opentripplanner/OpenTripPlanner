@@ -29,6 +29,10 @@ public class HttpUtils {
         return getData(URI.create(uri));
     }
 
+    public static InputStream getData(String uri, Map<String, String> headers) throws IOException {
+        return getData(URI.create(uri), headers);
+    }
+
     public static InputStream getData(
         URI uri, long timeout, Map<String, String> requestHeaderValues
     ) throws IOException {
