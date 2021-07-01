@@ -92,7 +92,6 @@ public class GenericFileConfigurationParser {
 			return null;
 		}
 
-
 		RequestParameters[] requestParameters = genericFileConfiguration.getRequestParameters();
 
 		Arrays.stream(requestParameters).collect(Collectors.groupingBy(RequestParameters::getVariable))

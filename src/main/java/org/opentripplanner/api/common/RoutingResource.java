@@ -1,5 +1,6 @@
 package org.opentripplanner.api.common;
 
+import fi.metatavu.airquality.GenericFileConfigurationParser;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
@@ -635,8 +636,9 @@ public abstract class RoutingResource {
             }
         }
 
-        if (otpServer.getRouter().genericFileConfigurations != null) {
-            request.genericGridDataRequestParam = this.otpServer.getRouter().genericFileConfigurations;
+        if (otpServer.getRouter().genericFileConfiguration != null) {
+            request.genericFileConfiguration = otpServer.getRouter().genericFileConfiguration;
+            request.genericGridDataRequestParam = GenericFileConfigurationParser.parseConfParam(this.otpServer.getRouter().genericFileConfiguration);
             for (Map.Entry<RequestParameters, RequestParameters> genParam : request.genericGridDataRequestParam.entrySet()) {
                 RequestParameters thresholdEmpty = genParam.getKey();
                 RequestParameters penaltyEmpty = genParam.getValue();

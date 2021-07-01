@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
+import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
@@ -68,6 +69,11 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
+    /** Fields used for routing based on additional .nc data files */
+    /** Settings file for the .nc data */
+    public GenericFileConfiguration genericFileConfiguration;
+
+    /** The filled request parameters for penalties and thresholds values */
     public Map<RequestParameters, RequestParameters> genericGridDataRequestParam;
 
     /**

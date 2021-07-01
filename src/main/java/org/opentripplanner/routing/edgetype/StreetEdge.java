@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import com.google.common.collect.Iterables;
 import fi.metatavu.airquality.EdgeDataFromGenericFile;
 import fi.metatavu.airquality.configuration_parsing.RequestParameters;
+import fi.metatavu.airquality.configuration_parsing.TimeUnit;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
@@ -622,11 +623,21 @@ public class StreetEdge extends Edge implements Cloneable {
                     }
                 }
 
+                //calculate time format based on the input file settings
+                TimeUnit selectedTimeUnit = options.genericFileConfiguration.getTimeFormat();
                 Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
-                int dataQualityHour = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
-                if (dataQualityHour >= 0) {
-                    if (dataQualityHour < genDataValuesForTime.length) {
-                        float value = genDataValuesForTime[dataQualityHour];
+                int dataQualityRequestedTime;
+                if (selectedTimeUnit == TimeUnit.SECONDS) {
+                    dataQualityRequestedTime = (int) ChronoUnit.SECONDS.between(aqiTimeInstant, requestInstant);
+                } else if (selectedTimeUnit == TimeUnit.MS_EPOCH) {
+                    dataQualityRequestedTime = (int) ChronoUnit.MILLIS.between(aqiTimeInstant, requestInstant);
+                } else {
+                    dataQualityRequestedTime = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
+                }
+
+                if (dataQualityRequestedTime >= 0) {
+                    if (dataQualityRequestedTime < genDataValuesForTime.length) {
+                        float value = genDataValuesForTime[dataQualityRequestedTime];
                         String penaltyFormulaString = thresholdPenaltyPair.getValue().getFormula();
 
                         if (penaltyFormulaString.isEmpty()) {

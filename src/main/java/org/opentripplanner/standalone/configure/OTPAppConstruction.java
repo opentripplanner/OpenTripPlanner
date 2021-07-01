@@ -48,8 +48,6 @@ public class OTPAppConstruction {
     private OtpDataStore store = null;
     private OTPServer server = null;
     private GraphBuilderDataSources graphBuilderDataSources = null;
-    private Map<RequestParameters, RequestParameters> configurations;
-
 
     /**
      * Create a new OTP configuration instance for a given directory.
@@ -116,18 +114,12 @@ public class OTPAppConstruction {
     }
 
     /**
-     * Return map of expected request parameters for the generic data
+     * Return configuration file for extra data provided by .nc file
      *
-     * @return map of reques parameters, where key = threshold, value = penalty
+     * @return configuration for .nc file
      */
-    public Map<RequestParameters, RequestParameters> genericFileParameters(){
-        if (this.configurations != null){
-            return this.configurations;
-        }
-
-        GenericFileConfiguration configurationsArray = GenericFileConfigurationParser.parse(store().getGenericDataSettings());
-        Map<RequestParameters, RequestParameters> parametersMap = GenericFileConfigurationParser.parseConfParam(configurationsArray);
-        return parametersMap;
+    public GenericFileConfiguration getGenFileConfiguration(){
+        return GenericFileConfigurationParser.parse(store().getGenericDataSettings());
     }
 
     /**
