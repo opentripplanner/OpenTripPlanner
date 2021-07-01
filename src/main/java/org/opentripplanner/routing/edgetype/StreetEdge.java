@@ -626,13 +626,13 @@ public class StreetEdge extends Edge implements Cloneable {
                 //calculate time format based on the input file settings
                 TimeUnit selectedTimeUnit = options.genericFileConfiguration.getTimeFormat();
                 Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
-                int dataQualityRequestedTime = 0;
-                if (selectedTimeUnit == TimeUnit.HOURS) {
-                    dataQualityRequestedTime = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
-                } else if (selectedTimeUnit == TimeUnit.SECONDS) {
+                int dataQualityRequestedTime;
+                if (selectedTimeUnit == TimeUnit.SECONDS) {
                     dataQualityRequestedTime = (int) ChronoUnit.SECONDS.between(aqiTimeInstant, requestInstant);
                 } else if (selectedTimeUnit == TimeUnit.MS_EPOCH) {
                     dataQualityRequestedTime = (int) ChronoUnit.MILLIS.between(aqiTimeInstant, requestInstant);
+                } else {
+                    dataQualityRequestedTime = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
                 }
 
                 if (dataQualityRequestedTime >= 0) {

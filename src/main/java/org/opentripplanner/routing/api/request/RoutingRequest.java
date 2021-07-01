@@ -69,7 +69,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
-    /* Fields used for routing based on additional .nc data files */
+    /** Fields used for routing based on additional .nc data files */
     /** Settings file for the .nc data */
     public GenericFileConfiguration genericFileConfiguration;
 

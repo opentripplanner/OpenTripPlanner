@@ -65,8 +65,10 @@ public class GenericEdgeUpdater {
         if ((timeFormat == null || timeFormat == TimeUnit.SECONDS)
             && dataType.equals(Integer.TYPE)) {
             return originInstant.plusSeconds(timeArray.getInt(0)).toEpochMilli();
-        }
-        else if (timeFormat == TimeUnit.HOURS) {
+        } else if (timeFormat == TimeUnit.MS_EPOCH && dataType.equals(Long.TYPE)) {
+            return timeArray.getLong(0);
+        } else {
+            //default option is hours
             long addSeconds = 0;
             if  (dataType.equals(Double.TYPE)) {
                 addSeconds = (long) (timeArray.getDouble(0) * 3600);
@@ -77,10 +79,6 @@ public class GenericEdgeUpdater {
 
             return originInstant.plusSeconds(addSeconds).toEpochMilli();
         }
-        else if (timeFormat == TimeUnit.MS_EPOCH && dataType.equals(Long.TYPE)) {
-            return timeArray.getLong(0);
-        }
-        else throw new IllegalArgumentException("Invalid time format");
     }
 
     /**
