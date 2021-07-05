@@ -39,6 +39,7 @@ public class AccessEgressFilter {
   ) {
     return nearbyStops
         .stream()
+        // Sorts by least distance
         .sorted()
         .limit(maxCarPickupAccessEgressStops)
         .collect(Collectors.toList());
@@ -52,6 +53,7 @@ public class AccessEgressFilter {
   ) {
     return nearbyStops
         .stream()
+        // Sorts by least distance
         .sorted()
         .limit(maxCarParkAccessEgressStops)
         .collect(Collectors.toList());
