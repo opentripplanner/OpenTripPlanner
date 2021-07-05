@@ -23,9 +23,9 @@ public class AccessEgressFilter {
   ) {
     switch (streetMode) {
       case CAR_PICKUP:
-        return filterCarPickup(nearbyStops, request);
+        return filterCarPickup(nearbyStops, request.maxCarPickupAccessEgressStops);
       case CAR_TO_PARK:
-        return filterByCarPark(nearbyStops, request);
+        return filterByCarPark(nearbyStops, request.maxCarParkAccessEgressStops);
       default:
         return nearbyStops;
     }
@@ -35,12 +35,12 @@ public class AccessEgressFilter {
    * Returns the closest stops by distance
    */
   private static Collection<NearbyStop> filterCarPickup(
-      Collection<NearbyStop> nearbyStops, RoutingRequest request
+      Collection<NearbyStop> nearbyStops, int maxCarPickupAccessEgressStops
   ) {
     return nearbyStops
         .stream()
         .sorted()
-        .limit(request.maxCarPickupAccessEgressStops)
+        .limit(maxCarPickupAccessEgressStops)
         .collect(Collectors.toList());
   }
 
@@ -48,12 +48,12 @@ public class AccessEgressFilter {
    * Returns the closest stops by distance
    */
   private static Collection<NearbyStop> filterByCarPark(
-      Collection<NearbyStop> nearbyStops, RoutingRequest request
+      Collection<NearbyStop> nearbyStops, int maxCarParkAccessEgressStops
   ) {
     return nearbyStops
         .stream()
         .sorted()
-        .limit(request.maxCarParkAccessEgressStops)
+        .limit(maxCarParkAccessEgressStops)
         .collect(Collectors.toList());
   }
 }
