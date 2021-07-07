@@ -147,7 +147,12 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
       var to = TripStopTime.departure(toTrip, toTripStopPos);
 
-      result.add(new TripToTripTransfer<>(from, to, it, tx));
+      boolean alightingPossible = from.trip().pattern().alightingPossibleAt(from.stopPosition());
+      boolean boardingPossible = to.trip().pattern().boardingPossibleAt(to.stopPosition());
+
+      if (boardingPossible && alightingPossible) {
+        result.add(new TripToTripTransfer<>(from, to, it, tx));
+      }
     }
     return result;
   }
