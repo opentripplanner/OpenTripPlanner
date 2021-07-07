@@ -11,6 +11,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
+
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenTransferProvider;
+
 /**
  * A calculator that will take you back in time not forward, this is the
  * basic logic to implement a reveres search.
@@ -134,6 +137,11 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     @Override
     public RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route) {
         return route.getGuaranteedTransfersFrom();
+    }
+
+    @Override
+    public RaptorForbiddenTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route) {
+        return route.getForbiddenTransfersFrom();
     }
 
     @Override

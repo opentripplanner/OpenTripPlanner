@@ -30,6 +30,8 @@ public class TransferService implements Serializable {
     /** Index of guaranteed transfers by the to/destination point. */
     private final Multimap<TripTransferPoint, Transfer> guaranteedTransferByToPoint;
 
+    private final Multimap<Stop, Transfer> forbiddenTransferByToStop;
+
     /**
      * Table which contains transfers between two trips/routes
      */
@@ -52,6 +54,7 @@ public class TransferService implements Serializable {
 
     public TransferService() {
         this.guaranteedTransferByToPoint = ArrayListMultimap.create();
+        this.forbiddenTransferByToStop = ArrayListMultimap.create();
         this.trip2tripTransfers = new HashMap<>();
         this.trip2StopTransfers = new HashMap<>();
         this.stop2TripTransfers = new HashMap<>();
@@ -75,6 +78,10 @@ public class TransferService implements Serializable {
 
     public Collection<Transfer> listGuaranteedTransfersTo(Trip toTrip, int toStopIndex) {
         return guaranteedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
+    }
+
+    public Collection<Transfer> listForbiddenTransfersTo(Stop stop) {
+        return forbiddenTransferByToStop.get(stop);
     }
 
     @Nullable
@@ -183,6 +190,12 @@ public class TransferService implements Serializable {
             if(toPoint instanceof TripTransferPoint) {
                 guaranteedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
             }
+        }
+        if(transfer.getPriority() == TransferPriority.NOT_ALLOWED){
+            if(toPoint instanceof StopTransferPoint) {
+                forbiddenTransferByToStop.put(toPoint.getStop(), transfer);
+            }
+
         }
     }
 }

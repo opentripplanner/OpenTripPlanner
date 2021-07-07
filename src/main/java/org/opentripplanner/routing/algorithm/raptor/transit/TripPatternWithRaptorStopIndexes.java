@@ -13,6 +13,9 @@ import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternGuara
 import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenTransferProvider;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternForbiddenTransferProvider;
+
 public class TripPatternWithRaptorStopIndexes {
     private final TripPattern pattern;
 
@@ -27,6 +30,16 @@ public class TripPatternWithRaptorStopIndexes {
      * List of transfers TTO this pattern for each stop position in pattern
      */
     private final TIntObjectMap<List<Transfer>> guaranteedTransfersTo = new TIntObjectHashMap<>();
+
+    /**
+     * List of transfers FROM this pattern for each stop position in pattern
+     */
+    private final TIntObjectMap<List<Transfer>> forbiddenTransfersFrom = new TIntObjectHashMap<>();
+
+    /**
+     * List of transfers TTO this pattern for each stop position in pattern
+     */
+    private final TIntObjectMap<List<Transfer>> forbiddenTransfersTo = new TIntObjectHashMap<>();
 
 
     public TripPatternWithRaptorStopIndexes(
@@ -66,6 +79,14 @@ public class TripPatternWithRaptorStopIndexes {
         return new PatternGuaranteedTransferProvider(false, guaranteedTransfersFrom);
     }
 
+    public RaptorForbiddenTransferProvider<TripSchedule> getForbiddenTransfersTo() {
+        return new PatternForbiddenTransferProvider(true, forbiddenTransfersTo);
+    }
+
+    public RaptorForbiddenTransferProvider<TripSchedule> getForbiddenTransfersFrom() {
+        return new PatternForbiddenTransferProvider(false, forbiddenTransfersFrom);
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -96,6 +117,16 @@ public class TripPatternWithRaptorStopIndexes {
     /** These are public to allow the mappers to inject transfers */
     public void addGuaranteedTransfersTo(Transfer tx) {
         add(guaranteedTransfersTo, tx, tx.getTo().getStopPosition());
+    }
+
+    /** These are public to allow the mappers to inject transfers */
+    public void addForbiddenTransferFrom(Transfer tx, int stopPos) {
+        add(forbiddenTransfersFrom, tx, tx.getFrom().getStopPosition());
+    }
+
+    /** These are public to allow the mappers to inject transfers */
+    public void addForbiddenTransfersTo(Transfer tx, int stopPos) {
+        add(forbiddenTransfersTo, tx, stopPos);
     }
 
     private static <T> void add(TIntObjectMap<List<T>> index, T e, int pos) {

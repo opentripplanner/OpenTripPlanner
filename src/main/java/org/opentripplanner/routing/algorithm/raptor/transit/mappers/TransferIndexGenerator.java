@@ -3,8 +3,11 @@ package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 
@@ -40,6 +43,7 @@ public class TransferIndexGenerator {
     private void generateTransfers(TripPatternWithRaptorStopIndexes pattern) {
         for (Trip trip : pattern.getPattern().getTrips()) {
             int nStops = pattern.getPattern().getStops().size();
+            List<Stop> stops = pattern.getPattern().getStops();
             for (int stopPos=0; stopPos < nStops; ++stopPos) {
                 var transfers= transferService.listGuaranteedTransfersTo(trip, stopPos);
                 for (Transfer tx : transfers) {
@@ -54,6 +58,13 @@ public class TransferIndexGenerator {
                             }
                         }
                     }
+                }
+                // TODO: Aboslutely not sure on this one
+                var forbiddenTransfers = transferService.listForbiddenTransfersTo(stops.get(stopPos));
+                for (Transfer tx : forbiddenTransfers) {
+                    // TODO: Do we need to handle transfersFrom?
+                    // TODO: Not sure about this stopPos usage
+                    pattern.addForbiddenTransfersTo(tx, stopPos);
                 }
             }
         }

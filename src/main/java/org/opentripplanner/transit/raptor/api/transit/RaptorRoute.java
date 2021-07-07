@@ -29,4 +29,13 @@ public interface RaptorRoute<T extends RaptorTripSchedule> {
      * Return a guaranteed transfer provider for the given route transferring FROM the route.
      */
     RaptorGuaranteedTransferProvider<T> getGuaranteedTransfersFrom();
+    /**
+     * Return a guaranteed transfer provider for the given route transferring TO the route.
+     */
+    RaptorForbiddenTransferProvider<T> getForbiddenTransfersTo();
+
+    /**
+     * Return a guaranteed transfer provider for the given route transferring FROM the route.
+     */
+    RaptorForbiddenTransferProvider<T> getForbiddenTransfersFrom();
 }

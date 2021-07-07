@@ -11,6 +11,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
+
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenTransferProvider;
+
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
  * <em>earliest boarding time</em> and time-shifting the access paths.
@@ -162,6 +165,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
      * target is the FROM pattern/stop.
      */
     RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route);
+    RaptorForbiddenTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route);
 
     /**
      * Return a calculator for test purpose. The following parameters are fixed:

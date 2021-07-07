@@ -11,6 +11,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
+
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenTransferProvider;
+
 /**
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay
  * refers to days in order.
@@ -66,6 +69,16 @@ public class TripPatternForDates
     @Override
     public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersFrom() {
         return getTripPattern().getGuaranteedTransfersFrom();
+    }
+
+    @Override
+    public RaptorForbiddenTransferProvider<TripSchedule> getForbiddenTransfersTo() {
+        return getTripPattern().getForbiddenTransfersTo();
+    }
+
+    @Override
+    public RaptorForbiddenTransferProvider<TripSchedule> getForbiddenTransfersFrom() {
+        return getTripPattern().getForbiddenTransfersFrom();
     }
 
     // Implementing RaptorTripPattern
