@@ -148,7 +148,7 @@ public class CommandLineParameters implements Cloneable {
     public String bugsnagReleaseStage;
 
     @Parameter(names = {"--bugsnagAppType"},
-        description = "A Bugsang app type to use when reporting errors."
+        description = "A Bugsnag app type to use when reporting errors."
     )
     public String bugsnagAppType;
 
