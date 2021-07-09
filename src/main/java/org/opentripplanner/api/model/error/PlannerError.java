@@ -4,7 +4,7 @@ import org.opentripplanner.api.common.LocationNotAccessible;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.*;
-import org.opentripplanner.standalone.BugsnagReporter;
+import org.opentripplanner.standalone.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +41,7 @@ public class PlannerError {
         message = messages.get(e.getClass());
         if (message == null) {
             message = Message.SYSTEM_ERROR;
-            BugsnagReporter.reportErrorToBugsnag("Unhandled exception while planning trip", req, e);
+            ErrorUtils.reportErrorToBugsnag("Unhandled exception while planning trip", req, e);
         }
         this.setMsg(message);
         if (e instanceof VertexNotFoundException)

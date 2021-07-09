@@ -8,15 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Bugsnag util for reporting errors to the project defined by the Bugsnag project notifier API key.
+ * A util class for reporting errors to the project defined by the Bugsnag project notifier API key.
  *
  * A Bugsnag project identifier key is unique to a Bugsnag project and allows errors to be saved against it. This key
  * can be obtained by logging into Bugsnag (https://app.bugsnag.com), clicking on Projects (left side menu) and
  * selecting the required project. Once selected, the notifier API key is presented.
  */
-public class BugsnagReporter {
+public class ErrorUtils {
     private static Bugsnag bugsnag;
-    private static final Logger LOG = LoggerFactory.getLogger(BugsnagReporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ErrorUtils.class);
 
     /**
      * Initialize Bugsnag using the project notifier API key when the application is first loaded.
@@ -52,7 +52,7 @@ public class BugsnagReporter {
         // Log error to log output.
         LOG.error(message, throwable);
 
-        // If bugsnag is disabled, make sure to report full error to otp-middleware logs.
+        // If bugsnag is disabled, make sure to report log full error.
         if (bugsnag == null) {
             LOG.warn("Bugsnag error reporting is disabled. Unable to report to Bugsnag this message: {} for this bad entity: {}",
                 message,
