@@ -143,7 +143,7 @@ public class CommandLineParameters implements Cloneable {
     public String bugsnagKey = null;
 
     @Parameter(names = {"--bugsnagReleaseStage"},
-        description = "A Bugsang release stage to use when reporting errors."
+        description = "A Bugsnag release stage to use when reporting errors."
     )
     public String bugsnagReleaseStage;
 
@@ -283,4 +283,3 @@ public class CommandLineParameters implements Cloneable {
         }
     }
 }
-
