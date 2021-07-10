@@ -765,5 +765,11 @@
             <artifactId>bsf</artifactId>
             <version>2.4.0</version>
         </dependency>
+        <!-- Error reporting -->
+        <dependency>
+            <groupId>com.bugsnag</groupId>
+            <version>3.6.2</version>
+            <artifactId>bugsnag</artifactId>
+        </dependency>
     </dependencies>
 </project>
