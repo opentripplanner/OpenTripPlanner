@@ -186,7 +186,6 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
                                  Collection<FareRuleSet> fareRules
     ) {
         float cost = 0;
-        float mostExpensiveDiscountedFare = 0;
         for (Ride ride : rides) {
             RideType rideType = classify(ride.routeData);
             float singleLegPrice = getRidePrice(ride, fareType, fareRules);
@@ -194,14 +193,13 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             if (hasFreeTransfers(fareType, rideType)) {
                 // If using Orca (free transfers), the total fare should be equivalent to the
                 // most expensive leg of the journey.
-                mostExpensiveDiscountedFare = Float.max(mostExpensiveDiscountedFare, discountedFare);
+                cost = Float.max(cost, discountedFare);
             } else {
                 // If free transfers not permitted (i.e., paying with cash), accumulate each
                 // leg as we go.
                 cost += singleLegPrice;
             }
         }
-        cost += mostExpensiveDiscountedFare;
         if (cost < Float.POSITIVE_INFINITY) {
             fare.addFare(fareType, getMoney(currency, cost));
         }
