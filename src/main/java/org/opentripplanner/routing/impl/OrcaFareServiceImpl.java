@@ -1,7 +1,10 @@
 package org.opentripplanner.routing.impl;
 
+import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,11 +13,12 @@ import java.util.List;
 
 public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
 
-    enum RideType {
+    private static final Logger LOG = LoggerFactory.getLogger(OrcaFareServiceImpl.class);
+
+    public enum RideType {
         COMM_TRANS_LOCAL_SWIFT,
         COMM_TRANS_COMMUTER_EXPRESS,
         EVERETT_TRANSIT,
-        INTERCITY_TRANSIT,
         KC_WATER_TAXI_VASHON_ISLAND,
         KC_WATER_TAXI_WEST_SEATTLE,
         KC_METRO,
@@ -25,9 +29,8 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         WASHINGTON_STATE_FERRIES
     }
 
-    // Testing only.
-    public OrcaFareServiceImpl() {}
-
+    public boolean IS_TEST;
+    public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
 
     public OrcaFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
         addFareRules(Fare.FareType.regular, regularFareRules);
@@ -42,50 +45,44 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
     private static final long serialVersionUID = 20210625L;
 
     /**
-     * Classify the ride type based on the route information provided. In most cases the agency name is sufficient. Above
-     * this the route type and description is checked.
+     * Classify the ride type based on the route information provided. In most cases the agency name is sufficient. In
+     * some cases the route description and short name are needed to define inner agency ride types.
      */
-    private static RideType classify(String agencyId, String routeId) {
-        if ("Community Transit".equals(agencyId)) {
-            if (route.getType() == 3) {
+    private static RideType classify(Route routeData) {
+        if ("29".equals(routeData.getAgency().getId())) {
+            try {
+                int routeId = Integer.parseInt(routeData.getShortName());
+                if (routeId >= 400 && routeId <= 899) {
+                    return RideType.COMM_TRANS_COMMUTER_EXPRESS;
+                }
                 return RideType.COMM_TRANS_LOCAL_SWIFT;
-            } else {
-                // FIXME: The only route type used is 3 (Bus) so assuming for now that anything else is comm express.
-                return RideType.COMM_TRANS_COMMUTER_EXPRESS;
+            } catch (NumberFormatException e) {
+                LOG.warn("Unable to determine comm trans route id from {}.", routeData.getShortName(), e);
+                return RideType.COMM_TRANS_LOCAL_SWIFT;
             }
-        } else if ("Metro Transit".equals(agencyId)) {
-            if (route.getType() == 4 && route.getDesc().contains("Water Taxi: West Seattle")) {
+        } else if ("1".equals(routeData.getAgency().getId())) {
+            if (routeData.getType() == 4 && routeData.getDesc().contains("Water Taxi: West Seattle")) {
                 return RideType.KC_WATER_TAXI_WEST_SEATTLE;
-            } else if (route.getType() == 4 && route.getDesc().contains("Water Taxi: Vashon Island")) {
+            } else if (routeData.getType() == 4 && routeData.getDesc().contains("Water Taxi: Vashon Island")) {
                 return RideType.KC_WATER_TAXI_VASHON_ISLAND;
             }
             return RideType.KC_METRO;
-        } else if ("Sound Transit".equals(agencyId)) {
+        } else if ("40".equals(routeData.getAgency().getId())) {
             return RideType.SOUND_TRANSIT;
-        } else if ("Everett Transit".equals(agencyId)) {
+        } else if ("97".equals(routeData.getAgency().getId())) {
             return RideType.EVERETT_TRANSIT;
-        } else if ("Pierce Transit".equals(agencyId)) {
+        } else if ("3".equals(routeData.getAgency().getId())) {
             return RideType.PIERCE_COUNTY_TRANSIT;
-        } else if ("City of Seattle".equals(agencyId)) {
+        } else if ("23".equals(routeData.getAgency().getId())) {
             return RideType.SEATTLE_STREET_CAR;
-        } else if ("Washington State Ferries".equals(agencyId)) {
+        } else if ("wsf".equalsIgnoreCase(routeData.getAgency().getId())) {
             return RideType.WASHINGTON_STATE_FERRIES;
-        } else if ("Kitsap Transit".equals(agencyId)) {
+        } else if ("kt".equalsIgnoreCase(routeData.getAgency().getId())) {
             return RideType.KITSAP_TRANSIT;
         }
         return null;
     }
 
-    /**
-     * Return the Orca discount if applicable. In most cases the orca fare for regular and youth is the same as the
-     * cash fare with the following exceptions:
-     * 1) KC water taxi where the orca regular and youth fares are less.
-     * 2) WSF where Orca can not be used.
-     * 3) Pierce County where orca Lift can not be used.
-     *
-     * In cases where Orca is not applicable a null value is returned. No assumptions are therefore made regarding the
-     * correct cash value to be applied.
-     */
     private float getDiscountedFare(Fare.FareType fareType, RideType rideType, float defaultFare) {
         if (rideType == null) {
             return defaultFare;
@@ -100,9 +97,18 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             case senior:
                 return getSeniorFare(fareType, rideType, defaultFare);
             case orcaRegular:
+                return getOrcaRegularFare(rideType, defaultFare);
             case regular:
             default:
                 return defaultFare;
+        }
+    }
+
+    private float getOrcaRegularFare(RideType rideType, float defaultFare) {
+        switch (rideType) {
+            case KC_WATER_TAXI_VASHON_ISLAND: return 5.75f;
+            case KC_WATER_TAXI_WEST_SEATTLE: return 5.00f;
+            default: return defaultFare;
         }
     }
 
@@ -113,7 +119,6 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             case PIERCE_COUNTY_TRANSIT: return defaultFare;
             case KC_WATER_TAXI_VASHON_ISLAND: return 4.50f;
             case KC_WATER_TAXI_WEST_SEATTLE: return 3.75f;
-            case INTERCITY_TRANSIT: return 0.00f;
             case KITSAP_TRANSIT: return 1.00f;
             // KCM, Sound Transit, Everett, Seattle Streetcar.
             default: return 1.50f;
@@ -124,7 +129,6 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         switch (rideType) {
             case COMM_TRANS_LOCAL_SWIFT: return 1.25f;
             case COMM_TRANS_COMMUTER_EXPRESS: return 2.00f;
-            case INTERCITY_TRANSIT: return 0.00f;
             case EVERETT_TRANSIT:
                 return fareType.equals(Fare.FareType.orcaSenior) ? 0.50f : defaultFare;
             case PIERCE_COUNTY_TRANSIT:
@@ -147,13 +151,16 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             case KC_WATER_TAXI_VASHON_ISLAND: return 4.50f;
             case KC_WATER_TAXI_WEST_SEATTLE: return 3.75f;
             case KITSAP_TRANSIT: return 2.00f;
-            case INTERCITY_TRANSIT: return 0.00f;
             // Default case accounts for KC_METRO, Sound Transit, Everett, and Seattle Streetcar.
             default: return 1.50f;
         }
     }
 
     private float getRidePrice(Ride ride, Fare.FareType fareType, Collection<FareRuleSet> fareRules) {
+        if (IS_TEST) {
+            // Testing, return default test ride price.
+            return DEFAULT_TEST_RIDE_PRICE;
+        }
         List<Ride> ridesSingleton = new ArrayList<>();
         ridesSingleton.add(ride);
         return calculateCost(fareType, ridesSingleton, fareRules);
@@ -166,23 +173,35 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
                                    List<Ride> rides,
                                    Collection<FareRuleSet> fareRules
     ) {
+        return calculateFare(fare, currency, fareType, rides, fareRules);
+    }
+
+    /**
+     * Public access to allow unit testing.
+     */
+    public boolean calculateFare(Fare fare,
+                                 Currency currency,
+                                 Fare.FareType fareType,
+                                 List<Ride> rides,
+                                 Collection<FareRuleSet> fareRules
+    ) {
         float cost = 0;
+        float mostExpensiveDiscountedFare = 0;
         for (Ride ride : rides) {
-            String routeId = ride.route.getId();
-            String agencyId = ride.agency;
-            RideType rideType = classify(agencyId, routeId);
-            float singleLegPrice = getRidePrice(ride, Fare.FareType.regular, fareRules);
+            RideType rideType = classify(ride.routeData);
+            float singleLegPrice = getRidePrice(ride, fareType, fareRules);
             float discountedFare = getDiscountedFare(fareType, rideType, singleLegPrice);
             if (hasFreeTransfers(fareType, rideType)) {
                 // If using Orca (free transfers), the total fare should be equivalent to the
                 // most expensive leg of the journey.
-                cost = Float.max(cost, discountedFare);
+                mostExpensiveDiscountedFare = Float.max(mostExpensiveDiscountedFare, discountedFare);
             } else {
                 // If free transfers not permitted (i.e., paying with cash), accumulate each
                 // leg as we go.
-                cost += discountedFare;
+                cost += singleLegPrice;
             }
         }
+        cost += mostExpensiveDiscountedFare;
         if (cost < Float.POSITIVE_INFINITY) {
             fare.addFare(fareType, getMoney(currency, cost));
         }
