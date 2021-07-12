@@ -239,9 +239,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                     }
 
                     if(pattern.boardingPossibleAt(stopPos)) {
-                        if(!isForbiddenTransfer(txForbiddenService, stopIndex, stopPos)) {
-                            // MC Raptor have many, while RR have one boarding
-                            transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
+                        // MC Raptor have many, while RR have one boarding
+                        transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
+                            if(!isForbiddenTransfer(txForbiddenService, stopIndex, stopPos)) {
                                 RaptorTripScheduleBoardOrAlightEvent<T> result = null;
 
                                 if(enableGuaranteedTransfers) {
@@ -267,8 +267,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                                 if (result != null) {
                                     transitWorker.board(stopIndex, earliestBoardTime, result);
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
                 }
             }
