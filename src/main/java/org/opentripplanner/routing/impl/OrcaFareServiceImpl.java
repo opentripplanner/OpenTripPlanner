@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
 
+/**
+ * Calculate Orca discount fares based on the fare type and the agencies traversed within a trip.
+ */
 public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrcaFareServiceImpl.class);
@@ -29,6 +32,7 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         WASHINGTON_STATE_FERRIES
     }
 
+    // If set to true, the test ride price is used instead of the actual agency cash fare.
     public boolean IS_TEST;
     public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
 
@@ -41,8 +45,6 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         addFareRules(Fare.FareType.orcaLift, regularFareRules);
         addFareRules(Fare.FareType.orcaSenior, regularFareRules);
     }
-
-    private static final long serialVersionUID = 20210625L;
 
     /**
      * Classify the ride type based on the route information provided. In most cases the agency name is sufficient. In
@@ -83,6 +85,10 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         return null;
     }
 
+    /**
+     * Define which discount fare should be applied based on the fare type. If the ride type is unknown the discount
+     * fare can not be applied, use the default fare.
+     */
     private float getDiscountedFare(Fare.FareType fareType, RideType rideType, float defaultFare) {
         if (rideType == null) {
             return defaultFare;
@@ -97,14 +103,17 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             case senior:
                 return getSeniorFare(fareType, rideType, defaultFare);
             case orcaRegular:
-                return getOrcaRegularFare(rideType, defaultFare);
+                return getRegularFare(rideType, defaultFare);
             case regular:
             default:
                 return defaultFare;
         }
     }
 
-    private float getOrcaRegularFare(RideType rideType, float defaultFare) {
+    /**
+     * Apply Orca regular discount fares. If the ride type can not be matched the default fare is used.
+     */
+    private float getRegularFare(RideType rideType, float defaultFare) {
         switch (rideType) {
             case KC_WATER_TAXI_VASHON_ISLAND: return 5.75f;
             case KC_WATER_TAXI_WEST_SEATTLE: return 5.00f;
@@ -112,6 +121,9 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         }
     }
 
+    /**
+     * Apply Orca lift discount fares based on the ride type.
+     */
     private float getLiftFare(RideType rideType, float defaultFare) {
         switch (rideType) {
             case COMM_TRANS_LOCAL_SWIFT: return 1.25f;
@@ -125,6 +137,9 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         }
     }
 
+    /**
+     * Apply Orca senior discount fares based on the fare and ride types.
+     */
     private float getSeniorFare(Fare.FareType fareType, RideType rideType, float defaultFare) {
         switch (rideType) {
             case COMM_TRANS_LOCAL_SWIFT: return 1.25f;
@@ -143,6 +158,9 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         }
     }
 
+    /**
+     * Apply Orca youth discount fares based on the ride type.
+     */
     private float getYouthFare(RideType rideType) {
         switch (rideType) {
             case COMM_TRANS_LOCAL_SWIFT: return 1.75f;
@@ -156,6 +174,10 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         }
     }
 
+    /**
+     * Get the ride price for a single leg. If testing, this class is being called directly so the required agency cash
+     * values are not available therefore the default test price is used instead.
+     */
     private float getRidePrice(Ride ride, Fare.FareType fareType, Collection<FareRuleSet> fareRules) {
         if (IS_TEST) {
             // Testing, return default test ride price.
@@ -177,7 +199,8 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     /**
-     * Public access to allow unit testing.
+     * Accumulate the cost of a trip by working through each leg and applying the appropriate cost based on either the
+     * cash price or discount price. This method has public access to allow for unit testing.
      */
     public boolean calculateFare(Fare fare,
                                  Currency currency,
@@ -206,10 +229,17 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         return cost > 0 && cost < Float.POSITIVE_INFINITY;
     }
 
+    /**
+     * If using Orca and the ride type is not Washington state ferries (they do no allow free transfers) a free transfer
+     * can be applied.
+     */
     private boolean hasFreeTransfers(Fare.FareType fareType, RideType rideType) {
         return rideType != RideType.WASHINGTON_STATE_FERRIES && usesOrca(fareType);
     }
 
+    /**
+     * Define Orca fare types.
+     */
     private boolean usesOrca(Fare.FareType fareType) {
         return fareType.equals(Fare.FareType.orcaLift) ||
             fareType.equals(Fare.FareType.orcaSenior) ||

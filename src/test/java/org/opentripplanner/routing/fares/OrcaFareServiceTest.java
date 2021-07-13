@@ -19,6 +19,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.COMM_TRANS_COMMUTER_EXPRESS;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.COMM_TRANS_LOCAL_SWIFT;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.EVERETT_TRANSIT;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.KC_METRO;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.KC_WATER_TAXI_VASHON_ISLAND;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.KITSAP_TRANSIT;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.PIERCE_COUNTY_TRANSIT;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.SEATTLE_STREET_CAR;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.SOUND_TRANSIT;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.WASHINGTON_STATE_FERRIES;
+
 public class OrcaFareServiceTest {
 
     private static OrcaFareServiceImpl orcaFareService;
@@ -35,7 +46,8 @@ public class OrcaFareServiceTest {
     /**
      * These test are design to specifically validate Orca fares. Since these fares are hard-coded, it is acceptable to
      * make direct calls to the Orca fare service with predefined routes. Where the default fare is applied a test
-     * substitute {@link OrcaFareServiceImpl#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare types.
+     * substitute {@link OrcaFareServiceImpl#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
+     * types.
      */
     @ParameterizedTest
     @MethodSource("trips")
@@ -50,31 +62,31 @@ public class OrcaFareServiceTest {
 
     private static Stream<Arguments> trips() {
         List<Ride> trip1 = getTrip(
-            OrcaFareServiceImpl.RideType.COMM_TRANS_COMMUTER_EXPRESS
+            COMM_TRANS_COMMUTER_EXPRESS
         );
         List<Ride> trip2 = getTrip(
-            OrcaFareServiceImpl.RideType.KITSAP_TRANSIT,
-            OrcaFareServiceImpl.RideType.WASHINGTON_STATE_FERRIES,
-            OrcaFareServiceImpl.RideType.COMM_TRANS_LOCAL_SWIFT
+            KITSAP_TRANSIT,
+            WASHINGTON_STATE_FERRIES,
+            COMM_TRANS_LOCAL_SWIFT
         );
         List<Ride> trip3 = getTrip(
-            OrcaFareServiceImpl.RideType.PIERCE_COUNTY_TRANSIT,
-            OrcaFareServiceImpl.RideType.SOUND_TRANSIT,
-            OrcaFareServiceImpl.RideType.COMM_TRANS_COMMUTER_EXPRESS
+            PIERCE_COUNTY_TRANSIT,
+            SOUND_TRANSIT,
+            COMM_TRANS_COMMUTER_EXPRESS
         );
         List<Ride> trip4 = getTrip(
-            OrcaFareServiceImpl.RideType.EVERETT_TRANSIT,
-            OrcaFareServiceImpl.RideType.COMM_TRANS_COMMUTER_EXPRESS,
-            OrcaFareServiceImpl.RideType.SOUND_TRANSIT
+            EVERETT_TRANSIT,
+            COMM_TRANS_COMMUTER_EXPRESS,
+            SOUND_TRANSIT
         );
         List<Ride> trip5 = getTrip(
-            OrcaFareServiceImpl.RideType.KC_WATER_TAXI_VASHON_ISLAND,
-            OrcaFareServiceImpl.RideType.KC_METRO
+            KC_WATER_TAXI_VASHON_ISLAND,
+            KC_METRO
         );
         List<Ride> trip6 = getTrip(
-            OrcaFareServiceImpl.RideType.SEATTLE_STREET_CAR,
-            OrcaFareServiceImpl.RideType.KC_METRO,
-            OrcaFareServiceImpl.RideType.COMM_TRANS_COMMUTER_EXPRESS
+            SEATTLE_STREET_CAR,
+            KC_METRO,
+            COMM_TRANS_COMMUTER_EXPRESS
         );
         return Stream.of(
             Arguments.of(trip1, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS),
@@ -84,7 +96,8 @@ public class OrcaFareServiceTest {
             Arguments.of(trip1, Fare.FareType.orcaRegular, DEFAULT_RIDE_PRICE_IN_CENTS),
             Arguments.of(trip1, Fare.FareType.orcaSenior, 200f),
             Arguments.of(trip1, Fare.FareType.orcaYouth, 300f),
-            // The costs are made up of the expected cost to be applied for each agency.
+            // The following costs are made up of the expected cost to be applied for each agency. This is usually the
+            // most expensive leg of the journey.
             Arguments.of(trip2, Fare.FareType.orcaLift, 100f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
             Arguments.of(trip2, Fare.FareType.orcaRegular, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS),
             Arguments.of(trip2, Fare.FareType.orcaSenior, 100f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
