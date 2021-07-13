@@ -1,10 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.router.street;
 
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -32,17 +35,36 @@ public class AccessEgressFilter {
   }
 
   /**
-   * Returns the closest stops by distance
+   * Returns the closest stops by distance. In addition, all other stops within the same stations
+   * as the closest stops are added.
    */
   private static Collection<NearbyStop> filterCarPickup(
       Collection<NearbyStop> nearbyStops, int maxCarPickupAccessEgressStops
   ) {
-    return nearbyStops
-        .stream()
+    // Add all stops locations (including areas) within range to result
+    Set<NearbyStop> result = nearbyStops.stream()
         // Sorts by least distance
         .sorted()
         .limit(maxCarPickupAccessEgressStops)
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
+
+    // Get the station for the stops within range
+    Set<Station> stations = result
+        .stream()
+        .filter(s -> s.stop instanceof Stop)
+        .map(s -> ((Stop) s.stop).getParentStation())
+        .collect(Collectors.toSet());
+
+    // All the child stops that are outside of the range
+    result.addAll(
+        nearbyStops
+        .stream()
+        .filter(s -> s.stop instanceof Stop)
+        .filter(s -> stations.contains(((Stop) s.stop).getParentStation()))
+        .collect(Collectors.toList())
+    );
+
+    return result;
   }
 
   /**
