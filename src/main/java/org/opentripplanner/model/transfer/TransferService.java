@@ -85,6 +85,11 @@ public class TransferService implements Serializable {
     }
 
     @Nullable
+    public Transfer findTransfer(Stop fromStop, Stop toStop) {
+        return stop2StopTransfers.get(new P2<>(fromStop, toStop));
+    }
+
+    @Nullable
     public Transfer findTransfer(
             Stop fromStop,
             Stop toStop,
@@ -110,7 +115,7 @@ public class TransferService implements Serializable {
         if (result != null) { return result; }
 
         // If no specificity ranked transfers found return stop-2-stop transfers (lowest ranking)
-        return stop2StopTransfers.get(new P2<>(fromStop, toStop));
+        return findTransfer(fromStop, toStop);
     }
 
     void add(Transfer transfer) {

@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
+import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -75,7 +75,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         int nTransfersTotal = 0;
         int nLinkableStops = 0;
 
-        RoutingRequest streetRequest = Transfer.prepareTransferRoutingRequest(new RoutingRequest());
+        RoutingRequest streetRequest =
+            org.opentripplanner.routing.algorithm.raptor.transit.Transfer.prepareTransferRoutingRequest(new RoutingRequest());
 
         // This could be multi-threaded, in which case we'd need to be careful about the lifecycle of NearbyStopFinder instances.
         for (TransitStopVertex ts0 : stops) {
@@ -87,6 +88,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, streetRequest, false)) {
                 // Skip the origin stop, loop transfers are not needed.
                 if (sd.stop == stop) { continue; }
+                // Skip stop if ForbiddenTransfers is enabled and transfer is forbidden
+                if (OTPFeature.ForbiddenTransfers.isOn() && sd.stop instanceof Stop) {
+                  Transfer transfer = graph.getTransferService().findTransfer(stop, (Stop) sd.stop);
+                  if (transfer != null && transfer.isForbidden()) { continue; }
+                }
                 graph.transfersByStop.put(
                     stop,
                     new SimpleTransfer(ts0.getStop(), sd.stop, sd.distance, sd.edges)

@@ -82,6 +82,10 @@ public final class Transfer implements Serializable {
         return guaranteed;
     }
 
+    public boolean isForbidden() {
+        return priority == TransferPriority.NOT_ALLOWED;
+    }
+
     public boolean includeSlack() {
         return !(guaranteed || staySeated);
     }
