@@ -199,8 +199,8 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     /**
-     * Accumulate the cost of a trip by working through each leg and applying the appropriate cost based on either the
-     * cash price or discount price. This method has public access to allow for unit testing.
+     * Calculate the cost of a journey. Where free transfers are not permitted the cash price is use. If free transfers
+     * are applicable, the most expensive discount fare across all legs is added to the final cumulative cash price.
      */
     public boolean calculateFare(Fare fare,
                                  Currency currency,
@@ -209,6 +209,7 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
                                  Collection<FareRuleSet> fareRules
     ) {
         float cost = 0;
+        float orcaFareDiscount = 0;
         for (Ride ride : rides) {
             RideType rideType = classify(ride.routeData);
             float singleLegPrice = getRidePrice(ride, fareType, fareRules);
@@ -216,13 +217,14 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             if (hasFreeTransfers(fareType, rideType)) {
                 // If using Orca (free transfers), the total fare should be equivalent to the
                 // most expensive leg of the journey.
-                cost = Float.max(cost, discountedFare);
+                orcaFareDiscount = Float.max(orcaFareDiscount, discountedFare);
             } else {
                 // If free transfers not permitted (i.e., paying with cash), accumulate each
                 // leg as we go.
                 cost += singleLegPrice;
             }
         }
+        cost += orcaFareDiscount;
         if (cost < Float.POSITIVE_INFINITY) {
             fare.addFare(fareType, getMoney(currency, cost));
         }

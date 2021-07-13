@@ -98,9 +98,9 @@ public class OrcaFareServiceTest {
             Arguments.of(trip1, Fare.FareType.orcaYouth, 300f),
             // The following costs are made up of the expected cost to be applied for each agency. This is usually the
             // most expensive leg of the journey.
-            Arguments.of(trip2, Fare.FareType.orcaLift, 100f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
+            Arguments.of(trip2, Fare.FareType.orcaLift, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 125f),
             Arguments.of(trip2, Fare.FareType.orcaRegular, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS),
-            Arguments.of(trip2, Fare.FareType.orcaSenior, 100f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
+            Arguments.of(trip2, Fare.FareType.orcaSenior, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 125f),
             Arguments.of(trip2, Fare.FareType.orcaYouth, 200f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
             Arguments.of(trip3, Fare.FareType.orcaLift, DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f),
             Arguments.of(trip3, Fare.FareType.orcaRegular, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
