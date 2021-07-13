@@ -4,6 +4,8 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.util.Collection;
@@ -68,16 +70,34 @@ public class AccessEgressFilter {
   }
 
   /**
-   * Returns the closest stops by distance
+   * Returns the closest stops by distance. In addition, all other stops using the same car park
+   * are added.
    */
   private static Collection<NearbyStop> filterByCarPark(
       Collection<NearbyStop> nearbyStops, int maxCarParkAccessEgressStops
   ) {
-    return nearbyStops
-        .stream()
+    // Add all stops locations within range to result
+    Set<NearbyStop> result = nearbyStops.stream()
         // Sorts by least distance
         .sorted()
         .limit(maxCarParkAccessEgressStops)
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
+
+    // Get the car park used for the stops within range
+    Set<Edge> parAndRideEdges = result
+        .stream()
+        .filter(s -> s.edges.stream().anyMatch(e -> e instanceof ParkAndRideEdge))
+        .map(s -> s.edges.stream().filter(e -> e instanceof ParkAndRideEdge).findFirst().get())
+        .collect(Collectors.toSet());
+
+    // Add all the stops that use the same car park as stops within range
+    result.addAll(
+        nearbyStops
+            .stream()
+            .filter(s -> s.edges.stream().anyMatch(parAndRideEdges::contains))
+            .collect(Collectors.toList())
+    );
+
+    return result;
   }
 }
