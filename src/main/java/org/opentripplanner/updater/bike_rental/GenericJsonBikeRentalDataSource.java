@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @see BikeRentalDataSource
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
@@ -100,7 +98,6 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     }
 
     @Override
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public boolean update() {
         errors = new LinkedList<>();
 

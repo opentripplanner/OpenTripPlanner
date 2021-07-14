@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.bike_rental;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
@@ -23,7 +22,6 @@ import static org.opentripplanner.util.HttpUtils.getDataFromUrlOrFile;
 /**
  * Created by demory on 2017-03-14.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
     private static final Logger LOG = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
@@ -62,7 +60,6 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
     }
 
     @Override
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public boolean update() {
         errors = new LinkedList<>();
         updateUrls();
@@ -100,7 +97,6 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
     /**
      * Reads the GBFS.json url (if it exists) and sets the urls of the other sources
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     private void updateUrls() {
         // fetch data from root URL. This file/endpoint is actually not required per the GBFS spec
         // See https://github.com/NABSA/gbfs/blob/master/gbfs.md#files
