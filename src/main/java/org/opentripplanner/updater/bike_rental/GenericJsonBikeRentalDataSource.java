@@ -103,7 +103,8 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
 
         InputStream data = null;
         try {
-            if(url == null){
+            if (url == null) {
+                // If the file is not expected to exist, return false without an error.
                 return false;
             }
             URL url2 = new URL(url);
