@@ -17,23 +17,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.COMM_TRANS_AGENCY_ID;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.EVERETT_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.KC_METRO_AGENCY_ID;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.KITSAP_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.PIERCE_COUNTY_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.ROUTE_TYPE_FERRY;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.COMM_TRANS_COMMUTER_EXPRESS;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.COMM_TRANS_LOCAL_SWIFT;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.EVERETT_TRANSIT;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.KC_METRO;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.KC_WATER_TAXI_VASHON_ISLAND;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.KC_WATER_TAXI_WEST_SEATTLE;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.KITSAP_TRANSIT;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.PIERCE_COUNTY_TRANSIT;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.SEATTLE_STREET_CAR;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.SOUND_TRANSIT;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.RideType.WASHINGTON_STATE_FERRIES;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.SEATTLE_STREET_CAR_AGENCY_ID;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.SOUND_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.WASHINGTON_STATE_FERRIES_AGENCY_ID;
 
 public class OrcaFareServiceTest {
 
     private static OrcaFareServiceImpl orcaFareService;
     private static float DEFAULT_RIDE_PRICE_IN_CENTS;
+
+    private static final Map<OrcaFareServiceImpl.RideType, Ride> tripStrategy = new HashMap<>();
 
     @BeforeAll
     public static void setUpClass() {
@@ -41,6 +54,24 @@ public class OrcaFareServiceTest {
         orcaFareService = new OrcaFareServiceImpl(regularFareRules.values());
         orcaFareService.IS_TEST = true;
         DEFAULT_RIDE_PRICE_IN_CENTS = OrcaFareServiceImpl.DEFAULT_TEST_RIDE_PRICE * 100;
+
+        tripStrategy.put(COMM_TRANS_LOCAL_SWIFT, getRide(COMM_TRANS_AGENCY_ID));
+        tripStrategy.put(COMM_TRANS_COMMUTER_EXPRESS, getRide(COMM_TRANS_AGENCY_ID, "400"));
+        tripStrategy.put(EVERETT_TRANSIT, getRide(EVERETT_TRANSIT_AGENCY_ID));
+        tripStrategy.put(PIERCE_COUNTY_TRANSIT, getRide(PIERCE_COUNTY_TRANSIT_AGENCY_ID));
+        tripStrategy.put(SEATTLE_STREET_CAR, getRide(SEATTLE_STREET_CAR_AGENCY_ID));
+        tripStrategy.put(KITSAP_TRANSIT, getRide(KITSAP_TRANSIT_AGENCY_ID));
+        tripStrategy.put(
+            KC_WATER_TAXI_VASHON_ISLAND,
+            getRide(KC_METRO_AGENCY_ID, ROUTE_TYPE_FERRY, "Water Taxi: Vashon Island")
+        );
+        tripStrategy.put(
+            KC_WATER_TAXI_WEST_SEATTLE,
+            getRide(KC_METRO_AGENCY_ID, ROUTE_TYPE_FERRY, "Water Taxi: West Seattle")
+        );
+        tripStrategy.put(KC_METRO, getRide(KC_METRO_AGENCY_ID));
+        tripStrategy.put(SOUND_TRANSIT, getRide(SOUND_TRANSIT_AGENCY_ID));
+        tripStrategy.put(WASHINGTON_STATE_FERRIES, getRide(WASHINGTON_STATE_FERRIES_AGENCY_ID));
     }
 
     /**
@@ -56,7 +87,7 @@ public class OrcaFareServiceTest {
                                   float expectedFareInCents
     ) {
         Fare fare = new Fare();
-        orcaFareService.calculateFare(fare, null, fareType, rides, null);
+        orcaFareService.populateFare(fare, null, fareType, rides, null);
         Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).getCents());
     }
 
@@ -88,6 +119,10 @@ public class OrcaFareServiceTest {
             KC_METRO,
             COMM_TRANS_COMMUTER_EXPRESS
         );
+        // The cost parameters are made up of the expected fare to be applied after each leg of a trip has been evaluated.
+        // E.g. if a trip covers three agencies a value of "0f + 0f + 200f" would represent no charge for the first two
+        // legs, but a charge of 200 cents for the third. This implies that the third leg is the most expensive transfer
+        // of the trip.
         return Stream.of(
             Arguments.of(trip1, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS),
             Arguments.of(trip1, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS),
@@ -96,20 +131,30 @@ public class OrcaFareServiceTest {
             Arguments.of(trip1, Fare.FareType.orcaRegular, DEFAULT_RIDE_PRICE_IN_CENTS),
             Arguments.of(trip1, Fare.FareType.orcaSenior, 200f),
             Arguments.of(trip1, Fare.FareType.orcaYouth, 300f),
-            // The following costs are made up of the expected cost to be applied for each agency. This is usually the
-            // most expensive leg of the journey.
+            Arguments.of(trip2, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
+            Arguments.of(trip2, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
+            Arguments.of(trip2, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
             Arguments.of(trip2, Fare.FareType.orcaLift, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 125f),
             Arguments.of(trip2, Fare.FareType.orcaRegular, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS),
             Arguments.of(trip2, Fare.FareType.orcaSenior, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 125f),
             Arguments.of(trip2, Fare.FareType.orcaYouth, 200f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
+            Arguments.of(trip3, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
+            Arguments.of(trip3, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
+            Arguments.of(trip3, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
             Arguments.of(trip3, Fare.FareType.orcaLift, DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f),
             Arguments.of(trip3, Fare.FareType.orcaRegular, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
             Arguments.of(trip3, Fare.FareType.orcaSenior, 0f + 0f + 200f),
             Arguments.of(trip3, Fare.FareType.orcaYouth, 0f + 0f + 300f),
+            Arguments.of(trip4, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
+            Arguments.of(trip4, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
+            Arguments.of(trip4, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
             Arguments.of(trip4, Fare.FareType.orcaLift, 0f + 200f + 0f),
             Arguments.of(trip4, Fare.FareType.orcaRegular, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f),
             Arguments.of(trip4, Fare.FareType.orcaSenior, 0f + 0f + 200f),
             Arguments.of(trip4, Fare.FareType.orcaYouth, 0f + 0f + 300f),
+            Arguments.of(trip5, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 2),
+            Arguments.of(trip5, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 2),
+            Arguments.of(trip5, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 2),
             Arguments.of(trip5, Fare.FareType.orcaLift, 450f + 0f),
             Arguments.of(trip5, Fare.FareType.orcaRegular, 575f + 0f),
             Arguments.of(trip5, Fare.FareType.orcaSenior, 300f + 0f),
@@ -128,42 +173,7 @@ public class OrcaFareServiceTest {
     private static List<Ride> getTrip(OrcaFareServiceImpl.RideType... rideTypes) {
         List<Ride> rides = new ArrayList<>();
         for (OrcaFareServiceImpl.RideType rideType : rideTypes) {
-            switch (rideType) {
-                case COMM_TRANS_LOCAL_SWIFT:
-                    rides.add(getRide("29"));
-                    break;
-                case COMM_TRANS_COMMUTER_EXPRESS:
-                    rides.add(getRide("29", "400"));
-                    break;
-                case EVERETT_TRANSIT:
-                    rides.add(getRide("97"));
-                    break;
-                case PIERCE_COUNTY_TRANSIT:
-                    rides.add(getRide("3"));
-                    break;
-                case SEATTLE_STREET_CAR:
-                    rides.add(getRide("23"));
-                    break;
-                case KITSAP_TRANSIT:
-                    rides.add(getRide("kt"));
-                    break;
-                case KC_WATER_TAXI_VASHON_ISLAND:
-                    rides.add(getRide("1", 4, "Water Taxi: Vashon Island"));
-                    break;
-                case KC_WATER_TAXI_WEST_SEATTLE:
-                    rides.add(getRide("1", 4, "Water Taxi: West Seattle"));
-                    break;
-                case KC_METRO:
-                    rides.add(getRide("1"));
-                    break;
-                case SOUND_TRANSIT:
-                    rides.add(getRide("40"));
-                    break;
-                case WASHINGTON_STATE_FERRIES:
-                    rides.add(getRide("wsf"));
-                    break;
-            }
-
+            rides.add(tripStrategy.get(rideType));
         }
         return rides;
     }
