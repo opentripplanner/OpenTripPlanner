@@ -13,11 +13,11 @@ import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.impl.OrcaFareServiceImpl;
 import org.opentripplanner.routing.impl.Ride;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.COMM_TRANS_AGENCY_ID;
@@ -55,28 +55,28 @@ public class OrcaFareServiceTest {
         orcaFareService.IS_TEST = true;
         DEFAULT_RIDE_PRICE_IN_CENTS = OrcaFareServiceImpl.DEFAULT_TEST_RIDE_PRICE * 100;
 
-        tripStrategy.put(COMM_TRANS_LOCAL_SWIFT, getRide(COMM_TRANS_AGENCY_ID));
-        tripStrategy.put(COMM_TRANS_COMMUTER_EXPRESS, getRide(COMM_TRANS_AGENCY_ID, "400"));
-        tripStrategy.put(EVERETT_TRANSIT, getRide(EVERETT_TRANSIT_AGENCY_ID));
-        tripStrategy.put(PIERCE_COUNTY_TRANSIT, getRide(PIERCE_COUNTY_TRANSIT_AGENCY_ID));
-        tripStrategy.put(SEATTLE_STREET_CAR, getRide(SEATTLE_STREET_CAR_AGENCY_ID));
-        tripStrategy.put(KITSAP_TRANSIT, getRide(KITSAP_TRANSIT_AGENCY_ID));
+        tripStrategy.put(COMM_TRANS_LOCAL_SWIFT, getRide(COMM_TRANS_AGENCY_ID, 30));
+        tripStrategy.put(COMM_TRANS_COMMUTER_EXPRESS, getRide(COMM_TRANS_AGENCY_ID, "400", 7));
+        tripStrategy.put(EVERETT_TRANSIT, getRide(EVERETT_TRANSIT_AGENCY_ID, 23));
+        tripStrategy.put(PIERCE_COUNTY_TRANSIT, getRide(PIERCE_COUNTY_TRANSIT_AGENCY_ID, 12));
+        tripStrategy.put(SEATTLE_STREET_CAR, getRide(SEATTLE_STREET_CAR_AGENCY_ID, 17));
+        tripStrategy.put(KITSAP_TRANSIT, getRide(KITSAP_TRANSIT_AGENCY_ID, 15));
         tripStrategy.put(
             KC_WATER_TAXI_VASHON_ISLAND,
-            getRide(KC_METRO_AGENCY_ID, ROUTE_TYPE_FERRY, "Water Taxi: Vashon Island")
+            getRide(KC_METRO_AGENCY_ID, ROUTE_TYPE_FERRY, "Water Taxi: Vashon Island", 11)
         );
         tripStrategy.put(
             KC_WATER_TAXI_WEST_SEATTLE,
-            getRide(KC_METRO_AGENCY_ID, ROUTE_TYPE_FERRY, "Water Taxi: West Seattle")
+            getRide(KC_METRO_AGENCY_ID, ROUTE_TYPE_FERRY, "Water Taxi: West Seattle", 44)
         );
-        tripStrategy.put(KC_METRO, getRide(KC_METRO_AGENCY_ID));
-        tripStrategy.put(SOUND_TRANSIT, getRide(SOUND_TRANSIT_AGENCY_ID));
-        tripStrategy.put(WASHINGTON_STATE_FERRIES, getRide(WASHINGTON_STATE_FERRIES_AGENCY_ID));
+        tripStrategy.put(KC_METRO, getRide(KC_METRO_AGENCY_ID, 13));
+        tripStrategy.put(SOUND_TRANSIT, getRide(SOUND_TRANSIT_AGENCY_ID, 5));
+        tripStrategy.put(WASHINGTON_STATE_FERRIES, getRide(WASHINGTON_STATE_FERRIES_AGENCY_ID, 34));
     }
 
     /**
-     * These test are design to specifically validate Orca fares. Since these fares are hard-coded, it is acceptable to
-     * make direct calls to the Orca fare service with predefined routes. Where the default fare is applied a test
+     * These tests are designed to specifically validate Orca fares. Since these fares are hard-coded, it is acceptable
+     * to make direct calls to the Orca fare service with predefined routes. Where the default fare is applied a test
      * substitute {@link OrcaFareServiceImpl#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
      * types.
      */
@@ -119,9 +119,18 @@ public class OrcaFareServiceTest {
             KC_METRO,
             COMM_TRANS_COMMUTER_EXPRESS
         );
+        // Total trip time = 2h 4m. The last leg is outside of the free transfer window so the cash price is paid.
+        List<Ride> trip7 = getTrip(
+            KITSAP_TRANSIT,
+            KITSAP_TRANSIT,
+            KITSAP_TRANSIT,
+            KITSAP_TRANSIT,
+            WASHINGTON_STATE_FERRIES,
+            COMM_TRANS_LOCAL_SWIFT
+        );
         // The cost parameters are made up of the expected fare to be applied after each leg of a trip has been evaluated.
         // E.g. if a trip covers three agencies a value of "0f + 0f + 200f" would represent no charge for the first two
-        // legs, but a charge of 200 cents for the third. This implies that the third leg is the most expensive transfer
+        // legs, but a charge of 200 cents for the third. This implies that the third leg is the most expensive portion
         // of the trip.
         return Stream.of(
             Arguments.of(trip1, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS),
@@ -159,10 +168,20 @@ public class OrcaFareServiceTest {
             Arguments.of(trip5, Fare.FareType.orcaRegular, 575f + 0f),
             Arguments.of(trip5, Fare.FareType.orcaSenior, 300f + 0f),
             Arguments.of(trip5, Fare.FareType.orcaYouth, 450f + 0f),
+            Arguments.of(trip6, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
+            Arguments.of(trip6, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
+            Arguments.of(trip6, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 3),
             Arguments.of(trip6, Fare.FareType.orcaLift, 0f + 0f + 200f),
             Arguments.of(trip6, Fare.FareType.orcaRegular, 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS),
             Arguments.of(trip6, Fare.FareType.orcaSenior, 0f + 0f + 200f),
-            Arguments.of(trip6, Fare.FareType.orcaYouth, 0f + 0f + 300f)
+            Arguments.of(trip6, Fare.FareType.orcaYouth, 0f + 0f + 300f),
+            Arguments.of(trip7, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 6),
+            Arguments.of(trip7, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 6),
+            Arguments.of(trip7, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 6),
+            Arguments.of(trip7, Fare.FareType.orcaLift, 100f + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS),
+            Arguments.of(trip7, Fare.FareType.orcaRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS),
+            Arguments.of(trip7, Fare.FareType.orcaSenior, 100f + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS),
+            Arguments.of(trip7, Fare.FareType.orcaYouth, 200f + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS)
         );
     }
 
@@ -171,30 +190,31 @@ public class OrcaFareServiceTest {
      * the values used in {@link OrcaFareServiceImpl} to determine the correct ride type.
      */
     private static List<Ride> getTrip(OrcaFareServiceImpl.RideType... rideTypes) {
-        List<Ride> rides = new ArrayList<>();
-        for (OrcaFareServiceImpl.RideType rideType : rideTypes) {
-            rides.add(tripStrategy.get(rideType));
-        }
-        return rides;
+        return Arrays.stream(rideTypes).map(tripStrategy::get).collect(Collectors.toList());
     }
 
-    private static Ride getRide(String agencyId) {
-        return getRide(agencyId, "-1", -1, null);
+    private static Ride getRide(String agencyId, long durationMins) {
+        return getRide(agencyId, "-1", -1, null, durationMins);
     }
 
-    private static Ride getRide(String agencyId, int rideType, String desc) {
-        return getRide(agencyId, "-1", rideType, desc);
+    private static Ride getRide(String agencyId, int rideType, String desc, long durationMins) {
+        return getRide(agencyId, "-1", rideType, desc, durationMins);
     }
 
-    private static Ride getRide(String agencyId, String shortName) {
-        return getRide(agencyId, shortName, -1, null);
+    private static Ride getRide(String agencyId, String shortName, long durationMins) {
+        return getRide(agencyId, shortName, -1, null,0);
     }
 
     /**
      * Create a {@link Ride} containing route data that will be used by {@link OrcaFareServiceImpl} to determine the
      * correct ride type.
      */
-    private static Ride getRide(String agencyId, String shortName, int rideType, String desc) {
+    private static Ride getRide(String agencyId,
+                                String shortName,
+                                int rideType,
+                                String desc,
+                                long durationMins
+    ) {
         Ride ride = new Ride();
         Agency agency = new Agency();
         agency.setId(agencyId);
@@ -204,6 +224,7 @@ public class OrcaFareServiceTest {
         route.setType(rideType);
         route.setDesc(desc);
         ride.routeData = route;
+        ride.endTime = durationMins * 60;
         return ride;
     }
 }

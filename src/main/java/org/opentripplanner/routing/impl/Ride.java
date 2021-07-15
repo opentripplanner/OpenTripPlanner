@@ -12,7 +12,7 @@ public class Ride {
 
     String feedId;
 
-    public String agency; // route agency
+    String agency; // route agency
 
     FeedScopedId route;
 
@@ -28,25 +28,25 @@ public class Ride {
 
     long startTime;
 
-    long endTime;
+    public long endTime;
 
     // in DefaultFareServiceImpl classifier is just the TraverseMode
     // it can be used differently in custom fare services
-    public Object classifier;
+    Object classifier;
 
-    public Stop firstStop;
+    Stop firstStop;
 
-    public Stop lastStop;
+    Stop lastStop;
 
     public Ride() {
-        zones = new HashSet<String>();
+        zones = new HashSet<>();
     }
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("Ride");
         if (startZone != null) {
-            builder.append("(from zone ");
+            builder.append(" from zone ");
             builder.append(startZone);
         }
         if (endZone != null) {
@@ -57,23 +57,14 @@ public class Ride {
         builder.append(route);
         if (zones.size() > 0) {
             builder.append(" through zones ");
-            boolean first = true;
-            for (String zone : zones) {
-                if (first) {
-                    first = false;
-                } else {
-                    builder.append(",");
-                }
-                builder.append(zone);
-            }
+            builder.append(String.join(",", zones));
         }
         builder.append(" at ");
         builder.append(startTime);
         if (classifier != null) {
             builder.append(", classified by ");
-            builder.append(classifier.toString());
+            builder.append(classifier);
         }
-        builder.append(")");
         return builder.toString();
     }
 }

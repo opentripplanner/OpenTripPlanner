@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.impl;
 
+import com.google.common.collect.Lists;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.HashMap;
@@ -20,6 +20,8 @@ import java.util.function.Function;
 public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrcaFareServiceImpl.class);
+
+    private long FREE_TRANSFER_TIME_LIMIT = 7200; // 2 hours
 
     public static final String COMM_TRANS_AGENCY_ID = "29";
     public static final String KC_METRO_AGENCY_ID = "1";
@@ -214,14 +216,12 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             // Testing, return default test ride price.
             return DEFAULT_TEST_RIDE_PRICE;
         }
-        List<Ride> ridesSingleton = new ArrayList<>();
-        ridesSingleton.add(ride);
-        return calculateCost(fareType, ridesSingleton, fareRules);
+        return calculateCost(fareType, Lists.newArrayList(ride), fareRules);
     }
 
     /**
-     * Calculate the cost of a journey. Where free transfers are not permitted the cash price is use. If free transfers
-     * are applicable, the most expensive discount fare across all legs is added to the final cumulative cash price.
+     * Calculate the cost of a journey. Where free transfers are not permitted the cash price is used. If free transfers
+     * are applicable, the most expensive discount fare across all legs is added to the final cumulative price.
      */
     @Override
     public boolean populateFare(Fare fare,
@@ -230,20 +230,27 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
                                    List<Ride> rides,
                                    Collection<FareRuleSet> fareRules
     ) {
+        long freeTransferTripTime = 0;
         float cost = 0;
         float orcaFareDiscount = 0;
         for (Ride ride : rides) {
             RideType rideType = classify(ride.routeData);
+            freeTransferTripTime += ride.endTime - ride.startTime;
             float singleLegPrice = getRidePrice(ride, fareType, fareRules);
             float discountedFare = getDiscountedFare(fareType, rideType, singleLegPrice);
-            if (hasFreeTransfers(fareType, rideType)) {
+            if (hasFreeTransfers(fareType, rideType, freeTransferTripTime)) {
                 // If using Orca (free transfers), the total fare should be equivalent to the
                 // most expensive leg of the journey.
                 orcaFareDiscount = Float.max(orcaFareDiscount, discountedFare);
             } else {
-                // If free transfers not permitted (i.e., paying with cash), accumulate each
-                // leg as we go.
+                // If free transfers are not permitted, add the cash price of this leg to the total cost.
+                // This case is for Washington State Ferries, which do not offer any discounts.
                 cost += singleLegPrice;
+            }
+            if (freeTransferTripTime > FREE_TRANSFER_TIME_LIMIT) {
+                // If the trip time has exceeded the free transfer time limit of two hours the rider is required to
+                // purchase a new fare. This also resets the free transfer trip window.
+                freeTransferTripTime = 0;
             }
         }
         cost += orcaFareDiscount;
@@ -254,11 +261,13 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     /**
-     * If using Orca and the ride type is not Washington state ferries (they do no allow free transfers) a free transfer
-     * can be applied.
+     * A free transfer can be applied if using Orca, the ride type is not Washington State Ferries (they do no allow
+     * free transfers) and the trip is still within the free 2 hour transfer window.
      */
-    private boolean hasFreeTransfers(Fare.FareType fareType, RideType rideType) {
-        return rideType != RideType.WASHINGTON_STATE_FERRIES && usesOrca(fareType);
+    private boolean hasFreeTransfers(Fare.FareType fareType, RideType rideType, long freeTransferTripTime) {
+        return rideType != RideType.WASHINGTON_STATE_FERRIES &&
+            usesOrca(fareType) &&
+            freeTransferTripTime <= FREE_TRANSFER_TIME_LIMIT;
     }
 
     /**
