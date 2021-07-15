@@ -1,4 +1,5 @@
 package org.opentripplanner.transit.raptor.api.transit;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 
 
 import javax.annotation.Nullable;
@@ -78,4 +79,6 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      */
     @Nullable
     int[] stopBoarAlightCost();
+
+    TransitLayer getTransitLayer();
 }

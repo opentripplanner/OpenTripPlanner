@@ -82,6 +82,10 @@ public final class Transfer implements Serializable {
         return guaranteed;
     }
 
+    public boolean isForbidden() {
+        return priority == TransferPriority.NOT_ALLOWED;
+    }
+
     /**
      * Maximum time after scheduled departure time the connecting transport is guarantied to wait
      * for the delayed trip.
