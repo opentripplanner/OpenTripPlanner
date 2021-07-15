@@ -75,12 +75,10 @@ public class TransitLayerMapper {
 
         transferByStopIndex = mapTransfers(stopIndex, graph.transfersByStop);
 
-        //if(OTPFeature.GuaranteedTransfers.isOn()) {
-            TransferIndexGenerator.generateTransfers(
-                    graph.getTransferService(),
-                    newTripPatternForOld.values()
-            );
-        //}
+        TransferIndexGenerator.generateTransfers(
+                graph.getTransferService(),
+                newTripPatternForOld.values()
+        );
 
         var transferCache = new RaptorRequestTransferCache(tuningParameters.transferCacheMaxSize());
 
