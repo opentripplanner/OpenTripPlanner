@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BaseGtfsResponse {
+public class BaseGbfsResponse {
     public Integer last_updated;
     public Integer ttl;
 }

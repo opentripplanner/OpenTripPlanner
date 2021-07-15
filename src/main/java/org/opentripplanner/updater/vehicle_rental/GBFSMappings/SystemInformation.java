@@ -4,7 +4,7 @@ package org.opentripplanner.updater.vehicle_rental.GBFSMappings;
  * Response class for the system_information.json file.
  * See https://github.com/NABSA/gbfs/blob/v1.0/gbfs.md#system_informationjson
  */
-public class SystemInformation extends BaseGtfsResponse {
+public class SystemInformation extends BaseGbfsResponse {
     public SystemInformationData data;
 
     /**

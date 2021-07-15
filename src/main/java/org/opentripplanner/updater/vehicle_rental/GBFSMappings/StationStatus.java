@@ -6,7 +6,7 @@ import java.util.List;
  * Response class for the station_status.json file.
  * See https://github.com/NABSA/gbfs/blob/v1.0/gbfs.md#station_statusjson
  */
-public class StationStatus extends BaseGtfsResponse {
+public class StationStatus extends BaseGbfsResponse {
     public StationStatusData data;
 
     public static class StationStatusData {
