@@ -4,7 +4,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenStopTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -122,7 +122,7 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public RaptorForbiddenTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route) {
+    public RaptorForbiddenStopTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route) {
         return route.getForbiddenTransfersTo();
     }
 

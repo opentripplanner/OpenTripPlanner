@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface RaptorForbiddenTransferProvider<T extends RaptorTripSchedule> {
+public interface RaptorForbiddenStopTransferProvider<T extends RaptorTripSchedule> {
 
     /**
      * Check if the current pattern have any guaranteed transfers for the given stop position in

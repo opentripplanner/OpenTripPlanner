@@ -196,7 +196,7 @@ public class TransferService implements Serializable {
                 guaranteedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
             }
         }
-        if(transfer.getPriority() == TransferPriority.NOT_ALLOWED){
+        if(transfer.isForbidden()){
             if(toPoint instanceof StopTransferPoint) {
                 forbiddenTransferByToStop.put(toPoint.getStop(), transfer);
             }

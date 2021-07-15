@@ -12,7 +12,7 @@ import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenStopTransferProvider;
 
 /**
  * A calculator that will take you back in time not forward, this is the
@@ -140,7 +140,7 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public RaptorForbiddenTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route) {
+    public RaptorForbiddenStopTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route) {
         return route.getForbiddenTransfersFrom();
     }
 

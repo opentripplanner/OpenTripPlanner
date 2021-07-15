@@ -13,8 +13,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternGuara
 import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenTransferProvider;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternForbiddenTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenStopTransferProvider;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternForbiddenStopTransferProvider;
 
 public class TripPatternWithRaptorStopIndexes {
     private final TripPattern pattern;
@@ -79,12 +79,12 @@ public class TripPatternWithRaptorStopIndexes {
         return new PatternGuaranteedTransferProvider(false, guaranteedTransfersFrom);
     }
 
-    public RaptorForbiddenTransferProvider<TripSchedule> getForbiddenTransfersTo() {
-        return new PatternForbiddenTransferProvider(true, forbiddenTransfersTo);
+    public RaptorForbiddenStopTransferProvider<TripSchedule> getForbiddenTransfersTo() {
+        return new PatternForbiddenStopTransferProvider(true, forbiddenTransfersTo);
     }
 
-    public RaptorForbiddenTransferProvider<TripSchedule> getForbiddenTransfersFrom() {
-        return new PatternForbiddenTransferProvider(false, forbiddenTransfersFrom);
+    public RaptorForbiddenStopTransferProvider<TripSchedule> getForbiddenTransfersFrom() {
+        return new PatternForbiddenStopTransferProvider(false, forbiddenTransfersFrom);
     }
 
 
@@ -117,11 +117,6 @@ public class TripPatternWithRaptorStopIndexes {
     /** These are public to allow the mappers to inject transfers */
     public void addGuaranteedTransfersTo(Transfer tx) {
         add(guaranteedTransfersTo, tx, tx.getTo().getStopPosition());
-    }
-
-    /** These are public to allow the mappers to inject transfers */
-    public void addForbiddenTransferFrom(Transfer tx, int stopPos) {
-        add(forbiddenTransfersFrom, tx, tx.getFrom().getStopPosition());
     }
 
     /** These are public to allow the mappers to inject transfers */

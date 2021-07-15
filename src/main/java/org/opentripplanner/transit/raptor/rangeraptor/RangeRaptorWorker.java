@@ -27,7 +27,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenStopTransferProvider;
 
 /**
  * The algorithm used herein is described in
@@ -303,7 +303,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     private boolean isForbiddenTransfer(
-        RaptorForbiddenTransferProvider<T> txForbiddenService,
+        RaptorForbiddenStopTransferProvider<T> txForbiddenService,
         int targetStopIndex,
         int targetStopPos
     ) {
