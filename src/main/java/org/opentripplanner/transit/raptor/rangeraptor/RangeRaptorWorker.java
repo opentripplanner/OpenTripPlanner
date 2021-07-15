@@ -310,12 +310,15 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         if (!txForbiddenService.transferExist(targetStopPos)) { return false; }
 
         // Get the previous transit stop arrival (transfer source)
+        // TODO: Verify this get fromStop
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return false; }
+        // TODO(transfers): should be simplifiable if we only want to handle
+        // stop to stop, by only comparing targetStopIndex and sourceStopIndex?
+        //
 
         return txForbiddenService.find(
-            transitData.getTransitLayer(),
-            sourceStopArrival.stop()
+            transitData.getTransitLayer().getStopByIndex(sourceStopArrival.stop())
         ) != null;
     }
 

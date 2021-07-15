@@ -2,6 +2,8 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import gnu.trove.map.TIntObjectMap;
 import java.util.List;
+
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -50,12 +52,11 @@ public final class PatternForbiddenStopTransferProvider
 
     @Override
     public final TransferPoint find(
-            TransitLayer transitLayer,
-            int sourceStopIndex
+            Stop sourceStop
     ) {
         for (Transfer tx : currentTransfers) {
             var sourcePoint = translator.source(tx);
-            if (sourcePoint.getStop() == transitLayer.getStopByIndex(sourceStopIndex)) {
+            if (sourcePoint.getStop() == sourceStop) {
                 return translator.target(tx);
             }
         }

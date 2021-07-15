@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.transfer.TransferPoint;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 
 
 import javax.annotation.Nullable;
@@ -33,7 +32,6 @@ public interface RaptorForbiddenStopTransferProvider<T extends RaptorTripSchedul
      */
     @Nullable
     TransferPoint find(
-            TransitLayer transitLayer,
-            int sourceStopIndex
+            Stop sourceStop
     );
 }
