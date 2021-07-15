@@ -59,11 +59,9 @@ public class TransferIndexGenerator {
                         }
                     }
                 }
-                // TODO: Aboslutely not sure on this one
                 var forbiddenTransfers = transferService.listForbiddenTransfersTo(stops.get(stopPos));
                 for (Transfer tx : forbiddenTransfers) {
                     // TODO: Do we need to handle transfersFrom?
-                    // TODO: Not sure about this stopPos usage
                     pattern.addForbiddenTransfersTo(tx, stopPos);
                 }
             }
