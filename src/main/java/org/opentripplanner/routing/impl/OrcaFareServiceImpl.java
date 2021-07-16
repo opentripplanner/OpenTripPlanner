@@ -21,13 +21,14 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrcaFareServiceImpl.class);
 
-    private long FREE_TRANSFER_TIME_LIMIT = 7200; // 2 hours
+    private static final long FREE_TRANSFER_TIME_DURATION = 7200; // 2 hours
 
     public static final String COMM_TRANS_AGENCY_ID = "29";
     public static final String KC_METRO_AGENCY_ID = "1";
     public static final String SOUND_TRANSIT_AGENCY_ID = "40";
     public static final String EVERETT_TRANSIT_AGENCY_ID = "97";
     public static final String PIERCE_COUNTY_TRANSIT_AGENCY_ID = "3";
+    public static final String SKAGIT_TRANSIT_AGENCY_ID = "e0e4541a-2714-487b-b30c-f5c6cb4a310f";
     public static final String SEATTLE_STREET_CAR_AGENCY_ID = "23";
     public static final String WASHINGTON_STATE_FERRIES_AGENCY_ID = "wsf";
     public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
@@ -42,6 +43,7 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         KC_METRO,
         KITSAP_TRANSIT,
         PIERCE_COUNTY_TRANSIT,
+        SKAGIT_TRANSIT,
         SEATTLE_STREET_CAR,
         SOUND_TRANSIT,
         WASHINGTON_STATE_FERRIES
@@ -57,10 +59,10 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         addFareRules(Fare.FareType.regular, regularFareRules);
         addFareRules(Fare.FareType.senior, regularFareRules);
         addFareRules(Fare.FareType.youth, regularFareRules);
-        addFareRules(Fare.FareType.orcaRegular, regularFareRules);
-        addFareRules(Fare.FareType.orcaYouth, regularFareRules);
-        addFareRules(Fare.FareType.orcaLift, regularFareRules);
-        addFareRules(Fare.FareType.orcaSenior, regularFareRules);
+        addFareRules(Fare.FareType.electronicRegular, regularFareRules);
+        addFareRules(Fare.FareType.electronicYouth, regularFareRules);
+        addFareRules(Fare.FareType.electronicSpecial, regularFareRules);
+        addFareRules(Fare.FareType.electronicSenior, regularFareRules);
 
         classificationStrategy.put(
             COMM_TRANS_AGENCY_ID,
@@ -93,6 +95,7 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         classificationStrategy.put(SOUND_TRANSIT_AGENCY_ID, routeData -> RideType.SOUND_TRANSIT);
         classificationStrategy.put(EVERETT_TRANSIT_AGENCY_ID, routeData -> RideType.EVERETT_TRANSIT);
         classificationStrategy.put(PIERCE_COUNTY_TRANSIT_AGENCY_ID, routeData -> RideType.PIERCE_COUNTY_TRANSIT);
+        classificationStrategy.put(SKAGIT_TRANSIT_AGENCY_ID, routeData -> RideType.SKAGIT_TRANSIT);
         classificationStrategy.put(SEATTLE_STREET_CAR_AGENCY_ID, routeData -> RideType.SEATTLE_STREET_CAR);
         classificationStrategy.put(WASHINGTON_STATE_FERRIES_AGENCY_ID, routeData -> RideType.WASHINGTON_STATE_FERRIES);
         classificationStrategy.put(KITSAP_TRANSIT_AGENCY_ID, routeData -> RideType.KITSAP_TRANSIT);
@@ -117,14 +120,14 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         }
         switch (fareType) {
             case youth:
-            case orcaYouth:
+            case electronicYouth:
                 return getYouthFare(rideType, defaultFare);
-            case orcaLift:
+            case electronicSpecial:
                 return getLiftFare(rideType, defaultFare);
-            case orcaSenior:
+            case electronicSenior:
             case senior:
                 return getSeniorFare(fareType, rideType, defaultFare);
-            case orcaRegular:
+            case electronicRegular:
                 return getRegularFare(rideType, defaultFare);
             case regular:
             default:
@@ -172,12 +175,12 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             case COMM_TRANS_LOCAL_SWIFT: return 1.25f;
             case COMM_TRANS_COMMUTER_EXPRESS: return 2.00f;
             case EVERETT_TRANSIT:
-                return fareType.equals(Fare.FareType.orcaSenior) ? 0.50f : defaultFare;
+                return fareType.equals(Fare.FareType.electronicSenior) ? 0.50f : defaultFare;
             case PIERCE_COUNTY_TRANSIT:
             case SEATTLE_STREET_CAR:
             case KITSAP_TRANSIT:
                 // Pierce, Seattle Streetcar, and Kitsap only provide discounted senior fare for orca.
-                return fareType.equals(Fare.FareType.orcaSenior) ? 1.00f : defaultFare;
+                return fareType.equals(Fare.FareType.electronicSenior) ? 1.00f : defaultFare;
             case KC_WATER_TAXI_VASHON_ISLAND: return 3.00f;
             case KC_WATER_TAXI_WEST_SEATTLE: return 2.50f;
             case KC_METRO:
@@ -222,6 +225,10 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
     /**
      * Calculate the cost of a journey. Where free transfers are not permitted the cash price is used. If free transfers
      * are applicable, the most expensive discount fare across all legs is added to the final cumulative price.
+     *
+     * The computed fare for Orca card users takes into account realtime trip updates where available, so that, for
+     * instance, when a leg on a long itinerary is delayed to begin after the initial two hour window has expired,
+     * the calculated fare for that trip will be two one-way fares instead of one.
      */
     @Override
     public boolean populateFare(Fare fare,
@@ -230,27 +237,32 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
                                    List<Ride> rides,
                                    Collection<FareRuleSet> fareRules
     ) {
-        long freeTransferTripTime = 0;
+        Long freeTransferStartTime = null;
         float cost = 0;
         float orcaFareDiscount = 0;
         for (Ride ride : rides) {
             RideType rideType = classify(ride.routeData);
-            freeTransferTripTime += ride.endTime - ride.startTime;
+            if (freeTransferStartTime == null && permitsFreeTransfers(rideType)) {
+                // The start of a free transfer must be with a transit agency that permits it!
+                freeTransferStartTime = ride.startTime;
+            }
             float singleLegPrice = getRidePrice(ride, fareType, fareRules);
             float discountedFare = getDiscountedFare(fareType, rideType, singleLegPrice);
-            if (hasFreeTransfers(fareType, rideType, freeTransferTripTime)) {
+            if (hasFreeTransfers(fareType, rideType) && inFreeTransferWindow(freeTransferStartTime, ride.startTime)) {
                 // If using Orca (free transfers), the total fare should be equivalent to the
                 // most expensive leg of the journey.
                 orcaFareDiscount = Float.max(orcaFareDiscount, discountedFare);
             } else {
                 // If free transfers are not permitted, add the cash price of this leg to the total cost.
-                // This case is for Washington State Ferries, which do not offer any discounts.
                 cost += singleLegPrice;
             }
-            if (freeTransferTripTime > FREE_TRANSFER_TIME_LIMIT) {
+            if (!inFreeTransferWindow(freeTransferStartTime, ride.startTime)) {
                 // If the trip time has exceeded the free transfer time limit of two hours the rider is required to
-                // purchase a new fare. This also resets the free transfer trip window.
-                freeTransferTripTime = 0;
+                // purchase a new fare. This also resets the free transfer trip window, applies the orca discount to the
+                // overall cost and then resets the orca fare discount ready for the next transfer window.
+                freeTransferStartTime = null;
+                cost += orcaFareDiscount;
+                orcaFareDiscount = 0;
             }
         }
         cost += orcaFareDiscount;
@@ -261,22 +273,34 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     /**
-     * A free transfer can be applied if using Orca, the ride type is not Washington State Ferries (they do no allow
-     * free transfers) and the trip is still within the free 2 hour transfer window.
+     *  Trip within the free two hour transfer window.
      */
-    private boolean hasFreeTransfers(Fare.FareType fareType, RideType rideType, long freeTransferTripTime) {
-        return rideType != RideType.WASHINGTON_STATE_FERRIES &&
-            usesOrca(fareType) &&
-            freeTransferTripTime <= FREE_TRANSFER_TIME_LIMIT;
+    private boolean inFreeTransferWindow(Long freeTransferStartTime, long currentLegStartTime) {
+        return freeTransferStartTime != null &&
+            currentLegStartTime < freeTransferStartTime + FREE_TRANSFER_TIME_DURATION;
+    }
+
+    /**
+     * A free transfer can be applied if using Orca and the transit agency permits free transfers.
+     */
+    private boolean hasFreeTransfers(Fare.FareType fareType, RideType rideType) {
+        return permitsFreeTransfers(rideType) && usesOrca(fareType);
+    }
+
+    /**
+     * All transit agencies permit free transfers, apart from these.
+     */
+    private boolean permitsFreeTransfers(RideType rideType) {
+        return rideType != RideType.WASHINGTON_STATE_FERRIES && rideType != RideType.SKAGIT_TRANSIT;
     }
 
     /**
      * Define Orca fare types.
      */
     private boolean usesOrca(Fare.FareType fareType) {
-        return fareType.equals(Fare.FareType.orcaLift) ||
-            fareType.equals(Fare.FareType.orcaSenior) ||
-            fareType.equals(Fare.FareType.orcaRegular) ||
-            fareType.equals(Fare.FareType.orcaYouth);
+        return fareType.equals(Fare.FareType.electronicSpecial) ||
+            fareType.equals(Fare.FareType.electronicSenior) ||
+            fareType.equals(Fare.FareType.electronicRegular) ||
+            fareType.equals(Fare.FareType.electronicYouth);
     }
 }

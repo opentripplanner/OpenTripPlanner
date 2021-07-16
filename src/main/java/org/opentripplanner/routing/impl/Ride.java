@@ -26,9 +26,9 @@ public class Ride {
 
     String endZone;
 
-    long startTime;
+    public long startTime;
 
-    public long endTime;
+    long endTime;
 
     // in DefaultFareServiceImpl classifier is just the TraverseMode
     // it can be used differently in custom fare services
