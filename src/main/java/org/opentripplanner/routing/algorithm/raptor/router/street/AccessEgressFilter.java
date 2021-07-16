@@ -28,9 +28,12 @@ public class AccessEgressFilter {
   ) {
     switch (streetMode) {
       case CAR_PICKUP:
-        return filterCarPickup(nearbyStops, request.maxCarPickupAccessEgressStops);
       case CAR_TO_PARK:
-        return filterByCarPark(nearbyStops, request.maxCarParkAccessEgressStops);
+        return filterByDistanceOfNearestStop(
+            nearbyStops,
+            request.accessEgressFilterMinimumDistanceMeters,
+            request.accessEgressFilterDistanceFactor
+        );
       default:
         return nearbyStops;
     }
@@ -99,5 +102,23 @@ public class AccessEgressFilter {
     );
 
     return result;
+  }
+
+  /**
+   * Returns the stops within a radius of either the minDistance parameters or the distance of
+   * the closest stop multiplied by the distanceFactor parameter, whichever is highest.
+   */
+  private static Collection<NearbyStop> filterByDistanceOfNearestStop(
+      Collection<NearbyStop> nearbyStops, double minDistance, double distanceFactor
+  ) {
+    if (nearbyStops.isEmpty()) { return nearbyStops; }
+
+    double closestStopDistance = nearbyStops.stream().sorted().findFirst().get().distance;
+    double distanceLimit = Double.max(closestStopDistance * distanceFactor, minDistance);
+
+    return nearbyStops
+        .stream()
+        .filter(s -> s.distance <= distanceLimit)
+        .collect(Collectors.toList());
   }
 }

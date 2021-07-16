@@ -138,6 +138,22 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public int maxCarParkAccessEgressStops = 5;
 
     /**
+     * The factor to be multiplied by the closest stop distance to get the distance to filter by
+     * when doing for access/egress searches for {@link StreetMode#CAR_TO_PARK} and
+     * {@link StreetMode#CAR_PICKUP}. This is for both for performance reasons and because we want
+     * car to be used as a last resort and not replace large parts of a transit trip.
+     */
+    public double accessEgressFilterDistanceFactor = 1.5;
+
+    /**
+     * The minimum distance to filter by when doing for access/egress searches for
+     * {@link StreetMode#CAR_TO_PARK} and {@link StreetMode#CAR_PICKUP}. This is for both for
+     * performance reasons and because we want car to be used as a last resort and not replace
+     * large parts of a transit trip.
+     */
+    public double accessEgressFilterMinimumDistanceMeters = 1000;
+
+    /**
      * The access/egress/direct/transit modes allowed for this main request. The parameter
      * "streetSubRequestModes" below is used for a single A Star sub request.
      *
