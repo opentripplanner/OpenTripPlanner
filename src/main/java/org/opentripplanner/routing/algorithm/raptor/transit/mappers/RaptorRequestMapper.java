@@ -58,6 +58,7 @@ public class RaptorRequestMapper {
                 .searchWindow(request.searchWindow)
                 .timetableEnabled(request.timetableView)
                 .guaranteedTransfersEnabled(OTPFeature.GuaranteedTransfers.isOn())
+                .forbiddenTransfersEnabled(OTPFeature.ForbiddenTransfers.isOn())
                 .addAccessPaths(accessPaths)
                 .addEgressPaths(egressPaths);
 

@@ -103,7 +103,8 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
                 ctx.calculator(),
                 ctx.createLifeCyclePublisher(),
                 ctx.timers(),
-                ctx.enableGuaranteedTransfers()
+                ctx.enableGuaranteedTransfers(),
+                ctx.enableForbiddenTransfers()
         );
     }
 

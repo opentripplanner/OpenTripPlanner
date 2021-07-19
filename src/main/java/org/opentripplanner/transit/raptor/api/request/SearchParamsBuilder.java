@@ -26,6 +26,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
     private boolean guaranteedTransfersEnabled;
+    private boolean forbiddenTransfersEnabled;
     private final Collection<RaptorTransfer> accessPaths = new ArrayList<>();
     private final Collection<RaptorTransfer> egressPaths = new ArrayList<>();
 
@@ -40,6 +41,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
         this.timetableEnabled = defaults.timetableEnabled();
         this.guaranteedTransfersEnabled = defaults.guaranteedTransfersEnabled();
+        this.forbiddenTransfersEnabled = defaults.forbiddenTransfersEnabled();
         this.accessPaths.addAll(defaults.accessPaths());
         this.egressPaths.addAll(defaults.egressPaths());
     }
@@ -138,6 +140,15 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
     public SearchParamsBuilder<T> guaranteedTransfersEnabled(boolean enable) {
         this.guaranteedTransfersEnabled = enable;
+        return this;
+    }
+
+    public boolean forbiddenTransfersEnabled() {
+        return forbiddenTransfersEnabled;
+    }
+
+    public SearchParamsBuilder<T> forbiddenTransfersEnabled(boolean enable) {
+        this.forbiddenTransfersEnabled = enable;
         return this;
     }
 

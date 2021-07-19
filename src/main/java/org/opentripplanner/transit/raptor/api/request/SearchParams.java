@@ -39,6 +39,7 @@ public class SearchParams {
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
     private final boolean guaranteedTransfersEnabled;
+    private final boolean forbiddenTransfersEnabled;
     private final Collection<RaptorTransfer> accessPaths;
     private final Collection<RaptorTransfer> egressPaths;
 
@@ -55,6 +56,7 @@ public class SearchParams {
         relaxCostAtDestination = NOT_SET;
         timetableEnabled = false;
         guaranteedTransfersEnabled = false;
+        forbiddenTransfersEnabled = false;
         accessPaths = List.of();
         egressPaths = List.of();
     }
@@ -69,6 +71,7 @@ public class SearchParams {
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
         this.guaranteedTransfersEnabled = builder.guaranteedTransfersEnabled();
+        this.forbiddenTransfersEnabled = builder.forbiddenTransfersEnabled();
         this.accessPaths = List.copyOf(builder.accessPaths());
         this.egressPaths = List.copyOf(builder.egressPaths());
     }
@@ -218,6 +221,11 @@ public class SearchParams {
      */
     public boolean guaranteedTransfersEnabled() {
         return guaranteedTransfersEnabled;
+    }
+
+    // TODO(transfers) add a comment
+    public boolean forbiddenTransfersEnabled() {
+        return forbiddenTransfersEnabled;
     }
 
     /**

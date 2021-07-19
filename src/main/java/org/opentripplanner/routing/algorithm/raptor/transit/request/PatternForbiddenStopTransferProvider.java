@@ -9,15 +9,14 @@ import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenStopTransferProvider;
 
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-
 
 /**
- * The responsibility of this class is to provide guaranteed transfers to the Raptor search
+ * The responsibility of this class is to provide forbidden transfers to the Raptor search
  * for a given pattern. The instance is stateful and not thread-safe. The current stop
  * position is checked for transfers, then the provider is asked to list all transfers
  * between the current pattern and the source trip stop arrival. The source is the "from"
  * point in a transfer for a forward search, and the "to" point in the reverse search.
+ * Note that only stop to stop transfers are handled.
  */
 public final class PatternForbiddenStopTransferProvider
         implements RaptorForbiddenStopTransferProvider<TripSchedule> {
@@ -45,7 +44,7 @@ public final class PatternForbiddenStopTransferProvider
     public final boolean transferExist(int targetStopPos) {
         if(transfers == null) { return false; }
 
-        // Get all guaranteed transfers for the target pattern at the target stop position
+        // Get all forbidden transfers for the target pattern at the target stop position
         this.currentTransfers = transfers.get(targetStopPos);
         return currentTransfers != null;
     }

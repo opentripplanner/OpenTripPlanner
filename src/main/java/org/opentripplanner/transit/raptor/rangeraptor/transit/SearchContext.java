@@ -196,6 +196,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return searchParams().guaranteedTransfersEnabled();
     }
 
+    // TODO(transfers) double check we want to skip the same profile
+    public boolean enableForbiddenTransfers() {
+        if(profile().isOneOf(RaptorProfile.BEST_TIME, RaptorProfile.NO_WAIT_BEST_TIME)) {
+            return false;
+        }
+        return searchParams().forbiddenTransfersEnabled();
+    }
+
     /* private methods */
 
     /**

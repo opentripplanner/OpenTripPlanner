@@ -30,12 +30,12 @@ public interface RaptorRoute<T extends RaptorTripSchedule> {
      */
     RaptorGuaranteedTransferProvider<T> getGuaranteedTransfersFrom();
     /**
-     * Return a guaranteed transfer provider for the given route transferring TO the route.
+     * Return a forbidden transfer provider for the given route transferring TO the route.
      */
     RaptorForbiddenStopTransferProvider<T> getForbiddenTransfersTo();
 
     /**
-     * Return a guaranteed transfer provider for the given route transferring FROM the route.
+     * Return a forbidden transfer provider for the given route transferring FROM the route.
      */
     RaptorForbiddenStopTransferProvider<T> getForbiddenTransfersFrom();
 }
