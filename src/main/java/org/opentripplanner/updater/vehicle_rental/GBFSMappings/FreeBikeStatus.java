@@ -6,7 +6,7 @@ import java.util.List;
  * Response class for the free_bike_status.json file.
  * See https://github.com/NABSA/gbfs/blob/v1.0/gbfs.md#free_bike_statusjson
  */
-public class FreeBikeStatus extends BaseGtfsResponse {
+public class FreeBikeStatus extends BaseGbfsResponse {
     public FreeBikeStatusData data;
 
     public static class FreeBikeStatusData {
