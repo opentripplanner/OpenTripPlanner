@@ -13,19 +13,31 @@ Feel free to add more reports and to add your organization to the contact info l
 
 ## Changelog
 
-- Initial version of the report API (Mai 2021). Support listing all transfers as a CSV 
-  text file.
-
+- 2021-05-19: Initial version of the report API. Support listing all transfers as a CSV text file.
+- 2021-07-19: Add report that exports the bicycle safety factors as CSV and an interactive HTML table view.
 
 ## Documentation
 
-This module mount an endpoint for generating reports under `otp/report`. Available reports:
+This module mounts an endpoint for generating reports under `otp/report`. Available reports:
 
  - [/otp/report/transfers.csv](http://localhost:8080/otp/report/transfers.csv)
+ - [/otp/report/bicycle-safety.html](http://localhost:8080/otp/report/bicycle-safety.html): Interactive viewer of the rules that determine how bicycle safety factors are applied.
+ - [/otp/report/bicycle-safety.csv](http://localhost:8080/otp/report/bicycle-safety.csv): Raw CSV data for the report.
+   - [Norwegian version](http://localhost:8080/otp/report/bicycle-safety.csv?osmWayPropertySet=norway)
+   - [German version](http://localhost:8080/otp/report/bicycle-safety.csv?osmWayPropertySet=germany)
+   - [UK version](http://localhost:8080/otp/report/bicycle-safety.csv?osmWayPropertySet=uk)
+   - [Finnish version](http://localhost:8080/otp/report/bicycle-safety.csv?osmWayPropertySet=finland)
 
  
 ### Configuration
 
 The report API is turned _off_ by default. To turn it on enable the `ReportApi` feature.
- 
- 
+
+```json
+// otp-config.json
+{
+  "otpFeatures": {
+    "ReportApi": true
+  }
+}
+```

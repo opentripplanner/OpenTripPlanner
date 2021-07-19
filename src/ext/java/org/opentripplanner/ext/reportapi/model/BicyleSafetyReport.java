@@ -19,7 +19,9 @@ public class BicyleSafetyReport {
         var buf = new CsvReportBuilder(",");
 
         buf.addHeader(
-                "OSM tags", "mixin", "permissions", "safety penalty there", "safety penalty back");
+                "OSM tags for osmWayPropertySet " + configName, "mixin", "permissions",
+                "safety penalty there", "safety penalty back"
+        );
 
         wayPropertySet.getWayProperties().forEach(p -> {
             buf.addText(p.getSpecifier().toString());
