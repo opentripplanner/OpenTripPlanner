@@ -53,7 +53,7 @@ public class OrcaFareServiceTest {
      * Test to confirm the correct transfer cost per fare type within a single agency.
      */
     @Test
-    public void calFareForSingleAgency() {
+    public void calculateFareForSingleAgency() {
         Ride ride = getRide(COMM_TRANS_AGENCY_ID, "400", 0);
         List<Ride> rides = Lists.newArrayList(ride);
         calculateFare(rides, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS);
@@ -70,7 +70,7 @@ public class OrcaFareServiceTest {
      * as the highest fare where Orca can be used.
      */
     @Test
-    public void calFareWithNoFreeTransfer() {
+    public void calculateFareWithNoFreeTransfer() {
         List<Ride> rides = Lists.newArrayList();
         rides.add(getRide(KITSAP_TRANSIT_AGENCY_ID, 0));
         rides.add(getRide(WASHINGTON_STATE_FERRIES_AGENCY_ID, 1));
@@ -91,7 +91,7 @@ public class OrcaFareServiceTest {
      * charged at a discount rate... if using Orca.
      */
     @Test
-    public void calFareThatExceedsTwoHourFreeTransferWindow() {
+    public void calculateFareThatExceedsTwoHourFreeTransferWindow() {
         List<Ride> rides = Lists.newArrayList();
         rides.add(getRide(KITSAP_TRANSIT_AGENCY_ID, 0));
         rides.add(getRide(KITSAP_TRANSIT_AGENCY_ID, 30));
@@ -115,7 +115,7 @@ public class OrcaFareServiceTest {
      * all subsequent transfers will come under one transfer window and only one Orca discount charge will apply.
      */
     @Test
-    public void calFareThatStartsWithACashFare() {
+    public void calculateFareThatStartsWithACashFare() {
         List<Ride> rides = Lists.newArrayList();
         rides.add(getRide(WASHINGTON_STATE_FERRIES_AGENCY_ID, 0));
         rides.add(getRide(KITSAP_TRANSIT_AGENCY_ID, 30));
