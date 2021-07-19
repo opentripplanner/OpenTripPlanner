@@ -1010,39 +1010,12 @@ connect to a network resource is the `url` field.
             "feedId": "TriMet"
         },
 
-        // Polling bike rental updater.
-        // sourceType can be: jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets,
-        // city-bikes, citi-bike-nyc, next-bike, vcub, kml
-        {
-            "type": "bike-rental",
-            "frequencySec": 300,
-            "sourceType": "city-bikes",
-            "url": "http://host.domain.tld"
-        },
-
-        //<!--- San Francisco Bay Area bike share -->
-        {
-          "type": "bike-rental",
-          "frequencySec": 300,
-          "sourceType": "sf-bay-area",
-          "url": "http://www.bayareabikeshare.com/stations/json"
-        },
-
-        //<!--- Tampa Area bike share -->
+        //<!--- Tampa Area GBFS bike share -->
         {
           "type": "bike-rental",
           "frequencySec": 300,
           "sourceType": "gbfs",
-          "url": "http://coast.socialbicycles.com/opendata/"
-        },
-
-        // Polling bike rental updater for DC bikeshare (a Bixi system)
-        // Negative update frequency means to run once and then stop updating (essentially static data)
-        {
-            "type": "bike-rental",
-            "sourceType": "bixi",
-            "url": "https://www.capitalbikeshare.com/data/stations/bikeStations.xml",
-            "frequencySec": -1
+          "url": "http://coast.socialbicycles.com/opendata/gbfs.json"
         },
 
         // Bike parking availability
