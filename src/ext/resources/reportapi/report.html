@@ -2,7 +2,7 @@
 <html>
 <head>
 
-  <title>Bicycle safety report browser</title>
+  <title>OTP Bicycle safety factor report browser</title>
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,9 +20,18 @@
 </head>
 <body>
 
-<div class="col-lg-8 mx-auto p-3 py-md-5">
-  <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
-    <h1>Bicycle safety report browser</h1>
+<div class="col-lg-8 mx-auto p-3">
+  <nav class="nav justify-content-end">
+    <a class="nav-link" href="bicycle-safety.html">Default</a>
+    <a class="nav-link" href="bicycle-safety.html?osmWayPropertySet=norway">Norway</a>
+    <a class="nav-link" href="bicycle-safety.html?osmWayPropertySet=finland">Finland</a>
+    <a class="nav-link" href="bicycle-safety.html?osmWayPropertySet=uk">UK</a>
+    <a class="nav-link" href="bicycle-safety.html?osmWayPropertySet=germany">Germany</a>
+  </nav>
+
+  <header class="align-items-center pb-3 mb-5 border-bottom">
+    <h1>OTP Bicycle safety factor report browser</h1>
+    <div class="config"></div>
   </header>
 
   <main>
@@ -30,11 +39,11 @@
     <div class="row g-5">
 
       <div class="col-md-12">
-        <table>
+        <table class="display">
           <thead>
           <tr>
-            <th>OSM tag matcher</th>
-            <th>Is a mixin?</th>
+            <th>OSM tag match expression</th>
+            <th>Mixin?</th>
             <th>Traversal permissions</th>
             <th>Safety factor there</th>
             <th>Safety factor back</th>
@@ -46,14 +55,15 @@
       </div>
     </div>
   </main>
-  <footer class="pt-5 my-5 text-muted border-top">
-    Created by the OpenTripPlanner team
-  </footer>
 </div>
 
 
 <script type="text/javascript">
-  fetch("bicycle-safety.csv?osmWayPropertySet=norway")
+  const urlParams = new URLSearchParams(window.location.search);
+  const configName = urlParams.get("osmWayPropertySet") || "default";
+  $(".config").text(`osmWayPropertySet: ${configName}`);
+
+  fetch(`bicycle-safety.csv?osmWayPropertySet=${configName}`)
     .then(res => res.text())
     .then(text => {
       const rows = text.split("\n")
