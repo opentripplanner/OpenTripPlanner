@@ -158,13 +158,14 @@ public class QuayType {
                           .type(GraphQLList.list(TRANSPORT_MODE))
                           .build())
                     .argument(GraphQLArgument.newArgument()
-                        .name("includeCancelledTrips")
-                        .description("Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED")
-                        .type(Scalars.GraphQLBoolean)
-                        .defaultValue(false)
-                        .build())
+                          .name("includeCancelledTrips")
+                          .description("Indicates that realtime-cancelled or planned cancelled trips should also be included.")
+                          .type(Scalars.GraphQLBoolean)
+                          .defaultValue(false)
+                          .build())
                     .dataFetcher(environment -> {
                         boolean omitNonBoarding = environment.getArgument("omitNonBoarding");
+                        boolean includeCancelledTrips = environment.getArgument("includeCancelledTrips");
                         int numberOfDepartures = environment.getArgument("numberOfDepartures");
                         Integer departuresPerLineAndDestinationDisplay = environment.getArgument("numberOfDeparturesPerLineAndDestinationDisplay");
                         int timeRange = environment.getArgument("timeRange");
@@ -181,6 +182,7 @@ public class QuayType {
                           startTimeSeconds,
                           timeRange,
                           omitNonBoarding,
+                          includeCancelledTrips,
                           numberOfDepartures,
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,

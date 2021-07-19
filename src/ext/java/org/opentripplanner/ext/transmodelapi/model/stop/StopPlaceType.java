@@ -182,6 +182,12 @@ public class StopPlaceType {
                 .defaultValue(false)
                 .build())
             .argument(GraphQLArgument.newArgument()
+                .name("includeCancelledTrips")
+                .description("Indicates that realtime-cancelled trips should also be included.")
+                .type(Scalars.GraphQLBoolean)
+                .defaultValue(false)
+                .build())
+            .argument(GraphQLArgument.newArgument()
                 .name("whiteListed")
                 .description("Whitelisted")
                 .description("Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for")
@@ -194,6 +200,7 @@ public class StopPlaceType {
                 .build())
             .dataFetcher(environment -> {
               boolean omitNonBoarding = environment.getArgument("omitNonBoarding");
+              boolean includeCancelledTrips = environment.getArgument("includeCancelledTrips");
               int numberOfDepartures = environment.getArgument("numberOfDepartures");
               Integer departuresPerLineAndDestinationDisplay = environment.getArgument("numberOfDeparturesPerLineAndDestinationDisplay");
               int timeRage = environment.getArgument("timeRange");
@@ -213,6 +220,7 @@ public class StopPlaceType {
                           startTimeSeconds,
                           timeRage,
                           omitNonBoarding,
+                          includeCancelledTrips,
                           numberOfDepartures,
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,
@@ -235,6 +243,7 @@ public class StopPlaceType {
       Long startTimeSeconds,
       int timeRage,
       boolean omitNonBoarding,
+      boolean includeCancelledTrips,
       int numberOfDepartures,
       Integer departuresPerLineAndDestinationDisplay,
       Collection<FeedScopedId> authorityIdsWhiteListed,
@@ -257,7 +266,7 @@ public class StopPlaceType {
         timeRage,
         departuresPerTripPattern,
         omitNonBoarding,
-        false
+        includeCancelledTrips
     );
 
     // TODO OTP2 - Applying filters here is not correct - the `departuresPerTripPattern` is used

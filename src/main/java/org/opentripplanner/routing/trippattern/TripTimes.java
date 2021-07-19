@@ -561,6 +561,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return timepoints.get(stopIndex);
     }
 
+    /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
+    public boolean stopOrTripIsCancelled(int stop) {
+        return isCancelledStop(stop) || trip.getTripAlteration().isCanceledOrReplaced();
+    }
+
     /**
      * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS feed versions.
      * Use hops rather than stops because:

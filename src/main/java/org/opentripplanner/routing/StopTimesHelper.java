@@ -34,7 +34,7 @@ public class StopTimesHelper {
    * @param timeRange Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
-   * @param includeCancelledTrips If true, cancelled trips will also be included in result
+   * @param includeCancellations If true, cancelled trips will also be included in result
    */
   public static List<StopTimesInPattern> stopTimesForStop(
       RoutingService routingService,
@@ -44,25 +44,28 @@ public class StopTimesHelper {
       int timeRange,
       int numberOfDepartures,
       boolean omitNonPickups,
-      boolean includeCancelledTrips
+      boolean includeCancellations
   ) {
-
-    //
-    // TODO: SIRI: Add support for including cancelled trips
-    //
-
-
     if (startTime == 0) {
       startTime = System.currentTimeMillis() / 1000;
     }
-    List<StopTimesInPattern> ret = new ArrayList<>();
+    List<StopTimesInPattern> result = new ArrayList<>();
     Date date = new Date(startTime * 1000);
     ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
 
-    Collection<TripPattern> patternsForStop = routingService.getPatternsForStop(stop, true);
+    Collection<TripPattern> plannedPatterns = routingService.getPatternsForStop(stop, false);
+    Collection<TripPattern> realTimePatterns = routingService.getPatternsForStop(stop, true);
 
-    for (TripPattern pattern : patternsForStop) {
+    // Ensure that realtimePatterns only include realtime-departures
+    realTimePatterns.removeAll(plannedPatterns);
 
+    /*
+     First, check all TripPatterns without realtime-patterns to get all planned stops. Flag to
+     include realtime-cancelled trips is always set to false in this step to avoid replaced trips
+     from being included since a planned trip will be cancelled when it is replaced with a modified
+     stopPattern. Planned cancellations will be included based on provided parameter.
+     */
+    for (TripPattern pattern : plannedPatterns) {
       Queue<TripTimeShort> pq = listTripTimeShortsForPatternAtStop(
           routingService,
           timetableSnapshot,
@@ -72,18 +75,51 @@ public class StopTimesHelper {
           timeRange,
           numberOfDepartures,
           omitNonPickups,
-          serviceDates
+          serviceDates,
+          false,
+          includeCancellations
       );
 
-      if (pq.size() != 0) {
-        StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
-        while (pq.size() != 0) {
-          stopTimes.times.add(0, pq.poll());
-        }
-        ret.add(stopTimes);
-      }
+      result.addAll(getStopTimesInPattern(pattern, pq));
     }
-    return ret;
+
+    /*
+    Second, check realtime-TripPatterns, with the provided value for includeCancelledTrips. Planned
+    cancellations is always set to false in this step.
+     */
+    for (TripPattern pattern : realTimePatterns) {
+      Queue<TripTimeShort> pq = listTripTimeShortsForPatternAtStop(
+          routingService,
+          timetableSnapshot,
+          stop,
+          pattern,
+          startTime,
+          timeRange,
+          numberOfDepartures,
+          omitNonPickups,
+          serviceDates,
+          includeCancellations,
+          false
+      );
+
+      result.addAll(getStopTimesInPattern(pattern, pq));
+    }
+
+    return result;
+  }
+
+  private static List<StopTimesInPattern> getStopTimesInPattern(
+      TripPattern pattern, Queue<TripTimeShort> pq
+  ) {
+    List<StopTimesInPattern> result = new ArrayList<>();
+    if (pq.size() != 0) {
+      StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
+      while (pq.size() != 0) {
+        stopTimes.times.add(0, pq.poll());
+      }
+      result.add(stopTimes);
+    }
+    return result;
   }
 
   /**
@@ -166,7 +202,9 @@ public class StopTimesHelper {
         timeRange,
         numberOfDepartures,
         omitNonPickups,
-        serviceDates
+        serviceDates,
+        false,
+        false
     );
 
     return new ArrayList<>(pq);
@@ -175,13 +213,15 @@ public class StopTimesHelper {
   private static Queue<TripTimeShort> listTripTimeShortsForPatternAtStop(
       RoutingService routingService,
       TimetableSnapshot timetableSnapshot,
-      Stop stop,
+      Stop requestedStop,
       TripPattern pattern,
       long startTime,
       int timeRange,
       int numberOfDepartures,
       boolean omitNonPickups,
-      ServiceDate[] serviceDates
+      ServiceDate[] serviceDates,
+      boolean includeRealTimeCancellations,
+      boolean includePlannedCancellations
   ) {
 
     // The bounded priority Q is used to keep a sorted short list of trip times. We can not
@@ -194,62 +234,93 @@ public class StopTimesHelper {
     // ways to do it.
     //
     // The {@link MinMaxPriorityQueue} is marked beta, but we do not have a god alternative.
-    MinMaxPriorityQueue<TripTimeShort> pq = MinMaxPriorityQueue
-            .orderedBy(Comparator.comparing((TripTimeShort tts) -> tts.getServiceDay()
-                + tts.getRealtimeDeparture()))
-            .maximumSize(numberOfDepartures)
-            .create();
+    MinMaxPriorityQueue<TripTimeShort> result = MinMaxPriorityQueue
+        .orderedBy(Comparator.comparing((TripTimeShort tts) -> tts.getServiceDay()
+            + tts.getRealtimeDeparture()))
+        .maximumSize(numberOfDepartures)
+        .create();
 
     // Loop through all possible days
     for (ServiceDate serviceDate : serviceDates) {
-      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
-      Timetable tt;
+      ServiceDay serviceDay = new ServiceDay(
+          routingService.getServiceCodes(),
+          serviceDate,
+          routingService.getCalendarService(),
+          pattern.route.getAgency().getId()
+      );
+      Timetable timetable;
       if (timetableSnapshot != null) {
-        tt = timetableSnapshot.resolve(pattern, serviceDate);
-      } else {
-        tt = pattern.scheduledTimetable;
+        timetable = timetableSnapshot.resolve(pattern, serviceDate);
+      }
+      else {
+        timetable = pattern.scheduledTimetable;
       }
 
-      if (!tt.temporallyViable(sd, startTime, timeRange, true)) continue;
+      // Short-circuiting must be delayed in the case of includeRealTimeCancellations
+      if (!includeRealTimeCancellations
+          && !timetable.temporallyViable(serviceDay, startTime, timeRange,true)) {
+        continue;
+      }
 
-      int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
-      int sidx = 0;
-      for (Stop currStop : pattern.stopPattern.stops) {
-        if (currStop == stop) {
-          if (omitNonPickups && pattern.stopPattern.pickups[sidx] == StopPattern.PICKDROP_NONE) continue;
-          for (TripTimes t : tt.tripTimes) {
-            if (!sd.serviceRunning(t.serviceCode)) continue;
-            if (t.getDepartureTime(sidx) != -1 &&
-                    t.getDepartureTime(sidx) >= secondsSinceMidnight) {
-              pq.add(new TripTimeShort(t, sidx, stop, sd));
+      int secondsSinceMidnight = serviceDay.secondsSinceMidnight(startTime);
+      int stopIndex = 0;
+      for (Stop currentStop : pattern.stopPattern.stops) {
+        if (currentStop == requestedStop) {
+          // Short-circuiting must be delayed in the case of includeRealTimeCancellations
+          if (!includeRealTimeCancellations) {
+            if (omitNonPickups
+                && pattern.stopPattern.pickups[stopIndex] == StopPattern.PICKDROP_NONE) {
+              continue;
+            }
+          }
+          for (TripTimes tripTimes : timetable.tripTimes) {
+            // Short-circuiting must be delayed in the case of includeRealTimeCancellations
+            if (!includeRealTimeCancellations
+                && !serviceDay.serviceRunning(tripTimes.serviceCode)) { continue; }
+
+            boolean stopOrTripIsCancelled = tripTimes.stopOrTripIsCancelled(stopIndex)
+                || !(tripTimes.getPickupType(stopIndex) == StopPattern.PICKDROP_SCHEDULED);
+
+            boolean includeByCancellation = !stopOrTripIsCancelled
+                || includePlannedCancellations
+                || includeRealTimeCancellations;
+
+            boolean includeByDepartureTime =
+                tripTimes.getDepartureTime(stopIndex) >= secondsSinceMidnight
+                    && tripTimes.getDepartureTime(stopIndex) <= secondsSinceMidnight + timeRange;
+
+            if (includeByDepartureTime && includeByCancellation) {
+              result.add(new TripTimeShort(tripTimes, stopIndex, requestedStop, serviceDay));
             }
           }
 
           // TODO: This needs to be adapted after #1647 is merged
-          for (FrequencyEntry freq : tt.frequencyEntries) {
-            if (!sd.serviceRunning(freq.tripTimes.serviceCode)) continue;
-            int departureTime = freq.nextDepartureTime(sidx, secondsSinceMidnight);
-            if (departureTime == -1) continue;
-            int lastDeparture = freq.endTime + freq.tripTimes.getArrivalTime(sidx) -
-                    freq.tripTimes.getDepartureTime(0);
+          for (FrequencyEntry frequencyEntry : timetable.frequencyEntries) {
+            if (!serviceDay.serviceRunning(frequencyEntry.tripTimes.serviceCode)) { continue; }
+            int departureTime = frequencyEntry.nextDepartureTime(stopIndex, secondsSinceMidnight);
+            if (departureTime == -1) { continue; }
+            int lastDeparture =
+                frequencyEntry.endTime + frequencyEntry.tripTimes.getArrivalTime(stopIndex)
+                    - frequencyEntry.tripTimes.getDepartureTime(0);
             int i = 0;
             while (departureTime <= lastDeparture && i < numberOfDepartures) {
-              pq.add(
-                      new TripTimeShort(
-                              freq.materialize(sidx, departureTime, true),
-                              sidx,
-                              stop,
-                              sd
-                      )
-              );
-              departureTime += freq.headway;
+              result.add(new TripTimeShort(frequencyEntry.materialize(
+                  stopIndex,
+                  departureTime,
+                  true
+              ),
+                  stopIndex,
+                  requestedStop,
+                  serviceDay
+              ));
+              departureTime += frequencyEntry.headway;
               i++;
             }
           }
         }
-        sidx++;
+        stopIndex++;
       }
     }
-    return pq;
+    return result;
   }
 }
