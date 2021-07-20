@@ -7,7 +7,7 @@ steps:
     args: 
     - '-c'
     - mvn package -Dmaven.test.skip=true
-  - name: 'maven:3.6.3-openjdk-11'
+  - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     env:
       - "AWS_ACCESS_KEY_ID=${_AWS_ACCESS_KEY_ID}"
@@ -17,7 +17,7 @@ steps:
     - '-c'
     - |
       if [ -n "${_DEPLOYMENT}" ]; then
-        apt update && apt uninstall python -y && apt install python3.7 -y &&
+        apt update && apt install -y unzip python &&
         curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" &&
         unzip awscli-bundle.zip &&
         ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws &&
