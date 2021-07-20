@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * @see BikeRentalDataSource
  */
-abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSourceParameters> implements BikeRentalDataSource {
+public abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSourceParameters> implements BikeRentalDataSource {
 
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
     protected final T config;

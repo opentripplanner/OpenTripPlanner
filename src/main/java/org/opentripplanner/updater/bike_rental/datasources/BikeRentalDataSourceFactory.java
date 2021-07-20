@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.bike_rental.datasources;
 
+import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRentalDataSourceParameters;
@@ -25,8 +26,8 @@ public class BikeRentalDataSourceFactory {
       case SHARE_BIKE:    return new ShareBikeRentalDataSource(source);
       case UIP_BIKE:      return new UIPBikeRentalDataSource(source);
       case GBFS:          return new GbfsBikeRentalDataSource((GbfsBikeRentalDataSourceParameters) source);
-      case SMOOVE:        return new SmooveBikeRentalDataSource(source);
       case BICIMAD:       return new BicimadBikeRentalDataSource(source);
+      case SMOOVE:        return new SmooveBikeRentalDataSource(source);
     }
     throw new IllegalArgumentException(
         "Unknown bike rental source type: " + source.getSourceType()
