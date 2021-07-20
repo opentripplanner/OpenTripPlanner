@@ -1,5 +1,5 @@
 package org.opentripplanner.transit.raptor.api.transit;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.model.Stop;
 
 
 import javax.annotation.Nullable;
@@ -80,5 +80,9 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
     @Nullable
     int[] stopBoarAlightCost();
 
-    TransitLayer getTransitLayer();
+    /**
+     * Return the OTP Stop from the stopIndex of the TransitLayer by given stopIndex
+     */
+    @Nullable
+    Stop getStopByIndex(int stopIndex);
 }

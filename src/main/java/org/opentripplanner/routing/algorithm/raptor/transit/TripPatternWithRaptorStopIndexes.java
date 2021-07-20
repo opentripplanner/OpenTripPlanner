@@ -79,11 +79,11 @@ public class TripPatternWithRaptorStopIndexes {
         return new PatternGuaranteedTransferProvider(false, guaranteedTransfersFrom);
     }
 
-    public RaptorForbiddenStopTransferProvider<TripSchedule> getForbiddenTransfersTo() {
+    public RaptorForbiddenStopTransferProvider getForbiddenTransfersTo() {
         return new PatternForbiddenStopTransferProvider(true, forbiddenTransfersTo);
     }
 
-    public RaptorForbiddenStopTransferProvider<TripSchedule> getForbiddenTransfersFrom() {
+    public RaptorForbiddenStopTransferProvider getForbiddenTransfersFrom() {
         return new PatternForbiddenStopTransferProvider(false, forbiddenTransfersFrom);
     }
 

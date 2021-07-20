@@ -32,10 +32,10 @@ public interface RaptorRoute<T extends RaptorTripSchedule> {
     /**
      * Return a forbidden transfer provider for the given route transferring TO the route.
      */
-    RaptorForbiddenStopTransferProvider<T> getForbiddenTransfersTo();
+    RaptorForbiddenStopTransferProvider getForbiddenTransfersTo();
 
     /**
      * Return a forbidden transfer provider for the given route transferring FROM the route.
      */
-    RaptorForbiddenStopTransferProvider<T> getForbiddenTransfersFrom();
+    RaptorForbiddenStopTransferProvider getForbiddenTransfersFrom();
 }

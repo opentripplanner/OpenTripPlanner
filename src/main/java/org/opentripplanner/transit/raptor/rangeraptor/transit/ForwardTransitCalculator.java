@@ -122,7 +122,7 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public RaptorForbiddenStopTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route) {
+    public RaptorForbiddenStopTransferProvider forbiddenTransfers(RaptorRoute<T> route) {
         return route.getForbiddenTransfersTo();
     }
 

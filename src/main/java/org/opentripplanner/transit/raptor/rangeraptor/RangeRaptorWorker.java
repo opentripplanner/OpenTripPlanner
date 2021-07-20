@@ -309,7 +309,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     private boolean isForbiddenTransfer(
-        RaptorForbiddenStopTransferProvider<T> txForbiddenService,
+        RaptorForbiddenStopTransferProvider txForbiddenService,
         int targetStopIndex,
         int targetStopPos
     ) {
@@ -319,9 +319,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return false; }
 
-        return txForbiddenService.find(
-            transitData.getTransitLayer().getStopByIndex(sourceStopArrival.stop())
-        ) != null;
+        return txForbiddenService.isForbiddenTransfer(
+            transitData.getStopByIndex(sourceStopArrival.stop())
+        );
     }
 
     private void transfersForRound() {

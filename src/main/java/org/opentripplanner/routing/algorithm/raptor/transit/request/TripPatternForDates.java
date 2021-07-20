@@ -72,12 +72,12 @@ public class TripPatternForDates
     }
 
     @Override
-    public RaptorForbiddenStopTransferProvider<TripSchedule> getForbiddenTransfersTo() {
+    public RaptorForbiddenStopTransferProvider getForbiddenTransfersTo() {
         return getTripPattern().getForbiddenTransfersTo();
     }
 
     @Override
-    public RaptorForbiddenStopTransferProvider<TripSchedule> getForbiddenTransfersFrom() {
+    public RaptorForbiddenStopTransferProvider getForbiddenTransfersFrom() {
         return getTripPattern().getForbiddenTransfersFrom();
     }
 

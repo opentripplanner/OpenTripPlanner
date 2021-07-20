@@ -140,7 +140,7 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public RaptorForbiddenStopTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route) {
+    public RaptorForbiddenStopTransferProvider forbiddenTransfers(RaptorRoute<T> route) {
         return route.getForbiddenTransfersFrom();
     }
 

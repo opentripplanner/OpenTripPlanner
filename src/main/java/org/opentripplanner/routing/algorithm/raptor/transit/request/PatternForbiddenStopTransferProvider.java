@@ -19,7 +19,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenStopTransfe
  * Note that only stop to stop transfers are handled.
  */
 public final class PatternForbiddenStopTransferProvider
-        implements RaptorForbiddenStopTransferProvider<TripSchedule> {
+        implements RaptorForbiddenStopTransferProvider {
 
     private final DirectionHelper translator;
 
@@ -50,16 +50,16 @@ public final class PatternForbiddenStopTransferProvider
     }
 
     @Override
-    public final TransferPoint find(
+    public final boolean isForbiddenTransfer(
             Stop sourceStop
     ) {
         for (Transfer tx : currentTransfers) {
             var sourcePoint = translator.source(tx);
             if (sourcePoint.getStop() == sourceStop) {
-                return translator.target(tx);
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     private interface DirectionHelper {

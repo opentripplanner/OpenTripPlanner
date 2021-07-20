@@ -165,7 +165,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
      * target is the FROM pattern/stop.
      */
     RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route);
-    RaptorForbiddenStopTransferProvider<T> forbiddenTransfers(RaptorRoute<T> route);
+    RaptorForbiddenStopTransferProvider forbiddenTransfers(RaptorRoute<T> route);
 
     /**
      * Return a calculator for test purpose. The following parameters are fixed:
