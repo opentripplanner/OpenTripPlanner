@@ -278,8 +278,7 @@ public class StopTimesHelper {
             if (!includeRealTimeCancellations
                 && !serviceDay.serviceRunning(tripTimes.serviceCode)) { continue; }
 
-            boolean stopOrTripIsCancelled = tripTimes.stopOrTripIsCancelled(stopIndex)
-                || !(tripTimes.getPickupType(stopIndex) == StopPattern.PICKDROP_SCHEDULED);
+            boolean stopOrTripIsCancelled = tripTimes.stopOrTripIsCancelled(stopIndex);
 
             boolean includeByCancellation = !stopOrTripIsCancelled
                 || includePlannedCancellations
