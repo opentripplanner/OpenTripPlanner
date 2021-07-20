@@ -2,9 +2,10 @@
 
 OpenTripPlanner (OTP) is an open source multi-modal trip planner, focusing on travel by scheduled public transportation in combination with bicycling, walking, and mobility services including bike share and ride hailing. Its server component runs on any platform with a Java virtual machine (including Linux, Mac, and Windows). It exposes REST and GraphQL APIs that can be accessed by various clients including open source Javascript components and native mobile applications. It builds its representation of the transportation network from open data in open standard file formats (primarily GTFS and OpenStreetMap). It applies real-time updates and alerts with immediate visibility to clients, finding itineraries that account for disruptions and service changes.
 
-Note that this branch contains **OpenTripPlanner 2**, the second major version of OTP, which has been under development since Q2 2018 and is approaching release. As of September 2020, OTP2 is in feature freeze and we have tagged a release candidate `v2.0-RC1` which is undergoing testing. 
+Note that this branch contains **OpenTripPlanner 2**, the second major version of OTP, which has been under development since Q2 2018 and  released as verion v2.0.0 in November 2020.
 
-If you do not want to test or explore this cutting edge version, please switch to the `master` or `dev-1.x` branches for the latest stable 1.x release and upcoming final 1.x release respectively.
+If you do not want to test or explore this version, please switch to the `dev-1.x` branches for the latest stable 1.x release and upcoming final 1.x release respectively.
+
 
 ## Repository layout
 
