@@ -8,7 +8,7 @@ severe, but potentially problematic situations in the input data. Such problems 
 logger, depending on your need you might turn this logger on/off. At the end of the graph build 
 process, OTP prints a summary of all the issues, like the following:
 
- ```
+```
  11:35:57.515 INFO (Graph.java:970) Summary (number of each type of issues):
  11:35:57.518 INFO (Graph.java:976)     TurnRestrictionBad - 560
  11:35:57.518 INFO (Graph.java:976)     TurnRestrictionException - 15
