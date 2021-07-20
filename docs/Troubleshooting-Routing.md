@@ -41,13 +41,14 @@ There you can see whole graph. You can click on edges and vertices and see the m
 It can be hard to use on large graphs since, whole graph is displayed at once. And it can be hard
  to search for specific streets since only street graph is shown without the rest of information.
  
- Another option is to use debug layers, which shows extra layers on top of normal map.
- To enable them you need to add `?debug_layers=true` to URL. For example 
- [http://localhost:8080/?debug_layers=true](http://localhost:8080/?debug_layers=true).
-  This adds debug layers to layer choosing dialog. Currently you can choose between:
+Another option is to use debug layers, which shows extra layers on top of the normal [debug UI map](http://localhost:8080). 
+If you want to see them you need to open the map layer selector on the top left hand side and choose
+the requested layer.
+
+Currently you can choose between:
 
 - Wheelchair access (which colors street edges red if they don't allow wheelchair or green otherwise)
-- Bike Safety (colors street edges based on how good are for cycling [smaller is better])
+- [Bicycle safety](Troubleshooting-Routing.md#Bicycle-safety-factor) (colors street edges based on how good are for cycling [smaller is better])
 - Traversal permissions (colors street edges based on what types of transit modes are allowed to
  travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer also
  draws links from transit stops/bike rentals and P+R to graph. And also draws transit stops, bike rentals
@@ -68,7 +69,15 @@ example. If it's an error, it's usually caused by improperly connected OSM data 
 
 ## OpenStreetMap Data
 
-### Tags Affecting Permissions
+### Tags affecting permissions and bicycle safety
+
+OTP has a very flexible system for deciding when a street is to be allowed by pedestrians, bicycles or cars.
+
+To configure the which settings to use for your location, please use the [osmWayPropertySet config attribute](Configuration.md#Way-property-sets).
+
+In the following section we will discuss the default case, which will be used if the property is not set.
+
+### Default settings
 
 Access tags (such as bicycle/foot = yes/no/designated) can be used to override default graph-building parameters. 
 
@@ -80,7 +89,41 @@ Finally, bicycles are *not*allowed on *highway=footway* when any of the followin
 
 Other access tags (such as `access=no` and `access=private` affect routing as well, and can be overridden similarly. While `access=no` prohibits all traffic, `access=private` disallows through traffic.
 
-See [osmWayPropertySet config attribute](Configuration.md#Way-property-sets)
+### Bicycle safety factor
+
+Bicycle routing is even more configurable than the other traverse modes: during graph build a so-called bicycle safety score is
+computed for each street. How this is calculated depends on the slope of the way and its OSM tags. At request time you can
+use the `triangleFactors` to decide how important bicycle safety is compared to speed and flatness.
+
+Each `WayPropertySet` contains rules for a given set of tag matchers that influence the bicycle safety score. For example, a rule looks like this:
+
+```java
+props.setProperties("highway=track", StreetTraversalPermission.ALL, 1.3, 1.3);
+```
+
+This means that an OSM way with the tag `highway=track` is traversable by all modes (pedestrian, bicycle, car) and that
+its bicycle safety score is `1.3` (smaller is better). If there is a more specific matcher like `highway=track;bicycle=no`
+and it matches a given OSM way, it is chosen instead and its settings applied.
+
+There are also so-called mixins. These are applied on top of the most specific matchers and potentially
+to many OSM ways. A mixins safety value is multiplied with the one value of the non-mixin match. 
+A mixin looks like this (note the `true` at the end):
+
+```java
+props.setProperties("surface=mud", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+```
+
+The Javadoc of [`OSMSpecifier.java`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/graph_builder/module/osm/OSMSpecifier.java)
+contains the precise documentation about the syntax of the matchers.
+
+There are a lot of rules for which tags results in a specific safety score so it's not easy to get an overview.
+There is however an OTP feature to get an HTML viewer with a search feature that lets you browse through the rules.
+
+![Command-Line-Parameter-Flow](images/bicycle-safety-report.png)
+
+To enable it activate the [Report API sandbox feature](sandbox/ReportApi.md).
+
+To view the output of the bicycle safety calculation on a map, check the [debug layers](Troubleshooting-Routing.md#Debug-layers).
 
 ### Railway Platforms
 
