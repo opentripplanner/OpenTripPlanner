@@ -52,6 +52,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
      * guaranteed transfers.
      */
     TransitArrival<T> previousTransit(int boardStopIndex);
+
     void board(
             final int stopIndex,
             final int earliestBoardTime,
