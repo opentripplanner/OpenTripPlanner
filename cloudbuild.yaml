@@ -7,6 +7,25 @@ steps:
     args: 
     - '-c'
     - mvn package -Dmaven.test.skip=true
+  - name: 'maven:3.6.3-openjdk-11'
+    entrypoint: 'bash'
+    env:
+      - "AWS_ACCESS_KEY_ID=${_AWS_ACCESS_KEY_ID}"
+      - "AWS_SECRET_ACCESS_KEY=${_AWS_SECRET_ACCESS_KEY}"
+      - "AWS_DEFAULT_REGION=${_AWS_DEFAULT_REGION}"
+    args:
+    - '-c'
+    - |
+      if [ -n "${_DEPLOYMENT}" ]; then
+        apt update && apt install -y unzip python &&
+        curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" &&
+        unzip awscli-bundle.zip &&
+        ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws &&
+        aws s3 cp ${_S3_PATH} helsinki --recursive &&
+        ls -lha &&
+        cd helsinki &&
+        java -Xmx30G -jar ../target/otp-2.1.0-SNAPSHOT-shaded.jar --build . --save
+      fi
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     timeout: 7200s
@@ -29,9 +48,6 @@ steps:
     - '-c'
     - |
       if [ -n "${_DEPLOYMENT}" ]; then
-        apt update && apt install -y unzip python &&
-        curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" &&
-        unzip awscli-bundle.zip &&
         ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws &&
         aws ecr get-login-password | docker login --username AWS --password-stdin ${_DOCKER_REPO_URL}
         docker push ${_DOCKER_REPO_URL}:$(echo ${BUILD_ID} | cut -b 1-8)
