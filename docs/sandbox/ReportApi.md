@@ -9,6 +9,7 @@ Feel free to add more reports and to add your organization to the contact info l
 
 ## Contact Info
 - Entur, Norway
+- [Leonard Ehrenfried](https://leonard.io), Germany, [mail@leonard.io](mailto:mail@leonard.io)
 
 
 ## Changelog

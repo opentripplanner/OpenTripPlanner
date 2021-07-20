@@ -93,7 +93,7 @@ Other access tags (such as `access=no` and `access=private` affect routing as we
 
 Bicycle routing is even more configurable than the other traverse modes: during graph build a so-called bicycle safety score is
 computed for each street. How this is calculated depends on the slope of the way and its OSM tags. At request time you can
-use the `triangleFactors` to decide how important bicycle safety is compared to speed and flatness.
+then use the `triangleFactors` to decide how important bicycle safety is compared to speed and flatness.
 
 Each `WayPropertySet` contains rules for a given set of tag matchers that influence the bicycle safety score. For example, a rule looks like this:
 
@@ -105,8 +105,9 @@ This means that an OSM way with the tag `highway=track` is traversable by all mo
 its bicycle safety score is `1.3` (smaller is better). If there is a more specific matcher like `highway=track;bicycle=no`
 and it matches a given OSM way, it is chosen instead and its settings applied.
 
-There are also so-called mixins. These are applied on top of the most specific matchers and potentially
-to many OSM ways. A mixins safety value is multiplied with the one value of the non-mixin match. 
+There are also so-called mixins. These are applied on top of the most specific matchers and a single
+OSM way can match many mixins. The mixins' safety values are multiplied with the value of the base 
+(non-mixin) match. 
 A mixin looks like this (note the `true` at the end):
 
 ```java
@@ -119,7 +120,7 @@ contains the precise documentation about the syntax of the matchers.
 There are a lot of rules for which tags results in a specific safety score so it's not easy to get an overview.
 There is however an OTP feature to get an HTML viewer with a search feature that lets you browse through the rules.
 
-![Command-Line-Parameter-Flow](images/bicycle-safety-report.png)
+![Bicycle safety report](images/bicycle-safety-report.png)
 
 To enable it activate the [Report API sandbox feature](sandbox/ReportApi.md).
 
