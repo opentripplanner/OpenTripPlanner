@@ -33,6 +33,7 @@
 - Allow http headers to be specified for bike rental updaters [#3533](https://github.com/opentripplanner/OpenTripPlanner/pull/3533)
 - Per-mode reluctance parameters are added so that itineraries with multiple modes may have varying reluctances. [#3501](https://github.com/opentripplanner/OpenTripPlanner/issues/3501)
 - Add `maxAreaNodes` configuration parameter for changing an area visibility calculation limit (https://github.com/opentripplanner/OpenTripPlanner/issues/3534)
+- Add option to include cancellations in StopTimes call (https://github.com/opentripplanner/OpenTripPlanner/pull/3567)
 
 ## 2.0.0 (2020-11-27)
 
