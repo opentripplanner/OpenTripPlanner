@@ -70,5 +70,4 @@ public class TestTransferProvider implements RaptorGuaranteedTransferProvider<Te
                 .addObj("index", transfersByFromStopPos)
                 .toString();
     }
-
 }

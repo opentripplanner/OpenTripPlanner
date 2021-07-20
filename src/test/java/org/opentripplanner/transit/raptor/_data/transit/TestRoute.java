@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenStopTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -16,6 +18,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     private final List<TestTripSchedule> schedules = new ArrayList<>();
     private final TestTransferProvider transfersFrom = new TestTransferProvider();
     private final TestTransferProvider transfersTo = new TestTransferProvider();
+    private final TestForbiddenStopTransferProvider forbiddenTransfers = new TestForbiddenStopTransferProvider();
 
 
     private TestRoute(TestTripPattern pattern) {
@@ -58,6 +61,18 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     @Override
     public RaptorGuaranteedTransferProvider<TestTripSchedule> getGuaranteedTransfersFrom() {
         return transfersFrom;
+    }
+
+    // TODO(transfers)
+    @Override
+    public RaptorForbiddenStopTransferProvider getForbiddenTransfersFrom() {
+        return null;
+    }
+
+    // TODO(transfers)
+    @Override
+    public RaptorForbiddenStopTransferProvider getForbiddenTransfersTo() {
+        return forbiddenTransfers;
     }
 
     public TestRoute withTimetable(TestTripSchedule ... trips) {
@@ -106,5 +121,9 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
         this.transfersTo.addGuaranteedTransfers(
                 fromTrip, fromStopPos, toTrip, toTripIndex, toStopPos, toTime
         );
+    }
+
+    void addForbiddenTransfers(int targetStopPos, Transfer transfer) {
+        this.forbiddenTransfers.addForbiddenTransfers(targetStopPos, transfer);
     }
 }

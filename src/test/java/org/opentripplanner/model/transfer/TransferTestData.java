@@ -8,6 +8,8 @@ import org.opentripplanner.model.Trip;
 public interface TransferTestData {
     Stop STOP_A = Stop.stopForTest("A", 60.0, 11.0);
     Stop STOP_B = Stop.stopForTest("B", 60.0, 11.0);
+    Stop STOP_C = Stop.stopForTest("C", 60.0, 11.0);
+    Stop STOP_D = Stop.stopForTest("D", 60.0, 11.0);
 
     Route ROUTE_1 = new Route(new FeedScopedId("R", "1"));
     Route ROUTE_2 = new Route(new FeedScopedId("R", "2"));
@@ -17,6 +19,8 @@ public interface TransferTestData {
 
     TransferPoint STOP_POINT_A = new StopTransferPoint(STOP_A);
     TransferPoint STOP_POINT_B = new StopTransferPoint(STOP_B);
+    TransferPoint STOP_POINT_C = new StopTransferPoint(STOP_C);
+    TransferPoint STOP_POINT_D = new StopTransferPoint(STOP_D);
 
     TransferPoint ROUTE_POINT_11 = new RouteTransferPoint(ROUTE_1, TRIP_1, 1);
     TransferPoint ROUTE_POINT_22 = new RouteTransferPoint(ROUTE_2, TRIP_2, 2);

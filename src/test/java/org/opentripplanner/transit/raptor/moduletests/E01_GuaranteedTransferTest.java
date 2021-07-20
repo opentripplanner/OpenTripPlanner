@@ -45,6 +45,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
      */
     @Before
     public void setup() {
+
         var r1 = route("R1", STOP_A, STOP_B)
                 .withTimetable(schedule("0:02 0:05"));
         var r2 = route("R2", STOP_B, STOP_C)

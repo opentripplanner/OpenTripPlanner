@@ -3,6 +3,7 @@ package org.opentripplanner.model.transfer;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.transfer.Transfer.MAX_WAIT_TIME_NOT_SET;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
+import static org.opentripplanner.model.transfer.TransferPriority.NOT_ALLOWED;
 
 import java.util.List;
 import org.junit.Test;
@@ -40,6 +41,9 @@ public class TransferServiceTest implements TransferTestData {
 
         // Stop position fall back to STOP -> STOP when stop position do not match
         assertEquals(A, subject.findTransfer(STOP_A, STOP_B, TRIP_1, TRIP_2, 7, 7));
+
+        // Find using only from and to stops
+        assertEquals(A, subject.findTransfer(STOP_A, STOP_B));
     }
 
     @Test
@@ -51,6 +55,24 @@ public class TransferServiceTest implements TransferTestData {
         subject.addAll(List.of(A, A_EQ));
 
         assertEquals(A, subject.findTransfer(STOP_A, STOP_B, TRIP_1, TRIP_2, 1, 2));
+    }
+
+    @Test
+    public void addForbiddenTransfersRetrieveThem() {
+        // Forbidden transfer to another stop
+        var F_A = new Transfer(STOP_POINT_A, STOP_POINT_B, NOT_ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
+        // Forbidden transfer to target stop
+        var F_B = new Transfer(STOP_POINT_B, STOP_POINT_C, NOT_ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
+        var F_D = new Transfer(STOP_POINT_D, STOP_POINT_C, NOT_ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
+        // Forbidden transfer to target stop (same stop)
+        var F_CC = new Transfer(STOP_POINT_C, STOP_POINT_C, NOT_ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
+        // No constranit transfet to target stop
+        var C = transfer(STOP_POINT_A, STOP_POINT_C);
+
+        subject.addAll(List.of(F_A, F_B, F_D, C, F_CC));
+
+        // It should only returns forbidden tranfers to target stop
+        assertEquals(List.of(F_B, F_D, F_CC), subject.listForbiddenTransfersTo(STOP_C));
     }
 
 
