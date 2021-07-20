@@ -17,7 +17,7 @@ steps:
     - '-c'
     - |
       if [ -n "${_DEPLOYMENT}" ]; then
-        apt update && apt install python3.7 -y && apt install -y unzip python3.7 &&
+        apt update && apt install python3.7 -y &&
         curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" &&
         unzip awscli-bundle.zip &&
         ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws &&
