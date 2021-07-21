@@ -266,12 +266,9 @@ public class StopTimesHelper {
       int stopIndex = 0;
       for (Stop currentStop : pattern.stopPattern.stops) {
         if (currentStop == requestedStop) {
-          // Short-circuiting must be delayed in the case of includeRealTimeCancellations
-          if (!includeRealTimeCancellations) {
-            if (omitNonPickups
-                && pattern.stopPattern.pickups[stopIndex] == StopPattern.PICKDROP_NONE) {
-              continue;
-            }
+          if (omitNonPickups
+              && pattern.stopPattern.pickups[stopIndex] == StopPattern.PICKDROP_NONE) {
+            continue;
           }
           for (TripTimes tripTimes : timetable.tripTimes) {
             // Short-circuiting must be delayed in the case of includeRealTimeCancellations

@@ -565,8 +565,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
     public boolean stopOrTripIsCancelled(int stop) {
         return isCancelledStop(stop)
-            || trip.getTripAlteration().isCanceledOrReplaced()
-            || getPickupType(stop) != PICKDROP_NONE;
+            || trip.getTripAlteration().isCanceledOrReplaced();
     }
 
     /**
