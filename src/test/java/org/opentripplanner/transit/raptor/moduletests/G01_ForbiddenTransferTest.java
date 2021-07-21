@@ -25,7 +25,9 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.transfer.Transfer;
 
 /**
+ * FEATURE UNDER TEST
  *
+ * Raptor should not return path if it would need to use a NOT_ALLOWED transfers.
  */
 public class G01_ForbiddenTransferTest implements RaptorTestConstants {
   private final TestTransitData data = new TestTransitData();
@@ -35,8 +37,11 @@ public class G01_ForbiddenTransferTest implements RaptorTestConstants {
       RaptorConfig.defaultConfigForTest()
   );
 
-  private static final String EXP_PATH = "";
-
+  /**
+  * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
+  * <p>
+  * Access(stop 1) and egress(stop 3) is 30s.
+  */
   @Before
   public void setup() {
     Stop OTP_STOP_A = TransferTestData.STOP_A;
@@ -85,6 +90,17 @@ public class G01_ForbiddenTransferTest implements RaptorTestConstants {
   public void standard() {
     var request = requestBuilder
         .profile(RaptorProfile.STANDARD)
+        .build();
+
+    var response = raptorService.route(request, data);
+
+    assert(response.paths().isEmpty());
+  }
+
+  @Test
+  public void multiCriteria() {
+    var request = requestBuilder
+        .profile(RaptorProfile.MULTI_CRITERIA)
         .build();
 
     var response = raptorService.route(request, data);
