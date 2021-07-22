@@ -25,6 +25,9 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
+import org.opentripplanner.api.parameter.ApiRequestMode;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
@@ -46,6 +49,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -904,6 +908,89 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setToString(String to) {
         this.to = LocationStringParser.fromOldStyleString(to);
+    }
+
+    /**
+     * setFromString
+     * Set from coordinates by stationId of bicycleRentStations
+     * To use this set requestQueryParameter from to a stationId
+     * @param from : represents fromPlace queryParameter
+     * @param modeSet : It's needed to find out if the query is a BICYCLE_RENT query.
+     * @param router : It's needed to fetch the bicycle rent stations.
+     */
+    public void setFromString(String from, QualifiedModeSet modeSet, Router router) {
+        // Overrides the default logic just, if there was bikeStationId given.
+        setFromString(from);
+        if (isLocationMaybeBikeRentalStationId(this.from, modeSet)) {
+            this.from = returnLocationForBikeRentalStation(from, router);
+        }
+    }
+
+    /**
+     * setToString
+     * Set to coordinates by stationId of bicycleRentStations
+     * To use this set requestQueryParameter to to a stationId
+     * @param to : represents toPlace queryParameter
+     * @param modeSet : It's needed to find out if the query is a BICYCLE_RENT query.
+     * @param router : It's needed to fetch the bicycle rent stations.
+     */
+    public void setToString(String to, QualifiedModeSet modeSet, Router router) {
+        // overrides the default just, if there was bikeStationId given
+        setToString(to);
+        if (isLocationMaybeBikeRentalStationId(this.to, modeSet)) {
+            this.to = returnLocationForBikeRentalStation(to, router);
+        }
+    }
+
+    /**
+     * isLocationMaybeBikeRentalStationId
+     * Checks if modes contain bikeRentalStation and if stopId and coordinates are null.
+     * By this check can be validated, that location is not a coordinate and not a feedId.
+     * By this process of elimination, we suppose it's a bikeRentalStationId.
+     * It does NOT test if it's an existing bikeRentalStation.
+     * @param location : location, which shall be validated. It should be the value set in the default Setters.
+     * @param modeSet : set of modes.
+     * @return
+     * true - if location is probably a rentalStationId <br/>
+     * false - if location is a feedId, contains coordinates or no bikeRental mode was set.
+     */
+    private boolean isLocationMaybeBikeRentalStationId(GenericLocation location, QualifiedModeSet modeSet) {
+        return isRentedBicycleMode(modeSet) &&
+                location.stopId == null &&
+                location.lat == null &&
+                location.lng == null;
+    }
+
+    /**
+     * isRentedBicycleMode
+     * This method validates, if "BICYCLE_RENT" was set in the queryParameter "mode"
+     * @param modeSet : QualifiedModeSet object, which represents mode-settings.
+     * @return
+     * true - mode contains BICYCLE_RENT <br/> false - mode contains no BICYCLE_RENT
+     */
+    private Boolean isRentedBicycleMode(QualifiedModeSet modeSet) {
+        return modeSet.qModes
+                .stream()
+                .anyMatch(mode -> mode.mode.equals(ApiRequestMode.BICYCLE) && mode.qualifiers.contains(Qualifier.RENT));
+    }
+
+    /**
+     * returnLocationForBikeRentalStation
+     * Returns location with coordinates by stationId of a bicycleRentStation.
+     * Generates coordinates by comparing the id with all bicycleRentStations.
+     * If no station was found, returns a GenericLocation object without properties like default Setters.
+     *
+     * @param id represents the location as String as given in the queryParameters
+     * @param router It's needed to fetch the bicycle rent stations.It's needed to fetch the bicycle rent stations.
+     * @return GenericLocation : location with coordinates
+     */
+    private GenericLocation returnLocationForBikeRentalStation(String id, Router router) {
+         return router.graph.getBikerentalStationService().getBikeRentalStations()
+                    .stream()
+                    .filter(bikeRentalStation -> bikeRentalStation.id.equals(id))
+                    .findFirst()
+                    .map(bikeRentalStation -> new GenericLocation(bikeRentalStation.y, bikeRentalStation.x))
+                    .orElse(new GenericLocation(null, null));
     }
 
     /**

@@ -593,8 +593,8 @@ public class LegacyGraphQLQueryTypeImpl
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
-      callWith.argument("fromPlace", request::setFromString);
-      callWith.argument("toPlace", request::setToString);
+      callWith.argument("fromPlace", (Consumer<String>) request::setFromString);
+      callWith.argument("toPlace",  (Consumer<String>) request::setToString);
 
       callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
       callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
