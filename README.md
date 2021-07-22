@@ -4,7 +4,7 @@ OpenTripPlanner (OTP) is an open source multi-modal trip planner, focusing on tr
 
 Note that this branch contains **OpenTripPlanner 2**, the second major version of OTP, which has been under development since Q2 2018 and was released as version v2.0.0 in November 2020.
 
-If you do not want to test or explore this version, please switch to the final 1.x release tag `v1.5.0` or the `dev-1.x` branch for the latest patches and bugfixes.
+If you do not want to test or explore this version, please switch to the final 1.x release tag `v1.5.0` or the `dev-1.x` branch for any patches and bugfixes applied to the v1.5.0 release.
 
 
 ## Repository layout
