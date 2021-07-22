@@ -18,7 +18,7 @@ public class Ride {
 
     public Route routeData;
 
-    FeedScopedId trip;
+    public FeedScopedId trip;
 
     Set<String> zones;
 
