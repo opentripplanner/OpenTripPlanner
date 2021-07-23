@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -43,7 +43,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
      * <p>
      * Access(stop 1) and egress(stop 3) is 30s.
      */
-    @Before
+    @BeforeEach
     public void setup() {
         var r1 = route("R1", STOP_A, STOP_B)
                 .withTimetable(schedule("0:02 0:05"));

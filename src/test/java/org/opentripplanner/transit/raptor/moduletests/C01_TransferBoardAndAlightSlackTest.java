@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
@@ -8,8 +8,8 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.p
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -45,7 +45,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
       + "Walk 20s "
       + "[0:01:11 0:05:31 4m20s]";
 
-  @Before
+  @BeforeEach
   public void setup() {
     //Given slack: transfer 1m, board 30s, alight 10s
     requestBuilder.slackProvider(
