@@ -17,6 +17,12 @@ steps:
     - '-c'
     - |
       if [ -n "${_DEPLOYMENT}" ]; then
+        apt update &&  apt install -y wget build-essential
+        software-properties-common libz-dev zlib1g-dev && wget -c
+        https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${_GRAAL_VM_VERSION}/graalvm-ce-java11-linux-amd64-${_GRAAL_VM_VERSION}.tar.gz
+        -O - | tar -xz &&  mv graalvm-ce-java11-${_GRAAL_VM_VERSION}
+        /tmp/graalvm &&  export PATH=/tmp/graalvm/bin:$$PATH && export
+        JAVA_HOME=/tmp/graalvm &&
         curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" &&
         unzip awscli-bundle.zip &&
         ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws &&
