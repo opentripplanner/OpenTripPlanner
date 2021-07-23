@@ -122,7 +122,7 @@ public class RaptorPathToItineraryMapper {
 
         if(optimizedPath != null) {
             itinerary.waitTimeAdjustedGeneralizedCost = RaptorCostConverter.toOtpDomainCost(
-                    optimizedPath.getWaitTimeOptimizedCost()
+                    optimizedPath.waitTimeOptimizedCost()
             );
         }
 
