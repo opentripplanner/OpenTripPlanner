@@ -48,8 +48,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
 import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
-import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -563,15 +563,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             }
 
             if (estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.ALIGHTING) {
-                stopTime.setDropOffType(PICKDROP_SCHEDULED);
+                stopTime.setDropOffType(SCHEDULED);
             } else {
-                stopTime.setDropOffType(PICKDROP_NONE);
+                stopTime.setDropOffType(NONE);
             }
 
             if (estimatedCall.getDepartureBoardingActivity() == DepartureBoardingActivityEnumeration.BOARDING) {
-                stopTime.setPickupType(PICKDROP_SCHEDULED);
+                stopTime.setPickupType(SCHEDULED);
             } else {
-                stopTime.setPickupType(PICKDROP_NONE);
+                stopTime.setPickupType(NONE);
             }
 
             if (estimatedCall.getDestinationDisplaies() != null && !estimatedCall.getDestinationDisplaies().isEmpty()) {
@@ -773,7 +773,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         for (TripTimes tripTimes : times) {
             Trip trip = tripTimes.trip;
             for (TripPattern pattern : patterns) {
-                if (tripTimes.getNumStops() == pattern.stopPattern.stops.length) {
+                if (tripTimes.getNumStops() == pattern.stopPattern.getStops().length) {
                     if (!tripTimes.isCanceled()) {
                         /*
                           UPDATED and MODIFIED tripTimes should be handled the same way to always allow latest realtime-update
@@ -1245,9 +1245,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
                 TripPattern pattern = routingService.getPatternForTrip().get(trip);
 
-                if (stopNumber < pattern.stopPattern.stops.length) {
+                if (stopNumber < pattern.stopPattern.getStops().length) {
                     boolean firstReportedStopIsFound = false;
-                    Stop stop = pattern.stopPattern.stops[stopNumber - 1];
+                    Stop stop = pattern.stopPattern.getStops()[stopNumber - 1];
                     if (firstStopId.equals(stop.getId().getId())) {
                         firstReportedStopIsFound = true;
                     }

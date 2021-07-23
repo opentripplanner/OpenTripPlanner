@@ -10,6 +10,7 @@ import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeShort;
@@ -20,13 +21,12 @@ import org.opentripplanner.routing.services.TransitAlertService;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
 
 public class EstimatedCallType {
   private static final String NAME = "EstimatedCall";
@@ -153,11 +153,11 @@ public class EstimatedCallType {
                 .dataFetcher(environment -> {
                     if (((TripTimeShort) environment.getSource()).getPickupType() >= 0) {
                         //Realtime-updated
-                        return ((TripTimeShort) environment.getSource()).getPickupType() != PICKDROP_NONE;
+                        return ((TripTimeShort) environment.getSource()).getPickupType() != NONE.getGtfsCode();
                     }
                   return GqlUtil.getRoutingService(environment).getPatternForTrip()
                         .get(((TripTimeShort) environment.getSource()).getTrip())
-                        .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
+                        .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != NONE.getGtfsCode();
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -167,11 +167,11 @@ public class EstimatedCallType {
                 .dataFetcher(environment -> {
                     if (((TripTimeShort) environment.getSource()).getDropoffType() >= 0) {
                         //Realtime-updated
-                        return ((TripTimeShort) environment.getSource()).getDropoffType() != PICKDROP_NONE;
+                        return ((TripTimeShort) environment.getSource()).getDropoffType() != NONE.getGtfsCode();
                     }
                     return GqlUtil.getRoutingService(environment).getPatternForTrip()
                             .get(((TripTimeShort) environment.getSource()).getTrip())
-                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
+                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) != NONE.getGtfsCode();
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -181,7 +181,7 @@ public class EstimatedCallType {
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment).getPatternForTrip()
                             .get(((TripTimeShort) environment.getSource()).getTrip())
-                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) == PICKDROP_COORDINATE_WITH_DRIVER)
+                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) == COORDINATE_WITH_DRIVER.getGtfsCode())
                     .build())
 
             .field(GraphQLFieldDefinition

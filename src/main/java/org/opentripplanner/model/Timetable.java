@@ -117,7 +117,7 @@ public class Timetable implements Serializable {
      * actions to compact the data structure such as trimming and deduplicating arrays.
      */
     public void finish() {
-        int nStops = pattern.stopPattern.size;
+        int nStops = pattern.stopPattern.getSize();
         int nHops = nStops - 1;
         /* Find lower bounds on dwell and running times at each stop. */
         minDwellTimes = new int[nHops];

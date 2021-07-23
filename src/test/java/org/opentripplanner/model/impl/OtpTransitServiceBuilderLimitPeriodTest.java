@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -199,8 +200,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         st.setStop(stop);
         st.setDepartureTime(time);
         st.setArrivalTime(time);
-        st.setPickupType(1);
-        st.setDropOffType(1);
+        st.setPickupType(PickDrop.NONE);
+        st.setDropOffType(PickDrop.NONE);
         return st;
     }
 

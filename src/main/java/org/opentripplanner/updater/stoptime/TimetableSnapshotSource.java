@@ -36,6 +36,9 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
+
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
  * necessary to provide planning threads a consistent constant view of a graph with realtime data at
@@ -671,16 +674,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 // Set pickup type
                 // Set different pickup type for last stop
                 if (index == tripUpdate.getStopTimeUpdateCount() - 1) {
-                    stopTime.setPickupType(1); // No pickup available
+                    stopTime.setPickupType(NONE); // No pickup available
                 } else {
-                    stopTime.setPickupType(0); // Regularly scheduled pickup
+                    stopTime.setPickupType(SCHEDULED); // Regularly scheduled pickup
                 }
                 // Set drop off type
                 // Set different drop off type for first stop
                 if (index == 0) {
-                    stopTime.setDropOffType(1); // No drop off available
+                    stopTime.setDropOffType(NONE); // No drop off available
                 } else {
-                    stopTime.setDropOffType(0); // Regularly scheduled drop off
+                    stopTime.setDropOffType(SCHEDULED); // Regularly scheduled drop off
                 }
 
                 // Add stop time to list

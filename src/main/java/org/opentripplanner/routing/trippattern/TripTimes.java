@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.trippattern;
 
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
-
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
@@ -12,6 +10,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.slf4j.Logger;
@@ -166,8 +165,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
 
-            pickups[s] = st.getPickupType();
-            dropoffs[s] = st.getDropOffType();
+            pickups[s] = st.getPickupType().getGtfsCode();
+            dropoffs[s] = st.getDropOffType().getGtfsCode();
             dropOffBookingInfos.add(st.getDropOffBookingInfo());
             pickupBookingInfos.add(st.getPickupBookingInfo());
             s++;
@@ -458,7 +457,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         cancelAllStops();
 
         pickups = new int[getNumStops()];
-        Arrays.fill(pickups, PICKDROP_NONE);
+        Arrays.fill(pickups, PickDrop.NONE.getGtfsCode());
         dropoffs = pickups;
 
         // Update the real-time state

@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.util.MapUtils;
 
@@ -65,8 +66,8 @@ class StopTimeMapper {
         lhs.setStopSequence(rhs.getStopSequence());
         lhs.setStopHeadsign(rhs.getStopHeadsign());
         lhs.setRouteShortName(rhs.getRouteShortName());
-        lhs.setPickupType(rhs.getPickupType());
-        lhs.setDropOffType(rhs.getDropOffType());
+        lhs.setPickupType(PickDrop.fromGtfsCode(rhs.getPickupType()));
+        lhs.setDropOffType(PickDrop.fromGtfsCode(rhs.getDropOffType()));
         lhs.setShapeDistTraveled(rhs.getShapeDistTraveled());
         lhs.setFarePeriodId(rhs.getFarePeriodId());
         lhs.setFlexWindowStart(rhs.getStartPickupDropOffWindow());

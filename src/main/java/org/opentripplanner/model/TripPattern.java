@@ -144,8 +144,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         } else {
             return GeometryUtils.getGeometryFactory().createLineString(
                     new Coordinate[]{
-                            coordinate(stopPattern.stops[stopIndex]),
-                            coordinate(stopPattern.stops[stopIndex + 1])
+                            coordinate(stopPattern.getStops()[stopIndex]),
+                            coordinate(stopPattern.getStops()[stopIndex + 1])
                     }
             );
         }
@@ -190,8 +190,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 this.setHopGeometry(i,
                     GeometryUtils.getGeometryFactory().createLineString(
                         new Coordinate[]{
-                            coordinate(stopPattern.stops[i]),
-                            coordinate(stopPattern.stops[i + 1])
+                            coordinate(stopPattern.getStops()[i]),
+                            coordinate(stopPattern.getStops()[i + 1])
                         }
                     )
                 );
@@ -224,30 +224,30 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     // TODO verify correctness after substitution of StopPattern for ScheduledStopPattern
     // TODO get rid of the per stop flags and just use the values in StopPattern, or an Enum
     private void setStopsFromStopPattern(StopPattern stopPattern) {
-        perStopFlags = new int[stopPattern.size];
+        perStopFlags = new int[stopPattern.getSize()];
         int i = 0;
-        for (Stop stop : stopPattern.stops) {
+        for (Stop stop : stopPattern.getStops()) {
             // Assume that stops can be boarded with wheelchairs by default (defer to per-trip data)
             if (stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE) {
                 perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
             }
-            perStopFlags[i] |= stopPattern.pickups[i] << SHIFT_PICKUP;
-            perStopFlags[i] |= stopPattern.dropoffs[i] << SHIFT_DROPOFF;
+            perStopFlags[i] |= stopPattern.getPickup(i).getGtfsCode() << SHIFT_PICKUP;
+            perStopFlags[i] |= stopPattern.getDropoff(i).getGtfsCode() << SHIFT_DROPOFF;
             ++i;
         }
     }
 
     public Stop getStop(int stopIndex) {
-        return stopPattern.stops[stopIndex];
+        return stopPattern.getStops()[stopIndex];
     }
 
 
     public int getStopIndex(Stop stop) {
-        return Arrays.asList(stopPattern.stops).indexOf(stop);
+        return Arrays.asList(stopPattern.getStops()).indexOf(stop);
     }
 
     public List<Stop> getStops() {
-        return Arrays.asList(stopPattern.stops);
+        return Arrays.asList(stopPattern.getStops());
     }
 
     public Trip getTrip(int tripIndex) {
@@ -517,7 +517,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
                 LOG.debug("Named {} patterns in route {}", routeTripPatterns.size(), uniqueRouteNames.get(route));
                 for (TripPattern pattern : routeTripPatterns) {
-                    LOG.debug("    {} ({} stops)", pattern.name, pattern.stopPattern.size);
+                    LOG.debug("    {} ({} stops)", pattern.name, pattern.stopPattern.getSize());
                 }
             }
         }

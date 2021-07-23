@@ -8,10 +8,8 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeShort;
-
-import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
 public class TimetabledPassingTimeType {
   private static final String NAME = "TimetabledPassingTime";
@@ -70,7 +68,7 @@ public class TimetabledPassingTimeType {
               return GqlUtil.getRoutingService(environment)
                   .getPatternForTrip()
                   .get(((TripTimeShort) environment.getSource()).getTrip())
-                  .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != PICKDROP_NONE;
+                  .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != PickDrop.NONE.getGtfsCode();
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -83,7 +81,7 @@ public class TimetabledPassingTimeType {
                   .getPatternForTrip()
                   .get(((TripTimeShort) environment.getSource()).getTrip())
                   .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex())
-                  != PICKDROP_NONE;
+                  != PickDrop.NONE.getGtfsCode();
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -96,7 +94,7 @@ public class TimetabledPassingTimeType {
                   .getPatternForTrip()
                   .get(((TripTimeShort) environment.getSource()).getTrip())
                   .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex())
-                  == PICKDROP_COORDINATE_WITH_DRIVER;
+                  == PickDrop.COORDINATE_WITH_DRIVER.getGtfsCode();
             })
             .build())
         .field(GraphQLFieldDefinition

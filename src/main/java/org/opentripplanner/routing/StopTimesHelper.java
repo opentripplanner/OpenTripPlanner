@@ -1,8 +1,8 @@
 package org.opentripplanner.routing;
 
 import com.google.common.collect.MinMaxPriorityQueue;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -19,6 +19,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
+
+import static org.opentripplanner.model.PickDrop.NONE;
 
 public class StopTimesHelper {
   /**
@@ -113,9 +115,9 @@ public class StopTimesHelper {
       }
       ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
       int sidx = 0;
-      for (Stop currStop : pattern.stopPattern.stops) {
+      for (Stop currStop : pattern.stopPattern.getStops()) {
         if (currStop == stop) {
-          if(omitNonPickups && pattern.stopPattern.pickups[sidx] == StopPattern.PICKDROP_NONE) continue;
+          if(omitNonPickups && pattern.stopPattern.getPickup(sidx) == NONE) continue;
           for (TripTimes t : tt.tripTimes) {
             if (!sd.serviceRunning(t.serviceCode)) { continue; }
             stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
@@ -214,9 +216,9 @@ public class StopTimesHelper {
 
       int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
       int sidx = 0;
-      for (Stop currStop : pattern.stopPattern.stops) {
+      for (Stop currStop : pattern.stopPattern.getStops()) {
         if (currStop == stop) {
-          if (omitNonPickups && pattern.stopPattern.pickups[sidx] == StopPattern.PICKDROP_NONE) continue;
+          if (omitNonPickups && pattern.stopPattern.getPickup(sidx) == NONE) continue;
           for (TripTimes t : tt.tripTimes) {
             if (!sd.serviceRunning(t.serviceCode)) continue;
             if (t.getDepartureTime(sidx) != -1 &&
