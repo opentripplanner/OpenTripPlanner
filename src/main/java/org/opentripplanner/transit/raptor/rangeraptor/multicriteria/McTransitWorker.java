@@ -97,13 +97,10 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
             prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
         }
 
-        final int boardWaitTimeForCostCalculation = boardTime - prevArrival.arrivalTime();
-        final int relativeBoardCost = calculateOnTripRelativeCost(
-            prevArrival,
-            trip.transitReluctanceFactorIndex(),
-            boardTime,
-            boardWaitTimeForCostCalculation
-        );
+        final int boardCost = calculateCostAtBoardTime(prevArrival, boardTime);
+
+        final int relativeBoardCost = boardCost +
+                calculateOnTripRelativeCost(trip.transitReluctanceFactorIndex(), boardTime);
 
         patternRides.add(
             new PatternRide<>(
@@ -111,7 +108,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                 stopIndex,
                 result.getStopPositionInPattern(),
                 boardTime,
-                boardWaitTimeForCostCalculation,
+                boardCost,
                 relativeBoardCost,
                 trip
             )
@@ -132,20 +129,33 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
      * trip.
      *
      * @param prevArrival The stop-arrival where the trip was boarded.
-     * @param boardTime the wait-time at the board stop before boarding.
-     * @param boardWaitTime the wait-time at the board stop before boarding.
      */
-    private int calculateOnTripRelativeCost(
-        AbstractStopArrival<T> prevArrival,
-        int transitReluctanceIndex,
-        int boardTime,
-        int boardWaitTime
-    ) {
-        return costCalculator.onTripRidingCost(
-                prevArrival,
+    private int calculateCostAtBoardTime(AbstractStopArrival<T> prevArrival, int boardTime) {
+        // Calculate the wait-time before the boarding witch should be accounted for in the cost
+        // calculation. Any slack at the end of the last leg is not part of this, because that is
+        // already accounted for. If the previous leg is an access-leg, then it is already
+        // time-shifted, witch is important for this calculation to be correct.
+        final int boardWaitTime = boardTime - prevArrival.arrivalTime();
+
+        boolean firstRide = prevArrival.arrivedByAccess()
+                && !prevArrival.accessPath().access().hasRides();
+
+        return prevArrival.cost() + costCalculator.boardCost(
+                firstRide,
                 boardWaitTime,
-                boardTime,
-                transitReluctanceIndex
+                prevArrival.stop()
         );
+    }
+
+    /**
+     * Calculate a cost for riding a trip. It should include the cost from the beginning of the
+     * journey all the way until a trip is boarded. The cost is used to compare trips boarding
+     * the same pattern with the same number of transfers. It is ok for the cost to be relative
+     * to any point in place or time - as long as it can be used to compare to paths that started
+     * at the origin in the same iteration, having used the same number-of-rounds to board the same
+     * trip.
+     */
+    private int calculateOnTripRelativeCost(int transitReluctanceIndex, int boardTime) {
+        return costCalculator.onTripRelativeRidingCost(boardTime, transitReluctanceIndex);
     }
 }

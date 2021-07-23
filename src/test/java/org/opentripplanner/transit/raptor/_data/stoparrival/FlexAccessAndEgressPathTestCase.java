@@ -41,6 +41,7 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
+    private static final int ZERO = 0;
     public static final double WAIT_RELUCTANCE = 0.8;
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
@@ -77,8 +78,10 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
     // Wait at least 1m45s (45s BOARD_SLACK and 60s TRANSFER_SLACK)
     public static final int L1_TRANSIT_DURATION = L1_END - L1_START;
-    public static final int L1_COST_EX_WAIT = COST_CALCULATOR.transitArrivalCost(
-            false, STOP_B, 0, L1_TRANSIT_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_C
+    public static final int L1_COST_EX_WAIT =
+            COST_CALCULATOR.transitArrivalCost(
+                    COST_CALCULATOR.boardCost(false, ZERO, STOP_B),
+                    ZERO, L1_TRANSIT_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_C
     );
     // Transfers (C ~ Walk 2m ~ D) (Used in Case B only)
     public static final int TX2_START = time("10:20:15");

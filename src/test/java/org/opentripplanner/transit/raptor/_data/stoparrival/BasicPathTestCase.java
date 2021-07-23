@@ -278,25 +278,39 @@ public class BasicPathTestCase implements RaptorTestConstants {
         // The calculator is not under test here, so we assert everything is as expected
         assertEquals(
             LINE_11_COST,
-            COST_CALCULATOR.transitArrivalCost(
-                true, STOP_A, L11_WAIT_DURATION, L11_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_B
-            )
+            transitArrivalCost(TRIP_1, L11_WAIT_DURATION, L11_DURATION, STOP_A, STOP_B)
         );
         assertEquals(
             LINE_21_COST,
-            COST_CALCULATOR.transitArrivalCost(
-                false, STOP_C, L21_WAIT_DURATION, L21_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_D
-            )
+            transitArrivalCost(TRIP_2, L21_WAIT_DURATION, L21_DURATION, STOP_C, STOP_D)
         );
         assertEquals(
             LINE_31_COST,
-            COST_CALCULATOR.transitArrivalCost(
-                false, STOP_D, L31_WAIT_DURATION, L31_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_E
-            )
+            transitArrivalCost(TRIP_3, L31_WAIT_DURATION, L31_DURATION, STOP_D, STOP_E)
         );
 
         assertEquals(BASIC_PATH_AS_STRING, basicTripAsPath().toString());
 
         assertEquals(BASIC_PATH_AS_DETAILED_STRING, basicTripAsPath().toStringDetailed());
+    }
+
+    private static int transitArrivalCost(
+            TestTripSchedule trip,
+            int waitDuration,
+            int transitDuration,
+            int boardStop,
+            int alightStop
+    ) {
+        boolean firstTransit = TRIP_1 == trip;
+        int waitTimeBoarding = waitDuration - ALIGHT_SLACK;
+        int boardCost = COST_CALCULATOR.boardCost(firstTransit, waitTimeBoarding, boardStop);
+
+        return COST_CALCULATOR.transitArrivalCost(
+                boardCost,
+                ALIGHT_SLACK,
+                transitDuration,
+                trip.transitReluctanceFactorIndex(),
+                alightStop
+        );
     }
 }

@@ -94,15 +94,16 @@ public class TransitPathLegBuilder<T extends RaptorTripSchedule> {
       int fromStopArrivalTime
   ) {
     int alightSlack = slackProvider.alightSlack(trip().pattern());
-    int waitTime = boardTime() - fromStopArrivalTime + alightSlack;
+    int waitTimeBoarding = boardTime() - fromStopArrivalTime;
     int transitTime =  alightTime() - boardTime();
+    int boardCost = calc.boardCost(firstTransit, waitTimeBoarding, boardStop());
+
     return calc.transitArrivalCost(
-        firstTransit,
-        boardStop(),
-        waitTime,
-        transitTime,
-        trip().transitReluctanceFactorIndex(),
-        alightStop()
+            boardCost,
+            alightSlack,
+            transitTime,
+            trip().transitReluctanceFactorIndex(),
+            alightStop()
     );
   }
 }

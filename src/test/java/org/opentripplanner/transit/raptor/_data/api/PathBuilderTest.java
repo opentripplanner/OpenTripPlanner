@@ -39,16 +39,17 @@ public class PathBuilderTest implements RaptorTestConstants {
   public void testSimplePathWithOneTransit() {
     int transitDuration = duration("5m");
 
-    int waitTime = BOARD_SLACK + ALIGHT_SLACK;
-
     var path = subject
         .access(time("10:00:15"), D1m, STOP_A)
         .bus("L1", time("10:02"), transitDuration, STOP_B)
         .egress(D2m);
 
+    int boardCost = COST_CALCULATOR.boardCost(true, BOARD_SLACK, STOP_A);
+
     int transitCost = COST_CALCULATOR.transitArrivalCost(
-            true, STOP_A, waitTime, transitDuration, TRANSIT_RELUCTANCE_INDEX, STOP_B
+            boardCost, ALIGHT_SLACK, transitDuration, TRANSIT_RELUCTANCE_INDEX, STOP_B
     );
+
     int accessEgressCost = TestTransfer.walkCost(D2m + D1m);
 
     assertEquals(accessEgressCost + transitCost, path.generalizedCost());

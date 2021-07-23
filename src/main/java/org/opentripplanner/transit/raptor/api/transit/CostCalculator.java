@@ -15,14 +15,26 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
      * debugging easier if the cost can be compared with the "stop-arrival-cost". The cost must
      * incorporate the fact that 2 boarding may happen at 2 different stops.
      *
-     * @param prevStopArrival    The previous stop arrival
-     * @param waitTime           The time waiting before boarding at the board stop
+     * @param firstRide {@code true} if this is the first boarding in the path including
+     *                  any FLEX/ACCESS rides.
+     * @param waitTime  The time waiting before boarding at the board stop
+     */
+    int boardCost(
+            boolean firstRide,
+            int waitTime,
+            int boardStop
+    );
+
+    /**
+     * Calculate cost when on-board of a trip. The cost is only used to compare to paths on the
+     * same trip - so any cost that is constant for a given trip can be dropped, but it will make
+     * debugging easier if the cost can be compared with the "stop-arrival-cost". The cost must
+     * incorporate the fact that 2 boarding may happen at 2 different stops.
+     *
      * @param boardTime          The time of boarding
      * @param transitFactorIndex The index used to look up the transit reluctance/factor
      */
-    int onTripRidingCost(
-            ArrivalView<T> prevStopArrival,
-            int waitTime,
+    int onTripRelativeRidingCost(
             int boardTime,
             int transitFactorIndex
     );
@@ -30,16 +42,14 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
     /**
      * Calculate the value when arriving by transit.
      *
-     * @param firstRound         Indicate if this is the first round (first transit).
      * @param transitFactorIndex The index used to look up the transit reluctance/factor
      */
     int transitArrivalCost(
-        boolean firstRound,
-        int fromStop,
-        int waitTime,
-        int transitTime,
-        int transitFactorIndex,
-        int toStop
+            int boardCost,
+            int alightSlack,
+            int transitTime,
+            int transitFactorIndex,
+            int toStop
     );
 
     /**

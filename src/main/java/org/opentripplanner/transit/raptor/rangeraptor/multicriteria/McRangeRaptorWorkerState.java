@@ -38,7 +38,6 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
     private final CostCalculator<T> costCalculator;
     private final TransitCalculator<T> transitCalculator;
-    private boolean firstRound;
 
     /**
      * create a RaptorState for a network with a particular number of stops, and a given maximum
@@ -62,7 +61,6 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         lifeCycle.onSetupIteration((ignore) -> setupIteration());
         lifeCycle.onTransitsForRoundComplete(this::transitsForRoundComplete);
         lifeCycle.onTransfersForRoundComplete(this::transfersForRoundComplete);
-        lifeCycle.onPrepareForNextRound(r -> firstRound = r == 1);
     }
 
     // The below methods are ordered after the sequence they naturally appear in the algorithm,
@@ -128,17 +126,14 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
 
         if (exceedsTimeLimit(stopArrivalTime)) { return; }
 
-        // Calculate wait time before and after the transit
-        final int waitTime = ride.boardWaitTimeForCostCalculation + alightSlack;
-
         final int costTransit = costCalculator.transitArrivalCost(
-            firstRound,
-            ride.prevArrival.stop(),
-            waitTime,
+            ride.boardCost,
+            alightSlack,
             alightTime - ride.boardTime,
             ride.trip.transitReluctanceFactorIndex(),
             alightStop
         );
+
         arrivalsCache.add(
             new TransitStopArrival<>(
                 ride.prevArrival,

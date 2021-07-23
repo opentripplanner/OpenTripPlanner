@@ -108,15 +108,17 @@ public class PathBuilder {
       return leg.egressLeg();
     }
     else if(leg.isTransit()) {
-      int waitTime = transitWaitTime(index);
+      int waitDurationBefore = transitWaitDurationBefore(index);
       boolean firstTransit = index == 1 && !legs.get(0).transfer.hasRides();
+      final int boardCost = costCalculator.boardCost(firstTransit, waitDurationBefore, leg.fromStop);
+
       @SuppressWarnings("ConstantConditions")
-      int cost  = costCalculator.transitArrivalCost(
-              firstTransit, leg.fromStop, waitTime, leg.duration(),
+      int transitCost  = costCalculator.transitArrivalCost(
+              boardCost, alightSlack, leg.duration(),
               leg.trip.transitReluctanceFactorIndex(),
               leg.toStop
       );
-      return leg.transitLeg(leg(index+1), cost);
+      return leg.transitLeg(leg(index+1), transitCost);
     }
     else {
       return leg.transferLeg(leg(index+1));
@@ -137,7 +139,7 @@ public class PathBuilder {
     return this;
   }
 
-  private int transitWaitTime(int index) {
+  private int transitWaitDurationBefore(int index) {
     Leg curr = legs.get(index);
     Leg prev = legs.get(index-1);
 
@@ -145,9 +147,9 @@ public class PathBuilder {
       // We can ignore alight-slack here, because the it should be added to the
       // previous toTime to find stop-arrival-time, and then the stop-arrival-time is
       // subtracted from the current fromTime plus alight-slack.
-      return curr.fromTime - prev.toTime;
+      return curr.fromTime - (prev.toTime + alightSlack);
     }
-    return (curr.fromTime - prev.toTime) + alightSlack;
+    return (curr.fromTime - prev.toTime);
   }
 
   private static class Leg {
