@@ -1,7 +1,6 @@
 package org.opentripplanner.routing;
 
 import com.google.common.collect.MinMaxPriorityQueue;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
@@ -111,13 +110,15 @@ public class StopTimesHelper {
       if (timetableSnapshot != null){
         tt = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
-        tt = pattern.scheduledTimetable;
+        tt = pattern.getScheduledTimetable();
       }
-      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
+      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern
+          .getRoute()
+          .getAgency().getId());
       int sidx = 0;
-      for (Stop currStop : pattern.stopPattern.getStops()) {
+      for (Stop currStop : pattern.getStopPattern().getStops()) {
         if (currStop == stop) {
-          if(omitNonPickups && pattern.stopPattern.getPickup(sidx) == NONE) continue;
+          if(omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
           for (TripTimes t : tt.tripTimes) {
             if (!sd.serviceRunning(t.serviceCode)) { continue; }
             stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
@@ -204,21 +205,23 @@ public class StopTimesHelper {
 
     // Loop through all possible days
     for (ServiceDate serviceDate : serviceDates) {
-      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
+      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern
+          .getRoute()
+          .getAgency().getId());
       Timetable tt;
       if (timetableSnapshot != null) {
         tt = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
-        tt = pattern.scheduledTimetable;
+        tt = pattern.getScheduledTimetable();
       }
 
       if (!tt.temporallyViable(sd, startTime, timeRange, true)) continue;
 
       int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
       int sidx = 0;
-      for (Stop currStop : pattern.stopPattern.getStops()) {
+      for (Stop currStop : pattern.getStopPattern().getStops()) {
         if (currStop == stop) {
-          if (omitNonPickups && pattern.stopPattern.getPickup(sidx) == NONE) continue;
+          if (omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
           for (TripTimes t : tt.tripTimes) {
             if (!sd.serviceRunning(t.serviceCode)) continue;
             if (t.getDepartureTime(sidx) != -1 &&

@@ -366,7 +366,7 @@ public class RaptorPathToItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
 
         for (int i = boardStopIndexInPattern + 1; i < alightStopIndexInPattern; i++) {
-            Stop stop = tripPattern.stopPattern.getStops()[i];
+            Stop stop = tripPattern.getStopPattern().getStops()[i];
 
             Place place = mapStopToPlace(stop, i, tripSchedule.getOriginalTripTimes());
             StopArrival visit = new StopArrival(

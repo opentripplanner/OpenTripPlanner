@@ -98,7 +98,7 @@ public class Timetable implements Serializable {
      */
     public boolean temporallyViable(ServiceDay sd, long searchTime, int bestWait, boolean boarding) {
         // Check whether any services are running at all on this pattern.
-        if ( ! sd.anyServiceRunning(this.pattern.services)) { return false; }
+        if ( ! sd.anyServiceRunning(this.pattern.getServices())) { return false; }
         // Make the search time relative to the given service day.
         searchTime = sd.secondsSinceMidnight(searchTime);
         // Check whether any trip can be boarded at all, given the search time
@@ -117,7 +117,7 @@ public class Timetable implements Serializable {
      * actions to compact the data structure such as trimming and deduplicating arrays.
      */
     public void finish() {
-        int nStops = pattern.stopPattern.getSize();
+        int nStops = pattern.getStopPattern().getSize();
         int nHops = nStops - 1;
         /* Find lower bounds on dwell and running times at each stop. */
         minDwellTimes = new int[nHops];

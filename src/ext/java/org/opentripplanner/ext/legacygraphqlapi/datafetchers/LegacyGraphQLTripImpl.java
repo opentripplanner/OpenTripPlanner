@@ -144,7 +144,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment -> {
       TripPattern tripPattern = getTripPattern(environment);
       if (tripPattern == null) { return List.of(); }
-      return TripTimeShort.fromTripTimes(tripPattern.scheduledTimetable, getSource(environment));
+      return TripTimeShort.fromTripTimes(tripPattern.getScheduledTimetable(), getSource(environment));
     };
   }
 
@@ -155,7 +155,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         RoutingService routingService = getRoutingService(environment);
         TripPattern tripPattern = getTripPattern(environment);
         if (tripPattern == null) { return null; }
-        Timetable timetable = tripPattern.scheduledTimetable;
+        Timetable timetable = tripPattern.getScheduledTimetable();
 
         TripTimes triptimes = timetable.getTripTimes(getSource(environment));
         ServiceDay serviceDate = null;
@@ -186,7 +186,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         RoutingService routingService = getRoutingService(environment);
         TripPattern tripPattern = getTripPattern(environment);
         if (tripPattern == null) { return null; }
-        Timetable timetable = tripPattern.scheduledTimetable;
+        Timetable timetable = tripPattern.getScheduledTimetable();
 
         TripTimes triptimes = timetable.getTripTimes(getSource(environment));
         ServiceDay serviceDate = null;

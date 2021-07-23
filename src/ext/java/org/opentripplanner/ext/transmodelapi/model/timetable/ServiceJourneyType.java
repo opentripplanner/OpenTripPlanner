@@ -139,7 +139,11 @@ public class ServiceJourneyType {
                     .dataFetcher(env -> {
                         Trip trip = trip(env);
                         return TripTimeShort.fromTripTimes(
-                            GqlUtil.getRoutingService(env).getPatternForTrip().get(trip).scheduledTimetable,
+                            GqlUtil
+                                .getRoutingService(env)
+                                .getPatternForTrip()
+                                .get(trip)
+                                .getScheduledTimetable(),
                             trip
                         );
                     })

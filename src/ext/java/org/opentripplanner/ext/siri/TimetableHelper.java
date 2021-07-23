@@ -93,7 +93,7 @@ public class TimetableHelper {
 
         boolean stopPatternChanged = false;
 
-        Stop[] modifiedStops = timetable.pattern.stopPattern.getStops();
+        Stop[] modifiedStops = timetable.pattern.getStopPattern().getStops();
 
         Trip trip = getTrip(tripId, timetable);
 
@@ -156,8 +156,12 @@ public class TimetableHelper {
                         newTimes.setCancelledStop(callCounter, recordedCall.isCancellation());
                     }
 
-                    newTimes.setDropoffType(callCounter, timetable.pattern.stopPattern.getDropoff(callCounter).getGtfsCode());
-                    newTimes.setPickupType(callCounter, timetable.pattern.stopPattern.getPickup(callCounter).getGtfsCode());
+                    newTimes.setDropoffType(callCounter, timetable.pattern
+                        .getStopPattern()
+                        .getDropoff(callCounter).getGtfsCode());
+                    newTimes.setPickupType(callCounter, timetable.pattern
+                        .getStopPattern()
+                        .getPickup(callCounter).getGtfsCode());
 
                     int arrivalTime = newTimes.getArrivalTime(callCounter);
                     int realtimeArrivalTime = arrivalTime;
@@ -285,8 +289,8 @@ public class TimetableHelper {
             }
             if (!foundMatch) {
 
-                if (timetable.pattern.stopPattern.getPickup(callCounter) == NONE &&
-                        timetable.pattern.stopPattern.getDropoff(callCounter) == NONE) {
+                if (timetable.pattern.getStopPattern().getPickup(callCounter) == NONE &&
+                        timetable.pattern.getStopPattern().getDropoff(callCounter) == NONE) {
                     // When newTimes contains stops without pickup/dropoff - set both arrival/departure to previous stop's departure
                     // This necessary to accommodate the case when delay is reduced/eliminated between to stops with pickup/dropoff, and
                     // multiple non-pickup/dropoff stops are in between.
@@ -330,7 +334,7 @@ public class TimetableHelper {
             return null;
         }
 
-        if (newTimes.getNumStops() != timetable.pattern.stopPattern.getStops().length) {
+        if (newTimes.getNumStops() != timetable.pattern.getStopPattern().getStops().length) {
             return null;
         }
 
@@ -371,7 +375,7 @@ public class TimetableHelper {
         }
 
         //Get all scheduled stops
-        Stop[] stops = timetable.pattern.stopPattern.getStops();
+        Stop[] stops = timetable.pattern.getStopPattern().getStops();
 
         // Keeping track of visited stop-objects to allow multiple visits to a stop.
         List<Object> alreadyVisited = new ArrayList<>();
@@ -479,8 +483,8 @@ public class TimetableHelper {
             stopTime.setStop(stop);
             stopTime.setTrip(trip);
             stopTime.setStopSequence(i);
-            stopTime.setDropOffType(timetable.pattern.stopPattern.getDropoff(i));
-            stopTime.setPickupType(timetable.pattern.stopPattern.getPickup(i));
+            stopTime.setDropOffType(timetable.pattern.getStopPattern().getDropoff(i));
+            stopTime.setPickupType(timetable.pattern.getStopPattern().getPickup(i));
             stopTime.setArrivalTime(oldTimes.getScheduledArrivalTime(i));
             stopTime.setDepartureTime(oldTimes.getScheduledDepartureTime(i));
             stopTime.setStopHeadsign(oldTimes.getHeadsign(i));

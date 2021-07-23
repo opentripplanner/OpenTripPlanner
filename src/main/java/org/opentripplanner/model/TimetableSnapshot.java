@@ -157,7 +157,7 @@ public class TimetableSnapshot {
             }
         }
 
-        return pattern.scheduledTimetable;
+        return pattern.getScheduledTimetable();
     }
     
     /**

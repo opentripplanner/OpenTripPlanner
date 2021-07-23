@@ -68,7 +68,7 @@ public class TimetableTest {
         }
         
         pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
-        timetable = pattern.scheduledTimetable;
+        timetable = pattern.getScheduledTimetable();
     }
 
     @Test

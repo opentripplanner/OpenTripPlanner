@@ -172,7 +172,7 @@ public class GeometryAndBlockProcessor {
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
         for (TripPattern tableTripPattern : tripPatterns) {
-            tableTripPattern.scheduledTimetable.finish();
+            tableTripPattern.getScheduledTimetable().finish();
         }
 
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
@@ -192,7 +192,7 @@ public class GeometryAndBlockProcessor {
 
         LOG.info("Finding interlining trips based on block IDs.");
         for (TripPattern pattern : tripPatterns) {
-            Timetable timetable = pattern.scheduledTimetable;
+            Timetable timetable = pattern.getScheduledTimetable();
             /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
             for (TripTimes tripTimes : timetable.tripTimes) {
                 Trip trip = tripTimes.trip;

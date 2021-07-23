@@ -175,7 +175,8 @@ class TripPatternMapper {
             stopPattern
         );
 
-        tripPattern.name = journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue();
+        tripPattern.setName(
+            journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue());
 
         createTripTimes(trips, tripPattern);
 

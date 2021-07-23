@@ -148,7 +148,7 @@ public class RoutingService {
         return timetableSnapshot != null ? timetableSnapshot.resolve(
                 tripPattern,
                 new ServiceDate(Calendar.getInstance().getTime())
-        ) : tripPattern.scheduledTimetable;
+        ) : tripPattern.getScheduledTimetable();
     }
 
     public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {

@@ -100,7 +100,7 @@ public class QuayType {
                       return GqlUtil.getRoutingService(environment)
                           .getPatternsForStop(environment.getSource(),true)
                               .stream()
-                              .map(pattern -> pattern.route)
+                              .map(pattern -> pattern.getRoute())
                               .distinct()
                               .collect(Collectors.toList());
                     })

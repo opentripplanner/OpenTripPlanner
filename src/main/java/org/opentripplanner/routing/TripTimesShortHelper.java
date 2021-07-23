@@ -31,7 +31,7 @@ public class TripTimesShortHelper {
       timetable = timetableSnapshot.resolve(pattern, serviceDate);
     }
     if (timetable == null) {
-      timetable = routingService.getPatternForTrip().get(trip).scheduledTimetable;
+      timetable = routingService.getPatternForTrip().get(trip).getScheduledTimetable();
     }
 
     // This check is made here to avoid changing TripTimeShort.fromTripTimes

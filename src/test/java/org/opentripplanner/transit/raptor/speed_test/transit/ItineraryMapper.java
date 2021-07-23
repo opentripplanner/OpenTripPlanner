@@ -121,7 +121,7 @@ public class ItineraryMapper {
 
                 TripSchedule tripSchedule = it.trip();
                 TripPattern tripPattern = tripSchedule.getOriginalTripPattern();
-                Route routeInfo = tripPattern.route;
+                Route routeInfo = tripPattern.getRoute();
 
 
                 leg.from = mapToPlace(it.fromStop());
@@ -129,7 +129,7 @@ public class ItineraryMapper {
 
                 leg.route = routeInfo.getShortName();
                 leg.agencyName = routeInfo.getAgency().getName();
-                leg.tripShortName = tripSchedule.getOriginalTripPattern().name;
+                leg.tripShortName = tripSchedule.getOriginalTripPattern().getName();
                 leg.agencyId = routeInfo.getAgency().getId();
                 leg.routeShortName = routeInfo.getShortName()   ;
                 leg.routeLongName = routeInfo.getLongName();

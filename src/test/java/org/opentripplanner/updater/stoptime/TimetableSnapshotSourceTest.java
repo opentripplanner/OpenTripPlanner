@@ -111,8 +111,8 @@ public class TimetableSnapshotSourceTest {
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.getTripForId().get(tripId);
         final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
-        final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
-        final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
+        final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
+        final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
         updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), feedId);
 
@@ -137,8 +137,8 @@ public class TimetableSnapshotSourceTest {
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.getTripForId().get(tripId);
         final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
-        final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
-        final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
+        final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
+        final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
         final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

@@ -226,7 +226,7 @@ public class IndexAPI {
         return routingService
                 .getPatternsForStop(stop)
                 .stream()
-                .map(it -> it.route)
+                .map(it -> it.getRoute())
                 .map(RouteMapper::mapToApiShort)
                 .collect(Collectors.toList());
     }
@@ -342,7 +342,7 @@ public class IndexAPI {
                 Stop stop = getStop(routingService, stopId);
                 Set<Route> routesHere = new HashSet<>();
                 for (TripPattern pattern : routingService.getPatternsForStop(stop)) {
-                    routesHere.add(pattern.route);
+                    routesHere.add(pattern.getRoute());
                 }
                 routes.retainAll(routesHere);
             }

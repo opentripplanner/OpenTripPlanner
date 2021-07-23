@@ -331,7 +331,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
 
         // Apply update on the *scheduled* time table and set the updated trip times in the buffer
-        final TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
+        final TripTimes updatedTripTimes = pattern.getScheduledTimetable().createUpdatedTripTimes(tripUpdate,
                 timeZone, serviceDate);
 
         if (updatedTripTimes == null) {
@@ -742,7 +742,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         if (pattern != null) {
             // Cancel scheduled trip times for this trip in this pattern
-            final Timetable timetable = pattern.scheduledTimetable;
+            final Timetable timetable = pattern.getScheduledTimetable();
             final int tripIndex = timetable.getTripIndex(tripId);
             if (tripIndex == -1) {
                 LOG.warn("Could not cancel scheduled trip {}", tripId);

@@ -77,7 +77,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   }
 
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
-    FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().route.getId();
+    FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().getRoute().getId();
     return !bannedRoutes.contains(routeId);
   }
 

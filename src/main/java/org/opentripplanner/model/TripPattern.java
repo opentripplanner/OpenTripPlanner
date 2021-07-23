@@ -51,39 +51,20 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     private static final long serialVersionUID = 1;
 
-    /** The human-readable, unique name for this trip pattern. */
-    public String name;
+    private String name;
 
-    /**
-     * The GTFS Route of all trips in this pattern.
-     */
-    public final Route route;
+    private final Route route;
 
-    /**
-     * All trips in this pattern call at this sequence of stops. This includes information about GTFS
-     * pick-up and drop-off types.
-     */
-    public final StopPattern stopPattern;
+    private final StopPattern stopPattern;
 
-    /**
-     * This is the "original" timetable holding the scheduled stop times from GTFS, with no
-     * realtime updates applied. If realtime stoptime updates are applied, next/previous departure
-     * searches will be conducted using a different, updated timetable in a snapshot.
-     */
-    public final Timetable scheduledTimetable = new Timetable(this);
+    private final Timetable scheduledTimetable = new Timetable(this);
 
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
     // in this order, e.g. for interlining.
     // potential optimization: trip fields can be removed from TripTimes?
     // TODO: this field can be removed, and interlining can be done differently?
-    /**
-     * This pattern may have multiple Timetable objects, but they should all contain TripTimes
-     * for the same trips, in the same order (that of the scheduled Timetable). An exception to
-     * this rule may arise if unscheduled trips are added to a Timetable. For that case we need
-     * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
-     */
-    final ArrayList<Trip> trips = new ArrayList<Trip>();
+    private final ArrayList<Trip> trips = new ArrayList<Trip>();
 
     /**
      * Geometries of each inter-stop segment of the tripPattern.
@@ -100,12 +81,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      */
     private boolean createdByRealtimeUpdater = false;
 
-    /**
-     * A set of serviceIds with at least one trip in this pattern.
-     * Trips in a pattern are no longer necessarily running on the same service ID.
-     */
     // TODO MOVE codes INTO Timetable or TripTimes
-    BitSet services;
+    private BitSet services;
 
 
     public TripPattern(FeedScopedId id, Route route, StopPattern stopPattern) {
@@ -114,11 +91,15 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         this.stopPattern = stopPattern;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * Convinience method to get the route traverse mode, the mode for all trips in this pattern.
      */
     public final TransitMode getMode() {
-        return route.getMode();
+        return getRoute().getMode();
     }
 
     public LineString getHopGeometry(int stopIndex) {
@@ -130,8 +111,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         } else {
             return GeometryUtils.getGeometryFactory().createLineString(
                     new Coordinate[]{
-                            coordinate(stopPattern.getStops()[stopIndex]),
-                            coordinate(stopPattern.getStops()[stopIndex + 1])
+                            coordinate(getStopPattern().getStops()[stopIndex]),
+                            coordinate(getStopPattern().getStops()[stopIndex + 1])
                     }
             );
         }
@@ -176,8 +157,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 this.setHopGeometry(i,
                     GeometryUtils.getGeometryFactory().createLineString(
                         new Coordinate[]{
-                            coordinate(stopPattern.getStops()[i]),
-                            coordinate(stopPattern.getStops()[i + 1])
+                            coordinate(getStopPattern().getStops()[i]),
+                            coordinate(getStopPattern().getStops()[i + 1])
                         }
                     )
                 );
@@ -204,47 +185,43 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         // The serialized graph contains cyclic references TripPattern <--> Timetable.
         // The Timetable must be indexed from here (rather than in its own readObject method)
         // to ensure that the stops field it uses in TripPattern is already deserialized.
-        scheduledTimetable.finish();
+        getScheduledTimetable().finish();
     }
 
     public Stop getStop(int stopIndex) {
-        return stopPattern.getStops()[stopIndex];
+        return getStopPattern().getStops()[stopIndex];
     }
 
 
     public int getStopIndex(Stop stop) {
-        return Arrays.asList(stopPattern.getStops()).indexOf(stop);
+        return Arrays.asList(getStopPattern().getStops()).indexOf(stop);
     }
 
     public List<Stop> getStops() {
-        return Arrays.asList(stopPattern.getStops());
+        return Arrays.asList(getStopPattern().getStops());
     }
 
     public Trip getTrip(int tripIndex) {
-        return trips.get(tripIndex);
-    }
-
-    public List<Trip> getTrips() {
-        return trips;
+        return getTrips().get(tripIndex);
     }
 
     public int getTripIndex(Trip trip) {
-        return trips.indexOf(trip);
+        return getTrips().indexOf(trip);
     }
 
     /** Returns whether passengers can alight at a given stop */
     public boolean canAlight(int stopIndex) {
-        return stopPattern.getDropoff(stopIndex).isRoutable();
+        return getStopPattern().getDropoff(stopIndex).isRoutable();
     }
 
     /** Returns whether passengers can board at a given stop */
     public boolean canBoard(int stopIndex) {
-        return stopPattern.getPickup(stopIndex).isRoutable();
+        return getStopPattern().getPickup(stopIndex).isRoutable();
     }
 
     /** Returns whether a given stop is wheelchair-accessible. */
     public boolean wheelchairAccessible(int stopIndex) {
-        return stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
+        return getStopPattern().getStop(stopIndex).getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
     }
 
     /** Returns the zone of a given stop */
@@ -253,11 +230,11 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     }
 
     public PickDrop getAlightType(int stopIndex) {
-        return stopPattern.getDropoff(stopIndex);
+        return getStopPattern().getDropoff(stopIndex);
     }
 
     public PickDrop getBoardType(int stopIndex) {
-        return stopPattern.getPickup(stopIndex);
+        return getStopPattern().getPickup(stopIndex);
     }
 
     /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
@@ -271,12 +248,14 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      */
     public void add(TripTimes tt) {
         // Only scheduled trips (added at graph build time, rather than directly to the timetable via updates) are in this list.
-        trips.add(tt.trip);
-        scheduledTimetable.addTripTimes(tt);
+        getTrips().add(tt.trip);
+        getScheduledTimetable().addTripTimes(tt);
         // Check that all trips added to this pattern are on the initially declared route.
         // Identity equality is valid on GTFS entity objects.
-        if (this.route != tt.trip.getRoute()) {
-            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(), this.route);
+        if (this.getRoute() != tt.trip.getRoute()) {
+            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(),
+                this.getRoute()
+            );
         }
     }
 
@@ -287,10 +266,12 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * since it is redundant.
      */
     public void add(FrequencyEntry freq) {
-        trips.add(freq.tripTimes.trip);
-        scheduledTimetable.addFrequencyEntry(freq);
-        if (this.route != freq.tripTimes.trip.getRoute()) {
-            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", freq.tripTimes.trip, route);
+        getTrips().add(freq.tripTimes.trip);
+        getScheduledTimetable().addFrequencyEntry(freq);
+        if (this.getRoute() != freq.tripTimes.trip.getRoute()) {
+            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", freq.tripTimes.trip,
+                getRoute()
+            );
         }
     }
 
@@ -299,12 +280,12 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * @param removeTrip it the predicate returns true
      */
     public void removeTrips(Predicate<Trip> removeTrip) {
-        trips.removeIf(removeTrip);
-        if(trips.isEmpty()) {
-            scheduledTimetable.tripTimes.clear();
+        getTrips().removeIf(removeTrip);
+        if(getTrips().isEmpty()) {
+            getScheduledTimetable().tripTimes.clear();
         }
         else {
-            scheduledTimetable.tripTimes.removeIf(tt -> removeTrip.test(tt.trip));
+            getScheduledTimetable().tripTimes.removeIf(tt -> removeTrip.test(tt.trip));
         }
     }
 
@@ -320,7 +301,46 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * The direction for all the trips in this pattern.
      */
     public Direction getDirection() {
-        return trips.get(0).getDirection();
+        return getTrips().get(0).getDirection();
+    }
+
+    /**
+     * This pattern may have multiple Timetable objects, but they should all contain TripTimes
+     * for the same trips, in the same order (that of the scheduled Timetable). An exception to
+     * this rule may arise if unscheduled trips are added to a Timetable. For that case we need
+     * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
+     */
+    public ArrayList<Trip> getTrips() {
+        return trips;
+    }
+
+    /** The human-readable, unique name for this trip pattern. */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * The GTFS Route of all trips in this pattern.
+     */
+    public Route getRoute() {
+        return route;
+    }
+
+    /**
+     * All trips in this pattern call at this sequence of stops. This includes information about GTFS
+     * pick-up and drop-off types.
+     */
+    public StopPattern getStopPattern() {
+        return stopPattern;
+    }
+
+    /**
+     * This is the "original" timetable holding the scheduled stop times from GTFS, with no
+     * realtime updates applied. If realtime stoptime updates are applied, next/previous departure
+     * searches will be conducted using a different, updated timetable in a snapshot.
+     */
+    public Timetable getScheduledTimetable() {
+        return scheduledTimetable;
     }
 
     boolean isCreatedByRealtimeUpdater() {
@@ -382,7 +402,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         /* Group TripPatterns by Route */
         Multimap<Route, TripPattern> patternsByRoute = ArrayListMultimap.create();
         for (TripPattern ttp : tableTripPatterns) {
-            patternsByRoute.put(ttp.route, ttp);
+            patternsByRoute.put(ttp.getRoute(), ttp);
         }
 
         /* Ensure we have a unique name for every Route */
@@ -407,7 +427,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
             /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
             if (routeTripPatterns.size() == 1) {
-                routeTripPatterns.iterator().next().name = routeName;
+                routeTripPatterns.iterator().next().setName(routeName);
                 continue;
             }
 
@@ -433,7 +453,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 Stop end = stops.get(stops.size() - 1);
                 sb.append(" to " + stopNameAndId(end));
                 if (ends.get(end).size() == 1) {
-                    pattern.name = sb.toString();
+                    pattern.setName(sb.toString());
                     continue PATTERN; // only pattern with this last stop
                 }
 
@@ -441,7 +461,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 Stop start = stops.get(0);
                 sb.append(" from " + stopNameAndId(start));
                 if (starts.get(start).size() == 1) {
-                    pattern.name = (sb.toString());
+                    pattern.setName((sb.toString()));
                     continue PATTERN; // only pattern with this first stop
                 }
 
@@ -450,7 +470,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 Set<TripPattern> remainingPatterns = new HashSet<>(tripPatterns);
                 remainingPatterns.retainAll(ends.get(end)); // set intersection
                 if (remainingPatterns.size() == 1) {
-                    pattern.name = (sb.toString());
+                    pattern.setName((sb.toString()));
                     continue PATTERN;
                 }
 
@@ -462,7 +482,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                     intersection.retainAll(vias.get(via));
                     if (intersection.size() == 1) {
                         sb.append(" via " + stopNameAndId(via));
-                        pattern.name = (sb.toString());
+                        pattern.setName((sb.toString()));
                         continue PATTERN;
                     }
                 }
@@ -477,7 +497,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                     // The final fallback: reference a specific trip ID.
                     sb.append(" like trip " + pattern.getTrips().get(0).getId());
                 }
-                pattern.name = (sb.toString());
+                pattern.setName((sb.toString()));
             } // END foreach PATTERN
         } // END foreach ROUTE
 
@@ -487,7 +507,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
                 LOG.debug("Named {} patterns in route {}", routeTripPatterns.size(), uniqueRouteNames.get(route));
                 for (TripPattern pattern : routeTripPatterns) {
-                    LOG.debug("    {} ({} stops)", pattern.name, pattern.stopPattern.getSize());
+                    LOG.debug("    {} ({} stops)", pattern.getName(), pattern.getStopPattern().getSize());
                 }
             }
         }
@@ -499,20 +519,23 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * placed in the hop factory itself.
      */
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
-        services = new BitSet();
-        for (Trip trip : trips) {
+        setServices(new BitSet());
+        for (Trip trip : getTrips()) {
             FeedScopedId serviceId = trip.getServiceId();
             if (serviceCodes.containsKey(serviceId)) {
-                services.set(serviceCodes.get(serviceId));
+                getServices().set(serviceCodes.get(serviceId));
             }
             else {
                 LOG.warn("Service " + serviceId + " not found in service codes not found.");
             }
         }
-        scheduledTimetable.setServiceCodes (serviceCodes);
+        getScheduledTimetable().setServiceCodes (serviceCodes);
     }
 
     /**
+     * A set of serviceIds with at least one trip in this pattern.
+     * Trips in a pattern are no longer necessarily running on the same service ID.
+     */ /**
      * @return bitset of service codes
      */
     public BitSet getServices() {
@@ -527,7 +550,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     }
 
     public String getTripHeadsign() {
-        return trips.get(0).getTripHeadsign();
+        return getTrips().get(0).getTripHeadsign();
     }
 
     public static boolean idsAreUniqueAndNotNull(Collection<TripPattern> tripPatterns) {
@@ -559,9 +582,9 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         HashFunction murmur = Hashing.murmur3_32();
         BaseEncoding encoder = BaseEncoding.base64Url().omitPadding();
         StringBuilder sb = new StringBuilder(50);
-        sb.append(encoder.encode(stopPattern.semanticHash(murmur).asBytes()));
+        sb.append(encoder.encode(getStopPattern().semanticHash(murmur).asBytes()));
         if (trip != null) {
-            TripTimes tripTimes = scheduledTimetable.getTripTimes(trip);
+            TripTimes tripTimes = getScheduledTimetable().getTripTimes(trip);
             if (tripTimes == null) { return null; }
             sb.append(':');
             sb.append(encoder.encode(tripTimes.semanticHash(murmur).asBytes()));
@@ -585,7 +608,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      */
     public String getFeedId() {
         // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
-        return route.getId().getFeedId();
+        return getRoute().getId().getFeedId();
     }
 
     private static Coordinate coordinate(Stop s) {

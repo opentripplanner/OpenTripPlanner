@@ -128,7 +128,7 @@ public class TransitLayerMapper {
                 for (org.opentripplanner.model.TripPattern oldTripPattern : allTripPatterns) {
                     TripPatternForDate tripPatternForDate =
                         tripPatternForDateMapper.map(
-                            oldTripPattern.scheduledTimetable,
+                            oldTripPattern.getScheduledTimetable(),
                             serviceDate
                     );
                     if (tripPatternForDate != null) {
