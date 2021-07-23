@@ -30,7 +30,8 @@ steps:
         aws s3 cp ${_S3_PATH} helsinki --recursive &&
         ls -lha
       fi
-  - name: 'adoptopenjdk/openjdk11'
+  - name: 'maven:3.6.3-openjdk-11'
+    entrypoint: 'bash'
     args: 
     - '-c'
     - |
