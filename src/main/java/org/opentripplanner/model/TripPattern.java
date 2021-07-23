@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
@@ -58,13 +59,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     private final StopPattern stopPattern;
 
     private final Timetable scheduledTimetable = new Timetable(this);
-
-    // redundant since tripTimes have a trip
-    // however it's nice to have for order reference, since all timetables must have tripTimes
-    // in this order, e.g. for interlining.
-    // potential optimization: trip fields can be removed from TripTimes?
-    // TODO: this field can be removed, and interlining can be done differently?
-    private final ArrayList<Trip> trips = new ArrayList<Trip>();
 
     /**
      * Geometries of each inter-stop segment of the tripPattern.
@@ -310,8 +304,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * this rule may arise if unscheduled trips are added to a Timetable. For that case we need
      * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
      */
-    public ArrayList<Trip> getTrips() {
-        return trips;
+    public List<Trip> getTrips() {
+        return scheduledTimetable.tripTimes.stream().map(t -> t.trip).collect(Collectors.toList());
     }
 
     /** The human-readable, unique name for this trip pattern. */
