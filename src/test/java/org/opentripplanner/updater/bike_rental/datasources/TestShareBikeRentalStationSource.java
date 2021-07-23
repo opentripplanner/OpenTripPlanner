@@ -5,6 +5,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 
 import java.util.List;
+import java.util.Map;
 
 public class TestShareBikeRentalStationSource extends TestCase {
 
@@ -16,7 +17,8 @@ public class TestShareBikeRentalStationSource extends TestCase {
                 null,
                 "file:src/test/resources/bike/share-bike.json?SystemID=dummyid",
                 null,
-                null
+                null,
+                Map.of()
             ));
         assertTrue(shareBikeSource.update());
         List<BikeRentalStation> rentalStations = shareBikeSource.getStations();
@@ -45,7 +47,8 @@ public class TestShareBikeRentalStationSource extends TestCase {
                     null,
                     "file:src/test/resources/bike/share-bike.json",
                     null,
-                    null
+                    null,
+                    Map.of()
                 )
             );
         assertTrue(shareBikeSource.update());

@@ -170,8 +170,8 @@ public class TransferService implements Serializable {
         if (existingTransfer.equals(newTransfer)) {
             return false;
         }
-        LOG.error(
-                "To colliding transfers A abd B with the same specificity-ranking is imported, B is "
+        LOG.warn(
+                "Two colliding transfers A and B with the same specificity-ranking is imported, B is "
                         + "dropped. A={}, B={}", existingTransfer, newTransfer
         );
         return false;

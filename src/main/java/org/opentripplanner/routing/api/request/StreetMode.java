@@ -2,6 +2,11 @@ package org.opentripplanner.routing.api.request;
 
 public enum StreetMode {
   /**
+   * No street mode is set. This option is used if we do not want street routing at all in this part
+   * of the search.
+   */
+  NOT_SET(true, true, true, false, false, false),
+  /**
    * Walk only
    */
   WALK(true, true, true, true, false, false),

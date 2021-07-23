@@ -30,8 +30,10 @@
 - Fix for traveling back in time when optimize transfers [#3491](https://github.com/opentripplanner/OpenTripPlanner/pull/3491)
 - Transit reluctance per transit mode [#3440](https://github.com/opentripplanner/OpenTripPlanner/issues/3440)
 - Allow the removal of P+R results consisting only of driving of walking [#3515](https://github.com/opentripplanner/OpenTripPlanner/pull/3515)
+- Allow http headers to be specified for bike rental updaters [#3533](https://github.com/opentripplanner/OpenTripPlanner/pull/3533)
 - Per-mode reluctance parameters are added so that itineraries with multiple modes may have varying reluctances. [#3501](https://github.com/opentripplanner/OpenTripPlanner/issues/3501)
-- Add `maxAreaNodes` configuration parameter for changing an area visibility calculation limit (https://github.com/opentripplanner/OpenTripPlanner/issues/3534)
+- Add `maxAreaNodes` configuration parameter for changing an area visibility calculation limit [#3501](https://github.com/opentripplanner/OpenTripPlanner/issues/3534)
+- Add bicycle safety report to report API [#3563](https://github.com/opentripplanner/OpenTripPlanner/issues/3563)
 - Optimize Transfers performance issue [#3513](https://github.com/opentripplanner/OpenTripPlanner/issues/3513)
 
 

@@ -5,6 +5,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 
 import java.util.List;
+import java.util.Map;
 
 public class TestBicimadBikeRentalStationSource extends TestCase {
 
@@ -15,7 +16,8 @@ public class TestBicimadBikeRentalStationSource extends TestCase {
                         null,
                         "file:src/test/resources/bike/bicimad.json",
                         null,
-                        null
+                        null,
+                        Map.of()
                     )
                 );
                 assertTrue(bicimadBikeRentalDataSource.update());

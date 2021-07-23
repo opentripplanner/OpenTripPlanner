@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.bikerentalservicedirectory.api;
 
 import java.net.URI;
+import java.util.Map;
 
 public class BikeRentalServiceDirectoryFetcherParameters {
 
@@ -32,13 +33,25 @@ public class BikeRentalServiceDirectoryFetcherParameters {
    */
   private final String sourceNetworkName;
 
+  /**
+   * Json tag name for http headers
+   * <p>
+ *   Optional, default value is null
+   */
+  private final Map<String, String> headers;
+
   public BikeRentalServiceDirectoryFetcherParameters(
-      URI url, String sourcesName, String updaterUrlName, String networkName
+      URI url,
+      String sourcesName,
+      String updaterUrlName,
+      String networkName,
+      Map<String, String> headers
   ) {
     this.url = url;
     this.sourcesName = sourcesName;
     this.sourceUrlName = updaterUrlName;
     this.sourceNetworkName = networkName;
+    this.headers = headers;
   }
 
   public URI getUrl() {
@@ -55,5 +68,9 @@ public class BikeRentalServiceDirectoryFetcherParameters {
 
   public String getSourceNetworkName() {
     return sourceNetworkName;
+  }
+
+  public Map<String, String> getHeaders() {
+    return headers;
   }
 }
