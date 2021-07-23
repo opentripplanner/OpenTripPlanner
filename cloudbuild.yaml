@@ -28,10 +28,14 @@ steps:
         unzip awscliv2.zip && ./aws/install &&
         aws sts get-caller-identity &&
         aws s3 cp ${_S3_PATH} helsinki --recursive &&
-        ls -lha &&
-        cd helsinki &&
-        java -Xmx30G -jar ../target/otp-2.1.0-SNAPSHOT-shaded.jar --build . --save
+        ls -lha
       fi
+  - name: 'gcr.io/cloud-builders/java'
+    args: 
+    - '-c'
+    - |
+      cd helsinki &&
+      java -Xmx30G -jar ../target/otp-2.1.0-SNAPSHOT-shaded.jar --build . --save
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     timeout: 7200s
