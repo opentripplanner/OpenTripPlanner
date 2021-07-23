@@ -81,7 +81,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * trip level. An effort is made to re-use the sequence number arrays when they are the same
      * across different trips in the same pattern.
      */
-    private final int[] stopSequence;
+    private final int[] originalGtfsStopSequence;
 
     /**
      * The real-time state of this TripTimes.
@@ -123,7 +123,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         }
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
-        this.stopSequence = deduplicator.deduplicateIntArray(sequences);
+        this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
         this.setPickups(deduplicator.deduplicateIntArray(pickups));
         this.setDropoffs(deduplicator.deduplicateIntArray(dropoffs));
@@ -148,7 +148,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.headsigns = object.headsigns;
         this.scheduledDepartureTimes = object.getScheduledDepartureTimes();
         this.scheduledArrivalTimes = object.getScheduledArrivalTimes();
-        this.stopSequence = object.stopSequence;
+        this.originalGtfsStopSequence = object.originalGtfsStopSequence;
         this.timepoints = object.timepoints;
         this.setPickups(object.getPickups());
         this.setDropoffs(object.getDropoffs());
@@ -549,8 +549,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     }
 
     /** Just to create uniform getter-syntax across the whole public interface of TripTimes. */
-    public int getStopSequence(final int stop) {
-        return stopSequence[stop];
+    public int getOriginalGtfsStopSequence(final int stop) {
+        return originalGtfsStopSequence[stop];
     }
 
     /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */

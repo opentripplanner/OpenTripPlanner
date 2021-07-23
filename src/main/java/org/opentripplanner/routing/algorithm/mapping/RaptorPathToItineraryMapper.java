@@ -349,7 +349,7 @@ public class RaptorPathToItineraryMapper {
     private Place mapStopToPlace(Stop stop, Integer stopIndex, TripTimes tripTimes) {
         Place place = mapStopToPlace(stop);
         place.stopIndex = stopIndex;
-        place.stopSequence = tripTimes.getStopSequence(stopIndex);
+        place.stopSequence = tripTimes.getOriginalGtfsStopSequence(stopIndex);
         return place;
     }
 
