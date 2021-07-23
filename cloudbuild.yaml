@@ -7,7 +7,7 @@ steps:
     args: 
     - '-c'
     - mvn package -Dmaven.test.skip=true
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: 'gcr.io/cloud-builders/java'
     entrypoint: 'bash'
     env:
       - "AWS_ACCESS_KEY_ID=${_AWS_ACCESS_KEY_ID}"
@@ -17,17 +17,9 @@ steps:
     - '-c'
     - |
       if [ -n "${_DEPLOYMENT}" ]; then
-        add-apt-repository ppa:deadsnakes/ppa &&
-        apt update && apt install -y unzip &&
-        apt install -y python3.8 && apt install -y wget build-essential
-        software-properties-common libz-dev zlib1g-dev && wget -c
-        https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${_GRAAL_VM_VERSION}/graalvm-ce-java11-linux-amd64-${_GRAAL_VM_VERSION}.tar.gz
-        -O - | tar -xz &&  mv graalvm-ce-java11-${_GRAAL_VM_VERSION}
-        /tmp/graalvm &&  export PATH=/tmp/graalvm/bin:$$PATH && export
-        JAVA_HOME=/tmp/graalvm &&
-        curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" &&
-        unzip awscli-bundle.zip &&
-        python3.8 awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws &&
+        apt update &&  apt install -y unzip && curl
+        "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o
+        "awscliv2.zip" && unzip awscliv2.zip && ./aws/install &&
         aws s3 cp ${_S3_PATH} helsinki --recursive &&
         ls -lha &&
         cd helsinki &&
