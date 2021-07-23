@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,16 +54,6 @@ public class Timetable implements Serializable {
      * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.
      */
     public final ServiceDate serviceDate;
-
-    /**
-     * For each hop, the best running time. This serves to provide lower bounds on traversal time.
-     */
-    private transient int minRunningTimes[];
-
-    /**
-     * For each stop, the best dwell time. This serves to provide lower bounds on traversal time.
-     */
-    private transient int minDwellTimes[];
 
     /** 
      * Helps determine whether a particular pattern is worth searching for departures at a given time. 
@@ -118,27 +107,11 @@ public class Timetable implements Serializable {
      */
     public void finish() {
         int nStops = pattern.getStopPattern().getSize();
-        int nHops = nStops - 1;
-        /* Find lower bounds on dwell and running times at each stop. */
-        minDwellTimes = new int[nHops];
-        minRunningTimes = new int[nHops];
-        Arrays.fill(minDwellTimes, Integer.MAX_VALUE);
-        Arrays.fill(minRunningTimes, Integer.MAX_VALUE);
+
         // Concatenate raw TripTimes and those referenced from FrequencyEntries
         List<TripTimes> allTripTimes = Lists.newArrayList(tripTimes);
         for (FrequencyEntry freq : frequencyEntries) allTripTimes.add(freq.tripTimes);
-        for (TripTimes tt : allTripTimes) {
-            for (int h = 0; h < nHops; ++h) {
-                int dt = tt.getDwellTime(h);
-                if (minDwellTimes[h] > dt) {
-                    minDwellTimes[h] = dt;
-                }
-                int rt = tt.getRunningTime(h);
-                if (minRunningTimes[h] > rt) {
-                    minRunningTimes[h] = rt;
-                }
-            }
-        }
+
         /* Find the time range over which this timetable is active. Allows departure search optimizations. */
         minTime = Integer.MAX_VALUE;
         maxTime = Integer.MIN_VALUE;
@@ -388,32 +361,6 @@ public class Timetable implements Serializable {
      */
     public void addFrequencyEntry(FrequencyEntry freq) {
         frequencyEntries.add(freq);
-    }
-
-    /**
-     * Check that all dwell times at the given stop are zero, which allows removing the dwell edge.
-     * TODO we should probably just eliminate dwell-deletion. It won't be important if we get rid of transit edges.
-     */
-    boolean allDwellsZero(int hopIndex) {
-        for (TripTimes tt : tripTimes) {
-            if (tt.getDwellTime(hopIndex) != 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** Returns the shortest possible running time for this stop */
-    public int getBestRunningTime(int stopIndex) {
-        return minRunningTimes[stopIndex];
-    }
-
-    /** Returns the shortest possible dwell time at this stop */
-    public int getBestDwellTime(int stopIndex) {
-        if (minDwellTimes == null) {
-            return 0;
-        }
-        return minDwellTimes[stopIndex];
     }
 
     public boolean isValidFor(ServiceDate serviceDate) {
