@@ -30,7 +30,7 @@ steps:
         aws s3 cp ${_S3_PATH} helsinki --recursive &&
         ls -lha
       fi
-  - name: 'gcr.io/cloud-builders/java/gradle'
+  - name: 'adoptopenjdk/openjdk11'
     args: 
     - '-c'
     - |
