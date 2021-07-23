@@ -24,8 +24,8 @@ steps:
         -O - | tar -xz &&  mv graalvm-ce-java11-${_GRAAL_VM_VERSION}
         /tmp/graalvm &&  export PATH=/tmp/graalvm/bin:$$PATH && export
         JAVA_HOME=/tmp/graalvm &&
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o
-        "awscliv2.zip" && unzip awscliv2.zip && ./aws/install &&
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+        -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install &&
         aws s3 cp ${_S3_PATH} helsinki --recursive &&
         ls -lha &&
         cd helsinki &&
