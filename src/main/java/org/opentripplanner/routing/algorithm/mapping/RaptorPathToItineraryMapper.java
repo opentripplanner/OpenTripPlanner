@@ -159,7 +159,7 @@ public class RaptorPathToItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
         TripTimes tripTimes = tripSchedule.getOriginalTripTimes();
 
-        Leg leg = new Leg(tripTimes.trip);
+        Leg leg = new Leg(tripTimes.getTrip());
 
         // Find stop positions in pattern where this leg boards and alights.
         // We cannot assume every stop appears only once in a pattern, so we

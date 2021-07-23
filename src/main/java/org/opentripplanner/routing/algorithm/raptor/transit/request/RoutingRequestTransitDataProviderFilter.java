@@ -62,15 +62,15 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
     if (requireBikesAllowed) {
-      return bikeAccessForTrip(tripTimes.trip) == BikeAccess.ALLOWED;
+      return bikeAccessForTrip(tripTimes.getTrip()) == BikeAccess.ALLOWED;
     }
 
     if (requireWheelchairAccessible) {
-      return tripTimes.trip.getWheelchairAccessible() == 1;
+      return tripTimes.getTrip().getWheelchairAccessible() == 1;
     }
 
     if (!includePlannedCancellations) {
-      return !tripTimes.trip.getTripAlteration().isCanceledOrReplaced();
+      return !tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced();
     }
 
     return true;

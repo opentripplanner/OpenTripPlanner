@@ -718,7 +718,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
         // Set service code of new trip times
-        newTripTimes.serviceCode = serviceCode;
+        newTripTimes.setServiceCode(serviceCode);
 
         // Make sure that updated trip times have the correct real time state
         newTripTimes.setRealTimeState(realTimeState);

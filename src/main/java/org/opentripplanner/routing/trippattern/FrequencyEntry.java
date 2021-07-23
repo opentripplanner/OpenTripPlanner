@@ -47,7 +47,8 @@ public class FrequencyEntry implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("FreqEntry: trip %s start %s end %s headway %s", tripTimes.trip, formatSeconds(startTime), formatSeconds(endTime), formatSeconds(headway));
+        return String.format("FreqEntry: trip %s start %s end %s headway %s",
+            tripTimes.getTrip(), formatSeconds(startTime), formatSeconds(endTime), formatSeconds(headway));
     }
 
     public int nextDepartureTime (int stop, int time) {

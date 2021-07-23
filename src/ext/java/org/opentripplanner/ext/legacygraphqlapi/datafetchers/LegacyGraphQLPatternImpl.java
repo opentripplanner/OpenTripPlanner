@@ -73,8 +73,8 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         );
         return getSource(environment).getScheduledTimetable().tripTimes
             .stream()
-            .filter(times -> services.get(times.serviceCode))
-            .map(times -> times.trip)
+            .filter(times -> services.get(times.getServiceCode()))
+            .map(times -> times.getTrip())
             .collect(Collectors.toList());
       } catch (ParseException e) {
         return null; // Invalid date format

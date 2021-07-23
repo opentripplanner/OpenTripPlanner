@@ -56,7 +56,7 @@ public class RideMapper {
         }
         ride.agency = tripPattern.getRoute().getAgency().getId();
         ride.route = tripPattern.getRoute().getId();
-        ride.trip = tripSchedule.getOriginalTripTimes().trip.getId();
+        ride.trip = tripSchedule.getOriginalTripTimes().getTrip().getId();
         // TODO verify that times are in seconds after midnight
         ride.startTime = transitPathLeg.fromTime();
         ride.endTime  = transitPathLeg.toTime();

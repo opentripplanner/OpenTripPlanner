@@ -40,7 +40,7 @@ public class TripTimeShort {
      */
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {
         serviceDay         = sd != null ? sd.time(0) : UNDEFINED;
-        trip               = tt.trip;
+        trip               = tt.getTrip();
         stopId             = stop.getId();
         stopIndex          = i;
         stopCount          = tt.getNumStops();
@@ -68,7 +68,7 @@ public class TripTimeShort {
         }
 
         realtimeState      = tt.getRealTimeState();
-        blockId            = tt.trip.getBlockId();
+        blockId            = tt.getTrip().getBlockId();
         headsign           = tt.getHeadsign(i);
         pickupType         = tt.getPickupType(i);
         dropoffType        = tt.getDropoffType(i);

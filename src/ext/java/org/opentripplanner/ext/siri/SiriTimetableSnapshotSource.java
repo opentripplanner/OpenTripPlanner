@@ -649,7 +649,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             tripTimes.setRealTimeState(RealTimeState.ADDED);
         }
 
-        tripTimes.serviceCode = graph.getServiceCodes().get(calServiceId);
+        tripTimes.setServiceCode(graph.getServiceCodes().get(calServiceId));
 
         pattern.add(tripTimes);
 
@@ -771,7 +771,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         boolean result = false;
         for (TripTimes tripTimes : times) {
-            Trip trip = tripTimes.trip;
+            Trip trip = tripTimes.getTrip();
             for (TripPattern pattern : patterns) {
                 if (tripTimes.getNumStops() == pattern.getStopPattern().getStops().length) {
                     if (!tripTimes.isCanceled()) {
@@ -1270,10 +1270,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                             if (times.getScheduledDepartureTime(stopNumber - 1) == departureInSecondsSinceMidnight) {
                                 if (routingService
                                     .getCalendarService()
-                                    .getServiceDatesForServiceId(times.trip.getServiceId())
+                                    .getServiceDatesForServiceId(times.getTrip().getServiceId())
                                     .contains(serviceDate)
                                 ) {
-                                    result.add(times.trip);
+                                    result.add(times.getTrip());
                                 }
                             }
                         }

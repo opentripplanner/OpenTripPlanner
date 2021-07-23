@@ -120,7 +120,7 @@ public class StopTimesHelper {
         if (currStop == stop) {
           if(omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
           for (TripTimes t : tt.tripTimes) {
-            if (!sd.serviceRunning(t.serviceCode)) { continue; }
+            if (!sd.serviceRunning(t.getServiceCode())) { continue; }
             stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
           }
         }
@@ -223,7 +223,7 @@ public class StopTimesHelper {
         if (currStop == stop) {
           if (omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
           for (TripTimes t : tt.tripTimes) {
-            if (!sd.serviceRunning(t.serviceCode)) continue;
+            if (!sd.serviceRunning(t.getServiceCode())) continue;
             if (t.getDepartureTime(sidx) != -1 &&
                     t.getDepartureTime(sidx) >= secondsSinceMidnight) {
               pq.add(new TripTimeShort(t, sidx, stop, sd));
@@ -232,7 +232,7 @@ public class StopTimesHelper {
 
           // TODO: This needs to be adapted after #1647 is merged
           for (FrequencyEntry freq : tt.frequencyEntries) {
-            if (!sd.serviceRunning(freq.tripTimes.serviceCode)) continue;
+            if (!sd.serviceRunning(freq.tripTimes.getServiceCode())) continue;
             int departureTime = freq.nextDepartureTime(sidx, secondsSinceMidnight);
             if (departureTime == -1) continue;
             int lastDeparture = freq.endTime + freq.tripTimes.getArrivalTime(sidx) -

@@ -79,6 +79,6 @@ public class PriorityBasedTransfersCostCalculator<T extends RaptorTripSchedule> 
   }
 
   private Trip trip(T raptorTripSchedule) {
-    return ((TripSchedule)raptorTripSchedule).getOriginalTripTimes().trip;
+    return ((TripSchedule) raptorTripSchedule).getOriginalTripTimes().getTrip();
   }
 }

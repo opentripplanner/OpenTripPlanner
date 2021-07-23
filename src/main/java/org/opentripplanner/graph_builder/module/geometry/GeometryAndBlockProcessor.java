@@ -195,7 +195,7 @@ public class GeometryAndBlockProcessor {
             Timetable timetable = pattern.getScheduledTimetable();
             /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
             for (TripTimes tripTimes : timetable.tripTimes) {
-                Trip trip = tripTimes.trip;
+                Trip trip = tripTimes.getTrip();
                 if (!Strings.isNullOrEmpty(trip.getBlockId())) {
                     tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);
                     // For space efficiency, only record times that are part of a block.
@@ -219,7 +219,7 @@ public class GeometryAndBlockProcessor {
                     if (prev.getDepartureTime(prev.getNumStops() - 1) > curr.getArrivalTime(0)) {
                         LOG.error(
                                 "Trip times within block {} are not increasing on service {} after trip {}.",
-                                block.blockId, block.serviceId, prev.trip.getId());
+                                block.blockId, block.serviceId, prev.getTrip().getId());
                         continue SERVICE_BLOCK;
                     }
                     TripPattern prevPattern = patternForTripTimes.get(prev);
@@ -240,7 +240,7 @@ public class GeometryAndBlockProcessor {
                         // Only skip this particular interline edge; there may be other valid ones in the block.
                     } else {
                         interlines.put(new P2<>(prevPattern, currPattern),
-                                new P2<>(prev.trip, curr.trip));
+                                new P2<>(prev.getTrip(), curr.getTrip()));
                     }
                 }
                 prev = curr;

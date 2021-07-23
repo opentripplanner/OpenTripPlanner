@@ -158,7 +158,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
         // Verify scheduledTimetable trips (one trip is removed from patternInT1)
         assertEquals(1, patternInT1.getScheduledTimetable().tripTimes.size());
-        assertEquals(tripCSIn, patternInT1.getScheduledTimetable().tripTimes.get(0).trip);
+        assertEquals(tripCSIn, patternInT1.getScheduledTimetable().tripTimes.get(0).getTrip());
 
         // Verify scheduledTimetable trips in pattern is unchanged (one trip)
         assertEquals(1, patternInT2.getScheduledTimetable().tripTimes.size());

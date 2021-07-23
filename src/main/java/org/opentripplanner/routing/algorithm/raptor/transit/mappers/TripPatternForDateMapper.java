@@ -78,7 +78,7 @@ public class TripPatternForDateMapper {
         );
 
         for (TripTimes tripTimes : sortedTripTimes) {
-            if (!serviceCodesRunning.contains(tripTimes.serviceCode)) {
+            if (!serviceCodesRunning.contains(tripTimes.getServiceCode())) {
                 continue;
             }
             if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) {

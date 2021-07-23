@@ -219,12 +219,12 @@ public class TimetableSnapshot {
         
         // Assume all trips in a pattern are from the same feed, which should be the case.
         // Find trip index
-        int tripIndex = tt.getTripIndex(updatedTripTimes.trip.getId());
+        int tripIndex = tt.getTripIndex(updatedTripTimes.getTrip().getId());
         if (tripIndex == -1) {
             // Trip not found, add it
             tt.addTripTimes(updatedTripTimes);
             // Remember this pattern for the added trip id and service date
-            FeedScopedId tripId = updatedTripTimes.trip.getId();
+            FeedScopedId tripId = updatedTripTimes.getTrip().getId();
             TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
             lastAddedTripPattern.put(tripIdAndServiceDate, pattern);
         } else {

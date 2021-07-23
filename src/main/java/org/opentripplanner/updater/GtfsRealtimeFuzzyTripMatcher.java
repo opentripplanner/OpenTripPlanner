@@ -83,8 +83,8 @@ public class GtfsRealtimeFuzzyTripMatcher {
             if (pattern.getDirection().gtfsCode != direction) continue;
             for (TripTimes times : pattern.getScheduledTimetable().tripTimes) {
                 if (times.getScheduledDepartureTime(0) == startTime &&
-                        servicesRunningForDate.get(times.serviceCode)) {
-                    return times.trip;
+                        servicesRunningForDate.get(times.getServiceCode())) {
+                    return times.getTrip();
                 }
             }
         }

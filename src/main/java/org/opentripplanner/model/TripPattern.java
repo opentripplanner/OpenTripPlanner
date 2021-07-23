@@ -242,12 +242,13 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      */
     public void add(TripTimes tt) {
         // Only scheduled trips (added at graph build time, rather than directly to the timetable via updates) are in this list.
-        getTrips().add(tt.trip);
+        getTrips().add(tt.getTrip());
         getScheduledTimetable().addTripTimes(tt);
         // Check that all trips added to this pattern are on the initially declared route.
         // Identity equality is valid on GTFS entity objects.
-        if (this.getRoute() != tt.trip.getRoute()) {
-            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(),
+        if (this.getRoute() != tt.getTrip().getRoute()) {
+            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.",
+                tt.getTrip(), tt.getTrip().getRoute(),
                 this.getRoute()
             );
         }
@@ -260,10 +261,11 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * since it is redundant.
      */
     public void add(FrequencyEntry freq) {
-        getTrips().add(freq.tripTimes.trip);
+        getTrips().add(freq.tripTimes.getTrip());
         getScheduledTimetable().addFrequencyEntry(freq);
-        if (this.getRoute() != freq.tripTimes.trip.getRoute()) {
-            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", freq.tripTimes.trip,
+        if (this.getRoute() != freq.tripTimes.getTrip().getRoute()) {
+            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.",
+                freq.tripTimes.getTrip(),
                 getRoute()
             );
         }
@@ -279,7 +281,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
             getScheduledTimetable().tripTimes.clear();
         }
         else {
-            getScheduledTimetable().tripTimes.removeIf(tt -> removeTrip.test(tt.trip));
+            getScheduledTimetable().tripTimes.removeIf(tt -> removeTrip.test(tt.getTrip()));
         }
     }
 
@@ -305,7 +307,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
      */
     public List<Trip> getTrips() {
-        return scheduledTimetable.tripTimes.stream().map(t -> t.trip).collect(Collectors.toList());
+        return scheduledTimetable.tripTimes.stream().map(t -> t.getTrip()).collect(Collectors.toList());
     }
 
     /** The human-readable, unique name for this trip pattern. */

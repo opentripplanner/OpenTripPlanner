@@ -104,7 +104,7 @@ public class TimetableHelper {
         TripTimes newTimes = new TripTimes(trip, modifiedStopTimes, graph.deduplicator);
 
         //Populate missing data from existing TripTimes
-        newTimes.serviceCode = oldTimes.serviceCode;
+        newTimes.setServiceCode(oldTimes.getServiceCode());
 
         ZoneId zoneId = graph.getTimeZone().toZoneId();
 
@@ -669,8 +669,8 @@ public class TimetableHelper {
      */
     public static Trip getTrip(FeedScopedId tripId, Timetable timetable) {
         for (TripTimes tt : timetable.tripTimes) {
-            if (tt.trip.getId().equals(tripId)) {
-                return tt.trip;
+            if (tt.getTrip().getId().equals(tripId)) {
+                return tt.getTrip();
             }
         }
         return null;

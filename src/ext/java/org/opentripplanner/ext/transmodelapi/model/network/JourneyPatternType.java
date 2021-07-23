@@ -72,8 +72,8 @@ public class JourneyPatternType {
                   );
               return ((TripPattern) environment.getSource()).getScheduledTimetable().tripTimes
                   .stream()
-                  .filter(times -> services.get(times.serviceCode))
-                  .map(times -> times.trip)
+                  .filter(times -> services.get(times.getServiceCode()))
+                  .map(times -> times.getTrip())
                   .collect(Collectors.toList());
             })
             .build())
