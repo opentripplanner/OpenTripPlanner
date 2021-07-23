@@ -1,6 +1,6 @@
 timeout: 7200s
 options:
-  machineType: N1_HIGHMEM_8
+  machineType: n1-highmem-8
 steps:
   - name: 'maven:3.6.3-openjdk-11'
     entrypoint: 'bash'
