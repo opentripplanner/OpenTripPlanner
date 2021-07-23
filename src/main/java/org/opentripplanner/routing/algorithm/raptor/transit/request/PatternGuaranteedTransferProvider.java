@@ -22,6 +22,10 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 public final class PatternGuaranteedTransferProvider
         implements RaptorGuaranteedTransferProvider<TripSchedule> {
 
+    private static final int NOT_FOUND = -999_999_999;
+    private static final DirectionHelper FORWARD_HELPER = new ForwardDirectionHelper();
+    private static final DirectionHelper REVERSE_HELPER = new ReverseDirectionHelper();
+
     private final DirectionHelper translator;
 
     /**
@@ -35,9 +39,7 @@ public final class PatternGuaranteedTransferProvider
             boolean forwardSearch,
             TIntObjectMap<List<Transfer>> transfers
     ) {
-        this.translator = forwardSearch
-                ? new ForwardDirectionHelper()
-                : new ReverseDirectionHelper();
+        this.translator = forwardSearch ? FORWARD_HELPER : REVERSE_HELPER;
         this.transfers = transfers;
     }
 
@@ -62,26 +64,35 @@ public final class PatternGuaranteedTransferProvider
                 sourceTripSchedule, sourceArrivalTime, sourceStopIndex
         );
 
-        TransferPoint targetPoint = findMatchingTargetPoint(sourceTrip, sourceStopPos);
+        Transfer tx = findMatchingTargetPoint(sourceTrip, sourceStopPos);
 
-        if(targetPoint == null) { return null; }
+        if(tx == null) { return null; }
 
-        return translator.findTimetableTripIndex(
+        TransferPoint target = translator.target(tx);
+        final int targetStopPos = target.getStopPosition();
+
+        int tripIndex = translator.findTimetableTripIndex(
                 timetable,
-                targetPoint.getTrip(),
-                targetPoint.getStopPosition(),
+                target.getTrip(),
+                targetStopPos,
                 sourceArrivalTime
         );
+        if(tripIndex == NOT_FOUND) { return null; }
+
+        var trip = timetable.getTripSchedule(tripIndex);
+        int departureTime = translator.time(trip, targetStopPos);
+
+        return new Result(tripIndex, trip, targetStopPos, departureTime);
     }
 
-    private TransferPoint findMatchingTargetPoint(
+    private Transfer findMatchingTargetPoint(
             Trip sourceTrip,
             int sourceStopPos
     ) {
         for (Transfer tx : currentTransfers) {
             var sourcePoint = translator.source(tx);
             if(sourcePoint.matches(sourceTrip, sourceStopPos)) {
-                return translator.target(tx);
+                return tx;
             }
         }
         return null;
@@ -90,21 +101,28 @@ public final class PatternGuaranteedTransferProvider
     private interface DirectionHelper {
         TransferPoint source(Transfer tx);
         TransferPoint target(Transfer tx);
+        int time(RaptorTripSchedule schedule, int stopPos);
         int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop);
-        Result findTimetableTripIndex(
-                RaptorTimeTable<TripSchedule> timetable, Trip trip, int stopPos, int sourceTime
+        int findTimetableTripIndex(
+                RaptorTimeTable<TripSchedule> timetable,
+                Trip trip,
+                int stopPos,
+                int sourceTime
         );
     }
 
     private static class ForwardDirectionHelper implements DirectionHelper {
         @Override public TransferPoint source(Transfer tx) { return tx.getFrom();  }
         @Override public TransferPoint target(Transfer tx) { return tx.getTo(); }
+        @Override public int time(RaptorTripSchedule schedule, int stopPos) {
+            return schedule.departure(stopPos);
+        }
         @Override
         public int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop) {
             return schedule.findArrivalStopPosition(timeLimit, stop);
         }
         @Override
-        public Result findTimetableTripIndex(
+        public int findTimetableTripIndex(
                 RaptorTimeTable<TripSchedule> timetable,
                 Trip trip,
                 int stopPos,
@@ -117,24 +135,27 @@ public final class PatternGuaranteedTransferProvider
                 var it = timetable.getTripSchedule(i);
                 int departureTime = it.departure(stopPos);
                 if(departureTime < sourceArrivalTime) { continue; }
-                if(departureTime > maxLimit) { return null; }
+                if(departureTime > maxLimit) { return NOT_FOUND; }
                 if(it.getOriginalTripTimes().getTrip() == trip) {
-                    return new Result(i, it, stopPos, departureTime);
+                    return i;
                 }
             }
-            return null;
+            return NOT_FOUND;
         }
     }
 
     private static class ReverseDirectionHelper implements DirectionHelper {
         @Override public TransferPoint source(Transfer tx) { return tx.getTo();  }
         @Override public TransferPoint target(Transfer tx) { return tx.getFrom(); }
+        @Override public int time(RaptorTripSchedule schedule, int stopPos) {
+            return schedule.arrival(stopPos);
+        }
         @Override
         public int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop) {
             return schedule.findDepartureStopPosition(timeLimit, stop);
         }
         @Override
-        public Result findTimetableTripIndex(
+        public int findTimetableTripIndex(
                 RaptorTimeTable<TripSchedule> timetable,
                 Trip trip,
                 int stopPos,
@@ -145,14 +166,14 @@ public final class PatternGuaranteedTransferProvider
 
             for (int i = 0; i < timetable.numberOfTripSchedules(); i++) {
                 var it = timetable.getTripSchedule(i);
-                int arrivalTime = it.arrival(stopPos);
+                int arrivalTime = time(it, stopPos);
                 if(arrivalTime < minLimit) { continue; }
-                if(arrivalTime > toDepartureTime) { return null; }
+                if(arrivalTime > toDepartureTime) { return NOT_FOUND; }
                 if(it.getOriginalTripTimes().getTrip() == trip) {
-                    return new Result(i, it, stopPos, arrivalTime);
+                    return i;
                 }
             }
-            return null;
+            return NOT_FOUND;
         }
     }
 
