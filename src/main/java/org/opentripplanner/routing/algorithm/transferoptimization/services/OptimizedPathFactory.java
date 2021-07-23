@@ -93,8 +93,8 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Return the total transfer priority cost. This have nothing to do with the
-     * generalized-cost. Return {@code 0} if cost is neutral/no "special"-transfers exist.
+     * Return the total transfer priority cost. This is completely separate from the
+     * generalized-cost. Return zero if the cost is neutral (no "special" transfers exist).
      *
      * @see Transfer#priorityCost(Transfer)
      */

@@ -8,7 +8,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 
 /**
- * The optimized path decorate the path returned from Raptor with a transfer-priority-cost and
+ * An OptimizedPath decorates a path returned from Raptor with a transfer-priority-cost and
  * a wait-time-optimized-cost.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

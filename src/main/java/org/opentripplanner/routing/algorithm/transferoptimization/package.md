@@ -47,7 +47,7 @@ those paths (the post-processing).
 
 ## Implementation
 
-OTP find the best transfers in 2 steps:
+OTP finds the best transfers in 2 steps:
 
  1. As part of the routing. The routing engine (Raptor) applies generalized-cost and 
     number-of-transfers as criteria during the routing. In addition, Raptor supports overriding 
@@ -60,7 +60,7 @@ OTP find the best transfers in 2 steps:
        get guaranteed transfers. This service is also responsible for rejecting a transfer(TODO). 
  2. Optimize transfers: Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the 
     routing search are revised, optimizing the stop at which transfers happen between each pair of
-    transit rides(trips). This step does NOT compare different paths returned by the router
+    transit rides (trips). This step does NOT compare different paths returned by the router
     (Raptor), but instead finds all possible transfer locations for a given path, and the different
     alternatives to transfer between each pair of trips within the path. This is an outline of the
     process:
@@ -79,12 +79,12 @@ OTP find the best transfers in 2 steps:
 
 The `OptimizeTranferService` is the entry point and delegates to the "domain" services in 
 the `services` package. The result of the optimization process is an `OptimizedPath` found in the 
-`api` package. The optimization process first uses the `TransferGenerator` to finding all possible
-transfer points between each trip in a path. Then the `OptimizePathService` construct all possible
+`api` package. The optimization process first uses the `TransferGenerator` to find all possible
+transfer points between each trip in a path. Then the `OptimizePathService` constructs all possible
 paths starting at the "tail" with the egress-leg, and adds legs until the path is constructed.
-To avoid exploring to many paths, the optimization filters the result of each step reducing the 
+To avoid exploring too many paths, the optimization filters the result of each step, reducing the 
 set of optimal tails. The `MinCostFilterChain` is used to filter each equivalent set of paths and 
-the `TransitPathLegSelector` find the best tail for each transfer used to generate a new path-tail.
+the `TransitPathLegSelector` finds the best tail for each transfer used to generate a new path-tail.
 
 Here is an outline of the calls:
 
@@ -93,11 +93,11 @@ Here is an outline of the calls:
 
 ### Packages 
 
-The `org.opentripplanner.routing.algorithm.transferoptimization` have the following packages:
-- `api` classes used outside the transfer-optimization
-- `configure` - Create and wire up the the module.
-- `model` simple internal model classes used by the services to build the result. 
-- `services` internal transfer-optimization domain services, witch collaborate to do the job.  
+Package `org.opentripplanner.routing.algorithm.transferoptimization` has the following subpackages:
+- `api` classes used outside the transfer-optimization.
+- `configure` creates and wires up the the module.
+- `model` simple internal model classes used by the services to build the result.
+- `services` internal transfer-optimization domain services, witch collaborate to do the job.
 
 ### Important classes
 
@@ -110,9 +110,9 @@ The `OptimizeTransferService` is the entry point of the service and responsible 
 the sub-tasks to the internal domain services. It is also responsible for the life-cycle, mainly
 injecting 'setMinSafeTransferTime' before the calculation starts.
 
-The `OptimizePathService` find the best optimized path using the other domain services.
+The `OptimizePathService` finds the best optimized path using the other domain services.
 
-The `TransferGenerator` i responsible for finding all possible transfer options and decorate each 
+The `TransferGenerator` is responsible for finding all possible transfer options and decorating each 
 transfer with information that the other services will use later to do their job. The additional
 information added to each transfer is:
 - Guaranteed transfer information including priority, guaranteed, stay-seated and so on

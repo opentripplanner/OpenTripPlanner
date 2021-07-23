@@ -22,8 +22,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * This class is responsible for generating all possible permutations of a path with respect to
- * where the transfer happens and picking the best possible path. To perform ok, the paths generated
- * are pruned during construction.
+ * where the transfer happens and picking the best possible path. To improve performance, the paths
+ * generated are pruned during construction.
  * <p>
  * <b>Performance</b>
  * <p>
@@ -41,7 +41,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * Line 2:        + --- + --- + --- + --- +
  * Line 3:              + --------- + --- + --- +
  *
- * In this example there is the following possible paths from A to G:
+ * In this example, all the following paths are possible from A to G:
  *
  *   A ~ L1 ~ B ~ L2 ~ C ~ L3 ~ G   (best option)
  *   A ~ L1 ~ B ~ L2 ~ E ~ L3 ~ G
@@ -49,17 +49,17 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  *   A ~ L1 ~ D ~ L2 ~ E ~ L3 ~ G   (second best option)
  *   A ~ L1 ~ D ~ L2 ~ F ~ L3 ~ G
  *
- * The implementation however filter after finding each sub-path. The construction starts from
- * the end(tail) and works it way forward.
+ * However the implementation filters after finding each sub-path to generate less alternatives.
+ * The construction starts from the end (tail) and works its way forward.
  *
  * 1. Find transfer between L2 and L3:
  *    1.1 When boarding L2 at D we have 2 options for the next transfer: E and F => E is best
- *    1.2 When boarding L2 at C we have 2 options for the next transfer: C and E (best of E & F) => C is best
+ *    1.2 When boarding L2 at B we have 2 options for the next transfer: C and E (best of E & F) => C is best
  *    1.3 Tails found: [ L2 ~ E ~ L3 ~ G, L2 ~ C ~ L3 ~ G ]
  *
  * 2. Find transfer between L1 and L2, with 2 possible tails:
- *    1.1 Board L2 at D have only one possible tail to use: L2 ~ E ~ L3 ~ G  =>  A ~ L1 ~ D ~ L2 ~ E ~ L3 ~ G
- *    1.2 Board L2 at B have 2 possible tails, but the best is: L2 ~ C ~ L3 ~ G =>  A ~ L1 ~ B ~ L2 ~ C ~ L3 ~ G
+ *    1.1 Board L2 at D, only one possible tail to use: L2 ~ E ~ L3 ~ G  =>  A ~ L1 ~ D ~ L2 ~ E ~ L3 ~ G
+ *    1.2 Board L2 at B, 2 possible tails, but the best is: L2 ~ C ~ L3 ~ G =>  A ~ L1 ~ B ~ L2 ~ C ~ L3 ~ G
  *    1.3 The best path is: A ~ L1 ~ B ~ L2 ~ C ~ L3 ~ G
  * </pre>
  *
@@ -90,7 +90,7 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
   public Set<OptimizedPath<T>> findBestTransitPath(Path<T> originalPath) {
     List<TransitPathLeg<T>> transitLegs = originalPath.transitLegs().collect(Collectors.toList());
 
-    // Find all possible transfer between each pair of transit legs, and sort on arrival-time
+    // Find all possible transfers between each pair of transit legs, and sort on arrival time
     var possibleTransfers = sortTransfersOnArrivalTimeInDecOrder(
             transferGenerator.findAllPossibleTransfers(transitLegs)
     );
@@ -121,7 +121,7 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
     // Cache accessArrivalTime, any event before the access-arrival-time is safe to ignore
     int accessArrivalTime = path.accessLeg().toTime();
 
-    // Make sure we add the proper cost/slack for FLEX access
+    // Make sure we add the proper cost/slack for flex access
     boolean accessWithoutRides = !path.accessLeg().access().hasRides();
 
     for (int i = possibleTransfers.size()-1; i >=0; --i) {
@@ -156,7 +156,7 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
           continue;
         }
 
-        // Find the best tails witch is safe to board with respect to the tails arrival
+        // Find the best tails that are safe to board with respect to the arrival
         var candidateTails = tailSelector.next(tx.to().time());
 
         for (OptimizedPathTail<T> tail : candidateTails) {
@@ -186,9 +186,9 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
    * Create a new {@link OptimizedPathTail} for the originalLeg with the given
    * transfer, earliest-departure-time and following leg (tail).
    *
-   * Since the previous leg is not jet known the earliest-departure-time is used instead.
+   * Since the previous leg is not yet known, the earliest-departure-time is used instead.
    * For the first transit leg in a path the {@code earliestDepartureTime} must be set to
-   * the correct values (the access-leg-arrival-time), for all othe cases it only need to be
+   * the correct values (the access-leg-arrival-time), for all other cases it only need to be
    * before the first possible boarding.
    */
   private OptimizedPathTail<T> createNewTransitLegTail(

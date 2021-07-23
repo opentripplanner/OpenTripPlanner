@@ -112,10 +112,10 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     }
 
     /**
-     * The total number of transfers for this journey, excluding any transfer from/to/inside
-     * access or egress transfers. This method return the number of transit legs minus one.
+     * The total number of transfers for this journey, excluding any transfers from/to/within
+     * access or egress transfers. This method returns the number of transit legs minus one.
      *
-     * @return the number of transfers or zero 0.
+     * @return the number of transfers or zero.
      */
     public final int numberOfTransfersExAccessEgress() {
         return Math.max(0, (int)transitLegs().count() - 1);

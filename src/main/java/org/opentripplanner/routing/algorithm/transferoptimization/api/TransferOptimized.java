@@ -11,8 +11,8 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
  *     <li>break-tie-cost</li>
  * </ol>
  * <p>
- * If enabled allh of these cost is used to find the optimal transfer-points for a given set of
- * transit legs. The transfer-priority take precedence over the wait-time-optimized-cost, and the
+ * If enabled all of these costs are used to find the optimal transfer-points for a given set of
+ * transit legs. The transfer-priority takes precedence over the wait-time-optimized-cost, and the
  * break-tie-cost is only used if the cost is the same using the two other filters. For example for
  * a given path the normal case is that the the transfer-priority-cost is
  * {@link Transfer#NEUTRAL_PRIORITY_COST}. Then we look at the wait-time-optimized-cost or the
@@ -26,7 +26,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
  * kept as is. If the wait-time-optimized-cost is not enabled, the generalized-cost from Raptor is
  * used instead.
  * <p>
- * This interface do not serve a role or implementation purpose, is is ONLY used to group and
+ * This interface does not serve a role or implementation purpose, is is ONLY used to group and
  * describe the different costs for transfer optimizing. Two classes implement this interface.
  */
 public interface TransferOptimized {
@@ -34,8 +34,9 @@ public interface TransferOptimized {
     int NEUTRAL_COST = 0;
 
     /**
-     * Return the total transfer priority cost. This have nothing to do with the
-     * generalized-cost. Return {@code 0}(zero) if cost is neutral/no "special"-transfers exist.
+     * Return the total transfer priority cost. This is completely separate from the
+     * generalized cost. Return {@code 0}(zero) if cost is neutral/no "special" transfer
+     * characteristics are present.
      * <p>
      * Precedence: first
      *
@@ -44,7 +45,7 @@ public interface TransferOptimized {
     int transferPriorityCost();
 
     /**
-     * The generalized-cost adjusted with a better wait-time calculation.
+     * The generalized cost adjusted with a better wait time calculation.
      * <p>
      * Precedence: second
      *

@@ -9,8 +9,8 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- * This class is used to decorate a {@link TransitPathLeg} with information about the
- * guaranteed-transfers and cashing transfer-priority-cost and optimized-wait-time-transfer-cost.
+ * This class is used to decorate a {@link TransitPathLeg} with information about guaranteed
+ * transfers, and also caches transfer-priority-cost and optimized-wait-time-transfer-cost.
  * <p>
  * The class is only used inside the {@code transferoptimization} package to store temporary
  * path "tails", while building new paths with new transfer points.
@@ -41,9 +41,9 @@ public class OptimizedPathTail<T extends RaptorTripSchedule> implements Transfer
     }
 
     /**
-     * A map of all guaranteed transfers for all transfers part of this tail. The potential
-     * set of keys are the transfer legs part of this tail, but a transfer-leg/guaranteed-transfer
-     * (key/value) is only added if the guaranteed-transfer exist.
+     * A map of all guaranteed transfers for all transfers within this tail. The potential
+     * set of keys are the transfer legs within this tail, but a key-value pair (k=transfer leg, v=
+     * guaranteed transfer) is only added if the guaranteed transfer exists.
      */
     public Map<PathLeg<T>, Transfer> getTransfersTo() {
         return transfersTo;
@@ -61,10 +61,10 @@ public class OptimizedPathTail<T extends RaptorTripSchedule> implements Transfer
 
     @Override
     public int breakTieCost() {
-        // We add the arrival-times together to mimic doing the transfers as early as possible
-        // when there are more than on transfer point between two trips.
+        // We add the arrival times together to mimic doing the transfers as early as possible
+        // when more than one transfer point exists between two trips.
         // We calculate this on the fly, because it is not likely to be done very often and
-        // the calculation is light-weight
+        // the calculation is light-weight.
         return leg.stream().filter(PathLeg::isTransitLeg).mapToInt(PathLeg::toTime).sum();
     }
 

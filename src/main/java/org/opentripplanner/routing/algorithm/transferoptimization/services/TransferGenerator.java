@@ -19,16 +19,16 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 
 /**
- * This class is responsible for finding all possible transfers between to trips. The configured
- * slack should be respected, and the transfers found here should be equivalent with the transfers
+ * This class is responsible for finding all possible transfers between two trips. The configured
+ * slack should be respected, and the transfers found here should be equivalent to the transfers
  * explored during routing (in Raptor).
  * <p>
- * This class also filter away transfers witch can not be used due to time-constraints. For example
+ * This class also filters away transfers which cannot be used due to time constraints. For example,
  * if a transfer point is before the the earliest possible boarding or after the latest possible
  * arrival.
  * <p>
- * This service do NOT put together transfers that would represent a legal path. There are
- * potentially millions permutations here, so we do this later when we can prune the result.
+ * This service does NOT combine transfers between various trips to form full paths. There are
+ * potentially millions of permutations, so we do that later when we can prune the result.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

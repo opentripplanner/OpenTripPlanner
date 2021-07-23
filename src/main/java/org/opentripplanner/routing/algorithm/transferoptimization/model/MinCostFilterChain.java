@@ -7,9 +7,9 @@ import java.util.function.ToIntFunction;
 
 
 /**
- * This class take a list of "cost-functions" and create a filter chain for them.
- * The "cost-functions" take precedence in the order they are listed. For two elements
- * 'a' and 'b' and cost-functions [f1(), f2()] the following is true:
+ * This class takes a list of "cost functions" and creates a filter chain for them.
+ * The precedence of the cost functions is determined by the order they are listed.
+ * For two elements 'a' and 'b' and cost-functions [f1(), f2()] the following is true:
  * <pre>
  *     f1(a) < f1(b) :=  [a]
  *     f1(a) = f1(b) and f2(a) < f2(b) :=  [a]

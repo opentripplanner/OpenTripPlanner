@@ -46,8 +46,8 @@ public class TripToTripTransfer<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The time it takes to transfer between the given from and to stop. For a transfer
-   * at the same stop the time is zero(0).
+   * The time it takes to transfer between the given from and to stop.
+   * For a transfer at the same stop the time is zero.
    */
   public int transferDuration() {
     return sameStop() ? 0 : pathTransfer.durationInSeconds();

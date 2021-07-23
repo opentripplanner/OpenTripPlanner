@@ -9,9 +9,9 @@ import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
- * This class take a list of transit legs and return the best leg based on the
- * {@link TransferOptimizedFilterFactory} and the minimum-time-limit. The leg arrival-time must be AFTER
- * the min-time-limit. The filter is used to pick the best leg from the legs satisfying the
+ * This class takes a list of transit legs and returns the best leg based on the
+ * {@link TransferOptimizedFilterFactory} and the min-time-limit. The leg arrival-time must be
+ * AFTER the min-time-limit. The filter is used to pick the best leg from the legs satisfying the
  * min-time-limit.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

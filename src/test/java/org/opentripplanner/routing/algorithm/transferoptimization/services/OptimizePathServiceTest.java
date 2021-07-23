@@ -18,7 +18,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
 /**
  * The {@code TransfersPermutationService} is tested using a fixed set of trips/routes, but we
- * construct paths and transfers for each case. All testes uses this set of trips:
+ * construct paths and transfers for each case. All tests use this set of trips:
  *
  * <pre>
  * DEPARTURE TIMES
@@ -30,10 +30,10 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
  * Note! The ARRIVAL TIMES are 1 minute BEFORE the departure times for all stops.
  * </pre>
  *
- * <p>This set allow us to construct all wanted testcases using different paths with different
- * set of transfers.
+ * <p>This set allow us to construct all desired testcases using different paths with different
+ * sets of transfers.
  *
- * <p>The test start with the simple cases and build up to more and more complicated cases.
+ * <p>The test starts with the simple cases and builds up to more and more complicated cases.
  */
 public class OptimizePathServiceTest implements RaptorTestConstants {
 
@@ -92,7 +92,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
     }
 
     /**
-     * This test emulate the normal case were there is only one option to transfer between two
+     * This test emulates the normal case were there is only one option to transfer between two
      * trips and we should find the exact same option. The path should exactly match the original
      * path after the path is reconstructed.
      */

@@ -5,7 +5,7 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 
 /**
- * This calculator uses the {@code minSafeTransferTime}(t0) and a inverse log function to calculate
+ * This calculator uses the {@code minSafeTransferTime}(t0) and an inverse log function to calculate
  * waiting time cost. The goal is to maximize the overall waiting time and distribute the waiting
  * time evenly between each transfer.
  * <p>
@@ -99,12 +99,12 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
  * <ol>
  *   <li>
  *     First of all we want to maximize the total transfers time across all transfers
- *     in the journey. This make sure we do not stay on a trip longer than needed and
+ *     in the journey. This makes sure we do not stay on a trip longer than needed and
  *     avoid back-travel.
  *   </li>
  *   <li>
  *     Second, we want to avoid VERY short transfers. The function above favor the set
- *     of transfer [3,5] over [2,6] and [2,6] over [1,7] - a linear function would not.
+ *     of transfers [3,5] over [2,6] and [2,6] over [1,7] - a linear function would not.
  *   </li>
  *   <li>
  *     Any 1/logN would be suitable, but log with base 10 is chosen (Supported in Java).
@@ -168,12 +168,12 @@ public class TransferWaitTimeCalculator {
       }
       totalWaitTime += waitTime;
 
-      // Do not add any cost for the wait-time after a regular walk/bike access leg,
-      // it can be time-shifted and is not considered.
+      // Do not add any cost for the wait-time after a regular walk/bike access leg.
+      // The leg can be time-shifted so wait time is compressible and not considered.
       //
       // Also, we ignore the fact that a flex leg might have rides, because we are not considering
-      // transfers between FLEX and regular transit here. That would require more knowledge about
-      // the FLEX ride
+      // transfers between flex and regular transit here. That would require more knowledge about
+      // the flex ride.
       if(!prev.isAccessLeg() || prev.asAccessLeg().access().hasRides()) {
         waitCost += calculateOptimizedWaitCost(waitTime);
       }
@@ -188,7 +188,7 @@ public class TransferWaitTimeCalculator {
     int linearWaitCostDiff = RaptorCostConverter.toRaptorCost(
             waitFactorCombined * totalWaitTime
     );
-    // We use the path generalized-cost as a starting point minus the cost of waiting.
+    // We use the path's generalized cost as a starting point, and subtract the cost of waiting.
     // We want to maximize the waiting, but balance it toward walking and time spent on-board.
     return leg.generalizedCostTotal() - linearWaitCostDiff + waitCost;
   }
