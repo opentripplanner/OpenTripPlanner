@@ -157,7 +157,7 @@ public class EstimatedCallType {
                     }
                   return GqlUtil.getRoutingService(environment).getPatternForTrip()
                         .get(((TripTimeShort) environment.getSource()).getTrip())
-                        .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != NONE.getGtfsCode();
+                        .getBoardType(((TripTimeShort) environment.getSource()).getStopIndex()) != NONE;
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -171,7 +171,7 @@ public class EstimatedCallType {
                     }
                     return GqlUtil.getRoutingService(environment).getPatternForTrip()
                             .get(((TripTimeShort) environment.getSource()).getTrip())
-                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) != NONE.getGtfsCode();
+                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) != NONE;
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -181,7 +181,7 @@ public class EstimatedCallType {
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment).getPatternForTrip()
                             .get(((TripTimeShort) environment.getSource()).getTrip())
-                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) == COORDINATE_WITH_DRIVER.getGtfsCode())
+                            .getAlightType(((TripTimeShort) environment.getSource()).getStopIndex()) == COORDINATE_WITH_DRIVER)
                     .build())
 
             .field(GraphQLFieldDefinition

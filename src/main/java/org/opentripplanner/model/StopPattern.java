@@ -147,6 +147,10 @@ public class StopPattern implements Serializable {
         return stops;
     }
 
+    public Stop getStop(int i) {
+        return stops[i];
+    }
+
     public PickDrop getPickup(int i) {
         return pickups[i];
     }

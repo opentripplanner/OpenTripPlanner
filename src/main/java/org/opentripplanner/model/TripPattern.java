@@ -51,14 +51,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     private static final long serialVersionUID = 1;
 
-    private static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
-    private static final int MASK_PICKUP = 2|4;
-    private static final int SHIFT_PICKUP = 1;
-    private static final int MASK_DROPOFF = 8|16;
-    private static final int SHIFT_DROPOFF = 3;
-    private static final int NO_PICKUP = 1;
-    //private static final int FLAG_BIKES_ALLOWED = 32;
-
     /** The human-readable, unique name for this trip pattern. */
     public String name;
 
@@ -108,11 +100,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      */
     private boolean createdByRealtimeUpdater = false;
 
-
-    /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
-    // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
-    int[] perStopFlags;
-
     /**
      * A set of serviceIds with at least one trip in this pattern.
      * Trips in a pattern are no longer necessarily running on the same service ID.
@@ -125,7 +112,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         super(id);
         this.route = route;
         this.stopPattern = stopPattern;
-        setStopsFromStopPattern(stopPattern);
     }
 
     /**
@@ -221,22 +207,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         scheduledTimetable.finish();
     }
 
-    // TODO verify correctness after substitution of StopPattern for ScheduledStopPattern
-    // TODO get rid of the per stop flags and just use the values in StopPattern, or an Enum
-    private void setStopsFromStopPattern(StopPattern stopPattern) {
-        perStopFlags = new int[stopPattern.getSize()];
-        int i = 0;
-        for (Stop stop : stopPattern.getStops()) {
-            // Assume that stops can be boarded with wheelchairs by default (defer to per-trip data)
-            if (stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE) {
-                perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
-            }
-            perStopFlags[i] |= stopPattern.getPickup(i).getGtfsCode() << SHIFT_PICKUP;
-            perStopFlags[i] |= stopPattern.getDropoff(i).getGtfsCode() << SHIFT_DROPOFF;
-            ++i;
-        }
-    }
-
     public Stop getStop(int stopIndex) {
         return stopPattern.getStops()[stopIndex];
     }
@@ -264,17 +234,17 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     /** Returns whether passengers can alight at a given stop */
     public boolean canAlight(int stopIndex) {
-        return getAlightType(stopIndex) != NO_PICKUP;
+        return stopPattern.getDropoff(stopIndex).isRoutable();
     }
 
     /** Returns whether passengers can board at a given stop */
     public boolean canBoard(int stopIndex) {
-        return getBoardType(stopIndex) != NO_PICKUP;
+        return stopPattern.getPickup(stopIndex).isRoutable();
     }
 
     /** Returns whether a given stop is wheelchair-accessible. */
     public boolean wheelchairAccessible(int stopIndex) {
-        return (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) != 0;
+        return stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
     }
 
     /** Returns the zone of a given stop */
@@ -282,12 +252,12 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         return getStop(stopIndex).getFirstZoneAsString();
     }
 
-    public int getAlightType(int stopIndex) {
-        return (perStopFlags[stopIndex] & MASK_DROPOFF) >> SHIFT_DROPOFF;
+    public PickDrop getAlightType(int stopIndex) {
+        return stopPattern.getDropoff(stopIndex);
     }
 
-    public int getBoardType(int stopIndex) {
-        return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
+    public PickDrop getBoardType(int stopIndex) {
+        return stopPattern.getPickup(stopIndex);
     }
 
     /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
@@ -571,13 +541,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         return String.format("<TripPattern %s>", this.getId());
     }
 
-	public Trip getExemplar() {
-		if(this.trips.isEmpty()){
-			return null;
-		}
-		return this.trips.get(0);
-	}
-
     /**
      * In most cases we want to use identity equality for Trips.
      * However, in some cases we want a way to consistently identify trips across versions of a GTFS feed, when the
@@ -604,24 +567,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
             sb.append(encoder.encode(tripTimes.semanticHash(murmur).asBytes()));
         }
         return sb.toString();
-    }
-
-    /** This method can be used in very specific circumstances, where each TripPattern has only one FrequencyEntry. */
-    public FrequencyEntry getSingleFrequencyEntry() {
-        Timetable table = this.scheduledTimetable;
-        List<FrequencyEntry> freqs = this.scheduledTimetable.frequencyEntries;
-        if ( ! table.tripTimes.isEmpty()) {
-            LOG.debug("Timetable has {} non-frequency entries and {} frequency entries.", table.tripTimes.size(),
-                    table.frequencyEntries.size());
-            return null;
-        }
-        if (freqs.isEmpty()) {
-            LOG.debug("Timetable has no frequency entries.");
-            return null;
-        }
-        // Many of these have multiple frequency entries. Return the first one for now.
-        // TODO return all of them and filter on time window
-        return freqs.get(0);
     }
 
     public TripPattern clone () {
