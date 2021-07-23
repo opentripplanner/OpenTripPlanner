@@ -1,6 +1,6 @@
 timeout: 7200s
 options:
-  machineType: n1-highmem-8
+  machineType: E2_HIGHCPU_32
 steps:
   - name: 'maven:3.6.3-openjdk-11'
     entrypoint: 'bash'
@@ -30,7 +30,7 @@ steps:
     - '-c'
     - |
       cd helsinki &&
-      java -Xms46G -Xmx50G -jar ../target/otp-2.1.0-SNAPSHOT-shaded.jar --build . --save
+      java -Xms28G -Xmx30G -jar ../target/otp-2.1.0-SNAPSHOT-shaded.jar --build . --save
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     timeout: 7200s
