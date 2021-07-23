@@ -17,7 +17,7 @@ steps:
     - '-c'
     - |
       if [ -n "${_DEPLOYMENT}" ]; then
-        add-apt-repository ppa:deadsnakes/ppa
+        add-apt-repository ppa:deadsnakes/ppa &&
         apt update && apt install -y unzip &&
         apt install -y python3.8 && apt install -y wget build-essential
         software-properties-common libz-dev zlib1g-dev && wget -c
