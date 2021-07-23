@@ -1,6 +1,6 @@
 timeout: 7200s
 options:
-  machineType: N1_HIGHCPU_32
+  machineType: N1_HIGHMEM_8
 steps:
   - name: 'maven:3.6.3-openjdk-11'
     entrypoint: 'bash'
@@ -19,16 +19,10 @@ steps:
       if [ -n "${_DEPLOYMENT}" ]; then
         apt update && apt install -y unzip &&
         apt install -y wget build-essential
-        software-properties-common libz-dev zlib1g-dev && wget -c
-        https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${_GRAAL_VM_VERSION}/graalvm-ce-java11-linux-amd64-${_GRAAL_VM_VERSION}.tar.gz
-        -O - | tar -xz &&  mv graalvm-ce-java11-${_GRAAL_VM_VERSION}
-        /tmp/graalvm &&  export PATH=/tmp/graalvm/bin:$$PATH && export
-        JAVA_HOME=/tmp/graalvm &&
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&
         unzip awscliv2.zip && ./aws/install &&
         aws sts get-caller-identity &&
-        aws s3 cp ${_S3_PATH} helsinki --recursive &&
-        ls -lha
+        aws s3 cp ${_S3_PATH} helsinki --recursive
       fi
   - name: 'maven:3.6.3-openjdk-11'
     entrypoint: 'bash'
@@ -36,7 +30,7 @@ steps:
     - '-c'
     - |
       cd helsinki &&
-      java -Xmx30G -jar ../target/otp-2.1.0-SNAPSHOT-shaded.jar --build . --save
+      java -Xms46G -Xmx50G -jar ../target/otp-2.1.0-SNAPSHOT-shaded.jar --build . --save
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     timeout: 7200s
