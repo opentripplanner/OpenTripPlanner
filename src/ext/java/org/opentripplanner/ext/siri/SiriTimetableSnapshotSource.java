@@ -622,8 +622,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 tripTimes.updateDepartureDelay(i, expectedDepartureTime - aimedDepartureTime);
             }
 
-            if (estimatedCall.isCancellation() != null) {
-                tripTimes.setCancelledStop(i,  estimatedCall.isCancellation());
+            if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+                tripTimes.cancelStop(i);
             }
 
             boolean isCallPredictionInaccurate = estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();

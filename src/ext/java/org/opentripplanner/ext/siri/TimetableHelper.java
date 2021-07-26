@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri;
 
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -153,8 +152,8 @@ public class TimetableHelper {
                         }
                     }
 
-                    if (recordedCall.isCancellation() != null) {
-                        newTimes.setCancelledStop(callCounter, recordedCall.isCancellation());
+                    if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
+                        newTimes.cancelStop(callCounter);
                     }
 
                     int arrivalTime = newTimes.getArrivalTime(callCounter);
@@ -223,8 +222,8 @@ public class TimetableHelper {
                             }
                         }
 
-                        if (estimatedCall.isCancellation() != null) {
-                            newTimes.setCancelledStop(callCounter, estimatedCall.isCancellation());
+                        if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+                            newTimes.cancelStop(callCounter);
                         }
 
                         boolean isCallPredictionInaccurate = estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();

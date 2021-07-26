@@ -52,8 +52,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     private boolean[] recordedStops;
 
-    private boolean[] cancelledStops;
-
     private boolean[] predictionInaccurateOnStops;
 
     private List<PickDrop> pickups;
@@ -150,10 +148,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     public void setRecordedStops(boolean[] recordedStops) {
         this.recordedStops = recordedStops;
-    }
-
-    public void setCancelledStops(boolean[] cancelledStops) {
-        this.cancelledStops = cancelledStops;
     }
 
     public void setPredictionInaccurateOnStops(boolean[] predictionInaccurateOnStops) {
@@ -312,18 +306,21 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getRecordedStops()[stop];
     }
 
-    //Is single stop cancelled
-    public void setCancelledStop(int stop, boolean isCancelled) {
-        checkCreateTimesArrays();
-        getCancelledStops()[stop] = isCancelled;
+    /**
+     * Cancels both pickup and dropoff for the specified stop
+     */
+    public void cancelStop(int stop) {
+        cancelDropOffForStop(stop);
+        cancelPickupForStop(stop);
     }
 
     // TODO OTP2 - Unused, but will be used by Transmodel API
+
+    /**
+     * Returns true if both pickup and dropoff is cancelled for the specified stop
+     */
     public boolean isCancelledStop(int stop) {
-        if (getCancelledStops() == null) {
-            return false;
-        }
-        return getCancelledStops()[stop];
+        return dropoffs.get(stop) == PickDrop.CANCELLED && pickups.get(stop) == PickDrop.CANCELLED;
     }
 
     //Is prediction for single stop inaccurate
@@ -465,13 +462,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             setArrivalTimes(Arrays.copyOf(getScheduledArrivalTimes(), getScheduledArrivalTimes().length));
             setDepartureTimes(Arrays.copyOf(getScheduledDepartureTimes(), getScheduledDepartureTimes().length));
             setRecordedStops(new boolean[getArrivalTimes().length]);
-            setCancelledStops(new boolean[getArrivalTimes().length]);
             setPredictionInaccurateOnStops(new boolean[getArrivalTimes().length]);
             for (int i = 0; i < getArrivalTimes().length; i++) {
                 getArrivalTimes()[i] += getTimeShift();
                 getDepartureTimes()[i] += getTimeShift();
                 getRecordedStops()[i] = false;
-                getCancelledStops()[i] = false;
                 getPredictionInaccurateOnStops()[i] = false;
             }
 
@@ -551,15 +546,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     public boolean[] getRecordedStops() {
         return recordedStops;
-    }
-
-    /**
-     * TODO OTP2 - This needs redesign and a bit more analyzes
-     *
-     * Flag tho indicate cancellations on each stop. Non-final to allow updates.
-     */
-    public boolean[] getCancelledStops() {
-        return cancelledStops;
     }
 
     /**
