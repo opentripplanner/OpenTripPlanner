@@ -1,15 +1,20 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
 import java.util.function.IntFunction;
+import java.util.function.ToIntFunction;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.MinSafeTransferTimeCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizeTransferCostCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.PriorityBasedTransfersCostCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.StandardTransferGenerator;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.TransfersPermutationService;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathService;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
+import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
@@ -62,55 +67,53 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   }
 
   private OptimizeTransferService<T> createOptimizeTransferService() {
-    var trip2tripTxService = createTripToTripTransfersService();
+    var pathTransferGenerator = createTransferGenerator(
+            config.optimizeTransferPriority()
+    );
     var costCalculator = createCostCalculator();
-
-    var transfersPermutationService = createTransfersPermutationService(
-        trip2tripTxService,
-        costCalculator
+    var filter = createTransferOptimizedFilter(
+            config.optimizeTransferPriority(), config.optimizeTransferWaitTime()
     );
 
-    var priorityCostCalculator = priorityCostCalculator();
+    if(config.optimizeTransferWaitTime()) {
+      var transferWaitTimeCalculator = createTransferWaitTimeCalculator();
 
-    if(config.useOptimizeTransferCostFunction()) {
+      var transfersPermutationService = createOptimizePathService(
+              pathTransferGenerator,
+              filter,
+              transferWaitTimeCalculator::cost,
+              costCalculator
+      );
+
       return new OptimizeTransferService<>(
-          transfersPermutationService,
-          priorityCostCalculator,
-          createMinSafeTxTimeService(),
-          createOptimizeTransferCostCalculator()
+              transfersPermutationService,
+              createMinSafeTxTimeService(),
+              transferWaitTimeCalculator
       );
     }
     else {
-      return new OptimizeTransferService<>(
-          transfersPermutationService,
-          priorityCostCalculator
+      var transfersPermutationService = createOptimizePathService(
+              pathTransferGenerator,
+              filter,
+              PathLeg::generalizedCostTotal,
+              costCalculator
       );
+      return new OptimizeTransferService<>(transfersPermutationService);
     }
   }
 
-  private PriorityBasedTransfersCostCalculator<T> priorityCostCalculator() {
-    return new PriorityBasedTransfersCostCalculator<>(
-         stopLookup, transferService
-    );
-  }
-
-
-  private OptimizeTransferCostCalculator createOptimizeTransferCostCalculator() {
-    return new OptimizeTransferCostCalculator(
-        config.waitReluctanceRouting(),
-        config.inverseWaitReluctance(),
-        config.minSafeWaitTimeFactor()
-    );
-  }
-
-  private TransfersPermutationService<T> createTransfersPermutationService(
-      StandardTransferGenerator<T> standardTransferGenerator,
-      CostCalculator<T> costCalculator
+  private OptimizePathService<T> createOptimizePathService(
+          TransferGenerator<T> transferGenerator,
+          MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
+          ToIntFunction<PathLeg<?>> costCalcForWaitOptimization,
+          CostCalculator<T> costCalculator
   ) {
-    return new TransfersPermutationService<>(
-            standardTransferGenerator,
-        costCalculator,
-        raptorRequest.slackProvider()
+    return new OptimizePathService<>(
+            transferGenerator,
+            costCalculator,
+            raptorRequest.slackProvider(),
+            costCalcForWaitOptimization,
+            transferPointFilter
     );
   }
 
@@ -118,11 +121,30 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     return new MinSafeTransferTimeCalculator<>(raptorRequest.slackProvider());
   }
 
-  private StandardTransferGenerator<T> createTripToTripTransfersService() {
-    return new StandardTransferGenerator<>(
+  private TransferGenerator<T> createTransferGenerator(boolean transferPriority) {
+    var transferServiceAdaptor = (transferService != null && transferPriority)
+            ? TransferServiceAdaptor.<T>create(stopLookup, transferService)
+            : TransferServiceAdaptor.<T>noop();
+
+    return new TransferGenerator<>(
+        transferServiceAdaptor,
         raptorRequest.slackProvider(),
         transitDataProvider
     );
+  }
+
+  private TransferWaitTimeCalculator createTransferWaitTimeCalculator() {
+    return new TransferWaitTimeCalculator(
+            config.waitReluctanceRouting(),
+            config.inverseWaitReluctance(),
+            config.minSafeWaitTimeFactor()
+    );
+  }
+
+  private MinCostFilterChain<OptimizedPathTail<T>> createTransferOptimizedFilter(
+          boolean transferPriority, boolean optimizeWaitTime
+  ) {
+    return TransferOptimizedFilterFactory.filter(transferPriority, optimizeWaitTime);
   }
 
   private DefaultCostCalculator<T> createCostCalculator() {

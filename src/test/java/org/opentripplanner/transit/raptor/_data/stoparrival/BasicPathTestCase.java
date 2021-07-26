@@ -134,7 +134,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     public static final int TRIP_DURATION = EGRESS_END - ACCESS_START;
 
     private static final RaptorTransfer ACCESS = walk(STOP_B, ACCESS_DURATION, ACCESS_COST);
-    private static final RaptorTransfer EGRESS = walk(STOP_F, EGRESS_DURATION, EGRESS_COST);
+    private static final RaptorTransfer EGRESS = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
 
     public static final String LINE_11 = "L11";
     public static final String LINE_21 = "L21";
@@ -223,7 +223,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
      */
     public static Path<TestTripSchedule> basicTripAsPath() {
         PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
-                EGRESS, STOP_E, EGRESS_START, EGRESS_END
+                EGRESS, EGRESS_START, EGRESS_END
         );
         TransitPathLeg<TestTripSchedule> leg5 = new TransitPathLeg<>(
             STOP_D, L31_START, STOP_E, L31_END, LINE_31_COST, TRIP_3, leg6
@@ -233,13 +233,13 @@ public class BasicPathTestCase implements RaptorTestConstants {
         );
         var transfer = TestTransfer.walk(STOP_C, TX_END - TX_START);
         PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
-            STOP_B, TX_START, STOP_C, TX_END, transfer, leg4.asTransitLeg()
+            STOP_B, TX_START, TX_END, transfer, leg4.asTransitLeg()
         );
         TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
             STOP_A, L11_START, STOP_B, L11_END, LINE_11_COST, TRIP_1, leg3
         );
         AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
-            ACCESS, STOP_A, ACCESS_START, ACCESS_END, leg2.asTransitLeg()
+            ACCESS, ACCESS_START, ACCESS_END, leg2.asTransitLeg()
         );
         return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
     }

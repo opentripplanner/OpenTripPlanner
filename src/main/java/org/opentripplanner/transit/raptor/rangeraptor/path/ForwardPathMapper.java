@@ -64,7 +64,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         return new EgressPathLeg<>(
             egress,
-            destinationArrival.previous().stop(),
             departureTime,
             destinationArrival.arrivalTime()
         );
@@ -90,7 +89,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         return new TransferPathLeg<>(
                 arrival.previous().stop(),
                 departureTime,
-                arrival.stop(),
                 arrival.arrivalTime(),
                 arrival.transferPath().transfer(),
                 nextLeg
@@ -129,7 +127,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         return new AccessPathLeg<>(
             access,
-            from.stop(),
             targetFromTime,
             targetToTime,
             nextLeg
