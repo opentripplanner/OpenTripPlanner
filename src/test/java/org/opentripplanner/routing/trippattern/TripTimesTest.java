@@ -64,6 +64,7 @@ public class TripTimesTest {
         assertEquals(5 * 60 + 12, updatedTripTimesA.getDepartureTime(5));
     }
 
+    /*
     @Test
     public void testPassedUpdate() {
         TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
@@ -73,6 +74,7 @@ public class TripTimesTest {
         assertEquals(TripTimes.UNAVAILABLE, updatedTripTimesA.getDepartureTime(0));
         assertEquals(60, updatedTripTimesA.getArrivalTime(1));
     }
+     */
 
     @Test
     public void testNonIncreasingUpdate() {
@@ -101,6 +103,7 @@ public class TripTimesTest {
         assertEquals(6 * 60 + 13, updatedTripTimesA.getArrivalTime(6));
     }
 
+    /*
     @Test
     public void testCancel() {
         TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
@@ -115,6 +118,7 @@ public class TripTimesTest {
             assertEquals(TripTimes.UNAVAILABLE, updatedTripTimesA.getArrivalTime(i));
         }
     }
+     */
 
     @Test
     public void testApply() {

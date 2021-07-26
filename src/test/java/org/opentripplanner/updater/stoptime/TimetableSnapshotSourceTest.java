@@ -13,6 +13,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -125,8 +126,8 @@ public class TimetableSnapshotSourceTest {
 
         final TripTimes tripTimes = forToday.getTripTimes(tripIndex);
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
-            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getDepartureTime(i));
-            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getArrivalTime(i));
+            assertEquals(PickDrop.CANCELLED, tripTimes.getPickupType(i));
+            assertEquals(PickDrop.CANCELLED, tripTimes.getPickupType(i));
         }
         assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
     }
