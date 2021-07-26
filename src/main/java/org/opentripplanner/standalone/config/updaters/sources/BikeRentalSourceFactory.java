@@ -20,6 +20,7 @@ public class BikeRentalSourceFactory {
 
   static {
     CONFIG_MAPPING.put("gbfs", GBFS);
+    CONFIG_MAPPING.put("smoove", DataSourceType.SMOOVE);
   }
 
   private final DataSourceType type;
