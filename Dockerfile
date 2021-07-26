@@ -14,6 +14,7 @@ COPY helsinki/settings.json /opt/otp/settings.json
 COPY helsinki/*.osm.pbf /opt/otp/map.osm.pbf
 COPY helsinki/graphs /opt/otp/graphs
 
+RUN mkdir /opt/otp/built
 RUN chmod -R 777 /opt
 
 EXPOSE 8080
