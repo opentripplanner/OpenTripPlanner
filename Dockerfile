@@ -9,7 +9,10 @@ RUN apt update && \
 
 COPY target/*-shaded.jar /opt/java/app.jar
 COPY run-otp.sh /opt/run-otp.sh
-COPY helsinki/* /opt/otp/
+
+COPY helsinki/settings.json /opt/otp/settings.json
+COPY helsinki/*.osm.pbf /opt/otp/map.osm.pbf
+COPY helsinki/graphs /opt/otp/graphs
 
 RUN chmod -R 777 /opt
 
