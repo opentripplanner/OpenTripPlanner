@@ -1,12 +1,11 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * This is a Request builder to help construct valid requests. Se the
@@ -14,7 +13,6 @@ import java.util.Set;
  * <p/>
  * <ul>
  *     <li>{@link RaptorRequest}
- *     <li>{@link McCostParams}
  *     <li>{@link DebugRequest}
  * </ul>
  *
@@ -28,7 +26,6 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
     // Algorithm
     private RaptorProfile profile;
-    private final McCostParamsBuilder mcCost;
     private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
 
 
@@ -46,7 +43,6 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
         // Algorithm
         this.profile = defaults.profile();
-        this.mcCost = new McCostParamsBuilder(defaults.multiCriteriaCostFactors());
         this.optimizations.addAll(defaults.optimizations());
 
         // Debug
@@ -100,10 +96,6 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     public RaptorRequestBuilder<T> disableOptimization(Optimization optimization) {
         this.optimizations.remove(optimization);
         return this;
-    }
-
-    public McCostParamsBuilder mcCostFactors() {
-        return this.mcCost;
     }
 
     public DebugRequestBuilder debug() {

@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.api.transit;
+package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
 import java.util.Locale;
 
@@ -48,7 +48,7 @@ public final class RaptorCostConverter {
   public static int[] toRaptorCosts(double[] domainValues) {
     int[] raptorCost = new int[domainValues.length];
     for (int i = 0; i < domainValues.length; i++) {
-      raptorCost[i]  = toRaptorCost(domainValues[i]);
+      raptorCost[i] = toRaptorCost(domainValues[i]);
     }
     return raptorCost;
   }

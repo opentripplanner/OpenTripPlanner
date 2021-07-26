@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
@@ -110,7 +111,7 @@ public class TestDebugLogger implements DebugLogger {
                 TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
                 TimeUtils.timeToStrLong(p.egressLeg().toTime()),
                 DurationUtils.durationToStr(p.durationInSeconds()),
-                numFormat.format(p.otpDomainCost()),
+                numFormat.format(RaptorCostConverter.toOtpDomainCost(p.generalizedCost())),
                 details(e.action().toString(), e.reason(), e.element().toString())
             )
         );

@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.api.view;
 
 
+import java.util.Locale;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.util.time.DurationUtils;
@@ -137,7 +137,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
                 "Access { stop: %d, duration: %s, arrival-time: %s %s }",
                 stop(), DurationUtils.durationToStr(accessPath().access().durationInSeconds()),
                 TimeUtils.timeToStrCompact(arrivalTime()),
-                RaptorCostConverter.toString(cost())
+                costToString(cost())
             );
         }
         if(arrivedByTransit()) {
@@ -147,7 +147,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
                 stop(),
                 transitPath().trip().pattern().debugInfo(),
                 TimeUtils.timeToStrCompact(arrivalTime()),
-                RaptorCostConverter.toString(cost())
+                costToString(cost())
             );
         }
         if(arrivedByTransfer()) {
@@ -156,7 +156,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
                 round(),
                 stop(),
                 TimeUtils.timeToStrCompact(arrivalTime()),
-                RaptorCostConverter.toString(cost())
+                costToString(cost())
             );
         }
         if(arrivedAtDestination()) {
@@ -166,9 +166,17 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
                 previous().stop(),
                 DurationUtils.durationToStr(egressPath().egress().durationInSeconds()),
                 TimeUtils.timeToStrCompact(arrivalTime()),
-                RaptorCostConverter.toString(cost())
+                costToString(cost())
             );
         }
         throw new IllegalStateException("Unknown type of stop-arrival: " + getClass());
+    }
+
+
+    /**
+     * Convert Raptor internal cost to a string with format $###.## (in seconds)
+     */
+    public static String costToString(int raptorCost) {
+        return String.format(Locale.ROOT, "$%.2f",  raptorCost / 100.0);
     }
 }

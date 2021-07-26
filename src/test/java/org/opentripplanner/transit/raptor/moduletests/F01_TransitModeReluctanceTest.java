@@ -32,7 +32,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
   );
 
   private final static String EXPECTED =  "Walk 30s ~ 1 ~ BUS %s 0:01 0:02:40 ~ 2 ~ Walk 20s "
-          + "[0:00:30 0:03 2m30s $%d]";
+          + "[0:00:30 0:03 2m30s $%d.00]";
 
   @BeforeEach
   public void setup() {
@@ -61,7 +61,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
   @Test
   public void preferR1() {
     // Give R1 a slightly smaller(0.01 less then R2) transit reluctance factor
-    requestBuilder.mcCostFactors().transitReluctanceFactors(new double[] {0.99, 1.0 });
+    data.mcCostParamsBuilder().transitReluctanceFactors(new double[] { 0.99, 1.0 });
     var request = requestBuilder.build();
     var response = raptorService.route(request, data);
 
@@ -71,7 +71,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
 
   @Test
   public void preferR2() {
-    requestBuilder.mcCostFactors().transitReluctanceFactors(new double[] {0.9, 0.89 });
+    data.mcCostParamsBuilder().transitReluctanceFactors(new double[] { 0.9, 0.89 });
     var request = requestBuilder.build();
     var response = raptorService.route(request, data);
 

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 
 public class RaptorCostConverterTest {
   @Test
@@ -33,5 +34,4 @@ public class RaptorCostConverterTest {
   public void testToString() {
     assertEquals("$120.00", RaptorCostConverter.toString(12_000));
   }
-
 }

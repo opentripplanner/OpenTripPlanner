@@ -15,10 +15,8 @@ import org.opentripplanner.routing.algorithm.transferoptimization.services.Trans
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -70,7 +68,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     var pathTransferGenerator = createTransferGenerator(
             config.optimizeTransferPriority()
     );
-    var costCalculator = createCostCalculator();
+    var costCalculator = transitDataProvider.multiCriteriaCostCalculator();
     var filter = createTransferOptimizedFilter(
             config.optimizeTransferPriority(), config.optimizeTransferWaitTime()
     );
@@ -145,16 +143,5 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
           boolean transferPriority, boolean optimizeWaitTime
   ) {
     return TransferOptimizedFilterFactory.filter(transferPriority, optimizeWaitTime);
-  }
-
-  private DefaultCostCalculator<T> createCostCalculator() {
-    McCostParams p = raptorRequest.multiCriteriaCostFactors();
-    return new DefaultCostCalculator<>(
-        p.boardCost(),
-        p.transferCost(),
-        p.waitReluctanceFactor(),
-        transitDataProvider.stopBoarAlightCost(),
-        p.transitReluctanceFactors()
-    );
   }
 }

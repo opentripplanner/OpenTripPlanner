@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -133,17 +132,6 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     }
 
     /**
-     * The computed generalized-cost for this path leg.
-     * <p>
-     * {@code -1} is returned if no cost exist.
-     * <p>
-     * The unit is seconds (OTP Domain/AStar unit)
-     */
-    public int otpDomainCost() {
-        return RaptorCostConverter.toOtpDomainCost(generalizedCost());
-    }
-
-    /**
      * The first leg/path of this journey - witch is linked to the next and so on. The leg
      * can contain sub-legs, for example: walk-flex-walk.
      *
@@ -242,12 +230,11 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
         }
         // Add summary info
         {
-            buf.append("[").time(startTime, endTime).duration(endTime - startTime);
-
-            if (detailed) { buf.costCentiSec(generalizedCost); }
-            else { buf.costSec(generalizedCost); }
-
-            buf.append("]");
+            buf.append("[")
+                    .time(startTime, endTime)
+                    .duration(endTime - startTime)
+                    .costCentiSec(generalizedCost)
+                    .append("]");
         }
         return buf.toString();
     }

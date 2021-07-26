@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.api.transit;
+package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
 import java.util.Arrays;
 

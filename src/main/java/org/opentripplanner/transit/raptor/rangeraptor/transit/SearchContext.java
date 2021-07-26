@@ -7,13 +7,11 @@ import java.util.Collection;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
-import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -68,10 +66,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.transit = transit;
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
-        this.costCalculator = createCostCalculator(
-            transit.stopBoarAlightCost(),
-            request.multiCriteriaCostFactors()
-        );
+        this.costCalculator = transit.multiCriteriaCostCalculator();
         this.roundTracker = new RoundTracker(
             nRounds(),
             request.searchParams().numberOfAdditionalTransfers(),
@@ -242,15 +237,5 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return request.searchDirection().isForward()
                 ? new ForwardPathMapper<>(request.slackProvider(), lifeCycle)
                 : new ReversePathMapper<>(request.slackProvider(), lifeCycle);
-    }
-
-    private CostCalculator<T> createCostCalculator(int[] stopVisitCost, McCostParams f) {
-        return new DefaultCostCalculator<T>(
-                f.boardCost(),
-                f.transferCost(),
-                f.waitReluctanceFactor(),
-                stopVisitCost,
-                f.transitReluctanceFactors()
-        );
     }
 }

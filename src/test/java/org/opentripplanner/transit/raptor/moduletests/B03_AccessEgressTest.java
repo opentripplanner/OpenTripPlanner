@@ -100,15 +100,15 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
     // expect: With 3 optimal solutions for both access and egress we get 3 x 3 = 9 optimal
     //         alternatives then timetable is enabled.
     assertEquals(""
-            + "Walk 7m ~ 3 ~ BUS R1 0:18 0:32 ~ 6 ~ Walk 7m [0:11 0:39 28m $3120]\n"
-            + "Walk 4m ~ 2 ~ BUS R1 0:14 0:32 ~ 6 ~ Walk 7m [0:10 0:39 29m $3000]\n"
-            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:32 ~ 6 ~ Walk 7m [0:09:59 0:39 29m1s $2762]\n"
-            + "Walk 7m ~ 3 ~ BUS R1 0:18 0:36 ~ 7 ~ Walk 4m [0:11 0:40 29m $3000]\n"
-            + "Walk 4m ~ 2 ~ BUS R1 0:14 0:36 ~ 7 ~ Walk 4m [0:10 0:40 30m $2880]\n"
-            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:36 ~ 7 ~ Walk 4m [0:09:59 0:40 30m1s $2642]\n"
-            + "Walk 7m ~ 3 ~ BUS R1 0:18 0:40 ~ 8 ~ Walk 1s [0:11 0:40:01 29m1s $2762]\n"
-            + "Walk 4m ~ 2 ~ BUS R1 0:14 0:40 ~ 8 ~ Walk 1s [0:10 0:40:01 30m1s $2642]\n"
-            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:40 ~ 8 ~ Walk 1s [0:09:59 0:40:01 30m2s $2404]",
+            + "Walk 7m ~ 3 ~ BUS R1 0:18 0:32 ~ 6 ~ Walk 7m [0:11 0:39 28m $3120.00]\n"
+            + "Walk 4m ~ 2 ~ BUS R1 0:14 0:32 ~ 6 ~ Walk 7m [0:10 0:39 29m $3000.00]\n"
+            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:32 ~ 6 ~ Walk 7m [0:09:59 0:39 29m1s $2762.00]\n"
+            + "Walk 7m ~ 3 ~ BUS R1 0:18 0:36 ~ 7 ~ Walk 4m [0:11 0:40 29m $3000.00]\n"
+            + "Walk 4m ~ 2 ~ BUS R1 0:14 0:36 ~ 7 ~ Walk 4m [0:10 0:40 30m $2880.00]\n"
+            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:36 ~ 7 ~ Walk 4m [0:09:59 0:40 30m1s $2642.00]\n"
+            + "Walk 7m ~ 3 ~ BUS R1 0:18 0:40 ~ 8 ~ Walk 1s [0:11 0:40:01 29m1s $2762.00]\n"
+            + "Walk 4m ~ 2 ~ BUS R1 0:14 0:40 ~ 8 ~ Walk 1s [0:10 0:40:01 30m1s $2642.00]\n"
+            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:40 ~ 8 ~ Walk 1s [0:09:59 0:40:01 30m2s $2404.00]",
         PathUtils.pathsToString(response)
     );
   }
@@ -128,11 +128,11 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
     // expect: Expect pareto optimal results with earliest-arrival-time and cost as the criteria,
     //         but not departure-time.
     assertEquals(""
-            + "Walk 7m ~ 3 ~ BUS R1 0:18 0:32 ~ 6 ~ Walk 7m [0:11 0:39 28m $3120]\n"
-            + "Walk 4m ~ 2 ~ BUS R1 0:14 0:32 ~ 6 ~ Walk 7m [0:10 0:39 29m $3000]\n"
-            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:32 ~ 6 ~ Walk 7m [0:09:59 0:39 29m1s $2762]\n"
-            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:36 ~ 7 ~ Walk 4m [0:09:59 0:40 30m1s $2642]\n"
-            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:40 ~ 8 ~ Walk 1s [0:09:59 0:40:01 30m2s $2404]",
+            + "Walk 7m ~ 3 ~ BUS R1 0:18 0:32 ~ 6 ~ Walk 7m [0:11 0:39 28m $3120.00]\n"
+            + "Walk 4m ~ 2 ~ BUS R1 0:14 0:32 ~ 6 ~ Walk 7m [0:10 0:39 29m $3000.00]\n"
+            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:32 ~ 6 ~ Walk 7m [0:09:59 0:39 29m1s $2762.00]\n"
+            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:36 ~ 7 ~ Walk 4m [0:09:59 0:40 30m1s $2642.00]\n"
+            + "Walk 1s ~ 1 ~ BUS R1 0:10 0:40 ~ 8 ~ Walk 1s [0:09:59 0:40:01 30m2s $2404.00]",
         PathUtils.pathsToString(response)
     );
   }

@@ -2,8 +2,8 @@ package org.opentripplanner.transit.raptor.util;
 
 import java.util.Calendar;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -75,15 +75,9 @@ public class PathStringBuilder {
         return space().time(fromTime, toTime).costCentiSec(generalizedCost);
     }
 
-    public PathStringBuilder costSec(int generalizedCost) {
-        if(generalizedCost <= 0) { return this; }
-        space().append("$").append(RaptorCostConverter.toOtpDomainCost(generalizedCost));
-        return this;
-    }
-
     public PathStringBuilder costCentiSec(int generalizedCost) {
         if(generalizedCost <= 0) { return this; }
-        space().append(RaptorCostConverter.toString(generalizedCost));
+        space().append(ArrivalView.costToString(generalizedCost));
         return this;
     }
 

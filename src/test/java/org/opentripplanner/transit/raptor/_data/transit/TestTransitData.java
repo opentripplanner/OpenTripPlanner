@@ -10,10 +10,13 @@ import java.util.Set;
 import lombok.val;
 import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferPriority;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -26,6 +29,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<Transfer> guaranteedTransfers = new ArrayList<>();
+  private final McCostParamsBuilder costParamsBuilder = new McCostParamsBuilder();
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfers(int fromStop) {
@@ -48,7 +52,14 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   @Override
-  public int[] stopBoarAlightCost() {
+  public CostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
+    return new DefaultCostCalculator<>(
+            costParamsBuilder.build(),
+            stopBoarAlightCost()
+    );
+  }
+
+  private int[] stopBoarAlightCost() {
     // Not implemented, no test for this yet.
     return null;
   }
@@ -122,6 +133,10 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
             MAX_WAIT_TIME_NOT_SET
     ));
     return this;
+  }
+
+  public McCostParamsBuilder mcCostParamsBuilder() {
+    return costParamsBuilder;
   }
 
   public Transfer findGuaranteedTransfer(

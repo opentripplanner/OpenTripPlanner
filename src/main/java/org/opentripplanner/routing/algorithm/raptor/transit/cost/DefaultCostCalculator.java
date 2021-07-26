@@ -1,9 +1,9 @@
-package org.opentripplanner.transit.raptor.api.transit;
+package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
 
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.request.McCostParams;
-import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
@@ -17,6 +17,7 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
     private final FactorStrategy transitFactors;
     private final int[] stopVisitCost;
 
+
     /**
      * Cost unit: SECONDS - The unit for all input parameters are in the OTP TRANSIT model cost unit
      * (in Raptor the unit for cost is centi-seconds).
@@ -29,10 +30,9 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
             int boardCost,
             int transferCost,
             double waitReluctanceFactor,
-            @Nullable int[] stopVisitCost,
-            @Nullable double[] transitReluctanceFactors
+            @Nullable double[] transitReluctanceFactors,
+            @Nullable int[] stopVisitCost
     ) {
-        this.stopVisitCost = stopVisitCost;
         this.boardCostOnly = RaptorCostConverter.toRaptorCost(boardCost);
         this.boardAndTransferCost = RaptorCostConverter.toRaptorCost(transferCost) + boardCostOnly;
         this.waitFactor = RaptorCostConverter.toRaptorCost(waitReluctanceFactor);
@@ -40,6 +40,18 @@ public final class DefaultCostCalculator<T extends RaptorTripSchedule> implement
         this.transitFactors = transitReluctanceFactors == null
             ? new SingleValueFactorStrategy(McCostParams.DEFAULT_TRANSIT_RELUCTANCE)
             : new IndexBasedFactorStrategy(transitReluctanceFactors);
+
+        this.stopVisitCost = stopVisitCost;
+    }
+
+    public DefaultCostCalculator(McCostParams params, int[] stopVisitCost) {
+        this(
+                params.boardCost(),
+                params.transferCost(),
+                params.waitReluctanceFactor(),
+                params.transitReluctanceFactors(),
+                stopVisitCost
+        );
     }
 
     @Override

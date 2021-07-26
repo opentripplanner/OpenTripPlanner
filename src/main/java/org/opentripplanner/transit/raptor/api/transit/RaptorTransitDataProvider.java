@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
-import javax.annotation.Nullable;
 import java.util.Iterator;
 
 
@@ -70,12 +69,8 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      */
     int numberOfStops();
 
-
     /**
-     * Return a the cost of boarding and alighting a trip at a particular stop.
-     *
-     * Nor extra costs exist this method returns {@code null}.
+     * Create/provide the cost criteria calculator.
      */
-    @Nullable
-    int[] stopBoarAlightCost();
+    CostCalculator<T> multiCriteriaCostCalculator();
 }

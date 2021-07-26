@@ -1,19 +1,21 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.McCostParamsMapper;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 
 
 /**
@@ -37,6 +39,9 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   private final ZonedDateTime startOfTime;
 
+  private final CostCalculator<TripSchedule> generalizedCostCalculator;
+
+
   public RaptorRoutingRequestTransitData(
       TransitLayer transitLayer,
       Instant departureTime,
@@ -58,8 +63,11 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
         additionalFutureSearchDays,
         filter
     );
-
     this.transfers = transitLayer.getRaptorTransfersForRequest(routingRequest);
+    this.generalizedCostCalculator = new DefaultCostCalculator<>(
+            McCostParamsMapper.map(routingRequest),
+            transitLayer.getStopIndex().stopBoardAlightCosts
+    );
   }
 
   /**
@@ -88,8 +96,8 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public int[] stopBoarAlightCost() {
-    return transitLayer.getStopIndex().stopBoardAlightCosts;
+  public CostCalculator<TripSchedule> multiCriteriaCostCalculator() {
+    return generalizedCostCalculator;
   }
 
   public ZonedDateTime getStartOfTime() {

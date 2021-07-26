@@ -54,7 +54,7 @@ public class PathBuilderTest implements RaptorTestConstants {
 
     assertEquals(accessEgressCost + transitCost, path.generalizedCost());
     assertEquals(
-        "Walk 1m ~ 1 ~ BUS L1 10:02 10:07 ~ 2 ~ Walk 2m [10:00:15 10:09:15 9m $798]",
+        "Walk 1m ~ 1 ~ BUS L1 10:02 10:07 ~ 2 ~ Walk 2m [10:00:15 10:09:15 9m $798.00]",
         path.toString()
     );
   }
