@@ -327,7 +327,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
 
     public void setRecorded(int stop, boolean recorded) {
-        checkCreateTimesArrays();
+        prepareForRealTimeUpdates();
         recordedStops[stop] = recorded;
     }
 
@@ -358,7 +358,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
     //Is prediction for single stop inaccurate
     public void setPredictionInaccurate(int stop, boolean predictionInaccurate) {
-        checkCreateTimesArrays();
+        prepareForRealTimeUpdates();
         predictionInaccurateOnStops[stop] = predictionInaccurate;
     }
 
@@ -371,7 +371,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
 
     public void cancelPickupForStop(int stop) {
-        checkCreateTimesArrays();
+        prepareForRealTimeUpdates();
         pickups.set(stop, PickDrop.CANCELLED);
     }
 
@@ -381,7 +381,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
 
     public void cancelDropOffForStop(int stop) {
-        checkCreateTimesArrays();
+        prepareForRealTimeUpdates();
         dropoffs.set(stop, PickDrop.CANCELLED);
     }
 
@@ -467,30 +467,32 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
 
     public void updateDepartureTime(final int stop, final int time) {
-        checkCreateTimesArrays();
+        prepareForRealTimeUpdates();
         departureTimes[stop] = time;
     }
 
     public void updateDepartureDelay(final int stop, final int delay) {
-        checkCreateTimesArrays();
+        prepareForRealTimeUpdates();
         departureTimes[stop] = scheduledDepartureTimes[stop] + timeShift + delay;
     }
 
     public void updateArrivalTime(final int stop, final int time) {
-        checkCreateTimesArrays();
+        prepareForRealTimeUpdates();
         arrivalTimes[stop] = time;
     }
 
     public void updateArrivalDelay(final int stop, final int delay) {
-        checkCreateTimesArrays();
+        prepareForRealTimeUpdates();
         arrivalTimes[stop] = scheduledArrivalTimes[stop] + timeShift + delay;
     }
 
     /**
      * If they don't already exist, create arrays for updated arrival and departure times
      * that are just time-shifted copies of the zero-based scheduled departure times.
+     *
+     * Also sets the realtime state to UPDATED.
      */
-    private void checkCreateTimesArrays() {
+    private void prepareForRealTimeUpdates() {
         if (arrivalTimes == null) {
             setArrivalTimes(Arrays.copyOf(scheduledArrivalTimes, scheduledArrivalTimes.length));
             setDepartureTimes(Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length));
