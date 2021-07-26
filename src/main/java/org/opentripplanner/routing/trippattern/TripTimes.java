@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * along by States when routing to ensure that they have a consistent, fast view of the trip when
  * realtime updates have been applied. All times are expressed as seconds since midnight (as in GTFS).
  */
-public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable {
+public class TripTimes implements Serializable, Comparable<TripTimes> {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
@@ -159,21 +159,24 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     }
 
     /** This copy constructor does not copy the actual times, only the scheduled times. */
-    // It might be more maintainable to clone the triptimes then null out the scheduled times.
-    // However, we then lose the "final" modifiers on the fields, and the immutability.
     public TripTimes(final TripTimes object) {
-        this.trip = object.getTrip();
-        this.setServiceCode(object.getServiceCode());
-        this.setTimeShift(object.timeShift);
+        this.timeShift = object.timeShift;
+        this.trip = object.trip;
+        this.serviceCode = object.serviceCode;
         this.headsigns = object.headsigns;
-        this.scheduledDepartureTimes = object.scheduledDepartureTimes;
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
+        this.scheduledDepartureTimes = object.scheduledDepartureTimes;
+        this.arrivalTimes = null;
+        this.departureTimes = null;
+        this.recordedStops = object.recordedStops;
+        this.predictionInaccurateOnStops = object.predictionInaccurateOnStops;
+        this.pickups = new ArrayList<>(object.pickups);
+        this.dropoffs = new ArrayList<>(object.dropoffs);
+        this.pickupBookingInfos = object.pickupBookingInfos;
+        this.dropOffBookingInfos = object.dropOffBookingInfos;
         this.originalGtfsStopSequence = object.originalGtfsStopSequence;
+        this.realTimeState = object.realTimeState;
         this.timepoints = object.timepoints;
-        this.setPickups(object.pickups);
-        this.setDropoffs(object.dropoffs);
-        this.setDropOffBookingInfos(object.dropOffBookingInfos);
-        this.setPickupBookingInfos(object.pickupBookingInfos);
     }
 
     public void setRecordedStops(boolean[] recordedStops) {
@@ -515,17 +518,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return this.getDepartureTime(0) - other.getDepartureTime(0);
     }
 
-    @Override
-    public TripTimes clone() {
-        TripTimes ret = null;
-        try {
-            ret = (TripTimes) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            LOG.error("This is not happening.");
-        }
-        return ret;
-    }
-
    /**
     * Returns a time-shifted copy of this TripTimes in which the vehicle passes the given stop
     * index (not stop sequence number) at the given time. We only have a mechanism to shift the
@@ -534,7 +526,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     */
     public TripTimes timeShift (final int stop, final int time, final boolean depart) {
         if (arrivalTimes != null || departureTimes != null) { return null; }
-        final TripTimes shifted = this.clone();
+        final TripTimes shifted = new TripTimes(this);
         // Adjust 0-based times to match desired stoptime.
         final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));
         shifted.setTimeShift(shifted.timeShift + shift); // existing shift should usually (always?) be 0 on freqs
