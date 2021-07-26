@@ -426,15 +426,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         this.realTimeState = realTimeState;
     }
 
-    /** Used in debugging / dumping times. */
-    public static String formatSeconds(int s) {
-        int m = s / 60;
-        s = s % 60;
-        final int h = m / 60;
-        m = m % 60;
-        return String.format("%02d:%02d:%02d", h, m, s);
-    }
-
     /**
      * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply
      * negative running or dwell times. We really don't want those being used in routing.
