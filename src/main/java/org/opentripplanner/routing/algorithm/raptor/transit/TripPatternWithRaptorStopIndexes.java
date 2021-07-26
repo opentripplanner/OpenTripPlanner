@@ -17,6 +17,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorForbiddenStopTransfe
 import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternForbiddenStopTransferProvider;
 
 public class TripPatternWithRaptorStopIndexes {
+
     private final TripPattern pattern;
 
     private final int[] stopIndexes;
@@ -43,8 +44,8 @@ public class TripPatternWithRaptorStopIndexes {
 
 
     public TripPatternWithRaptorStopIndexes(
-        int[] stopIndexes,
-        TripPattern pattern
+            int[] stopIndexes,
+            TripPattern pattern
     ) {
         this.stopIndexes = stopIndexes;
         this.pattern = pattern;
@@ -109,28 +110,37 @@ public class TripPatternWithRaptorStopIndexes {
                 '}';
     }
 
-    /** These are public to allow the mappers to inject transfers */
+    /**
+     * These are public to allow the mappers to inject transfers
+     */
     public void addGuaranteedTransferFrom(Transfer tx) {
         add(guaranteedTransfersFrom, tx, tx.getFrom().getStopPosition());
     }
 
-    /** These are public to allow the mappers to inject transfers */
+    /**
+     * These are public to allow the mappers to inject transfers
+     */
     public void addGuaranteedTransfersTo(Transfer tx) {
         add(guaranteedTransfersTo, tx, tx.getTo().getStopPosition());
     }
 
-    /** These are public to allow the mappers to inject transfers */
+    /**
+     * These are public to allow the mappers to inject transfers
+     */
     public void addForbiddenTransfersFrom(Transfer tx, int stopPos) {
         add(forbiddenTransfersTo, tx, stopPos);
     }
-    /** These are public to allow the mappers to inject transfers */
+
+    /**
+     * These are public to allow the mappers to inject transfers
+     */
     public void addForbiddenTransfersTo(Transfer tx, int stopPos) {
         add(forbiddenTransfersTo, tx, stopPos);
     }
 
     private static <T> void add(TIntObjectMap<List<T>> index, T e, int pos) {
         var list = index.get(pos);
-        if(list == null) {
+        if (list == null) {
             list = new ArrayList<>();
             index.put(pos, list);
         }

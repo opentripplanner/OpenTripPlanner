@@ -12,6 +12,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRapto
 import org.opentripplanner.util.OTPFeature;
 
 public class TransferIndexGenerator {
+
     private final TransferService transferService;
     private final Map<Trip, TripPatternWithRaptorStopIndexes> patternByTrip = new HashMap<>();
 
@@ -49,15 +50,13 @@ public class TransferIndexGenerator {
         }
     }
 
-    private void generateGuaranteedTransfers(
-        TripPatternWithRaptorStopIndexes pattern
-    ) {
+    private void generateGuaranteedTransfers(TripPatternWithRaptorStopIndexes pattern) {
         for (Trip trip : pattern.getPattern().getTrips()) {
             int nStops = pattern.getPattern().getStops().size();
-            for (int stopPos=0; stopPos < nStops; ++stopPos) {
+            for (int stopPos = 0; stopPos < nStops; ++stopPos) {
                 var transfers = transferService.listGuaranteedTransfersTo(trip, stopPos);
                 for (Transfer tx : transfers) {
-                    if(tx.isGuaranteed() || tx.isStaySeated()) {
+                    if (tx.isGuaranteed() || tx.isStaySeated()) {
                         var fromTrip = tx.getFrom().getTrip();
                         var toTrip = tx.getTo().getTrip();
                         if (fromTrip != null && toTrip != null) {
@@ -74,17 +73,17 @@ public class TransferIndexGenerator {
     }
 
     private void generateForbiddenTransfers(
-        TripPatternWithRaptorStopIndexes pattern
+            TripPatternWithRaptorStopIndexes pattern
     ) {
         int nStops = pattern.getPattern().getStops().size();
         List<Stop> stops = pattern.getPattern().getStops();
-        for (int stopPos=0; stopPos < nStops; ++stopPos) {
+        for (int stopPos = 0; stopPos < nStops; ++stopPos) {
             var toForbiddenTransfers = transferService.listForbiddenTransfersTo(stops.get(stopPos));
             for (Transfer tx : toForbiddenTransfers) {
                 pattern.addForbiddenTransfersTo(tx, stopPos);
             }
             var fromForbiddenTransfers =
-                transferService.listForbiddenTransfersFrom(stops.get(stopPos));
+                    transferService.listForbiddenTransfersFrom(stops.get(stopPos));
             for (Transfer tx : fromForbiddenTransfers) {
                 pattern.addForbiddenTransfersFrom(tx, stopPos);
             }

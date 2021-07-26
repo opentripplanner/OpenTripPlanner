@@ -10,9 +10,8 @@ import org.opentripplanner.model.Stop;
  * <p>
  * When searching forward the <em>target</em> is the "to" end of the transfer, and the
  * <em>source</em> is the "from" transfer point. For a reverse search the <em>target</em> is "from"
- * and the <em>source</em> is the "to" transfer point.
- * Note that only stop to stop transfers are handled.
- *
+ * and the <em>source</em> is the "to" transfer point. Note that only stop to stop transfers are
+ * handled.
  */
 public interface RaptorForbiddenStopTransferProvider {
 

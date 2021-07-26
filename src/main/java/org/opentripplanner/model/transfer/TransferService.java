@@ -27,12 +27,18 @@ public class TransferService implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransferService.class);
 
-    /** Index of guaranteed transfers by the to/destination point. */
+    /**
+     * Index of guaranteed transfers by the to/destination point.
+     */
     private final Multimap<TripTransferPoint, Transfer> guaranteedTransferByToPoint;
 
-    /** Index of forbidden transfers by the source stop */
+    /**
+     * Index of forbidden transfers by the source stop
+     */
     private final Multimap<Stop, Transfer> forbiddenTransferByFromStop;
-    /** Index of forbidden transfers by the destination stop */
+    /**
+     * Index of forbidden transfers by the destination stop
+     */
     private final Multimap<Stop, Transfer> forbiddenTransferByToStop;
 
     /**
@@ -200,13 +206,13 @@ public class TransferService implements Serializable {
     private void addGuaranteedTransfer(Transfer transfer) {
         var fromPoint = transfer.getFrom();
         var toPoint = transfer.getTo();
-        if(transfer.isStaySeated() || transfer.isGuaranteed()) {
-            if(toPoint instanceof TripTransferPoint) {
+        if (transfer.isStaySeated() || transfer.isGuaranteed()) {
+            if (toPoint instanceof TripTransferPoint) {
                 guaranteedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
             }
         }
-        if(transfer.isForbidden()){
-            if(fromPoint instanceof StopTransferPoint && toPoint instanceof StopTransferPoint) {
+        if (transfer.isForbidden()) {
+            if (fromPoint instanceof StopTransferPoint && toPoint instanceof StopTransferPoint) {
                 forbiddenTransferByFromStop.put(fromPoint.getStop(), transfer);
                 forbiddenTransferByToStop.put(toPoint.getStop(), transfer);
             }

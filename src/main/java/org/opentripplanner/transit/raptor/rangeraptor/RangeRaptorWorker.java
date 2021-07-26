@@ -243,14 +243,15 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                         );
                     }
 
-                    if(pattern.boardingPossibleAt(stopPos)) {
+                    if (pattern.boardingPossibleAt(stopPos)) {
                         // MC Raptor have many, while RR have one boarding
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
                             // skip stop if its a forbidden stop to stop transfers
-                            if(!enableForbiddenTransfers || !isForbiddenTransfer(txForbiddenService, stopIndex, stopPos)) {
+                            if (!enableForbiddenTransfers || !isForbiddenTransfer(
+                                    txForbiddenService, stopIndex, stopPos)) {
                                 RaptorTripScheduleBoardOrAlightEvent<T> result = null;
 
-                                if(enableGuaranteedTransfers) {
+                                if (enableGuaranteedTransfers) {
                                     // Board using guaranteed transfers
                                     result = findGuaranteedTransfer(
                                             route.timetable(),
@@ -259,7 +260,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                                 }
 
                                 // Find the best trip and board [no guaranteed transfer exist]
-                                if(result == null) {
+                                if (result == null) {
                                     this.earliestBoardTime = earliestBoardTime(prevArrivalTime);
                                     // check if we can back up to an earlier trip due to this stop
                                     // being reached earlier
@@ -289,11 +290,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             int targetStopIndex,
             int targetStopPos
     ) {
-        if(!txService.transferExist(targetStopPos)) { return null; }
+        if (!txService.transferExist(targetStopPos)) { return null; }
 
         // Get the previous transit stop arrival (transfer source)
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
-        if(sourceStopArrival == null) { return null; }
+        if (sourceStopArrival == null) { return null; }
 
         this.earliestBoardTime = calculator.minusDuration(
                 sourceStopArrival.arrivalTime(),
@@ -309,18 +310,18 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     private boolean isForbiddenTransfer(
-        RaptorForbiddenStopTransferProvider txForbiddenService,
-        int targetStopIndex,
-        int targetStopPos
+            RaptorForbiddenStopTransferProvider txForbiddenService,
+            int targetStopIndex,
+            int targetStopPos
     ) {
         if (!txForbiddenService.transferExist(targetStopPos)) { return false; }
 
         // Get the previous transit stop arrival (transfer source)
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
-        if(sourceStopArrival == null) { return false; }
+        if (sourceStopArrival == null) { return false; }
 
         return txForbiddenService.isForbiddenTransfer(
-            transitData.getStopByIndex(sourceStopArrival.stop())
+                transitData.getStopByIndex(sourceStopArrival.stop())
         );
     }
 
