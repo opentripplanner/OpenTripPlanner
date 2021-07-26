@@ -66,11 +66,13 @@ public class TransferServiceTest implements TransferTestData {
         var F_D = new Transfer(STOP_POINT_D, STOP_POINT_C, NOT_ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
         // Forbidden transfer to target stop (same stop)
         var F_CC = new Transfer(STOP_POINT_C, STOP_POINT_C, NOT_ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
-        // No constranit transfet to target stop
+        // No constraint transfer to target stop
         var C = transfer(STOP_POINT_A, STOP_POINT_C);
 
         subject.addAll(List.of(F_A, F_B, F_D, C, F_CC));
 
+        // It should only return forbidden transfers from target stop
+        assertEquals(List.of(F_B), subject.listForbiddenTransfersFrom(STOP_B));
         // It should only returns forbidden tranfers to target stop
         assertEquals(List.of(F_B, F_D, F_CC), subject.listForbiddenTransfersTo(STOP_C));
     }
