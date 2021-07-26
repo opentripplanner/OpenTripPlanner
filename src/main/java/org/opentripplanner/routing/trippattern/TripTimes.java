@@ -64,9 +64,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     private boolean[] predictionInaccurateOnStops;
 
-    private int[] pickups;
+    private List<PickDrop> pickups;
 
-    private int[] dropoffs;
+    private List<PickDrop> dropoffs;
 
     private List<BookingInfo> dropOffBookingInfos;
 
@@ -104,8 +104,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         setTimeShift(stopTimes.iterator().next().getArrivalTime());
-        final int[] pickups   = new int[nStops];
-        final int[] dropoffs   = new int[nStops];
+        final List<PickDrop> pickups   = new ArrayList<>();
+        final List<PickDrop> dropoffs   = new ArrayList<>();
         final List<BookingInfo> dropOffBookingInfos = new ArrayList<>();
         final List<BookingInfo> pickupBookingInfos = new ArrayList<>();
         int s = 0;
@@ -115,8 +115,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             sequences[s] = st.getStopSequence();
             timepoints.set(s, st.getTimepoint() == 1);
 
-            pickups[s] = st.getPickupType().getGtfsCode();
-            dropoffs[s] = st.getDropOffType().getGtfsCode();
+            pickups.add(st.getPickupType());
+            dropoffs.add(st.getDropOffType());
             dropOffBookingInfos.add(st.getDropOffBookingInfo());
             pickupBookingInfos.add(st.getPickupBookingInfo());
             s++;
@@ -125,8 +125,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
         this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
-        this.setPickups(deduplicator.deduplicateIntArray(pickups));
-        this.setDropoffs(deduplicator.deduplicateIntArray(dropoffs));
+        this.setPickups(deduplicator.deduplicateImmutableList(PickDrop.class, pickups));
+        this.setDropoffs(deduplicator.deduplicateImmutableList(PickDrop.class, dropoffs));
         this.setDropOffBookingInfos(deduplicator.deduplicateImmutableList(BookingInfo.class, dropOffBookingInfos));
         this.setPickupBookingInfos(deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos));
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
@@ -168,11 +168,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.predictionInaccurateOnStops = predictionInaccurateOnStops;
     }
 
-    public void setPickups(int[] pickups) {
+    public void setPickups(List<PickDrop> pickups) {
         this.pickups = pickups;
     }
 
-    public void setDropoffs(int[] dropoffs) {
+    public void setDropoffs(List<PickDrop> dropoffs) {
         this.dropoffs = dropoffs;
     }
 
@@ -348,30 +348,24 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getPredictionInaccurateOnStops()[stop];
     }
 
-    public void setPickupType(int stop, int pickupType) {
+    public void setPickupType(int stop, PickDrop pickupType) {
         checkCreateTimesArrays();
-        getPickups()[stop] = pickupType;
+        pickups.set(stop, pickupType);
     }
 
     // TODO OTP2 - Unused, but will be used by Transmodel API
-    public int getPickupType(int stop) {
-        if (getPickups() == null) {
-            return -999;
-        }
-        return getPickups()[stop];
+    public PickDrop getPickupType(int stop) {
+        return getPickups().get(stop);
     }
 
-    public void setDropoffType(int stop, int dropoffType) {
+    public void setDropoffType(int stop, PickDrop dropoffType) {
         checkCreateTimesArrays();
-        getDropoffs()[stop] = dropoffType;
+        dropoffs.set(stop, dropoffType);
     }
 
     // TODO OTP2 - Unused, but will be used by Transmodel API
-    public int getDropoffType(int stop) {
-        if (getDropoffs() == null) {
-            return -999;
-        }
-        return getDropoffs()[stop];
+    public PickDrop getDropoffType(int stop) {
+        return getDropoffs().get(stop);
     }
 
     public BookingInfo getDropOffBookingInfo(int stop) {
@@ -448,24 +442,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     /** Cancel this entire trip */
     public void cancel() {
-        setArrivalTimes(new int[getNumStops()]);
-        Arrays.fill(getArrivalTimes(), UNAVAILABLE);
-        setDepartureTimes(getArrivalTimes());
-
-        cancelAllStops();
-
-        setPickups(new int[getNumStops()]);
-        Arrays.fill(getPickups(), PickDrop.NONE.getGtfsCode());
-        setDropoffs(getPickups());
-
-        // Update the real-time state
         realTimeState = RealTimeState.CANCELED;
-    }
-
-    public void cancelAllStops() {
-        // Flag all stops as cancelled
-        setCancelledStops(new boolean[getNumStops()]);
-        Arrays.fill(getCancelledStops(), true);
     }
 
     public void updateDepartureTime(final int stop, final int time) {
@@ -608,7 +585,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      *
      * Flag tho indicate cancellations on each stop. Non-final to allow updates.
      */
-    public int[] getPickups() {
+    public List<PickDrop> getPickups() {
         return pickups;
     }
 
@@ -617,7 +594,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      *
      * Flag tho indicate cancellations on each stop. Non-final to allow updates.
      */
-    public int[] getDropoffs() {
+    public List<PickDrop> getDropoffs() {
         return dropoffs;
     }
 
