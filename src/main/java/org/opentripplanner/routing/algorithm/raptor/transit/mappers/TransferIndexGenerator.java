@@ -79,10 +79,14 @@ public class TransferIndexGenerator {
         int nStops = pattern.getPattern().getStops().size();
         List<Stop> stops = pattern.getPattern().getStops();
         for (int stopPos=0; stopPos < nStops; ++stopPos) {
-            var forbiddenTransfers = transferService.listForbiddenTransfersTo(stops.get(stopPos));
-            for (Transfer tx : forbiddenTransfers) {
-                // TODO: Do we need to handle transfersFrom?
+            var toForbiddenTransfers = transferService.listForbiddenTransfersTo(stops.get(stopPos));
+            for (Transfer tx : toForbiddenTransfers) {
                 pattern.addForbiddenTransfersTo(tx, stopPos);
+            }
+            var fromForbiddenTransfers =
+                transferService.listForbiddenTransfersFrom(stops.get(stopPos));
+            for (Transfer tx : fromForbiddenTransfers) {
+                pattern.addForbiddenTransfersFrom(tx, stopPos);
             }
         }
     }

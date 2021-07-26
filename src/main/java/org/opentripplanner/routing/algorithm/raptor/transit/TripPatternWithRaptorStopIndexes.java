@@ -120,6 +120,10 @@ public class TripPatternWithRaptorStopIndexes {
     }
 
     /** These are public to allow the mappers to inject transfers */
+    public void addForbiddenTransfersFrom(Transfer tx, int stopPos) {
+        add(forbiddenTransfersTo, tx, stopPos);
+    }
+    /** These are public to allow the mappers to inject transfers */
     public void addForbiddenTransfersTo(Transfer tx, int stopPos) {
         add(forbiddenTransfersTo, tx, stopPos);
     }

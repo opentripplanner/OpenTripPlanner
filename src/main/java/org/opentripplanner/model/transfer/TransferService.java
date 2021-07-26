@@ -30,6 +30,9 @@ public class TransferService implements Serializable {
     /** Index of guaranteed transfers by the to/destination point. */
     private final Multimap<TripTransferPoint, Transfer> guaranteedTransferByToPoint;
 
+    /** Index of forbidden transfers by the source stop */
+    private final Multimap<Stop, Transfer> forbiddenTransferByFromStop;
+    /** Index of forbidden transfers by the destination stop */
     private final Multimap<Stop, Transfer> forbiddenTransferByToStop;
 
     /**
@@ -54,6 +57,7 @@ public class TransferService implements Serializable {
 
     public TransferService() {
         this.guaranteedTransferByToPoint = ArrayListMultimap.create();
+        this.forbiddenTransferByFromStop = ArrayListMultimap.create();
         this.forbiddenTransferByToStop = ArrayListMultimap.create();
         this.trip2tripTransfers = new HashMap<>();
         this.trip2StopTransfers = new HashMap<>();
@@ -78,6 +82,10 @@ public class TransferService implements Serializable {
 
     public Collection<Transfer> listGuaranteedTransfersTo(Trip toTrip, int toStopIndex) {
         return guaranteedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
+    }
+
+    public Collection<Transfer> listForbiddenTransfersFrom(Stop stop) {
+        return forbiddenTransferByFromStop.get(stop);
     }
 
     public Collection<Transfer> listForbiddenTransfersTo(Stop stop) {
@@ -190,6 +198,7 @@ public class TransferService implements Serializable {
     }
 
     private void addGuaranteedTransfer(Transfer transfer) {
+        var fromPoint = transfer.getFrom();
         var toPoint = transfer.getTo();
         if(transfer.isStaySeated() || transfer.isGuaranteed()) {
             if(toPoint instanceof TripTransferPoint) {
@@ -197,10 +206,10 @@ public class TransferService implements Serializable {
             }
         }
         if(transfer.isForbidden()){
-            if(toPoint instanceof StopTransferPoint) {
+            if(fromPoint instanceof StopTransferPoint && toPoint instanceof StopTransferPoint) {
+                forbiddenTransferByFromStop.put(fromPoint.getStop(), transfer);
                 forbiddenTransferByToStop.put(toPoint.getStop(), transfer);
             }
-
         }
     }
 }

@@ -18,7 +18,8 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     private final List<TestTripSchedule> schedules = new ArrayList<>();
     private final TestTransferProvider transfersFrom = new TestTransferProvider();
     private final TestTransferProvider transfersTo = new TestTransferProvider();
-    private final TestForbiddenStopTransferProvider forbiddenTransfers = new TestForbiddenStopTransferProvider();
+    private final TestForbiddenStopTransferProvider forbiddenTransfersFrom = new TestForbiddenStopTransferProvider();
+    private final TestForbiddenStopTransferProvider forbiddenTransfersTo = new TestForbiddenStopTransferProvider();
 
 
     private TestRoute(TestTripPattern pattern) {
@@ -63,16 +64,14 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
         return transfersFrom;
     }
 
-    // TODO(transfers)
     @Override
     public RaptorForbiddenStopTransferProvider getForbiddenTransfersFrom() {
-        return null;
+        return forbiddenTransfersFrom;
     }
 
-    // TODO(transfers)
     @Override
     public RaptorForbiddenStopTransferProvider getForbiddenTransfersTo() {
-        return forbiddenTransfers;
+        return forbiddenTransfersTo;
     }
 
     public TestRoute withTimetable(TestTripSchedule ... trips) {
@@ -123,7 +122,11 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
         );
     }
 
-    void addForbiddenTransfers(int targetStopPos, Transfer transfer) {
-        this.forbiddenTransfers.addForbiddenTransfers(targetStopPos, transfer);
+    void addForbiddenTransfersFrom(int sourceStopPos, Transfer transfer) {
+        this.forbiddenTransfersFrom.addForbiddenTransfers(sourceStopPos, transfer);
+    }
+
+    void addForbiddenTransfersTo(int targetStopPos, Transfer transfer) {
+        this.forbiddenTransfersTo.addForbiddenTransfers(targetStopPos, transfer);
     }
 }

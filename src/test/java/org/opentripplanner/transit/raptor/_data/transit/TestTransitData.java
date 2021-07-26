@@ -163,12 +163,15 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   };
 
   public TestTransitData withForbiddenTransfer(
+    int fromStopIndex,
     int toStopIndex,
     Transfer transfer
   ) {
     for (TestRoute route : routes) {
+      int fromStopPos = route.pattern().findStopPositionAfter(0, fromStopIndex);
       int toStopPos = route.pattern().findStopPositionAfter(0, toStopIndex);
-      route.addForbiddenTransfers(toStopPos, transfer);
+      route.addForbiddenTransfersFrom(fromStopPos, transfer);
+      route.addForbiddenTransfersTo(toStopPos, transfer);
     }
     return this;
   }

@@ -19,6 +19,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.model.Stop;
@@ -27,7 +28,7 @@ import org.opentripplanner.model.transfer.Transfer;
 /**
  * FEATURE UNDER TEST
  *
- * Raptor should not return path if it would need to use a NOT_ALLOWED transfers.
+ * Raptor should not return path if it would need to use a NOT_ALLOWED transfer.
  */
 public class G01_ForbiddenTransferTest implements RaptorTestConstants {
   private final TestTransitData data = new TestTransitData();
@@ -69,7 +70,7 @@ public class G01_ForbiddenTransferTest implements RaptorTestConstants {
     data.withStopByIndex(OTP_STOP_A, STOP_A)
         .withStopByIndex(OTP_STOP_B, STOP_B)
         .withStopByIndex(OTP_STOP_C, STOP_C);
-    data.withForbiddenTransfer(STOP_B, t1);
+    data.withForbiddenTransfer(STOP_B, STOP_B, t1);
 
     requestBuilder.searchParams()
       .forbiddenTransfersEnabled(true)
@@ -97,6 +98,17 @@ public class G01_ForbiddenTransferTest implements RaptorTestConstants {
     assert(response.paths().isEmpty());
   }
 
+  @Test
+  public void standardReverse() {
+    var request = requestBuilder
+        .searchDirection(SearchDirection.REVERSE)
+        .profile(RaptorProfile.STANDARD)
+        .build();
+
+    var response = raptorService.route(request, data);
+
+    assert(response.paths().isEmpty());
+  }
   @Test
   public void multiCriteria() {
     var request = requestBuilder
