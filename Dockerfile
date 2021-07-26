@@ -9,7 +9,7 @@ RUN apt update && \
 
 COPY target/*-shaded.jar /opt/java/app.jar
 COPY run-otp.sh /opt/run-otp.sh
-COPY helsinki/* /opt/otp
+COPY helsinki/* /opt/otp/
 
 RUN chmod -R 755 /opt
 
