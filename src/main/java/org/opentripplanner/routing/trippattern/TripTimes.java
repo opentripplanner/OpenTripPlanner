@@ -304,18 +304,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         else return departureTimes[stop]; // updated times are not time shifted.
     }
 
-    /** @return the amount of time in seconds that the vehicle waits at the stop. */
-    public int getDwellTime(final int stop) {
-        // timeShift is not relevant since this involves updated times and is relative.
-        return getDepartureTime(stop) - getArrivalTime(stop);
-    }
-
-    /** @return the amount of time in seconds that the vehicle takes to reach the following stop. */
-    public int getRunningTime(final int stop) {
-        // timeShift is not relevant since this involves updated times and is relative.
-        return getArrivalTime(stop + 1) - getDepartureTime(stop);
-    }
-
     /** @return the difference between the scheduled and actual arrival times at this stop. */
     public int getArrivalDelay(final int stop) {
         return getArrivalTime(stop) - (scheduledArrivalTimes[stop] + timeShift);

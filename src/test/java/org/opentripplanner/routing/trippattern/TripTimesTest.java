@@ -160,38 +160,4 @@ public class TripTimesTest {
 
         assertFalse(updatedTripTimesA.timesIncreasing());
     }
-
-    @Test
-    public void testGetRunningTime() {
-        for (int i = 0; i < stops.length - 1; i++) {
-            assertEquals(60, originalTripTimes.getRunningTime(i));
-        }
-
-        TripTimes updatedTripTimes = new TripTimes(originalTripTimes);
-
-        for (int i = 0; i < stops.length - 1; i++) {
-            updatedTripTimes.updateDepartureDelay(i, i);
-        }
-
-        for (int i = 0; i < stops.length - 1; i++) {
-            assertEquals(60 - i, updatedTripTimes.getRunningTime(i));
-        }
-    }
-
-    @Test
-    public void testGetDwellTime() {
-        for (int i = 0; i < stops.length; i++) {
-            assertEquals(0, originalTripTimes.getDwellTime(i));
-        }
-
-        TripTimes updatedTripTimes = new TripTimes(originalTripTimes);
-
-        for (int i = 0; i < stops.length; i++) {
-            updatedTripTimes.updateArrivalDelay(i, -i);
-        }
-
-        for (int i = 0; i < stops.length; i++) {
-            assertEquals(i, updatedTripTimes.getDwellTime(i));
-        }
-    }
 }
