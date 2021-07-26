@@ -644,7 +644,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         graph.index.getPatternForTrip().put(trip, pattern);
 
         if (estimatedVehicleJourney.isCancellation() != null && estimatedVehicleJourney.isCancellation()) {
-            tripTimes.cancel();
+            tripTimes.cancelTrip();
         } else {
             tripTimes.setRealTimeState(RealTimeState.ADDED);
         }
@@ -796,7 +796,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                         );
 
                         if (modifiedStops != null && modifiedStops.isEmpty()) {
-                            tripTimes.cancel();
+                            tripTimes.cancelTrip();
                         } else {
                             // Add new trip
                             result = result | addTripToGraphAndBuffer(feedId, graph, trip, modifiedStopTimes, modifiedStops, tripTimes, serviceDate);
@@ -911,7 +911,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 LOG.warn("Could not cancel scheduled trip {}", tripId);
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-                newTripTimes.cancel();
+                newTripTimes.cancelTrip();
                 buffer.update(pattern, newTripTimes, serviceDate);
                 success = true;
             }
@@ -941,7 +941,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 LOG.warn("Could not cancel previously added trip {}", tripId);
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-                newTripTimes.cancel();
+                newTripTimes.cancelTrip();
                 buffer.update(pattern, newTripTimes, serviceDate);
 //                buffer.removeLastAddedTripPattern(feedId, tripId, serviceDate);
                 success = true;

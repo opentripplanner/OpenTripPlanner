@@ -223,7 +223,7 @@ public class Timetable implements Serializable {
 
         if (tripDescriptor.hasScheduleRelationship() && tripDescriptor.getScheduleRelationship()
                 == TripDescriptor.ScheduleRelationship.CANCELED) {
-            newTimes.cancel();
+            newTimes.cancelTrip();
         } else {
             // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
             Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();

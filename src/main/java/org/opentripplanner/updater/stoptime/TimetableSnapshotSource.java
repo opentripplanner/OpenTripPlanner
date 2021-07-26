@@ -748,7 +748,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 LOG.warn("Could not cancel scheduled trip {}", tripId);
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-                newTripTimes.cancel();
+                newTripTimes.cancelTrip();
                 buffer.update(pattern, newTripTimes, serviceDate);
                 success = true;
             }
@@ -780,7 +780,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 LOG.warn("Could not cancel previously added trip {}", tripId);
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-                newTripTimes.cancel();
+                newTripTimes.cancelTrip();
                 buffer.update(pattern, newTripTimes, serviceDate);
                 success = true;
             }

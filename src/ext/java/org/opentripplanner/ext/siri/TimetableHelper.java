@@ -70,7 +70,7 @@ public class TimetableHelper {
         TripTimes oldTimes = new TripTimes(existingTripTimes);
 
         if (journey.isCancellation() != null && journey.isCancellation()) {
-            oldTimes.cancel();
+            oldTimes.cancelTrip();
             return oldTimes;
         }
 
@@ -319,7 +319,7 @@ public class TimetableHelper {
 
         if (journey.isCancellation() != null && journey.isCancellation()) {
             LOG.debug("Trip is cancelled");
-            newTimes.cancel();
+            newTimes.cancelTrip();
         }
 
         if (!newTimes.timesIncreasing()) {
