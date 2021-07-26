@@ -282,7 +282,7 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
+                                newTimes.cancelDropOffForStop(i);
                             } else {
                                 newTimes.updateArrivalDelay(i, delay);
                             }
@@ -308,7 +308,7 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                                newTimes.cancelPickupForStop(i);
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
                             }
@@ -322,8 +322,8 @@ public class Timetable implements Serializable {
                     }
                 } else {
                     if (delay == null) {
-                        newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
-                        newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                        newTimes.cancelDropOffForStop(i);
+                        newTimes.cancelPickupForStop(i);
                     } else {
                         newTimes.updateArrivalDelay(i, delay);
                         newTimes.updateDepartureDelay(i, delay);

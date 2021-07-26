@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -156,13 +157,6 @@ public class TimetableHelper {
                         newTimes.setCancelledStop(callCounter, recordedCall.isCancellation());
                     }
 
-                    newTimes.setDropoffType(callCounter, timetable.pattern
-                        .getStopPattern()
-                        .getDropoff(callCounter).getGtfsCode());
-                    newTimes.setPickupType(callCounter, timetable.pattern
-                        .getStopPattern()
-                        .getPickup(callCounter).getGtfsCode());
-
                     int arrivalTime = newTimes.getArrivalTime(callCounter);
                     int realtimeArrivalTime = arrivalTime;
                     if (recordedCall.getActualArrivalTime() != null) {
@@ -241,12 +235,12 @@ public class TimetableHelper {
                         // Update dropoff-/pickuptype only if status is cancelled
                         CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();
                         if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
-                            newTimes.setDropoffType(callCounter, NONE.getGtfsCode());
+                            newTimes.cancelDropOffForStop(callCounter);
                         }
 
                         CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
                         if (departureStatus == CallStatusEnumeration.CANCELLED) {
-                            newTimes.setPickupType(callCounter, NONE.getGtfsCode());
+                            newTimes.cancelPickupForStop(callCounter);
                         }
 
                         int arrivalTime = newTimes.getArrivalTime(callCounter);

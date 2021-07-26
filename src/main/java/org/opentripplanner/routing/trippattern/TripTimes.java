@@ -26,14 +26,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
 
-    /**
-     * This constant is used for indicating passed stops, fully canceled trips and trips that are
-     * otherwise unavailable during routing. It should only be used in a contiguous block at the
-     * beginning of the trip and may or may not cover the entire trip. Partially canceling a trip in
-     * this way is specifically not allowed.
-     */
-    public static final int UNAVAILABLE = -1;
-
     private int timeShift;
 
     private final Trip trip;
@@ -348,9 +340,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getPredictionInaccurateOnStops()[stop];
     }
 
-    public void setPickupType(int stop, PickDrop pickupType) {
+    public void cancelPickupForStop(int stop) {
         checkCreateTimesArrays();
-        pickups.set(stop, pickupType);
+        pickups.set(stop, PickDrop.CANCELLED);
     }
 
     // TODO OTP2 - Unused, but will be used by Transmodel API
@@ -358,9 +350,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getPickups().get(stop);
     }
 
-    public void setDropoffType(int stop, PickDrop dropoffType) {
+    public void cancelDropOffForStop(int stop) {
         checkCreateTimesArrays();
-        dropoffs.set(stop, dropoffType);
+        dropoffs.set(stop, PickDrop.CANCELLED);
     }
 
     // TODO OTP2 - Unused, but will be used by Transmodel API
@@ -390,8 +382,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * @return true if this TripTimes is canceled
      */
     public boolean isCanceled() {
-        final boolean isCanceled = realTimeState == RealTimeState.CANCELED;
-        return isCanceled;
+        return realTimeState == RealTimeState.CANCELED;
     }
 
     /**
