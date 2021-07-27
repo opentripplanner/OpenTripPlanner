@@ -8,70 +8,27 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-// TODO OTP2 - Convert all fields to get-methods and keep reference to TripTimes and let
-//           - getters call the appropriate TripTimes method instead of coping the fields.
+/**
+ * Represents a Trip on a specific stop index and service day
+ */
 public class TripTimeShort {
 
     public static final int UNDEFINED = -1;
 
-    private final FeedScopedId stopId;
+    private final TripTimes tripTimes;
     private final int stopIndex;
-    private final int stopCount;
-    private final int scheduledArrival;
-    private final int scheduledDeparture;
-    private final int realtimeArrival;
-    private final int realtimeDeparture;
-    private final boolean recordedStop;
-    private final int arrivalDelay;
-    private final int departureDelay;
-    private final boolean timepoint;
-    private final boolean realtime;
-    private final boolean cancelledStop;
-    private final RealTimeState realtimeState;
-    private final long serviceDay;
-    private final Trip trip;
-    private final String blockId;
-    private final String headsign;
-    private final int pickupType;
-    private final int dropoffType;
+    // This is only needed because TripTimes has no reference to TripPattern/Stop
+    private final Stop stop;
+    private final ServiceDay serviceDay;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
      */
-    public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {
-        serviceDay         = sd != null ? sd.time(0) : UNDEFINED;
-        trip               = tt.getTrip();
-        stopId             = stop.getId();
-        stopIndex          = i;
-        stopCount          = tt.getNumStops();
-        scheduledArrival   = tt.getScheduledArrivalTime(i);
-        scheduledDeparture = tt.getScheduledDepartureTime(i);
-        timepoint          = tt.isTimepoint(i);
-        realtime           = !tt.isScheduled();
-        cancelledStop = tt.isCancelledStop(i);
-        recordedStop = tt.isRecordedStop(i);
-
-        if (isRealtime() && isCancelledStop()) {
-            /*
-             Trips/stops cancelled in realtime should not present "23:59:59, yesterday" as arrival-/departureTime
-             Setting realtime arrival and departure to planned times
-             */
-            realtimeArrival = tt.getScheduledArrivalTime(i);
-            realtimeDeparture = tt.getScheduledDepartureTime(i);
-            arrivalDelay = 0;
-            departureDelay = 0;
-        } else {
-            realtimeArrival    = tt.getArrivalTime(i);
-            arrivalDelay       = tt.getArrivalDelay(i);
-            realtimeDeparture  = tt.getDepartureTime(i);
-            departureDelay     = tt.getDepartureDelay(i);
-        }
-
-        realtimeState      = tt.getRealTimeState();
-        blockId            = tt.getTrip().getBlockId();
-        headsign           = tt.getHeadsign(i);
-        pickupType         = tt.getPickupType(i).getGtfsCode();
-        dropoffType        = tt.getDropoffType(i).getGtfsCode();
+    public TripTimeShort(TripTimes tripTimes, int stopIndex, Stop stop, ServiceDay serviceDay) {
+        this.tripTimes = tripTimes;
+        this.stopIndex = stopIndex;
+        this.stop = stop;
+        this.serviceDay = serviceDay;
     }
 
     /**
@@ -107,7 +64,7 @@ public class TripTimeShort {
     }
 
     public FeedScopedId getStopId() {
-        return stopId;
+        return stop.getId();
     }
 
     public int getStopIndex() {
@@ -115,93 +72,95 @@ public class TripTimeShort {
     }
 
     public int getStopCount() {
-        return stopCount;
+        return tripTimes.getNumStops();
     }
 
     public int getScheduledArrival() {
-        return scheduledArrival;
+        return tripTimes.getScheduledArrivalTime(stopIndex);
     }
 
     public int getScheduledDeparture() {
-        return scheduledDeparture;
+        return tripTimes.getScheduledDepartureTime(stopIndex);
     }
 
     public int getRealtimeArrival() {
-        return realtimeArrival;
+        return isRealtime() && isCancelledStop()
+            ? tripTimes.getScheduledArrivalTime(stopIndex) : tripTimes.getArrivalTime(stopIndex);
     }
 
     public int getRealtimeDeparture() {
-        return realtimeDeparture;
+        return isRealtime() && isCancelledStop()
+        ? tripTimes.getScheduledDepartureTime(stopIndex) : tripTimes.getDepartureTime(stopIndex);
     }
 
     /**
      * Returns the actual arrival time if available. Otherwise -1 is returned.
      */
     public int getActualArrival() {
-        return recordedStop ? realtimeArrival : UNDEFINED;
+        return tripTimes.isRecordedStop(stopIndex) ? tripTimes.getArrivalTime(stopIndex) : UNDEFINED;
     }
 
     /**
      * Returns the actual departure time if available. Otherwise -1 is returned.
      */
     public int getActualDeparture() {
-        return recordedStop ? realtimeDeparture : UNDEFINED;
+        return tripTimes.isRecordedStop(stopIndex) ? tripTimes.getDepartureTime(stopIndex) : UNDEFINED;
     }
 
     public int getArrivalDelay() {
-        return arrivalDelay;
+        return tripTimes.getArrivalDelay(stopIndex);
     }
 
     public int getDepartureDelay() {
-        return departureDelay;
+        return tripTimes.getDepartureDelay(stopIndex);
     }
 
     public boolean isTimepoint() {
-        return timepoint;
+        return tripTimes.isTimepoint(stopIndex);
     }
 
     public boolean isRealtime() {
-        return realtime;
+        return !tripTimes.isScheduled();
     }
 
     public boolean isCancelledStop() {
-        return cancelledStop;
+        return tripTimes.isCancelledStop(stopIndex);
     }
 
     /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
     public boolean isCanceledEffectively() {
-        return cancelledStop || trip.getTripAlteration().isCanceledOrReplaced();
+        return tripTimes.isCancelledStop(stopIndex) || tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced();
     }
 
     public RealTimeState getRealtimeState() {
-        return realtimeState;
+        return tripTimes.getRealTimeState();
     }
 
     public long getServiceDay() {
-        return serviceDay;
+        return serviceDay != null ? serviceDay.time(0) : UNDEFINED;
     }
 
     public Trip getTrip() {
-        return trip;
+        return tripTimes.getTrip();
     }
 
     public String getBlockId() {
-        return blockId;
+        return tripTimes.getTrip().getBlockId();
     }
 
     public String getHeadsign() {
-        return headsign;
+        return tripTimes.getHeadsign(stopIndex);
     }
 
     public int getPickupType() {
-        return pickupType;
+        return tripTimes.getPickupType(stopIndex).getGtfsCode();
     }
 
     public int getDropoffType() {
-        return dropoffType;
+        return tripTimes.getDropoffType(stopIndex).getGtfsCode();
     }
 
     public StopTimeKey getStopTimeKey() {
-        return new StopTimeKey(trip.getId(), stopIndex);
+        return new StopTimeKey(tripTimes.getTrip().getId(), stopIndex);
     }
 }

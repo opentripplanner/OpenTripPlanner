@@ -123,7 +123,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         final int[] sequences  = new int[nStops];
         final BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
-        setTimeShift(stopTimes.iterator().next().getArrivalTime());
+        this.timeShift = stopTimes.iterator().next().getArrivalTime();
         final List<PickDrop> pickups   = new ArrayList<>();
         final List<PickDrop> dropoffs   = new ArrayList<>();
         final List<BookingInfo> dropOffBookingInfos = new ArrayList<>();
@@ -145,15 +145,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
         this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
-        this.setPickups(deduplicator.deduplicateImmutableList(PickDrop.class, pickups));
-        this.setDropoffs(deduplicator.deduplicateImmutableList(PickDrop.class, dropoffs));
-        this.setDropOffBookingInfos(deduplicator.deduplicateImmutableList(BookingInfo.class, dropOffBookingInfos));
-        this.setPickupBookingInfos(deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos));
+        this.pickups = pickups;
+        this.dropoffs = dropoffs;
+        this.dropOffBookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, dropOffBookingInfos);
+        this.pickupBookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos);
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
-        this.setArrivalTimes(null);
-        this.setDepartureTimes(null);
-        this.setRecordedStops(null);
+        this.arrivalTimes = null;
+        this.departureTimes = null;
+        this.recordedStops = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
@@ -179,48 +179,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         this.timepoints = object.timepoints;
     }
 
-    public void setRecordedStops(boolean[] recordedStops) {
-        this.recordedStops = recordedStops;
-    }
-
-    public void setPredictionInaccurateOnStops(boolean[] predictionInaccurateOnStops) {
-        this.predictionInaccurateOnStops = predictionInaccurateOnStops;
-    }
-
-    public void setPickups(List<PickDrop> pickups) {
-        this.pickups = pickups;
-    }
-
-    public void setDropoffs(List<PickDrop> dropoffs) {
-        this.dropoffs = dropoffs;
-    }
-
-    public void setDropOffBookingInfos(
-        List<BookingInfo> dropOffBookingInfos
-    ) {
-        this.dropOffBookingInfos = dropOffBookingInfos;
-    }
-
-    public void setPickupBookingInfos(
-        List<BookingInfo> pickupBookingInfos
-    ) {
-        this.pickupBookingInfos = pickupBookingInfos;
-    }
-
     public void setServiceCode(int serviceCode) {
         this.serviceCode = serviceCode;
-    }
-
-    public void setArrivalTimes(int[] arrivalTimes) {
-        this.arrivalTimes = arrivalTimes;
-    }
-
-    public void setDepartureTimes(int[] departureTimes) {
-        this.departureTimes = departureTimes;
-    }
-
-    public void setTimeShift(int timeShift) {
-        this.timeShift = timeShift;
     }
 
     /**
@@ -473,10 +433,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      */
     private void prepareForRealTimeUpdates() {
         if (arrivalTimes == null) {
-            setArrivalTimes(Arrays.copyOf(scheduledArrivalTimes, scheduledArrivalTimes.length));
-            setDepartureTimes(Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length));
-            setRecordedStops(new boolean[arrivalTimes.length]);
-            setPredictionInaccurateOnStops(new boolean[arrivalTimes.length]);
+            this.arrivalTimes = Arrays.copyOf(scheduledArrivalTimes, scheduledArrivalTimes.length);
+            this.departureTimes = Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length);
+            this.recordedStops = new boolean[arrivalTimes.length];
+            this.predictionInaccurateOnStops = new boolean[arrivalTimes.length];
             for (int i = 0; i < arrivalTimes.length; i++) {
                 arrivalTimes[i] += timeShift;
                 departureTimes[i] += timeShift;
@@ -510,7 +470,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         final TripTimes shifted = new TripTimes(this);
         // Adjust 0-based times to match desired stoptime.
         final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));
-        shifted.setTimeShift(shifted.timeShift + shift); // existing shift should usually (always?) be 0 on freqs
+        // existing shift should usually (always?) be 0 on freqs
+        shifted.timeShift = shifted.timeShift + shift;
         return shifted;
     }
 
