@@ -194,7 +194,7 @@ public class GeometryAndBlockProcessor {
         for (TripPattern pattern : tripPatterns) {
             Timetable timetable = pattern.getScheduledTimetable();
             /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
-            for (TripTimes tripTimes : timetable.tripTimes) {
+            for (TripTimes tripTimes : timetable.getTripTimes()) {
                 Trip trip = tripTimes.getTrip();
                 if (!Strings.isNullOrEmpty(trip.getBlockId())) {
                     tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);

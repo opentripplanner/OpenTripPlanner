@@ -71,7 +71,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         BitSet services = getRoutingService(environment).getServicesRunningForDate(
             ServiceDate.parseString(servicaDate)
         );
-        return getSource(environment).getScheduledTimetable().tripTimes
+        return getSource(environment).getScheduledTimetable().getTripTimes()
             .stream()
             .filter(times -> services.get(times.getServiceCode()))
             .map(times -> times.getTrip())

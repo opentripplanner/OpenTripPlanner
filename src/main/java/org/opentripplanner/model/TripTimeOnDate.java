@@ -40,7 +40,7 @@ public class TripTimeOnDate {
         List<TripTimeOnDate> out = new ArrayList<>();
         // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeOnDate(times, i, table.pattern.getStop(i), null));
+            out.add(new TripTimeOnDate(times, i, table.getPattern().getStop(i), null));
         }
         return out;
     }
@@ -55,7 +55,7 @@ public class TripTimeOnDate {
         List<TripTimeOnDate> out = new ArrayList<>();
         // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeOnDate(times, i, table.pattern.getStop(i), serviceDay));
+            out.add(new TripTimeOnDate(times, i, table.getPattern().getStop(i), serviceDay));
         }
         return out;
     }

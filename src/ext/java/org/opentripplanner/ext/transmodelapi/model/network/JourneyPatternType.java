@@ -70,7 +70,7 @@ public class JourneyPatternType {
                           environment.getArgument("date")
                       )
                   );
-              return ((TripPattern) environment.getSource()).getScheduledTimetable().tripTimes
+              return ((TripPattern) environment.getSource()).getScheduledTimetable().getTripTimes()
                   .stream()
                   .filter(times -> services.get(times.getServiceCode()))
                   .map(times -> times.getTrip())

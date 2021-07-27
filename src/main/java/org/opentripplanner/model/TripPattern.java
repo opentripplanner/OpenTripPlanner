@@ -278,10 +278,10 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     public void removeTrips(Predicate<Trip> removeTrip) {
         getTrips().removeIf(removeTrip);
         if(getTrips().isEmpty()) {
-            scheduledTimetable.tripTimes.clear();
+            scheduledTimetable.getTripTimes().clear();
         }
         else {
-            scheduledTimetable.tripTimes.removeIf(tt -> removeTrip.test(tt.getTrip()));
+            scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
         }
     }
 
@@ -307,7 +307,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
      */
     public List<Trip> getTrips() {
-        return scheduledTimetable.tripTimes.stream().map(t -> t.getTrip()).collect(Collectors.toList());
+        return scheduledTimetable.getTripTimes().stream().map(t -> t.getTrip()).collect(Collectors.toList());
     }
 
     /** The human-readable, unique name for this trip pattern. */

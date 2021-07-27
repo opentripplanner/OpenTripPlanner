@@ -119,9 +119,9 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         assertEquals(4, subject.getTripsById().size());
         assertEquals(3, subject.getTripPatterns().get(STOP_PATTERN).size());
         assertEquals(2, patternInT1.getTrips().size());
-        assertEquals(2, patternInT1.getScheduledTimetable().tripTimes.size());
+        assertEquals(2, patternInT1.getScheduledTimetable().getTripTimes().size());
         assertEquals(1, patternInT2.getTrips().size());
-        assertEquals(1, patternInT2.getScheduledTimetable().tripTimes.size());
+        assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
         // Limit service to last half of month
         subject.limitServiceDays(new ServiceDateInterval(D2, D3));
@@ -157,11 +157,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         assertEquals(1, patternInT2.getTrips().size());
 
         // Verify scheduledTimetable trips (one trip is removed from patternInT1)
-        assertEquals(1, patternInT1.getScheduledTimetable().tripTimes.size());
-        assertEquals(tripCSIn, patternInT1.getScheduledTimetable().tripTimes.get(0).getTrip());
+        assertEquals(1, patternInT1.getScheduledTimetable().getTripTimes().size());
+        assertEquals(tripCSIn, patternInT1.getScheduledTimetable().getTripTimes().get(0).getTrip());
 
         // Verify scheduledTimetable trips in pattern is unchanged (one trip)
-        assertEquals(1, patternInT2.getScheduledTimetable().tripTimes.size());
+        assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
     }
 
     private TripPattern createTripPattern(String id, Collection<Trip> trips) {

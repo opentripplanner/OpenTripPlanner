@@ -93,7 +93,7 @@ public class TimetableHelper {
 
         boolean stopPatternChanged = false;
 
-        Stop[] modifiedStops = timetable.pattern.getStopPattern().getStops();
+        Stop[] modifiedStops = timetable.getPattern().getStopPattern().getStops();
 
         Trip trip = getTrip(tripId, timetable);
 
@@ -282,8 +282,8 @@ public class TimetableHelper {
             }
             if (!foundMatch) {
 
-                if (timetable.pattern.getStopPattern().getPickup(callCounter) == NONE &&
-                        timetable.pattern.getStopPattern().getDropoff(callCounter) == NONE) {
+                if (timetable.getPattern().getStopPattern().getPickup(callCounter) == NONE &&
+                        timetable.getPattern().getStopPattern().getDropoff(callCounter) == NONE) {
                     // When newTimes contains stops without pickup/dropoff - set both arrival/departure to previous stop's departure
                     // This necessary to accommodate the case when delay is reduced/eliminated between to stops with pickup/dropoff, and
                     // multiple non-pickup/dropoff stops are in between.
@@ -327,7 +327,7 @@ public class TimetableHelper {
             return null;
         }
 
-        if (newTimes.getNumStops() != timetable.pattern.getStopPattern().getStops().length) {
+        if (newTimes.getNumStops() != timetable.getPattern().getStopPattern().getStops().length) {
             return null;
         }
 
@@ -368,7 +368,7 @@ public class TimetableHelper {
         }
 
         //Get all scheduled stops
-        Stop[] stops = timetable.pattern.getStopPattern().getStops();
+        Stop[] stops = timetable.getPattern().getStopPattern().getStops();
 
         // Keeping track of visited stop-objects to allow multiple visits to a stop.
         List<Object> alreadyVisited = new ArrayList<>();
@@ -476,8 +476,8 @@ public class TimetableHelper {
             stopTime.setStop(stop);
             stopTime.setTrip(trip);
             stopTime.setStopSequence(i);
-            stopTime.setDropOffType(timetable.pattern.getStopPattern().getDropoff(i));
-            stopTime.setPickupType(timetable.pattern.getStopPattern().getPickup(i));
+            stopTime.setDropOffType(timetable.getPattern().getStopPattern().getDropoff(i));
+            stopTime.setPickupType(timetable.getPattern().getStopPattern().getPickup(i));
             stopTime.setArrivalTime(oldTimes.getScheduledArrivalTime(i));
             stopTime.setDepartureTime(oldTimes.getScheduledDepartureTime(i));
             stopTime.setStopHeadsign(oldTimes.getHeadsign(i));
@@ -592,7 +592,7 @@ public class TimetableHelper {
         if (update == null) {
             return null;
         }
-        final List<Stop> stops = timetable.pattern.getStops();
+        final List<Stop> stops = timetable.getPattern().getStops();
 
         VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
 
@@ -661,7 +661,7 @@ public class TimetableHelper {
      * @return the matching Trip in this particular Timetable
      */
     public static Trip getTrip(FeedScopedId tripId, Timetable timetable) {
-        for (TripTimes tt : timetable.tripTimes) {
+        for (TripTimes tt : timetable.getTripTimes()) {
             if (tt.getTrip().getId().equals(tripId)) {
                 return tt.getTrip();
             }

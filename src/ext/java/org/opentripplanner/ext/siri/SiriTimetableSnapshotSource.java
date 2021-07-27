@@ -874,12 +874,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
          * Update pattern with triptimes so get correct dwell times and lower bound on running times.
          * New patterns only affects a single trip, previously added tripTimes is no longer valid, and is therefore removed
          */
-        pattern.getScheduledTimetable().tripTimes.clear();
+        pattern.getScheduledTimetable().getTripTimes().clear();
         pattern.getScheduledTimetable().addTripTimes(updatedTripTimes);
         pattern.getScheduledTimetable().finish();
 
         // Remove trip times to avoid real time trip times being visible for ignoreRealtimeInformation queries
-        pattern.getScheduledTimetable().tripTimes.clear();
+        pattern.getScheduledTimetable().getTripTimes().clear();
 
         // Add to buffer as-is to include it in the 'lastAddedTripPattern'
         buffer.update(pattern, updatedTripTimes, serviceDate);
@@ -1045,7 +1045,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             else {
                 //Match origin only - since destination is not defined
                 if (firstStop.getId().getId().equals(siriOriginRef)) {
-                    tripPattern.getScheduledTimetable().tripTimes
+                    tripPattern.getScheduledTimetable().getTripTimes()
                         .get(0)
                         .getDepartureTime(0); // TODO does this line do anything?
                     patterns.add(tripPattern);
@@ -1263,10 +1263,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                         }
                     }
                     if (firstReportedStopIsFound) {
-                        for (TripTimes times : getCurrentTimetable(
-                            pattern,
-                            serviceDate
-                        ).tripTimes) {
+                        for (TripTimes times : getCurrentTimetable(pattern, serviceDate)
+                            .getTripTimes()) {
                             if (times.getScheduledDepartureTime(stopNumber - 1) == departureInSecondsSinceMidnight) {
                                 if (routingService
                                     .getCalendarService()

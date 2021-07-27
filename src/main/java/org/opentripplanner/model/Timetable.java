@@ -34,26 +34,13 @@ public class Timetable implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(Timetable.class);
     private static final long serialVersionUID = 1L;
 
-    /**
-     * A circular reference between TripPatterns and their scheduled (non-updated) timetables.
-     */
-    public final TripPattern pattern;
+    private final TripPattern pattern;
 
-    /**
-     * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
-     * additional TripTimes objects for unscheduled trips. Frequency entries are stored separately.
-     */
-    public final List<TripTimes> tripTimes = Lists.newArrayList();
+    private final List<TripTimes> tripTimes = Lists.newArrayList();
 
-    /**
-     * Contains one FrequencyEntry object for each block of frequency-based trips.
-     */
-    public final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+    private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
 
-    /**
-     * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.
-     */
-    public final ServiceDate serviceDate;
+    private final ServiceDate serviceDate;
 
     /** 
      * Helps determine whether a particular pattern is worth searching for departures at a given time. 
@@ -378,5 +365,34 @@ public class Timetable implements Serializable {
             TripTimes tt = freq.tripTimes;
             tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
         }
+    }
+
+    /**
+     * A circular reference between TripPatterns and their scheduled (non-updated) timetables.
+     */
+    public TripPattern getPattern() {
+        return pattern;
+    }
+
+    /**
+     * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
+     * additional TripTimes objects for unscheduled trips. Frequency entries are stored separately.
+     */
+    public List<TripTimes> getTripTimes() {
+        return tripTimes;
+    }
+
+    /**
+     * Contains one FrequencyEntry object for each block of frequency-based trips.
+     */
+    public List<FrequencyEntry> getFrequencyEntries() {
+        return frequencyEntries;
+    }
+
+    /**
+     * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.
+     */
+    public ServiceDate getServiceDate() {
+        return serviceDate;
     }
 }

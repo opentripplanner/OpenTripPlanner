@@ -64,9 +64,9 @@ public class TripPatternMapperTest {
         assertEquals("NSR:Quay:3", stops.get(2).getId().getId());
         assertEquals("NSR:Quay:4", stops.get(3).getId().getId());
 
-        assertEquals(1, tripPattern.getScheduledTimetable().tripTimes.size());
+        assertEquals(1, tripPattern.getScheduledTimetable().getTripTimes().size());
 
-        TripTimes tripTimes = tripPattern.getScheduledTimetable().tripTimes.get(0);
+        TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes().get(0);
 
         assertEquals(4, tripTimes.getNumStops());
 

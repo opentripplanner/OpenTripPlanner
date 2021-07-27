@@ -42,7 +42,7 @@ public class TimetableSnapshot {
     protected static class SortedTimetableComparator implements Comparator<Timetable> {
         @Override
         public int compare(Timetable t1, Timetable t2) {
-            return t1.serviceDate.compareTo(t2.serviceDate);
+            return t1.getServiceDate().compareTo(t2.getServiceDate());
         }
     }
     
@@ -209,7 +209,7 @@ public class TimetableSnapshot {
                 temp.addAll(sortedTimetables);
                 sortedTimetables = temp;
             }
-            if(old.serviceDate != null)
+            if(old.getServiceDate() != null)
                 sortedTimetables.remove(old);
             sortedTimetables.add(tt);
             timetables.put(pattern, sortedTimetables);
@@ -339,7 +339,7 @@ public class TimetableSnapshot {
             SortedSet<Timetable> toKeepTimetables =
                     new TreeSet<Timetable>(new SortedTimetableComparator());
             for(Timetable timetable : sortedTimetables) {
-                if(serviceDate.compareTo(timetable.serviceDate) < 0) {
+                if(serviceDate.compareTo(timetable.getServiceDate()) < 0) {
                     toKeepTimetables.add(timetable);
                 } else {
                     modified = true;
