@@ -15,7 +15,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -188,7 +188,7 @@ public class QuayType {
                           transitModes,
                           environment
                       )
-                            .sorted(TripTimeShort.compareByDeparture())
+                            .sorted(TripTimeOnDate.compareByDeparture())
                             .distinct()
                             .limit(numberOfDepartures)
                             .collect(Collectors.toList());

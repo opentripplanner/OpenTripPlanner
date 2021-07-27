@@ -10,7 +10,7 @@ import java.util.List;
 public class StopTimesInPattern {
 
     public TripPattern pattern;
-    public List<TripTimeShort> times = new ArrayList<>();
+    public List<TripTimeOnDate> times = new ArrayList<>();
 
     public StopTimesInPattern(TripPattern pattern) {
         this.pattern = pattern;

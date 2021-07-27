@@ -1,6 +1,6 @@
 package org.opentripplanner.routing;
 
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TripTimesShortHelper {
-  public static List<TripTimeShort> getTripTimesShort(RoutingService routingService, Trip trip, ServiceDate serviceDate) {
+  public static List<TripTimeOnDate> getTripTimesShort(RoutingService routingService, Trip trip, ServiceDate serviceDate) {
     final ServiceDay serviceDay = new ServiceDay(routingService.getServiceCodes(),
         serviceDate,
         routingService.getCalendarService(),
@@ -40,7 +40,7 @@ public class TripTimesShortHelper {
       return new ArrayList<>();
     }
     else {
-      return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
+      return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDay);
     }
   }
 

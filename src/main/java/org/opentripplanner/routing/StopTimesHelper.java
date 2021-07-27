@@ -6,7 +6,7 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -64,7 +64,7 @@ public class StopTimesHelper {
 
     for (TripPattern pattern : patternsForStop) {
 
-      Queue<TripTimeShort> pq = listTripTimeShortsForPatternAtStop(
+      Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
           routingService,
           timetableSnapshot,
           stop,
@@ -121,7 +121,7 @@ public class StopTimesHelper {
           if(omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
           for (TripTimes t : tt.tripTimes) {
             if (!sd.serviceRunning(t.getServiceCode())) { continue; }
-            stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
+            stopTimes.times.add(new TripTimeOnDate(t, sidx, stop, sd));
           }
         }
         sidx++;
@@ -145,7 +145,7 @@ public class StopTimesHelper {
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
    */
-  public static List<TripTimeShort> stopTimesForPatternAtStop(
+  public static List<TripTimeOnDate> stopTimesForPatternAtStop(
           RoutingService routingService,
           TimetableSnapshot timetableSnapshot,
           Stop stop,
@@ -160,7 +160,7 @@ public class StopTimesHelper {
     }
     Date date = new Date(startTime * 1000);
     ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
-    Queue<TripTimeShort> pq = listTripTimeShortsForPatternAtStop(
+    Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
         routingService,
         timetableSnapshot,
         stop,
@@ -175,7 +175,7 @@ public class StopTimesHelper {
     return new ArrayList<>(pq);
   }
 
-  private static Queue<TripTimeShort> listTripTimeShortsForPatternAtStop(
+  private static Queue<TripTimeOnDate> listTripTimeShortsForPatternAtStop(
       RoutingService routingService,
       TimetableSnapshot timetableSnapshot,
       Stop stop,
@@ -197,8 +197,8 @@ public class StopTimesHelper {
     // ways to do it.
     //
     // The {@link MinMaxPriorityQueue} is marked beta, but we do not have a god alternative.
-    MinMaxPriorityQueue<TripTimeShort> pq = MinMaxPriorityQueue
-            .orderedBy(Comparator.comparing((TripTimeShort tts) -> tts.getServiceDay()
+    MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue
+            .orderedBy(Comparator.comparing((TripTimeOnDate tts) -> tts.getServiceDay()
                 + tts.getRealtimeDeparture()))
             .maximumSize(numberOfDepartures)
             .create();
@@ -226,7 +226,7 @@ public class StopTimesHelper {
             if (!sd.serviceRunning(t.getServiceCode())) continue;
             if (t.getDepartureTime(sidx) != -1 &&
                     t.getDepartureTime(sidx) >= secondsSinceMidnight) {
-              pq.add(new TripTimeShort(t, sidx, stop, sd));
+              pq.add(new TripTimeOnDate(t, sidx, stop, sd));
             }
           }
 
@@ -240,7 +240,7 @@ public class StopTimesHelper {
             int i = 0;
             while (departureTime <= lastDeparture && i < numberOfDepartures) {
               pq.add(
-                      new TripTimeShort(
+                      new TripTimeOnDate(
                               freq.materialize(sidx, departureTime, true),
                               sidx,
                               stop,

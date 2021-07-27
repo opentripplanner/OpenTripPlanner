@@ -31,7 +31,7 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
@@ -439,13 +439,13 @@ public class IndexAPI {
 
     @GET
     @Path("/trips/{tripId}/stoptimes")
-    public List<TripTimeShort> getStoptimesForTrip(@PathParam("tripId") String tripId) {
+    public List<TripTimeOnDate> getStoptimesForTrip(@PathParam("tripId") String tripId) {
         RoutingService routingService = createRoutingService();
         Trip trip = getTrip(routingService, tripId);
         TripPattern pattern = getTripPattern(routingService, trip);
         // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
         Timetable table = routingService.getTimetableForTripPattern(pattern);
-        return TripTimeShort.fromTripTimes(table, trip);
+        return TripTimeOnDate.fromTripTimes(table, trip);
     }
 
     /** Return geometry for the trip as a packed coordinate sequence */
