@@ -1,15 +1,16 @@
 # Changelog
 
 ## 2.1.0 (in progress)
+- Add support for `NOT_ALLOWED` stop-to-stop transfers [#3505](https://github.com/opentripplanner/OpenTripPlanner/issues/3505)
 - Fix NullPointerException when a RealTime update do not match an existing TripPattern [#3284](https://github.com/opentripplanner/OpenTripPlanner/issues/3284)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
 - Prioritize "direct" routes over transfers in group-filters [#3309](https://github.com/opentripplanner/OpenTripPlanner/issues/3309)
-- The itinerary filter configuration is moved from the `RoutingRequest` into its own JSON node `itineraryFilters`.  
+- The itinerary filter configuration is moved from the `RoutingRequest` into its own JSON node `itineraryFilters`.
 - Remove poor transit results for short trips, when walking is better [#3331](https://github.com/opentripplanner/OpenTripPlanner/issues/3331)
 - A pathway's `traversal_time` is used when calculating the duration of transfers [#3357](https://github.com/opentripplanner/OpenTripPlanner/issues/3357).
 - GTFS Trips will by default not allow bikes if no explicit value is set [#3359](https://github.com/opentripplanner/OpenTripPlanner/issues/3359).
-- Improve the dynamic search window calculation. The configuration parameters `minTransitTimeCoefficient` and `minWaitTimeCoefficient` replace the old `minTripTimeCoefficient` parameter. [#3366](https://github.com/opentripplanner/OpenTripPlanner/issues/3366)   
+- Improve the dynamic search window calculation. The configuration parameters `minTransitTimeCoefficient` and `minWaitTimeCoefficient` replace the old `minTripTimeCoefficient` parameter. [#3366](https://github.com/opentripplanner/OpenTripPlanner/issues/3366)
 - Allow loops caused by turn restriction in street routes [#3399](https://github.com/opentripplanner/OpenTripPlanner/pull/3399)
 - Apply turn restrictions when splitting edges. [#3414](https://github.com/opentripplanner/OpenTripPlanner/pull/3414)
 - Add separate no-thru handling for bicycles [#3410](https://github.com/opentripplanner/OpenTripPlanner/pull/3410)
@@ -46,7 +47,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Remove extra Djikstra implementations
 - Remove redundant LineStrings in order to save memory [#2795](https://github.com/opentripplanner/OpenTripPlanner/issues/2795)
 - NeTEx import support [#2769](https://github.com/opentripplanner/OpenTripPlanner/issues/2769)
-- New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
+- New Transit search algorithm, Raptor, replaces the AStar for all transit searches.
 - Added NeTEx notices [#2824](https://github.com/opentripplanner/OpenTripPlanner/issues/2824)
 - Make transfers and access/egress use effectiveWalkDistance to take slopes into account [#2857](https://github.com/opentripplanner/OpenTripPlanner/issues/2857)
 - Add MultiModalStation and GroupOfStations to OTP model and added these to the NeTEx import [#2813](https://github.com/opentripplanner/OpenTripPlanner/issues/2813)
@@ -55,8 +56,8 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Cleanup and rename Graph Builder Annotations, now Data Import Issues [#2871](https://github.com/opentripplanner/OpenTripPlanner/issues/2871)
 - Bugfix for graph building crashing on unsupported modes [#2899](https://github.com/opentripplanner/OpenTripPlanner/issues/2899)
 - Add command line parameter for building partial graphs [#2583](https://github.com/opentripplanner/OpenTripPlanner/issues/2583)
-- Refactor GenericLocation/AStar/RoutingContext to allow multiple start vertices [#2887](https://github.com/opentripplanner/OpenTripPlanner/issues/2887) 
-- New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
+- Refactor GenericLocation/AStar/RoutingContext to allow multiple start vertices [#2887](https://github.com/opentripplanner/OpenTripPlanner/issues/2887)
+- New Transit search algorithm, Raptor, replaces the AStar for all transit searches.
 - Update only the relevant parts of the TransitLayer each time an update is applied [#2918](https://github.com/opentripplanner/OpenTripPlanner/issues/2918)
 - Ability to switch off the fare service[#2912](https://github.com/opentripplanner/OpenTripPlanner/issues/2912).
 - Limit the transit service period[#2925](https://github.com/opentripplanner/OpenTripPlanner/issues/2925).
@@ -85,7 +86,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Fix: The updater config type is unknown: gtfs-http [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
 - Fix: Problem building and loading the GTFS file in San Fransisco Bay Area [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
 - Fix: The `BusRouteStreetMatcher` and `TransitToTaggedStopsModule` graph builder modules are not run if the graph is build in two steps, and add progress tracker to BusRouteStreetMatcher. [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
-- Improvement: Insert project information like Maven version number into configuration files. [#3254](https://github.com/opentripplanner/OpenTripPlanner/pull/3254)   
+- Improvement: Insert project information like Maven version number into configuration files. [#3254](https://github.com/opentripplanner/OpenTripPlanner/pull/3254)
 - Added pathway FeedScopedId as the route text to trip plan responses. [#3287](https://github.com/opentripplanner/OpenTripPlanner/issues/3287)
 
 
@@ -261,7 +262,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Handle embeded router configuration for POSTed graphs and zips for building.
 - Simplified router-config handling.
 - Properly lazy-initialize profile routing stopClusters. Added stop clusters to the Index API.
-- Completely removed the ill-advised path parser system, which was too clever for its own good.    
+- Completely removed the ill-advised path parser system, which was too clever for its own good.
 - Sort itineraries by total travel time rather than in-transit time.
 - Rental bikes: allow loading generic KML.
 - Removed the experimental TransportNetwork classes, which shared no code with the rest of OTP and were duplicated in the R5 project. There are still some elements that can be cleaned out when only R5 is used by Conveyal's analysis system. The broker code in OTP is now able to start up R5 workers for Analyst.
@@ -459,7 +460,7 @@ This release was made to consolidate all the development that had occurred with 
 - fixed fare overflow problem
 - fixed bug in loop road turn conversion
 - additional graphbuilder warnings and annotations
-- fixed a batch of bugs found by fixbugs  
+- fixed a batch of bugs found by fixbugs
 
 ## 0.5.0 (2012-03-09)
 - stop codes, zones, and agency names in planner responses
