@@ -84,13 +84,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      */
     private boolean[] predictionInaccurateOnStops;
 
-    private List<PickDrop> pickups;
+    private final List<PickDrop> pickups;
 
-    private List<PickDrop> dropoffs;
+    private final List<PickDrop> dropoffs;
 
-    private List<BookingInfo> dropOffBookingInfos;
+    private final List<BookingInfo> dropOffBookingInfos;
 
-    private List<BookingInfo> pickupBookingInfos;
+    private final List<BookingInfo> pickupBookingInfos;
 
     /**
      * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits
