@@ -6,7 +6,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 
 public class InterchangeType {
 
@@ -73,7 +73,7 @@ public class InterchangeType {
                 .build();
     }
 
-    private static Transfer transfer(DataFetchingEnvironment environment) {
+    private static ConstrainedTransfer transfer(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
 }

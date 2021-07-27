@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import gnu.trove.map.TIntObjectMap;
 import java.util.List;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
@@ -19,8 +19,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  * between the current pattern and the source trip stop arrival. The source is the "from"
  * point in a transfer for a forward search, and the "to" point in the reverse search.
  */
-public final class PatternGuaranteedTransferProvider
-        implements RaptorGuaranteedTransferProvider<TripSchedule> {
+public final class PatternTransferConstraintsProvider
+        implements RaptorTransferConstraintsProvider<TripSchedule> {
 
     private static final int NOT_FOUND = -999_999_999;
     private static final DirectionHelper FORWARD_HELPER = new ForwardDirectionHelper();
@@ -31,13 +31,13 @@ public final class PatternGuaranteedTransferProvider
     /**
      * List of transfers for each stop position in pattern
      */
-    private final TIntObjectMap<List<Transfer>> transfers;
+    private final TIntObjectMap<List<ConstrainedTransfer>> transfers;
 
-    private List<Transfer> currentTransfers;
+    private List<ConstrainedTransfer> currentTransfers;
 
-    public PatternGuaranteedTransferProvider(
+    public PatternTransferConstraintsProvider(
             boolean forwardSearch,
-            TIntObjectMap<List<Transfer>> transfers
+            TIntObjectMap<List<ConstrainedTransfer>> transfers
     ) {
         this.translator = forwardSearch ? FORWARD_HELPER : REVERSE_HELPER;
         this.transfers = transfers;
@@ -64,7 +64,7 @@ public final class PatternGuaranteedTransferProvider
                 sourceTripSchedule, sourceArrivalTime, sourceStopIndex
         );
 
-        Transfer tx = findMatchingTargetPoint(sourceTrip, sourceStopPos);
+        ConstrainedTransfer tx = findMatchingTargetPoint(sourceTrip, sourceStopPos);
 
         if(tx == null) { return null; }
 
@@ -85,11 +85,11 @@ public final class PatternGuaranteedTransferProvider
         return new Result(tripIndex, trip, targetStopPos, departureTime);
     }
 
-    private Transfer findMatchingTargetPoint(
+    private ConstrainedTransfer findMatchingTargetPoint(
             Trip sourceTrip,
             int sourceStopPos
     ) {
-        for (Transfer tx : currentTransfers) {
+        for (ConstrainedTransfer tx : currentTransfers) {
             var sourcePoint = translator.source(tx);
             if(sourcePoint.matches(sourceTrip, sourceStopPos)) {
                 return tx;
@@ -99,8 +99,8 @@ public final class PatternGuaranteedTransferProvider
     }
 
     private interface DirectionHelper {
-        TransferPoint source(Transfer tx);
-        TransferPoint target(Transfer tx);
+        TransferPoint source(ConstrainedTransfer tx);
+        TransferPoint target(ConstrainedTransfer tx);
         int time(RaptorTripSchedule schedule, int stopPos);
         int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop);
         int findTimetableTripIndex(
@@ -112,8 +112,8 @@ public final class PatternGuaranteedTransferProvider
     }
 
     private static class ForwardDirectionHelper implements DirectionHelper {
-        @Override public TransferPoint source(Transfer tx) { return tx.getFrom();  }
-        @Override public TransferPoint target(Transfer tx) { return tx.getTo(); }
+        @Override public TransferPoint source(ConstrainedTransfer tx) { return tx.getFrom();  }
+        @Override public TransferPoint target(ConstrainedTransfer tx) { return tx.getTo(); }
         @Override public int time(RaptorTripSchedule schedule, int stopPos) {
             return schedule.departure(stopPos);
         }
@@ -145,8 +145,8 @@ public final class PatternGuaranteedTransferProvider
     }
 
     private static class ReverseDirectionHelper implements DirectionHelper {
-        @Override public TransferPoint source(Transfer tx) { return tx.getTo();  }
-        @Override public TransferPoint target(Transfer tx) { return tx.getFrom(); }
+        @Override public TransferPoint source(ConstrainedTransfer tx) { return tx.getTo();  }
+        @Override public TransferPoint target(ConstrainedTransfer tx) { return tx.getFrom(); }
         @Override public int time(RaptorTripSchedule schedule, int stopPos) {
             return schedule.arrival(stopPos);
         }

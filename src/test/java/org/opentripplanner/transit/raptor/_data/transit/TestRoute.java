@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
@@ -51,12 +51,12 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     }
 
     @Override
-    public RaptorGuaranteedTransferProvider<TestTripSchedule> getGuaranteedTransfersTo() {
+    public RaptorTransferConstraintsProvider<TestTripSchedule> getTransferConstraintsTo() {
         return transfersTo;
     }
 
     @Override
-    public RaptorGuaranteedTransferProvider<TestTripSchedule> getGuaranteedTransfersFrom() {
+    public RaptorTransferConstraintsProvider<TestTripSchedule> getTransferConstraintsFrom() {
         return transfersFrom;
     }
 

@@ -28,27 +28,27 @@ public class TransferService implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(TransferService.class);
 
     /** Index of guaranteed transfers by the to/destination point. */
-    private final Multimap<TripTransferPoint, Transfer> guaranteedTransferByToPoint;
+    private final Multimap<TripTransferPoint, ConstrainedTransfer> guaranteedTransferByToPoint;
 
     /**
      * Table which contains transfers between two trips/routes
      */
-    private final Map<P2<TripTransferPoint>, Transfer> trip2tripTransfers;
+    private final Map<P2<TripTransferPoint>, ConstrainedTransfer> trip2tripTransfers;
 
     /**
      * Table which contains transfers between a trip/route and a stops
      */
-    private final Map<T2<TripTransferPoint, Stop>, Transfer> trip2StopTransfers;
+    private final Map<T2<TripTransferPoint, Stop>, ConstrainedTransfer> trip2StopTransfers;
 
     /**
      * Table which contains transfers between a stop and a trip/route
      */
-    private final Map<T2<Stop, TripTransferPoint>, Transfer> stop2TripTransfers;
+    private final Map<T2<Stop, TripTransferPoint>, ConstrainedTransfer> stop2TripTransfers;
 
     /**
      * Table which contains transfers between two stops
      */
-    private final Map<P2<Stop>, Transfer> stop2StopTransfers;
+    private final Map<P2<Stop>, ConstrainedTransfer> stop2StopTransfers;
 
     public TransferService() {
         this.guaranteedTransferByToPoint = ArrayListMultimap.create();
@@ -58,14 +58,14 @@ public class TransferService implements Serializable {
         this.stop2StopTransfers = new HashMap<>();
     }
 
-    public void addAll(Collection<Transfer> transfers) {
-        for (Transfer transfer : transfers) {
+    public void addAll(Collection<ConstrainedTransfer> transfers) {
+        for (ConstrainedTransfer transfer : transfers) {
             add(transfer);
         }
     }
 
-    public List<Transfer> listAll() {
-        var list = new ArrayList<Transfer>();
+    public List<ConstrainedTransfer> listAll() {
+        var list = new ArrayList<ConstrainedTransfer>();
         list.addAll(trip2tripTransfers.values());
         list.addAll(trip2StopTransfers.values());
         list.addAll(stop2TripTransfers.values());
@@ -73,12 +73,12 @@ public class TransferService implements Serializable {
         return list;
     }
 
-    public Collection<Transfer> listGuaranteedTransfersTo(Trip toTrip, int toStopIndex) {
+    public Collection<ConstrainedTransfer> listGuaranteedTransfersTo(Trip toTrip, int toStopIndex) {
         return guaranteedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
     }
 
     @Nullable
-    public Transfer findTransfer(
+    public ConstrainedTransfer findTransfer(
             Stop fromStop,
             Stop toStop,
             Trip fromTrip,
@@ -88,7 +88,7 @@ public class TransferService implements Serializable {
     ) {
         var fromTripKey = new TripTransferPoint(fromTrip, fromStopPosition);
         var toTripKey = new TripTransferPoint(toTrip, toStopPosition);
-        Transfer result;
+        ConstrainedTransfer result;
 
         // Check the highest specificity ranked transfers first (trip-2-trip)
         result = trip2tripTransfers.get(new P2<>(fromTripKey, toTripKey));
@@ -106,7 +106,7 @@ public class TransferService implements Serializable {
         return stop2StopTransfers.get(new P2<>(fromStop, toStop));
     }
 
-    void add(Transfer transfer) {
+    void add(ConstrainedTransfer transfer) {
         TransferPoint from = transfer.getFrom();
         TransferPoint to = transfer.getTo();
 
@@ -156,8 +156,8 @@ public class TransferService implements Serializable {
      * specificity-ranking, thus using maps instead of multi-maps.
      */
     private boolean doAddTransferBasedOnSpecificityRanking(
-            Transfer newTransfer,
-            Transfer existingTransfer
+            ConstrainedTransfer newTransfer,
+            ConstrainedTransfer existingTransfer
     ) {
         if (existingTransfer == null) { return true; }
 
@@ -177,7 +177,7 @@ public class TransferService implements Serializable {
         return false;
     }
 
-    private void addGuaranteedTransfer(Transfer transfer) {
+    private void addGuaranteedTransfer(ConstrainedTransfer transfer) {
         var toPoint = transfer.getTo();
         if(transfer.isStaySeated() || transfer.isGuaranteed()) {
             if(toPoint instanceof TripTransferPoint) {

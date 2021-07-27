@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
@@ -34,7 +34,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 public class TransferGenerator<T extends RaptorTripSchedule> {
 
-  private final TransferServiceAdaptor<T> guaranteedTransferServiceAdaptor;
+  private final TransferServiceAdaptor<T> transferServiceAdaptor;
   private final RaptorSlackProvider slackProvider;
   private final RaptorTransitDataProvider<T> stdTransfers;
 
@@ -42,11 +42,11 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   private T toTrip;
 
   public TransferGenerator(
-      TransferServiceAdaptor<T> guaranteedTransferServiceAdaptor,
+      TransferServiceAdaptor<T> transferServiceAdaptor,
       RaptorSlackProvider slackProvider,
       RaptorTransitDataProvider<T> stdTransfers
   ) {
-    this.guaranteedTransferServiceAdaptor = guaranteedTransferServiceAdaptor;
+    this.transferServiceAdaptor = transferServiceAdaptor;
     this.slackProvider = slackProvider;
     this.stdTransfers = stdTransfers;
   }
@@ -112,7 +112,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
   private Collection<TripToTripTransfer<T>> transferFromSameStop(TripStopTime<T> from) {
     final int stop = from.stop();
-    var tx = guaranteedTransferServiceAdaptor.findTransfer(from, toTrip, stop);
+    var tx = transferServiceAdaptor.findTransfer(from, toTrip, stop);
 
     final int earliestDepartureTime = earliestDepartureTime(from.time(), tx);
 
@@ -138,7 +138,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       var it = transfers.next();
       int toStop = it.stop();
 
-      var tx = guaranteedTransferServiceAdaptor.findTransfer(from, toTrip, toStop);
+      var tx = transferServiceAdaptor.findTransfer(from, toTrip, toStop);
 
       int earliestDepartureTime = earliestDepartureTime(from.time(), it.durationInSeconds(), tx);
       int toTripStopPos = toTrip.findDepartureStopPosition(earliestDepartureTime, toStop);
@@ -157,11 +157,11 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     return result;
   }
 
-  private int earliestDepartureTime(int  fromTime, int transferDurationInSeconds, @Nullable Transfer tx) {
+  private int earliestDepartureTime(int  fromTime, int transferDurationInSeconds, @Nullable ConstrainedTransfer tx) {
     return earliestDepartureTime(fromTime, tx) + transferDurationInSeconds;
   }
 
-  private int earliestDepartureTime(int  fromTime, @Nullable Transfer tx) {
+  private int earliestDepartureTime(int  fromTime, @Nullable ConstrainedTransfer tx) {
     return tx==null || tx.includeSlack()
             ? fromTime + slackProvider.transitSlack(fromTrip.pattern())
             : fromTime;

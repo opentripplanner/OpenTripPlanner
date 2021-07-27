@@ -110,11 +110,11 @@ public class OtpTransitServiceImplTest {
         assertEquals(
                 //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), guaranteed}\n"
                 //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), guaranteed}\n"
-                "Transfer{from: (stop: K), to: (stop: L), priority: RECOMMENDED}\n"
-                + "Transfer{from: (stop: K), to: (stop: M), priority: NOT_ALLOWED}\n"
-                + "Transfer{from: (stop: L), to: (stop: K), priority: RECOMMENDED}\n"
-                + "Transfer{from: (stop: M), to: (stop: K), priority: NOT_ALLOWED}\n"
-                + "Transfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), guaranteed}",
+                "ConstrainedTransfer{from: (stop: K), to: (stop: L), priority: RECOMMENDED}\n"
+                + "ConstrainedTransfer{from: (stop: K), to: (stop: M), priority: NOT_ALLOWED}\n"
+                + "ConstrainedTransfer{from: (stop: L), to: (stop: K), priority: RECOMMENDED}\n"
+                + "ConstrainedTransfer{from: (stop: M), to: (stop: K), priority: NOT_ALLOWED}\n"
+                + "ConstrainedTransfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), guaranteed}",
                 result
         );
     }
@@ -208,8 +208,7 @@ public class OtpTransitServiceImplTest {
     }
 
     private static <T> T first(Collection<? extends T> c) {
-        //noinspection ConstantConditions
-        return c.stream().sorted(comparing(T::toString)).findFirst().get();
+        return c.stream().min(comparing(T::toString)).orElseThrow();
     }
 
     private static String toString(ShapePoint sp) {

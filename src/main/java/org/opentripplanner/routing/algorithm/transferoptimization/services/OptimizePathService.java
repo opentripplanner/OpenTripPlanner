@@ -225,7 +225,7 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
 
     return optimizedPathFactory.createPathLeg(
             fromTransitLeg,
-            tx.guaranteedTransfer(),
+            tx.constrainedTransfer(),
             tail.getTransfersTo(),
             toTransitLeg
     );

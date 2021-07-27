@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -10,7 +10,7 @@ import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
- * This builder is used to create a {@link Transfer} for use in unit-tests. It build a valid
+ * This builder is used to create a {@link ConstrainedTransfer} for use in unit-tests. It build a valid
  * instance with dummy trip reference.
  */
 @SuppressWarnings("UnusedReturnValue")
@@ -22,7 +22,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     private boolean staySeated = false;
     private boolean guaranteed = false;
     private TransferPriority priority = TransferPriority.ALLOWED;
-    private int maxWaitTime = Transfer.MAX_WAIT_TIME_NOT_SET;
+    private int maxWaitTime = ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET;
 
     private TestTransferBuilder(
             T fromTrip,
@@ -81,14 +81,14 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public Transfer build() {
+    public ConstrainedTransfer build() {
         if(fromTrip == null) { throw new NullPointerException(); }
         if(toTrip == null) { throw new NullPointerException(); }
 
         int fromStopPos =fromTrip.pattern().findStopPositionAfter(0, fromStopIndex);
         int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStopIndex);
 
-        return new Transfer(
+        return new ConstrainedTransfer(
                 new TripTransferPoint(createDummyTrip(fromTrip), fromStopPos),
                 new TripTransferPoint(createDummyTrip(toTrip), toStopPos),
                 priority,

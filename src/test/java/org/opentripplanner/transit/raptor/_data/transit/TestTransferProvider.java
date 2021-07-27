@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
-public class TestTransferProvider implements RaptorGuaranteedTransferProvider<TestTripSchedule> {
+public class TestTransferProvider implements RaptorTransferConstraintsProvider<TestTripSchedule> {
 
     /** Index of guaranteed transfers by fromStopPos */
     private final TIntObjectMap<List<GuaranteedTransfer>> transfersByFromStopPos = new TIntObjectHashMap<>();

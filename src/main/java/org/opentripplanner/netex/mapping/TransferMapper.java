@@ -8,7 +8,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.netex.issues.InterchangePointMappingFailed;
@@ -54,7 +54,7 @@ public class TransferMapper {
      * </pre>
      */
     @Nullable
-    public Transfer mapToTransfer(ServiceJourneyInterchange it) {
+    public ConstrainedTransfer mapToTransfer(ServiceJourneyInterchange it) {
         var id = it.getId();
         var from = mapPoint("from", id, it.getFromJourneyRef(), it.getFromPointRef());
         var to = mapPoint("to", id, it.getToJourneyRef(), it.getFromPointRef());
@@ -64,9 +64,9 @@ public class TransferMapper {
         var staySeated = isTrue(it.isStaySeated());
         var guaranteed = isTrue(it.isGuaranteed());
         var priority = mapPriority(it.getPriority());
-        var maxWaitTime = DurationMapper.mapDurationToSec(it.getMaximumWaitTime(), Transfer.MAX_WAIT_TIME_NOT_SET);
+        var maxWaitTime = DurationMapper.mapDurationToSec(it.getMaximumWaitTime(), ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET);
 
-        var tx = new Transfer(from, to, priority, staySeated, guaranteed, maxWaitTime);
+        var tx = new ConstrainedTransfer(from, to, priority, staySeated, guaranteed, maxWaitTime);
 
         if(tx.noConstraints()) {
             issueStore.add(new InterchangeWithoutConstraint(tx));

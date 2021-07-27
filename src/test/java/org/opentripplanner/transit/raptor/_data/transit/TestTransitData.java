@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import static org.opentripplanner.model.transfer.Transfer.MAX_WAIT_TIME_NOT_SET;
+import static org.opentripplanner.model.transfer.ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import lombok.val;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBuilder;
@@ -28,7 +28,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   private final List<List<RaptorTransfer>> transfersByStop = new ArrayList<>();
   private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
-  private final List<Transfer> guaranteedTransfers = new ArrayList<>();
+  private final List<ConstrainedTransfer> guaranteedTransfers = new ArrayList<>();
   private final McCostParamsBuilder costParamsBuilder = new McCostParamsBuilder();
 
   @Override
@@ -124,7 +124,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
         }
       }
     }
-    guaranteedTransfers.add(new Transfer(
+    guaranteedTransfers.add(new ConstrainedTransfer(
             new TestTransferPoint(fromStop, fromTrip),
             new TestTransferPoint(toStop, toTrip),
             TransferPriority.ALLOWED,
@@ -139,13 +139,13 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     return costParamsBuilder;
   }
 
-  public Transfer findGuaranteedTransfer(
+  public ConstrainedTransfer findGuaranteedTransfer(
           TestTripSchedule fromTrip,
           int fromStop,
           TestTripSchedule toTrip,
           int toStop
   ) {
-    for (Transfer tx : guaranteedTransfers) {
+    for (ConstrainedTransfer tx : guaranteedTransfers) {
       if(
           ((TestTransferPoint)tx.getFrom()).matches(fromTrip, fromStop) &&
           ((TestTransferPoint)tx.getTo()).matches(toTrip, toStop)
@@ -158,7 +158,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
 
   public TransferServiceAdaptor<TestTripSchedule> transferServiceAdaptor() {
     return new TransferServiceAdaptor<>(null, null) {
-      @Override protected Transfer findTransfer(
+      @Override protected ConstrainedTransfer findTransfer(
               TripStopTime<TestTripSchedule> from, TestTripSchedule toTrip, int toStop
       ) {
         return findGuaranteedTransfer(from.trip(), from.stop(), toTrip, toStop);

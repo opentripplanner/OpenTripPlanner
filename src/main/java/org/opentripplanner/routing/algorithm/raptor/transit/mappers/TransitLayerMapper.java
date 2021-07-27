@@ -75,7 +75,7 @@ public class TransitLayerMapper {
 
         transferByStopIndex = mapTransfers(stopIndex, graph.transfersByStop);
 
-        if(OTPFeature.GuaranteedTransfers.isOn()) {
+        if(OTPFeature.ConstrainedTransfers.isOn()) {
             TransferIndexGenerator.generateTransfers(
                     graph.getTransferService(),
                     newTripPatternForOld.values()

@@ -1,14 +1,14 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import static org.opentripplanner.model.transfer.Transfer.MAX_WAIT_TIME_NOT_SET;
+import static org.opentripplanner.model.transfer.ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.StopTransferPoint;
-import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.graph.GraphIndex;
 
@@ -23,19 +23,19 @@ public class TransfersReport {
     private static final int NOT_SET = -1;
 
 
-    private final List<Transfer> transfers;
+    private final List<ConstrainedTransfer> transfers;
     private final GraphIndex index;
     private final CsvReportBuilder buf = new CsvReportBuilder();
 
     private TransfersReport(
-            List<Transfer> transfers,
+            List<ConstrainedTransfer> transfers,
             GraphIndex index
     ) {
         this.transfers = transfers;
         this.index = index;
     }
 
-    public static String export(List<Transfer> transfers, GraphIndex index) {
+    public static String export(List<ConstrainedTransfer> transfers, GraphIndex index) {
         return new TransfersReport(transfers, index).export();
     }
 

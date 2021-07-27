@@ -13,8 +13,8 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.StopTransferPoint;
-import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
@@ -94,8 +94,8 @@ class TransferMapper {
     throw new IllegalArgumentException("Mapping missing for type: " + type);
   }
 
-  Collection<Transfer> map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
-    List<Transfer> result = new ArrayList<>();
+  Collection<ConstrainedTransfer> map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
+    List<ConstrainedTransfer> result = new ArrayList<>();
 
     for (org.onebusaway.gtfs.model.Transfer it : allTransfers) {
       result.addAll(map(it));
@@ -106,11 +106,11 @@ class TransferMapper {
   /**
    * Map from GTFS to OTP model, {@code null} safe.
    */
-  Collection<Transfer> map(org.onebusaway.gtfs.model.Transfer original) {
+  Collection<ConstrainedTransfer> map(org.onebusaway.gtfs.model.Transfer original) {
     return original == null ? List.of() : doMap(original);
   }
 
-  private Collection<Transfer> doMap(org.onebusaway.gtfs.model.Transfer rhs) {
+  private Collection<ConstrainedTransfer> doMap(org.onebusaway.gtfs.model.Transfer rhs) {
 
     Trip fromTrip = tripMapper.map(rhs.getFromTrip());
     Trip toTrip = tripMapper.map(rhs.getToTrip());
@@ -148,17 +148,17 @@ class TransferMapper {
     Collection<TransferPoint> fromPoints = mapTransferPoints(fromStops, fromTrip, fromRoute);
     Collection<TransferPoint> toPoints = mapTransferPoints(toStops, toTrip, toRoute);
 
-    Collection<Transfer> result = new ArrayList<>();
+    Collection<ConstrainedTransfer> result = new ArrayList<>();
 
     for (TransferPoint fromPoint : fromPoints) {
       for (TransferPoint toPoint : toPoints) {
-        Transfer transfer = new Transfer(
+        var transfer = new ConstrainedTransfer(
                 fromPoint,
                 toPoint,
                 transferPriority,
                 staySeated,
                 guaranteed,
-                Transfer.MAX_WAIT_TIME_NOT_SET
+                ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET
         );
         result.add(transfer);
       }

@@ -8,9 +8,9 @@ import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.transfer.Transfer;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternGuaranteedTransferProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternTransferConstraintsProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TripPatternWithRaptorStopIndexes {
@@ -21,12 +21,12 @@ public class TripPatternWithRaptorStopIndexes {
     /**
      * List of transfers FROM this pattern for each stop position in pattern
      */
-    private final TIntObjectMap<List<Transfer>> guaranteedTransfersFrom = new TIntObjectHashMap<>();
+    private final TIntObjectMap<List<ConstrainedTransfer>> transferConstraintsFrom = new TIntObjectHashMap<>();
 
     /**
      * List of transfers TTO this pattern for each stop position in pattern
      */
-    private final TIntObjectMap<List<Transfer>> guaranteedTransfersTo = new TIntObjectHashMap<>();
+    private final TIntObjectMap<List<ConstrainedTransfer>> transferConstraintsTo = new TIntObjectHashMap<>();
 
 
     public TripPatternWithRaptorStopIndexes(
@@ -58,12 +58,12 @@ public class TripPatternWithRaptorStopIndexes {
         return stopIndexes[stopPositionInPattern];
     }
 
-    public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersTo() {
-        return new PatternGuaranteedTransferProvider(true, guaranteedTransfersTo);
+    public RaptorTransferConstraintsProvider<TripSchedule> getTransferConstraintsTo() {
+        return new PatternTransferConstraintsProvider(true, transferConstraintsTo);
     }
 
-    public RaptorGuaranteedTransferProvider<TripSchedule> getGuaranteedTransfersFrom() {
-        return new PatternGuaranteedTransferProvider(false, guaranteedTransfersFrom);
+    public RaptorTransferConstraintsProvider<TripSchedule> getTransferConstraintsFrom() {
+        return new PatternTransferConstraintsProvider(false, transferConstraintsFrom);
     }
 
 
@@ -89,13 +89,13 @@ public class TripPatternWithRaptorStopIndexes {
     }
 
     /** These are public to allow the mappers to inject transfers */
-    public void addGuaranteedTransferFrom(Transfer tx) {
-        add(guaranteedTransfersFrom, tx, tx.getFrom().getStopPosition());
+    public void addTransferConstraintsFrom(ConstrainedTransfer tx) {
+        add(transferConstraintsFrom, tx, tx.getFrom().getStopPosition());
     }
 
     /** These are public to allow the mappers to inject transfers */
-    public void addGuaranteedTransfersTo(Transfer tx) {
-        add(guaranteedTransfersTo, tx, tx.getTo().getStopPosition());
+    public void addTransferConstraintsTo(ConstrainedTransfer tx) {
+        add(transferConstraintsTo, tx, tx.getTo().getStopPosition());
     }
 
     private static <T> void add(TIntObjectMap<List<T>> index, T e, int pos) {

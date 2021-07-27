@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
@@ -52,7 +52,7 @@ class GroupNetexMapper {
                 transitBuilder.getTripsById()
         );
         for (ServiceJourneyInterchange it : interchanges) {
-            Transfer result = mapper.mapToTransfer(it);
+            ConstrainedTransfer result = mapper.mapToTransfer(it);
             if(result != null) {
                 transitBuilder.getTransfers().add(result);
             }

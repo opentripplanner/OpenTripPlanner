@@ -21,12 +21,12 @@ public interface RaptorRoute<T extends RaptorTripSchedule> {
     RaptorTripPattern pattern();
 
     /**
-     * Return a guaranteed transfer provider for the given route transferring TO the route.
+     * Return a constrained transfer provider for the given route transferring TO the route.
      */
-    RaptorGuaranteedTransferProvider<T> getGuaranteedTransfersTo();
+    RaptorTransferConstraintsProvider<T> getTransferConstraintsTo();
 
     /**
-     * Return a guaranteed transfer provider for the given route transferring FROM the route.
+     * Return a constrained transfer provider for the given route transferring FROM the route.
      */
-    RaptorGuaranteedTransferProvider<T> getGuaranteedTransfersFrom();
+    RaptorTransferConstraintsProvider<T> getTransferConstraintsFrom();
 }

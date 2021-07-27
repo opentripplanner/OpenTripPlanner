@@ -184,11 +184,11 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return publisher;
     }
 
-    public boolean enableGuaranteedTransfers() {
+    public boolean enableConstrainedTransfers() {
         if(profile().isOneOf(RaptorProfile.BEST_TIME, RaptorProfile.NO_WAIT_BEST_TIME)) {
             return false;
         }
-        return searchParams().guaranteedTransfersEnabled();
+        return searchParams().constrainedTransfersEnabled();
     }
 
     /* private methods */

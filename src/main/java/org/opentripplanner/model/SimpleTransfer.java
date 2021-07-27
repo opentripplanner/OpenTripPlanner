@@ -3,12 +3,13 @@ package org.opentripplanner.model;
 import java.io.Serializable;
 import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.graph.Edge;
 
 /**
  * Represents a transfer between stops that does not take the street network into account.
  * <p>
- * Do not confuse this with {@link org.opentripplanner.model.transfer.Transfer}.
+ * Do not confuse this with {@link ConstrainedTransfer}.
  *
  * <p>
  * TODO these should really have a set of valid modes in case bike vs. walk transfers are different
