@@ -56,7 +56,7 @@ public class StopPattern implements Serializable {
 
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimeIterator.next();
-            getStops()[i] = (Stop) stopTime.getStop();
+            stops[i] = (Stop) stopTime.getStop();
             // should these just be booleans? anything but 1 means pick/drop is allowed.
             // pick/drop messages could be stored in individual trips
             pickups[i] = stopTime.getPickupType();
@@ -79,18 +79,18 @@ public class StopPattern implements Serializable {
      */
     public boolean containsStop (String stopId) {
         if (stopId == null) { return false; }
-        for (Stop stop : getStops()) if (stopId.equals(stop.getId().toString())) { return true; }
+        for (Stop stop : stops) if (stopId.equals(stop.getId().toString())) { return true; }
         return false;
     }
 
     public int getSize() {
-        return getStops().length;
+        return stops.length;
     }
 
     public boolean equals(Object other) {
         if (other instanceof StopPattern) {
             StopPattern that = (StopPattern) other;
-            return Arrays.equals(this.getStops(), that.getStops()) &&
+            return Arrays.equals(this.stops, that.stops) &&
                    Arrays.equals(this.pickups, that.pickups) &&
                    Arrays.equals(this.dropoffs, that.dropoffs);
         } else {
@@ -99,8 +99,8 @@ public class StopPattern implements Serializable {
     }
 
     public int hashCode() {
-        int hash = getStops().length;
-        hash += Arrays.hashCode(this.getStops());
+        int hash = stops.length;
+        hash += Arrays.hashCode(this.stops);
         hash *= 31;
         hash += Arrays.hashCode(this.pickups);
         hash *= 31;
@@ -111,8 +111,8 @@ public class StopPattern implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("StopPattern: ");
-        for (int i = 0, j = getStops().length; i < j; ++i) {
-            sb.append(String.format("%s_%s%s ", getStops()[i].getCode(), pickups[i], dropoffs[i]));
+        for (int i = 0, j = stops.length; i < j; ++i) {
+            sb.append(String.format("%s_%s%s ", stops[i].getCode(), pickups[i], dropoffs[i]));
         }
         return sb.toString();
     }
@@ -126,9 +126,9 @@ public class StopPattern implements Serializable {
      */
     public HashCode semanticHash(HashFunction hashFunction) {
         Hasher hasher = hashFunction.newHasher();
-        int size = getStops().length;
+        int size = stops.length;
         for (int s = 0; s < size; s++) {
-            Stop stop = getStops()[s];
+            Stop stop = stops[s];
             // Truncate the lat and lon to 6 decimal places in case they move slightly between
             // feed versions
             hasher.putLong((long) (stop.getLat() * 1000000));

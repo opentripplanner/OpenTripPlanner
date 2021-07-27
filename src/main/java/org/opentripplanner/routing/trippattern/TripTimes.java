@@ -188,7 +188,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      * headsign is the same at all stops (including null) and can be found in the Trip object.
      */
     private String[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
-        final String tripHeadsign = getTrip().getTripHeadsign();
+        final String tripHeadsign = trip.getTripHeadsign();
         boolean useStopHeadsigns = false;
         if (tripHeadsign == null) {
             useStopHeadsigns = true;
