@@ -63,7 +63,7 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      switch (getSource(environment).getPickupType()) {
+      switch (getSource(environment).getPickupType().getGtfsCode()) {
         case 0: return "SCHEDULED";
         case 1: return "NONE";
         case 2: return "CALL_AGENCY";
@@ -76,7 +76,7 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      switch (getSource(environment).getDropoffType()) {
+      switch (getSource(environment).getDropoffType().getGtfsCode()) {
         case 0: return "SCHEDULED";
         case 1: return "NONE";
         case 2: return "CALL_AGENCY";

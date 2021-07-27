@@ -269,7 +269,7 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.cancelDropOffForStop(i);
+                                // newTimes.cancelDropOffForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
                             } else {
                                 newTimes.updateArrivalDelay(i, delay);
                             }
@@ -295,7 +295,7 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.cancelPickupForStop(i);
+                                //newTimes.cancelPickupForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
                             }
@@ -309,8 +309,8 @@ public class Timetable implements Serializable {
                     }
                 } else {
                     if (delay == null) {
-                        newTimes.cancelDropOffForStop(i);
-                        newTimes.cancelPickupForStop(i);
+                        // newTimes.cancelDropOffForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
+                        // newTimes.cancelPickupForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
                     } else {
                         newTimes.updateArrivalDelay(i, delay);
                         newTimes.updateDepartureDelay(i, delay);
