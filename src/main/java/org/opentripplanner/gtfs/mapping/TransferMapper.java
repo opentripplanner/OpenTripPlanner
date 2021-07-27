@@ -122,7 +122,7 @@ class TransferMapper {
 
     TransferPriority transferPriority = mapTypeToPriority(rhs.getTransferType());
 
-    // TODO TGR - Create a SimpleTransfer for this se issue #3369
+    // TODO TGR - Create a transfer for this se issue #3369
     int transferTime = rhs.getMinTransferTime();
 
     // If this transfer do not give any advantages in the routing, then drop it

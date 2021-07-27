@@ -1,10 +1,13 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Iterables;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -16,10 +19,6 @@ import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit
@@ -89,7 +88,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                 if (sd.stop == stop) { continue; }
                 graph.transfersByStop.put(
                     stop,
-                    new SimpleTransfer(ts0.getStop(), sd.stop, sd.distance, sd.edges)
+                    new PathTransfer(ts0.getStop(), sd.stop, sd.distance, sd.edges)
                 );
                 n += 1;
             }
@@ -101,7 +100,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                     if (sd.stop == ts0.getStop()) { continue; }
                     if (sd.stop instanceof Stop) { continue; }
                     graph.transfersByStop.put(sd.stop,
-                        new SimpleTransfer(sd.stop, ts0.getStop(), sd.distance, sd.edges)
+                        new PathTransfer(sd.stop, ts0.getStop(), sd.distance, sd.edges)
                     );
                     n += 1;
                 }
