@@ -88,7 +88,8 @@ public interface EntitySelector {
 
     @Override
     public int hashCode() {
-      return tripId.hashCode();
+      int serviceDateResult = serviceDate == null ? 0:serviceDate.hashCode();
+      return 31 * serviceDateResult + tripId.hashCode();
     }
   }
 
