@@ -465,7 +465,7 @@ public class IndexAPI {
         RoutingService routingService = createRoutingService();
         AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
         FeedScopedId id = createId("tripId", tripId);
-        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id));
+        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id, null));
     }
 
     @GET

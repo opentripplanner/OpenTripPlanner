@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.alertpatch;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 public interface EntitySelector {
   class Agency implements EntitySelector {
@@ -62,14 +63,26 @@ public interface EntitySelector {
 
   class Trip implements EntitySelector {
     public final FeedScopedId tripId;
+    public final ServiceDate serviceDate;
 
-    public Trip(FeedScopedId tripId) {this.tripId = tripId;}
+    public Trip(FeedScopedId tripId) {this(tripId, null);}
+    public Trip(FeedScopedId tripId, ServiceDate serviceDate) {
+      this.tripId = tripId;
+      this.serviceDate = serviceDate;
+    }
 
     @Override
     public boolean equals(Object o) {
       if (this == o) { return true; }
       if (o == null || getClass() != o.getClass()) { return false; }
       Trip trip = (Trip) o;
+
+      if ((serviceDate != null && trip.serviceDate != null) &&
+          !serviceDate.equals(trip.serviceDate)) {
+        // Only compare serviceDate when NOT null
+        return false;
+      }
+
       return tripId.equals(trip.tripId);
     }
 
@@ -123,7 +136,11 @@ public interface EntitySelector {
     public final StopAndRouteOrTripKey stopAndTrip;
 
     public StopAndTrip(FeedScopedId stopId, FeedScopedId tripId) {
-      this.stopAndTrip = new StopAndRouteOrTripKey(stopId, tripId);
+      this(stopId, tripId, null);
+    }
+
+    public StopAndTrip(FeedScopedId stopId, FeedScopedId tripId, ServiceDate serviceDate) {
+      this.stopAndTrip = new StopAndRouteOrTripKey(stopId, tripId, serviceDate);
     }
 
     @Override
@@ -143,11 +160,16 @@ public interface EntitySelector {
   class StopAndRouteOrTripKey {
     private final FeedScopedId stop;
     private final FeedScopedId routeOrTrip;
+    private final ServiceDate serviceDate;
     private transient int hash = 0;
 
     public StopAndRouteOrTripKey(FeedScopedId stop, FeedScopedId routeOrTrip) {
+      this(stop, routeOrTrip, null);
+    }
+    public StopAndRouteOrTripKey(FeedScopedId stop, FeedScopedId routeOrTrip, ServiceDate serviceDate) {
       this.stop = stop;
       this.routeOrTrip = routeOrTrip;
+      this.serviceDate = serviceDate;
     }
 
     @Override
@@ -164,16 +186,25 @@ public interface EntitySelector {
       if (!stop.equals(that.stop)) {
         return false;
       }
+
+      if (serviceDate != null &&
+          !serviceDate.equals(that.serviceDate)) {
+        // Only compare serviceDate when NOT null
+        return false;
+      }
+
       return routeOrTrip.equals(that.routeOrTrip);
     }
 
     @Override
     public int hashCode() {
       if (hash == 0) {
-        int result = stop.hashCode();
-        hash = 31 * result + routeOrTrip.hashCode();
+        int stopResult = stop.hashCode();
+        int serviceDateResult = serviceDate == null ? 0:serviceDate.hashCode();
+        hash = 31 * stopResult + 31 * serviceDateResult + routeOrTrip.hashCode();
       }
       return hash;
     }
+
   }
 }

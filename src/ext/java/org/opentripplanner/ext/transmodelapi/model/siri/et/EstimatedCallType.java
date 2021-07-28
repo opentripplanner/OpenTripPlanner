@@ -13,11 +13,13 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -262,16 +264,20 @@ public class EstimatedCallType {
 
     TransitAlertService alertPatchService = routingService.getTransitAlertService();
 
+    long serviceDayMillis = 1000 * tripTimeShort.getServiceDay();
+
+    final ServiceDate serviceDate = new ServiceDate(LocalDate.ofEpochDay(1+tripTimeShort.getServiceDay()/(24*3600)));
+    
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId));
+    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId, serviceDate));
     allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId));
     // StopPlace
     allAlerts.addAll(alertPatchService.getStopAlerts(parentStopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(parentStopId, tripId));
+    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate));
     allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(parentStopId, routeId));
     // Trip
-    allAlerts.addAll(alertPatchService.getTripAlerts(tripId));
+    allAlerts.addAll(alertPatchService.getTripAlerts(tripId, serviceDate));
     // Route
     allAlerts.addAll(alertPatchService.getRouteAlerts(routeId));
     // Agency
@@ -280,7 +286,7 @@ public class EstimatedCallType {
     // TripPattern
     allAlerts.addAll(alertPatchService.getTripPatternAlerts(routingService.getPatternForTrip().get(trip).getId()));
 
-    long serviceDayMillis = 1000 * tripTimeShort.getServiceDay();
+
     long arrivalMillis = 1000 * tripTimeShort.getRealtimeArrival();
     long departureMillis = 1000 * tripTimeShort.getRealtimeDeparture();
 
