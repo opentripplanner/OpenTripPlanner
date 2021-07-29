@@ -58,8 +58,8 @@ public class OrcaFareServiceTest {
             getRide(COMM_TRANS_AGENCY_ID, "400", 0)
         );
         calculateFare(rides, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS);
-        calculateFare(rides, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS);
-        calculateFare(rides, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS);
+        calculateFare(rides, Fare.FareType.senior, 200f);
+        calculateFare(rides, Fare.FareType.youth, 300f);
         calculateFare(rides, Fare.FareType.electronicSpecial, 200f);
         calculateFare(rides, Fare.FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS);
         calculateFare(rides, Fare.FareType.electronicSenior, 200f);
@@ -78,8 +78,8 @@ public class OrcaFareServiceTest {
             getRide(COMM_TRANS_AGENCY_ID, 2)
         );
         calculateFare(rides, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 3);
-        calculateFare(rides, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 3);
-        calculateFare(rides, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 3);
+        calculateFare(rides, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS + 125);
+        calculateFare(rides, Fare.FareType.youth, 200f + DEFAULT_RIDE_PRICE_IN_CENTS + 175f);
         calculateFare(rides, Fare.FareType.electronicSpecial, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 125f);
         calculateFare(rides, Fare.FareType.electronicRegular, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS);
         calculateFare(rides, Fare.FareType.electronicSenior, 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 125f);
@@ -104,7 +104,7 @@ public class OrcaFareServiceTest {
         );
         calculateFare(rides, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
         calculateFare(rides, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
-        calculateFare(rides, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
+        calculateFare(rides, Fare.FareType.youth, 200f + 200f + 200f + 200f + 200f + 200f);
         calculateFare(rides, Fare.FareType.electronicSpecial, 100f + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 100f);
         calculateFare(rides, Fare.FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f +
             DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS);
@@ -128,7 +128,7 @@ public class OrcaFareServiceTest {
         );
         calculateFare(rides, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
         calculateFare(rides, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
-        calculateFare(rides, Fare.FareType.youth, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
+        calculateFare(rides, Fare.FareType.youth, 349f + 200f + 200f + 200f + 200f + 200f);
         calculateFare(rides, Fare.FareType.electronicSpecial, DEFAULT_RIDE_PRICE_IN_CENTS + 100f + 0f + 0f + 0f + 0f);
         calculateFare(rides, Fare.FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS +
             DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f);
