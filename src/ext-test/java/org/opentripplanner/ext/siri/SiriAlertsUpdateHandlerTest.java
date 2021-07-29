@@ -471,20 +471,21 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
-    // Verify that requesting specific date also includes alert for all dates
+    // Verify that requesting specific date does not include alert for all dates
     ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
-    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
+    Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
 
     assertNotNull(tripPatches);
-    assertEquals(1, tripPatches.size());
-    final TransitAlert transitAlert = tripPatches.iterator().next();
+    assertEquals(0, tripPatches.size());
 
     // Verify that NOT requesting specific date includes alert for all dates
     serviceDate = null;
-    final Collection<TransitAlert> datedTripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
+    tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
 
     assertNotNull(tripPatches);
-    assertEquals(1, datedTripPatches.size());
+    assertEquals(1, tripPatches.size());
+
+    final TransitAlert transitAlert = tripPatches.iterator().next();
 
     final TransitAlert datedTransitAlert = tripPatches.iterator().next();
 
@@ -519,9 +520,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
     FramedVehicleJourneyRefStructure framedVehicleJourneyRef = new FramedVehicleJourneyRefStructure();
     framedVehicleJourneyRef.setDatedVehicleJourneyRef(datedVehicleJourney);
-    DataFrameRefStructure dataFrameRef = new DataFrameRefStructure();
-    dataFrameRef.setValue(dataFrameValue);
-    framedVehicleJourneyRef.setDataFrameRef(dataFrameRef);
+    if (dataFrameValue != null) {
+      DataFrameRefStructure dataFrameRef = new DataFrameRefStructure();
+      dataFrameRef.setValue(dataFrameValue);
+      framedVehicleJourneyRef.setDataFrameRef(dataFrameRef);
+    }
     affectedVehicleJourney.setFramedVehicleJourneyRef(framedVehicleJourneyRef);
 
     if (stopIds != null) {

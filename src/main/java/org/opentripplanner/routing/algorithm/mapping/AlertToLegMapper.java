@@ -101,8 +101,12 @@ public class AlertToLegMapper {
 
         Collection<TransitAlert> patches;
 
-        // trips
+        // trips - alerts tagged on ServiceDate
         patches = alertPatchService(graph).getTripAlerts(leg.getTrip().getId(), leg.serviceDate);
+        addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
+
+        // trips - alerts tagged on any date
+        patches = alertPatchService(graph).getTripAlerts(leg.getTrip().getId(), null);
         addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
 
         // route
@@ -170,7 +174,26 @@ public class AlertToLegMapper {
     }
 
     private static Collection<TransitAlert> getAlertsForStopAndTrip(Graph graph, FeedScopedId stopId, FeedScopedId tripId, ServiceDate serviceDate) {
-        return getAlertsForStopAndTrip(graph, stopId, tripId, true, serviceDate);
+
+        // Finding alerts for ServiceDate
+        final Collection<TransitAlert> alerts = getAlertsForStopAndTrip(
+            graph,
+            stopId,
+            tripId,
+            true,
+            serviceDate
+        );
+
+        // Finding alerts for any date
+        alerts.addAll(getAlertsForStopAndTrip(
+            graph,
+            stopId,
+            tripId,
+            true,
+            null
+        ));
+
+        return alerts;
     }
 
     private static Collection<TransitAlert> getAlertsForStopAndTrip(Graph graph, FeedScopedId stopId, FeedScopedId tripId, boolean checkParentStop, ServiceDate serviceDate) {

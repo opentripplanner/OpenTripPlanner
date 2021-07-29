@@ -65,6 +65,8 @@ public interface EntitySelector {
     public final FeedScopedId tripId;
     public final ServiceDate serviceDate;
 
+    private transient int hash = 0;
+
     public Trip(FeedScopedId tripId) {this(tripId, null);}
     public Trip(FeedScopedId tripId, ServiceDate serviceDate) {
       this.tripId = tripId;
@@ -88,7 +90,11 @@ public interface EntitySelector {
 
     @Override
     public int hashCode() {
-      return tripId.hashCode();
+      if ( hash == 0) {
+        int serviceDateResult = serviceDate == null ? 0 : serviceDate.hashCode();
+        hash = 31 * serviceDateResult + tripId.hashCode();
+      }
+      return hash;
     }
   }
 
@@ -187,13 +193,11 @@ public interface EntitySelector {
         return false;
       }
 
-      if (serviceDate != null &&
-          !serviceDate.equals(that.serviceDate)) {
-        // Only compare serviceDate when NOT null
+      if (!routeOrTrip.equals(that.routeOrTrip)) {
         return false;
       }
 
-      return routeOrTrip.equals(that.routeOrTrip);
+      return serviceDate != null ? serviceDate.equals(that.serviceDate) : that.serviceDate == null;
     }
 
     @Override

@@ -25,24 +25,26 @@ public class EntitySelectorTest {
         );
 
         // Assert match on null date
-        assertEquals(key, new EntitySelector.StopAndTrip(stopId,
+        assertEquals(key, new EntitySelector.StopAndTrip(
+            stopId,
             tripId
         ));
 
         // Assert match on explicitly set null date
-        assertEquals(key, new EntitySelector.StopAndTrip(stopId,
+        assertEquals(key, new EntitySelector.StopAndTrip(
+            stopId,
             tripId,
             null
         ));
 
         // Assert match on specific date
-        assertEquals(key, new EntitySelector.StopAndTrip(stopId,
+        assertNotEquals(key, new EntitySelector.StopAndTrip(stopId,
             tripId,
             new ServiceDate(2021, 01, 01)
         ));
 
         // Assert match on another specific date
-        assertEquals(key, new EntitySelector.StopAndTrip(stopId,
+        assertNotEquals(key, new EntitySelector.StopAndTrip(stopId,
             tripId,
             new ServiceDate(2021, 01, 31)
         ));
