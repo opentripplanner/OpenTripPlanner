@@ -304,7 +304,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      *         information is actually available in this TripTimes.
      */
     public boolean isScheduled() {
-        return departureTimes == null && arrivalTimes == null;
+        return realTimeState == RealTimeState.SCHEDULED;
     }
 
     /**
