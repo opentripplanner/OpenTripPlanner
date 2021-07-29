@@ -21,4 +21,5 @@ EXPOSE 8080
 
 WORKDIR "/opt/otp"
 
-ENTRYPOINT [ "/bin/bash", "/opt/run-otp.sh" ]
+ENTRYPOINT [ "/bin/bash" ]
+CMD [ "-c", "java -Xmx6G -jar ../java/app.jar --load --port 8080 --securePort 8081 ." ]
