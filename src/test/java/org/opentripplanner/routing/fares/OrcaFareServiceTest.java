@@ -19,6 +19,7 @@ import java.util.Map;
 
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.COMM_TRANS_AGENCY_ID;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.KITSAP_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.SKAGIT_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.routing.impl.OrcaFareServiceImpl.WASHINGTON_STATE_FERRIES_AGENCY_ID;
 
 public class OrcaFareServiceTest {
@@ -88,9 +89,9 @@ public class OrcaFareServiceTest {
 
     /**
      * Total trip time is 2h 30m. The first four transfers are within the permitted two hour window. A single (highest)
-     * Orca fare will be charged for these transfers. The fifth transfer is outside of the two hour window and will be
-     * charged a cash rate. At this point, the two hour window will start again so the final transfer will be
-     * charged at a discount rate... if using Orca.
+     * Orca fare will be charged for these transfers. The fifth transfer is outside of the original two hour window so
+     * a single Orca fare for this leg is applied and the two hour window will start again. The final transfer is within
+     * the new two hour window and will be free.
      */
     @Test
     public void calculateFareThatExceedsTwoHourFreeTransferWindow() {
@@ -105,11 +106,65 @@ public class OrcaFareServiceTest {
         calculateFare(rides, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
         calculateFare(rides, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 6);
         calculateFare(rides, Fare.FareType.youth, 200f + 200f + 200f + 200f + 200f + 200f);
-        calculateFare(rides, Fare.FareType.electronicSpecial, 100f + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 100f);
+        calculateFare(rides, Fare.FareType.electronicSpecial, 100f + 0f + 0f + 0f + 100f + 0f);
         calculateFare(rides, Fare.FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f +
-            DEFAULT_RIDE_PRICE_IN_CENTS + DEFAULT_RIDE_PRICE_IN_CENTS);
-        calculateFare(rides, Fare.FareType.electronicSenior, 100f + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 100f);
-        calculateFare(rides, Fare.FareType.electronicYouth, 100f + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS + 100f);
+            DEFAULT_RIDE_PRICE_IN_CENTS + 0f);
+        calculateFare(rides, Fare.FareType.electronicSenior, 100f + 0f + 0f + 0f + 100f + 0f);
+        calculateFare(rides, Fare.FareType.electronicYouth, 100f + 0f + 0f + 0f + 100f + 0f);
+    }
+    /**
+     * Total trip time is 2h 30m. Calculate fare with two free transfer windows which include agencies which do not permit
+     * free transfers. The free transfers will be applied for Kitsap, but not for WSF nor Skagit. Note: Not a real world
+     * trip!
+     */
+    @Test
+    public void calculateFareThatIncludesNoFreeTransfers() {
+        List<Ride> rides = Arrays.asList(
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 0),
+            getRide(WASHINGTON_STATE_FERRIES_AGENCY_ID, 30),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 60),
+            getRide(SKAGIT_TRANSIT_AGENCY_ID, 90),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 120),
+            getRide(WASHINGTON_STATE_FERRIES_AGENCY_ID, 150, "Fauntleroy-VashonIsland")
+        );
+        calculateFare(rides, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 5 + 595f);
+        calculateFare(rides, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 3 + 50f +
+            DEFAULT_RIDE_PRICE_IN_CENTS + 295f);
+        calculateFare(rides, Fare.FareType.youth, 200f + DEFAULT_RIDE_PRICE_IN_CENTS + 200f + 50f + 200f + 295f);
+        calculateFare(rides, Fare.FareType.electronicSpecial, 100f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f +
+            DEFAULT_RIDE_PRICE_IN_CENTS + 100f + DEFAULT_RIDE_PRICE_IN_CENTS);
+        calculateFare(rides, Fare.FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS * 2 + 0f +
+            DEFAULT_RIDE_PRICE_IN_CENTS * 3);
+        calculateFare(rides, Fare.FareType.electronicSenior, 100f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f +
+            50f + 100f + DEFAULT_RIDE_PRICE_IN_CENTS);
+        calculateFare(rides, Fare.FareType.electronicYouth, 100f + DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 50f + 100f + DEFAULT_RIDE_PRICE_IN_CENTS);
+    }
+
+    /**
+     * Total trip time is 4h 30m. This is equivalent to three transfer windows and therefore three Orca fare charges.
+     */
+    @Test
+    public void calculateFareThatExceedsTwoHourFreeTransferWindowTwice() {
+        List<Ride> rides = Arrays.asList(
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 0),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 30),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 60),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 90),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 120),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 150),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 180),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 210),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 240),
+            getRide(KITSAP_TRANSIT_AGENCY_ID, 270)
+        );
+        calculateFare(rides, Fare.FareType.regular, DEFAULT_RIDE_PRICE_IN_CENTS * 10);
+        calculateFare(rides, Fare.FareType.senior, DEFAULT_RIDE_PRICE_IN_CENTS * 10);
+        calculateFare(rides, Fare.FareType.youth, 200f + 200f + 200f + 200f + 200f + 200f + 200f + 200f + 200f + 200f);
+        calculateFare(rides, Fare.FareType.electronicSpecial, 100f + 0f + 0f + 0f + 100f + 0f + 0f + 0f + 100f + 0f);
+        calculateFare(rides, Fare.FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f +
+            DEFAULT_RIDE_PRICE_IN_CENTS + 0f + 0f + 0f + DEFAULT_RIDE_PRICE_IN_CENTS);
+        calculateFare(rides, Fare.FareType.electronicSenior, 100f + 0f + 0f + 0f + 100f + 0f + 0f + 0f + 100f + 0f);
+        calculateFare(rides, Fare.FareType.electronicYouth, 100f + 0f + 0f + 0f + 100f + 0f + 0f + 0f + 100f + 0f);
     }
 
     /**
