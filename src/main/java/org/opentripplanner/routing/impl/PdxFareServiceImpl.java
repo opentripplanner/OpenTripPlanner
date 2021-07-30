@@ -5,9 +5,7 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
 
-import com.google.common.collect.Iterables;
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.slf4j.Logger;

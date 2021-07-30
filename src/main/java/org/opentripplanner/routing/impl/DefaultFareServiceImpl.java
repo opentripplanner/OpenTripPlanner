@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -28,75 +29,6 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-/** A set of edges on a single route, with associated information for calculating fares */
-class Ride {
-
-    String feedId;
-
-    String agency; // route agency
-
-    FeedScopedId route;
-
-    FeedScopedId trip;
-    
-    Set<String> zones;
-
-    String startZone;
-
-    String endZone;
-
-    long startTime;
-
-    long endTime;
-
-    // in DefaultFareServiceImpl classifier is just the TraverseMode
-    // it can be used differently in custom fare services
-    public Object classifier;
-
-    public Stop firstStop;
-
-    public Stop lastStop;
-
-    public Ride() {
-        zones = new HashSet<String>();
-    }
-
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Ride");
-        if (startZone != null) {
-            builder.append("(from zone ");
-            builder.append(startZone);
-        }
-        if (endZone != null) {
-            builder.append(" to zone ");
-            builder.append(endZone);
-        }
-        builder.append(" on route ");
-        builder.append(route);
-        if (zones.size() > 0) {
-            builder.append(" through zones ");
-            boolean first = true;
-            for (String zone : zones) {
-                if (first) {
-                    first = false;
-                } else {
-                    builder.append(",");
-                }
-                builder.append(zone);
-            }
-        }
-        builder.append(" at ");
-        builder.append(startTime);
-        if (classifier != null) {
-            builder.append(", classified by ");
-            builder.append(classifier.toString());
-        }
-        builder.append(")");
-        return builder.toString();
-    }
-}
 
 /** Holds information for doing the graph search on fares */
 class FareSearch {
@@ -175,6 +107,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 ride.startZone = hEdge.getBeginStop().getZoneId();
                 ride.zones.add(ride.startZone);
                 ride.agency = state.getBackTrip().getRoute().getAgency().getId();
+                ride.routeData = state.getBackTrip().getRoute();
                 ride.route = state.getRoute();
                 ride.startTime = state.getBackState().getTimeSeconds();
                 ride.firstStop = hEdge.getBeginStop();

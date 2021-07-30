@@ -765,6 +765,13 @@
             <artifactId>bsf</artifactId>
             <version>2.4.0</version>
         </dependency>
+        <!-- Unit testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Error reporting -->
         <dependency>
             <groupId>com.bugsnag</groupId>
