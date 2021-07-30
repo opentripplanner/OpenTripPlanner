@@ -52,6 +52,11 @@ public class GeoJsonUtils {
                 geometries.add(GeometryUtils.convertGeoJsonToJtsGeometry(feature.getGeometry()));
             }
 
+            // if there is just one geometry item, return that immediately, otherwise a ClassCastException will occur
+            if (geometries.size() == 1) {
+                return geometries.get(0);
+            }
+
             // union all geometries into a single geometry
             GeometryFactory geometryFactory = new GeometryFactory();
             GeometryCollection geometryCollection =
