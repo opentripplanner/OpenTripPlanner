@@ -370,21 +370,35 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
                 // If using Orca (free transfers), the total fare should be equivalent to the
                 // most expensive leg of the journey.
                 orcaFareDiscount = Float.max(orcaFareDiscount, legFare);
-            } else if (usesOrca(fareType) && !inFreeTransferWindow) {
-                // If using Orca and outside of the free transfer window, add the single leg cash price.
-                cost += singleLegPrice;
+           } else if (usesOrca(fareType) && !inFreeTransferWindow) {
+                // If using Orca and outside of the free transfer window, add the cumulative Orca fare (the maximum leg 
+                // fare encountered within the free transfer window).
+                cost += orcaFareDiscount;
+                
+                // Reset the free transfer start time and next Orca fare as needed.
+                if (ridePermitsFreeTransfers) {
+                    // The leg is using a ride type that permits free transfers. 
+                    // The next free transfer window begins at the start time of this leg.
+                    freeTransferStartTime = ride.startTime;
+                    // Reset the Orca fare to be the fare of this leg.
+                    orcaFareDiscount = legFare;
+                } else {
+                    // The leg is not using a ride type that permits free transfers.
+                    // Since there are no free transfers for this leg, increase the total cost by the fare for this leg.
+                    cost += legFare;
+                    // The current free transfer window has expired and won't start again until another leg is 
+                    // encountered that does have free transfers.
+                    freeTransferStartTime = null;
+                    // The previous Orca fare has been applied to the total cost. Also, the non-free transfer cost has
+                    // also been applied to the total cost. Therefore, the next Orca cost for the next free-transfer 
+                    // window needs to be reset to 0 so that it is not applied after looping through all rides.
+                    orcaFareDiscount = 0;
+                }
             } else {
                 // If not using Orca, add the agencies default price for this leg.
                 cost += legFare;
             }
-            if (!inFreeTransferWindow) {
-                // If the trip time has exceeded the free transfer time limit of two hours the rider is required to
-                // purchase a new fare. This also resets the free transfer trip window, applies the orca discount to the
-                // overall cost and then resets the orca fare discount ready for the next transfer window.
-                freeTransferStartTime = ridePermitsFreeTransfers ? ride.startTime : null;
-                cost += orcaFareDiscount;
-                orcaFareDiscount = 0;
-            }
+        }
         }
         cost += orcaFareDiscount;
         if (cost < Float.POSITIVE_INFINITY) {
