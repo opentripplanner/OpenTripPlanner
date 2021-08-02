@@ -80,6 +80,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     private boolean[] recordedStops;
 
     /**
+     * Stop has been cancelled by realtime updates.
+     */
+    private boolean[] cancelledStops;
+
+    /**
      * Flag to indicate inaccurate predictions on each stop. Non-final to allow updates.
      */
     private boolean[] predictionInaccurateOnStops;
@@ -144,6 +149,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         this.arrivalTimes = null;
         this.departureTimes = null;
         this.recordedStops = null;
+        this.cancelledStops = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
@@ -267,6 +273,18 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         recordedStops[stop] = recorded;
     }
 
+    public void setCancelled(int stop) {
+        prepareForRealTimeUpdates();
+        cancelledStops[stop] = true;
+    }
+
+    public boolean isCancelledStop(int stop) {
+        if (cancelledStops == null) {
+            return false;
+        }
+        return cancelledStops[stop];
+    }
+
     // TODO OTP2 - Unused, but will be used by Transmodel API
     public boolean isRecordedStop(int stop) {
         if (recordedStops == null) {
@@ -387,11 +405,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
             this.arrivalTimes = Arrays.copyOf(scheduledArrivalTimes, scheduledArrivalTimes.length);
             this.departureTimes = Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length);
             this.recordedStops = new boolean[arrivalTimes.length];
+            this.cancelledStops = new boolean[arrivalTimes.length];
             this.predictionInaccurateOnStops = new boolean[arrivalTimes.length];
             for (int i = 0; i < arrivalTimes.length; i++) {
                 arrivalTimes[i] += timeShift;
                 departureTimes[i] += timeShift;
                 recordedStops[i] = false;
+                cancelledStops[i] = false;
                 predictionInaccurateOnStops[i] = false;
             }
 

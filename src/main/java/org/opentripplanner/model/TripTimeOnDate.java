@@ -125,7 +125,8 @@ public class TripTimeOnDate {
     }
 
     public boolean isCancelledStop() {
-        return tripPattern.getStopPattern().getPickup(stopIndex) == PickDrop.CANCELLED
+        return tripTimes.isCancelledStop(stopIndex) ||
+            tripPattern.getStopPattern().getPickup(stopIndex) == PickDrop.CANCELLED
             && tripPattern.getStopPattern().getDropoff(stopIndex) == PickDrop.CANCELLED;
     }
 
@@ -157,13 +158,13 @@ public class TripTimeOnDate {
     }
 
     public PickDrop getPickupType() {
-        return tripTimes.isCanceled()
+        return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
             ? PickDrop.CANCELLED
             : tripPattern.getStopPattern().getPickup(stopIndex);
     }
 
     public PickDrop getDropoffType() {
-        return tripTimes.isCanceled()
+        return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
             ? PickDrop.CANCELLED
             : tripPattern.getStopPattern().getDropoff(stopIndex);
     }

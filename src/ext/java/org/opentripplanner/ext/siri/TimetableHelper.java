@@ -154,6 +154,7 @@ public class TimetableHelper {
 
                     if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
                         modifiedStopTimes.get(callCounter).cancel();
+                        newTimes.setCancelled(callCounter);
                     }
 
                     int arrivalTime = newTimes.getArrivalTime(callCounter);
@@ -224,6 +225,7 @@ public class TimetableHelper {
 
                         if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
                             modifiedStopTimes.get(callCounter).cancel();
+                            newTimes.setCancelled(callCounter);
                         }
 
                         boolean isCallPredictionInaccurate = estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();
