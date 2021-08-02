@@ -131,7 +131,9 @@ public class TripTimeOnDate {
 
     /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
     public boolean isCanceledEffectively() {
-        return isCancelledStop() || tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced();
+        return isCancelledStop()
+            || tripTimes.isCanceled()
+            || tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced();
     }
 
     public RealTimeState getRealtimeState() {
