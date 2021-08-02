@@ -157,11 +157,15 @@ public class TripTimeOnDate {
     }
 
     public PickDrop getPickupType() {
-        return tripPattern.getStopPattern().getPickup(stopIndex);
+        return tripTimes.isCanceled()
+            ? PickDrop.CANCELLED
+            : tripPattern.getStopPattern().getPickup(stopIndex);
     }
 
     public PickDrop getDropoffType() {
-        return tripPattern.getStopPattern().getDropoff(stopIndex);
+        return tripTimes.isCanceled()
+            ? PickDrop.CANCELLED
+            : tripPattern.getStopPattern().getDropoff(stopIndex);
     }
 
     public StopTimeKey getStopTimeKey() {
