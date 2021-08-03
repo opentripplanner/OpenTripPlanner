@@ -11,8 +11,10 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,12 +77,16 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      * Flag to indicate that the stop has been passed without removing arrival/departure-times - i.e. "estimates" are
      * actual times, no longer estimates.
      *
-     * Non-final to allow updates.
+     * This is only for API-purposes. Non-final to allow updates.
      */
     private boolean[] recordedStops;
 
     /**
-     * Stop has been cancelled by realtime updates.
+     * Stop has been cancelled by realtime updates. This is only for API-purposes and does not
+     * affect routing. It duplicates information found in the {@link StopPattern} of the new
+     * {@link TripPattern} created by the realtime update.
+     *
+     * Non-final to allow updates.
      */
     private boolean[] cancelledStops;
 
