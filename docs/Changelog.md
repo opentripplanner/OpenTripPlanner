@@ -36,6 +36,7 @@
 - Add bicycle safety report to report API [#3563](https://github.com/opentripplanner/OpenTripPlanner/issues/3563)
 - Optimize Transfers performance issue [#3513](https://github.com/opentripplanner/OpenTripPlanner/issues/3513)
 - Refactor StopPattern/TripPattern/TripTimes [#3571](https://github.com/opentripplanner/OpenTripPlanner/issues/3571)
+- Don't allow bicycle loops in A* [#3574](https://github.com/opentripplanner/OpenTripPlanner/pull/3574)
 
 
 ## 2.0.0 (2020-11-27)

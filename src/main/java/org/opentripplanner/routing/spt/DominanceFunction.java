@@ -81,10 +81,23 @@ public abstract class DominanceFunction implements Serializable {
          * Therefore, if we are close to the start or the end of a route we allow this.
          *
          * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
+         *
+         * == Bicycles ==
+         *
+         * We used to allow also loops for bicycles as turn restrictions also apply to them, however
+         * this causes problems when the start/destination is close to an area that has a very complex
+         * network of edges due to the visibility calculation. In such a case it can lead to timeouts as
+         * too many loops are produced.
+         *
+         * Example: https://github.com/opentripplanner/OpenTripPlanner/issues/3564
+         *
+         * In any case, cyclists can always get off the bike and push it across the street so not
+         * including the loops should still result in a route. Often this will be preferable to
+         * taking a detour due to turn restrictions anyway.
          */
         if (a.backEdge != b.getBackEdge()
                 && (a.backEdge instanceof StreetEdge)
-                && a.getBackMode() != null && (a.getBackMode().isDriving() || a.getBackMode().isCycling())
+                && a.getBackMode() != null && a.getBackMode().isDriving()
                 && a.getOptions().isCloseToStartOrEnd(a.getVertex())) {
             return false;
         }
