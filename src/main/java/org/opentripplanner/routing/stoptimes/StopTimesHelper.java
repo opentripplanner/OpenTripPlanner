@@ -1,4 +1,4 @@
-package org.opentripplanner.routing;
+package org.opentripplanner.routing.stoptimes;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import org.opentripplanner.model.Stop;
@@ -8,6 +8,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
