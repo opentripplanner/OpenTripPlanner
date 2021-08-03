@@ -35,6 +35,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -269,7 +270,7 @@ public class IndexAPI {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups,
+                omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
                 false
         )
                 .stream()
@@ -294,7 +295,7 @@ public class IndexAPI {
         List<StopTimesInPattern> stopTimes = routingService.getStopTimesForStop(
                 stop,
                 serviceDate,
-                omitNonPickups
+                omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
         );
         return StopTimesInPatternMapper.mapToApi(stopTimes);
     }

@@ -10,6 +10,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 public class LegacyGraphQLDepartureRowImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLDepartureRow {
@@ -48,7 +49,7 @@ public class LegacyGraphQLDepartureRowImpl
           args.getLegacyGraphQLStartTime(),
           args.getLegacyGraphQLTimeRange(),
           args.getLegacyGraphQLNumberOfDepartures(),
-          args.getLegacyGraphQLOmitNonPickups(),
+          args.getLegacyGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
           args.getLegacyGraphQLOmitCanceled()
       );
     };

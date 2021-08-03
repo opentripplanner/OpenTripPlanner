@@ -20,7 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 
-import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
+import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
 
 public class StopTimesHelper {
   /**
@@ -35,7 +36,7 @@ public class StopTimesHelper {
    * @param startTime Start time for the search. Seconds from UNIX epoch
    * @param timeRange Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
-   * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
+   * @param arrivalDeparture Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result
    */
   public static List<StopTimesInPattern> stopTimesForStop(
@@ -45,7 +46,7 @@ public class StopTimesHelper {
       long startTime,
       int timeRange,
       int numberOfDepartures,
-      boolean omitNonPickups,
+      ArrivalDeparture arrivalDeparture,
       boolean includeCancelledTrips
   ) {
 
@@ -73,7 +74,7 @@ public class StopTimesHelper {
           startTime,
           timeRange,
           numberOfDepartures,
-          omitNonPickups,
+          arrivalDeparture,
           serviceDates
       );
 
@@ -99,7 +100,7 @@ public class StopTimesHelper {
       RoutingService routingService,
       Stop stop,
       ServiceDate serviceDate,
-      boolean omitNonPickups
+      ArrivalDeparture arrivalDeparture
   ) {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
@@ -119,7 +120,7 @@ public class StopTimesHelper {
       int sidx = 0;
       for (Stop currStop : pattern.getStopPattern().getStops()) {
         if (currStop == stop) {
-          if(omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
+          if(skipByPickUpDropOff(pattern, arrivalDeparture, sidx)) continue;
           for (TripTimes t : tt.getTripTimes()) {
             if (!sd.serviceRunning(t.getServiceCode())) { continue; }
             stopTimes.times.add(new TripTimeOnDate(t, sidx, pattern, sd));
@@ -144,7 +145,7 @@ public class StopTimesHelper {
    * @param startTime Start time for the search. Seconds from UNIX epoch
    * @param timeRange Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
-   * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
+   * @param arrivalDeparture Filter by arrivals, departures, or both.
    */
   public static List<TripTimeOnDate> stopTimesForPatternAtStop(
           RoutingService routingService,
@@ -154,7 +155,7 @@ public class StopTimesHelper {
           long startTime,
           int timeRange,
           int numberOfDepartures,
-          boolean omitNonPickups) {
+          ArrivalDeparture arrivalDeparture) {
 
     if (startTime == 0) {
       startTime = System.currentTimeMillis() / 1000;
@@ -169,7 +170,7 @@ public class StopTimesHelper {
         startTime,
         timeRange,
         numberOfDepartures,
-        omitNonPickups,
+        arrivalDeparture,
         serviceDates
     );
 
@@ -184,7 +185,7 @@ public class StopTimesHelper {
       long startTime,
       int timeRange,
       int numberOfDepartures,
-      boolean omitNonPickups,
+      ArrivalDeparture arrivalDeparture,
       ServiceDate[] serviceDates
   ) {
 
@@ -222,7 +223,9 @@ public class StopTimesHelper {
       int sidx = 0;
       for (Stop currStop : pattern.getStopPattern().getStops()) {
         if (currStop == stop) {
-          if (omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
+
+          if (skipByPickUpDropOff(pattern, arrivalDeparture, sidx)) { continue; }
+
           for (TripTimes t : tt.getTripTimes()) {
             if (!sd.serviceRunning(t.getServiceCode())) continue;
             if (t.getDepartureTime(sidx) != -1 &&
@@ -257,5 +260,20 @@ public class StopTimesHelper {
       }
     }
     return pq;
+  }
+
+  private static boolean skipByPickUpDropOff(
+      TripPattern pattern, ArrivalDeparture arrivalDeparture, int sidx
+  ) {
+    boolean pickup = pattern.getStopPattern().getPickup(sidx).isRoutable();
+    boolean dropoff = pattern.getStopPattern().getDropoff(sidx).isRoutable();
+
+    if (!pickup && !dropoff)
+      return true;
+    if (!pickup && arrivalDeparture == DEPARTURES)
+      return true;
+    if (!dropoff && arrivalDeparture == ARRIVALS)
+      return true;
+    return false;
   }
 }

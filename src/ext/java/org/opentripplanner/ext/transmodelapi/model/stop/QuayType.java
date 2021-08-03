@@ -16,10 +16,12 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.ARRIVAL_DEPARTURE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 
 public class QuayType {
@@ -142,9 +144,9 @@ public class QuayType {
                             .type(Scalars.GraphQLInt)
                             .build())
                     .argument(GraphQLArgument.newArgument()
-                            .name("omitNonBoarding")
-                            .type(Scalars.GraphQLBoolean)
-                            .defaultValue(false)
+                            .name("arrivalDeparture")
+                            .type(EnumTypes.ARRIVAL_DEPARTURE)
+                            .defaultValue(ArrivalDeparture.DEPARTURES)
                             .build())
                     .argument(GraphQLArgument.newArgument()
                             .name("whiteListed")
@@ -164,7 +166,7 @@ public class QuayType {
                         .defaultValue(false)
                         .build())
                     .dataFetcher(environment -> {
-                        boolean omitNonBoarding = environment.getArgument("omitNonBoarding");
+                        ArrivalDeparture arrivalDeparture = environment.getArgument("arrivalDeparture");
                         int numberOfDepartures = environment.getArgument("numberOfDepartures");
                         Integer departuresPerLineAndDestinationDisplay = environment.getArgument("numberOfDeparturesPerLineAndDestinationDisplay");
                         int timeRange = environment.getArgument("timeRange");
@@ -180,7 +182,7 @@ public class QuayType {
                           stop,
                           startTimeSeconds,
                           timeRange,
-                          omitNonBoarding,
+                          arrivalDeparture,
                           numberOfDepartures,
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,

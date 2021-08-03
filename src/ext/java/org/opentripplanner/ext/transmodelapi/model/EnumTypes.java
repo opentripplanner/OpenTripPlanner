@@ -15,6 +15,7 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 
 public class EnumTypes {
@@ -263,6 +264,13 @@ public class EnumTypes {
         .value("replaced", TripAlteration.REPLACED)
         .value("extraJourney", TripAlteration.EXTRA_JOURNEY)
         .value("planned", TripAlteration.PLANNED)
+        .build();
+
+    public static GraphQLEnumType ARRIVAL_DEPARTURE = GraphQLEnumType.newEnum()
+        .name("ArrivalDeparture")
+        .value("arrivals", ArrivalDeparture.ARRIVALS, "Only show arrivals")
+        .value("departures", ArrivalDeparture.DEPARTURES, "Only show departures")
+        .value("both", ArrivalDeparture.BOTH, "Show both arrivals and departures")
         .build();
 
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {

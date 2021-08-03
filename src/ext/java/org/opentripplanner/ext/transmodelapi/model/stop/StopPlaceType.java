@@ -24,6 +24,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -177,9 +178,9 @@ public class StopPlaceType {
                 .type(Scalars.GraphQLInt)
                 .build())
             .argument(GraphQLArgument.newArgument()
-                .name("omitNonBoarding")
-                .type(Scalars.GraphQLBoolean)
-                .defaultValue(false)
+                .name("arrivalDeparture")
+                .type(EnumTypes.ARRIVAL_DEPARTURE)
+                .defaultValue(ArrivalDeparture.DEPARTURES)
                 .build())
             .argument(GraphQLArgument.newArgument()
                 .name("whiteListed")
@@ -193,7 +194,7 @@ public class StopPlaceType {
                 .type(GraphQLList.list(TRANSPORT_MODE))
                 .build())
             .dataFetcher(environment -> {
-              boolean omitNonBoarding = environment.getArgument("omitNonBoarding");
+              ArrivalDeparture arrivalDeparture = environment.getArgument("arrivalDeparture");
               int numberOfDepartures = environment.getArgument("numberOfDepartures");
               Integer departuresPerLineAndDestinationDisplay = environment.getArgument("numberOfDeparturesPerLineAndDestinationDisplay");
               int timeRage = environment.getArgument("timeRange");
@@ -212,7 +213,7 @@ public class StopPlaceType {
                           singleStop,
                           startTimeSeconds,
                           timeRage,
-                          omitNonBoarding,
+                          arrivalDeparture,
                           numberOfDepartures,
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,
@@ -234,7 +235,7 @@ public class StopPlaceType {
       Stop stop,
       Long startTimeSeconds,
       int timeRage,
-      boolean omitNonBoarding,
+      ArrivalDeparture arrivalDeparture,
       int numberOfDepartures,
       Integer departuresPerLineAndDestinationDisplay,
       Collection<FeedScopedId> authorityIdsWhiteListed,
@@ -256,7 +257,7 @@ public class StopPlaceType {
         startTimeSeconds,
         timeRage,
         departuresPerTripPattern,
-        omitNonBoarding,
+        arrivalDeparture,
         false
     );
 
