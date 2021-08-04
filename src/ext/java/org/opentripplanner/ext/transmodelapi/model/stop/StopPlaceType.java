@@ -22,7 +22,7 @@ import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 
 import java.util.Collection;
@@ -221,7 +221,7 @@ public class StopPlaceType {
                           environment
                       )
                   )
-                  .sorted(TripTimeShort.compareByDeparture())
+                  .sorted(TripTimeOnDate.compareByDeparture())
                   .distinct()
                   .limit(numberOfDepartures)
                   .collect(Collectors.toList());
@@ -230,7 +230,7 @@ public class StopPlaceType {
         .build();
   }
 
-  public static Stream<TripTimeShort> getTripTimesForStop(
+  public static Stream<TripTimeOnDate> getTripTimesForStop(
       Stop stop,
       Long startTimeSeconds,
       int timeRage,
@@ -270,7 +270,7 @@ public class StopPlaceType {
       stopTimesStream = stopTimesStream.filter(it -> transitModes.contains(it.pattern.getMode()));
     }
 
-    Stream<TripTimeShort> tripTimesStream = stopTimesStream
+    Stream<TripTimeOnDate> tripTimesStream = stopTimesStream
         .flatMap(p -> p.times.stream());
 
     tripTimesStream = JourneyWhiteListed.whiteListAuthoritiesAndOrLines(
@@ -285,13 +285,13 @@ public class StopPlaceType {
     // Group by line and destination display, limit departures per group and merge
     return tripTimesStream
         .collect(Collectors.groupingBy(t -> destinationDisplayPerLine(
-            ((TripTimeShort) t)
+            ((TripTimeOnDate) t)
         )))
         .values()
         .stream()
         .flatMap(tripTimes -> tripTimes
             .stream()
-            .sorted(TripTimeShort.compareByDeparture())
+            .sorted(TripTimeOnDate.compareByDeparture())
             .distinct()
             .limit(departuresPerLineAndDestinationDisplay));
   }
@@ -389,7 +389,7 @@ public class StopPlaceType {
     return false;
   }
 
-  private static String destinationDisplayPerLine(TripTimeShort t) {
+  private static String destinationDisplayPerLine(TripTimeOnDate t) {
     Trip trip = t.getTrip();
     return trip == null ? t.getHeadsign() : trip.getRoute().getId() + "|" + t.getHeadsign();
   }

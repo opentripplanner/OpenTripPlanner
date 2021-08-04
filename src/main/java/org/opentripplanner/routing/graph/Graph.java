@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
@@ -632,7 +631,7 @@ public class Graph implements Serializable {
         LOG.debug("Rebuilding edge and vertex indices.");
         for (TripPattern tp : tripPatternForId.values()) {
             // Skip frequency-based patterns which have no timetable (null)
-            if (tp != null) tp.scheduledTimetable.finish();
+            if (tp != null) tp.getScheduledTimetable().finish();
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);

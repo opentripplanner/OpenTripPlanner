@@ -4,12 +4,17 @@ import java.util.Objects;
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
+/**
+ *
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
+ */
 public final class TripStopTime<T extends RaptorTripSchedule> implements StopTime {
   private final T trip;
   private final int stopPosition;
   private final boolean departure;
 
   private TripStopTime(T trip, int stopPosition, boolean departure) {
+    assertStopPositionIsInRange(stopPosition, trip);
     this.trip = trip;
     this.stopPosition = stopPosition;
     this.departure = departure;
@@ -77,5 +82,11 @@ public final class TripStopTime<T extends RaptorTripSchedule> implements StopTim
   @Override
   public int hashCode() {
     return Objects.hash(trip, stopPosition, departure);
+  }
+
+  private void assertStopPositionIsInRange(int stopPosition, T trip) {
+    if(stopPosition < 0 || stopPosition >= trip.pattern().numberOfStopsInPattern()) {
+      throw new IndexOutOfBoundsException();
+    }
   }
 }

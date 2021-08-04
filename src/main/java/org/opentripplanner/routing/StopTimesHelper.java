@@ -2,12 +2,11 @@ package org.opentripplanner.routing;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -19,6 +18,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
+
+import static org.opentripplanner.model.PickDrop.NONE;
 
 public class StopTimesHelper {
   /**
@@ -63,7 +64,7 @@ public class StopTimesHelper {
 
     for (TripPattern pattern : patternsForStop) {
 
-      Queue<TripTimeShort> pq = listTripTimeShortsForPatternAtStop(
+      Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
           routingService,
           timetableSnapshot,
           stop,
@@ -109,16 +110,18 @@ public class StopTimesHelper {
       if (timetableSnapshot != null){
         tt = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
-        tt = pattern.scheduledTimetable;
+        tt = pattern.getScheduledTimetable();
       }
-      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
+      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern
+          .getRoute()
+          .getAgency().getId());
       int sidx = 0;
-      for (Stop currStop : pattern.stopPattern.stops) {
+      for (Stop currStop : pattern.getStopPattern().getStops()) {
         if (currStop == stop) {
-          if(omitNonPickups && pattern.stopPattern.pickups[sidx] == StopPattern.PICKDROP_NONE) continue;
-          for (TripTimes t : tt.tripTimes) {
-            if (!sd.serviceRunning(t.serviceCode)) { continue; }
-            stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
+          if(omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
+          for (TripTimes t : tt.getTripTimes()) {
+            if (!sd.serviceRunning(t.getServiceCode())) { continue; }
+            stopTimes.times.add(new TripTimeOnDate(t, sidx, stop, sd));
           }
         }
         sidx++;
@@ -142,7 +145,7 @@ public class StopTimesHelper {
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
    */
-  public static List<TripTimeShort> stopTimesForPatternAtStop(
+  public static List<TripTimeOnDate> stopTimesForPatternAtStop(
           RoutingService routingService,
           TimetableSnapshot timetableSnapshot,
           Stop stop,
@@ -157,7 +160,7 @@ public class StopTimesHelper {
     }
     Date date = new Date(startTime * 1000);
     ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
-    Queue<TripTimeShort> pq = listTripTimeShortsForPatternAtStop(
+    Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
         routingService,
         timetableSnapshot,
         stop,
@@ -172,7 +175,7 @@ public class StopTimesHelper {
     return new ArrayList<>(pq);
   }
 
-  private static Queue<TripTimeShort> listTripTimeShortsForPatternAtStop(
+  private static Queue<TripTimeOnDate> listTripTimeShortsForPatternAtStop(
       RoutingService routingService,
       TimetableSnapshot timetableSnapshot,
       Stop stop,
@@ -194,40 +197,42 @@ public class StopTimesHelper {
     // ways to do it.
     //
     // The {@link MinMaxPriorityQueue} is marked beta, but we do not have a god alternative.
-    MinMaxPriorityQueue<TripTimeShort> pq = MinMaxPriorityQueue
-            .orderedBy(Comparator.comparing((TripTimeShort tts) -> tts.getServiceDay()
+    MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue
+            .orderedBy(Comparator.comparing((TripTimeOnDate tts) -> tts.getServiceDay()
                 + tts.getRealtimeDeparture()))
             .maximumSize(numberOfDepartures)
             .create();
 
     // Loop through all possible days
     for (ServiceDate serviceDate : serviceDates) {
-      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
+      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern
+          .getRoute()
+          .getAgency().getId());
       Timetable tt;
       if (timetableSnapshot != null) {
         tt = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
-        tt = pattern.scheduledTimetable;
+        tt = pattern.getScheduledTimetable();
       }
 
       if (!tt.temporallyViable(sd, startTime, timeRange, true)) continue;
 
       int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
       int sidx = 0;
-      for (Stop currStop : pattern.stopPattern.stops) {
+      for (Stop currStop : pattern.getStopPattern().getStops()) {
         if (currStop == stop) {
-          if (omitNonPickups && pattern.stopPattern.pickups[sidx] == StopPattern.PICKDROP_NONE) continue;
-          for (TripTimes t : tt.tripTimes) {
-            if (!sd.serviceRunning(t.serviceCode)) continue;
+          if (omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
+          for (TripTimes t : tt.getTripTimes()) {
+            if (!sd.serviceRunning(t.getServiceCode())) continue;
             if (t.getDepartureTime(sidx) != -1 &&
                     t.getDepartureTime(sidx) >= secondsSinceMidnight) {
-              pq.add(new TripTimeShort(t, sidx, stop, sd));
+              pq.add(new TripTimeOnDate(t, sidx, stop, sd));
             }
           }
 
           // TODO: This needs to be adapted after #1647 is merged
-          for (FrequencyEntry freq : tt.frequencyEntries) {
-            if (!sd.serviceRunning(freq.tripTimes.serviceCode)) continue;
+          for (FrequencyEntry freq : tt.getFrequencyEntries()) {
+            if (!sd.serviceRunning(freq.tripTimes.getServiceCode())) continue;
             int departureTime = freq.nextDepartureTime(sidx, secondsSinceMidnight);
             if (departureTime == -1) continue;
             int lastDeparture = freq.endTime + freq.tripTimes.getArrivalTime(sidx) -
@@ -235,7 +240,7 @@ public class StopTimesHelper {
             int i = 0;
             while (departureTime <= lastDeparture && i < numberOfDepartures) {
               pq.add(
-                      new TripTimeShort(
+                      new TripTimeOnDate(
                               freq.materialize(sidx, departureTime, true),
                               sidx,
                               stop,

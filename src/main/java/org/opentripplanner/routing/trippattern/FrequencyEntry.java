@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.trippattern;
 
-import static org.opentripplanner.routing.trippattern.TripTimes.formatSeconds;
-
 import java.io.Serializable;
 import org.opentripplanner.model.Frequency;
 
@@ -47,7 +45,8 @@ public class FrequencyEntry implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("FreqEntry: trip %s start %s end %s headway %s", tripTimes.trip, formatSeconds(startTime), formatSeconds(endTime), formatSeconds(headway));
+        return String.format("FreqEntry: trip %s start %s end %s headway %s",
+            tripTimes.getTrip(), formatSeconds(startTime), formatSeconds(endTime), formatSeconds(headway));
     }
 
     public int nextDepartureTime (int stop, int time) {
@@ -120,4 +119,12 @@ public class FrequencyEntry implements Serializable {
         return tripTimes.getArrivalTime(tripTimes.getNumStops() - 1) - tripTimes.getArrivalTime(0) + endTime;
     }
 
+    /** Used in debugging / dumping times. */
+    private static String formatSeconds(int s) {
+        int m = s / 60;
+        s = s % 60;
+        final int h = m / 60;
+        m = m % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
+    }
 }

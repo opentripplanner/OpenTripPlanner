@@ -31,6 +31,7 @@ config:
     AlertSeverityLevelType: String
     BikePark: org.opentripplanner.routing.bike_park.BikePark#BikePark
     BikeRentalStation: org.opentripplanner.routing.bike_rental.BikeRentalStation#BikeRentalStation
+    BikeRentalStationUris: org.opentripplanner.routing.bike_rental.BikeRentalStationUris#BikeRentalStationUris
     BikesAllowed: String
     BookingInfo: org.opentripplanner.model.BookingInfo
     BookingTime: org.opentripplanner.model.BookingTime

@@ -14,28 +14,25 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLeg<T> {
     private final RaptorTransfer access;
     private final int fromTime;
-    private final int toStop;
     private final int toTime;
     private final PathLeg<T> next;
 
 
     public AccessPathLeg(
         @Nonnull RaptorTransfer access,
-        int toStop,
         int fromTime,
         int toTime,
         @Nonnull PathLeg<T> next
     ) {
         this.access = access;
         this.fromTime = fromTime;
-        this.toStop = toStop;
         this.toTime = toTime;
         this.next = next;
     }
 
     /** Create new access leg with a different tail */
     public AccessPathLeg(@Nonnull AccessPathLeg<T> o, @Nonnull PathLeg<T> next) {
-        this(o.access, o.toStop, o.fromTime, o.toTime, next);
+        this(o.access, o.fromTime, o.toTime, next);
     }
 
     @Override
@@ -48,7 +45,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
      */
     @Override
     public int toStop() {
-        return toStop;
+        return access.stop();
     }
 
     @Override
@@ -59,6 +56,11 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     @Override
     public int generalizedCost() {
         return access.generalizedCost();
+    }
+
+    @Override
+    public boolean isAccessLeg() {
+        return true;
     }
 
     public RaptorTransfer access() {
@@ -72,7 +74,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public String toString() {
-        return "Access " + asString(toStop);
+        return "Access " + asString(toStop());
     }
 
     @Override
@@ -81,13 +83,13 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
         if (o == null || getClass() != o.getClass()) { return false; }
         AccessPathLeg<?> that = (AccessPathLeg<?>) o;
         return fromTime == that.fromTime &&
-                toStop == that.toStop &&
+                toStop() == that.toStop() &&
                 toTime == that.toTime &&
                 next.equals(that.next);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fromTime, toStop, toTime, next);
+        return Objects.hash(fromTime, toStop(), toTime, next);
     }
 }

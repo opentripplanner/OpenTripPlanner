@@ -10,6 +10,7 @@ import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationUris;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.common.model.P2;
 import java.util.Map;
@@ -26,12 +27,9 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import graphql.relay.Connection;
-import graphql.relay.Edge;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
-import java.util.Map;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.SystemNotice;
 import graphql.schema.TypeResolver;
@@ -115,6 +113,17 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Integer> capacity();
 
         public DataFetcher<Boolean> allowOverloading();
+
+        public DataFetcher<BikeRentalStationUris> rentalUris();
+    }
+
+    public interface LegacyGraphQLBikeRentalStationUris {
+
+        public DataFetcher<String> android();
+
+        public DataFetcher<String> ios();
+
+        public DataFetcher<String> web();
     }
 
     /**
@@ -194,7 +203,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<TripPattern> pattern();
 
-        public DataFetcher<Iterable<TripTimeShort>> stoptimes();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
     }
 
     public interface LegacyGraphQLElevationProfileComponent {
@@ -593,7 +602,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Trip> fuzzyTrip();
 
-        public DataFetcher<Iterable<TripTimeShort>> cancelledTripTimes();
+        public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
 
         public DataFetcher<Iterable<TripPattern>> patterns();
 
@@ -694,7 +703,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        public DataFetcher<Iterable<TripTimeShort>> stopTimesForPattern();
+        public DataFetcher<Iterable<TripTimeOnDate>> stopTimesForPattern();
 
         public DataFetcher<String> gtfsId();
 
@@ -742,7 +751,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns();
 
-        public DataFetcher<Iterable<TripTimeShort>> stoptimesWithoutPatterns();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimesWithoutPatterns();
 
         public DataFetcher<Iterable<TransitAlert>> alerts();
     }
@@ -820,7 +829,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<TripPattern> pattern();
 
-        public DataFetcher<Iterable<TripTimeShort>> stoptimes();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
     }
 
     /**
@@ -887,13 +896,13 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<String> semanticHash();
 
-        public DataFetcher<Iterable<TripTimeShort>> stoptimes();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
 
-        public DataFetcher<TripTimeShort> departureStoptime();
+        public DataFetcher<TripTimeOnDate> departureStoptime();
 
-        public DataFetcher<TripTimeShort> arrivalStoptime();
+        public DataFetcher<TripTimeOnDate> arrivalStoptime();
 
-        public DataFetcher<Iterable<TripTimeShort>> stoptimesForDate();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimesForDate();
 
         public DataFetcher<Iterable<Iterable<Double>>> geometry();
 

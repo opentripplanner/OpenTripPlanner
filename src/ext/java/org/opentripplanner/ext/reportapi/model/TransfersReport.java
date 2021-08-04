@@ -102,7 +102,7 @@ public class TransfersReport {
         if (ptn.getStops().size() > p.getStopPosition()) {
             int pos = p.getStopPosition();
             Stop stop = ptn.getStops().get(pos);
-            var tt = ptn.scheduledTimetable.getTripTimes(trip);
+            var tt = ptn.getScheduledTimetable().getTripTimes(trip);
             r.loc += stop.getName() + " " + stop.getCoordinate();
             r.time = arrival ? tt.getScheduledArrivalTime(pos) : tt.getScheduledDepartureTime(pos);
             r.c = stop.getCoordinate().asJtsCoordinate();

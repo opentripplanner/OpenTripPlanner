@@ -124,12 +124,12 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
           .stream()
           .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))
           .filter(pattern -> filterByRoutes == null
-              || filterByRoutes.contains(pattern.route.getId()))
+              || filterByRoutes.contains(pattern.getRoute().getId()))
           .filter(pattern -> pattern.canBoard(pattern.getStopIndex(stop)))
           .collect(toList());
 
       for (TripPattern pattern : patterns) {
-        String seenKey = pattern.route.getId().toString() + ":" + pattern.getId().toString();
+        String seenKey = pattern.getRoute().getId().toString() + ":" + pattern.getId().toString();
         if (!seenPatternAtStops.contains(seenKey)) {
           PatternAtStop row = new PatternAtStop(stop, pattern);
           PlaceAtDistance place = new PlaceAtDistance(row, distance);

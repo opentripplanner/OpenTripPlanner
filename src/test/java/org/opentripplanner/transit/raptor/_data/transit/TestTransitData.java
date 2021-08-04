@@ -1,11 +1,17 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import static org.opentripplanner.model.transfer.Transfer.MAX_WAIT_TIME_NOT_SET;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import lombok.val;
+import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.TransferPriority;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -19,6 +25,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   private final List<List<RaptorTransfer>> transfersByStop = new ArrayList<>();
   private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
+  private final List<Transfer> guaranteedTransfers = new ArrayList<>();
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfers(int fromStop) {
@@ -44,6 +51,10 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   public int[] stopBoarAlightCost() {
     // Not implemented, no test for this yet.
     return null;
+  }
+
+  public TestRoute getRoute(int index) {
+    return routes.get(index);
   }
 
   public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request) {
@@ -102,8 +113,43 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
         }
       }
     }
+    guaranteedTransfers.add(new Transfer(
+            new TestTransferPoint(fromStop, fromTrip),
+            new TestTransferPoint(toStop, toTrip),
+            TransferPriority.ALLOWED,
+            false,
+            true,
+            MAX_WAIT_TIME_NOT_SET
+    ));
     return this;
   }
+
+  public Transfer findGuaranteedTransfer(
+          TestTripSchedule fromTrip,
+          int fromStop,
+          TestTripSchedule toTrip,
+          int toStop
+  ) {
+    for (Transfer tx : guaranteedTransfers) {
+      if(
+          ((TestTransferPoint)tx.getFrom()).matches(fromTrip, fromStop) &&
+          ((TestTransferPoint)tx.getTo()).matches(toTrip, toStop)
+      ) {
+        return tx;
+      }
+    }
+    return null;
+  }
+
+  public TransferServiceAdaptor<TestTripSchedule> transferServiceAdaptor() {
+    return new TransferServiceAdaptor<>(null, null) {
+      @Override protected Transfer findTransfer(
+              TripStopTime<TestTripSchedule> from, TestTripSchedule toTrip, int toStop
+      ) {
+        return findGuaranteedTransfer(from.trip(), from.stop(), toTrip, toStop);
+      }
+    };
+  };
 
   private void expandNumOfStops(int stopIndex) {
     for (int i=numberOfStops(); i<=stopIndex; ++i) {

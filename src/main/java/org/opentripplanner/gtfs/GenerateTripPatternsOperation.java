@@ -150,7 +150,7 @@ public class GenerateTripPatternsOperation {
 
     private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, Direction direction) {
         for(TripPattern tripPattern : tripPatterns.get(stopPattern)) {
-            if(tripPattern.route.equals(route) && tripPattern.getDirection().equals(direction)) {
+            if(tripPattern.getRoute().equals(route) && tripPattern.getDirection().equals(direction)) {
                 return tripPattern;
             }
         }

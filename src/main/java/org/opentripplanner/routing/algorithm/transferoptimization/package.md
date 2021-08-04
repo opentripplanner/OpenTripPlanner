@@ -47,7 +47,7 @@ those paths (the post-processing).
 
 ## Implementation
 
-Finding the best transfers is done in 2 separate steps in OTP:
+OTP finds the best transfers in 2 steps:
 
  1. As part of the routing. The routing engine (Raptor) applies generalized-cost and 
     number-of-transfers as criteria during the routing. In addition, Raptor supports overriding 
@@ -58,11 +58,12 @@ Finding the best transfers is done in 2 separate steps in OTP:
     3. Goal 3 and 6 is achieved by allowing guaranteed transfers to override regular transfers. An 
        optional `RaptorGuaranteedTransferProvider` is injected into Raptor witch Raptor calls to 
        get guaranteed transfers. This service is also responsible for rejecting a transfer(TODO). 
- 2. Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the routing search are 
-    revised, optimizing the stop at which transfers happen between each pair of transit rides
-    (trips). This step does NOT compare different paths returned by the router (Raptor), but instead
-    finds all possible transfer locations for a given path, and the different alternatives to 
-    transfer between each pair of trips within the path. This is an outline of the process:
+ 2. Optimize transfers: Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the 
+    routing search are revised, optimizing the stop at which transfers happen between each pair of
+    transit rides (trips). This step does NOT compare different paths returned by the router
+    (Raptor), but instead finds all possible transfer locations for a given path, and the different
+    alternatives to transfer between each pair of trips within the path. This is an outline of the
+    process:
     1. For each path find all possible permutations of transfers.
     2. Filter paths based on priority including `StaySeated=100`, `Guaranteed=10`, `Preferred=2`, 
        `Recommended=1`, `Allowed=0` and `NotAllowed=-1000`. Each path is given a combined score, 
@@ -74,8 +75,59 @@ Finding the best transfers is done in 2 separate steps in OTP:
        keep the number of options down to almost O(N), where N is the number of transfers.
 
 
-## Design
+## Design - Optimize transfers
 
+The `OptimizeTranferService` is the entry point and delegates to the "domain" services in 
+the `services` package. The result of the optimization process is an `OptimizedPath` found in the 
+`api` package. The optimization process first uses the `TransferGenerator` to find all possible
+transfer points between each trip in a path. Then the `OptimizePathService` constructs all possible
+paths starting at the "tail" with the egress-leg, and adds legs until the path is constructed.
+To avoid exploring too many paths, the optimization filters the result of each step, reducing the 
+set of optimal tails. The `MinCostFilterChain` is used to filter each equivalent set of paths and 
+the `TransitPathLegSelector` finds the best tail for each transfer used to generate a new path-tail.
+
+Here is an outline of the calls:
+
+![Transfer-Optimization-Object-Collaboration](TransferOptimizationObjCol.svg)
+
+
+### Packages 
+
+Package `org.opentripplanner.routing.algorithm.transferoptimization` has the following subpackages:
+- `api` classes used outside the transfer-optimization.
+- `configure` creates and wires up the the module.
+- `model` simple internal model classes used by the services to build the result.
+- `services` internal transfer-optimization domain services, witch collaborate to do the job.
+
+### Important classes
+
+The `TransferOptimizationServiceConfigurator` is responsible for creating and wiring up the module.
+The configuration `TransferOptimizationParameters` is used to configure classes and inject the 
+right versions of each class. For example, the min-cost-filter-chain is created with the 
+appropriate filters to perform the filtering according to the configuration.
+
+The `OptimizeTransferService` is the entry point of the service and responsible for delegating 
+the sub-tasks to the internal domain services. It is also responsible for the life-cycle, mainly
+injecting 'setMinSafeTransferTime' before the calculation starts.
+
+The `OptimizePathService` finds the best optimized path using the other domain services.
+
+The `TransferGenerator` is responsible for finding all possible transfer options and decorating each 
+transfer with information that the other services will use later to do their job. The additional
+information added to each transfer is:
+- Guaranteed transfer information including priority, guaranteed, stay-seated and so on
+- The various cost described in `TransferOptimized`:
+  - `transfer-priority-cost`
+  - `wait-time-optimized-cost` or `generalized-cost`
+  - `break-tie-cost`
+    
+The `wait-time-optimized-cost` is described in [detail below](#the-optimize-transfer-cost-function).
+
+The `TransitPathLegSelector` uses the filter-chain to prune the results already found before 
+combining them with new transfer-points and a new transit-path-leg. 
+
+The domain `OptimizedPathTail` is used to store the intermediate results. It decorates the `PathLeg`
+from Raptor with `TransferOptimized` costs and keep a list of all relevant guaranteed-transfers.
 
 
 ### The Optimize-transfer-cost Function
