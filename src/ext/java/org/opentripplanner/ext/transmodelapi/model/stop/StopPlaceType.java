@@ -193,8 +193,15 @@ public class StopPlaceType {
                 .description("Only show estimated calls for selected modes.")
                 .type(GraphQLList.list(TRANSPORT_MODE))
                 .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("includeCancelledTrips")
+                .description("Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED")
+                .type(Scalars.GraphQLBoolean)
+                .defaultValue(false)
+                .build())
             .dataFetcher(environment -> {
               ArrivalDeparture arrivalDeparture = environment.getArgument("arrivalDeparture");
+              boolean includeCancelledTrips = environment.getArgument("includeCancelledTrips");
               int numberOfDepartures = environment.getArgument("numberOfDepartures");
               Integer departuresPerLineAndDestinationDisplay = environment.getArgument("numberOfDeparturesPerLineAndDestinationDisplay");
               int timeRage = environment.getArgument("timeRange");
@@ -214,6 +221,7 @@ public class StopPlaceType {
                           startTimeSeconds,
                           timeRage,
                           arrivalDeparture,
+                          includeCancelledTrips,
                           numberOfDepartures,
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,
@@ -236,6 +244,7 @@ public class StopPlaceType {
       Long startTimeSeconds,
       int timeRage,
       ArrivalDeparture arrivalDeparture,
+      boolean includeCancelledTrips,
       int numberOfDepartures,
       Integer departuresPerLineAndDestinationDisplay,
       Collection<FeedScopedId> authorityIdsWhiteListed,
@@ -258,7 +267,7 @@ public class StopPlaceType {
         timeRage,
         departuresPerTripPattern,
         arrivalDeparture,
-        false
+        includeCancelledTrips
     );
 
     // TODO OTP2 - Applying filters here is not correct - the `departuresPerTripPattern` is used

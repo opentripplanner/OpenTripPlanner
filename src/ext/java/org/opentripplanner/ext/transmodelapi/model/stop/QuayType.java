@@ -144,8 +144,21 @@ public class QuayType {
                             .type(Scalars.GraphQLInt)
                             .build())
                     .argument(GraphQLArgument.newArgument()
+                            .name("omitNonBoarding")
+                            .type(Scalars.GraphQLBoolean)
+                            .description("DEPRECATED and non-functional. Use arrivalDeparture instead.")
+                            .defaultValue(false)
+                            .build())
+                    .argument(GraphQLArgument.newArgument()
                             .name("arrivalDeparture")
                             .type(EnumTypes.ARRIVAL_DEPARTURE)
+                            .description("Filters results by either departures, arrivals or both. "
+                                + "For departures forBoarding has to be true and the departure "
+                                + "time has to be within the specified time range. For arrivals, "
+                                + "forAlight has to be true and the arrival time has to be within "
+                                + "the specified time range. If both are asked for, either the "
+                                + "conditions for arrivals or the conditions for departures will "
+                                + "have to be true for an EstimatedCall to show.")
                             .defaultValue(ArrivalDeparture.DEPARTURES)
                             .build())
                     .argument(GraphQLArgument.newArgument()
@@ -167,6 +180,7 @@ public class QuayType {
                         .build())
                     .dataFetcher(environment -> {
                         ArrivalDeparture arrivalDeparture = environment.getArgument("arrivalDeparture");
+                        boolean includeCancelledTrips = environment.getArgument("includeCancelledTrips");
                         int numberOfDepartures = environment.getArgument("numberOfDepartures");
                         Integer departuresPerLineAndDestinationDisplay = environment.getArgument("numberOfDeparturesPerLineAndDestinationDisplay");
                         int timeRange = environment.getArgument("timeRange");
@@ -183,6 +197,7 @@ public class QuayType {
                           startTimeSeconds,
                           timeRange,
                           arrivalDeparture,
+                          includeCancelledTrips,
                           numberOfDepartures,
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,
