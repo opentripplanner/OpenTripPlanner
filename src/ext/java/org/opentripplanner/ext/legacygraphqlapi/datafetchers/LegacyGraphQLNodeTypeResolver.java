@@ -10,7 +10,7 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -38,7 +38,7 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
     if (o instanceof Route) { return schema.getObjectType("Route"); }
     if (o instanceof Stop) { return schema.getObjectType("Stop"); }
     if (o instanceof Station) { return schema.getObjectType("Stop"); }
-    if (o instanceof TripTimeShort) { return schema.getObjectType("Stoptime"); }
+    if (o instanceof TripTimeOnDate) { return schema.getObjectType("Stoptime"); }
     if (o instanceof NearbyStop) { return schema.getObjectType("stopAtDistance"); }
     if (o instanceof FareRuleSet) { return schema.getObjectType("TicketType"); }
     if (o instanceof Trip) { return schema.getObjectType("Trip"); }

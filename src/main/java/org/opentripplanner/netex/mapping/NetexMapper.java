@@ -355,7 +355,7 @@ public class NetexMapper {
                 transitBuilder.getTripsById().add(it.getKey());
             }
             for (TripPattern it : result.tripPatterns) {
-                transitBuilder.getTripPatterns().put(it.stopPattern, it);
+                transitBuilder.getTripPatterns().put(it.getStopPattern(), it);
             }
             stopTimesByNetexId.putAll(result.stopTimeByNetexId);
             groupMapper.scheduledStopPointsIndex.putAll(result.scheduledStopPointsIndex);

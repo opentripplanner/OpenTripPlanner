@@ -158,8 +158,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
   public void includePlannedCancellationsTest() {
     TripTimes tripTimesWithCancellation = createTestTripTimes();
     TripTimes tripTimesWithReplaced = createTestTripTimes();
-    tripTimesWithCancellation.trip.setAlteration(TripAlteration.CANCELLATION);
-    tripTimesWithReplaced.trip.setAlteration(TripAlteration.REPLACED);
+    tripTimesWithCancellation.getTrip().setAlteration(TripAlteration.CANCELLATION);
+    tripTimesWithReplaced.getTrip().setAlteration(TripAlteration.REPLACED);
 
     // Given
     var filter1 = new RoutingRequestTransitDataProviderFilter(

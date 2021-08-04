@@ -324,7 +324,7 @@ public class NycFareServiceImpl implements FareService {
 					continue;
 				}
 				TripPattern tripPattern = leg.asTransitLeg().trip().getOriginalTripPattern();
-				Route route = tripPattern.route;
+				Route route = tripPattern.getRoute();
 				int routeType = route.getType();
 				// Note the old implementation directly used the ints as classifiers here.
 				if (routeType == 1) {

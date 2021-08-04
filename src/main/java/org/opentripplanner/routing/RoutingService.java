@@ -10,7 +10,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -113,7 +113,7 @@ public class RoutingService {
      * @param numberOfDepartures Number of departures to fetch per pattern
      * @param omitNonPickups     If true, do not include vehicles that will not pick up passengers.
      */
-    public List<TripTimeShort> stopTimesForPatternAtStop(
+    public List<TripTimeOnDate> stopTimesForPatternAtStop(
             Stop stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
     ) {
         return StopTimesHelper.stopTimesForPatternAtStop(
@@ -148,10 +148,10 @@ public class RoutingService {
         return timetableSnapshot != null ? timetableSnapshot.resolve(
                 tripPattern,
                 new ServiceDate(Calendar.getInstance().getTime())
-        ) : tripPattern.scheduledTimetable;
+        ) : tripPattern.getScheduledTimetable();
     }
 
-    public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
+    public List<TripTimeOnDate> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
         return TripTimesShortHelper.getTripTimesShort(this, trip, serviceDate);
     }
 
