@@ -718,7 +718,7 @@ public abstract class GraphPathToTripPlanConverter {
             place.stopIndex = ((OnboardEdge) edge).getStopIndex();
             if (endOfLeg) place.stopIndex++;
             if (tripTimes != null) {
-                place.stopSequence = tripTimes.getGtfsStopSequence(place.stopIndex);
+                place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
             }
             place.vertexType = VertexType.TRANSIT;
             place.boardAlightType = BoardAlightType.DEFAULT;

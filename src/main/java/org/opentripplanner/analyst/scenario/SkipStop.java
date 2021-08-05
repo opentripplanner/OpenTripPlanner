@@ -157,7 +157,7 @@ public class SkipStop extends TripPatternFilter {
             cumulativeTime += dwellTime;
             stopTime.setDepartureTime(cumulativeTime);
 
-            stopTime.setStopSequence(tt.getGtfsStopSequence(i));
+            stopTime.setStopSequence(tt.getStopSequence(i));
             stopTime.setTimepoint(tt.isTimepoint(i) ? 1 : 0);
             newSts.add(stopTime);
         }
