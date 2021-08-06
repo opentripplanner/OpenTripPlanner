@@ -124,21 +124,31 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
-        BicycleOptimizeType optimize = environment.getArgument("optimize");
+        BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
-        if (optimize == BicycleOptimizeType.TRIANGLE) {
+        if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
             try {
                 RoutingRequest.assertTriangleParameters(
                     request.bikeTriangleSafetyFactor,
                     request.bikeTriangleTimeFactor,
                     request.bikeTriangleSlopeFactor
                 );
+                // TODO These are not defined in the graphql schema
                 callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
                 callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
                 callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
             } catch (ParameterException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
+            bicycleOptimizeType = BicycleOptimizeType.QUICK;
+            request.transferCost += 1800;
+        }
+
+        if (bicycleOptimizeType != null) {
+            request.bicycleOptimizeType = bicycleOptimizeType;
         }
 
         callWith.argument("arriveBy", request::setArriveBy);
@@ -172,15 +182,6 @@ public class TransmodelGraphQLPlanner {
 
         //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
         //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
-
-        if (optimize == BicycleOptimizeType.TRANSFERS) {
-            optimize = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
-
-        if (optimize != null) {
-            request.optimize = optimize;
-        }
 
         if (GqlUtil.hasArgument(environment, "modes")) {
             ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();

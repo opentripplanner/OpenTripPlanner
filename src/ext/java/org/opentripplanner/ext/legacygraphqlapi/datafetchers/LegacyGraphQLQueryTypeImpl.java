@@ -678,7 +678,7 @@ public class LegacyGraphQLQueryTypeImpl
         }
 
         if (optimize != null) {
-          request.optimize = optimize;
+          request.bicycleOptimizeType = optimize;
         }
       }
 
