@@ -39,7 +39,7 @@ public class ReportResource {
     @GET
     @Path("/bicycle-safety.html")
     @Produces(MediaType.TEXT_HTML)
-    public Response getBicycleSafetyPage(String wayPropertySet) {
+    public Response getBicycleSafetyPage() {
         var is = getClass().getResourceAsStream("/reportapi/report.html");
         try {
             return Response.ok(new String(is.readAllBytes(), StandardCharsets.UTF_8)).build();
