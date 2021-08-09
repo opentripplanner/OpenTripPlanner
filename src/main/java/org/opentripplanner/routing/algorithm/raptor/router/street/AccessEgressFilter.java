@@ -2,13 +2,18 @@ package org.opentripplanner.routing.algorithm.raptor.router.street;
 
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,14 +34,59 @@ public class AccessEgressFilter {
     switch (streetMode) {
       case CAR_PICKUP:
       case CAR_TO_PARK:
-        return filterByDistanceOfNearestStop(
+        return filterByClosestStationsPerPatterns(
             nearbyStops,
-            request.accessEgressFilterMinimumDistanceMeters,
-            request.accessEgressFilterDistanceFactor
+            request.maxNumberOfStationsForCarAccessEgress,
+            request.rctx.graph.index
         );
       default:
         return nearbyStops;
     }
+  }
+
+  /**
+   * Returns the closest stations for each TripPattern.
+   */
+  private static Collection<NearbyStop> filterByClosestStationsPerPatterns(
+      Collection<NearbyStop> nearbyStops, int maxNumberOfStations, GraphIndex graphIndex
+  ) {
+    if (nearbyStops.isEmpty()) { return nearbyStops; }
+
+    // Because order is kept using these stream operators, we will have unique stations by distance
+    List<Station> stationsByDistance = nearbyStops
+        .stream()
+        .sorted()
+        .filter(s -> s.stop instanceof Stop)
+        .map(s -> ((Stop) s.stop).getParentStation())
+        .distinct()
+        .collect(Collectors.toList());
+
+    Set<TripPattern> tripPatternsEncountered = new HashSet<>();
+    List<Station> resultByStation = new ArrayList<>();
+
+    for (Station station : stationsByDistance) {
+      Set<TripPattern> patternsForStation = station
+          .getChildStops()
+          .stream()
+          .flatMap(s -> graphIndex.getPatternsForStop(s).stream())
+          .collect(Collectors.toSet());
+
+      // Returns true if at least one new pattern was added to the set
+      if (tripPatternsEncountered.addAll(patternsForStation)) {
+        resultByStation.add(station);
+        // Break out of the loop when we have found the required number of stations
+        if (resultByStation.size() == maxNumberOfStations) { break; }
+      }
+    }
+
+    // Map back to NearbyStop objects
+    List<NearbyStop> result = nearbyStops
+        .stream()
+        .filter(s -> s.stop instanceof Stop)
+        .filter(s -> resultByStation.contains(((Stop) s.stop).getParentStation()))
+        .collect(Collectors.toList());
+
+    return result;
   }
 
   /**
@@ -111,7 +161,7 @@ public class AccessEgressFilter {
   private static Collection<NearbyStop> filterByDistanceOfNearestStop(
       Collection<NearbyStop> nearbyStops, double minDistance, double distanceFactor
   ) {
-    if (nearbyStops.isEmpty()) { return nearbyStops; }
+    if (!nearbyStops.isEmpty()) { return nearbyStops; }
 
     double closestStopDistance = nearbyStops.stream().sorted().findFirst().get().distance;
     double distanceLimit = Double.max(closestStopDistance * distanceFactor, minDistance);
