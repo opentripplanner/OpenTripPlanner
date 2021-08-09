@@ -42,7 +42,11 @@ public class NearbyStop implements Comparable<NearbyStop> {
 
   @Override
   public int compareTo(NearbyStop that) {
-    if (state != null && that.state != null) {
+    if ((this.state == null) != (that.state == null)) {
+      throw new IllegalStateException("Only NearbyStops which both contain or lack a state may be compared.");
+    }
+
+    if (this.state != null) {
       return (int) (this.state.getWeight()) - (int) (that.state.getWeight());
     }
     return (int) (this.distance) - (int) (that.distance);
