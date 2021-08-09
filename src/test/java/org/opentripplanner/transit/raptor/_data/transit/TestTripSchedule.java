@@ -100,6 +100,10 @@ public class TestTripSchedule implements RaptorTripSchedule {
             return this;
         }
 
+        public TestTripSchedule.Builder pattern(String name, int ... stops) {
+            return pattern(TestTripPattern.pattern(name, stops));
+        }
+
         /** @param times departure and arrival times per stop. Example: "0:10, 0:20, 0:45 .." */
         public TestTripSchedule.Builder times(String times) {
             return times(TimeUtils.times(times));

@@ -72,7 +72,7 @@ public class RoutingRequestMapper {
         request.nonpreferredTransferCost = c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
         request.numItineraries = c.asInt("numItineraries", dft.numItineraries);
         request.onlyTransitTrips = c.asBoolean("onlyTransitTrips", dft.onlyTransitTrips);
-        request.optimize = c.asEnum("optimize", dft.optimize);
+        request.bicycleOptimizeType = c.asEnum("optimize", dft.bicycleOptimizeType);
         request.otherThanPreferredRoutesPenalty = c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
         request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
         request.pathComparator = c.asText("pathComparator", dft.pathComparator);
@@ -101,9 +101,8 @@ public class RoutingRequestMapper {
     }
 
     private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {
-        p.useOptimizeTransferCostFunction = c.asBoolean(
-            "adjustGeneralizedCost",
-            p.useOptimizeTransferCostFunction
+        p.optimizeTransferWaitTime = c.asBoolean(
+                "optimizeTransferWaitTime", p.optimizeTransferWaitTime
         );
         p.minSafeWaitTimeFactor = c.asDouble("minSafeWaitTimeFactor", p.minSafeWaitTimeFactor);
         p.inverseWaitReluctance = c.asDouble("inverseWaitReluctance", p.inverseWaitReluctance);

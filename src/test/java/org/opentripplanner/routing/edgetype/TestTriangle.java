@@ -49,7 +49,7 @@ public class TestTriangle extends TestCase {
         double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
         RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);
-        options.optimize = BicycleOptimizeType.TRIANGLE;
+        options.bicycleOptimizeType = BicycleOptimizeType.TRIANGLE;
         options.bikeSpeed = 6.0;
         options.setNonTransitReluctance(1);
 

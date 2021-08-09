@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationUris;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRentalDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
@@ -184,6 +185,15 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
             brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
             brstation.isKeepingBicycleRentalAtDestinationAllowed = config.allowKeepingRentedBicycleAtDestination();
             brstation.isCarStation = routeAsCar;
+
+            if (stationNode.has("rental_uris")) {
+                var rentalUrisObject = stationNode.path("rental_uris");
+                String androidUri = rentalUrisObject.has("android") ? rentalUrisObject.get("android").asText() : null;
+                String iosUri = rentalUrisObject.has("ios") ? rentalUrisObject.get("ios").asText() : null;
+                String webUri = rentalUrisObject.has("web") ? rentalUrisObject.get("web").asText() : null;
+                brstation.rentalUris = new BikeRentalStationUris(androidUri, iosUri, webUri);
+            }
+
             return brstation;
         }
     }

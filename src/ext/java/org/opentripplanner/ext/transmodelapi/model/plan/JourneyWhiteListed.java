@@ -7,8 +7,7 @@ import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripTimeShort;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.model.TripTimeOnDate;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,8 +46,8 @@ public class JourneyWhiteListed {
     }
 
 
-    public static Stream<TripTimeShort> whiteListAuthoritiesAndOrLines(
-        Stream<TripTimeShort> stream,
+    public static Stream<TripTimeOnDate> whiteListAuthoritiesAndOrLines(
+        Stream<TripTimeOnDate> stream,
         Collection<FeedScopedId> authorityIds,
         Collection<FeedScopedId> lineIds
     ) {
@@ -63,7 +62,7 @@ public class JourneyWhiteListed {
     }
 
     private static boolean isTripTimeShortAcceptable(
-        TripTimeShort tts,
+        TripTimeOnDate tts,
         Collection<FeedScopedId> authorityIds,
         Collection<FeedScopedId> lineIds
     ) {

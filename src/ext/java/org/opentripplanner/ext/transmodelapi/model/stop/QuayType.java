@@ -15,7 +15,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -100,7 +100,7 @@ public class QuayType {
                       return GqlUtil.getRoutingService(environment)
                           .getPatternsForStop(environment.getSource(),true)
                               .stream()
-                              .map(pattern -> pattern.route)
+                              .map(pattern -> pattern.getRoute())
                               .distinct()
                               .collect(Collectors.toList());
                     })
@@ -188,7 +188,7 @@ public class QuayType {
                           transitModes,
                           environment
                       )
-                            .sorted(TripTimeShort.compareByDeparture())
+                            .sorted(TripTimeOnDate.compareByDeparture())
                             .distinct()
                             .limit(numberOfDepartures)
                             .collect(Collectors.toList());

@@ -24,7 +24,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -452,7 +452,7 @@ public class LegacyGraphQLQueryTypeImpl
 
   // TODO
   @Override
-  public DataFetcher<Iterable<TripTimeShort>> cancelledTripTimes() {
+  public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes() {
     return environment -> null;
   }
 
@@ -678,7 +678,7 @@ public class LegacyGraphQLQueryTypeImpl
         }
 
         if (optimize != null) {
-          request.optimize = optimize;
+          request.bicycleOptimizeType = optimize;
         }
       }
 

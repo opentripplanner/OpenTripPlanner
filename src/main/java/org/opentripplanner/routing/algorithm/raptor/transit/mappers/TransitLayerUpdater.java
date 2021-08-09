@@ -65,7 +65,7 @@ public class TransitLayerUpdater {
     final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld =
         mapOldTripPatternToRaptorTripPattern(
           realtimeTransitLayer.getStopIndex(),
-          updatedTimetables.stream().map(t -> t.pattern).collect(Collectors.toSet()
+          updatedTimetables.stream().map(t -> t.getPattern()).collect(Collectors.toSet()
         )
     );
 
@@ -82,7 +82,7 @@ public class TransitLayerUpdater {
     // Map new TriPatternForDate and index for old and new TripPatternsForDate on service date
     for (Timetable timetable : updatedTimetables) {
       @SuppressWarnings("ConstantConditions")
-      LocalDate date = ServiceCalendarMapper.localDateFromServiceDate(timetable.serviceDate);
+      LocalDate date = ServiceCalendarMapper.localDateFromServiceDate(timetable.getServiceDate());
 
       if(!tripPatternsStartingOnDateMapCache.containsKey(date)) {
         Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
@@ -94,22 +94,21 @@ public class TransitLayerUpdater {
 
       TripPatternForDate oldTripPatternForDate = tripPatternsStartingOnDateMapCache
           .get(date)
-          .get(timetable.pattern);
+          .get(timetable.getPattern());
 
       if (oldTripPatternForDate != null) {
-        tripPatternsStartingOnDateMapCache.get(date).remove(timetable.pattern, oldTripPatternForDate);
-        oldTripPatternsForDate.put(timetable.pattern, oldTripPatternForDate);
+        tripPatternsStartingOnDateMapCache.get(date).remove(timetable.getPattern(), oldTripPatternForDate);
+        oldTripPatternsForDate.put(timetable.getPattern(), oldTripPatternForDate);
         datesToBeUpdated.addAll(oldTripPatternForDate.getRunningPeriodDates());
       }
 
       TripPatternForDate newTripPatternForDate = tripPatternForDateMapper.map(
-          timetable,
-          timetable.serviceDate
+          timetable, timetable.getServiceDate()
       );
 
       if (newTripPatternForDate != null) {
-        tripPatternsStartingOnDateMapCache.get(date).put(timetable.pattern, newTripPatternForDate);
-        newTripPatternsForDate.put(timetable.pattern, newTripPatternForDate);
+        tripPatternsStartingOnDateMapCache.get(date).put(timetable.getPattern(), newTripPatternForDate);
+        newTripPatternsForDate.put(timetable.getPattern(), newTripPatternForDate);
         datesToBeUpdated.addAll(newTripPatternForDate.getRunningPeriodDates());
       }
     }

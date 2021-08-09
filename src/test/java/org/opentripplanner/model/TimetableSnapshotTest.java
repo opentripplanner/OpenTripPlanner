@@ -60,7 +60,7 @@ public class TimetableSnapshotTest {
     }
     
     private boolean updateResolver(TimetableSnapshot resolver, TripPattern pattern, TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
-        TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
+        TripTimes updatedTripTimes = pattern.getScheduledTimetable().createUpdatedTripTimes(tripUpdate,
                 timeZone, serviceDate);
         return resolver.update(pattern, updatedTripTimes, serviceDate);
     }

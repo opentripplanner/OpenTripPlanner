@@ -741,7 +741,7 @@ public abstract class RoutingResource {
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
-            request.setOptimize(optimize);
+            request.setBicycleOptimizeType(optimize);
             if (optimize == BicycleOptimizeType.TRIANGLE) {
                 RoutingRequest.assertTriangleParameters(
                         triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
@@ -808,7 +808,7 @@ public abstract class RoutingResource {
         }
 
         if (optimize != null) {
-            request.setOptimize(optimize);
+            request.setBicycleOptimizeType(optimize);
         }
         /* Temporary code to get bike/car parking and renting working. */
         if (modes != null && !modes.qModes.isEmpty()) {

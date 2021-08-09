@@ -174,17 +174,9 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public TraverseModeSet streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK); // defaults in constructor overwrite this
 
     /**
-     * The set of characteristics that the user wants to optimize for -- defaults to QUICK, or
-     * optimize for transit time.
-     *
-     * @deprecated TODO OTP2 this should be completely removed and done only with individual cost
-     *                       parameters
-     *                       Also: apparently OptimizeType only affects BICYCLE mode traversal of
-     *                       street segments. If this is the case it should be very well
-     *                       documented and carried over into the Enum name.
+     * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
      */
-    @Deprecated
-    public BicycleOptimizeType optimize = BicycleOptimizeType.QUICK;
+    public BicycleOptimizeType bicycleOptimizeType = BicycleOptimizeType.SAFE;
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
@@ -755,13 +747,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.setStreetSubRequestModes(new TraverseModeSet(mode));
     }
 
-    public RoutingRequest(TraverseMode mode, BicycleOptimizeType optimize) {
-        this(new TraverseModeSet(mode), optimize);
+    public RoutingRequest(TraverseMode mode, BicycleOptimizeType bicycleOptimizeType) {
+        this(new TraverseModeSet(mode), bicycleOptimizeType);
     }
 
-    public RoutingRequest(TraverseModeSet modeSet, BicycleOptimizeType optimize) {
+    public RoutingRequest(TraverseModeSet modeSet, BicycleOptimizeType bicycleOptimizeType) {
         this();
-        this.optimize = optimize;
+        this.bicycleOptimizeType = bicycleOptimizeType;
         this.setStreetSubRequestModes(modeSet);
     }
 
@@ -787,8 +779,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.streetSubRequestModes = streetSubRequestModes;
     }
 
-    public void setOptimize(BicycleOptimizeType optimize) {
-        this.optimize = optimize;
+    public void setBicycleOptimizeType(BicycleOptimizeType bicycleOptimizeType) {
+        this.bicycleOptimizeType = bicycleOptimizeType;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
@@ -973,7 +965,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public String toString(String sep) {
         return from + sep + to + sep + getDateTime() + sep
-                + arriveBy + sep + optimize + sep + streetSubRequestModes.getAsStr() + sep
+                + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr() + sep
                 + getNumItineraries();
     }
 

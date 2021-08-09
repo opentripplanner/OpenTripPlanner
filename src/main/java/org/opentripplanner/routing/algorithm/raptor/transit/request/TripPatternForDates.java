@@ -90,7 +90,7 @@ public class TripPatternForDates
 
     @Override
     public String debugInfo() {
-        return tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().route.getShortName();
+        return tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().getRoute().getShortName();
     }
 
 
