@@ -17,21 +17,35 @@ public class NorwayWayPropertySetSourceTest {
   @Test
   public void testMtbScaleNone() {
     // https://www.openstreetmap.org/way/302610220
-    var way = new OSMWithTags();
-    way.addTag("highway", "path");
-    way.addTag("mtb:scale", "3");
+    var way1 = new OSMWithTags();
+    way1.addTag("highway", "path");
+    way1.addTag("mtb:scale", "3");
 
     assertEquals(
-        wps.getDataForWay(way).getPermission(), StreetTraversalPermission.NONE);
+        wps.getDataForWay(way1).getPermission(), StreetTraversalPermission.NONE);
+
+    var way2 = new OSMWithTags();
+    way2.addTag("highway", "track");
+    way2.addTag("mtb:scale", "3");
+
+    assertEquals(
+        wps.getDataForWay(way2).getPermission(), StreetTraversalPermission.NONE);
   }
 
   @Test
   public void testMtbScalePedestrian() {
-    var way = new OSMWithTags();
-    way.addTag("highway", "path");
-    way.addTag("mtb:scale", "1");
+    var way1 = new OSMWithTags();
+    way1.addTag("highway", "path");
+    way1.addTag("mtb:scale", "1");
 
     assertEquals(
-        wps.getDataForWay(way).getPermission(), StreetTraversalPermission.PEDESTRIAN);
+        wps.getDataForWay(way1).getPermission(), StreetTraversalPermission.PEDESTRIAN);
+
+    var way2 = new OSMWithTags();
+    way2.addTag("highway", "track");
+    way2.addTag("mtb:scale", "1");
+
+    assertEquals(
+        wps.getDataForWay(way2).getPermission(), StreetTraversalPermission.PEDESTRIAN);
   }
 }
