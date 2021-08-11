@@ -128,17 +128,18 @@ public class TransmodelGraphQLPlanner {
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
             try {
+
+                callWith.argument("triangleFactors.safety", request::setBikeTriangleSafetyFactor);
+                callWith.argument("triangleFactors.slope", request::setBikeTriangleSlopeFactor);
+                callWith.argument("triangleFactors.distance", request::setBikeTriangleTimeFactor);
+
                 RoutingRequest.assertTriangleParameters(
-                    request.bikeTriangleSafetyFactor,
-                    request.bikeTriangleTimeFactor,
-                    request.bikeTriangleSlopeFactor
+                        request.bikeTriangleSafetyFactor,
+                        request.bikeTriangleTimeFactor,
+                        request.bikeTriangleSlopeFactor
                 );
-                // TODO These are not defined in the graphql schema
-                callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
-                callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
-                callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
             } catch (ParameterException e) {
-                throw new RuntimeException(e);
+                throw new graphql.GraphQLException(e);
             }
         }
 
