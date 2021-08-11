@@ -124,6 +124,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
+     * Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is
+     * done because some street modes searches are much more resource intensive than others.
+     */
+    public Map<StreetMode, Double> maxAccessEgressDurationSecondsForMode = new HashMap<>();
+
+    /**
      * The access/egress/direct/transit modes allowed for this main request. The parameter
      * "streetSubRequestModes" below is used for a single A Star sub request.
      *
@@ -1250,6 +1256,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             }
         }
         return bannedRoutes;
+    }
+
+    public double getMaxAccessEgressDurationSecondsForMode(StreetMode mode) {
+        return maxAccessEgressDurationSecondsForMode.getOrDefault(
+            mode,
+            maxAccessEgressDurationSeconds
+        );
     }
 
     /**
