@@ -816,7 +816,7 @@ This specifies a timeout in (optionally fractional) seconds. The search abort af
 ##maxAccessEgressDurationSecondsForMode
 
 Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done because 
-ome street modes searches are much more resource intensive than others.
+some street modes searches are much more resource intensive than others.
 
 ```JSON
 // router-config.json
