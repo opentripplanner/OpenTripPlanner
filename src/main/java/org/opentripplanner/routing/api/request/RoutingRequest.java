@@ -124,6 +124,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
+     * Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is
+     * done because some street modes searches are much more resource intensive than others.
+     */
+    public Map<StreetMode, Double> maxAccessEgressDurationSecondsForMode = new HashMap<>();
+
+    /**
      * Limits the number of closest stations to use for access/egress searches when using {@link
      * StreetMode#CAR_PICKUP}. This is for both for performance reasons and because we want car
      * to be used as a last resort and not replace large parts of a transit trip.
@@ -1257,6 +1263,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             }
         }
         return bannedRoutes;
+    }
+
+    public double getMaxAccessEgressDurationSecondsForMode(StreetMode mode) {
+        return maxAccessEgressDurationSecondsForMode.getOrDefault(
+            mode,
+            maxAccessEgressDurationSeconds
+        );
     }
 
     /**
