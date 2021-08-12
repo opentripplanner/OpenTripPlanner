@@ -82,9 +82,17 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     private boolean[] recordedStops;
 
     /**
-     * Stop has been cancelled by realtime updates. This is only for API-purposes and does not
-     * affect routing. It duplicates information found in the {@link StopPattern} of the new
-     * {@link TripPattern} created by the realtime update.
+     * Whether each stop has been cancelled by realtime updates (in the most recent derived realtime StopPattern).
+     * The cancellation information here need not match the information in the StopPattern for this TripTimes.
+     * This is somewhat redundant: it duplicates cancellation information found in the {@link StopPattern} of the new
+     * {@link TripPattern} created by the realtime update. The use case is displaying cancellation information when
+     * this original (non-real-time) pattern is queried, even though this original pattern allows pickup and dropoff
+     * at the canceled stop. This is only for API purposes and does not affect routing.
+     *
+     * // TODO This seems to only be changed after a new TripTimes has been created by the realtime
+     * // TODO updater and the scheduled TripTimes is never changed. We should clean this up
+     * // TODO when refactoring the realtime model. Preferably so that a reference is kept between
+     * // TODO the realtime data and the scheduled data, so that data is not duplicated
      *
      * Non-final to allow updates.
      */
