@@ -22,9 +22,6 @@ public class TripTimeOnDate {
     private final TripPattern tripPattern;
     private final ServiceDay serviceDay;
 
-    /**
-     * This is stop-specific, so the index i is a stop index, not a hop index.
-     */
     public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern, ServiceDay serviceDay) {
         this.tripTimes = tripTimes;
         this.stopIndex = stopIndex;
@@ -32,13 +29,10 @@ public class TripTimeOnDate {
         this.serviceDay = serviceDay;
     }
 
-    /**
-     * must pass in both table and trip, because tripTimes do not have stops.
-     */
+    /** Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns. */
     public static List<TripTimeOnDate> fromTripTimes (Timetable table, Trip trip) {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
         List<TripTimeOnDate> out = new ArrayList<>();
-        // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
             out.add(new TripTimeOnDate(times, i, table.getPattern(), null));
         }
@@ -46,14 +40,13 @@ public class TripTimeOnDate {
     }
 
     /**
-     * must pass in both table and trip, because tripTimes do not have stops.
+     * Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns.
      * @param serviceDay service day to set, if null none is set
      */
     public static List<TripTimeOnDate> fromTripTimes(Timetable table, Trip trip,
             ServiceDay serviceDay) {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));
         List<TripTimeOnDate> out = new ArrayList<>();
-        // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
             out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDay));
         }
