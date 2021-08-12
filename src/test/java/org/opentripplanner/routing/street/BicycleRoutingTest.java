@@ -9,6 +9,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -59,6 +60,7 @@ public class BicycleRoutingTest {
         request.dateTime = dateTime;
         request.from = from;
         request.to = to;
+        request.bicycleOptimizeType = BicycleOptimizeType.QUICK;
 
         request.streetSubRequestModes = new TraverseModeSet(TraverseMode.BICYCLE);
         request.setRoutingContext(graph);
