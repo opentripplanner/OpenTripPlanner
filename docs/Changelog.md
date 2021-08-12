@@ -36,8 +36,9 @@
 - Add maxAccessEgressDurationSecondsForMode to RoutingRequest [#3560](https://github.com/opentripplanner/OpenTripPlanner/issues/3560)
 - Add bicycle safety report to report API [#3563](https://github.com/opentripplanner/OpenTripPlanner/issues/3563)
 - Optimize Transfers performance issue [#3513](https://github.com/opentripplanner/OpenTripPlanner/issues/3513)
-- Refactor StopPattern/TripPattern/TripTimes [#3571](https://github.com/opentripplanner/OpenTripPlanner/issues/3571)
 - Don't allow bicycle loops in A* [#3574](https://github.com/opentripplanner/OpenTripPlanner/pull/3574)
+- Cancel individual stop on StopPattern instead of TripTimes [#3575](https://github.com/opentripplanner/OpenTripPlanner/issues/3575)
+- Refactor StopPattern/TripPattern/TripTimes [#3571](https://github.com/opentripplanner/OpenTripPlanner/issues/3571)
 - Do not allow bicycle traversal on ways tagged with mtb:scale [#3578](https://github.com/opentripplanner/OpenTripPlanner/pull/3578)
 
 

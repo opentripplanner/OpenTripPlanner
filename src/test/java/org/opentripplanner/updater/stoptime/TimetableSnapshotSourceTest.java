@@ -126,8 +126,8 @@ public class TimetableSnapshotSourceTest {
 
         final TripTimes tripTimes = forToday.getTripTimes(tripIndex);
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
-            assertEquals(PickDrop.CANCELLED, tripTimes.getPickupType(i));
-            assertEquals(PickDrop.CANCELLED, tripTimes.getPickupType(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getPickup(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getDropoff(i));
         }
         assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
     }

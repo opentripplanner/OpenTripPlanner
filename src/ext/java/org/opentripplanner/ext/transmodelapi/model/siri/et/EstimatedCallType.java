@@ -150,31 +150,15 @@ public class EstimatedCallType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("forBoarding")
                 .type(Scalars.GraphQLBoolean)
-                .description("Whether vehicle may be boarded at quay.")
-                .dataFetcher(environment -> {
-                    if (((TripTimeOnDate) environment.getSource()).getPickupType() >= 0) {
-                        //Realtime-updated
-                        return ((TripTimeOnDate) environment.getSource()).getPickupType() != NONE.getGtfsCode();
-                    }
-                  return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                        .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                        .getBoardType(((TripTimeOnDate) environment.getSource()).getStopIndex()) != NONE;
-                })
-                .build())
+                .description("Whether vehicle may be boarded at quay.").dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getPickupType().isRoutable()
+                ).build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("forAlighting")
                 .type(Scalars.GraphQLBoolean)
-                .description("Whether vehicle may be alighted at quay.")
-                .dataFetcher(environment -> {
-                    if (((TripTimeOnDate) environment.getSource()).getDropoffType() >= 0) {
-                        //Realtime-updated
-                        return ((TripTimeOnDate) environment.getSource()).getDropoffType() != NONE.getGtfsCode();
-                    }
-                    return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                            .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                            .getAlightType(((TripTimeOnDate) environment.getSource()).getStopIndex()) != NONE;
-                })
-                .build())
+                .description("Whether vehicle may be boarded at quay.").dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getDropoffType().isRoutable()
+                ).build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("requestStop")
                     .type(Scalars.GraphQLBoolean)

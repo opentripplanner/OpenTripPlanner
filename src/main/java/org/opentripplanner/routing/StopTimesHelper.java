@@ -121,7 +121,7 @@ public class StopTimesHelper {
           if(omitNonPickups && pattern.getStopPattern().getPickup(sidx) == NONE) continue;
           for (TripTimes t : tt.getTripTimes()) {
             if (!sd.serviceRunning(t.getServiceCode())) { continue; }
-            stopTimes.times.add(new TripTimeOnDate(t, sidx, stop, sd));
+            stopTimes.times.add(new TripTimeOnDate(t, sidx, pattern, sd));
           }
         }
         sidx++;
@@ -226,7 +226,7 @@ public class StopTimesHelper {
             if (!sd.serviceRunning(t.getServiceCode())) continue;
             if (t.getDepartureTime(sidx) != -1 &&
                     t.getDepartureTime(sidx) >= secondsSinceMidnight) {
-              pq.add(new TripTimeOnDate(t, sidx, stop, sd));
+              pq.add(new TripTimeOnDate(t, sidx, pattern, sd));
             }
           }
 
@@ -243,7 +243,7 @@ public class StopTimesHelper {
                       new TripTimeOnDate(
                               freq.materialize(sidx, departureTime, true),
                               sidx,
-                              stop,
+                              pattern,
                               sd
                       )
               );

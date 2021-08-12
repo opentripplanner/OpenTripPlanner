@@ -590,6 +590,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 stopTime.setDepartureTime(stopTime.getArrivalTime());
             }
 
+            if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+                stopTime.cancel();
+            }
+
             addedStops.add(stop);
             aimedStopTimes.add(stopTime);
         }
@@ -623,7 +627,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             }
 
             if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
-                tripTimes.cancelStop(i);
+                tripTimes.setCancelled(i);
             }
 
             boolean isCallPredictionInaccurate = estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();

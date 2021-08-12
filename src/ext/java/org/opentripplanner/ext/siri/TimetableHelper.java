@@ -153,7 +153,8 @@ public class TimetableHelper {
                     }
 
                     if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
-                        newTimes.cancelStop(callCounter);
+                        modifiedStopTimes.get(callCounter).cancel();
+                        newTimes.setCancelled(callCounter);
                     }
 
                     int arrivalTime = newTimes.getArrivalTime(callCounter);
@@ -223,7 +224,8 @@ public class TimetableHelper {
                         }
 
                         if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
-                            newTimes.cancelStop(callCounter);
+                            modifiedStopTimes.get(callCounter).cancel();
+                            newTimes.setCancelled(callCounter);
                         }
 
                         boolean isCallPredictionInaccurate = estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();
@@ -234,12 +236,12 @@ public class TimetableHelper {
                         // Update dropoff-/pickuptype only if status is cancelled
                         CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();
                         if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
-                            newTimes.cancelDropOffForStop(callCounter);
+                            modifiedStopTimes.get(callCounter).cancelDropOff();
                         }
 
                         CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
                         if (departureStatus == CallStatusEnumeration.CANCELLED) {
-                            newTimes.cancelPickupForStop(callCounter);
+                            modifiedStopTimes.get(callCounter).cancelPickup();
                         }
 
                         int arrivalTime = newTimes.getArrivalTime(callCounter);
@@ -513,7 +515,7 @@ public class TimetableHelper {
 
                         CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();
                         if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
-                            stopTime.setDropOffType(NONE);
+                            stopTime.cancelDropOff();
                         } else if (estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.ALIGHTING) {
                             stopTime.setDropOffType(SCHEDULED);
                         } else if (estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.NO_ALIGHTING) {
@@ -525,7 +527,7 @@ public class TimetableHelper {
 
                         CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
                         if (departureStatus == CallStatusEnumeration.CANCELLED) {
-                            stopTime.setPickupType(NONE);
+                            stopTime.cancelPickup();
                         } else if (estimatedCall.getDepartureBoardingActivity() == DepartureBoardingActivityEnumeration.BOARDING) {
                             stopTime.setPickupType(SCHEDULED);
                         } else if (estimatedCall.getDepartureBoardingActivity() == DepartureBoardingActivityEnumeration.NO_BOARDING) {
