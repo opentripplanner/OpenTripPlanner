@@ -23,8 +23,9 @@ public class TriangleFactorsInputType {
                     .defaultValue(0.3)
                     .build())
             .field(GraphQLInputObjectField.newInputObjectField()
-                    .name("distance")
-                    .description("How important is raw distance expressed as a fraction of 1.")
+                    .name("time")
+                    .description(
+                            "How important is time expressed as a fraction of 1. Note that what this really optimises for is distance (even if that means going over terrible surfaces, so I might be slower than the safe route).")
                     .defaultValue(0.3)
                     .type(Scalars.GraphQLFloat)
                     .build())

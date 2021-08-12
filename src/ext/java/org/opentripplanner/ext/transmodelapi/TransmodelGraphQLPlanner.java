@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
@@ -63,6 +64,10 @@ public class TransmodelGraphQLPlanner {
 
             response.debugOutput = res.getDebugAggregator().finishedRendering();
         }
+        catch (ParameterException e) {
+            var msg = e.message.get();
+            throw new GraphQLException(msg, e);
+        }
         catch (Exception e) {
             LOG.warn("System error");
             LOG.error("Root cause: " + e.getMessage(), e);
@@ -90,7 +95,8 @@ public class TransmodelGraphQLPlanner {
         return new GenericLocation(name, stopId, lat, lon);
     }
 
-    private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+    private RoutingRequest createRequest(DataFetchingEnvironment environment)
+    throws ParameterException {
         TransmodelRequestContext context = environment.getContext();
         Router router = context.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
@@ -127,20 +133,16 @@ public class TransmodelGraphQLPlanner {
         BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
-            try {
 
-                callWith.argument("triangleFactors.safety", request::setBikeTriangleSafetyFactor);
-                callWith.argument("triangleFactors.slope", request::setBikeTriangleSlopeFactor);
-                callWith.argument("triangleFactors.distance", request::setBikeTriangleTimeFactor);
+            callWith.argument("triangleFactors.safety", request::setBikeTriangleSafetyFactor);
+            callWith.argument("triangleFactors.slope", request::setBikeTriangleSlopeFactor);
+            callWith.argument("triangleFactors.time", request::setBikeTriangleTimeFactor);
 
-                RoutingRequest.assertTriangleParameters(
-                        request.bikeTriangleSafetyFactor,
-                        request.bikeTriangleTimeFactor,
-                        request.bikeTriangleSlopeFactor
-                );
-            } catch (ParameterException e) {
-                throw new graphql.GraphQLException(e);
-            }
+            RoutingRequest.assertTriangleParameters(
+                    request.bikeTriangleSafetyFactor,
+                    request.bikeTriangleTimeFactor,
+                    request.bikeTriangleSlopeFactor
+            );
         }
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
