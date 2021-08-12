@@ -455,11 +455,12 @@ public class TimetableHelper {
 
         EstimatedVehicleJourney.EstimatedCalls journeyCalls = journey.getEstimatedCalls();
 
-        if (journeyCalls == null) {
-            return null;
+        List<EstimatedCall> estimatedCalls;
+        if (journeyCalls != null) {
+            estimatedCalls = journeyCalls.getEstimatedCalls();
+        } else {
+            estimatedCalls = new ArrayList<>();
         }
-
-        List<EstimatedCall> estimatedCalls = journeyCalls.getEstimatedCalls();
 
         List<Stop> stops = createModifiedStops(timetable, journey, routingService);
 
@@ -519,7 +520,7 @@ public class TimetableHelper {
                         } else if (estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.NO_ALIGHTING) {
                             stopTime.setDropOffType(NONE);
                         } else if (estimatedCall.getArrivalBoardingActivity() == null && i == 0) {
-                            //First stop - default no pickup
+                            //First stop - default no dropoff
                             stopTime.setDropOffType(NONE);
                         }
 
@@ -531,7 +532,7 @@ public class TimetableHelper {
                         } else if (estimatedCall.getDepartureBoardingActivity() == DepartureBoardingActivityEnumeration.NO_BOARDING) {
                             stopTime.setPickupType(NONE);
                         } else if (estimatedCall.getDepartureBoardingActivity() == null && i == (stops.size()-1)) {
-                            //Last stop - default no dropoff
+                            //Last stop - default no pickup
                             stopTime.setPickupType(NONE);
                         }
 
