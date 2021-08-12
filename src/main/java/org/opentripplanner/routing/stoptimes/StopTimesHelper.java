@@ -58,6 +58,7 @@ public class StopTimesHelper {
     Date date = new Date(startTime * 1000);
     ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
 
+    // TODO The following logic could probably be encapsulated in the TimetableSnapshot
     Collection<TripPattern> plannedPatterns = routingService.getPatternsForStop(stop, false);
     Collection<TripPattern> realTimePatterns = routingService.getPatternsForStop(stop, true);
 
