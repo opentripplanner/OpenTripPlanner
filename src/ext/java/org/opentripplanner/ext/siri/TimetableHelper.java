@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
+import static java.util.Collections.EMPTY_LIST;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
@@ -81,14 +82,14 @@ public class TimetableHelper {
         if (journeyEstimatedCalls != null) {
             estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
         } else {
-            estimatedCalls = new ArrayList<>();
+            estimatedCalls = EMPTY_LIST;
         }
 
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
             recordedCalls = journeyRecordedCalls.getRecordedCalls();
         } else {
-            recordedCalls = new ArrayList<>();
+            recordedCalls = EMPTY_LIST;
         }
 
         boolean stopPatternChanged = false;
@@ -357,14 +358,14 @@ public class TimetableHelper {
         if (journeyEstimatedCalls != null) {
             estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
         } else {
-            estimatedCalls = new ArrayList<>();
+            estimatedCalls = EMPTY_LIST;
         }
 
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
             recordedCalls = journeyRecordedCalls.getRecordedCalls();
         } else {
-            recordedCalls = new ArrayList<>();
+            recordedCalls = EMPTY_LIST;
         }
 
         //Get all scheduled stops
@@ -459,7 +460,7 @@ public class TimetableHelper {
         if (journeyCalls != null) {
             estimatedCalls = journeyCalls.getEstimatedCalls();
         } else {
-            estimatedCalls = new ArrayList<>();
+            estimatedCalls = EMPTY_LIST;
         }
 
         List<Stop> stops = createModifiedStops(timetable, journey, routingService);
