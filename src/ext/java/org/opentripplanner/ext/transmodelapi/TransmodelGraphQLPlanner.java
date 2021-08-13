@@ -138,10 +138,10 @@ public class TransmodelGraphQLPlanner {
             callWith.argument("triangleFactors.slope", request::setBikeTriangleSlopeFactor);
             callWith.argument("triangleFactors.time", request::setBikeTriangleTimeFactor);
 
-            RoutingRequest.assertTriangleParameters(
+            request.setTriangleNormalized(
                     request.bikeTriangleSafetyFactor,
-                    request.bikeTriangleTimeFactor,
-                    request.bikeTriangleSlopeFactor
+                    request.bikeTriangleSlopeFactor,
+                    request.bikeTriangleTimeFactor
             );
         }
 

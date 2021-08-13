@@ -1339,13 +1339,25 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * This setter function accepts any three numbers and will normalize them to add up to 1.
      */
     public void setTriangleNormalized (double safe, double slope, double time) {
+        safe = setMinValue(safe);
+        slope = setMinValue(slope);
+        time = setMinValue(time);
+
         double total = safe + slope + time;
+        if(total != 1) {
+            LOG.warn("Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other.");
+        }
+
         safe /= total;
         slope /= total;
         time /= total;
         this.bikeTriangleSafetyFactor = safe;
         this.bikeTriangleSlopeFactor = slope;
         this.bikeTriangleTimeFactor = time;
+    }
+
+    private double setMinValue(double safe) {
+        return Math.max(0.001, safe);
     }
 
     public static void assertTriangleParameters(

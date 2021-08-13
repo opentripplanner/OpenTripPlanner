@@ -1,7 +1,9 @@
 package org.opentripplanner.routing.edgetype;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.State;
@@ -17,8 +19,66 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.NonLocalizedString;
 
-public class TestTriangle extends TestCase {
+public class TriangleTest {
 
+    float DELTA = 0.001f;
+
+    @Test
+    public void testPreciseValues() {
+        var req = new RoutingRequest();
+        req.setTriangleNormalized(0.5,0.4,0.1);
+        assertEquals(req.bikeTriangleSafetyFactor, 0.5, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0.4, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 0.1, DELTA);
+    }
+
+    @Test
+    public void testNormalizationGreaterThan1() {
+        var req = new RoutingRequest();
+        req.setTriangleNormalized(1,1,1);
+        assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 0.333, DELTA);
+
+        req.setTriangleNormalized(10,20,30);
+        assertEquals(req.bikeTriangleSafetyFactor, 0.166, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 0.5, DELTA);
+    }
+
+    @Test
+    public void testNormalizationLessThan1() {
+        var req = new RoutingRequest();
+        req.setTriangleNormalized(0.1,0.1,0.1);
+        assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 0.333, DELTA);
+    }
+
+    @Test
+    public void testZero() {
+        var req = new RoutingRequest();
+        req.setTriangleNormalized(0,0,0.1);
+        assertEquals(req.bikeTriangleSafetyFactor, 0.01, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0.01, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 0.98, DELTA);
+
+        req.setTriangleNormalized(0,0,0);
+        assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 0.333, DELTA);
+    }
+
+    @Test
+    public void testLessThanZero() {
+        var req = new RoutingRequest();
+        req.setTriangleNormalized(-1,-1,0.1);
+        assertEquals(req.bikeTriangleSafetyFactor, 0.01, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0.01, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 0.98, DELTA);
+    }
+
+    @Test
     public void testTriangle() {
         Coordinate c1 = new Coordinate(-122.575033, 45.456773);
         Coordinate c2 = new Coordinate(-122.576668, 45.451426);
