@@ -743,12 +743,7 @@ public abstract class RoutingResource {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setBicycleOptimizeType(optimize);
             if (optimize == BicycleOptimizeType.TRIANGLE) {
-                RoutingRequest.assertTriangleParameters(
-                        triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
-                );
-                request.setBikeTriangleSafetyFactor(triangleSafetyFactor);
-                request.setBikeTriangleSlopeFactor(triangleSlopeFactor);
-                request.setBikeTriangleTimeFactor(triangleTimeFactor);
+                request.setTriangleNormalized(triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor);
             }
         }
 

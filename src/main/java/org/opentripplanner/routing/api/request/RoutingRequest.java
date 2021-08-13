@@ -1338,7 +1338,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
      * This setter function accepts any three numbers and will normalize them to add up to 1.
      */
-    public void setTriangleNormalized (double safe, double slope, double time) {
+    public void setTriangleNormalized(double safe, double slope, double time) {
         safe = setMinValue(safe);
         slope = setMinValue(slope);
         time = setMinValue(time);

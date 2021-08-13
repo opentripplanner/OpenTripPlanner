@@ -658,16 +658,11 @@ public class LegacyGraphQLQueryTypeImpl
           callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
           callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
           callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
-          try {
-            RoutingRequest.assertTriangleParameters(
-                request.bikeTriangleSafetyFactor,
-                request.bikeTriangleTimeFactor,
-                request.bikeTriangleSlopeFactor
-            );
-          }
-          catch (ParameterException e) {
-            throw new RuntimeException(e);
-          }
+          request.setTriangleNormalized(
+                  request.bikeTriangleSafetyFactor,
+                  request.bikeTriangleSlopeFactor,
+                  request.bikeTriangleTimeFactor
+          );
         }
 
         if (optimize == BicycleOptimizeType.TRANSFERS) {
