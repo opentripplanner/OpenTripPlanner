@@ -19,6 +19,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               args.getLegacyGraphQLStartTime(),
               args.getLegacyGraphQLTimeRange(),
               args.getLegacyGraphQLNumberOfDepartures(),
-              args.getLegacyGraphQLOmitNonPickups()
+              args.getLegacyGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
           );
         },
         station -> null
@@ -265,7 +266,13 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
       Function<Stop, List<StopTimesInPattern>> stopTFunction = stop ->
-          routingService.getStopTimesForStop(stop, date, args.getLegacyGraphQLOmitNonPickups());
+          routingService.getStopTimesForStop(
+              stop,
+              date,
+              args.getLegacyGraphQLOmitNonPickups()
+                  ? ArrivalDeparture.DEPARTURES
+                  : ArrivalDeparture.BOTH
+          );
 
       return getValue(
           environment,
@@ -294,7 +301,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               args.getLegacyGraphQLStartTime(),
               args.getLegacyGraphQLTimeRange(),
               args.getLegacyGraphQLNumberOfDepartures(),
-              args.getLegacyGraphQLOmitNonPickups(),
+              args.getLegacyGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
               false
           );
 
@@ -325,7 +332,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               args.getLegacyGraphQLStartTime(),
               args.getLegacyGraphQLTimeRange(),
               args.getLegacyGraphQLNumberOfDepartures(),
-              args.getLegacyGraphQLOmitNonPickups(),
+              args.getLegacyGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
               false
           ).stream();
 
