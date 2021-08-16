@@ -321,6 +321,41 @@ otp.util.Itin = {
         'agencyId': parts.shift(),
         'id': parts.join(':')
       }
-    }
+    },
 
+    getModeColor : function(mode) {
+        if(mode === "WALK") return '#bbb';
+        if(mode === "BICYCLE") return '#44f';
+        if(mode === "SCOOTER") return '#88f';
+        if(mode === "CAR") return '#444';
+        if(mode === "RAIL") return '#b00';
+        if(mode === "COACH") return '#0f0';
+        if(mode === "SUBWAY") return '#f00';
+        if(mode === "BUS") return '#0f0';
+        if(mode === "TRAM") return '#f00';
+        if(mode === "TROLLEYBUS") return '#0f0';
+        if(mode === "FERRY") return '#f0f';
+        if(mode === "AIRPLANE") return '#f0f';
+        if(mode === "CABLE_CAR") return '#f0f';
+        if(mode === "GONDOLA") return '#f0f';
+        if(mode === "FUNICULAR") return '#f0f';
+        if(mode === "MONORAIL") return '#f0f';
+        return '#aaa';
+    },
+
+    getLegTextColor : function (leg) {
+        if (leg.routeTextColor) {
+            return '#' + leg.routeTextColor;
+        } else {
+            return '#000000';
+        }
+    },
+
+    getLegBackgroundColor : function (leg) {
+        if (leg.routeColor) {
+            return '#' + leg.routeColor;
+        } else {
+            return this.getModeColor(leg.mode);
+        }
+    },
 }

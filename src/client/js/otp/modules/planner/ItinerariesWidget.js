@@ -274,7 +274,8 @@ otp.widgets.ItinerariesWidget =
             var widthPx = pxSpan * (leg.endTime - leg.startTime) / maxSpan - 1;
 
             //div.append('<div class="otp-itinsAccord-header-segment" style="width: '+widthPx+'px; left: '+leftPx+'px; background: '+this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat;"></div>');
-
+            var legTextColor = otp.util.Itin.getLegTextColor(leg);
+            var legBackgroundColor = otp.util.Itin.getLegBackgroundColor(leg);
             var routeTitle = _.chain([leg.mode, leg.agencyName, leg.routeShortName, leg.routeLongName])
                     .filter(function (value) { return !!value; })
                     .reduce(function (l, r) { return l ? l + " " + r : r; }, "")
@@ -284,11 +285,12 @@ otp.widgets.ItinerariesWidget =
             .css({
                 width: widthPx,
                 left: leftPx,
-                //background: this.getModeColor(leg.mode)
-                background: this.getModeColor(leg.mode)+' url('+otp.config.resourcePath+'images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat'
+                color: legTextColor,
+                background: legBackgroundColor,
             })
             .appendTo(div);
-            if(showRouteLabel) segment.append('<div style="margin-left:'+(widthPx/2+9)+'px;">'+leg.routeShortName+'</div>');
+            segment.append('<div class="mode-icon" style="background: ' + legTextColor + '; mask-image: url('+otp.config.resourcePath+'images/mode/'+leg.mode.toLowerCase()+'.png); -webkit-mask-image: url('+otp.config.resourcePath+'images/mode/'+leg.mode.toLowerCase()+'.png)"></div>');
+            if(showRouteLabel) segment.append('<span>'+leg.routeShortName+'</span>');
 
         }
 
@@ -298,20 +300,6 @@ otp.widgets.ItinerariesWidget =
         }
 
     },
-
-    getModeColor : function(mode) {
-        if(mode === "WALK") return '#bbb';
-        if(mode === "BICYCLE") return '#44f';
-        if(mode === "SCOOTER") return '#88f';
-        if(mode === "SUBWAY") return '#f00';
-        if(mode === "RAIL") return '#b00';
-        if(mode === "BUS") return '#0f0';
-        if(mode === "TRAM") return '#f00';
-        if(mode === "CAR") return '#444';
-        if(mode === "AIRPLANE") return '#f0f';
-        return '#aaa';
-    },
-
 
     municoderResultId : 0,
 
