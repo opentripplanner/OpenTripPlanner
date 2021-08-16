@@ -379,12 +379,12 @@ otp.widgets.ItinerariesWidget =
                 }
             }
             else if(leg.agencyId !== null) {
-                headerHtml += ": "+leg.agencyName+", ";
-                if(leg.route !== leg.routeLongName) {
-                    headerHtml += "("+leg.route+") ";
+                headerHtml += ": " + leg.agencyName + ", ";
+                if (leg.routeShortName) {
+                    headerHtml += leg.routeShortName + " ";
                 }
                 if (leg.routeLongName) {
-                    headerHtml += leg.routeLongName;
+                    headerHtml += leg.routeLongName + " ";
                 }
 
                 if(leg.headsign) {
