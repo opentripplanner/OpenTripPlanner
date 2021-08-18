@@ -75,7 +75,7 @@ public class RaptorSearchWindowCalculator {
 
     public RaptorSearchWindowCalculator calculate() {
         if(heuristicMinTransitTime == NOT_SET) {
-            throw new IllegalArgumentException("The minTravelTime is not set.");
+            throw new IllegalArgumentException("The heuristicMinTransitTime is not set.");
         }
 
         if (!params.isSearchWindowSet()) {
@@ -101,7 +101,7 @@ public class RaptorSearchWindowCalculator {
             );
         }
         // See the UnitTest for verification of this:
-        // We want: 0 -> 0, 1 -> 60, 59 -> 60 ...
+        // We want: 0 -> 0, 1 -> 60, 60 -> 60, 61 -> 120 ...
         return ((minTravelTimeInSeconds + 59) / 60) * 60;
     }
 

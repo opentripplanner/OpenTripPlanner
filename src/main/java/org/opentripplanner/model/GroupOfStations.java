@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +57,10 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
 
     public Collection<StopCollection> getChildStations() {
         return this.childStations;
+    }
+
+    public void removeChildStationIf(Predicate<? super StopCollection> filter) {
+        this.childStations.removeIf(filter);
     }
 
     public void addChildStation(StopCollection station) {
