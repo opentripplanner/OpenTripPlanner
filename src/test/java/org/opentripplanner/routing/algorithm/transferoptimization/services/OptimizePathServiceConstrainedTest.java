@@ -19,23 +19,26 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 
 /**
  * <pre>
- * DEPARTURE TIMES
- * Stop        A      B-C        C-D         D-E         E-F         F-G        H
- * Tx time            1m         2m          3m          4m          5m
+ * POSSIBLE TRANSFERS
+ * Transfers        B-C 1m     C-D 2m       D-E 3m     E-F 4m      F-G 5m
  * Constraint       ALLOWED  RECOMMENDED  PREFERRED  GUARANTIED  STAY_SEATED
- * Trip 1    10:02  10:10      10:15       10:20       10:25       10:30
- * Trip 2             10:13      10:18       10:24       10:30       10:36    10:40
+ * Trip 1    10:02  B 10:10    C 10:15     D 10:20     E 10:25     F 10:30
+ * Trip 2           C 10:13    D 10:18     E 10:24     G 10:30     G 10:36    10:40
  * </pre>
- * <p>
+ *
  * Case: There is 5 possible places to transfer in this setup. We want to test that the correct one
- * is picked according to the constraint. We can test all relevant cases by changing the egress
- * stop, since the transfers are ordered with the highest priority last. Transfer in the same stop
- * is NOT_ALLOWED.
- * <p>
+ *     is picked according to the constraint. We can test all relevant cases by changing the egress
+ *     stop, since the transfers are ordered with the highest priority last. Transfer in the same stop
+ *     is NOT_ALLOWED.
+ *
  * Expect: The highest priority should be picked
- * <p>
+ *
+ * Module under test: We are testing the Optimized Transfer Service, not Routing it self. So, the 
+ *     path will always include two trips with one transfer selected even where single trip might 
+ *     be found by the router. 
+ *
  * Note! This test uses some of the constants and utility methods of {@link
- * OptimizePathServiceTest}
+ *     OptimizePathServiceTest}
  */
 @SuppressWarnings("SameParameterValue")
 public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
