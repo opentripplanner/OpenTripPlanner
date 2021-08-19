@@ -59,11 +59,10 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
     OptimizedPathTail<T> createPathLeg(
             TransitPathLeg<T> leg,
             @Nullable Transfer tx,
-            OptimizedPathTail<T> tail
+            Map<PathLeg<T>, Transfer> transfersTo,
+            TransitPathLeg<T> toTransitLeg
     ) {
-        Map<PathLeg<T>, Transfer> transfers = createTransfers(
-                tail.getLeg(), tx, tail.getTransfersTo()
-        );
+        var transfers = createTransfers(toTransitLeg, tx, transfersTo);
         return new OptimizedPathTail<>(
                 leg,
                 transfers,
