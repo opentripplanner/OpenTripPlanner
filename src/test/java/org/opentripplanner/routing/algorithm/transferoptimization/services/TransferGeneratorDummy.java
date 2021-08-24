@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import static org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime.arrival;
-import static org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime.departure;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 import java.util.Arrays;
 import java.util.List;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * Mock the TransferGenerator
@@ -32,23 +32,77 @@ class TransferGeneratorDummy {
 
   /** Transfer from trip & stop, walk, to stop & trip */
   static TripToTripTransfer<TestTripSchedule> tx(
-          TestTripSchedule fromTrip, int fromStop,
+          TestTripSchedule fromTrip,
+          int fromStop,
           int walkDuration,
-          int toStop, TestTripSchedule toTrip
+          int toStop,
+          TestTripSchedule toTrip
   ) {
+    return createTripToTripTransfer(fromTrip, fromStop, walkDuration, toStop, toTrip);
+  }
+
+  /** Transfer from trip via same stop to trip */
+  static TripToTripTransfer<TestTripSchedule> tx(
+          TestTripSchedule fromTrip,
+          int sameStop,
+          TestTripSchedule toTrip
+  ) {
+    return createTripToTripTransfer(fromTrip, sameStop, D0s, sameStop, toTrip);
+  }
+
+  /** Transfer from transfer constraints - same stop */
+  static TripToTripTransfer<TestTripSchedule> tx(TestTransferBuilder<TestTripSchedule> builder) {
+    return createTripToTripTransfer(builder, D0s);
+  }
+
+  /** Transfer from transfer constraints - with walking */
+  static TripToTripTransfer<TestTripSchedule> tx(
+          TestTransferBuilder<TestTripSchedule> builder,
+          int walkDuration
+  ) {
+    return createTripToTripTransfer(builder, walkDuration);
+  }
+
+  /* private methods */
+
+  private static TripToTripTransfer<TestTripSchedule> createTripToTripTransfer(
+          TestTripSchedule fromTrip,
+          int fromStop,
+          int walkDuration,
+          int toStop,
+          TestTripSchedule toTrip
+  ) {
+    var pathTransfer = fromStop == toStop ? null : walk(toStop, walkDuration);
+
     return new TripToTripTransfer<>(
-        arrival(fromTrip, fromTrip.pattern().findStopPositionAfter(0, fromStop)),
-        departure(toTrip, toTrip.pattern().findStopPositionAfter(0, toStop)),
-        fromStop == toStop ? null : walk(toStop, walkDuration)
+            departure(fromTrip, fromStop),
+            arrival(toTrip, toStop),
+            pathTransfer,
+            null
     );
   }
 
-  /** Transfer from trip via stop to trip */
-  static TripToTripTransfer<TestTripSchedule> tx(
-      TestTripSchedule fromTrip,
-      int sameStop,
-      TestTripSchedule toTrip
+  private static TripToTripTransfer<TestTripSchedule> createTripToTripTransfer(
+          TestTransferBuilder<TestTripSchedule> builder,
+          int walkDuration
   ) {
-    return tx(fromTrip, sameStop, D0s, sameStop, toTrip);
+    int fromStop = builder.getFromStopIndex();
+    int toStop = builder.getToStopIndex();
+    var pathTransfer = fromStop == toStop ? null : walk(toStop, walkDuration);
+
+    return new TripToTripTransfer<>(
+            departure(builder.getFromTrip(), builder.getFromStopIndex()),
+            arrival(builder.getToTrip(), builder.getToStopIndex()),
+            pathTransfer,
+            builder.build()
+    );
+  }
+
+  private static <T extends RaptorTripSchedule> TripStopTime<T> departure(T trip, int stopIndex) {
+    return TripStopTime.departure(trip, trip.pattern().findStopPositionAfter(0, stopIndex));
+  }
+
+  private static <T extends RaptorTripSchedule> TripStopTime<T> arrival(T trip, int stopIndex) {
+    return TripStopTime.arrival(trip, trip.pattern().findStopPositionAfter(0, stopIndex));
   }
 }

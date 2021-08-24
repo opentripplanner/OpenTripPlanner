@@ -223,7 +223,12 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
             costCalculator, slackProvider, firstRide, earliestDepartureTime
     );
 
-    return optimizedPathFactory.createPathLeg(fromTransitLeg, tx.guaranteedTransfer(), tail);
+    return optimizedPathFactory.createPathLeg(
+            fromTransitLeg,
+            tx.guaranteedTransfer(),
+            tail.getTransfersTo(),
+            toTransitLeg
+    );
   }
 
   private PathLeg<T> createTransferLegIfExist(
