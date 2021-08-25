@@ -9,24 +9,25 @@ import com.google.common.collect.Collections2;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.AreaShort;
 import org.opentripplanner.index.model.PatternDetail;
 import org.opentripplanner.index.model.PatternShort;
+import org.opentripplanner.index.model.RealtimeVehiclePosition;
 import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -63,6 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -366,6 +368,26 @@ public class IndexAPI {
        }
    }
 
+    /** Return all vehicle positions on the given route. */
+    @GET
+    @Path("/routes/{routeId}/vehicles")
+    public Response getVehiclePositionsForRoute (@PathParam("routeId") String routeIdString) {
+        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
+        Route route = index.routeForId.get(routeId);
+        if (route != null) {
+            Collection<TripPattern> patterns = index.patternsForRoute.get(route);
+            List<RealtimeVehiclePosition> vehiclePositions = patterns
+                    .stream()
+                    .map(TripPattern::getVehiclePositions)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+
+            return Response.status(Status.OK).entity(vehiclePositions).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+
    /** Return all stops in any pattern on a given route. */
    @GET
    @Path("/routes/{routeId}/stops")
@@ -517,6 +539,19 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
+
+    @GET
+    @Path("/patterns/{patternId}/vehicles")
+    public Response getVehiclePositionsForPattern (@PathParam("patternId") String patternIdString) {
+        // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
+        TripPattern pattern = index.patternForId.get(patternIdString);
+        if (pattern != null) {
+            List<RealtimeVehiclePosition> vehiclePositions = pattern.getVehiclePositions();
+            return Response.status(Status.OK).entity(vehiclePositions).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
 
     @GET
     @Path("/patterns/{patternId}/semanticHash")
