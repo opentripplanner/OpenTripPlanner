@@ -10,7 +10,6 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,13 +17,13 @@ import java.util.List;
  * Responsible for converting vehicle positions in memory to exportable ones, and associating each position
  * with a pattern.
  */
-public class VehiclePositionSnapshotSource {
+public class VehiclePositionPatternMatcher {
     private static final Logger LOG =
-            LoggerFactory.getLogger(VehiclePositionSnapshotSource.class);
+            LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
 
     private final GraphIndex graphIndex;
 
-    public VehiclePositionSnapshotSource(Graph graph) {
+    public VehiclePositionPatternMatcher(Graph graph) {
         graphIndex = graph.index;
     }
 

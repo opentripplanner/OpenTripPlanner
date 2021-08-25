@@ -37,9 +37,9 @@ public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
     @Override
     public void run(Graph graph) {
         // Apply updates to graph using realtime snapshot source
-        VehiclePositionSnapshotSource vehiclePositionSnapshotSource = graph.vehiclePositionSnapshotSource;
-        if (vehiclePositionSnapshotSource != null) {
-            vehiclePositionSnapshotSource.applyVehiclePositionUpdates(updates, feedId);
+        VehiclePositionPatternMatcher vehiclePositionPatternMatcher = graph.vehiclePositionPatternMatcher;
+        if (vehiclePositionPatternMatcher != null) {
+            vehiclePositionPatternMatcher.applyVehiclePositionUpdates(updates, feedId);
         } else {
             LOG.error("Could not find realtime data snapshot source in graph."
                     + " The following updates are not applied: {}", updates);

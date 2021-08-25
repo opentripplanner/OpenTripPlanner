@@ -57,7 +57,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-import org.opentripplanner.updater.vehicle_positions.VehiclePositionSnapshotSource;
+import org.opentripplanner.updater.vehicle_positions.VehiclePositionPatternMatcher;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +132,7 @@ public class Graph implements Serializable {
     /**
      * Class containing method to update realtime vehicle positions
      */
-    public transient VehiclePositionSnapshotSource vehiclePositionSnapshotSource = null;
+    public transient VehiclePositionPatternMatcher vehiclePositionPatternMatcher = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 

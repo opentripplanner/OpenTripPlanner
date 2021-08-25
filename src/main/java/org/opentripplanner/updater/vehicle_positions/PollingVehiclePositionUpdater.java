@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.vehicle_positions;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.transit.realtime.GtfsRealtime;
+import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -107,9 +107,9 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Only create a realtime vehicle positions source if none exists already
-        if (graph.vehiclePositionSnapshotSource == null) {
+        if (graph.vehiclePositionPatternMatcher == null) {
             // Add snapshot source to graph
-            graph.vehiclePositionSnapshotSource = (new VehiclePositionSnapshotSource(graph));
+            graph.vehiclePositionPatternMatcher = (new VehiclePositionPatternMatcher(graph));
         }
     }
 
@@ -121,7 +121,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     @Override
     public void runPolling() {
         // Get update lists from update source
-        List<GtfsRealtime.VehiclePosition> updates = vehiclePositionSource.getPositions();
+        List<VehiclePosition> updates = vehiclePositionSource.getPositions();
 
         if (updates != null) {
             // Handle updating trip positions via graph writer runnable
