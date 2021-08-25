@@ -1,8 +1,9 @@
-package org.opentripplanner.updater.bike_rental.datasources;
+package org.opentripplanner.ext.smoovebikerental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
+import org.opentripplanner.updater.bike_rental.datasources.GenericJsonBikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of a BikeRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
  * @see BikeRentalDataSource
  */
-class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource<BikeRentalDataSourceParameters> {
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 

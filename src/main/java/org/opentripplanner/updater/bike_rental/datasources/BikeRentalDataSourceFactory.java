@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.bike_rental.datasources;
 
+import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRentalDataSourceParameters;
