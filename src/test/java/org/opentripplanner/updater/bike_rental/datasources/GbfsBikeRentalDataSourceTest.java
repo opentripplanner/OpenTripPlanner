@@ -14,7 +14,7 @@ import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRental
 class GbfsBikeRentalDataSourceTest {
 
     @Test
-    void parseGeofencingZones() {
+    void parseOsloGeofencingZones() {
 
         // if you want to see the geojson in the test file on a map visit https://gist.github.com/leonardehrenfried/a1964e20e83faf8d56038480cb82e8f8
 
@@ -38,11 +38,19 @@ class GbfsBikeRentalDataSourceTest {
 
         // dropping off in Frogner Park (inside business area but inside a special exclusion zone) should not be allowed
         assertFalse(zones.canDropOffVehicle(new Coordinate( 10.7036, 59.9277)));
+
+        var envelope = zones.getEnvelope();
+        assertEquals(envelope.getMinX(), 10.625752);
+        assertEquals(envelope.getMaxX(), 10.852622);
+        assertEquals(envelope.getMinY(), 59.860121);
+        assertEquals(envelope.getMaxY(), 59.969796);
     }
 
     @Test
     void emptyZones(){
         var zones = new GeofencingZones(Collections.emptySet());
+        // if no rules are provided you're allowed to take the bike anywhere
         zones.canDropOffVehicle(new Coordinate(11.1024, 59.2820));
+        zones.canDropOffVehicle(new Coordinate(0, 0));
     }
 }
