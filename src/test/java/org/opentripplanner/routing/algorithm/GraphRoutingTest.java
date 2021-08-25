@@ -299,8 +299,8 @@ public abstract class GraphRoutingTest {
         ) {
             var bikeRentalStation = new BikeRentalStation();
             bikeRentalStation.id = id;
-            bikeRentalStation.x = longitude;
-            bikeRentalStation.y = latitude;
+            bikeRentalStation.longitude = longitude;
+            bikeRentalStation.latitude = latitude;
             bikeRentalStation.networks = networks;
             bikeRentalStation.isKeepingBicycleRentalAtDestinationAllowed = false;
             return bikeRentalStation;

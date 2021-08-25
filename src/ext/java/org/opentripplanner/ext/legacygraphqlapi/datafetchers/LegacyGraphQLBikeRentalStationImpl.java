@@ -23,7 +23,7 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<String> name() {
-        return environment -> getSource(environment).getName();
+        return environment -> getSource(environment).name.toString(environment.getLocale());
     }
 
     @Override
@@ -59,12 +59,12 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<Double> lon() {
-        return environment -> getSource(environment).x;
+        return environment -> getSource(environment).longitude;
     }
 
     @Override
     public DataFetcher<Double> lat() {
-        return environment -> getSource(environment).y;
+        return environment -> getSource(environment).latitude;
     }
 
     @Override

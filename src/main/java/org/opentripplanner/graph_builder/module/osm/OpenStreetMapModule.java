@@ -349,8 +349,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 BikeRentalStation station = new BikeRentalStation();
                 station.id = "" + node.getId();
                 station.name = creativeName;
-                station.x = node.lon;
-                station.y = node.lat;
+                station.longitude = node.lon;
+                station.latitude = node.lat;
                 // The following make sure that spaces+bikes=capacity, always.
                 // Also, for the degenerate case of capacity=1, we should have 1
                 // bike available, not 0.

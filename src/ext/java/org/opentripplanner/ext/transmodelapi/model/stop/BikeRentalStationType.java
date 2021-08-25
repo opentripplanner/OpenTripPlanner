@@ -26,7 +26,7 @@ public class BikeRentalStationType {
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("name")
                   .type(new GraphQLNonNull(Scalars.GraphQLString))
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).getName())
+                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).name.toString())
                   .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("description")
@@ -61,12 +61,12 @@ public class BikeRentalStationType {
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("longitude")
                   .type(Scalars.GraphQLFloat)
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).x)
+                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).longitude)
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("latitude")
                   .type(Scalars.GraphQLFloat)
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).y)
+                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).latitude)
                   .build())
           .build();
 }

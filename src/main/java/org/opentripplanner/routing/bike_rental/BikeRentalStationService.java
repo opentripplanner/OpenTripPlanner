@@ -61,7 +61,7 @@ public class BikeRentalStationService implements Serializable {
 
         return bikeRentalStations
             .stream()
-            .filter(b -> envelope.contains(new Coordinate(b.x, b.y)))
+            .filter(b -> envelope.contains(new Coordinate(b.longitude, b.latitude)))
             .collect(Collectors.toList());
     }
 }

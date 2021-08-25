@@ -42,7 +42,7 @@ public class BikeRentalLayerBuilder extends LayerBuilder<BikeRentalStation> {
     return service.getBikeRentalStations()
         .stream()
         .map(bikeRentalStation -> {
-          Coordinate coordinate = new Coordinate(bikeRentalStation.x, bikeRentalStation.y);
+          Coordinate coordinate = new Coordinate(bikeRentalStation.longitude, bikeRentalStation.latitude);
           Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
           point.setUserData(bikeRentalStation);
           return point;
