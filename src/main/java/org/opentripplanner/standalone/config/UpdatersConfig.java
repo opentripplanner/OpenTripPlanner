@@ -3,8 +3,10 @@ package org.opentripplanner.standalone.config;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import javax.annotation.Nullable;
-import org.opentripplanner.standalone.config.sandbox.BikeRentalServiceDirectoryFetcherConfig;
-import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
+
+import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
+import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirectoryFetcherConfig;
+import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
@@ -23,7 +25,7 @@ import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdat
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
@@ -73,12 +75,12 @@ public class UpdatersConfig implements UpdatersParameters {
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
 
   @Nullable
-  private final BikeRentalServiceDirectoryFetcherParameters bikeRentalServiceDirectoryFetcherParameters;
+  private final VehicleRentalServiceDirectoryFetcherParameters vehicleRentalServiceDirectoryFetcherParameters;
 
   public UpdatersConfig(NodeAdapter rootAdapter) {
-    this.bikeRentalServiceDirectoryFetcherParameters =
-        BikeRentalServiceDirectoryFetcherConfig.create(
-          rootAdapter.path("bikeRentalServiceDirectory")
+    this.vehicleRentalServiceDirectoryFetcherParameters =
+        VehicleRentalServiceDirectoryFetcherConfig.create(
+          rootAdapter.path("vehicleRentalServiceDirectory")
         );
 
     List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
@@ -94,17 +96,17 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   /**
-   * This is the endpoint url used for the BikeRentalServiceDirectory sandbox feature.
-   * @see org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher
+   * This is the endpoint url used for the VehicleRentalServiceDirectory sandbox feature.
+   * @see VehicleRentalServiceDirectoryFetcher
    */
   @Override
   @Nullable
-  public BikeRentalServiceDirectoryFetcherParameters getBikeRentalServiceDirectoryFetcherParameters() {
-   return this.bikeRentalServiceDirectoryFetcherParameters;
+  public VehicleRentalServiceDirectoryFetcherParameters getVehicleRentalServiceDirectoryFetcherParameters() {
+   return this.vehicleRentalServiceDirectoryFetcherParameters;
   }
 
   @Override
-  public List<BikeRentalUpdaterParameters> getBikeRentalParameters() {
+  public List<VehicleRentalUpdaterParameters> getBikeRentalParameters() {
     return getParameters(BIKE_RENTAL);
   }
 

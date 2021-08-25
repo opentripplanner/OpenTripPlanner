@@ -1,7 +1,7 @@
 package org.opentripplanner.updater;
 
 public enum DataSourceType {
-  // Bike Rental
+  // Vehicle Rental
   GBFS,
   SMOOVE,
 

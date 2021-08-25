@@ -1,11 +1,11 @@
-package org.opentripplanner.updater.bike_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +22,11 @@ import java.util.Map;
 /**
  * Fetch Bike Rental JSON feeds and pass each record on to the specific rental subclass
  *
- * @see BikeRentalDataSource
+ * @see VehicleRentalDataSource
  */
-public abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSourceParameters> implements BikeRentalDataSource {
+public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRentalDataSourceParameters> implements VehicleRentalDataSource {
 
-    private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
+    private static final Logger log = LoggerFactory.getLogger(GenericJsonVehicleRentalDataSource.class);
     protected final T config;
     private String url;
     private final Map<String, String> headers;
@@ -42,7 +42,7 @@ public abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSo
      *        Separate path levels with '/' For example "d/list"
      *
      */
-    public GenericJsonBikeRentalDataSource(
+    public GenericJsonVehicleRentalDataSource(
         T config,
         String jsonPath
     ) {
@@ -58,7 +58,7 @@ public abstract class GenericJsonBikeRentalDataSource<T extends BikeRentalDataSo
      *        Separate path levels with '/' For example "d/list"
      * @param headers http headers
      */
-    public GenericJsonBikeRentalDataSource(
+    public GenericJsonVehicleRentalDataSource(
         T config,
         String jsonPath,
         Map<String, String> headers

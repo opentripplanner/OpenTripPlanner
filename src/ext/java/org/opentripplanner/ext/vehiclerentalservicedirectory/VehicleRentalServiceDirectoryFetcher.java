@@ -1,31 +1,30 @@
-package org.opentripplanner.ext.bikerentalservicedirectory;
+package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fetches GBFS endpoints from the Bikeservice component located at
- * https://github.com/entur/bikeservice, which is an API for aggregating GBFS endpoints.
+ * Fetches GBFS endpoints from the micromobility aggregation service located at
+ * https://github.com/entur/lahmu, which is an API for aggregating GBFS endpoints.
  */
-public class BikeRentalServiceDirectoryFetcher {
+public class VehicleRentalServiceDirectoryFetcher {
 
-  private static final Logger LOG = LoggerFactory.getLogger(BikeRentalServiceDirectoryFetcher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalServiceDirectoryFetcher.class);
 
   private static final int DEFAULT_FREQUENCY_SEC = 15;
 
   public static List<GraphUpdater> createUpdatersFromEndpoint(
-      BikeRentalServiceDirectoryFetcherParameters parameters
+      VehicleRentalServiceDirectoryFetcherParameters parameters
   ) {
 
     LOG.info("Fetching list of updaters from {}", parameters.getUrl());
@@ -58,8 +57,8 @@ public class BikeRentalServiceDirectoryFetcher {
           return updaters;
         }
 
-        BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(
-            "bike-rental-service-directory:" + network,
+        VehicleRentalParameters bikeRentalParameters = new VehicleRentalParameters(
+            "vehicle-rental-service-directory:" + network,
             DEFAULT_FREQUENCY_SEC,
             new GbfsDataSourceParameters(
                 updaterUrl.asText(),
@@ -69,7 +68,7 @@ public class BikeRentalServiceDirectoryFetcher {
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 
-        GraphUpdater updater = new BikeRentalUpdater(bikeRentalParameters);
+        GraphUpdater updater = new VehicleRentalUpdater(bikeRentalParameters);
         updaters.add(updater);
       }
     }

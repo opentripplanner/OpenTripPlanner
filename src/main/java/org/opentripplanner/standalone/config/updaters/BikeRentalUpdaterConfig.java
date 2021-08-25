@@ -1,18 +1,18 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.standalone.config.updaters.sources.BikeRentalSourceFactory;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.sources.VehicleRentalSourceFactory;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 
 public class BikeRentalUpdaterConfig {
 
-  public static BikeRentalUpdaterParameters create(String configRef, NodeAdapter c) {
+  public static VehicleRentalUpdaterParameters create(String configRef, NodeAdapter c) {
     String sourceType = c.asText("sourceType");
-    return new BikeRentalUpdaterParameters(
+    return new VehicleRentalUpdaterParameters(
         configRef + "." + sourceType,
         c.asText("networks", null),
         c.asInt("frequencySec", 60),
-        BikeRentalSourceFactory.create(sourceType, c)
+        VehicleRentalSourceFactory.create(sourceType, c)
     );
   }
 }

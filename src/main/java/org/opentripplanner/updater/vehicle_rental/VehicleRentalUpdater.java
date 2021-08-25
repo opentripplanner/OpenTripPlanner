@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.vehicle_rental;
 
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
@@ -14,7 +14,7 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.bike_rental.datasources.BikeRentalDataSourceFactory;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +28,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
+ * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one VehicleRentalDataSource.
  */
-public class BikeRentalUpdater extends PollingGraphUpdater {
+public class VehicleRentalUpdater extends PollingGraphUpdater {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
 
     private GraphUpdaterManager updaterManager;
 
@@ -40,7 +40,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     Map<BikeRentalStation, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
 
-    private final BikeRentalDataSource source;
+    private final VehicleRentalDataSource source;
 
     private VertexLinker linker;
 
@@ -48,12 +48,12 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private final String network;
 
-    public BikeRentalUpdater(BikeRentalUpdaterParameters parameters) throws IllegalArgumentException {
+    public VehicleRentalUpdater(VehicleRentalUpdaterParameters parameters) throws IllegalArgumentException {
         super(parameters);
         // Configure updater
-        LOG.info("Setting up bike rental updater.");
+        LOG.info("Setting up vehicle rental updater.");
 
-        BikeRentalDataSource source = BikeRentalDataSourceFactory.create(parameters.sourceParameters());
+        VehicleRentalDataSource source = VehicleRentalDataSourceFactory.create(parameters.sourceParameters());
 
         this.source = source;
         this.network = parameters.getNetworks();

@@ -1,12 +1,12 @@
-package org.opentripplanner.ext.bikerentalservicedirectory.api;
+package org.opentripplanner.ext.vehiclerentalservicedirectory.api;
 
 import java.net.URI;
 import java.util.Map;
 
-public class BikeRentalServiceDirectoryFetcherParameters {
+public class VehicleRentalServiceDirectoryFetcherParameters {
 
   /**
-   * Endpoint for the BikeRentalServiceDirectory
+   * Endpoint for the VehicleRentalServiceDirectory
    * <p>
    * This is required.
    */
@@ -40,7 +40,7 @@ public class BikeRentalServiceDirectoryFetcherParameters {
    */
   private final Map<String, String> headers;
 
-  public BikeRentalServiceDirectoryFetcherParameters(
+  public VehicleRentalServiceDirectoryFetcherParameters(
       URI url,
       String sourcesName,
       String updaterUrlName,

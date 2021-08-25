@@ -2,22 +2,22 @@ package org.opentripplanner.ext.smoovebikerental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.datasources.GenericJsonBikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
+import org.opentripplanner.updater.vehicle_rental.datasources.GenericJsonVehicleRentalDataSource;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of a BikeRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
- * @see BikeRentalDataSource
+ * Implementation of a VehicleRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
+ * @see VehicleRentalDataSource
  */
-public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource<BikeRentalDataSourceParameters> {
+public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSource<VehicleRentalDataSourceParameters> {
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
-    public SmooveBikeRentalDataSource(BikeRentalDataSourceParameters config) {
+    public SmooveBikeRentalDataSource(VehicleRentalDataSourceParameters config) {
         super(config,"result");
     }
 

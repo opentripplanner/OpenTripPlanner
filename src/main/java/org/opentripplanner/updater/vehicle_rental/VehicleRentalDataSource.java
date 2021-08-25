@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.vehicle_rental;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
  * TODO clarify thread safety.
  * It appears that update() and getStations() are never called simultaneously by different threads, but is not stated.
  */
-public interface BikeRentalDataSource {
+public interface VehicleRentalDataSource {
 
     /**
      * Fetch current data about bike rental stations and availability from this source.

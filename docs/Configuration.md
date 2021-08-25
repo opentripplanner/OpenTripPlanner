@@ -950,32 +950,10 @@ departure times for the remainder of the trip.
 - **VehiclePositions** give the location of some or all vehicles currently in service, in terms of geographic coordinates
 or position relative to their scheduled stops.
 
-### Bicycle rental systems
+### Vehicle rental systems using GBFS
 
-Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental networks including the number
-of bikes and free parking spaces at each station. We support bike rental systems from JCDecaux, BCycle, VCub, Keolis,
-Bixi, the Dutch OVFiets system, ShareBike, GBFS and a generic KML format.
-It is straightforward to extend OTP to support any bike rental system that
-exposes a JSON API or provides KML place markers, though it requires writing a little code.
-
-The generic KML needs to be in format like
-
-```XML
-<?xml version="1.0" encoding="utf-8" ?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
-<Document id="root_doc">
-<Schema name="citybikes" id="citybikes">
-    <SimpleField name="ID" type="int"></SimpleField>
-</Schema>
-  <Placemark>
-    <name>A Bike Station</name>
-    <ExtendedData><SchemaData schemaUrl="#citybikes">
-        <SimpleData name="ID">0</SimpleData>
-    </SchemaData></ExtendedData>
-      <Point><coordinates>24.950682884886643,60.155923430488102</coordinates></Point>
-  </Placemark>
-</Document></kml>
-```
+Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks including the number
+of bikes and free parking spaces at each station. We support vehicle rental systems from using GBFS feed format.
 
 ### Configuring real-time updaters
 
@@ -1061,13 +1039,6 @@ To add a GBFS feed to the router add one entry in the `updater` field of `router
 }
 ```
 
-If there is no GBFS autodiscovery file, specify the base `url` under which the files may be found
-using their standard names:
-
-```JSON
-  "url": "http://coast.socialbicycles.com/opendata/"
-```
-
 ##### Arriving with rental bikes at the destination
 
 In some cases it may be useful to not drop off the rented bicycle before arriving at the
@@ -1085,14 +1056,16 @@ For this to be possible three things need to be configured:
    `keepingRentedBicycleAtDestinationCost` (default: `0`) may also be set in the
    [routing defaults](#routing-defaults).
 
-#### Bike Rental Service Directory configuration (sandbox feature)
+#### Vehicle Rental Service Directory configuration (sandbox feature)
 
-To configure and url for the [BikeRentalServiceDirectory](sandbox/BikeRentalServiceDirectory.md).
+To configure and url for the [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md).
 
 ```JSON
 // router-config.json
 {
-  "bikeRentalServiceDirectoryUrl": "https://api.dev.entur.io/mobility/v1/bikes"
+  "vehicleRentalServiceDirectory": {
+    "url": "https://api.dev.entur.io/mobility/v1/bikes"
+  }
 }
 ```
 

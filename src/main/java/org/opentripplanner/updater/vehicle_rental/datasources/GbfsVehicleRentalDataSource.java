@@ -1,12 +1,12 @@
-package org.opentripplanner.updater.bike_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationUris;
-import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.OTPFeature;
@@ -26,11 +26,11 @@ import java.util.Set;
  *
  * Leaving OTPFeature.FloatingBike turned off both prevents floating bike updaters added to
  * router-config.json from being used, but more importantly, floating bikes added by a
- * BikeRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be used.
+ * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be used.
  */
-class GbfsBikeRentalDataSource implements BikeRentalDataSource {
+class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
 
     private static final String DEFAULT_NETWORK_NAME = "GBFS";
 
@@ -41,19 +41,19 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
     private final GbfsStationStatusDataSource stationStatusSource;
 
     // free_bike_status.json declared OPTIONAL by GBFS spec
-    private final GbfsFloatingBikeDataSource floatingBikeSource;
+    private final GbfsFloatingVehicleDataSource floatingBikeSource;
 
     private final String networkName;
 
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private final boolean routeAsCar;
 
-    public GbfsBikeRentalDataSource(GbfsBikeRentalDataSourceParameters parameters) {
+    public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
         routeAsCar = parameters.routeAsCar();
         stationInformationSource = new GbfsStationDataSource(parameters);
         stationStatusSource = new GbfsStationStatusDataSource(parameters);
         floatingBikeSource = OTPFeature.FloatingBike.isOn()
-            ? new GbfsFloatingBikeDataSource(parameters)
+            ? new GbfsFloatingVehicleDataSource(parameters)
             : null;
 
         configureUrls(parameters.getUrl(), parameters.getHttpHeaders());
@@ -170,9 +170,9 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
-    class GbfsStationDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
+    class GbfsStationDataSource extends GenericJsonVehicleRentalDataSource<GbfsVehicleRentalDataSourceParameters> {
 
-        public GbfsStationDataSource (GbfsBikeRentalDataSourceParameters config) {
+        public GbfsStationDataSource (GbfsVehicleRentalDataSourceParameters config) {
             super(config, "data/stations");
         }
 
@@ -198,9 +198,9 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
-    class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
+    class GbfsStationStatusDataSource extends GenericJsonVehicleRentalDataSource<GbfsVehicleRentalDataSourceParameters> {
 
-        public GbfsStationStatusDataSource (GbfsBikeRentalDataSourceParameters config) {
+        public GbfsStationStatusDataSource (GbfsVehicleRentalDataSourceParameters config) {
             super(config, "data/stations");
         }
 
@@ -216,10 +216,10 @@ class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
-    // TODO This is not currently safe to use. See javadoc on GbfsBikeRentalDataSource class.
-    class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource<GbfsBikeRentalDataSourceParameters> {
+    // TODO This is not currently safe to use. See javadoc on GbfsVehicleRentalDataSource class.
+    class GbfsFloatingVehicleDataSource extends GenericJsonVehicleRentalDataSource<GbfsVehicleRentalDataSourceParameters> {
 
-        public GbfsFloatingBikeDataSource (GbfsBikeRentalDataSourceParameters config) {
+        public GbfsFloatingVehicleDataSource(GbfsVehicleRentalDataSourceParameters config) {
             super(config, "data/bikes");
         }
 

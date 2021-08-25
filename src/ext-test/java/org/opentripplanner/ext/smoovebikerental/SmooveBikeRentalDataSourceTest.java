@@ -6,17 +6,16 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 class SmooveBikeRentalDataSourceTest {
 
     @Test
     void makeStation() {
         SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(
-                new BikeRentalDataSourceParameters(
+                new VehicleRentalDataSourceParameters(
                         null,
                         "file:src/test/resources/bike/smoove.json",
-                        null,
                         null,
                         Map.of()
                 )

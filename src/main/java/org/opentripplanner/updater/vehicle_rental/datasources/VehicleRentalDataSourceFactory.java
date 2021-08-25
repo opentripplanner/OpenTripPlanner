@@ -1,13 +1,13 @@
-package org.opentripplanner.updater.bike_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
-import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
-public class BikeRentalDataSourceFactory {
+public class VehicleRentalDataSourceFactory {
 
-    public static BikeRentalDataSource create(BikeRentalDataSourceParameters source) {
+    public static VehicleRentalDataSource create(VehicleRentalDataSourceParameters source) {
         switch (source.getSourceType()) {
             // There used to be a lot more updaters and corresponding config variables here, but since
             // the industry has largely moved towards GBFS, they were removed.
@@ -15,7 +15,7 @@ public class BikeRentalDataSourceFactory {
             // If you want to add your provider-specific updater, you can move them into a sandbox module
             // and become the point of contact for the community.
             case GBFS:
-                return new GbfsBikeRentalDataSource((GbfsBikeRentalDataSourceParameters) source);
+                return new GbfsVehicleRentalDataSource((GbfsVehicleRentalDataSourceParameters) source);
             case SMOOVE:
                 return new SmooveBikeRentalDataSource(source);
         }

@@ -1,8 +1,8 @@
-package org.opentripplanner.updater.bike_rental.datasources;
+package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource {
+abstract class GenericXmlVehicleRentalDataSource implements VehicleRentalDataSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GenericXmlBikeRentalDataSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenericXmlVehicleRentalDataSource.class);
 
     private final String url;
 
@@ -22,7 +22,7 @@ abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource {
     private final XmlDataListDownloader<BikeRentalStation> xmlDownloader;
 
 
-    public GenericXmlBikeRentalDataSource(BikeRentalDataSourceParameters config, String path) {
+    public GenericXmlVehicleRentalDataSource(VehicleRentalDataSourceParameters config, String path) {
         url = config.getUrl();
         xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader.setPath(path);

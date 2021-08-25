@@ -1,19 +1,19 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.vehicle_rental;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
-public class BikeRentalUpdaterParameters implements PollingGraphUpdaterParameters {
+public class VehicleRentalUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String configRef;
   private final String networks;
   private final int frequencySec;
-  private final BikeRentalDataSourceParameters source;
+  private final VehicleRentalDataSourceParameters source;
 
-  public BikeRentalUpdaterParameters(
+  public VehicleRentalUpdaterParameters(
       String configRef,
       String networks,
       int frequencySec,
-      BikeRentalDataSourceParameters source
+      VehicleRentalDataSourceParameters source
   ) {
     this.configRef = configRef;
     this.networks = networks;
@@ -37,7 +37,7 @@ public class BikeRentalUpdaterParameters implements PollingGraphUpdaterParameter
     return configRef;
   }
 
-  BikeRentalDataSourceParameters sourceParameters() {
+  VehicleRentalDataSourceParameters sourceParameters() {
     return source;
   }
 }
