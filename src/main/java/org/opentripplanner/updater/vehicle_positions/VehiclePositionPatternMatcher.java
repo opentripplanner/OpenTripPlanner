@@ -52,6 +52,8 @@ public class VehiclePositionPatternMatcher {
             }
 
             RealtimeVehiclePosition newPosition = parseVehiclePosition(vehiclePosition);
+            newPosition.patternId = pattern.code;
+
             if (pattern.vehiclePositions == null) {
                 pattern.vehiclePositions = new HashMap<>();
             }
@@ -79,7 +81,7 @@ public class VehiclePositionPatternMatcher {
             if (newPosition.label == null) {
                 newPosition.label = vehiclePosition.getVehicle().getLicensePlate();
             }
-            newPosition.id = vehiclePosition.getVehicle().getId();
+            newPosition.vehicleId = vehiclePosition.getVehicle().getId();
         }
 
         if (vehiclePosition.hasCurrentStatus()) {
