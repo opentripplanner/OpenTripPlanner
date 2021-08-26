@@ -26,6 +26,7 @@ class FareAttributeMapper {
         FareAttribute lhs = new FareAttribute();
 
         lhs.setId(mapAgencyAndId(rhs.getId()));
+        lhs.setAgencyId(rhs.getAgencyId());
         lhs.setPrice(rhs.getPrice());
         lhs.setCurrencyType(rhs.getCurrencyType());
         lhs.setPaymentMethod(rhs.getPaymentMethod());

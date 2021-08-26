@@ -2,10 +2,8 @@ package org.opentripplanner.routing.impl;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.services.FareServiceFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -35,7 +33,7 @@ public class PdxFareServiceFactory extends DefaultFareServiceFactory {
      */
     @Override
     public void processGtfs(OtpTransitService transitService) {
-        fillFareRules(null, transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
+        fillFareRules(transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
     }
 
     /**
