@@ -58,7 +58,7 @@ public class PathwayMapperTest {
         assertEquals("A_1", result.getId().toString());
         assertNotNull(result.getFromStop());
         assertNotNull(result.getToStop());
-        assertEquals(PATHWAY_TYPE, result.getPathwayType());
+        assertEquals(PATHWAY_TYPE, result.getPathwayMode());
         assertEquals(TRAVERSAL_TIME, result.getTraversalTime());
         assertEquals(WHEELCHAIR_TRAVERSAL_TIME, result.getWheelchairTraversalTime());
     }
@@ -73,7 +73,7 @@ public class PathwayMapperTest {
         assertNotNull(result.getId());
         assertNull(result.getFromStop());
         assertNull(result.getToStop());
-        assertEquals(0, result.getPathwayType());
+        assertEquals(0, result.getPathwayMode());
         assertEquals(0, result.getTraversalTime());
         assertFalse(result.isWheelchairTraversalTimeSet());
     }
