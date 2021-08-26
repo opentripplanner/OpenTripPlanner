@@ -17,14 +17,18 @@ public class GeofencingZones {
 
     public GeofencingZones(Set<GeofencingZone> zones) {this.zones = zones;}
 
+    public boolean canDropOffVehicle(Geometry g) {
+        // if there are no rules, this means that you can drop off free-floating bikes anywhere (in the world!)
+        if (isEmpty()) { return true; }
+        else {
+            return zones.stream().anyMatch(zone -> zone.dropOffAllowed(g)) &&
+                    zones.stream().noneMatch(zone -> zone.dropOffProhibited(g));
+        }
+    }
+
     public boolean canDropOffVehicle(Coordinate c) {
         var point = geometryFactory.createPoint(c);
-        // if there are no rules, this means that you can drop off the bike anywhere (in the world!)
-        if (isEmpty()) {return true;}
-        else {
-            return zones.stream().anyMatch(zone -> zone.dropOffAllowed(point)) &&
-                    zones.stream().noneMatch(zone -> zone.dropOffProhibited(point));
-        }
+        return canDropOffVehicle(point);
     }
 
     public int size() {return zones.size();}
@@ -47,12 +51,12 @@ public class GeofencingZones {
             this.dropOffAllowed = dropOffAllowed;
         }
 
-        boolean dropOffAllowed(Point p) {
-            return geometry.contains(p) && dropOffAllowed;
+        boolean dropOffAllowed(Geometry p) {
+            return geometry.intersects(p) && dropOffAllowed;
         }
 
-        boolean dropOffProhibited(Point p) {
-            return geometry.contains(p) && !dropOffAllowed;
+        boolean dropOffProhibited(Geometry p) {
+            return geometry.intersects(p) && !dropOffAllowed;
         }
     }
 }
