@@ -2,7 +2,7 @@ package org.opentripplanner.updater.vehicle_rental;
 
 import java.util.List;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
 
 /**
  * TODO clarify thread safety.

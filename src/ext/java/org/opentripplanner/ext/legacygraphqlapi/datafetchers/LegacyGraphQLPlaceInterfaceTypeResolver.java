@@ -7,7 +7,7 @@ import graphql.schema.TypeResolver;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
 
 public class LegacyGraphQLPlaceInterfaceTypeResolver implements TypeResolver {
 

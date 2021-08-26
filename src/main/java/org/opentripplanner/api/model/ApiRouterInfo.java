@@ -5,7 +5,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.TraverseModeMapper;
 import org.opentripplanner.common.geometry.GeometrySerializer;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.TravelOption;
 import org.opentripplanner.util.TravelOptionsMaker;

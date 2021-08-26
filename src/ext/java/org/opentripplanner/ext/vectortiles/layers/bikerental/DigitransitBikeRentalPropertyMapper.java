@@ -2,7 +2,7 @@ package org.opentripplanner.ext.vectortiles.layers.bikerental;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 
 import java.util.Collection;

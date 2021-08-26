@@ -7,7 +7,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLSchema;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
 
 public class PlaceInterfaceType {
 

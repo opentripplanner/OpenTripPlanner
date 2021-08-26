@@ -1,6 +1,6 @@
 package org.opentripplanner.api.model;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStationUris;
+import org.opentripplanner.routing.vehicle_rental.BikeRentalStationUris;
 
 import java.util.List;
 

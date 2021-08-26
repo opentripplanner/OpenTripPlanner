@@ -6,7 +6,7 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
+import org.opentripplanner.routing.vehicle_rental.TimeBasedBikeRentalFareServiceFactory;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.fares.MultipleFareServiceFactory;

@@ -563,7 +563,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * dropping it off.
      *
      * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
-     * @see org.opentripplanner.routing.bike_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
+     * @see org.opentripplanner.routing.vehicle_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
      */
     public boolean allowKeepingRentedBicycleAtDestination = false;
 

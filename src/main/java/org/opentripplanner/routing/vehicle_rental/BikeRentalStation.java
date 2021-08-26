@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.bike_rental;
+package org.opentripplanner.routing.vehicle_rental;
 
 import static java.util.Locale.ROOT;
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.bike_rental;
+package org.opentripplanner.routing.vehicle_rental;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.common.model.P2;
