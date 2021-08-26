@@ -555,9 +555,9 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double bikeTriangleSafetyFactor;
 
     /**
-     * Whether or not bike rental availability information will be used to plan bike rental trips
+     * Whether or not vehicle rental availability information will be used to plan bike rental trips
      */
-    public boolean useBikeRentalAvailabilityInformation = false;
+    public boolean useVehicleRentalAvailabilityInformation = false;
 
     /**
      * Whether arriving at the destination with a rented (station) bicycle is allowed without
@@ -1079,7 +1079,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
         ret.setArriveBy(!ret.arriveBy);
-        ret.useBikeRentalAvailabilityInformation = false;
+        ret.useVehicleRentalAvailabilityInformation = false;
         return ret;
     }
 

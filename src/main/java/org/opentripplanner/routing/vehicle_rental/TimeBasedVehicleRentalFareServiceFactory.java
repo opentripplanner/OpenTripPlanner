@@ -17,10 +17,10 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory {
+public class TimeBasedVehicleRentalFareServiceFactory implements FareServiceFactory {
 
     private static Logger log = LoggerFactory
-            .getLogger(TimeBasedBikeRentalFareServiceFactory.class);
+            .getLogger(TimeBasedVehicleRentalFareServiceFactory.class);
 
     // Each entry is <max time, cents at that time>; the list is sorted in
     // ascending time order
@@ -30,7 +30,7 @@ public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory
 
     @Override
     public FareService makeFareService() {
-        return new TimeBasedBikeRentalFareService(currency, pricingBySecond);
+        return new TimeBasedVehicleRentalFareService(currency, pricingBySecond);
     }
 
     @Override

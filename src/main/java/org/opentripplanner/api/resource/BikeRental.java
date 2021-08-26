@@ -5,7 +5,7 @@ import org.opentripplanner.api.mapping.VehicleRentalStationMapper;
 import org.opentripplanner.api.model.ApiVehicleRentalStation;
 import org.opentripplanner.api.model.ApiVehicleRentalStationList;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
@@ -43,17 +43,17 @@ public class BikeRental {
 
         Router router = otpServer.getRouter();
 
-        BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
+        VehicleRentalStationService vehicleRentalService = router.graph.getService(VehicleRentalStationService.class);
         Locale locale;
         locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
-        if (bikeRentalService == null) { return new ApiVehicleRentalStationList(); }
+        if (vehicleRentalService == null) { return new ApiVehicleRentalStationList(); }
         Envelope envelope;
         if (lowerLeft != null) {
             envelope = getEnvelope(lowerLeft, upperRight);
         } else {
             envelope = new Envelope(-180,180,-90,90); 
         }
-        Collection<VehicleRentalStation> stations = bikeRentalService.getBikeRentalStations();
+        Collection<VehicleRentalStation> stations = vehicleRentalService.getVehicleRentalStations();
         List<ApiVehicleRentalStation> out = new ArrayList<>();
         for (VehicleRentalStation station : stations) {
             if (envelope.contains(station.longitude, station.latitude)) {

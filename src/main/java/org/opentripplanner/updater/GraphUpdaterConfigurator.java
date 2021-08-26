@@ -94,7 +94,7 @@ public abstract class GraphUpdaterConfigurator {
     /* private methods */
 
     /**
-     * Use the online UpdaterDirectoryService to fetch BikeRental updaters.
+     * Use the online UpdaterDirectoryService to fetch VehicleRental updaters.
      */
     private static List<GraphUpdater> fetchVehicleRentalServicesFromOnlineDirectory(
         VehicleRentalServiceDirectoryFetcherParameters parameters

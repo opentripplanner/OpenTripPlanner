@@ -18,7 +18,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexLegMapper;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
-import org.opentripplanner.model.BikeRentalStationInfo;
+import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.WgsCoordinate;
@@ -33,7 +33,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.BikeRentalEdge;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -44,7 +44,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -483,8 +483,8 @@ public abstract class GraphPathToItineraryMapper {
             place.platformCode = stop.getPlatformCode();
             place.zoneId = stop.getFirstZoneAsString();
             place.vertexType = VertexType.TRANSIT;
-        } else if(vertex instanceof BikeRentalStationVertex) {
-            place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
+        } else if(vertex instanceof VehicleRentalStationVertex) {
+            place.bikeShareId = ((VehicleRentalStationVertex) vertex).getId();
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
@@ -788,23 +788,23 @@ public abstract class GraphPathToItineraryMapper {
         // add bike rental information if applicable
         if(onBikeRentalState != null && !steps.isEmpty()) {
             steps.get(steps.size()-1).bikeRentalOnStation = 
-                    new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getVertex());
+                    new VehicleRentalStationInfo((VehicleRentalStationVertex) onBikeRentalState.getVertex());
         }
         if(offBikeRentalState != null && !steps.isEmpty()) {
             steps.get(0).bikeRentalOffStation = 
-                    new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getVertex());
+                    new VehicleRentalStationInfo((VehicleRentalStationVertex) offBikeRentalState.getVertex());
         }
 
         return steps;
     }
 
     private static boolean isRentalPickUp(State state) {
-        return state.getBackEdge() instanceof BikeRentalEdge && (state.getBackState() == null || !state.getBackState()
+        return state.getBackEdge() instanceof VehicleRentalEdge && (state.getBackState() == null || !state.getBackState()
                 .isBikeRenting());
     }
 
     private static boolean isRentalDropOff(State state) {
-        return state.getBackEdge() instanceof BikeRentalEdge && state.getBackState().isBikeRenting();
+        return state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isBikeRenting();
     }
 
     private static boolean isLink(Edge edge) {

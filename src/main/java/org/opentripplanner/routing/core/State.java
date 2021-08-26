@@ -10,7 +10,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -569,7 +569,7 @@ public class State implements Cloneable {
             editor.setBackMode(orig.getBackMode());
 
             if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
-                var stationVertex = ((BikeRentalStationVertex) orig.vertex);
+                var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
                 editor.dropOffRentedVehicleAtStation(
                         stationVertex.getVehicleMode(),
                         stationVertex.getStation().networks,
@@ -577,7 +577,7 @@ public class State implements Cloneable {
                 );
             }
             else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
-                var stationVertex = ((BikeRentalStationVertex) orig.vertex);
+                var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
                 if (orig.getBackState().isBikeRentingFromStation()) {
                     editor.beginVehicleRentingAtStation(
                             stationVertex.getVehicleMode(),

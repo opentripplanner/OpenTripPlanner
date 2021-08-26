@@ -13,7 +13,7 @@ public class VehicleRentalStation implements Serializable {
     public I18NString name;
     public double longitude;
     public double latitude;
-    public int bikesAvailable = Integer.MAX_VALUE;
+    public int vehiclesAvailable = Integer.MAX_VALUE;
     public int spacesAvailable = Integer.MAX_VALUE;
     public boolean allowDropoff = true;
     public boolean isFloatingBike = false;
@@ -31,7 +31,7 @@ public class VehicleRentalStation implements Serializable {
      */
     public boolean realTimeData = true;
 
-    public BikeRentalStationUris rentalUris;
+    public VehicleRentalStationUris rentalUris;
 
     /**
      * FIXME nonstandard definition of equals, relying on only the station field.

@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * This appears to be used in combination with transit using an AddingMultipleFareService.
  */
-public class TimeBasedBikeRentalFareService implements FareService, Serializable {
+public class TimeBasedVehicleRentalFareService implements FareService, Serializable {
 
     private static final long serialVersionUID = 5226621661906177942L;
 
@@ -27,12 +27,12 @@ public class TimeBasedBikeRentalFareService implements FareService, Serializable
 
     private Currency currency;
 
-    protected TimeBasedBikeRentalFareService(Currency currency, List<P2<Integer>> pricingBySecond) {
+    protected TimeBasedVehicleRentalFareService(Currency currency, List<P2<Integer>> pricingBySecond) {
         this.currency = currency;
         this.pricing_by_second = pricingBySecond;
     }
 
-    // FIXME we need to test if the leg is a bike rental leg.
+    // FIXME we need to test if the leg is a vehicle rental leg.
     //       OTP2 doesn't handle non walk access or egress yet.
     private int getLegCost(PathLeg<TripSchedule> pathLeg) {
         int rideCost = 0;

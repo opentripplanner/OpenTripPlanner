@@ -12,7 +12,7 @@ import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.BikeParkUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.VehicleRentalUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
@@ -44,7 +44,7 @@ import java.util.function.BiFunction;
  */
 public class UpdatersConfig implements UpdatersParameters {
 
-  private static final String BIKE_RENTAL = "bike-rental";
+  private static final String VEHICLE_RENTAL = "vehicle-rental";
   private static final String STOP_TIME_UPDATER = "stop-time-updater";
   private static final String WEBSOCKET_GTFS_RT_UPDATER = "websocket-gtfs-rt-updater";
   private static final String MQTT_GTFS_RT_UPDATER = "mqtt-gtfs-rt-updater";
@@ -59,7 +59,7 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final Map<String, BiFunction<String, NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
 
   static {
-    CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::create);
+    CONFIG_CREATORS.put(VEHICLE_RENTAL, VehicleRentalUpdaterConfig::create);
     CONFIG_CREATORS.put(BIKE_PARK, BikeParkUpdaterConfig::create);
     CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::create);
     CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::create);
@@ -107,7 +107,7 @@ public class UpdatersConfig implements UpdatersParameters {
 
   @Override
   public List<VehicleRentalUpdaterParameters> getBikeRentalParameters() {
-    return getParameters(BIKE_RENTAL);
+    return getParameters(VEHICLE_RENTAL);
   }
 
   @Override

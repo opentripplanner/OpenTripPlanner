@@ -5,7 +5,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.util.Locale;
@@ -14,20 +14,20 @@ import java.util.Locale;
  * This represents the connection between a street vertex and a bike rental station vertex.
  * 
  */
-public class StreetBikeRentalLink extends Edge {
+public class StreetVehicleRentalLink extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    private BikeRentalStationVertex bikeRentalStationVertex;
+    private VehicleRentalStationVertex vehicleRentalStationVertex;
 
-    public StreetBikeRentalLink(StreetVertex fromv, BikeRentalStationVertex tov) {
+    public StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalStationVertex tov) {
         super(fromv, tov);
-        bikeRentalStationVertex = tov;
+        vehicleRentalStationVertex = tov;
     }
 
-    public StreetBikeRentalLink(BikeRentalStationVertex fromv, StreetVertex tov) {
+    public StreetVehicleRentalLink(VehicleRentalStationVertex fromv, StreetVertex tov) {
         super(fromv, tov);
-        bikeRentalStationVertex = fromv;
+        vehicleRentalStationVertex = fromv;
     }
 
     public String getDirection() {
@@ -43,19 +43,19 @@ public class StreetBikeRentalLink extends Edge {
     }
 
     public String getName() {
-        return bikeRentalStationVertex.getName();
+        return vehicleRentalStationVertex.getName();
     }
 
     @Override
     public String getName(Locale locale) {
-        return bikeRentalStationVertex.getName(locale);
+        return vehicleRentalStationVertex.getName(locale);
     }
 
     public State traverse(State s0) {
         // Disallow traversing two StreetBikeRentalLinks in a row.
         // This prevents the router from using bike rental stations as shortcuts to get around
         // turn restrictions.
-        if (s0.getBackEdge() instanceof StreetBikeRentalLink) {
+        if (s0.getBackEdge() instanceof StreetVehicleRentalLink) {
             return null;
         }
 
@@ -75,6 +75,6 @@ public class StreetBikeRentalLink extends Edge {
     }
 
     public String toString() {
-        return "StreetBikeRentalLink(" + fromv + " -> " + tov + ")";
+        return "StreetVehicleRentalLink(" + fromv + " -> " + tov + ")";
     }
 }

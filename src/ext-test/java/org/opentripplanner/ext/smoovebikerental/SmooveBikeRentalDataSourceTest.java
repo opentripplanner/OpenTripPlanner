@@ -36,7 +36,7 @@ class SmooveBikeRentalDataSourceTest {
         assertEquals(24.952269, hamn.longitude);
         assertEquals(60.167913, hamn.latitude);
         assertEquals(11, hamn.spacesAvailable);
-        assertEquals(1, hamn.bikesAvailable);
+        assertEquals(1, hamn.vehiclesAvailable);
 
         VehicleRentalStation fake = rentalStations.get(1);
         assertEquals("Fake", fake.name.toString());
@@ -45,7 +45,7 @@ class SmooveBikeRentalDataSourceTest {
         assertEquals(60.0, fake.latitude);
         // operative: false overrides available bikes and slots
         assertEquals(0, fake.spacesAvailable);
-        assertEquals(0, fake.bikesAvailable);
+        assertEquals(0, fake.vehiclesAvailable);
 
         VehicleRentalStation foo = rentalStations.get(2);
         assertEquals("Foo", foo.name.toString());
@@ -53,7 +53,7 @@ class SmooveBikeRentalDataSourceTest {
         assertEquals(25.0, foo.longitude);
         assertEquals(61.0, foo.latitude);
         assertEquals(5, foo.spacesAvailable);
-        assertEquals(5, foo.bikesAvailable);
+        assertEquals(5, foo.vehiclesAvailable);
         // Ignores mismatch with total_slots
     }
 }

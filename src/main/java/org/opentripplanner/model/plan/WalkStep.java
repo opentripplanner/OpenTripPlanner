@@ -2,7 +2,7 @@ package org.opentripplanner.model.plan;
 
 import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.BikeRentalStationInfo;
+import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.graph.Edge;
@@ -107,9 +107,9 @@ public class WalkStep {
      * The bike rental on/off station info.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
-    public BikeRentalStationInfo bikeRentalOnStation;
+    public VehicleRentalStationInfo bikeRentalOnStation;
 
-    public BikeRentalStationInfo bikeRentalOffStation;
+    public VehicleRentalStationInfo bikeRentalOffStation;
 
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);

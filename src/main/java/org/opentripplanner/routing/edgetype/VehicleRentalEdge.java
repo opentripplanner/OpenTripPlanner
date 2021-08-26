@@ -8,19 +8,19 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
 /**
- * Renting or dropping off a rented bike edge.
+ * Renting or dropping off a rented vehicle edge.
  * 
  * @author laurent
  * 
  */
-public class BikeRentalEdge extends Edge {
+public class VehicleRentalEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    public BikeRentalEdge(BikeRentalStationVertex vertex) {
+    public VehicleRentalEdge(VehicleRentalStationVertex vertex) {
         super(vertex, vertex);
     }
 
@@ -30,7 +30,7 @@ public class BikeRentalEdge extends Edge {
         StateEditor s1 = s0.edit(this);
         RoutingRequest options = s0.getOptions();
 
-        BikeRentalStationVertex stationVertex = (BikeRentalStationVertex) tov;
+        VehicleRentalStationVertex stationVertex = (VehicleRentalStationVertex) tov;
         var networks = stationVertex.getStation().networks;
 
         boolean pickedUp;
@@ -39,7 +39,7 @@ public class BikeRentalEdge extends Edge {
                 case BEFORE_RENTING:
                     return null;
                 case HAVE_RENTED:
-                    if (options.useBikeRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
                         return null;
                     }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), networks, true);
@@ -54,7 +54,7 @@ public class BikeRentalEdge extends Edge {
                     }
                     break;
                 case RENTING_FROM_STATION:
-                    if (options.useBikeRentalAvailabilityInformation && stationVertex.getBikesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getVehiclesAvailable() == 0) {
                         return null;
                     }
                     // For arriveBy searches mayKeepRentedBicycleAtDestination is only set in State#getInitialStates(),
@@ -72,7 +72,7 @@ public class BikeRentalEdge extends Edge {
         } else {
             switch (s0.getBikeRentalState()) {
                 case BEFORE_RENTING:
-                    if (options.useBikeRentalAvailabilityInformation && stationVertex.getBikesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getVehiclesAvailable() == 0) {
                         return null;
                     }
                     if (stationVertex.getStation().isFloatingBike) {
@@ -92,7 +92,7 @@ public class BikeRentalEdge extends Edge {
                 case RENTING_FLOATING:
                 case RENTING_FROM_STATION:
                     if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
-                    if (options.useBikeRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
                         return null;
                     }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), networks, false);

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles.layers.bikerental;
+package org.opentripplanner.ext.vectortiles.layers.vehiclerental;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;

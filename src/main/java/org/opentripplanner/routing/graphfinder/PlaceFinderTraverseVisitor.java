@@ -11,7 +11,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.ArrayList;
@@ -102,8 +102,8 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
       handleStop(stop, distance);
       handlePatternsAtStop(stop, distance);
     }
-    else if (vertex instanceof BikeRentalStationVertex) {
-      handleBikeRentalStation(((BikeRentalStationVertex) vertex).getStation(), distance);
+    else if (vertex instanceof VehicleRentalStationVertex) {
+      handleBikeRentalStation(((VehicleRentalStationVertex) vertex).getStation(), distance);
     }
   }
 

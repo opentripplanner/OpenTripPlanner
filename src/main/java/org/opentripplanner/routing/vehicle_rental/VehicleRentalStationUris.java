@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
  * <a href="https://github.com/NABSA/gbfs/blob/v2.2/gbfs.md#station_informationjson">GBFS station_information.json specification</a>
  * for more details.
  */
-public class BikeRentalStationUris {
+public class VehicleRentalStationUris {
 
     /**
      * A URI that can be passed to an Android app with an {@code android.intent.action.VIEW} Android
@@ -35,7 +35,7 @@ public class BikeRentalStationUris {
     @Nullable
     public final String web;
 
-    public BikeRentalStationUris(String android, String ios, String web) {
+    public VehicleRentalStationUris(String android, String ios, String web) {
         this.android = android;
         this.ios = ios;
         this.web = web;

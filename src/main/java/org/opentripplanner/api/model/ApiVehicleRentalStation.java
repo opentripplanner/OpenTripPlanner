@@ -1,6 +1,6 @@
 package org.opentripplanner.api.model;
 
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStationUris;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 
 import java.util.List;
 
@@ -25,5 +25,5 @@ public class ApiVehicleRentalStation {
      */
     public boolean realTimeData = true;
 
-    public BikeRentalStationUris rentalUris;
+    public VehicleRentalStationUris rentalUris;
 }

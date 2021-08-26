@@ -151,7 +151,7 @@ public class ConstantsForTests {
 
             graph.index();
 
-            graph.getBikerentalStationService().getBikeRentalStations()
+            graph.getVehicleRentalStationService().getVehicleRentalStations()
                     .forEach(bikeRentalStation -> bikeRentalStation.isKeepingBicycleRentalAtDestinationAllowed = true);
 
             return graph;

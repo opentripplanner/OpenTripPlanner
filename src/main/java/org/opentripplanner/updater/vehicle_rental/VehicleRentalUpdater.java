@@ -3,14 +3,14 @@ package org.opentripplanner.updater.vehicle_rental;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.BikeRentalEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one VehicleRentalDataSource.
+ * Dynamic vehicle-rental station updater which updates the Graph with bike rental stations from one VehicleRentalDataSource.
  */
 public class VehicleRentalUpdater extends PollingGraphUpdater {
 
@@ -36,7 +36,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private GraphUpdaterManager updaterManager;
 
-    Map<VehicleRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<>();
+    Map<VehicleRentalStation, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
 
     Map<VehicleRentalStation, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
 
@@ -44,7 +44,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private VertexLinker linker;
 
-    private BikeRentalStationService service;
+    private VehicleRentalStationService service;
 
     private final String network;
 
@@ -58,9 +58,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         this.source = source;
         this.network = parameters.getNetworks();
         if (pollingPeriodSeconds <= 0) {
-            LOG.info("Creating bike-rental updater running once only (non-polling): {}", source);
+            LOG.info("Creating vehicle-rental updater running once only (non-polling): {}", source);
         } else {
-            LOG.info("Creating bike-rental updater running every {} seconds: {}", pollingPeriodSeconds, source);
+            LOG.info("Creating vehicle-rental updater running every {} seconds: {}", pollingPeriodSeconds, source);
         }
     }
 
@@ -74,12 +74,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         // Creation of network linker library will not modify the graph
         linker = graph.getLinker();
         // Adding a bike rental station service needs a graph writer runnable
-        service = graph.getService(BikeRentalStationService.class, true);
+        service = graph.getService(VehicleRentalStationService.class, true);
     }
 
     @Override
     protected void runPolling() {
-        LOG.debug("Updating bike rental stations from " + source);
+        LOG.debug("Updating vehicle rental stations from " + source);
         if (!source.update()) {
             LOG.debug("No updates");
             return;
@@ -115,40 +115,40 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                     /* API did not provide a network list, use default */
                     station.networks = defaultNetworks;
                 }
-                service.addBikeRentalStation(station);
+                service.addVehicleRentalStation(station);
                 stationSet.add(station);
-                BikeRentalStationVertex bikeRentalVertex = verticesByStation.get(station);
-                if (bikeRentalVertex == null) {
-                    bikeRentalVertex = new BikeRentalStationVertex(graph, station);
+                VehicleRentalStationVertex vehicleRentalVertex = verticesByStation.get(station);
+                if (vehicleRentalVertex == null) {
+                    vehicleRentalVertex = new VehicleRentalStationVertex(graph, station);
                     DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
-                        bikeRentalVertex,
+                        vehicleRentalVertex,
                         new TraverseModeSet(TraverseMode.WALK),
                         LinkingDirection.BOTH_WAYS,
                         (vertex, streetVertex) -> List.of(
-                            new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
-                            new StreetBikeRentalLink(streetVertex, (BikeRentalStationVertex) vertex)
+                            new StreetVehicleRentalLink((VehicleRentalStationVertex) vertex, streetVertex),
+                            new StreetVehicleRentalLink(streetVertex, (VehicleRentalStationVertex) vertex)
                         )
                     );
-                    if (bikeRentalVertex.getOutgoing().isEmpty()) {
+                    if (vehicleRentalVertex.getOutgoing().isEmpty()) {
                         // the toString includes the text "Bike rental station"
-                        LOG.info("VehicleRentalStation {} is unlinked", bikeRentalVertex);
+                        LOG.info("VehicleRentalStation {} is unlinked", vehicleRentalVertex);
                     }
-                    tempEdges.addEdge(new BikeRentalEdge(bikeRentalVertex));
-                    verticesByStation.put(station, bikeRentalVertex);
+                    tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex));
+                    verticesByStation.put(station, vehicleRentalVertex);
                     tempEdgesByStation.put(station, tempEdges);
                 } else {
-                    bikeRentalVertex.setBikesAvailable(station.bikesAvailable);
-                    bikeRentalVertex.setSpacesAvailable(station.spacesAvailable);
+                    vehicleRentalVertex.setVehiclesAvailable(station.vehiclesAvailable);
+                    vehicleRentalVertex.setSpacesAvailable(station.spacesAvailable);
                 }
             }
             /* remove existing stations that were not present in the update */
             List<VehicleRentalStation> toRemove = new ArrayList<>();
-            for (Entry<VehicleRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
+            for (Entry<VehicleRentalStation, VehicleRentalStationVertex> entry : verticesByStation.entrySet()) {
                 VehicleRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
                 toRemove.add(station);
-                service.removeBikeRentalStation(station);
+                service.removeVehicleRentalStation(station);
             }
             for (VehicleRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification

@@ -36,7 +36,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -67,7 +67,7 @@ public class LegacyGraphQLQueryTypeImpl
       String type = args.getLegacyGraphQLId().getType();
       String id = args.getLegacyGraphQLId().getId();
       RoutingService routingService = environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
-      BikeRentalStationService bikerentalStationService = routingService.getBikerentalStationService();
+      VehicleRentalStationService vehicleRentalStationService = routingService.getVehicleRentalStationService();
 
       switch (type) {
         case "Agency":
@@ -75,15 +75,15 @@ public class LegacyGraphQLQueryTypeImpl
         case "Alert":
           return null; //TODO
         case "BikePark":
-          return bikerentalStationService == null ? null : bikerentalStationService
+          return vehicleRentalStationService == null ? null : vehicleRentalStationService
               .getBikeParks()
               .stream()
               .filter(bikePark -> bikePark.id.equals(id))
               .findAny()
               .orElse(null);
         case "BikeRentalStation":
-          return bikerentalStationService == null ? null : bikerentalStationService
-              .getBikeRentalStations()
+          return vehicleRentalStationService == null ? null : vehicleRentalStationService
+              .getVehicleRentalStations()
               .stream()
               .filter(bikeRentalStation -> bikeRentalStation.id.equals(id))
               .findAny()
@@ -493,17 +493,17 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleRentalStation>> bikeRentalStations() {
     return environment -> {
-      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
-              .getBikerentalStationService();
+      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+              .getVehicleRentalStationService();
 
-      if (bikerentalStationService == null) { return null; }
+      if (vehicleRentalStationService == null) { return null; }
 
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeRentalStationsArgs(
               environment.getArguments());
 
       if (args.getLegacyGraphQLIds() != null) {
         Map<String, VehicleRentalStation> bikeRentalStations =
-                bikerentalStationService.getBikeRentalStations()
+                vehicleRentalStationService.getVehicleRentalStations()
                         .stream()
                         .collect(Collectors.toMap(station -> station.id, station -> station));
         return ((List<String>) args.getLegacyGraphQLIds())
@@ -512,7 +512,7 @@ public class LegacyGraphQLQueryTypeImpl
                 .collect(Collectors.toList());
       }
 
-      return bikerentalStationService.getBikeRentalStations();
+      return vehicleRentalStationService.getVehicleRentalStations();
     };
   }
 
@@ -521,13 +521,13 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeRentalStationArgs(environment.getArguments());
 
-      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
-          .getBikerentalStationService();
+      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+          .getVehicleRentalStationService();
 
-      if (bikerentalStationService == null) { return null; }
+      if (vehicleRentalStationService == null) { return null; }
 
-      return bikerentalStationService
-              .getBikeRentalStations()
+      return vehicleRentalStationService
+              .getVehicleRentalStations()
               .stream()
               .filter(bikeRentalStation -> bikeRentalStation.id.equals(args.getLegacyGraphQLId()))
               .findAny()
@@ -538,12 +538,12 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<BikePark>> bikeParks() {
     return environment -> {
-      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
-          .getBikerentalStationService();
+      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+          .getVehicleRentalStationService();
 
-      if (bikerentalStationService == null) { return null; }
+      if (vehicleRentalStationService == null) { return null; }
 
-      return bikerentalStationService.getBikeParks();
+      return vehicleRentalStationService.getBikeParks();
     };
   }
 
@@ -552,12 +552,12 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeParkArgs(environment.getArguments());
 
-      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
-          .getBikerentalStationService();
+      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+          .getVehicleRentalStationService();
 
-      if (bikerentalStationService == null) { return null; }
+      if (vehicleRentalStationService == null) { return null; }
 
-      return bikerentalStationService
+      return vehicleRentalStationService
               .getBikeParks()
               .stream()
               .filter(bikepark -> bikepark.id.equals(args.getLegacyGraphQLId()))
@@ -718,7 +718,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
       boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-      request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
+      request.useVehicleRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
       callWith.argument("startTransitStopId", (String v) -> request.startingTransitStopId = FeedScopedId.parseId(v));
       callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = FeedScopedId.parseId(v));

@@ -928,8 +928,8 @@ public class TransmodelGraphQLSchema {
             .dataFetcher(environment -> {
               Collection<VehicleRentalStation> all = new ArrayList<>(GqlUtil
                   .getRoutingService(environment)
-                  .getBikerentalStationService()
-                  .getBikeRentalStations());
+                  .getVehicleRentalStationService()
+                  .getVehicleRentalStations());
               List<String> filterByIds = environment.getArgument("ids");
               if (!CollectionUtils.isEmpty(filterByIds)) {
                 return all
@@ -952,8 +952,8 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
-                  .getBikeRentalStations()
+                  .getVehicleRentalStationService()
+                  .getVehicleRentalStations()
                   .stream()
                   .filter(bikeRentalStation -> bikeRentalStation.id.equals(environment.getArgument(
                       "id")))
@@ -990,7 +990,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> GqlUtil
                 .getRoutingService(environment)
-                .getBikerentalStationService().getBikeRentalStationForEnvelope(
+                .getVehicleRentalStationService().getVehicleRentalStationForEnvelope(
                     environment.getArgument("minimumLongitude"),
                     environment.getArgument("minimumLatitude"),
                     environment.getArgument("maximumLongitude"),
@@ -1009,7 +1009,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
+                  .getVehicleRentalStationService()
                   .getBikeParks()
                   .stream()
                   .filter(bikePark -> bikePark.id.equals(environment.getArgument("id")))
@@ -1024,7 +1024,7 @@ public class TransmodelGraphQLSchema {
             .type(new GraphQLNonNull(new GraphQLList(bikeParkType)))
             .dataFetcher(environment -> {
               return new ArrayList<>(GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
+                  .getVehicleRentalStationService()
                   .getBikeParks());
             })
             .build())

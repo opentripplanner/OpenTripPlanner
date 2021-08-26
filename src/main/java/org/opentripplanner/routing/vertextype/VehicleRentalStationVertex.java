@@ -6,19 +6,18 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
- * A vertex for a bike rental station.
- * It is connected to the streets by a StreetBikeRentalLink.
- * To allow transitions on and off a bike, it has RentABike* loop edges.
+ * A vertex for a vehicle rental station.
+ * It is connected to the streets by a StreetVehicleRentalLink.
+ * To allow transitions on and off a bike, it has VehicleRentalEdge loop edges.
  *
  * @author laurent
  *
- * TODO if we continue using this for car rental and flex systems, change name to VehicleRentalStationVertex
  */
-public class BikeRentalStationVertex extends Vertex {
+public class VehicleRentalStationVertex extends Vertex {
 
     private static final long serialVersionUID = 1L;
 
-    private int bikesAvailable;
+    private int vehiclesAvailable;
 
     private int spacesAvailable;
 
@@ -29,12 +28,12 @@ public class BikeRentalStationVertex extends Vertex {
 
     private VehicleRentalStation station;
 
-    public BikeRentalStationVertex(Graph g, VehicleRentalStation station) {
+    public VehicleRentalStationVertex(Graph g, VehicleRentalStation station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
         super(g, "bike rental station " + station.id, station.longitude, station.latitude, station.name);
         this.setId(station.id);
         this.station = station;
-        this.setBikesAvailable(station.bikesAvailable);
+        this.setVehiclesAvailable(station.vehiclesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
         this.isCarStation = station.isCarStation;
     }
@@ -43,16 +42,16 @@ public class BikeRentalStationVertex extends Vertex {
         return station;
     }
 
-    public int getBikesAvailable() {
-        return bikesAvailable;
+    public int getVehiclesAvailable() {
+        return vehiclesAvailable;
     }
 
     public int getSpacesAvailable() {
         return spacesAvailable;
     }
 
-    public void setBikesAvailable(int bikes) {
-        this.bikesAvailable = bikes;
+    public void setVehiclesAvailable(int bikes) {
+        this.vehiclesAvailable = bikes;
     }
 
     public void setSpacesAvailable(int spaces) {

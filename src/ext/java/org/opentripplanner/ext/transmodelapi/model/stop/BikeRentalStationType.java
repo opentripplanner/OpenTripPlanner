@@ -36,7 +36,7 @@ public class BikeRentalStationType {
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("bikesAvailable")
                   .type(Scalars.GraphQLInt)
-                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).bikesAvailable)
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).vehiclesAvailable)
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("spacesAvailable")

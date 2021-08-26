@@ -53,10 +53,10 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
             return null;
         }
         if (!node.path("operative").asText().equals("true")) {
-            station.bikesAvailable = 0;
+            station.vehiclesAvailable = 0;
             station.spacesAvailable = 0;
         } else {
-            station.bikesAvailable = node.path("avl_bikes").asInt();
+            station.vehiclesAvailable = node.path("avl_bikes").asInt();
             station.spacesAvailable = node.path("free_slots").asInt();
         }
         return station;

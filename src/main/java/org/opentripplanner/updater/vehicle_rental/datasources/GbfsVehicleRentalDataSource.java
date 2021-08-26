@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStationUris;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
@@ -95,7 +95,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         for (VehicleRentalStation station : stationInformationSource.getStations()) {
             if (!statusLookup.containsKey(station.id)) continue;
             VehicleRentalStation status = statusLookup.get(station.id);
-            station.bikesAvailable = status.bikesAvailable;
+            station.vehiclesAvailable = status.vehiclesAvailable;
             station.spacesAvailable = status.spacesAvailable;
         }
 
@@ -191,7 +191,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
                 String androidUri = rentalUrisObject.has("android") ? rentalUrisObject.get("android").asText() : null;
                 String iosUri = rentalUrisObject.has("ios") ? rentalUrisObject.get("ios").asText() : null;
                 String webUri = rentalUrisObject.has("web") ? rentalUrisObject.get("web").asText() : null;
-                brstation.rentalUris = new BikeRentalStationUris(androidUri, iosUri, webUri);
+                brstation.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
             }
 
             return brstation;
@@ -208,7 +208,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         public VehicleRentalStation makeStation(JsonNode stationNode) {
             VehicleRentalStation brstation = new VehicleRentalStation();
             brstation.id = stationNode.path("station_id").asText();
-            brstation.bikesAvailable = stationNode.path("num_bikes_available").asInt();
+            brstation.vehiclesAvailable = stationNode.path("num_bikes_available").asInt();
             brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
             brstation.isKeepingBicycleRentalAtDestinationAllowed = config.allowKeepingRentedBicycleAtDestination();
             brstation.isCarStation = routeAsCar;
@@ -234,7 +234,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
                 brstation.name = new NonLocalizedString(stationNode.path("name").asText());
                 brstation.longitude = stationNode.path("lon").asDouble();
                 brstation.latitude = stationNode.path("lat").asDouble();
-                brstation.bikesAvailable = 1;
+                brstation.vehiclesAvailable = 1;
                 brstation.spacesAvailable = 0;
                 brstation.allowDropoff = false;
                 brstation.isFloatingBike = true;

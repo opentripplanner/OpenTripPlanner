@@ -16,7 +16,7 @@ public class VehicleRentalStationMapper {
         api.name = domain.name.toString(locale);
         api.x = domain.longitude;
         api.y = domain.latitude;
-        api.bikesAvailable = domain.bikesAvailable;
+        api.bikesAvailable = domain.vehiclesAvailable;
         api.spacesAvailable = domain.spacesAvailable;
         api.allowDropoff = domain.allowDropoff;
         api.isFloatingBike = domain.isFloatingBike;

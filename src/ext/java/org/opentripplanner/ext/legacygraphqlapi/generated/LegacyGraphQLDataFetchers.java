@@ -10,7 +10,7 @@ import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStationUris;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.common.model.P2;
 import java.util.Map;
@@ -114,7 +114,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Boolean> allowOverloading();
 
-        public DataFetcher<BikeRentalStationUris> rentalUris();
+        public DataFetcher<VehicleRentalStationUris> rentalUris();
     }
 
     public interface LegacyGraphQLBikeRentalStationUris {

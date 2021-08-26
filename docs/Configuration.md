@@ -530,9 +530,9 @@ For unknown reasons that seem to depend on data and machine settings, it might b
 
 By default OTP will compute fares according to the GTFS specification if fare data is provided in
 your GTFS input. It is possible to turn off this by setting the fare to "off". For more complex 
-scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
+scenarios or to handle vehicle rental fares, it is necessary to manually configure fares using the
 `fares` section in `build-config.json`. You can combine different fares (for example transit and
-bike-rental) by defining a `combinationStrategy` parameter, and a list of sub-fares to combine 
+vehicle-rental) by defining a `combinationStrategy` parameter, and a list of sub-fares to combine 
 (all fields starting with `fare` are considered to be sub-fares).
 
 ```JSON
@@ -557,7 +557,7 @@ bike-rental) by defining a `combinationStrategy` parameter, and a list of sub-fa
     "fare0": "new-york",
     // Second fare to combine
     "fare1": {
-      "type": "bike-rental-time-based",
+      "type": "vehicle-rental-time-based",
       "currency": "USD",
       "prices": {
           // For trip shorter than 30', $4 fare
@@ -582,9 +582,9 @@ Turning the fare service _off_, this will ignore any fare data in the provided G
 
 The current list of custom fare type is:
 
-- `bike-rental-time-based` - accepting the following parameters:
+- `vehicle-rental-time-based` - accepting the following parameters:
     - `currency` - the ISO 4217 currency code to use, such as `"EUR"` or `"USD"`,
-    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed time of bike rental is lower than the defined time.
+    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed time of vehicle rental is lower than the defined time.
 - `san-francisco` (no parameters)
 - `new-york` (no parameters)
 - `seattle` (no parameters)
@@ -990,7 +990,7 @@ connect to a network resource is the `url` field.
 
         //<!--- Tampa Area GBFS bike share -->
         {
-          "type": "bike-rental",
+          "type": "vehicle-rental",
           "frequencySec": 300,
           "sourceType": "gbfs",
           "url": "http://coast.socialbicycles.com/opendata/gbfs.json"
@@ -1028,7 +1028,7 @@ To add a GBFS feed to the router add one entry in the `updater` field of `router
 ```JSON
 // router-config.json
 {
-   "type": "bike-rental",
+   "type": "vehicle-rental",
    "sourceType": "gbfs",
    // frequency in seconds in which the GBFS service will be polled
    "frequencySec": 60,

@@ -11,24 +11,24 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.bike_park.BikePark;
 
-public class BikeRentalStationService implements Serializable {
+public class VehicleRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 
     private Set<VehicleRentalStation> vehicleRentalStations = new HashSet<>();
 
     private Set<BikePark> bikeParks = new HashSet<>();
 
-    public Collection<VehicleRentalStation> getBikeRentalStations() {
+    public Collection<VehicleRentalStation> getVehicleRentalStations() {
         return vehicleRentalStations;
     }
 
-    public void addBikeRentalStation(VehicleRentalStation vehicleRentalStation) {
+    public void addVehicleRentalStation(VehicleRentalStation vehicleRentalStation) {
         // Remove old reference first, as adding will be a no-op if already present
         vehicleRentalStations.remove(vehicleRentalStation);
         vehicleRentalStations.add(vehicleRentalStation);
     }
 
-    public void removeBikeRentalStation(VehicleRentalStation vehicleRentalStation) {
+    public void removeVehicleRentalStation(VehicleRentalStation vehicleRentalStation) {
         vehicleRentalStations.remove(vehicleRentalStation);
     }
 
@@ -47,11 +47,11 @@ public class BikeRentalStationService implements Serializable {
     }
 
     /**
-     * Gets all the bike rental stations inside the envelope. This is currently done by iterating
-     * over a set, but we could use a spatial index if the number of bike rental stations is high
+     * Gets all the vehicle rental stations inside the envelope. This is currently done by iterating
+     * over a set, but we could use a spatial index if the number of vehicle rental stations is high
      * enough for performance to be a concern.
      */
-    public List<VehicleRentalStation> getBikeRentalStationForEnvelope(
+    public List<VehicleRentalStation> getVehicleRentalStationForEnvelope(
         double minLon, double minLat, double maxLon, double maxLat
     ) {
         Envelope envelope = new Envelope(
