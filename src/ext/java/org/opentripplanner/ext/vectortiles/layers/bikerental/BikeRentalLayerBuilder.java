@@ -8,7 +8,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class BikeRentalLayerBuilder extends LayerBuilder<BikeRentalStation> {
+public class BikeRentalLayerBuilder extends LayerBuilder<VehicleRentalStation> {
   enum MapperType { Digitransit }
 
-  static Map<MapperType, Function<Graph, PropertyMapper<BikeRentalStation>>> mappers = Map.of(
+  static Map<MapperType, Function<Graph, PropertyMapper<VehicleRentalStation>>> mappers = Map.of(
       MapperType.Digitransit, DigitransitBikeRentalPropertyMapper::create
   );
 

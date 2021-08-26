@@ -14,7 +14,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
@@ -53,7 +53,7 @@ import org.opentripplanner.util.NonLocalizedString;
 public abstract class GraphRoutingTest {
 
     public static final String TEST_FEED_ID = "testFeed";
-    public static final String TEST_BIKE_RENTAL_NETWORK = "test network";
+    public static final String TEST_VEHICLE_RENTAL_NETWORK = "test network";
 
     protected Graph graphOf(Builder builder) {
         return builder.graph();
@@ -291,13 +291,13 @@ public abstract class GraphRoutingTest {
         }
 
         // -- Bike rental
-        public BikeRentalStation bikeRentalStationEntity(
+        public VehicleRentalStation bikeRentalStationEntity(
                 String id,
                 double latitude,
                 double longitude,
                 Set<String> networks
         ) {
-            var bikeRentalStation = new BikeRentalStation();
+            var bikeRentalStation = new VehicleRentalStation();
             bikeRentalStation.id = id;
             bikeRentalStation.longitude = longitude;
             bikeRentalStation.latitude = latitude;
@@ -325,7 +325,7 @@ public abstract class GraphRoutingTest {
                 double latitude,
                 double longitude
         ) {
-            return bikeRentalStation(id, latitude, longitude, Set.of(TEST_BIKE_RENTAL_NETWORK));
+            return bikeRentalStation(id, latitude, longitude, Set.of(TEST_VEHICLE_RENTAL_NETWORK));
         }
 
         public StreetBikeRentalLink link(StreetVertex from, BikeRentalStationVertex to) {

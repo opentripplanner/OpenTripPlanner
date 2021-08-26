@@ -2,7 +2,7 @@ package org.opentripplanner.updater.vehicle_rental;
 
 import java.util.List;
 
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 /**
  * TODO clarify thread safety.
@@ -19,6 +19,6 @@ public interface VehicleRentalDataSource {
     /**
      * @return a List of all currently known bike rental stations. The updater will use this to update the Graph.
      */
-    List<BikeRentalStation> getStations();
+    List<VehicleRentalStation> getStations();
     
 }

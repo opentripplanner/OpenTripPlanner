@@ -46,6 +46,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -563,7 +564,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * dropping it off.
      *
      * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
-     * @see org.opentripplanner.routing.vehicle_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
+     * @see VehicleRentalStation#isKeepingBicycleRentalAtDestinationAllowed
      */
     public boolean allowKeepingRentedBicycleAtDestination = false;
 

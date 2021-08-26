@@ -35,7 +35,7 @@ import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -491,7 +491,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<BikeRentalStation>> bikeRentalStations() {
+  public DataFetcher<Iterable<VehicleRentalStation>> bikeRentalStations() {
     return environment -> {
       BikeRentalStationService bikerentalStationService = getRoutingService(environment)
               .getBikerentalStationService();
@@ -502,7 +502,7 @@ public class LegacyGraphQLQueryTypeImpl
               environment.getArguments());
 
       if (args.getLegacyGraphQLIds() != null) {
-        Map<String, BikeRentalStation> bikeRentalStations =
+        Map<String, VehicleRentalStation> bikeRentalStations =
                 bikerentalStationService.getBikeRentalStations()
                         .stream()
                         .collect(Collectors.toMap(station -> station.id, station -> station));
@@ -517,7 +517,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<BikeRentalStation> bikeRentalStation() {
+  public DataFetcher<VehicleRentalStation> bikeRentalStation() {
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeRentalStationArgs(environment.getArguments());
 

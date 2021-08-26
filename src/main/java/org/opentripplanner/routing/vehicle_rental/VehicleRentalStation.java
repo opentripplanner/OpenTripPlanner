@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Set;
 import org.opentripplanner.util.I18NString;
 
-public class BikeRentalStation implements Serializable {
+public class VehicleRentalStation implements Serializable {
     private static final long serialVersionUID = 8311460609708089384L;
 
     public String id;
@@ -38,10 +38,10 @@ public class BikeRentalStation implements Serializable {
      * We should probably be keying collections on station ID rather than the station object with nonstandard equals.
      */
     public boolean equals(Object o) {
-        if (!(o instanceof BikeRentalStation)) {
+        if (!(o instanceof VehicleRentalStation)) {
             return false;
         }
-        BikeRentalStation other = (BikeRentalStation) o;
+        VehicleRentalStation other = (VehicleRentalStation) o;
         return other.id.equals(id);
     }
     

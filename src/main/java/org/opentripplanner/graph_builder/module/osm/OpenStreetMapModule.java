@@ -30,7 +30,7 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -346,7 +346,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             + creativeName + ") with no network; including as compatible-with-all.");
                     networkSet = null; // Special "catch-all" value
                 }
-                BikeRentalStation station = new BikeRentalStation();
+                VehicleRentalStation station = new VehicleRentalStation();
                 station.id = "" + node.getId();
                 station.name = creativeName;
                 station.longitude = node.lon;

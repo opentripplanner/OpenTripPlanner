@@ -83,7 +83,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -926,7 +926,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
             .dataFetcher(environment -> {
-              Collection<BikeRentalStation> all = new ArrayList<>(GqlUtil
+              Collection<VehicleRentalStation> all = new ArrayList<>(GqlUtil
                   .getRoutingService(environment)
                   .getBikerentalStationService()
                   .getBikeRentalStations());

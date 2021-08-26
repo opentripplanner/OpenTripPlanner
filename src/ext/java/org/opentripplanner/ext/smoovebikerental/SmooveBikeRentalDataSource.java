@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.smoovebikerental;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.GenericJsonVehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
@@ -39,8 +39,8 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
      * }
      * </pre>
      */
-    public BikeRentalStation makeStation(JsonNode node) {
-        BikeRentalStation station = new BikeRentalStation();
+    public VehicleRentalStation makeStation(JsonNode node) {
+        VehicleRentalStation station = new VehicleRentalStation();
         station.id = node.path("name").asText().split("\\s", 2)[0];
         station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
         String[] coordinates = node.path("coordinates").asText().split(",");

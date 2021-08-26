@@ -14,22 +14,22 @@ import org.opentripplanner.routing.bike_park.BikePark;
 public class BikeRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 
-    private Set<BikeRentalStation> bikeRentalStations = new HashSet<>();
+    private Set<VehicleRentalStation> vehicleRentalStations = new HashSet<>();
 
     private Set<BikePark> bikeParks = new HashSet<>();
 
-    public Collection<BikeRentalStation> getBikeRentalStations() {
-        return bikeRentalStations;
+    public Collection<VehicleRentalStation> getBikeRentalStations() {
+        return vehicleRentalStations;
     }
 
-    public void addBikeRentalStation(BikeRentalStation bikeRentalStation) {
+    public void addBikeRentalStation(VehicleRentalStation vehicleRentalStation) {
         // Remove old reference first, as adding will be a no-op if already present
-        bikeRentalStations.remove(bikeRentalStation);
-        bikeRentalStations.add(bikeRentalStation);
+        vehicleRentalStations.remove(vehicleRentalStation);
+        vehicleRentalStations.add(vehicleRentalStation);
     }
 
-    public void removeBikeRentalStation(BikeRentalStation bikeRentalStation) {
-        bikeRentalStations.remove(bikeRentalStation);
+    public void removeBikeRentalStation(VehicleRentalStation vehicleRentalStation) {
+        vehicleRentalStations.remove(vehicleRentalStation);
     }
 
     public Collection<BikePark> getBikeParks() {
@@ -51,7 +51,7 @@ public class BikeRentalStationService implements Serializable {
      * over a set, but we could use a spatial index if the number of bike rental stations is high
      * enough for performance to be a concern.
      */
-    public List<BikeRentalStation> getBikeRentalStationForEnvelope(
+    public List<VehicleRentalStation> getBikeRentalStationForEnvelope(
         double minLon, double minLat, double maxLon, double maxLat
     ) {
         Envelope envelope = new Envelope(
@@ -59,7 +59,7 @@ public class BikeRentalStationService implements Serializable {
             new Coordinate(maxLon, maxLat)
         );
 
-        return bikeRentalStations
+        return vehicleRentalStations
             .stream()
             .filter(b -> envelope.contains(new Coordinate(b.longitude, b.latitude)))
             .collect(Collectors.toList());

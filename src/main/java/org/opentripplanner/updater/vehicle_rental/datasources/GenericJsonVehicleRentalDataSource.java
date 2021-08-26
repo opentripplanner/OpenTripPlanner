@@ -3,7 +3,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
@@ -33,7 +33,7 @@ public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRental
 
     private final String jsonParsePath;
 
-    List<BikeRentalStation> stations = new ArrayList<>();
+    List<VehicleRentalStation> stations = new ArrayList<>();
 
     /**
      * Construct superclass
@@ -107,7 +107,7 @@ public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRental
 
     private void parseJSON(InputStream dataStream) throws IllegalArgumentException, IOException {
 
-        ArrayList<BikeRentalStation> out = new ArrayList<>();
+        ArrayList<VehicleRentalStation> out = new ArrayList<>();
 
         String rentalString = convertStreamToString(dataStream);
 
@@ -132,7 +132,7 @@ public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRental
             if (node == null) {
                 continue;
             }
-            BikeRentalStation brstation = makeStation(node);
+            VehicleRentalStation brstation = makeStation(node);
             if (brstation != null) {
                 out.add(brstation);
             }
@@ -162,7 +162,7 @@ public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRental
     }
 
     @Override
-    public synchronized List<BikeRentalStation> getStations() {
+    public synchronized List<VehicleRentalStation> getStations() {
         return stations;
     }
 
@@ -174,7 +174,7 @@ public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRental
     	this.url = url;
     }
 
-    public abstract BikeRentalStation makeStation(JsonNode rentalStationNode);
+    public abstract VehicleRentalStation makeStation(JsonNode rentalStationNode);
 
     @Override
     public String toString() {

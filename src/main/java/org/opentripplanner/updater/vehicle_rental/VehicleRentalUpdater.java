@@ -2,7 +2,7 @@ package org.opentripplanner.updater.vehicle_rental;
 
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -36,9 +36,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private GraphUpdaterManager updaterManager;
 
-    Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<>();
+    Map<VehicleRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<>();
 
-    Map<BikeRentalStation, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
+    Map<VehicleRentalStation, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
 
     private final VehicleRentalDataSource source;
 
@@ -84,7 +84,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             LOG.debug("No updates");
             return;
         }
-        List<BikeRentalStation> stations = source.getStations();
+        List<VehicleRentalStation> stations = source.getStations();
 
         // Create graph writer runnable to apply these stations to the graph
         BikeRentalGraphWriterRunnable graphWriterRunnable = new BikeRentalGraphWriterRunnable(stations);
@@ -97,20 +97,20 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private class BikeRentalGraphWriterRunnable implements GraphWriterRunnable {
 
-        private final List<BikeRentalStation> stations;
+        private final List<VehicleRentalStation> stations;
 
-        public BikeRentalGraphWriterRunnable(List<BikeRentalStation> stations) {
+        public BikeRentalGraphWriterRunnable(List<VehicleRentalStation> stations) {
             this.stations = stations;
         }
 
 		@Override
         public void run(Graph graph) {
             // Apply stations to graph
-            Set<BikeRentalStation> stationSet = new HashSet<>();
+            Set<VehicleRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Collections.singletonList(network));
 
             /* add any new stations and update bike counts for existing stations */
-            for (BikeRentalStation station : stations) {
+            for (VehicleRentalStation station : stations) {
                 if (station.networks == null) {
                     /* API did not provide a network list, use default */
                     station.networks = defaultNetworks;
@@ -131,7 +131,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                     );
                     if (bikeRentalVertex.getOutgoing().isEmpty()) {
                         // the toString includes the text "Bike rental station"
-                        LOG.info("BikeRentalStation {} is unlinked", bikeRentalVertex);
+                        LOG.info("VehicleRentalStation {} is unlinked", bikeRentalVertex);
                     }
                     tempEdges.addEdge(new BikeRentalEdge(bikeRentalVertex));
                     verticesByStation.put(station, bikeRentalVertex);
@@ -142,15 +142,15 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                 }
             }
             /* remove existing stations that were not present in the update */
-            List<BikeRentalStation> toRemove = new ArrayList<>();
-            for (Entry<BikeRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
-                BikeRentalStation station = entry.getKey();
+            List<VehicleRentalStation> toRemove = new ArrayList<>();
+            for (Entry<VehicleRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
+                VehicleRentalStation station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
                 toRemove.add(station);
                 service.removeBikeRentalStation(station);
             }
-            for (BikeRentalStation station : toRemove) {
+            for (VehicleRentalStation station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);
                 tempEdgesByStation.get(station).disposeEdges();

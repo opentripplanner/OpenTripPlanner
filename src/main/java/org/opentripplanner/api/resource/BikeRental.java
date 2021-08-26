@@ -4,7 +4,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.VehicleRentalStationMapper;
 import org.opentripplanner.api.model.ApiVehicleRentalStation;
 import org.opentripplanner.api.model.ApiVehicleRentalStationList;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.BikeRentalStationService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
@@ -53,9 +53,9 @@ public class BikeRental {
         } else {
             envelope = new Envelope(-180,180,-90,90); 
         }
-        Collection<BikeRentalStation> stations = bikeRentalService.getBikeRentalStations();
+        Collection<VehicleRentalStation> stations = bikeRentalService.getBikeRentalStations();
         List<ApiVehicleRentalStation> out = new ArrayList<>();
-        for (BikeRentalStation station : stations) {
+        for (VehicleRentalStation station : stations) {
             if (envelope.contains(station.longitude, station.latitude)) {
                 out.add(VehicleRentalStationMapper.mapToApi(station, locale));
             }

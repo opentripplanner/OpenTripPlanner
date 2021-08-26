@@ -3,7 +3,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.BikeRentalStationUris;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
@@ -83,31 +83,31 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
     }
 
     @Override
-    public List<BikeRentalStation> getStations() {
+    public List<VehicleRentalStation> getStations() {
 
         // Index all the station status entries on their station ID.
-        Map<String, BikeRentalStation> statusLookup = new HashMap<>();
-        for (BikeRentalStation station : stationStatusSource.getStations()) {
+        Map<String, VehicleRentalStation> statusLookup = new HashMap<>();
+        for (VehicleRentalStation station : stationStatusSource.getStations()) {
             statusLookup.put(station.id, station);
         }
 
         // Iterate over all known stations, and if we have any status information add it to those station objects.
-        for (BikeRentalStation station : stationInformationSource.getStations()) {
+        for (VehicleRentalStation station : stationInformationSource.getStations()) {
             if (!statusLookup.containsKey(station.id)) continue;
-            BikeRentalStation status = statusLookup.get(station.id);
+            VehicleRentalStation status = statusLookup.get(station.id);
             station.bikesAvailable = status.bikesAvailable;
             station.spacesAvailable = status.spacesAvailable;
         }
 
         // Copy the full list of station objects (with status updates) into a List, appending the floating bike stations.
-        List<BikeRentalStation> stations = new LinkedList<>(stationInformationSource.getStations());
+        List<VehicleRentalStation> stations = new LinkedList<>(stationInformationSource.getStations());
         if (OTPFeature.FloatingBike.isOn()) {
             stations.addAll(floatingBikeSource.getStations());
         }
 
         // Set identical network ID on all stations
         Set<String> networkIdSet = Sets.newHashSet(this.networkName);
-        for (BikeRentalStation station : stations) station.networks = networkIdSet;
+        for (VehicleRentalStation station : stations) station.networks = networkIdSet;
 
         return stations;
     }
@@ -177,8 +177,8 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         }
 
         @Override
-        public BikeRentalStation makeStation(JsonNode stationNode) {
-            BikeRentalStation brstation = new BikeRentalStation();
+        public VehicleRentalStation makeStation(JsonNode stationNode) {
+            VehicleRentalStation brstation = new VehicleRentalStation();
             brstation.id = stationNode.path("station_id").asText();
             brstation.longitude = stationNode.path("lon").asDouble();
             brstation.latitude = stationNode.path("lat").asDouble();
@@ -205,8 +205,8 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         }
 
         @Override
-        public BikeRentalStation makeStation(JsonNode stationNode) {
-            BikeRentalStation brstation = new BikeRentalStation();
+        public VehicleRentalStation makeStation(JsonNode stationNode) {
+            VehicleRentalStation brstation = new VehicleRentalStation();
             brstation.id = stationNode.path("station_id").asText();
             brstation.bikesAvailable = stationNode.path("num_bikes_available").asInt();
             brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
@@ -224,12 +224,12 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         }
 
         @Override
-        public BikeRentalStation makeStation(JsonNode stationNode) {
+        public VehicleRentalStation makeStation(JsonNode stationNode) {
             if (stationNode.path("station_id").asText().isBlank() &&
                     stationNode.has("lon") &&
                     stationNode.has("lat")
             ) {
-                BikeRentalStation brstation = new BikeRentalStation();
+                VehicleRentalStation brstation = new VehicleRentalStation();
                 brstation.id = stationNode.path("bike_id").asText();
                 brstation.name = new NonLocalizedString(stationNode.path("name").asText());
                 brstation.longitude = stationNode.path("lon").asDouble();

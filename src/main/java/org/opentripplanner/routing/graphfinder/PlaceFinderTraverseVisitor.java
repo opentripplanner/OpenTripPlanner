@@ -7,7 +7,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -50,7 +50,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
    * @param filterByPlaceTypes A list of PlaceTypes to search for. Use null to disable the filtering, and search for all types.
    * @param filterByStops A list of Stop ids for which to find Stops and PatternAtStops. Use null to disable the filtering.
    * @param filterByRoutes A list of Route ids used for filtering Stops. Only the stops which are served by the route are returned. Use null to disable the filtering.
-   * @param filterByBikeRentalStations A list of BikeRentalStation ids to use in filtering.  Use null to disable the filtering.
+   * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering.  Use null to disable the filtering.
    * @param maxResults Maximum number of results to return.
    */
   public PlaceFinderTraverseVisitor(
@@ -140,7 +140,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
-  private void handleBikeRentalStation(BikeRentalStation station, double distance) {
+  private void handleBikeRentalStation(VehicleRentalStation station, double distance) {
     if (!includeBikeShares) { return; }
     if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.id)) {
       return;

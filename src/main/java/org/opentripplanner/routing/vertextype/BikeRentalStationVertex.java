@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.routing.vehicle_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -27,9 +27,9 @@ public class BikeRentalStationVertex extends Vertex {
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean isCarStation;
 
-    private BikeRentalStation station;
+    private VehicleRentalStation station;
 
-    public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
+    public BikeRentalStationVertex(Graph g, VehicleRentalStation station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
         super(g, "bike rental station " + station.id, station.longitude, station.latitude, station.name);
         this.setId(station.id);
@@ -39,7 +39,7 @@ public class BikeRentalStationVertex extends Vertex {
         this.isCarStation = station.isCarStation;
     }
 
-    public BikeRentalStation getStation() {
+    public VehicleRentalStation getStation() {
         return station;
     }
 
