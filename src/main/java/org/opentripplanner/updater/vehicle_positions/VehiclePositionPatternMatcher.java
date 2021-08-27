@@ -7,11 +7,13 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Responsible for converting vehicle positions in memory to exportable ones, and associating each position
@@ -51,7 +53,7 @@ public class VehiclePositionPatternMatcher {
                 continue;
             }
 
-            RealtimeVehiclePosition newPosition = parseVehiclePosition(vehiclePosition);
+            RealtimeVehiclePosition newPosition = parseVehiclePosition(vehiclePosition, List.of(pattern.stopVertices));
             newPosition.patternId = pattern.code;
 
             if (pattern.vehiclePositions == null) {
@@ -64,10 +66,11 @@ public class VehiclePositionPatternMatcher {
     /**
      * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be
      * used by the API.
-     * @param vehiclePosition   GtfsRealtime vehicle position
-     * @return                  OTP RealtimeVehiclePosition
+     * @param vehiclePosition       GtfsRealtime vehicle position
+     * @param stopsOnVehicleTrip    Collection of stops method will try to match next arriving stop ID to
+     * @return                      OTP RealtimeVehiclePosition
      */
-    private RealtimeVehiclePosition parseVehiclePosition(VehiclePosition vehiclePosition) {
+    private RealtimeVehiclePosition parseVehiclePosition(VehiclePosition vehiclePosition, List<TransitStop> stopsOnVehicleTrip) {
         RealtimeVehiclePosition newPosition = new RealtimeVehiclePosition();
         if (vehiclePosition.hasPosition()) {
             newPosition.lat = vehiclePosition.getPosition().getLatitude();
@@ -91,6 +94,21 @@ public class VehiclePositionPatternMatcher {
         if (vehiclePosition.hasCongestionLevel()) {
             newPosition.congestionLevel = vehiclePosition.getCongestionLevel();
         }
+
+        if (vehiclePosition.hasTimestamp()) {
+            newPosition.seconds = vehiclePosition.getTimestamp();
+        }
+
+        if (vehiclePosition.hasStopId()) {
+            List<TransitStop> matchedStops = stopsOnVehicleTrip
+                    .stream()
+                    .filter(stop -> stop.getStopId().getId().equals(vehiclePosition.getStopId()))
+                    .collect(Collectors.toList());
+            if (matchedStops.size() == 1) {
+                newPosition.nextStop = matchedStops.get(0);
+            }
+        }
+
         return newPosition;
     }
 }
