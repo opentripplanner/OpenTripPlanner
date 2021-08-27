@@ -11,6 +11,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,7 +55,7 @@ public class VehiclePositionPatternMatcher {
                 continue;
             }
 
-            RealtimeVehiclePosition newPosition = parseVehiclePosition(vehiclePosition, List.of(pattern.stopVertices));
+            RealtimeVehiclePosition newPosition = parseVehiclePosition(vehiclePosition, new ArrayList<>(Arrays.asList(pattern.stopVertices)));
             newPosition.patternId = pattern.code;
 
             if (pattern.vehiclePositions == null) {
@@ -105,7 +107,7 @@ public class VehiclePositionPatternMatcher {
                     .filter(stop -> stop.getStopId().getId().equals(vehiclePosition.getStopId()))
                     .collect(Collectors.toList());
             if (matchedStops.size() == 1) {
-                newPosition.nextStop = matchedStops.get(0);
+                newPosition.nextStop = matchedStops.get(0).getName();
             }
         }
 

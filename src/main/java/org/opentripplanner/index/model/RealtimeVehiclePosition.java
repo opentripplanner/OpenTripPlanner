@@ -2,7 +2,6 @@ package org.opentripplanner.index.model;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.CongestionLevel;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
-import org.opentripplanner.routing.vertextype.TransitStop;
 
 /**
  * A simplified vehicle position class that supports being output to HTTP.
@@ -22,7 +21,7 @@ public class RealtimeVehiclePosition {
     public String patternId;
 
     public VehicleStopStatus stopStatus;
-    public TransitStop nextStop;
+    public String nextStop;
 
     public CongestionLevel congestionLevel;
 }
