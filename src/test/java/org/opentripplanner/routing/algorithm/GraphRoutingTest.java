@@ -290,23 +290,23 @@ public abstract class GraphRoutingTest {
             return List.of(link(from, to), link(to, from));
         }
 
-        // -- Bike rental
-        public VehicleRentalStation bikeRentalStationEntity(
+        // -- Vehicle rental
+        public VehicleRentalStation vehicleRentalStationEntity(
                 String id,
                 double latitude,
                 double longitude,
                 Set<String> networks
         ) {
-            var bikeRentalStation = new VehicleRentalStation();
-            bikeRentalStation.id = id;
-            bikeRentalStation.longitude = longitude;
-            bikeRentalStation.latitude = latitude;
-            bikeRentalStation.networks = networks;
-            bikeRentalStation.isKeepingBicycleRentalAtDestinationAllowed = false;
-            return bikeRentalStation;
+            var vehicleRentalStation = new VehicleRentalStation();
+            vehicleRentalStation.id = id;
+            vehicleRentalStation.longitude = longitude;
+            vehicleRentalStation.latitude = latitude;
+            vehicleRentalStation.networks = networks;
+            vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
+            return vehicleRentalStation;
         }
 
-        public VehicleRentalStationVertex bikeRentalStation(
+        public VehicleRentalStationVertex vehicleRentalStation(
                 String id,
                 double latitude,
                 double longitude,
@@ -314,18 +314,18 @@ public abstract class GraphRoutingTest {
         ) {
             var vertex = new VehicleRentalStationVertex(
                     graph,
-                    bikeRentalStationEntity(id, latitude, longitude, networks)
+                    vehicleRentalStationEntity(id, latitude, longitude, networks)
             );
             new VehicleRentalEdge(vertex);
             return vertex;
         }
 
-        public VehicleRentalStationVertex bikeRentalStation(
+        public VehicleRentalStationVertex vehicleRentalStation(
                 String id,
                 double latitude,
                 double longitude
         ) {
-            return bikeRentalStation(id, latitude, longitude, Set.of(TEST_VEHICLE_RENTAL_NETWORK));
+            return vehicleRentalStation(id, latitude, longitude, Set.of(TEST_VEHICLE_RENTAL_NETWORK));
         }
 
         public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalStationVertex to) {

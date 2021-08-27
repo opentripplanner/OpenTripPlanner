@@ -158,7 +158,7 @@ public class RoutingWorker {
         // Prepare access/egress lists
         try (RoutingRequest accessRequest = request.getStreetSearchRequest(request.modes.accessMode)) {
             accessRequest.setRoutingContext(router.graph);
-            accessRequest.allowKeepingRentedBicycleAtDestination = false;
+            accessRequest.allowKeepingRentedVehicleAtDestination = false;
 
             Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
                     accessRequest,

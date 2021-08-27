@@ -84,7 +84,7 @@ public class PlanPlaceType {
                   .getVehicleRentalStationService()
                   .getVehicleRentalStations()
                   .stream()
-                  .filter(bikeRentalStation -> bikeRentalStation.id.equals(((Place) environment.getSource()).bikeShareId))
+                  .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(((Place) environment.getSource()).bikeShareId))
                   .findFirst()
                   .orElse(null)
                   : null;

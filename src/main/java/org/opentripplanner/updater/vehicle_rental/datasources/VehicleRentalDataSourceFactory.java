@@ -20,7 +20,7 @@ public class VehicleRentalDataSourceFactory {
                 return new SmooveBikeRentalDataSource(source);
         }
         throw new IllegalArgumentException(
-                "Unknown bike rental source type: " + source.getSourceType()
+                "Unknown vehicle rental source type: " + source.getSourceType()
         );
     }
 }

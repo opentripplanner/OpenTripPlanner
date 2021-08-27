@@ -106,7 +106,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<VehicleRentalUpdaterParameters> getBikeRentalParameters() {
+  public List<VehicleRentalUpdaterParameters> getVehicleRentalParameters() {
     return getParameters(VEHICLE_RENTAL);
   }
 

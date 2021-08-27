@@ -6,12 +6,12 @@ import java.util.Map;
 
 public class GbfsVehicleRentalDataSourceParameters extends VehicleRentalDataSourceParameters {
 
-  private final boolean allowKeepingRentedBicycleAtDestination;
+  private final boolean allowKeepingRentedVehicleAtDestination;
   private final boolean routeAsCar;
 
-  public GbfsVehicleRentalDataSourceParameters(String url, String network, boolean routeAsCar, boolean allowKeepingRentedBicycleAtDestination, Map<String, String> httpHeaders) {
+  public GbfsVehicleRentalDataSourceParameters(String url, String network, boolean routeAsCar, boolean allowKeepingRentedVehicleAtDestination, Map<String, String> httpHeaders) {
     super(DataSourceType.GBFS, url, network, httpHeaders);
-    this.allowKeepingRentedBicycleAtDestination = allowKeepingRentedBicycleAtDestination;
+    this.allowKeepingRentedVehicleAtDestination = allowKeepingRentedVehicleAtDestination;
     this.routeAsCar = routeAsCar;
   }
 
@@ -19,7 +19,7 @@ public class GbfsVehicleRentalDataSourceParameters extends VehicleRentalDataSour
     return routeAsCar;
   }
 
-  public boolean allowKeepingRentedBicycleAtDestination() {
-    return allowKeepingRentedBicycleAtDestination;
+  public boolean allowKeepingRentedVehicleAtDestination() {
+    return allowKeepingRentedVehicleAtDestination;
   }
 }

@@ -18,7 +18,7 @@ public class VehicleRentalStation implements Serializable {
     public boolean allowDropoff = true;
     public boolean isFloatingBike = false;
     public boolean isCarStation = false;
-    public boolean isKeepingBicycleRentalAtDestinationAllowed = false;
+    public boolean isKeepingVehicleRentalAtDestinationAllowed = false;
 
     /**
      * List of compatible network names. Null (default) to be compatible with all.

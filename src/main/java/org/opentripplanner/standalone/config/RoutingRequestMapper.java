@@ -44,8 +44,8 @@ public class RoutingRequestMapper {
         request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
         request.bikeWalkingReluctance = c.asDouble("bikeWalkingReluctance", dft.bikeWalkingReluctance);
         request.bikeWalkingSpeed = c.asDouble("bikeWalkingSpeed", dft.bikeWalkingSpeed);
-        request.allowKeepingRentedBicycleAtDestination = c.asBoolean("allowKeepingRentedBicycleAtDestination", dft.allowKeepingRentedBicycleAtDestination);
-        request.keepingRentedBicycleAtDestinationCost = c.asDouble("keepingRentedBicycleAtDestinationCost", dft.keepingRentedBicycleAtDestinationCost);
+        request.allowKeepingRentedVehicleAtDestination = c.asBoolean("allowKeepingRentedBicycleAtDestination", dft.allowKeepingRentedVehicleAtDestination);
+        request.keepingRentedVehicleAtDestinationCost = c.asDouble("keepingRentedBicycleAtDestinationCost", dft.keepingRentedVehicleAtDestinationCost);
         request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
         request.boardSlackForMode = c.asEnumMap("boardSlackForMode", TraverseMode.class, NodeAdapter::asInt);
         request.maxAccessEgressDurationSecondsForMode = c.asEnumMap("maxAccessEgressDurationSecondsForMode", StreetMode.class, NodeAdapter::asDouble);

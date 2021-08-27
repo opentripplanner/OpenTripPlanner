@@ -124,7 +124,7 @@ public abstract class GraphPathToItineraryMapper {
         calculateElevations(itinerary, edges);
 
         itinerary.generalizedCost = (int) lastState.weight;
-        itinerary.arrivedAtDestinationWithRentedBicycle = lastState.isBikeRentingFromStation();
+        itinerary.arrivedAtDestinationWithRentedVehicle = lastState.isBikeRentingFromStation();
 
         return itinerary;
     }
@@ -293,12 +293,12 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.walkingBike = states[states.length - 1].isBackWalkingBike();
 
-        leg.rentedBike = states[0].isBikeRenting();
+        leg.rentedVehicle = states[0].isBikeRenting();
 
-        if (leg.rentedBike) {
-            Set<String> bikeRentalNetworks = states[0].getBikeRentalNetworks();
-            if (bikeRentalNetworks != null) {
-                leg.addBikeRentalNetworks(states[0].getBikeRentalNetworks());
+        if (leg.rentedVehicle) {
+            Set<String> vehicleRentalNetworks = states[0].getVehicleRentalNetworks();
+            if (vehicleRentalNetworks != null) {
+                leg.addVehicleRentalNetworks(states[0].getVehicleRentalNetworks());
             }
         }
 
@@ -508,13 +508,13 @@ public abstract class GraphPathToItineraryMapper {
         int roundaboutExit = 0; // track whether we are in a roundabout, and if so the exit number
         String roundaboutPreviousStreet = null;
 
-        State onBikeRentalState = null, offBikeRentalState = null;
+        State onVehicleRentalState = null, offVehicleRentalState = null;
 
         if (isRentalPickUp(states[states.length - 1])) {
-            onBikeRentalState = states[states.length - 1];
+            onVehicleRentalState = states[states.length - 1];
         }
         if (isRentalDropOff(states[0])) {
-            offBikeRentalState = states[0];
+            offVehicleRentalState = states[0];
         }
 
         for (int i = 0; i < states.length - 1; i++) {
@@ -785,14 +785,14 @@ public abstract class GraphPathToItineraryMapper {
             step.edges.add(edge);
         }
 
-        // add bike rental information if applicable
-        if(onBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(steps.size()-1).bikeRentalOnStation = 
-                    new VehicleRentalStationInfo((VehicleRentalStationVertex) onBikeRentalState.getVertex());
+        // add vehicle rental information if applicable
+        if(onVehicleRentalState != null && !steps.isEmpty()) {
+            steps.get(steps.size()-1).vehicleRentalOnStation =
+                    new VehicleRentalStationInfo((VehicleRentalStationVertex) onVehicleRentalState.getVertex());
         }
-        if(offBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(0).bikeRentalOffStation = 
-                    new VehicleRentalStationInfo((VehicleRentalStationVertex) offBikeRentalState.getVertex());
+        if(offVehicleRentalState != null && !steps.isEmpty()) {
+            steps.get(0).vehicleRentalOffStation =
+                    new VehicleRentalStationInfo((VehicleRentalStationVertex) offVehicleRentalState.getVertex());
         }
 
         return steps;

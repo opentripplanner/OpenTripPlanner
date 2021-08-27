@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Dynamic vehicle-rental station updater which updates the Graph with bike rental stations from one VehicleRentalDataSource.
+ * Dynamic vehicle-rental station updater which updates the Graph with vehicle rental stations from one VehicleRentalDataSource.
  */
 public class VehicleRentalUpdater extends PollingGraphUpdater {
 
@@ -73,7 +73,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
         linker = graph.getLinker();
-        // Adding a bike rental station service needs a graph writer runnable
+        // Adding a vehicle rental station service needs a graph writer runnable
         service = graph.getService(VehicleRentalStationService.class, true);
     }
 
@@ -87,7 +87,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         List<VehicleRentalStation> stations = source.getStations();
 
         // Create graph writer runnable to apply these stations to the graph
-        BikeRentalGraphWriterRunnable graphWriterRunnable = new BikeRentalGraphWriterRunnable(stations);
+        VehicleRentalGraphWriterRunnable graphWriterRunnable = new VehicleRentalGraphWriterRunnable(stations);
         updaterManager.execute(graphWriterRunnable);
     }
 
@@ -95,11 +95,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     public void teardown() {
     }
 
-    private class BikeRentalGraphWriterRunnable implements GraphWriterRunnable {
+    private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
 
         private final List<VehicleRentalStation> stations;
 
-        public BikeRentalGraphWriterRunnable(List<VehicleRentalStation> stations) {
+        public VehicleRentalGraphWriterRunnable(List<VehicleRentalStation> stations) {
             this.stations = stations;
         }
 
@@ -109,7 +109,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             Set<VehicleRentalStation> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Collections.singletonList(network));
 
-            /* add any new stations and update bike counts for existing stations */
+            /* add any new stations and update vehicle counts for existing stations */
             for (VehicleRentalStation station : stations) {
                 if (station.networks == null) {
                     /* API did not provide a network list, use default */

@@ -182,6 +182,7 @@ public class Graph implements Serializable {
     /** List of transit modes that are availible in GTFS data used in this graph**/
     private final HashSet<TransitMode> transitModes = new HashSet<>();
 
+    // TODO OTP2: This is only enabled with static bike rental
     public boolean hasBikeSharing = false;
 
     public boolean hasParkRide = false;

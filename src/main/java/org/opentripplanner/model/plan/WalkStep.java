@@ -104,12 +104,12 @@ public class WalkStep {
     public List<Edge> edges = Lists.newArrayList();
 
     /**
-     * The bike rental on/off station info.
+     * The vehicle rental on/off station info.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
-    public VehicleRentalStationInfo bikeRentalOnStation;
+    public VehicleRentalStationInfo vehicleRentalOnStation;
 
-    public VehicleRentalStationInfo bikeRentalOffStation;
+    public VehicleRentalStationInfo vehicleRentalOffStation;
 
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);

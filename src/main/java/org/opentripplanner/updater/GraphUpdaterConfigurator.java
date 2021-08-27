@@ -111,7 +111,7 @@ public abstract class GraphUpdaterConfigurator {
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        for (VehicleRentalUpdaterParameters configItem : config.getBikeRentalParameters()) {
+        for (VehicleRentalUpdaterParameters configItem : config.getVehicleRentalParameters()) {
             updaters.add(new VehicleRentalUpdater(configItem));
         }
         for (GtfsRealtimeAlertsUpdaterParameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {

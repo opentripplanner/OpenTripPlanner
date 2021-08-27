@@ -21,7 +21,7 @@ public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalStation
   enum MapperType { Digitransit }
 
   static Map<MapperType, Function<Graph, PropertyMapper<VehicleRentalStation>>> mappers = Map.of(
-      MapperType.Digitransit, DigitransitBikeRentalPropertyMapper::create
+      MapperType.Digitransit, DigitransitVehicleRentalPropertyMapper::create
   );
 
   private final Graph graph;
@@ -41,10 +41,10 @@ public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalStation
     if (service == null) {return List.of();}
     return service.getVehicleRentalStations()
         .stream()
-        .map(bikeRentalStation -> {
-          Coordinate coordinate = new Coordinate(bikeRentalStation.longitude, bikeRentalStation.latitude);
+        .map(vehicleRentalStation -> {
+          Coordinate coordinate = new Coordinate(vehicleRentalStation.longitude, vehicleRentalStation.latitude);
           Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-          point.setUserData(bikeRentalStation);
+          point.setUserData(vehicleRentalStation);
           return point;
         })
         .collect(Collectors.toList());

@@ -183,7 +183,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
             brstation.longitude = stationNode.path("lon").asDouble();
             brstation.latitude = stationNode.path("lat").asDouble();
             brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
-            brstation.isKeepingBicycleRentalAtDestinationAllowed = config.allowKeepingRentedBicycleAtDestination();
+            brstation.isKeepingVehicleRentalAtDestinationAllowed = config.allowKeepingRentedVehicleAtDestination();
             brstation.isCarStation = routeAsCar;
 
             if (stationNode.has("rental_uris")) {
@@ -210,7 +210,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
             brstation.id = stationNode.path("station_id").asText();
             brstation.vehiclesAvailable = stationNode.path("num_bikes_available").asInt();
             brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
-            brstation.isKeepingBicycleRentalAtDestinationAllowed = config.allowKeepingRentedBicycleAtDestination();
+            brstation.isKeepingVehicleRentalAtDestinationAllowed = config.allowKeepingRentedVehicleAtDestination();
             brstation.isCarStation = routeAsCar;
             return brstation;
         }

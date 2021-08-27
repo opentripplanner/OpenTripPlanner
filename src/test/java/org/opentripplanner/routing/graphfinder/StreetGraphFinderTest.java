@@ -55,8 +55,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
                 S2 = stop("S2", 47.510, 19.001);
                 S3 = stop("S3", 47.520, 19.001);
 
-                BR1 = bikeRentalStation("BR1", 47.500, 18.999);
-                BR2 = bikeRentalStation("BR2", 47.520, 18.999);
+                BR1 = vehicleRentalStation("BR1", 47.500, 18.999);
+                BR2 = vehicleRentalStation("BR2", 47.520, 18.999);
 
                 BP1 = bikePark("BP1", 47.520, 18.999);
 

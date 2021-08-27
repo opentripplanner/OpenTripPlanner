@@ -19,7 +19,7 @@ public interface UpdatersParameters {
 
   VehicleRentalServiceDirectoryFetcherParameters getVehicleRentalServiceDirectoryFetcherParameters();
 
-  List<VehicleRentalUpdaterParameters> getBikeRentalParameters();
+  List<VehicleRentalUpdaterParameters> getVehicleRentalParameters();
 
   List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters();
 

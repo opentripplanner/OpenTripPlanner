@@ -734,10 +734,10 @@ public abstract class RoutingResource {
             request.bikeSwitchCost = bikeSwitchCost;
 
         if (allowKeepingRentedBicycleAtDestination != null)
-            request.allowKeepingRentedBicycleAtDestination = allowKeepingRentedBicycleAtDestination;
+            request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
 
         if (keepingRentedBicycleAtDestinationCost != null)
-            request.keepingRentedBicycleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+            request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle

@@ -57,7 +57,7 @@ public class VehicleRentalServiceDirectoryFetcher {
           return updaters;
         }
 
-        VehicleRentalParameters bikeRentalParameters = new VehicleRentalParameters(
+        VehicleRentalParameters vehicleRentalParameters = new VehicleRentalParameters(
             "vehicle-rental-service-directory:" + network,
             DEFAULT_FREQUENCY_SEC,
             new GbfsDataSourceParameters(
@@ -68,12 +68,12 @@ public class VehicleRentalServiceDirectoryFetcher {
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 
-        GraphUpdater updater = new VehicleRentalUpdater(bikeRentalParameters);
+        GraphUpdater updater = new VehicleRentalUpdater(vehicleRentalParameters);
         updaters.add(updater);
       }
     }
     catch (java.io.IOException e) {
-      LOG.warn("Error fetching list of bike rental endpoints from {}", parameters.getUrl(), e);
+      LOG.warn("Error fetching list of vehicle rental endpoints from {}", parameters.getUrl(), e);
     }
 
     LOG.info("{} updaters fetched", updaters.size());

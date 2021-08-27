@@ -35,7 +35,7 @@ public class VehicleRentalEdge extends Edge {
 
         boolean pickedUp;
         if (options.arriveBy) {
-            switch (s0.getBikeRentalState()) {
+            switch (s0.getVehicleRentalState()) {
                 case BEFORE_RENTING:
                     return null;
                 case HAVE_RENTED:
@@ -57,12 +57,12 @@ public class VehicleRentalEdge extends Edge {
                     if (options.useVehicleRentalAvailabilityInformation && stationVertex.getVehiclesAvailable() == 0) {
                         return null;
                     }
-                    // For arriveBy searches mayKeepRentedBicycleAtDestination is only set in State#getInitialStates(),
+                    // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in State#getInitialStates(),
                     // and so here it is checked if this bicycle could have been kept at the destination
-                    if (s0.mayKeepRentedBicycleAtDestination() && !stationVertex.getStation().isKeepingBicycleRentalAtDestinationAllowed) {
+                    if (s0.mayKeepRentedVehicleAtDestination() && !stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed) {
                         return null;
                     }
-                    if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
+                    if (!hasCompatibleNetworks(networks, s0.getVehicleRentalNetworks())) { return null; }
                     s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), networks, false, true);
                     pickedUp = true;
                     break;
@@ -70,7 +70,7 @@ public class VehicleRentalEdge extends Edge {
                     throw new IllegalStateException();
             }
         } else {
-            switch (s0.getBikeRentalState()) {
+            switch (s0.getVehicleRentalState()) {
                 case BEFORE_RENTING:
                     if (options.useVehicleRentalAvailabilityInformation && stationVertex.getVehiclesAvailable() == 0) {
                         return null;
@@ -80,8 +80,8 @@ public class VehicleRentalEdge extends Edge {
                                 false);
                     } else {
                         var mayKeep =
-                                stationVertex.getStation().isKeepingBicycleRentalAtDestinationAllowed
-                                        && options.allowKeepingRentedBicycleAtDestination;
+                                stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed
+                                        && options.allowKeepingRentedVehicleAtDestination;
                         s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), networks,
                                 mayKeep, false);
                     }
@@ -91,7 +91,7 @@ public class VehicleRentalEdge extends Edge {
                     return null;
                 case RENTING_FLOATING:
                 case RENTING_FROM_STATION:
-                    if (!hasCompatibleNetworks(networks, s0.getBikeRentalNetworks())) { return null; }
+                    if (!hasCompatibleNetworks(networks, s0.getVehicleRentalNetworks())) { return null; }
                     if (options.useVehicleRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
                         return null;
                     }

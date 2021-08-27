@@ -77,7 +77,7 @@ public class BikeRentalSnapshotTest
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
 
         request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
-        request.allowKeepingRentedBicycleAtDestination = true;
+        request.allowKeepingRentedVehicleAtDestination = true;
         request.from = p1;
         request.to = p2;
 
@@ -89,7 +89,7 @@ public class BikeRentalSnapshotTest
         RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
 
         request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
-        request.allowKeepingRentedBicycleAtDestination = true;
+        request.allowKeepingRentedVehicleAtDestination = true;
         request.from = p1;
         request.to = p2;
         request.arriveBy = true;

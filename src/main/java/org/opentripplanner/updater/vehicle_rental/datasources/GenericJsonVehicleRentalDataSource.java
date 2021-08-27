@@ -20,7 +20,7 @@ import java.util.Map;
 
 
 /**
- * Fetch Bike Rental JSON feeds and pass each record on to the specific rental subclass
+ * Fetch Vehicle Rental JSON feeds and pass each record on to the specific rental subclass
  *
  * @see VehicleRentalDataSource
  */
@@ -93,13 +93,13 @@ public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRental
             parseJSON(data);
             data.close();
         } catch (IllegalArgumentException e) {
-            log.warn("Error parsing bike rental feed from " + url, e);
+            log.warn("Error parsing vehicle rental feed from " + url, e);
             return false;
         } catch (JsonProcessingException e) {
-            log.warn("Error parsing bike rental feed from " + url + "(bad JSON of some sort)", e);
+            log.warn("Error parsing vehicle rental feed from " + url + "(bad JSON of some sort)", e);
             return false;
         } catch (IOException e) {
-            log.warn("Error reading bike rental feed from " + url, e);
+            log.warn("Error reading vehicle rental feed from " + url, e);
             return false;
         }
         return true;

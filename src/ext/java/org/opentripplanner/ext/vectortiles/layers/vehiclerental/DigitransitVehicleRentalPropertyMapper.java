@@ -8,9 +8,9 @@ import org.opentripplanner.routing.graph.Graph;
 import java.util.Collection;
 import java.util.List;
 
-public class DigitransitBikeRentalPropertyMapper extends PropertyMapper<VehicleRentalStation> {
-  public static DigitransitBikeRentalPropertyMapper create(Graph graph) {
-    return new DigitransitBikeRentalPropertyMapper();
+public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<VehicleRentalStation> {
+  public static DigitransitVehicleRentalPropertyMapper create(Graph graph) {
+    return new DigitransitVehicleRentalPropertyMapper();
   }
 
   @Override

@@ -59,8 +59,8 @@ public class BikeRentalTest extends GraphRoutingTest {
                 T1 = streetLocation("T1", 47.500, 18.999, false);
                 T2 = streetLocation("T1", 47.530, 18.999, true);
 
-                B1 = bikeRentalStation("B1", 47.510, 19.001);
-                B2 = bikeRentalStation("B2", 47.520, 19.001);
+                B1 = vehicleRentalStation("B1", 47.510, 19.001);
+                B2 = vehicleRentalStation("B2", 47.520, 19.001);
 
                 biLink(A, S1);
                 biLink(D, E1);
@@ -235,7 +235,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testBikeRentalFromStationWantToKeepCantKeep() {
-        B1.getStation().isKeepingBicycleRentalAtDestinationAllowed = false;
+        B1.getStation().isKeepingVehicleRentalAtDestinationAllowed = false;
 
         assertPath(
                 S1, E1, 40,
@@ -264,7 +264,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testBikeRentalFromStationWantToKeepCanKeep() {
-        B1.getStation().isKeepingBicycleRentalAtDestinationAllowed = true;
+        B1.getStation().isKeepingVehicleRentalAtDestinationAllowed = true;
 
         assertPath(
                 S1, E1, 40,
@@ -293,7 +293,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testBikeRentalFromStationWantToKeepCanKeepButCostly() {
-        B1.getStation().isKeepingBicycleRentalAtDestinationAllowed = true;
+        B1.getStation().isKeepingVehicleRentalAtDestinationAllowed = true;
         int keepRentedBicycleAtDestinationCost = 1000;
 
         assertPath(
@@ -424,8 +424,8 @@ public class BikeRentalTest extends GraphRoutingTest {
         options.bikeRentalDropoffCost = 33;
         options.bikeRentalDropoffTime = 15;
         options.useVehicleRentalAvailabilityInformation = useAvailabilityInformation;
-        options.allowKeepingRentedBicycleAtDestination = keepRentedBicycleCost > 0;
-        options.keepingRentedBicycleAtDestinationCost = keepRentedBicycleCost;
+        options.allowKeepingRentedVehicleAtDestination = keepRentedBicycleCost > 0;
+        options.keepingRentedVehicleAtDestinationCost = keepRentedBicycleCost;
 
         return runStreetSearchAndCreateDescriptor(
                 fromVertex, toVertex, arriveBy, options, StreetMode.BIKE_RENTAL);
@@ -458,8 +458,8 @@ public class BikeRentalTest extends GraphRoutingTest {
                         Locale.ROOT,
                         "%s - %s%s - %s (%,.2f, %d)",
                         s.getBackMode(),
-                        s.getBikeRentalState(),
-                        s.mayKeepRentedBicycleAtDestination() ? " (may keep)" : "",
+                        s.getVehicleRentalState(),
+                        s.mayKeepRentedVehicleAtDestination() ? " (may keep)" : "",
                         s.getBackEdge() != null ? s.getBackEdge().getName() : null,
                         s.getWeight(),
                         s.getElapsedTimeSeconds()

@@ -47,7 +47,7 @@ public class VehicleRentalSourceFactory {
             url(),
             network(),
             routeAsCar(),
-            allowKeepingBicycleRentalsAtDestination(),
+            allowKeepingRentedVehicleAtDestination(),
             headers()
         );
       default:
@@ -76,7 +76,7 @@ public class VehicleRentalSourceFactory {
     return c.asBoolean("routeAsCar", false);
   }
 
-  private boolean allowKeepingBicycleRentalsAtDestination() {
+  private boolean allowKeepingRentedVehicleAtDestination() {
     return c.asBoolean("allowKeepingRentedBicycleAtDestination", false);
   }
 }

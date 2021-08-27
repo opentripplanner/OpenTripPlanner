@@ -555,7 +555,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double bikeTriangleSafetyFactor;
 
     /**
-     * Whether or not vehicle rental availability information will be used to plan bike rental trips
+     * Whether or not vehicle rental availability information will be used to plan vehicle rental trips
      */
     public boolean useVehicleRentalAvailabilityInformation = false;
 
@@ -563,17 +563,17 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * Whether arriving at the destination with a rented (station) bicycle is allowed without
      * dropping it off.
      *
-     * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
-     * @see VehicleRentalStation#isKeepingBicycleRentalAtDestinationAllowed
+     * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
+     * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
      */
-    public boolean allowKeepingRentedBicycleAtDestination = false;
+    public boolean allowKeepingRentedVehicleAtDestination = false;
 
     /**
      * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
      *
-     * @see RoutingRequest#allowKeepingRentedBicycleAtDestination
+     * @see RoutingRequest#allowKeepingRentedVehicleAtDestination
      */
-    public double keepingRentedBicycleAtDestinationCost = 0;
+    public double keepingRentedVehicleAtDestinationCost = 0;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.

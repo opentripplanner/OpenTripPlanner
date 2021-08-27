@@ -85,7 +85,7 @@ public class LegacyGraphQLQueryTypeImpl
           return vehicleRentalStationService == null ? null : vehicleRentalStationService
               .getVehicleRentalStations()
               .stream()
-              .filter(bikeRentalStation -> bikeRentalStation.id.equals(id))
+              .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(id))
               .findAny()
               .orElse(null);
         case "CarPark":
@@ -502,13 +502,13 @@ public class LegacyGraphQLQueryTypeImpl
               environment.getArguments());
 
       if (args.getLegacyGraphQLIds() != null) {
-        Map<String, VehicleRentalStation> bikeRentalStations =
+        Map<String, VehicleRentalStation> vehicleRentalStations =
                 vehicleRentalStationService.getVehicleRentalStations()
                         .stream()
                         .collect(Collectors.toMap(station -> station.id, station -> station));
         return ((List<String>) args.getLegacyGraphQLIds())
                 .stream()
-                .map(bikeRentalStations::get)
+                .map(vehicleRentalStations::get)
                 .collect(Collectors.toList());
       }
 
@@ -529,7 +529,7 @@ public class LegacyGraphQLQueryTypeImpl
       return vehicleRentalStationService
               .getVehicleRentalStations()
               .stream()
-              .filter(bikeRentalStation -> bikeRentalStation.id.equals(args.getLegacyGraphQLId()))
+              .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(args.getLegacyGraphQLId()))
               .findAny()
               .orElse(null);
     };
@@ -622,8 +622,8 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
       callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
       callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
-      callWith.argument("allowKeepingRentedBicycleAtDestination", (Boolean v) -> request.allowKeepingRentedBicycleAtDestination = v);
-      callWith.argument("keepingRentedBicycleAtDestinationCost", (Integer v) -> request.keepingRentedBicycleAtDestinationCost = v);
+      callWith.argument("allowKeepingRentedBicycleAtDestination", (Boolean v) -> request.allowKeepingRentedVehicleAtDestination = v);
+      callWith.argument("keepingRentedBicycleAtDestinationCost", (Integer v) -> request.keepingRentedVehicleAtDestinationCost = v);
 
       callWith.argument(
               "modeWeight", (Map<String, Object> v) -> request.setTransitReluctanceForMode(

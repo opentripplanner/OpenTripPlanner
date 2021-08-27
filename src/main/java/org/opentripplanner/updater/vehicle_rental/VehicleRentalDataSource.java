@@ -11,13 +11,13 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 public interface VehicleRentalDataSource {
 
     /**
-     * Fetch current data about bike rental stations and availability from this source.
+     * Fetch current data about vehicle rental stations and availability from this source.
      * @return true if this operation may have changed something in the list of stations.
      */
     boolean update();
 
     /**
-     * @return a List of all currently known bike rental stations. The updater will use this to update the Graph.
+     * @return a List of all currently known vehicle rental stations. The updater will use this to update the Graph.
      */
     List<VehicleRentalStation> getStations();
     
