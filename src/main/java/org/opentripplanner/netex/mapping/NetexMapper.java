@@ -228,7 +228,8 @@ public class NetexMapper {
 
     private void mapTariffZones() {
         TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(idFactory);
-        for (TariffZone tariffZone : currentNetexIndex.getTariffZonesById().localValues()) {
+        for (String tariffZoneId : currentNetexIndex.getTariffZonesById().localKeys()) {
+            TariffZone tariffZone = currentNetexIndex.getTariffZonesById().lookupLastVersionById(tariffZoneId);
             transitBuilder.getFareZonesById().add(tariffZoneMapper.mapTariffZone(tariffZone));
         }
     }
