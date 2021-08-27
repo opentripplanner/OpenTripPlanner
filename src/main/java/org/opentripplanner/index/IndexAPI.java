@@ -357,12 +357,27 @@ public class IndexAPI {
    /** Return all stop patterns used by trips on the given route. */
    @GET
    @Path("/routes/{routeId}/patterns")
-   public Response getPatternsForRoute (@PathParam("routeId") String routeIdString) {
+   public Response getPatternsForRoute (@PathParam("routeId") String routeIdString,
+                                        @QueryParam("includeGeometry") boolean includeGeometry) {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
            Collection<TripPattern> patterns = index.patternsForRoute.get(route);
-           return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
+           List<EncodedPolylineBean> patternGeometries = patterns
+                   .stream()
+                   .map(pattern -> PolylineEncoder.createEncodings(pattern.geometry))
+                   .collect(Collectors.toList());
+
+
+           List<PatternShort> output;
+
+           if (includeGeometry) {
+            output = PatternShort.list(new ArrayList<>(patterns), patternGeometries);
+           } else {
+               output = PatternShort.list(patterns);
+           }
+
+           return Response.status(Status.OK).entity(output).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
