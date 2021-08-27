@@ -34,6 +34,7 @@ public class GeofencingZones {
     public int size() {return zones.size();}
 
     public boolean isEmpty() {return zones.isEmpty();}
+    public boolean nonEmpty() {return !isEmpty();}
 
     public Envelope getEnvelope() {
         var envelope = new Envelope();
