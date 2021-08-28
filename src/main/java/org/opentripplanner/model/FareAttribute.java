@@ -9,6 +9,8 @@ public final class FareAttribute extends IdentityBean<FeedScopedId> {
 
     private FeedScopedId id;
 
+    private String agencyId;
+
     private float price;
 
     private String currencyType;
@@ -143,4 +145,11 @@ public final class FareAttribute extends IdentityBean<FeedScopedId> {
         this.seniorPrice = seniorPrice;
     }
 
+    public String getAgencyId() {
+        return agencyId;
+    }
+
+    public void setAgencyId(String agencyId) {
+        this.agencyId = agencyId;
+    }
 }

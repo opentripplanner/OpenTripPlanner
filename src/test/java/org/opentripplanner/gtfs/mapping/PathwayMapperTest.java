@@ -18,7 +18,7 @@ public class PathwayMapperTest {
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
-    private static final int PATHWAY_TYPE = 2;
+    private static final int PATHWAY_MODE = 2;
 
     private static final int TRAVERSAL_TIME = 3000;
 
@@ -37,8 +37,9 @@ public class PathwayMapperTest {
         PATHWAY.setId(AGENCY_AND_ID);
         PATHWAY.setFromStop(FROM_STOP);
         PATHWAY.setToStop(TO_STOP);
-        PATHWAY.setPathwayType(PATHWAY_TYPE);
+        PATHWAY.setPathwayMode(PATHWAY_MODE);
         PATHWAY.setTraversalTime(TRAVERSAL_TIME);
+        // TODO: Determine how to/whether this needs to be changed.
         PATHWAY.setWheelchairTraversalTime(WHEELCHAIR_TRAVERSAL_TIME);
     }
 
@@ -58,7 +59,7 @@ public class PathwayMapperTest {
         assertEquals("A_1", result.getId().toString());
         assertNotNull(result.getFromStop());
         assertNotNull(result.getToStop());
-        assertEquals(PATHWAY_TYPE, result.getPathwayType());
+        assertEquals(PATHWAY_MODE, result.getPathwayMode());
         assertEquals(TRAVERSAL_TIME, result.getTraversalTime());
         assertEquals(WHEELCHAIR_TRAVERSAL_TIME, result.getWheelchairTraversalTime());
     }
@@ -73,8 +74,9 @@ public class PathwayMapperTest {
         assertNotNull(result.getId());
         assertNull(result.getFromStop());
         assertNull(result.getToStop());
-        assertEquals(0, result.getPathwayType());
-        assertEquals(0, result.getTraversalTime());
+        assertEquals(0, result.getPathwayMode());
+        int MISSING_VALUE = -999;
+        assertEquals(MISSING_VALUE, result.getTraversalTime());
         assertFalse(result.isWheelchairTraversalTimeSet());
     }
 
