@@ -27,6 +27,7 @@ import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,14 +102,15 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             if ( ! (edge instanceof HopEdge))
                 continue;
             HopEdge hEdge = (HopEdge) edge;
-            if (ride == null || ! state.getRoute().equals(ride.route)) {
+            if (ride == null || ! state.getRoute().equals(ride.route) || createRideDueToInterlining(state, ride)) {
                 ride = new Ride();
                 rides.add(ride);
                 ride.startZone = hEdge.getBeginStop().getZoneId();
                 ride.zones.add(ride.startZone);
-                ride.agency = state.getBackTrip().getRoute().getAgency().getId();
-                ride.routeData = state.getBackTrip().getRoute();
-                ride.route = state.getRoute();
+                Route route = ((PatternDepartVertex)edge.getFromVertex()).getTripPattern().route;
+                ride.agency = route.getAgency().getId();
+                ride.routeData = route;
+                ride.route = route.getId();
                 ride.startTime = state.getBackState().getTimeSeconds();
                 ride.firstStop = hEdge.getBeginStop();
                 ride.trip = state.getTripId();
@@ -122,6 +124,14 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             ride.classifier = state.getBackMode();
         }
         return rides;
+    }
+
+    /**
+     * Returns true if a new ride should be created due to interlining. This is expected to be overridden in applicable
+     * extending classes.
+     */
+    protected boolean createRideDueToInterlining(State state, Ride ride) {
+        return false;
     }
 
     @Override

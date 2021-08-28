@@ -627,7 +627,7 @@ public class GraphPathToTripPlanConverterTest {
         secondTripTimes.serviceCode = graph.serviceCodes.get(secondTrip.getId());
         thirdTripTimes.serviceCode = graph.serviceCodes.get(thirdTrip.getId());
 
-        CalendarServiceData calendarServiceData = new CalendarServiceDataStub(graph.serviceCodes.keySet());
+        CalendarServiceData calendarServiceData = new CalendarServiceDataStub(graph.serviceCodes.keySet(), timeZone);
         CalendarServiceImpl calendarServiceImpl = new CalendarServiceImpl(calendarServiceData);
 
         calendarServiceData.putTimeZoneForAgencyId(feedId, timeZone);
@@ -2042,35 +2042,6 @@ public class GraphPathToTripPlanConverterTest {
 
     static TemporaryPartialStreetEdge newTemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2, LineString geometry, String name, double length) {
         return new TemporaryPartialStreetEdge(parentEdge, v1, v2, geometry, new NonLocalizedString(name), length);
-    }
-
-    /**
-     * This class extends the {@link CalendarServiceData} class to allow for easier testing.
-     * It includes methods to return both the set of service ids and the time zone used for testing.
-     */
-    private static final class CalendarServiceDataStub extends CalendarServiceData {
-        private static final long serialVersionUID = 1L;
-
-        final Set<FeedScopedId> serviceIds;
-
-        CalendarServiceDataStub(Set<FeedScopedId> serviceIds) {
-            this.serviceIds = serviceIds;
-        }
-
-        @Override
-        public Set<FeedScopedId> getServiceIds() {
-            return serviceIds;
-        }
-
-        @Override
-        public Set<FeedScopedId> getServiceIdsForDate(ServiceDate date) {
-            return serviceIds;
-        }
-
-        @Override
-        public TimeZone getTimeZoneForAgencyId(String agencyId) {
-            return timeZone;
-        }
     }
 
     /**
