@@ -44,7 +44,7 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
      */
     @Override
     public void processGtfs(OtpTransitService transitService) {
-        fillFareRules(null, transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
+        fillFareRules(transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
     }
 
     @Override
