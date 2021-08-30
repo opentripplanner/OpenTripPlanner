@@ -100,9 +100,9 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
     }
 
     public void removeChildStationIf(Predicate<Station> filter) {
-        childStations = childStations.stream()
+        childStations = Collections.unmodifiableCollection(childStations.stream()
                 .filter(Predicate.not(filter))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList()));
     }
 
     @Override

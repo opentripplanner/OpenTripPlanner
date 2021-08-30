@@ -77,6 +77,7 @@ public class RoutingWorker {
         this.raptorService = new RaptorService<>(config);
         this.request = request;
         this.emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
+        System.out.println(request);
     }
 
     public RoutingResponse route(Router router) {

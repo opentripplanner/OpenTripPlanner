@@ -475,6 +475,9 @@ public class OtpTransitServiceBuilder {
 
     private static void logRemove(String type, int orgSize, int newSize, String reason) {
         if(orgSize == newSize) { return; }
-        LOG.info("{} of {} {}(s) removed. Reason: {}", orgSize - newSize, orgSize, type, reason);
+        LOG.info(
+                "{} of {} {}(s) removed, {} left. Reason: {}",
+                orgSize - newSize, orgSize, type, newSize, reason
+        );
     }
 }
