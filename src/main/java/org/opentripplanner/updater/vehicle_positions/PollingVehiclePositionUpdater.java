@@ -25,7 +25,7 @@ import java.util.List;
  *
  */
 public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
-    private static final Logger LOG = LoggerFactory.getLogger(org.opentripplanner.updater.vehicle_positions.PollingVehiclePositionUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
 
     /**
      * Parent update manager. Is used to execute graph writer runnables.

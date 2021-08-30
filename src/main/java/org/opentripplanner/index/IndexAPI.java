@@ -363,16 +363,14 @@ public class IndexAPI {
        Route route = index.routeForId.get(routeId);
        if (route != null) {
            Collection<TripPattern> patterns = index.patternsForRoute.get(route);
-           List<EncodedPolylineBean> patternGeometries = patterns
-                   .stream()
-                   .map(pattern -> PolylineEncoder.createEncodings(pattern.geometry))
-                   .collect(Collectors.toList());
-
-
            List<PatternShort> output;
 
            if (includeGeometry) {
-            output = PatternShort.list(new ArrayList<>(patterns), patternGeometries);
+               List<EncodedPolylineBean> patternGeometries = patterns
+                       .stream()
+                       .map(pattern -> PolylineEncoder.createEncodings(pattern.geometry))
+                       .collect(Collectors.toList());
+               output = PatternShort.list(new ArrayList<>(patterns), patternGeometries);
            } else {
                output = PatternShort.list(patterns);
            }

@@ -11,7 +11,6 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,22 +39,23 @@ public class VehiclePositionPatternMatcher {
         for (VehiclePosition vehiclePosition : vehiclePositions) {
             if (!vehiclePosition.hasTrip()) {
                 LOG.warn("Realtime vehicle positions without trip IDs are not yet supported.");
+                continue;
             }
 
             String tripId = vehiclePosition.getTrip().getTripId();
             Trip trip = graphIndex.tripForId.get(new FeedScopedId(feedId, tripId));
             if (trip == null) {
-                LOG.warn("Unable to find OTP trip ID for vehicle position " + vehiclePosition);
+                LOG.warn(String.format("Unable to find OTP trip ID for vehicle position with trip ID %s", tripId));
                 continue;
             }
 
             TripPattern pattern = graphIndex.patternForTrip.get(trip);
             if (pattern == null) {
-                LOG.warn("Unable to match OTP pattern ID for vehicle position " + vehiclePosition);
+                LOG.warn(String.format("Unable to match OTP pattern ID for vehicle position with trip ID %s", tripId));
                 continue;
             }
 
-            RealtimeVehiclePosition newPosition = parseVehiclePosition(vehiclePosition, new ArrayList<>(Arrays.asList(pattern.stopVertices)));
+            RealtimeVehiclePosition newPosition = parseVehiclePosition(vehiclePosition, Arrays.asList(pattern.stopVertices));
             newPosition.patternId = pattern.code;
 
             if (pattern.vehiclePositions == null) {
@@ -107,8 +107,13 @@ public class VehiclePositionPatternMatcher {
                     .filter(stop -> stop.getStopId().getId().equals(vehiclePosition.getStopId()))
                     .collect(Collectors.toList());
             if (matchedStops.size() == 1) {
-                newPosition.nextStop = matchedStops.get(0).getName();
+                newPosition.nextStopName = matchedStops.get(0).getName();
+                newPosition.nextStopId = matchedStops.get(0).getStopId();
             }
+        }
+
+        if (vehiclePosition.hasCurrentStopSequence()) {
+            newPosition.nextStopSequenceId = vehiclePosition.getCurrentStopSequence();
         }
 
         return newPosition;

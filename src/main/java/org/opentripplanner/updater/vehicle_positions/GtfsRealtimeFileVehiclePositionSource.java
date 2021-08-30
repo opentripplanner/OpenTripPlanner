@@ -54,7 +54,7 @@ public class GtfsRealtimeFileVehiclePositionSource implements VehiclePositionSou
                 feedEntityList = feedMessage.getEntityList();
 
                 // Create List of TripUpdates
-                positions = new ArrayList<VehiclePosition>(feedEntityList.size());
+                positions = new ArrayList<>(feedEntityList.size());
                 for (FeedEntity feedEntity : feedEntityList) {
                     if (feedEntity.hasVehicle()) positions.add(feedEntity.getVehicle());
                 }
