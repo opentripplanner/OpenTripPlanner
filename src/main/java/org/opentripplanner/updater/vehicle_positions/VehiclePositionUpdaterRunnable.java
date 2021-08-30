@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
@@ -39,6 +40,12 @@ public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
         // Apply updates to graph using realtime snapshot source
         VehiclePositionPatternMatcher vehiclePositionPatternMatcher = graph.vehiclePositionPatternMatcher;
         if (vehiclePositionPatternMatcher != null) {
+            // "clean" all patterns, removing all removed vehicles
+            for (TripPattern pattern : graph.index.patternsForFeedId.get(feedId)) {
+                vehiclePositionPatternMatcher.cleanPatternVehiclePositions(pattern, updates);
+            }
+
+            // Apply new vehicle positions
             vehiclePositionPatternMatcher.applyVehiclePositionUpdates(updates, feedId);
         } else {
             LOG.error("Could not find realtime data snapshot source in graph."

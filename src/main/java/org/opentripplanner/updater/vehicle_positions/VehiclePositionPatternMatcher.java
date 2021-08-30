@@ -31,6 +31,24 @@ public class VehiclePositionPatternMatcher {
     }
 
     /**
+     * Iterates over a pattern's vehicle positions and removes all not in a new list of vehicle positions
+     * @param pattern           Pattern to "clean"
+     * @param vehiclePositions  List of new vehicle positions
+     */
+    public void cleanPatternVehiclePositions(TripPattern pattern, List<VehiclePosition> vehiclePositions) {
+        for (String key : pattern.vehiclePositions.keySet()) {
+            for (VehiclePosition vehiclePosition : vehiclePositions) {
+                String tripId = vehiclePosition.getTrip().getTripId();
+                if (tripId.equals(key)) {
+                    break;
+                }
+            }
+            // If we didn't return, it means this vehicle has ceased to exist and should be removed
+            pattern.vehiclePositions.remove(key);
+        }
+    }
+
+    /**
      * Attempts to match each vehicle position to a pattern, then adds each to a pattern
      * @param vehiclePositions  List of vehicle positions to match to patterns
      * @param feedId            Feed id of vehicle positions to assist in pattern-matching
@@ -55,7 +73,10 @@ public class VehiclePositionPatternMatcher {
                 continue;
             }
 
-            RealtimeVehiclePosition newPosition = parseVehiclePosition(vehiclePosition, Arrays.asList(pattern.stopVertices));
+            RealtimeVehiclePosition newPosition = parseVehiclePosition(
+                    vehiclePosition,
+                    Arrays.asList(pattern.stopVertices)
+            );
             newPosition.patternId = pattern.code;
 
             if (pattern.vehiclePositions == null) {
