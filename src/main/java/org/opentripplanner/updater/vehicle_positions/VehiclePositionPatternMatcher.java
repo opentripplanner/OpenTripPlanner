@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -26,25 +28,31 @@ public class VehiclePositionPatternMatcher {
 
     private final GraphIndex graphIndex;
 
+    /**
+     * Set of trip IDs we've seen, so if we stop seeing them we know to remove them from the pattern
+     */
+    private final Set<String> seenTripIds = new HashSet<>();
+
     public VehiclePositionPatternMatcher(Graph graph) {
         graphIndex = graph.index;
     }
 
     /**
-     * Iterates over a pattern's vehicle positions and removes all not in a new list of vehicle positions
-     * @param pattern           Pattern to "clean"
-     * @param vehiclePositions  List of new vehicle positions
+     * Clear seen trip IDs
      */
-    public void cleanPatternVehiclePositions(TripPattern pattern, List<VehiclePosition> vehiclePositions) {
+    public void wipeSeenTripIds() {
+        seenTripIds.clear();
+    }
+
+    /**
+     * Iterates over a pattern's vehicle positions and removes all not seen in the seenTripIds set
+     * @param pattern           Pattern to "clean"
+     */
+    public void cleanPatternVehiclePositions(TripPattern pattern) {
         for (String key : pattern.vehiclePositions.keySet()) {
-            for (VehiclePosition vehiclePosition : vehiclePositions) {
-                String tripId = vehiclePosition.getTrip().getTripId();
-                if (tripId.equals(key)) {
-                    break;
-                }
+            if (!seenTripIds.contains(key)) {
+                pattern.vehiclePositions.remove(key);
             }
-            // If we didn't return, it means this vehicle has ceased to exist and should be removed
-            pattern.vehiclePositions.remove(key);
         }
     }
 
@@ -73,6 +81,10 @@ public class VehiclePositionPatternMatcher {
                 continue;
             }
 
+            // Add trip to seen trip set
+            seenTripIds.add(tripId);
+
+            // Add position to pattern
             RealtimeVehiclePosition newPosition = parseVehiclePosition(
                     vehiclePosition,
                     Arrays.asList(pattern.stopVertices)

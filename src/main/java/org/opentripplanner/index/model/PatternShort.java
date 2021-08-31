@@ -45,7 +45,7 @@ public class PatternShort {
      * Maintain backwards compatibility for when geometry is not supplied
      */
     public static List<PatternShort> list (Collection<TripPattern> in) {
-        return list(new ArrayList<>(in),null);
+        return list(new ArrayList<>(in), null);
     }
 
 }
