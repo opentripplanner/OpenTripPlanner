@@ -1,5 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
+
+import java.util.TimeZone;
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
@@ -14,11 +18,6 @@ import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OrganisationRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
-
-import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
 public class RouteMapperTest {
 

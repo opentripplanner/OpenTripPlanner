@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import javax.annotation.Nullable;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Operator;
@@ -13,9 +15,6 @@ import org.rutebanken.netex.model.OperatorRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 /**
  * Maps NeTEx line to OTP Route.

@@ -2,6 +2,8 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +36,8 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -50,6 +53,8 @@ import org.rutebanken.netex.model.TariffZone;
  * </p>
  */
 public class NetexMapper {
+    private static final Logger LOG = LoggerFactory.getLogger(NetexMapper.class);
+
     private static final int LEVEL_SHARED = 0;
     private static final int LEVEL_GROUP = 1;
 
@@ -158,8 +163,12 @@ public class NetexMapper {
         mapAuthorities();
         mapOperators();
         mapShapePoints();
-        mapTariffZones();
-        mapStopPlaceAndQuays();
+
+        // The tariffZoneMapper is used to map all currently valid zones and to map the correct
+        // referenced zone in StopPlace - which may not be the most currently valid zone.
+        // This is a workaround until versioned entities are supported by OTP
+        var tariffZoneMapper = mapTariffZones();
+        mapStopPlaceAndQuays(tariffZoneMapper);
         mapMultiModalStopPlaces();
         mapGroupsOfStopPlaces();
         mapFlexibleStopPlaces();
@@ -226,28 +235,31 @@ public class NetexMapper {
         }
     }
 
-    private void mapTariffZones() {
-        TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(idFactory);
-        for (String tariffZoneId : currentNetexIndex.getTariffZonesById().localKeys()) {
-            TariffZone tariffZone = currentNetexIndex.getTariffZonesById().lookupLastVersionById(tariffZoneId);
-            transitBuilder.getFareZonesById().add(tariffZoneMapper.mapTariffZone(tariffZone));
-        }
+    private TariffZoneMapper mapTariffZones() {
+        TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(
+                getStartOfPeriod(),
+                idFactory,
+                currentNetexIndex.getTariffZonesById()
+        );
+        transitBuilder.getFareZonesById().addAll(tariffZoneMapper.listAllCurrentFareZones());
+        return tariffZoneMapper;
     }
 
-    private void mapStopPlaceAndQuays() {
-        for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
-            Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex.getStopPlaceById().lookup(stopPlaceId);
-            StopAndStationMapper stopMapper = new StopAndStationMapper(
+    private void mapStopPlaceAndQuays(TariffZoneMapper tariffZoneMapper) {
+        StopAndStationMapper stopMapper = new StopAndStationMapper(
                 idFactory,
                 currentNetexIndex.getQuayById(),
-                transitBuilder.getFareZonesById(),
+                tariffZoneMapper,
                 issueStore
-            );
+        );
+        for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
+            Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex.getStopPlaceById().lookup(stopPlaceId);
             stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
-            transitBuilder.getStops().addAll(stopMapper.resultStops);
-            transitBuilder.getStations().addAll(stopMapper.resultStations);
-            stationsByMultiModalStationRfs.putAll(stopMapper.resultStationByMultiModalStationRfs);
         }
+        transitBuilder.getStops().addAll(stopMapper.resultStops);
+        transitBuilder.getStations().addAll(stopMapper.resultStations);
+        stationsByMultiModalStationRfs.putAll(stopMapper.resultStationByMultiModalStationRfs);
+
     }
 
     private void mapMultiModalStopPlaces() {
@@ -384,5 +396,26 @@ public class NetexMapper {
             groupMapper.addInterchange(
                     currentNetexIndex.getServiceJourneyInterchangeById().localValues());
         }
+    }
+
+    /**
+     * The start of period is used to find the valid entities based on the current time.
+     * This should probably be configurable in the future, or even better incorporate the version
+     * number into the entity id, so we can operate with more than one version of an entity in OTPs
+     * internal model.
+     */
+    private LocalDateTime getStartOfPeriod() {
+        String timeZone = currentNetexIndex.getTimeZone();
+        if(timeZone == null) {
+            LocalDateTime time = LocalDateTime.now(ZoneId.of("UTC"));
+            LOG.warn(
+                    "No timezone set for the current NeTEx input data file. The import " +
+                    "start-of-period is set to " + time + " UTC, used to check entity validity " +
+                    "periods."
+            );
+            return time;
+
+        }
+        return LocalDateTime.now(ZoneId.of(timeZone));
     }
 }
