@@ -420,7 +420,7 @@ otp.widgets.tripoptions.WheelChairSelector =
 
     id           :  null,
     //TRANSLATORS: label for checkbox
-    label        : _tr("Wheelchair accesible trip:"),
+    label        : _tr("Wheelchair accessible trip:"),
 
     initialize : function(tripWidget) {
 
@@ -445,9 +445,7 @@ otp.widgets.tripoptions.WheelChairSelector =
     },
 
     restorePlan : function(data) {
-        if(data.queryParams.wheelchair) {
-            $("#"+this.id+"-wheelchair-input").prop("checked", data.queryParams.wheelchair);
-        }
+        $("#"+this.id+"-wheelchair-input").prop("checked", data.queryParams.wheelchair === 'true');
     },
 
     isApplicableForMode : function(mode) {
@@ -485,9 +483,7 @@ otp.widgets.tripoptions.DebugItineraryFiltersSelector = otp.Class(
             });
         },
         restorePlan: function (data) {
-            if (data.queryParams.debugItineraryFilter) {
-                $("#" + this.id + "-debug-filters-input").prop("checked", data.queryParams.debugItineraryFilter);
-            }
+            $("#" + this.id + "-debug-filters-input").prop("checked", data.queryParams.debugItineraryFilter === 'true');
         },
         isApplicableForMode : function(mode) { return true; }
     }
