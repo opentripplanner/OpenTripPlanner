@@ -2,7 +2,9 @@ package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -60,7 +62,8 @@ class RouteMapper {
                 line.getTransportSubmode()
         );
         otpRoute.setType(transportType);
-        otpRoute.setMode(TransitModeMapper.mapMode(transportType));
+        TransitMode mode = TransitModeMapper.mapMode(transportType);
+        otpRoute.setMode(mode);
         if (line instanceof FlexibleLine_VersionStructure) {
             otpRoute.setFlexibleLineType(((FlexibleLine_VersionStructure) line)
                 .getFlexibleLineType().value());
@@ -74,6 +77,11 @@ class RouteMapper {
             if (presentation.getTextColour() != null) {
                 otpRoute.setTextColor(hexBinaryAdapter.marshal(presentation.getTextColour()));
             }
+        }
+
+
+        if(mode == TransitMode.FERRY) {
+            otpRoute.setBikesAllowed(BikeAccess.ALLOWED);
         }
 
         return otpRoute;
