@@ -1078,10 +1078,34 @@ otp.widgets.tripoptions.AdditionalTripParameters =
                     }
                 })
 
-                this_.tripWidget.module.additionalParameters = params;
+                var keys = _(params).keys().join(',');
+                if (keys) {
+                    params['additionalParameters'] = keys;
+                    this_.tripWidget.module.additionalParameters = params;
+                } else {
+                    this_.tripWidget.module.additionalParameters = null;
+                }
             });
         },
-});
+
+        restorePlan : function(data) {
+            if (data.queryParams.additionalParameters) {
+                var str = '';
+                var keys = data.queryParams.additionalParameters.split(',');
+                var params = {};
+
+                _.each(keys, function (key) {
+                    str += key + '=' + data.queryParams[key] + '\n';
+                    params[key] = data.queryParams[key];
+                });
+
+                $('#'+this.id+'-value').val(str);
+
+                this.tripWidget.module.additionalParameters = params;
+            }
+        },
+    }
+);
 
 /*otp.widgets.TW_GroupTripSubmit =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
