@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.framework;
 import graphql.Scalars;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
+import graphql.schema.GraphQLNonNull;
 
 public class TriangleFactorsInputType {
 
@@ -13,21 +14,18 @@ public class TriangleFactorsInputType {
             .field(GraphQLInputObjectField.newInputObjectField()
                     .name("safety")
                     .description("How important is bicycle safety expressed as a fraction of 1.")
-                    .type(Scalars.GraphQLFloat)
-                    .defaultValue(0.4)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
             .field(GraphQLInputObjectField.newInputObjectField()
                     .name("slope")
                     .description("How important is slope/elevation expressed as a fraction of 1.")
-                    .type(Scalars.GraphQLFloat)
-                    .defaultValue(0.3)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
             .field(GraphQLInputObjectField.newInputObjectField()
                     .name("time")
                     .description(
                             "How important is time expressed as a fraction of 1. Note that what this really optimises for is distance (even if that means going over terrible surfaces, so I might be slower than the safe route).")
-                    .defaultValue(0.3)
-                    .type(Scalars.GraphQLFloat)
+                    .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                     .build())
             .build();
 }
