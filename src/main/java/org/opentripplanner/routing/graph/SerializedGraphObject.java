@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.datastore.DataSource;
@@ -168,10 +169,17 @@ public class SerializedGraphObject implements Serializable {
         kryo.addDefaultSerializer(TPrimitiveHash.class, ExternalizableSerializer.class);
         kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
         kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
+
+        // Add support for the package local java.util.ImmutableCollections, use List.of() to
+        // access. Not supported in the current com.conveyal:kryo-tools:1.3.0.
+        // This provide support for List.of, Set.of and Collectors.toUnmodifiable(Set|List)
+        kryo.register(List.of().getClass(), new JavaSerializer());
+
         // Kryo's default instantiation and deserialization of BitSets leaves them empty.
         // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.
         // BitSet's built-in Java serializer saves the internal bitfields, which is efficient. We use that one.
         kryo.register(BitSet.class, new JavaSerializer());
+
         // BiMap has a constructor that uses its putAll method, which just puts each item in turn.
         // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
         // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
