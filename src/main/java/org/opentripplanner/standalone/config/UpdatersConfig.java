@@ -32,6 +32,7 @@ import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParamete
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import java.util.function.BiFunction;
  */
 public class UpdatersConfig implements UpdatersParameters {
 
+  private static final String BIKE_RENTAL = "bike-rental"; // TODO: deprecated, remove in next major version
   private static final String VEHICLE_RENTAL = "vehicle-rental";
   private static final String STOP_TIME_UPDATER = "stop-time-updater";
   private static final String WEBSOCKET_GTFS_RT_UPDATER = "websocket-gtfs-rt-updater";
@@ -59,6 +61,7 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final Map<String, BiFunction<String, NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
 
   static {
+    CONFIG_CREATORS.put(BIKE_RENTAL, VehicleRentalUpdaterConfig::create); // TODO: deprecated, remove in next major version
     CONFIG_CREATORS.put(VEHICLE_RENTAL, VehicleRentalUpdaterConfig::create);
     CONFIG_CREATORS.put(BIKE_PARK, BikeParkUpdaterConfig::create);
     CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::create);
@@ -80,7 +83,9 @@ public class UpdatersConfig implements UpdatersParameters {
   public UpdatersConfig(NodeAdapter rootAdapter) {
     this.vehicleRentalServiceDirectoryFetcherParameters =
         VehicleRentalServiceDirectoryFetcherConfig.create(
-          rootAdapter.path("vehicleRentalServiceDirectory")
+          rootAdapter.exist("vehicleRentalServiceDirectory") ?
+          rootAdapter.path("vehicleRentalServiceDirectory") :
+          rootAdapter.path("bikeRentalServiceDirectory") // TODO: deprecated, remove in next major version
         );
 
     List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
@@ -107,7 +112,9 @@ public class UpdatersConfig implements UpdatersParameters {
 
   @Override
   public List<VehicleRentalUpdaterParameters> getVehicleRentalParameters() {
-    return getParameters(VEHICLE_RENTAL);
+    ArrayList<VehicleRentalUpdaterParameters> result = new ArrayList<>(getParameters(VEHICLE_RENTAL));
+    result.addAll(getParameters(BIKE_RENTAL));
+    return result;
   }
 
   @Override

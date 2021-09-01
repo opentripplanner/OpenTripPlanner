@@ -162,6 +162,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
         case "composite:additive":
             return new MultipleFareServiceFactory.AddingMultipleFareServiceFactory();
         case "vehicle-rental-time-based":
+        case "bike-rental-time-based": //TODO: deprecated, remove in next major version
             return new TimeBasedVehicleRentalFareServiceFactory();
         case "dutch":
             return new DutchFareServiceFactory();
