@@ -304,8 +304,12 @@ otp.widgets.ItinerariesWidget =
 
             //div.append('<div class="otp-itinsAccord-header-segment" style="width: '+widthPx+'px; left: '+leftPx+'px; background: '+this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat;"></div>');
 
+            var routeTitle = _.chain([leg.mode, leg.agencyName, leg.routeShortName, leg.routeLongName])
+                    .filter(function (value) { return !!value; })
+                    .reduce(function (l, r) { return l ? l + " " + r : r; }, "")
+                    .value();
             var showRouteLabel = widthPx > 40 && otp.util.Itin.isTransit(leg.mode) && leg.routeShortName && leg.routeShortName.length <= 6;
-            var segment = $('<div class="otp-itinsAccord-header-segment" />')
+            var segment = $('<div class="otp-itinsAccord-header-segment" title="' + routeTitle + '" />')
             .css({
                 width: widthPx,
                 left: leftPx,
