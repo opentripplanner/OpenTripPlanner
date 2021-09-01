@@ -2,8 +2,10 @@ package org.opentripplanner.routing.vehicle_rental;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,22 +16,22 @@ import org.opentripplanner.routing.bike_park.BikePark;
 public class VehicleRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 
-    private Set<VehicleRentalStation> vehicleRentalStations = new HashSet<>();
+    private final Map<String, VehicleRentalStation> vehicleRentalStations = new HashMap<>();
 
     private Set<BikePark> bikeParks = new HashSet<>();
 
     public Collection<VehicleRentalStation> getVehicleRentalStations() {
-        return vehicleRentalStations;
+        return vehicleRentalStations.values();
     }
 
     public void addVehicleRentalStation(VehicleRentalStation vehicleRentalStation) {
         // Remove old reference first, as adding will be a no-op if already present
-        vehicleRentalStations.remove(vehicleRentalStation);
-        vehicleRentalStations.add(vehicleRentalStation);
+        vehicleRentalStations.remove(vehicleRentalStation.id);
+        vehicleRentalStations.put(vehicleRentalStation.id, vehicleRentalStation);
     }
 
-    public void removeVehicleRentalStation(VehicleRentalStation vehicleRentalStation) {
-        vehicleRentalStations.remove(vehicleRentalStation);
+    public void removeVehicleRentalStation(String vehicleRentalStationId) {
+        vehicleRentalStations.remove(vehicleRentalStationId);
     }
 
     public Collection<BikePark> getBikeParks() {
@@ -60,6 +62,7 @@ public class VehicleRentalStationService implements Serializable {
         );
 
         return vehicleRentalStations
+            .values()
             .stream()
             .filter(b -> envelope.contains(new Coordinate(b.longitude, b.latitude)))
             .collect(Collectors.toList());

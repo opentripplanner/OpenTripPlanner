@@ -36,9 +36,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private GraphUpdaterManager updaterManager;
 
-    Map<VehicleRentalStation, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
+    Map<String, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
 
-    Map<VehicleRentalStation, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
+    Map<String, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
 
     private final VehicleRentalDataSource source;
 
@@ -106,7 +106,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 		@Override
         public void run(Graph graph) {
             // Apply stations to graph
-            Set<VehicleRentalStation> stationSet = new HashSet<>();
+            Set<String> stationSet = new HashSet<>();
             Set<String> defaultNetworks = new HashSet<>(Collections.singletonList(network));
 
             /* add any new stations and update vehicle counts for existing stations */
@@ -116,8 +116,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                     station.networks = defaultNetworks;
                 }
                 service.addVehicleRentalStation(station);
-                stationSet.add(station);
-                VehicleRentalStationVertex vehicleRentalVertex = verticesByStation.get(station);
+                stationSet.add(station.id);
+                VehicleRentalStationVertex vehicleRentalVertex = verticesByStation.get(station.id);
                 if (vehicleRentalVertex == null) {
                     vehicleRentalVertex = new VehicleRentalStationVertex(graph, station);
                     DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
@@ -134,23 +134,23 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                         LOG.info("VehicleRentalStation {} is unlinked", vehicleRentalVertex);
                     }
                     tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex));
-                    verticesByStation.put(station, vehicleRentalVertex);
-                    tempEdgesByStation.put(station, tempEdges);
+                    verticesByStation.put(station.id, vehicleRentalVertex);
+                    tempEdgesByStation.put(station.id, tempEdges);
                 } else {
                     vehicleRentalVertex.setVehiclesAvailable(station.vehiclesAvailable);
                     vehicleRentalVertex.setSpacesAvailable(station.spacesAvailable);
                 }
             }
             /* remove existing stations that were not present in the update */
-            List<VehicleRentalStation> toRemove = new ArrayList<>();
-            for (Entry<VehicleRentalStation, VehicleRentalStationVertex> entry : verticesByStation.entrySet()) {
-                VehicleRentalStation station = entry.getKey();
+            List<String> toRemove = new ArrayList<>();
+            for (Entry<String, VehicleRentalStationVertex> entry : verticesByStation.entrySet()) {
+                String station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
                 toRemove.add(station);
                 service.removeVehicleRentalStation(station);
             }
-            for (VehicleRentalStation station : toRemove) {
+            for (String station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);
                 tempEdgesByStation.get(station).disposeEdges();

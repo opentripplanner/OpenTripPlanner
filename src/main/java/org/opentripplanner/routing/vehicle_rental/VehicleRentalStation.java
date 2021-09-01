@@ -32,22 +32,6 @@ public class VehicleRentalStation implements Serializable {
     public boolean realTimeData = true;
 
     public VehicleRentalStationUris rentalUris;
-
-    /**
-     * FIXME nonstandard definition of equals, relying on only the station field.
-     * We should probably be keying collections on station ID rather than the station object with nonstandard equals.
-     */
-    public boolean equals(Object o) {
-        if (!(o instanceof VehicleRentalStation)) {
-            return false;
-        }
-        VehicleRentalStation other = (VehicleRentalStation) o;
-        return other.id.equals(id);
-    }
-    
-    public int hashCode() {
-        return id.hashCode() + 1;
-    }
     
     public String toString () {
         return String.format(ROOT, "Vehicle rental station %s at %.6f, %.6f", name, latitude, longitude);
