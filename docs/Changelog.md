@@ -43,6 +43,7 @@
 - Changes to the StopTimes call [#3576](https://github.com/opentripplanner/OpenTripPlanner/issues/3576)
 - Fix bug in optimize transfer service decorating path [#3587](https://github.com/opentripplanner/OpenTripPlanner/issues/3587)
 - Fix bug in Transmodel API when querying stopPlaves [#3591](https://github.com/opentripplanner/OpenTripPlanner/pull/3591)
+- When importing Netex, allow bicycles on ferries by default [#3596](https://github.com/opentripplanner/OpenTripPlanner/pull/3596)
 
 ## 2.0.0 (2020-11-27)
 
