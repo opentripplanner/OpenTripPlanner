@@ -46,12 +46,14 @@ public class VehiclePositionPatternMatcher {
 
     /**
      * Iterates over a pattern's vehicle positions and removes all not seen in the seenTripIds set
-     * @param pattern           Pattern to "clean"
+     * @param feedId           FeedId whose pattern's should be "cleaned"
      */
-    public void cleanPatternVehiclePositions(TripPattern pattern) {
-        for (String key : pattern.vehiclePositions.keySet()) {
-            if (!seenTripIds.contains(key)) {
-                pattern.vehiclePositions.remove(key);
+    public void cleanPatternVehiclePositions(String feedId) {
+        for (TripPattern pattern : graphIndex.patternsForFeedId.get(feedId)) {
+            for (String key : pattern.vehiclePositions.keySet()) {
+                if (!seenTripIds.contains(key)) {
+                    pattern.vehiclePositions.remove(key);
+                }
             }
         }
     }

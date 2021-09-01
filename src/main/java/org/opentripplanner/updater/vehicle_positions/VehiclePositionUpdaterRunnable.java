@@ -50,9 +50,7 @@ public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
 
             // "clean" all patterns, removing all vehicles not "seen" in the
             // previous step (stored in the seen trip IDs)
-            for (TripPattern pattern : graph.index.patternsForFeedId.get(feedId)) {
-                vehiclePositionPatternMatcher.cleanPatternVehiclePositions(pattern);
-            }
+            vehiclePositionPatternMatcher.cleanPatternVehiclePositions(feedId);
         } else {
             LOG.error("Could not find realtime data snapshot source in graph."
                     + " The following updates are not applied: {}", updates);
