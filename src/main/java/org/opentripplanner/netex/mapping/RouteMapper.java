@@ -79,7 +79,15 @@ class RouteMapper {
             }
         }
 
-
+        // we would love to read this information from the actual feed but it's unclear where
+        // this information would be located.
+        // the standard defines the following enum for baggage
+        // https://github.com/NeTEx-CEN/NeTEx/blob/0436cb774778ae68a682c28e0a21013e4886c883/xsd/netex_part_3/part3_fares/netex_usageParameterLuggage_support.xsd#L120
+        // and there is a usage of that in one of the Entur examples
+        // https://github.com/entur/profile-examples/blob/7f45e036c870205102d96ef58c7ce5008f4edcf1/netex/fares-sales/Entur_PARTIAL_EXAMPLE_INCOMPLETE_FinnmarkFullExample.xml#L1598-L1611
+        // but currently it doesn't look it is being parsed.
+        // until there is better information from the operators we assume that all ferries allow
+        // bicycles on board.
         if(mode == TransitMode.FERRY) {
             otpRoute.setBikesAllowed(BikeAccess.ALLOWED);
         }
