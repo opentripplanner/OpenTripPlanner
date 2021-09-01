@@ -1339,6 +1339,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * This setter function accepts any three numbers and will normalize them to add up to 1.
      */
     public void setTriangleNormalized(double safe, double slope, double time) {
+        if(safe == 0 && slope == 0 && time == 0) {
+            var oneThird = 1f /3;
+            safe = oneThird;
+            slope = oneThird;
+            time = oneThird;
+        }
         safe = setMinValue(safe);
         slope = setMinValue(slope);
         time = setMinValue(time);
@@ -1356,8 +1362,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.bikeTriangleTimeFactor = time;
     }
 
-    private double setMinValue(double safe) {
-        return Math.max(0.001, safe);
+    private double setMinValue(double value) {
+        return Math.max(0, value);
     }
 
     public static void assertTriangleParameters(

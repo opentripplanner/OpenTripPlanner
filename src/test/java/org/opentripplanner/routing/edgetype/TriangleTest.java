@@ -59,9 +59,9 @@ public class TriangleTest {
     public void testZero() {
         var req = new RoutingRequest();
         req.setTriangleNormalized(0,0,0.1);
-        assertEquals(req.bikeTriangleSafetyFactor, 0.01, DELTA);
-        assertEquals(req.bikeTriangleSlopeFactor, 0.01, DELTA);
-        assertEquals(req.bikeTriangleTimeFactor, 0.98, DELTA);
+        assertEquals(req.bikeTriangleSafetyFactor, 0, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 1, DELTA);
 
         req.setTriangleNormalized(0,0,0);
         assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
@@ -73,9 +73,9 @@ public class TriangleTest {
     public void testLessThanZero() {
         var req = new RoutingRequest();
         req.setTriangleNormalized(-1,-1,0.1);
-        assertEquals(req.bikeTriangleSafetyFactor, 0.01, DELTA);
-        assertEquals(req.bikeTriangleSlopeFactor, 0.01, DELTA);
-        assertEquals(req.bikeTriangleTimeFactor, 0.98, DELTA);
+        assertEquals(req.bikeTriangleSafetyFactor, 0, DELTA);
+        assertEquals(req.bikeTriangleSlopeFactor, 0, DELTA);
+        assertEquals(req.bikeTriangleTimeFactor, 1, DELTA);
     }
 
     @Test
