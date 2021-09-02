@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,11 +43,11 @@ public class GtfsRealtimeFileVehiclePositionSource implements VehiclePositionSou
      */
     public List<VehiclePosition> getPositions() {
         try (InputStream is = new FileInputStream(file)) {
-            this.getPositions(is);
+            return this.getPositions(is);
         } catch (Exception e) {
             LOG.warn("Failed to parse gtfs-rt feed at {}:", file, e);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

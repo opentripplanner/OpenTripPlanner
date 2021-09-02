@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -55,7 +56,7 @@ public class GtfsRealtimeHttpVehiclePositionSource implements VehiclePositionSou
         } catch (Exception e) {
             LOG.warn("Failed to parse gtfs-rt feed from {}:", url, e);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

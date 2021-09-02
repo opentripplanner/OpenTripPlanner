@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,9 +51,10 @@ public class VehiclePositionPatternMatcher {
      */
     public void cleanPatternVehiclePositions(String feedId) {
         for (TripPattern pattern : graphIndex.patternsForFeedId.get(feedId)) {
-            for (String key : pattern.vehiclePositions.keySet()) {
+            for (Iterator<String> iterator = pattern.vehiclePositions.keySet().iterator(); iterator.hasNext();) {
+                String key = iterator.next();
                 if (!seenTripIds.contains(key)) {
-                    pattern.vehiclePositions.remove(key);
+                    iterator.remove();
                 }
             }
         }
