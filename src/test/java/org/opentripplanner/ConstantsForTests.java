@@ -126,7 +126,6 @@ public class ConstantsForTests {
                 OpenStreetMapModule osmModule = new OpenStreetMapModule(List.of(osmProvider));
                 osmModule.staticBikeParkAndRide = true;
                 osmModule.staticParkAndRide = true;
-                osmModule.staticBikeRental = true;
                 osmModule.skipVisibility = true;
                 osmModule.buildGraph(graph, new HashMap<>());
             }
