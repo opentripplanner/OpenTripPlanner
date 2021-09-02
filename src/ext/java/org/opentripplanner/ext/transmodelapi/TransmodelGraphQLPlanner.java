@@ -2,6 +2,7 @@ package org.opentripplanner.ext.transmodelapi;
 
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.concurrent.atomic.AtomicReference;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
@@ -134,14 +135,19 @@ public class TransmodelGraphQLPlanner {
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
 
-            callWith.argument("triangleFactors.safety", request::setBikeTriangleSafetyFactor);
-            callWith.argument("triangleFactors.slope", request::setBikeTriangleSlopeFactor);
-            callWith.argument("triangleFactors.time", request::setBikeTriangleTimeFactor);
+            // because we must use a final variable in the lambda we have to use this ugly crutch.
+            final AtomicReference<Double> safety = new AtomicReference<>((double) 0);
+            final AtomicReference<Double> slope = new AtomicReference<>((double) 0);
+            final AtomicReference<Double> time = new AtomicReference<>((double) 0);
+
+            callWith.argument("triangleFactors.safety", safety::set);
+            callWith.argument("triangleFactors.slope", slope::set);
+            callWith.argument("triangleFactors.time", time::set);
 
             request.setTriangleNormalized(
-                    request.bikeTriangleSafetyFactor,
-                    request.bikeTriangleSlopeFactor,
-                    request.bikeTriangleTimeFactor
+                    safety.get(),
+                    slope.get(),
+                    time.get()
             );
         }
 

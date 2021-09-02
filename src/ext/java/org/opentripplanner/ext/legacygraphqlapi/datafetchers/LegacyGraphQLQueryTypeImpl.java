@@ -9,6 +9,7 @@ import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.util.concurrent.atomic.AtomicReference;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.ParameterException;
@@ -655,13 +656,20 @@ public class LegacyGraphQLQueryTypeImpl
         BicycleOptimizeType optimize = BicycleOptimizeType.valueOf(environment.getArgument("optimize"));
 
         if (optimize == BicycleOptimizeType.TRIANGLE) {
-          callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
-          callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
-          callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
+
+          // because we must use a final variable in the lambda we have to use this ugly crutch.
+          final AtomicReference<Double> safety = new AtomicReference<>((double) 0);
+          final AtomicReference<Double> slope = new AtomicReference<>((double) 0);
+          final AtomicReference<Double> time = new AtomicReference<>((double) 0);
+
+          callWith.argument("triangle.safetyFactor", safety::set);
+          callWith.argument("triangle.slopeFactor", slope::set);
+          callWith.argument("triangle.timeFactor", time::set);
+
           request.setTriangleNormalized(
-                  request.bikeTriangleSafetyFactor,
-                  request.bikeTriangleSlopeFactor,
-                  request.bikeTriangleTimeFactor
+                  safety.get(),
+                  slope.get(),
+                  time.get()
           );
         }
 

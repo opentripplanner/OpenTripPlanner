@@ -984,19 +984,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.intermediatePlaces.add(location);
     }
 
-    public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
-        this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
-    }
-
-    public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
-        this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
-    }
-
-    public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
-        this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
-    }
-
-
     /* INSTANCE METHODS */
 
     public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
