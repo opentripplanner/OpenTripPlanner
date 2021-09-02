@@ -212,7 +212,7 @@ public class TripQuery {
                     + "rental trips."
             )
             .type(Scalars.GraphQLBoolean)
-            .defaultValue(routing.request.useBikeRentalAvailabilityInformation)
+            .defaultValue(routing.request.useVehicleRentalAvailabilityInformation)
             .build()
         )
         .argument(GraphQLArgument.newArgument()

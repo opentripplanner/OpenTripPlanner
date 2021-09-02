@@ -7,7 +7,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLSchema;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 public class PlaceInterfaceType {
 
@@ -47,7 +47,7 @@ public class PlaceInterfaceType {
           if (o instanceof MonoOrMultiModalStation) {
             return schema.getObjectType("StopPlace");
           }
-          if (o instanceof BikeRentalStation) {
+          if (o instanceof VehicleRentalStation) {
             return schema.getObjectType("BikeRentalStation");
           }
           if (o instanceof BikePark) {
