@@ -9,6 +9,8 @@
 
 - Initial version of Transmodel Graph QL API (September 2019)
 - Added support for multimodal StopPlaces (November 2019)
+- Fix bug querying stopPlaces [#3591](https://github.com/opentripplanner/OpenTripPlanner/pull/3591)
+- Fix the field bikesAllowed [#3586](https://github.com/opentripplanner/OpenTripPlanner/pull/3586)
 
 
 ## Documentation
