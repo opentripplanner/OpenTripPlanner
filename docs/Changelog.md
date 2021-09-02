@@ -42,8 +42,6 @@
 - Do not allow bicycle traversal on ways tagged with mtb:scale [#3578](https://github.com/opentripplanner/OpenTripPlanner/pull/3578)
 - Changes to the StopTimes call [#3576](https://github.com/opentripplanner/OpenTripPlanner/issues/3576)
 - Fix bug in optimize transfer service decorating path [#3587](https://github.com/opentripplanner/OpenTripPlanner/issues/3587)
-- Fix bug in Transmodel API when querying stopPlaves [#3591](https://github.com/opentripplanner/OpenTripPlanner/pull/3591)
-- Fix the field bikesAllowed in the Transmodel API [#3586](https://github.com/opentripplanner/OpenTripPlanner/pull/3586)
 
 ## 2.0.0 (2020-11-27)
 
