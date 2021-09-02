@@ -1,9 +1,25 @@
 package org.opentripplanner.graph_builder.module.ned;
 
+import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
+
 import com.fasterxml.jackson.databind.JsonNode;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.geotools.geometry.DirectPosition2D;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
@@ -25,25 +41,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.ProgressTracker;
+import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 /**
  * THIS CLASS IS MULTI-THREADED
@@ -58,7 +58,14 @@ import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDif
  */
 public class ElevationModule implements GraphBuilderModule {
 
-    private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ElevationModule.class);
+
+    /**
+     * Wrap LOG with a Throttle logger for elevation edge warnings, this will prevent thousands
+     * of log events, and just log one message every 3 second.
+     */
+    private static final Logger ELEVATION_EDGE_ERROR_LOG = ThrottleLogger.throttle(LOG);
+
 
     /** The elevation data to be used in calculating elevations. */
     private final ElevationGridCoverageFactory gridCoverageFactory;
@@ -177,13 +184,13 @@ public class ElevationModule implements GraphBuilderModule {
             try {
                 ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
                 cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
-                log.info("Cached elevation data loaded into memory!");
+                LOG.info("Cached elevation data loaded into memory!");
             } catch (IOException | ClassNotFoundException e) {
                 issueStore.add(new Graphwide(
                     String.format("Cached elevations file could not be read in due to error: %s!", e.getMessage())));
             }
         }
-        log.info("Setting street elevation profiles from digital elevation model...");
+        LOG.info("Setting street elevation profiles from digital elevation model...");
 
         List<StreetWithElevationEdge> streetsWithElevationEdges = new LinkedList<>();
 
@@ -231,7 +238,7 @@ public class ElevationModule implements GraphBuilderModule {
                         )
                     )
                 );
-                log.warn(
+                LOG.warn(
                     "Elevation is missing at a large number of points. DEM may be for the wrong region. "
                         + "If it is unprojected, perhaps the axes are not in (longitude, latitude) order."
                 );
@@ -259,7 +266,7 @@ public class ElevationModule implements GraphBuilderModule {
                 out.writeObject(newCachedElevations);
                 out.close();
             } catch (IOException e) {
-                log.error(e.getMessage());
+                LOG.error(e.getMessage());
                 issueStore.add(new Graphwide("Failed to write cached elevation file!"));
             }
         }
@@ -296,7 +303,7 @@ public class ElevationModule implements GraphBuilderModule {
      */
     private void assignMissingElevations(Graph graph, List<StreetEdge> edgesWithElevation, HashMap<Vertex, Double> knownElevations) {
 
-        log.debug("Assigning missing elevations");
+        LOG.debug("Assigning missing elevations");
 
         BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
 
@@ -318,7 +325,7 @@ public class ElevationModule implements GraphBuilderModule {
                         vertex, elevation - getApproximateEllipsoidToGeoidDifference(vertex.getY(), vertex.getX())
                     );
                 } catch (TransformException e) {
-                    log.error(
+                    LOG.error(
                         "Error processing elevation for known elevation at vertex: {} due to error: {}",
                         vertex,
                         e
@@ -478,8 +485,9 @@ public class ElevationModule implements GraphBuilderModule {
                     Double toElevation = elevations.get(edge.getToVertex());
 
                     if (fromElevation == null || toElevation == null) {
-                        if (!edge.isElevationFlattened() && !edge.isSlopeOverride())
-                            log.warn("Unexpectedly missing elevation for edge " + edge);
+                        if (!edge.isElevationFlattened() && !edge.isSlopeOverride()) {
+                            LOG.warn("Unexpectedly missing elevation for edge " + edge);
+                        }
                         continue;
                     }
 
@@ -508,7 +516,7 @@ public class ElevationModule implements GraphBuilderModule {
         processEdge(ee);
         // Keep lambda to get correct line number in log
         //noinspection Convert2MethodRef
-        progress.step(m -> log.info(m));
+        progress.step(m -> LOG.info(m));
     }
 
     /**
@@ -605,7 +613,9 @@ public class ElevationModule implements GraphBuilderModule {
             setEdgeElevationProfile(ee, elevPCS, graph);
         } catch (ElevationLookupException e) {
             // only catch known elevation lookup exceptions
-            log.warn("Error processing elevation for edge: {} due to error: {}", ee, e);
+            ELEVATION_EDGE_ERROR_LOG.warn(
+                    "Error processing elevation for edge: {} due to error: {}", ee, e
+            );
         }
     }
 
@@ -634,7 +644,7 @@ public class ElevationModule implements GraphBuilderModule {
                     try {
                         getElevation(coverage, examplarCoordinate);
                     } catch (ElevationLookupException e) {
-                        log.warn(
+                        ELEVATION_EDGE_ERROR_LOG.warn(
                             "Error processing elevation for coordinate: {} due to error: {}",
                             examplarCoordinate,
                             e
@@ -752,12 +762,12 @@ public class ElevationModule implements GraphBuilderModule {
         // check for the existence of cached elevation data.
         if (readCachedElevations) {
             if (Files.exists(cachedElevationsFile.toPath())) {
-                log.info("Cached elevations file found!");
+                LOG.info("Cached elevations file found!");
             } else {
-                log.warn("No cached elevations file found or read access not allowed! Unable to load in cached elevations. This could take a while...");
+                LOG.warn("No cached elevations file found or read access not allowed! Unable to load in cached elevations. This could take a while...");
             }
         } else {
-            log.warn("Not using cached elevations! This could take a while...");
+            LOG.warn("Not using cached elevations! This could take a while...");
         }
     }
 
