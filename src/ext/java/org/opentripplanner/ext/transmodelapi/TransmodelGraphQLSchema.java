@@ -65,6 +65,7 @@ import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeRentalStationType;
+import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceAtDistanceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceInterfaceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.QuayAtDistanceType;
@@ -305,7 +306,15 @@ public class TransmodelGraphQLSchema {
                     )
                     .collect(Collectors.toList());
               }
-              return new ArrayList<>(GqlUtil.getRoutingService(env).getStations());
+              RoutingService routingService = GqlUtil.getRoutingService(env);
+              return routingService
+                  .getStations()
+                  .stream()
+                  .map(station -> new MonoOrMultiModalStation(
+                          station,
+                          routingService.getMultiModalStationForStations().get(station)
+                  ))
+                  .collect(Collectors.toList());
             })
             .build())
         .field(GraphQLFieldDefinition

@@ -44,6 +44,7 @@
 - Fix bug in optimize transfer service decorating path [#3587](https://github.com/opentripplanner/OpenTripPlanner/issues/3587)
 - Remove non-GBFS bicycle rental updaters [#3562](https://github.com/opentripplanner/OpenTripPlanner/issues/3562)
 
+
 ## 2.0.0 (2020-11-27)
 
 See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
