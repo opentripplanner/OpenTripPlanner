@@ -3,7 +3,7 @@ package org.opentripplanner.updater.bike_park;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
@@ -49,7 +49,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private VertexLinker linker;
 
-    private BikeRentalStationService bikeService;
+    private VehicleRentalStationService bikeService;
 
     public BikeParkUpdater(BikeParkUpdaterParameters parameters) {
         super(parameters);
@@ -69,7 +69,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         // Creation of network linker library will not modify the graph
         linker = graph.getLinker();
         // Adding a bike park station service needs a graph writer runnable
-        bikeService = graph.getService(BikeRentalStationService.class, true);
+        bikeService = graph.getService(VehicleRentalStationService.class, true);
     }
 
     @Override

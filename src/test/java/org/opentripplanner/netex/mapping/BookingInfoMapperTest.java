@@ -129,6 +129,19 @@ public class BookingInfoMapperTest {
     assertEquals(0, bookingInfo3.getLatestBookingTime().getDaysPrior());
     assertEquals(0, bookingInfo3.getEarliestBookingTime().getDaysPrior());
     assertEquals(LocalTime.MIDNIGHT, bookingInfo3.getEarliestBookingTime().getTime());
+
+    bookingArrangements.setBookWhen(PurchaseWhenEnumeration.ADVANCE_AND_DAY_OF_TRAVEL);
+
+    BookingInfo bookingInfo4 = BookingInfoMapper.map(stopPoint, null, null);
+    assertEquals(FIVE_THIRTY,  bookingInfo4.getLatestBookingTime().getTime());
+    assertEquals(0, bookingInfo4.getLatestBookingTime().getDaysPrior());
+    assertNull(bookingInfo4.getEarliestBookingTime());
+
+    bookingArrangements.setBookWhen(PurchaseWhenEnumeration.TIME_OF_TRAVEL_ONLY);
+
+    BookingInfo bookingInfo5 = BookingInfoMapper.map(stopPoint, null, null);
+    assertNull(bookingInfo5.getLatestBookingTime());
+    assertNull(bookingInfo5.getEarliestBookingTime());
   }
 
   @Test

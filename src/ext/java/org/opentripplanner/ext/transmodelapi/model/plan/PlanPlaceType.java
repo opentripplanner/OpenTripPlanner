@@ -81,10 +81,10 @@ public class PlanPlaceType {
               return ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
                   ? GqlUtil
                   .getRoutingService(environment)
-                  .getBikerentalStationService()
-                  .getBikeRentalStations()
+                  .getVehicleRentalStationService()
+                  .getVehicleRentalStations()
                   .stream()
-                  .filter(bikeRentalStation -> bikeRentalStation.id.equals(((Place) environment.getSource()).bikeShareId))
+                  .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(((Place) environment.getSource()).bikeShareId))
                   .findFirst()
                   .orElse(null)
                   : null;
@@ -95,7 +95,7 @@ public class PlanPlaceType {
         //                        .type(bikeParkType)
         //                        .description("The bike parking related to the place")
         //                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
-        //                                index.graph.getService(BikeRentalStationService.class)
+        //                                index.graph.getService(VehicleRentalStationService.class)
         //                                        .getBikeParks()
         //                                        .stream()
         //                                        .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))

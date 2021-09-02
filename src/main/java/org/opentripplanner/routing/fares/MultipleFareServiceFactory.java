@@ -49,7 +49,7 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
      * { combinationStrategy : "additive",
      *   // All properties starting with 'fare'
      *   fare1 : "seattle",
-     *   fare2 : { type: "bike-rental-time-based",
+     *   fare2 : { type: "vehicle-rental-time-based",
      *             prices : { ... }
      * } }
      * </pre>

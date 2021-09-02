@@ -165,7 +165,7 @@ public class LegType {
             .name("rentedBike")
             .description("Whether this leg is with a rented bike.")
             .type(Scalars.GraphQLBoolean)
-            .dataFetcher(env -> leg(env).rentedBike)
+            .dataFetcher(env -> leg(env).rentedVehicle)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()

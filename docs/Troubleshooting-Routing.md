@@ -51,7 +51,7 @@ Currently you can choose between:
 - [Bicycle safety](Troubleshooting-Routing.md#Bicycle-safety-factor) (colors street edges based on how good are for cycling [smaller is better])
 - Traversal permissions (colors street edges based on what types of transit modes are allowed to
  travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer also
- draws links from transit stops/bike rentals and P+R to graph. And also draws transit stops, bike rentals
+ draws links from transit stops/vehicle rentals and P+R to graph. And also draws transit stops, vehicle rentals
   and P+R vertices with different color.
 - No thru traffic - streets are colored if the edge has thru traffic restrictions (car and bicycle = `red`, car only = `orange`, bicycle only = `blue`, and no-restriction = `light gray`)
 

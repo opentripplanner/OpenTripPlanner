@@ -182,9 +182,9 @@ public class Leg {
      */
     public Boolean walkingBike;
 
-    public Boolean rentedBike;
+    public Boolean rentedVehicle;
 
-   public List<String> bikeRentalNetworks = new ArrayList<>();
+   public List<String> vehicleRentalNetworks = new ArrayList<>();
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
@@ -263,8 +263,8 @@ public class Leg {
       transitAlerts.add(alert);
     }
 
-    public void addBikeRentalNetworks(Collection<String> networks) {
-      bikeRentalNetworks.addAll(networks);
+    public void addVehicleRentalNetworks(Collection<String> networks) {
+      vehicleRentalNetworks.addAll(networks);
     }
 
     /**
@@ -341,8 +341,8 @@ public class Leg {
                 .addStr("boardRule", boardRule)
                 .addStr("alightRule", alightRule)
                 .addBool("walkingBike", walkingBike)
-                .addBool("rentedBike", rentedBike)
-                .addCol("bikeRentalNetworks", bikeRentalNetworks)
+                .addBool("rentedVehicle", rentedVehicle)
+                .addCol("bikeRentalNetworks", vehicleRentalNetworks)
                 .toString();
     }
 }

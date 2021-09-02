@@ -3,16 +3,15 @@ package org.opentripplanner.graph_builder.module;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.OTPFeature;
@@ -116,14 +115,14 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkBikeRentals(Graph graph) {
     LOG.info("Linking bike rental stations to graph...");
       // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
-    for (BikeRentalStationVertex bikeRental : graph.getVerticesOfType(BikeRentalStationVertex.class)) {
+    for (VehicleRentalStationVertex bikeRental : graph.getVerticesOfType(VehicleRentalStationVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           bikeRental,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
-              new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
-              new StreetBikeRentalLink(streetVertex, (BikeRentalStationVertex) vertex)
+              new StreetVehicleRentalLink((VehicleRentalStationVertex) vertex, streetVertex),
+              new StreetVehicleRentalLink(streetVertex, (VehicleRentalStationVertex) vertex)
           )
       );
     }

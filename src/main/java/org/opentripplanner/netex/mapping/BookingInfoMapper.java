@@ -151,7 +151,10 @@ public class BookingInfoMapper {
         return new BookingTime(latestBookingTime, 1);
       case DAY_OF_TRAVEL_ONLY:
       case ADVANCE_ONLY:
+      case ADVANCE_AND_DAY_OF_TRAVEL:
         return new BookingTime(latestBookingTime, 0);
+      case TIME_OF_TRAVEL_ONLY:
+        return null;
       default:
         throw new IllegalArgumentException("Value not supported: " + purchaseWhen.toString());
     }
@@ -161,6 +164,8 @@ public class BookingInfoMapper {
     switch (purchaseWhen) {
       case UNTIL_PREVIOUS_DAY:
       case ADVANCE_ONLY:
+      case ADVANCE_AND_DAY_OF_TRAVEL:
+      case TIME_OF_TRAVEL_ONLY:
         return null;
       case DAY_OF_TRAVEL_ONLY:
         return new BookingTime(LocalTime.MIDNIGHT, 0);
