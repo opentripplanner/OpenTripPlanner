@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimaps;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +84,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         AtomicInteger nTransfersTotal = new AtomicInteger();
         AtomicInteger nLinkedStops = new AtomicInteger();
 
+        // This is a synchronizedMultimap so that a parallel stream may be used to insert elements.
+        var transfersByStop = Multimaps.<StopLocation, SimpleTransfer>synchronizedMultimap(HashMultimap.create());
+
         stops.stream().parallel().forEach(ts0 -> {
             /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
              * Use map based on the list of edges, so that only distinct transfers are stored. */
@@ -120,7 +125,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                 issueStore.add(new StopNotLinkedForTransfers(ts0));
             } else {
                 distinctTransfers.values()
-                        .forEach(transfer -> graph.transfersByStop.put(transfer.from, transfer));
+                        .forEach(transfer -> transfersByStop.put(transfer.from, transfer));
                 nLinkedStops.incrementAndGet();
                 nTransfersTotal.addAndGet(distinctTransfers.size());
             }
@@ -129,6 +134,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             //noinspection Convert2MethodRef
             progress.step(m -> LOG.info(m));
         });
+
+        graph.transfersByStop.putAll(transfersByStop);
 
         LOG.info(progress.completeMessage());
         LOG.info("Done connecting stops to one another. Created a total of {} transfers from {} stops.", nTransfersTotal, nLinkedStops);
