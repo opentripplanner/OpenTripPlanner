@@ -42,8 +42,7 @@
 - Do not allow bicycle traversal on ways tagged with mtb:scale [#3578](https://github.com/opentripplanner/OpenTripPlanner/pull/3578)
 - Changes to the StopTimes call [#3576](https://github.com/opentripplanner/OpenTripPlanner/issues/3576)
 - Fix bug in optimize transfer service decorating path [#3587](https://github.com/opentripplanner/OpenTripPlanner/issues/3587)
-- Fix bug in Transmodel API when querying stopPlaves [#3591](https://github.com/opentripplanner/OpenTripPlanner/pull/3591)
-- Add new types of PurchaseWhenEnumeration in BookingInfoMapper [#3592](https://github.com/opentripplanner/OpenTripPlanner/pull/3592)
+- Remove non-GBFS bicycle rental updaters [#3562](https://github.com/opentripplanner/OpenTripPlanner/issues/3562)
 
 
 ## 2.0.0 (2020-11-27)

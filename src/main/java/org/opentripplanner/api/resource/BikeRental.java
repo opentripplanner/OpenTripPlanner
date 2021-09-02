@@ -1,8 +1,11 @@
 package org.opentripplanner.api.resource;
 
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.api.mapping.VehicleRentalStationMapper;
+import org.opentripplanner.api.model.ApiVehicleRentalStation;
+import org.opentripplanner.api.model.ApiVehicleRentalStationList;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
@@ -33,33 +36,31 @@ public class BikeRental {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public BikeRentalStationList getBikeRentalStations(
+    public ApiVehicleRentalStationList getBikeRentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
             @QueryParam("locale") String locale_param) {
 
         Router router = otpServer.getRouter();
 
-        BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
+        VehicleRentalStationService vehicleRentalService = router.graph.getService(VehicleRentalStationService.class);
         Locale locale;
         locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
-        if (bikeRentalService == null) { return new BikeRentalStationList(); }
+        if (vehicleRentalService == null) { return new ApiVehicleRentalStationList(); }
         Envelope envelope;
         if (lowerLeft != null) {
             envelope = getEnvelope(lowerLeft, upperRight);
         } else {
             envelope = new Envelope(-180,180,-90,90); 
         }
-        Collection<BikeRentalStation> stations = bikeRentalService.getBikeRentalStations();
-        List<BikeRentalStation> out = new ArrayList<>();
-        for (BikeRentalStation station : stations) {
-            if (envelope.contains(station.x, station.y)) {
-                BikeRentalStation station_localized = station.clone();
-                station_localized.locale = locale;
-                out.add(station_localized);
+        Collection<VehicleRentalStation> stations = vehicleRentalService.getVehicleRentalStations();
+        List<ApiVehicleRentalStation> out = new ArrayList<>();
+        for (VehicleRentalStation station : stations) {
+            if (envelope.contains(station.longitude, station.latitude)) {
+                out.add(VehicleRentalStationMapper.mapToApi(station, locale));
             }
         }
-        BikeRentalStationList brsl = new BikeRentalStationList();
+        ApiVehicleRentalStationList brsl = new ApiVehicleRentalStationList();
         brsl.stations = out;
         return brsl;
     }

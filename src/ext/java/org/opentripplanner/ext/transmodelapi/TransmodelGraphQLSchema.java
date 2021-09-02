@@ -84,7 +84,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -935,10 +935,10 @@ public class TransmodelGraphQLSchema {
                 .build())
             .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
             .dataFetcher(environment -> {
-              Collection<BikeRentalStation> all = new ArrayList<>(GqlUtil
+              Collection<VehicleRentalStation> all = new ArrayList<>(GqlUtil
                   .getRoutingService(environment)
-                  .getBikerentalStationService()
-                  .getBikeRentalStations());
+                  .getVehicleRentalStationService()
+                  .getVehicleRentalStations());
               List<String> filterByIds = environment.getArgument("ids");
               if (!CollectionUtils.isEmpty(filterByIds)) {
                 return all
@@ -961,8 +961,8 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
-                  .getBikeRentalStations()
+                  .getVehicleRentalStationService()
+                  .getVehicleRentalStations()
                   .stream()
                   .filter(bikeRentalStation -> bikeRentalStation.id.equals(environment.getArgument(
                       "id")))
@@ -999,7 +999,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> GqlUtil
                 .getRoutingService(environment)
-                .getBikerentalStationService().getBikeRentalStationForEnvelope(
+                .getVehicleRentalStationService().getVehicleRentalStationForEnvelope(
                     environment.getArgument("minimumLongitude"),
                     environment.getArgument("minimumLatitude"),
                     environment.getArgument("maximumLongitude"),
@@ -1018,7 +1018,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
+                  .getVehicleRentalStationService()
                   .getBikeParks()
                   .stream()
                   .filter(bikePark -> bikePark.id.equals(environment.getArgument("id")))
@@ -1033,7 +1033,7 @@ public class TransmodelGraphQLSchema {
             .type(new GraphQLNonNull(new GraphQLList(bikeParkType)))
             .dataFetcher(environment -> {
               return new ArrayList<>(GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
+                  .getVehicleRentalStationService()
                   .getBikeParks());
             })
             .build())

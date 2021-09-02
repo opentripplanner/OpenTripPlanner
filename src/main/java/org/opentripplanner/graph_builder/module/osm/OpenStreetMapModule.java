@@ -30,14 +30,14 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.BikeRentalEdge;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -54,7 +54,7 @@ import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
@@ -312,9 +312,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         private void processBikeRentalNodes() {
             LOG.info("Processing bike rental nodes...");
             int n = 0;
-            BikeRentalStationService bikeRentalService = graph.getService(
-                    BikeRentalStationService.class, true);
-            graph.putService(BikeRentalStationService.class, bikeRentalService);
+            VehicleRentalStationService bikeRentalService = graph.getService(
+                    VehicleRentalStationService.class, true);
+            graph.putService(VehicleRentalStationService.class, bikeRentalService);
             for (OSMNode node : osmdb.getBikeRentalNodes()) {
                 n++;
                 //Gets name tag and translations if they exists
@@ -346,21 +346,21 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             + creativeName + ") with no network; including as compatible-with-all.");
                     networkSet = null; // Special "catch-all" value
                 }
-                BikeRentalStation station = new BikeRentalStation();
+                VehicleRentalStation station = new VehicleRentalStation();
                 station.id = "" + node.getId();
                 station.name = creativeName;
-                station.x = node.lon;
-                station.y = node.lat;
+                station.longitude = node.lon;
+                station.latitude = node.lat;
                 // The following make sure that spaces+bikes=capacity, always.
                 // Also, for the degenerate case of capacity=1, we should have 1
                 // bike available, not 0.
                 station.spacesAvailable = capacity / 2;
-                station.bikesAvailable = capacity - station.spacesAvailable;
+                station.vehiclesAvailable = capacity - station.spacesAvailable;
                 station.realTimeData = false;
                 station.networks = networkSet;
-                bikeRentalService.addBikeRentalStation(station);
-                BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
-                new BikeRentalEdge(stationVertex);
+                bikeRentalService.addVehicleRentalStation(station);
+                VehicleRentalStationVertex stationVertex = new VehicleRentalStationVertex(graph, station);
+                new VehicleRentalEdge(stationVertex);
             }
             if (n > 1) {
                 graph.hasBikeSharing = true;
@@ -371,8 +371,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         private void processBikeParkAndRideNodes() {
             LOG.info("Processing bike P+R nodes...");
             int n = 0;
-            BikeRentalStationService bikeRentalService = graph.getService(
-                    BikeRentalStationService.class, true);
+            VehicleRentalStationService bikeRentalService = graph.getService(
+                    VehicleRentalStationService.class, true);
             for (OSMNode node : osmdb.getBikeParkingNodes()) {
                 n++;
                 I18NString creativeName = wayPropertySet.getCreativeNameForWay(node);
@@ -419,8 +419,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * @param area
          */
         private void buildBikeParkAndRideForArea(Area area) {
-            BikeRentalStationService bikeRentalService = graph.getService(
-                    BikeRentalStationService.class, true);
+            VehicleRentalStationService bikeRentalService = graph.getService(
+                    VehicleRentalStationService.class, true);
             Envelope envelope = new Envelope();
             long osmId = area.parent.getId();
             I18NString creativeName = wayPropertySet.getCreativeNameForWay(area.parent);

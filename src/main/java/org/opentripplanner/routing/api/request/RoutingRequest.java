@@ -46,6 +46,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -554,25 +555,25 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double bikeTriangleSafetyFactor;
 
     /**
-     * Whether or not bike rental availability information will be used to plan bike rental trips
+     * Whether or not vehicle rental availability information will be used to plan vehicle rental trips
      */
-    public boolean useBikeRentalAvailabilityInformation = false;
+    public boolean useVehicleRentalAvailabilityInformation = false;
 
     /**
      * Whether arriving at the destination with a rented (station) bicycle is allowed without
      * dropping it off.
      *
-     * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
-     * @see org.opentripplanner.routing.bike_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
+     * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
+     * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
      */
-    public boolean allowKeepingRentedBicycleAtDestination = false;
+    public boolean allowKeepingRentedVehicleAtDestination = false;
 
     /**
      * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
      *
-     * @see RoutingRequest#allowKeepingRentedBicycleAtDestination
+     * @see RoutingRequest#allowKeepingRentedVehicleAtDestination
      */
-    public double keepingRentedBicycleAtDestinationCost = 0;
+    public double keepingRentedVehicleAtDestinationCost = 0;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.
@@ -1078,7 +1079,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
         ret.setArriveBy(!ret.arriveBy);
-        ret.useBikeRentalAvailabilityInformation = false;
+        ret.useVehicleRentalAvailabilityInformation = false;
         return ret;
     }
 

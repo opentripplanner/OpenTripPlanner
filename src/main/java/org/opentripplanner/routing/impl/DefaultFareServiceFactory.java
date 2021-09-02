@@ -6,7 +6,7 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
+import org.opentripplanner.routing.vehicle_rental.TimeBasedVehicleRentalFareServiceFactory;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.fares.MultipleFareServiceFactory;
@@ -161,8 +161,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             return new NoopFareServiceFactory();
         case "composite:additive":
             return new MultipleFareServiceFactory.AddingMultipleFareServiceFactory();
-        case "bike-rental-time-based":
-            return new TimeBasedBikeRentalFareServiceFactory();
+        case "vehicle-rental-time-based":
+        case "bike-rental-time-based": //TODO: deprecated, remove in next major version
+            return new TimeBasedVehicleRentalFareServiceFactory();
         case "dutch":
             return new DutchFareServiceFactory();
         case "san-francisco":
