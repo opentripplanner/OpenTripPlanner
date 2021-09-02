@@ -2,7 +2,6 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;

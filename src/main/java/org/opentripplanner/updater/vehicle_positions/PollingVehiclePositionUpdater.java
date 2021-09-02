@@ -38,29 +38,10 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     private VehiclePositionSource vehiclePositionSource;
 
     /**
-     * Property to set on the VehiclePositionSource
-     */
-    private Integer logFrequency;
-
-    /**
-     * Property to set on the VehiclePositionSource
-     */
-    private Integer maxSnapshotFrequency;
-
-    /**
-     * Property to set on the VehiclePositionSource
-     */
-    private Boolean purgeExpiredData;
-
-    /**
      * Feed id that is used for the trip ids in the TripUpdates
      */
     private String feedId;
 
-    /**
-     * Set only if we should attempt to match the trip_id from other data in TripDescriptor
-     */
-    private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -88,19 +69,6 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
             ((JsonConfigurable) vehiclePositionSource).configure(graph, config);
         }
 
-        // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...
-        int logFrequency = config.path("logFrequency").asInt(-1);
-        if (logFrequency >= 0) {
-            this.logFrequency = logFrequency;
-        }
-        int maxSnapshotFrequency = config.path("maxSnapshotFrequencyMs").asInt(-1);
-        if (maxSnapshotFrequency >= 0) {
-            this.maxSnapshotFrequency = maxSnapshotFrequency;
-        }
-        this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
-        if (config.path("fuzzyTripMatching").asBoolean(false)) {
-            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
-        }
         LOG.info("Creating vehicle position updater running every {} seconds : {}", pollingPeriodSeconds, vehiclePositionSource);
     }
 

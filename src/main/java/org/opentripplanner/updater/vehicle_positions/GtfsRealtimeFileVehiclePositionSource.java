@@ -40,30 +40,13 @@ public class GtfsRealtimeFileVehiclePositionSource implements VehiclePositionSou
     /**
      * Parses raw GTFS-RT data into vehicle positions
      */
-    @Override
     public List<VehiclePosition> getPositions() {
-        List<VehiclePosition> positions = null;
-        List<FeedEntity> feedEntityList = null;
-        FeedMessage feedMessage = null;
-
-        try {
-            InputStream is = new FileInputStream(file);
-            if (is != null) {
-                // Decode message
-                feedMessage = FeedMessage.parseFrom(is);
-                feedEntityList = feedMessage.getEntityList();
-
-                // Create List of TripUpdates
-                positions = new ArrayList<>(feedEntityList.size());
-                for (FeedEntity feedEntity : feedEntityList) {
-                    if (feedEntity.hasVehicle()) positions.add(feedEntity.getVehicle());
-                }
-            }
+        try (InputStream is = new FileInputStream(file)) {
+            this.getPositions(is);
         } catch (Exception e) {
-            LOG.warn("Failed to parse gtfs-rt feed at " + file + ":", e);
+            LOG.warn("Failed to parse gtfs-rt feed at {}:", file, e);
         }
-
-        return positions;
+        return null;
     }
 
     @Override

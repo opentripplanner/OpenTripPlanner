@@ -73,13 +73,13 @@ public class VehiclePositionPatternMatcher {
             String tripId = vehiclePosition.getTrip().getTripId();
             Trip trip = graphIndex.tripForId.get(new FeedScopedId(feedId, tripId));
             if (trip == null) {
-                LOG.warn(String.format("Unable to find OTP trip ID for vehicle position with trip ID %s", tripId));
+                LOG.warn("Unable to find OTP trip ID for vehicle position with trip ID {}", tripId);
                 continue;
             }
 
             TripPattern pattern = graphIndex.patternForTrip.get(trip);
             if (pattern == null) {
-                LOG.warn(String.format("Unable to match OTP pattern ID for vehicle position with trip ID %s", tripId));
+                LOG.warn("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
                 continue;
             }
 
