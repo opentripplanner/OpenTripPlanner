@@ -64,9 +64,6 @@ public class VehiclePositionPatternMatcher {
      * @param feedId            Feed id of vehicle positions to assist in pattern-matching
      */
     public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions, String feedId) {
-        // Reset seen trip IDs before populating the set again
-        wipeSeenTripIds();
-
         for (VehiclePosition vehiclePosition : vehiclePositions) {
             if (!vehiclePosition.hasTrip()) {
                 LOG.warn("Realtime vehicle positions without trip IDs are not yet supported.");
@@ -101,10 +98,6 @@ public class VehiclePositionPatternMatcher {
             }
             pattern.vehiclePositions.put(tripId, newPosition);
         }
-
-        // "clean" all patterns, removing all vehicles not "seen" in the
-        // previous step (stored in the seen trip IDs)
-        cleanPatternVehiclePositions(feedId);
     }
 
     /**
