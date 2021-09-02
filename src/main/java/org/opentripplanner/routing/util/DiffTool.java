@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.util;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
+import javax.annotation.Nullable;
 
 
 /**
@@ -14,6 +13,11 @@ import java.util.List;
  * <p>
  */
 public final class DiffTool {
+
+  public static class Diff<T> extends ArrayList<Entry<T>> {
+    /* All elements exist in both collections, hence no differences. */
+    public boolean isEqual() { return stream().allMatch(Entry::isEqual); }
+  }
 
   public static class Entry<T> {
     public final T left;
@@ -56,12 +60,12 @@ public final class DiffTool {
   /**
    * Compare to collections(left and right) and return a list of differences.
    */
-  public static <T> List<Entry<T>> diff(
+  public static <T> Diff<T> diff(
       Collection<T> left,
       Collection<T> right,
       Comparator<T> comparator
   ) {
-    List<Entry<T>> result = new ArrayList<>();
+    Diff<T> result = new Diff<>();
 
     Iterator<T> iLeft = left.stream().sorted(comparator).iterator();
     Iterator<T> iRight = right.stream().sorted(comparator).iterator();
@@ -71,22 +75,24 @@ public final class DiffTool {
     while (l != null && r != null) {
       int c = comparator.compare(l, r);
       if(c < 0) {
-        result.add(new Entry<T>(l, null));
+        result.add(new Entry<>(l, null));
         l = next(iLeft);
       }
       else if(c > 0) {
-        result.add(new Entry<T>(null, r));
+        result.add(new Entry<>(null, r));
         r = next(iRight);
       }
       // c == 0
       else {
-        result.add(new Entry<T>(l, r));
+        result.add(new Entry<>(l, r));
         l = next(iLeft);
         r = next(iRight);
       }
     }
-    while (iLeft.hasNext()) { result.add(new Entry<T>(iLeft.next(), null)); }
-    while (iRight.hasNext()) { result.add(new Entry<T>(null, iRight.next())); }
+    while (iLeft.hasNext()) { result.add(new Entry<>(iLeft.next(), null)); }
+    while (iRight.hasNext()) { result.add(new Entry<>(null, iRight.next())); }
+
+    result.sort((o1, o2) -> -comparator.compare(o1.element(), o2.element()));
 
     return result;
   }

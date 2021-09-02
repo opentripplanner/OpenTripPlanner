@@ -1,11 +1,9 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.time.TimeUtils;
+import static java.time.ZoneOffset.UTC;
+import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
+import static org.opentripplanner.routing.core.TraverseMode.CAR;
+import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -13,10 +11,12 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import static java.time.ZoneOffset.UTC;
-import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily
@@ -78,11 +78,27 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   /**
-   * Add a bus leg to the itinerary.
+   * Add a bicycle leg to the itinerary.
    */
   public TestItineraryBuilder bicycle(int startTime, int endTime, Place to) {
     cost += cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to);
+    return this;
+  }
+
+  public TestItineraryBuilder drive(int startTime, int endTime, Place to) {
+    cost += cost(CAR_RELUCTANCE_FACTOR, endTime - startTime);
+    streetLeg(CAR, startTime, endTime, to);
+    return this;
+  }
+
+  /**
+   * Add a rented bicycle leg to the itinerary.
+   */
+  public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
+    cost += cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
+    streetLeg(BICYCLE, startTime, endTime, to);
+    this.legs.get(0).rentedBike = true;
     return this;
   }
 
@@ -159,6 +175,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       case BICYCLE: return BICYCLE_SPEED;
       case BUS: return BUS_SPEED;
       case RAIL: return RAIL_SPEED;
+      case CAR: return CAR_SPEED;
       default: throw new IllegalStateException("Unsupported mode: " + mode);
     }
   }

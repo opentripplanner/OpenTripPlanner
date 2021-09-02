@@ -429,7 +429,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         Vertex stop_c = graph.getVertex(feedId + ":C");
         Vertex stop_d = graph.getVertex(feedId + ":D");
         RoutingRequest options = new RoutingRequest();
-        options.optimize = BicycleOptimizeType.QUICK;
+        options.bicycleOptimizeType = BicycleOptimizeType.QUICK;
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0);
         options.setRoutingContext(graph, stop_c, stop_d);  
                 

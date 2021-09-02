@@ -13,8 +13,6 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 public final class StopTime implements Comparable<StopTime> {
 
-    private static final long serialVersionUID = 1L;
-
     public static final int MISSING_VALUE = -999;
 
     private Trip trip;
@@ -33,9 +31,9 @@ public final class StopTime implements Comparable<StopTime> {
 
     private String routeShortName;
 
-    private int pickupType;
+    private PickDrop pickupType = PickDrop.SCHEDULED;
 
-    private int dropOffType;
+    private PickDrop dropOffType = PickDrop.SCHEDULED;
 
     private double shapeDistTraveled = MISSING_VALUE;
 
@@ -52,7 +50,9 @@ public final class StopTime implements Comparable<StopTime> {
     // Disabled by default
     private int flexContinuousDropOff = MISSING_VALUE;
 
-    private BookingInfo bookingInfo;
+    private BookingInfo dropOffBookingInfo;
+
+    private BookingInfo pickupBookingInfo;
 
     public StopTime() { }
 
@@ -73,6 +73,8 @@ public final class StopTime implements Comparable<StopTime> {
         this.flexWindowEnd = st.flexWindowEnd;
         this.flexContinuousPickup = st.flexContinuousPickup;
         this.flexContinuousDropOff = st.flexContinuousDropOff;
+        this.dropOffBookingInfo = st.dropOffBookingInfo;
+        this.pickupBookingInfo = st.pickupBookingInfo;
     }
 
     /**
@@ -185,19 +187,19 @@ public final class StopTime implements Comparable<StopTime> {
         this.routeShortName = routeShortName;
     }
 
-    public int getPickupType() {
+    public PickDrop getPickupType() {
         return pickupType;
     }
 
-    public void setPickupType(int pickupType) {
+    public void setPickupType(PickDrop pickupType) {
         this.pickupType = pickupType;
     }
 
-    public int getDropOffType() {
+    public PickDrop getDropOffType() {
         return dropOffType;
     }
 
-    public void setDropOffType(int dropOffType) {
+    public void setDropOffType(PickDrop dropOffType) {
         this.dropOffType = dropOffType;
     }
 
@@ -257,16 +259,37 @@ public final class StopTime implements Comparable<StopTime> {
         this.flexContinuousDropOff = flexContinuousDropOff;
     }
 
-    public BookingInfo getBookingInfo() {
-        return bookingInfo;
+    public BookingInfo getDropOffBookingInfo() {
+        return dropOffBookingInfo;
     }
 
-    public void setBookingInfo(BookingInfo bookingInfo) {
-        this.bookingInfo = bookingInfo;
+    public void setDropOffBookingInfo(BookingInfo dropOffBookingInfo) {
+        this.dropOffBookingInfo = dropOffBookingInfo;
+    }
+
+    public BookingInfo getPickupBookingInfo() {
+        return pickupBookingInfo;
+    }
+
+    public void setPickupBookingInfo(BookingInfo pickupBookingInfo) {
+        this.pickupBookingInfo = pickupBookingInfo;
     }
 
     public int compareTo(StopTime o) {
         return this.getStopSequence() - o.getStopSequence();
+    }
+
+    public void cancel() {
+        pickupType = PickDrop.CANCELLED;
+        dropOffType = PickDrop.CANCELLED;
+    }
+
+    public void cancelDropOff() {
+        dropOffType = PickDrop.CANCELLED;
+    }
+
+    public void cancelPickup() {
+        pickupType = PickDrop.CANCELLED;
     }
 
     @Override

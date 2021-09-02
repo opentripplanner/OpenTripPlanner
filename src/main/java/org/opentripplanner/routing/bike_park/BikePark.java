@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.bike_park;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import static java.util.Locale.ROOT;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
-import java.util.Locale;
 
 public class BikePark implements Serializable {
     private static final long serialVersionUID = 8311460609708089384L;
@@ -45,6 +45,6 @@ public class BikePark implements Serializable {
     }
 
     public String toString () {
-        return String.format(Locale.US, "Bike park %s at %.6f, %.6f", name, y, x);
+        return String.format(ROOT, "Bike park %s at %.6f, %.6f", name, y, x);
     }
 }

@@ -4,8 +4,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
@@ -48,9 +47,7 @@ public class BikeRentalModule implements GraphBuilderModule {
         for (BikeRentalStation station : stations) {
             service.addBikeRentalStation(station);
             BikeRentalStationVertex vertex = new BikeRentalStationVertex(graph, station);
-            new RentABikeOnEdge(vertex, vertex, station.networks);
-            if (station.allowDropoff)
-                new RentABikeOffEdge(vertex, vertex, station.networks);
+            new BikeRentalEdge(vertex);
         }
         LOG.info("Created " + stations.size() + " bike rental stations.");
     }

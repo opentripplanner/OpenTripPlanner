@@ -1,5 +1,8 @@
 package org.opentripplanner.routing;
 
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
 import lombok.experimental.Delegate;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -7,7 +10,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -15,11 +18,9 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.standalone.server.Router;
-
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * This is the entry point of all API requests towards the OTP graph. A new instance of this class
@@ -50,18 +51,8 @@ public class RoutingService {
 
     // TODO We should probably not have the Router as a parameter here
     public RoutingResponse route(RoutingRequest request, Router router) {
-        RoutingResponse response = null;
-        try {
-            RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
-            response = worker.route(router);
-        } catch (Exception e) {
-            if (request != null) {
-                request.cleanup();
-            }
-            throw e;
-        }
-        request.cleanup();
-        return response;
+        RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
+        return worker.route(router);
     }
 
     /**
@@ -77,11 +68,11 @@ public class RoutingService {
      * @param startTime             Start time for the search. Seconds from UNIX epoch
      * @param timeRange             Searches forward for timeRange seconds from startTime
      * @param numberOfDepartures    Number of departures to fetch per pattern
-     * @param omitNonPickups        If true, do not include vehicles that will not pick up passengers.
+     * @param arrivalDeparture      Filter by arrivals, departures, or both
      * @param includeCancelledTrips If true, cancelled trips will also be included in result.
      */
     public List<StopTimesInPattern> stopTimesForStop(
-            Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups, boolean includeCancelledTrips
+            Stop stop, long startTime, int timeRange, int numberOfDepartures, ArrivalDeparture arrivalDeparture, boolean includeCancelledTrips
     ) {
         return StopTimesHelper.stopTimesForStop(
                 this,
@@ -90,7 +81,7 @@ public class RoutingService {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups,
+                arrivalDeparture,
                 includeCancelledTrips
         );
     }
@@ -103,9 +94,9 @@ public class RoutingService {
      * @param serviceDate Return all departures for the specified date
      */
     public List<StopTimesInPattern> getStopTimesForStop(
-            Stop stop, ServiceDate serviceDate, boolean omitNonPickups
+            Stop stop, ServiceDate serviceDate, ArrivalDeparture arrivalDeparture
     ) {
-        return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, omitNonPickups);
+        return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, arrivalDeparture);
     }
 
 
@@ -122,10 +113,10 @@ public class RoutingService {
      * @param startTime          Start time for the search. Seconds from UNIX epoch
      * @param timeRange          Searches forward for timeRange seconds from startTime
      * @param numberOfDepartures Number of departures to fetch per pattern
-     * @param omitNonPickups     If true, do not include vehicles that will not pick up passengers.
+     * @param arrivalDeparture   Filter by arrivals, departures, or both
      */
-    public List<TripTimeShort> stopTimesForPatternAtStop(
-            Stop stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
+    public List<TripTimeOnDate> stopTimesForPatternAtStop(
+            Stop stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, ArrivalDeparture arrivalDeparture
     ) {
         return StopTimesHelper.stopTimesForPatternAtStop(
                 this,
@@ -135,7 +126,7 @@ public class RoutingService {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups
+                arrivalDeparture
         );
     }
 
@@ -159,10 +150,10 @@ public class RoutingService {
         return timetableSnapshot != null ? timetableSnapshot.resolve(
                 tripPattern,
                 new ServiceDate(Calendar.getInstance().getTime())
-        ) : tripPattern.scheduledTimetable;
+        ) : tripPattern.getScheduledTimetable();
     }
 
-    public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
+    public List<TripTimeOnDate> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
         return TripTimesShortHelper.getTripTimesShort(this, trip, serviceDate);
     }
 

@@ -24,7 +24,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -120,7 +120,7 @@ public class LegacyGraphQLQueryTypeImpl
           Stop stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
 
           // TODO: Add geometry
-          return new NearbyStop(stop, Integer.parseInt(parts[0]), 0, null, null, null);
+          return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null, null);
         }
         case "TicketType":
           return null; //TODO
@@ -267,8 +267,11 @@ public class LegacyGraphQLQueryTypeImpl
 
       List<TransitMode> filterByModes = args.getLegacyGraphQLFilterByModes() != null ? StreamSupport
           .stream(args.getLegacyGraphQLFilterByModes().spliterator(), false)
-          .map(mode -> mode.label)
-          .map(TransitMode::valueOf)
+          .map(mode -> {
+            try { return TransitMode.valueOf(mode.label); }
+            catch (IllegalArgumentException ignored) { return null; }
+          })
+          .filter(Objects::nonNull)
           .collect(Collectors.toList()) : null;
       List<PlaceType> filterByPlaceTypes =
           args.getLegacyGraphQLFilterByPlaceTypes() != null ? StreamSupport
@@ -449,7 +452,7 @@ public class LegacyGraphQLQueryTypeImpl
 
   // TODO
   @Override
-  public DataFetcher<Iterable<TripTimeShort>> cancelledTripTimes() {
+  public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes() {
     return environment -> null;
   }
 
@@ -491,9 +494,23 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<Iterable<BikeRentalStation>> bikeRentalStations() {
     return environment -> {
       BikeRentalStationService bikerentalStationService = getRoutingService(environment)
-          .getBikerentalStationService();
+              .getBikerentalStationService();
 
       if (bikerentalStationService == null) { return null; }
+
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeRentalStationsArgs(
+              environment.getArguments());
+
+      if (args.getLegacyGraphQLIds() != null) {
+        Map<String, BikeRentalStation> bikeRentalStations =
+                bikerentalStationService.getBikeRentalStations()
+                        .stream()
+                        .collect(Collectors.toMap(station -> station.id, station -> station));
+        return ((List<String>) args.getLegacyGraphQLIds())
+                .stream()
+                .map(bikeRentalStations::get)
+                .collect(Collectors.toList());
+      }
 
       return bikerentalStationService.getBikeRentalStations();
     };
@@ -572,7 +589,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<RoutingResponse> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      RoutingRequest request = new RoutingRequest();
+      RoutingRequest request = context.getRouter().defaultRoutingRequest.clone();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
@@ -590,30 +607,32 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("wheelchair", request::setWheelchairAccessible);
       callWith.argument("numItineraries", request::setNumItineraries);
       callWith.argument("searchWindow", (Long m) -> request.searchWindow = Duration.ofSeconds(m));
-      callWith.argument("maxWalkDistance", request::setMaxWalkDistance);
       // callWith.argument("maxSlope", request::setMaxSlope);
-      callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
       // callWith.argument("carParkCarLegWeight", request::setCarParkCarLegWeight);
       // callWith.argument("itineraryFiltering", request::setItineraryFiltering);
+      callWith.argument("bikeReluctance", request::setBikeReluctance);
+      callWith.argument("bikeWalkingReluctance", request::setBikeWalkingReluctance);
+      callWith.argument("carReluctance", request::setCarReluctance);
       callWith.argument("walkReluctance", request::setWalkReluctance);
       // callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
       callWith.argument("waitReluctance", request::setWaitReluctance);
       callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
       callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);
+      callWith.argument("bikeWalkingSpeed", (Double v) -> request.bikeWalkingSpeed = v);
       callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
       callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
       callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
+      callWith.argument("allowKeepingRentedBicycleAtDestination", (Boolean v) -> request.allowKeepingRentedBicycleAtDestination = v);
+      callWith.argument("keepingRentedBicycleAtDestinationCost", (Integer v) -> request.keepingRentedBicycleAtDestinationCost = v);
 
-      // callWith.argument("modeWeight.TRAM", (Double v) -> request.setModeWeight(TraverseMode.TRAM, v));
-      // callWith.argument("modeWeight.SUBWAY", (Double v) -> request.setModeWeight(TraverseMode.SUBWAY, v));
-      // callWith.argument("modeWeight.RAIL", (Double v) -> request.setModeWeight(TraverseMode.RAIL, v));
-      // callWith.argument("modeWeight.BUS", (Double v) -> request.setModeWeight(TraverseMode.BUS, v));
-      // callWith.argument("modeWeight.FERRY", (Double v) -> request.setModeWeight(TraverseMode.FERRY, v));
-      // callWith.argument("modeWeight.CABLE_CAR", (Double v) -> request.setModeWeight(TraverseMode.CABLE_CAR, v));
-      // callWith.argument("modeWeight.GONDOLA", (Double v) -> request.setModeWeight(TraverseMode.GONDOLA, v));
-      // callWith.argument("modeWeight.FUNICULAR", (Double v) -> request.setModeWeight(TraverseMode.FUNICULAR, v));
-      // callWith.argument("modeWeight.AIRPLANE", (Double v) -> request.setModeWeight(TraverseMode.AIRPLANE, v));
-
+      callWith.argument(
+              "modeWeight", (Map<String, Object> v) -> request.setTransitReluctanceForMode(
+                      v.entrySet()
+                              .stream()
+                              .collect(Collectors.toMap(e -> TransitMode.valueOf(e.getKey()),
+                                      e -> (Double) e.getValue()
+                              ))));
+      callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
       callWith.argument("arriveBy", request::setArriveBy);
       request.showIntermediateStops = true;
       callWith.argument("intermediatePlaces", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(LegacyGraphQLQueryTypeImpl::toGenericLocation).collect(Collectors.toList()));
@@ -659,7 +678,7 @@ public class LegacyGraphQLQueryTypeImpl
         }
 
         if (optimize != null) {
-          request.optimize = optimize;
+          request.bicycleOptimizeType = optimize;
         }
       }
 

@@ -50,7 +50,6 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         return new McTransitWorker<>(
                 state,
                 context.slackProvider(),
-                context.calculator(),
                 context.costCalculator(),
                 context.debugFactory()
         );

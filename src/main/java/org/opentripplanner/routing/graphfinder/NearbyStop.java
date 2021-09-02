@@ -1,19 +1,15 @@
 package org.opentripplanner.routing.graphfinder;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
@@ -21,32 +17,27 @@ import java.util.List;
  */
 public class NearbyStop implements Comparable<NearbyStop> {
 
-  private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-
   public final StopLocation stop;
   public final double distance;
-  public final int distanceIndependentTime;
 
   public final List<Edge> edges;
   public final LineString geometry;
   public final State state;
 
   public NearbyStop(
-      StopLocation stop, double distance, int distanceIndependentTime, List<Edge> edges, LineString geometry, State state
+      StopLocation stop, double distance, List<Edge> edges, LineString geometry, State state
   ) {
     this.stop = stop;
     this.distance = distance;
-    this.distanceIndependentTime = distanceIndependentTime;
     this.edges = edges;
     this.geometry = geometry;
     this.state = state;
   }
 
   public NearbyStop(
-      TransitStopVertex stopVertex, double distance, List<Edge> edges, LineString geometry,
-      State state
+      TransitStopVertex stopVertex, double distance, List<Edge> edges, State state
   ) {
-    this(stopVertex.getStop(), distance, 0, edges, geometry, state);
+    this(stopVertex.getStop(), distance, edges, null, state);
   }
 
   @Override
@@ -54,8 +45,32 @@ public class NearbyStop implements Comparable<NearbyStop> {
     return (int) (this.distance) - (int) (that.distance);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) { return true; }
+    if (o == null || getClass() != o.getClass()) { return false; }
+    final NearbyStop that = (NearbyStop) o;
+    return Double.compare(that.distance, distance) == 0
+            && stop.equals(that.stop)
+            && Objects.equals(edges, that.edges)
+            && Objects.equals(geometry, that.geometry)
+            && Objects.equals(state, that.state);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(stop, distance, edges, geometry, state);
+  }
+
   public String toString() {
-    return String.format("stop %s at %.1f meters", stop, distance);
+    return String.format(
+            Locale.ROOT,
+            "stop %s at %.1f meters%s%s%s",
+            stop, distance,
+            edges != null ? " (" + edges.size() + " edges)" : "",
+            geometry != null ? " w/geometry" : "",
+            state != null ? " w/state" : ""
+    );
   }
 
   /**
@@ -64,37 +79,17 @@ public class NearbyStop implements Comparable<NearbyStop> {
    */
   public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
     double effectiveWalkDistance = 0.0;
-    int distanceIndependentTime = 0;
-    GraphPath graphPath = new GraphPath(state, false);
-    CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-    List<Edge> edges = new ArrayList<>();
+    var graphPath = new GraphPath(state);
+    var edges = new ArrayList<Edge>();
     for (Edge edge : graphPath.edges) {
-      LineString geometry = edge.getGeometry();
-      if (geometry != null) {
-        if (coordinates.size() == 0) {
-          coordinates.extend(geometry.getCoordinates());
-        }
-        else {
-          coordinates.extend(geometry.getCoordinates(), 1);
-        }
-      }
       effectiveWalkDistance += edge.getEffectiveWalkDistance();
-      distanceIndependentTime += edge.getDistanceIndependentTime();
       edges.add(edge);
-    }
-    if (coordinates.size() < 2) {   // Otherwise the walk step generator breaks.
-      ArrayList<Coordinate> coordinateList = new ArrayList<Coordinate>(2);
-      coordinateList.add(graphPath.states.get(1).getVertex().getCoordinate());
-      State lastState = graphPath.states.getLast().getBackState();
-      coordinateList.add(lastState.getVertex().getCoordinate());
-      coordinates = new CoordinateArrayListSequence(coordinateList);
     }
     return new NearbyStop(
         stop,
         effectiveWalkDistance,
-        distanceIndependentTime,
         edges,
-        geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())),
+        null,
         state
     );
   }

@@ -1,15 +1,15 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.debug;
 
 
+import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
-
-import java.util.Collection;
 
 
 /**
@@ -79,6 +79,11 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
         debug.rejectTransfer(fromStop, transfer, transfer.stop(), arrivalTime);
         delegate.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
+    }
+
+    @Override
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        return delegate.previousTransit(boardStopIndex);
     }
 
     @Override

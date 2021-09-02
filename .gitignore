@@ -13,6 +13,7 @@
 *.iws
 *.swp
 *.DS_Store
+*.snap.debug
 dependency-reduced-pom.xml
 interactive_otp_main.json
 /otp
@@ -20,6 +21,7 @@ interactive_otp_main.json
 
 # Directories
 .idea/
+.run/
 .venv/
 _site/
 build/
@@ -32,3 +34,5 @@ node_modules/
 target/
 /graphs
 
+# for local dev only
+src/ext/resources/reportapi/report.csv

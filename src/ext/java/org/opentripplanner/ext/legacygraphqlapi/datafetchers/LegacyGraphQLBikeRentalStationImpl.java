@@ -5,6 +5,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationUris;
 
 public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBikeRentalStation {
     @Override
@@ -64,6 +65,23 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     @Override
     public DataFetcher<Double> lat() {
         return environment -> getSource(environment).y;
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowOverloading() {
+        // TODO implement this
+        return environment -> false;
+    }
+
+    @Override
+    public DataFetcher<Integer> capacity() {
+        // TODO implement this
+        return environment -> 0;
+    }
+
+    @Override
+    public DataFetcher<BikeRentalStationUris> rentalUris() {
+        return environment -> getSource(environment).rentalUris;
     }
 
     private BikeRentalStation getSource(DataFetchingEnvironment environment) {

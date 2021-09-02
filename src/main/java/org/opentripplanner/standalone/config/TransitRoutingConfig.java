@@ -19,6 +19,7 @@ public final class TransitRoutingConfig
     private final int scheduledTripBinarySearchThreshold;
     private final int iterationDepartureStepInSeconds;
     private final int searchThreadPoolSize;
+    private final int transferCacheMaxSize;
     private final Map<StopTransferPriority, Integer> stopTransferCost;
     private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
@@ -49,6 +50,10 @@ public final class TransitRoutingConfig
             "stopTransferCost",
             StopTransferPriority.class,
             NodeAdapter::asInt
+        );
+        this.transferCacheMaxSize = c.asInt(
+                "transferCacheMaxSize",
+                25
         );
     }
 
@@ -85,6 +90,11 @@ public final class TransitRoutingConfig
     @Override
     public Integer stopTransferCost(StopTransferPriority key) {
         return stopTransferCost.get(key);
+    }
+
+    @Override
+    public int transferCacheMaxSize() {
+        return transferCacheMaxSize;
     }
 
     private static class DynamicSearchWindowConfig

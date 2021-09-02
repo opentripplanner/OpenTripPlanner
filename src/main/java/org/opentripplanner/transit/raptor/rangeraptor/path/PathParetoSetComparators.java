@@ -30,14 +30,14 @@ public class PathParetoSetComparators {
         return (l, r) ->
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds();
+                l.durationInSeconds() < r.durationInSeconds();
     }
 
     public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorStandardAndLatestDepature() {
         return (l, r) ->
                 l.startTime() > r.startTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds();
+                l.durationInSeconds() < r.durationInSeconds();
     }
 
     public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetable() {
@@ -45,7 +45,7 @@ public class PathParetoSetComparators {
                 l.rangeRaptorIterationDepartureTime() > r.rangeRaptorIterationDepartureTime() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds();
+                l.durationInSeconds() < r.durationInSeconds();
     }
 
     public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetableAndCost() {
@@ -53,7 +53,7 @@ public class PathParetoSetComparators {
                 l.rangeRaptorIterationDepartureTime() > r.rangeRaptorIterationDepartureTime() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
+                l.durationInSeconds() < r.durationInSeconds() ||
                 l.generalizedCost() < r.generalizedCost();
     }
 
@@ -64,7 +64,7 @@ public class PathParetoSetComparators {
                 l.rangeRaptorIterationDepartureTime() > r.rangeRaptorIterationDepartureTime() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
+                l.durationInSeconds() < r.durationInSeconds() ||
                 l.generalizedCost() < Math.round(r.generalizedCost() * relaxCostAtDestinationArrival);
     }
 
@@ -72,7 +72,7 @@ public class PathParetoSetComparators {
         return (l, r) ->
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
+                l.durationInSeconds() < r.durationInSeconds() ||
                 l.generalizedCost() < r.generalizedCost();
     }
 
@@ -80,7 +80,7 @@ public class PathParetoSetComparators {
         return (l, r) ->
                 l.startTime() > r.startTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
+                l.durationInSeconds() < r.durationInSeconds() ||
                 l.generalizedCost() < r.generalizedCost();
     }
 
@@ -90,7 +90,7 @@ public class PathParetoSetComparators {
         return (l, r) ->
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
+                l.durationInSeconds() < r.durationInSeconds() ||
                 l.generalizedCost() < Math.round(r.generalizedCost() * relaxCostAtDestinationArrival);
     }
 
@@ -100,7 +100,7 @@ public class PathParetoSetComparators {
         return (l, r) ->
                 l.startTime() > r.startTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
+                l.durationInSeconds() < r.durationInSeconds() ||
                 l.generalizedCost() < Math.round(r.generalizedCost() * relaxCostAtDestinationArrival);
     }
 }

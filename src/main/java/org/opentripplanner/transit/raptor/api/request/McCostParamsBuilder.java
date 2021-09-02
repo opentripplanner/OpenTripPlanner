@@ -4,17 +4,18 @@ package org.opentripplanner.transit.raptor.api.request;
 /**
  * Mutable version of the {@link McCostParams}.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class McCostParamsBuilder {
     private int boardCost;
     private int transferCost;
-    private double walkReluctanceFactor;
+    private double[] transitReluctanceFactors;
     private double waitReluctanceFactor;
 
 
     McCostParamsBuilder(McCostParams defaults) {
         this.boardCost = defaults.boardCost();
         this.transferCost = defaults.transferCost();
-        this.walkReluctanceFactor = defaults.walkReluctanceFactor();
+        this.transitReluctanceFactors = defaults.transitReluctanceFactors();
         this.waitReluctanceFactor = defaults.waitReluctanceFactor();
     }
 
@@ -36,12 +37,12 @@ public class McCostParamsBuilder {
         return this;
     }
 
-    public double walkReluctanceFactor() {
-        return walkReluctanceFactor;
+    public double[] transitReluctanceFactors() {
+        return transitReluctanceFactors;
     }
 
-    public McCostParamsBuilder walkReluctanceFactor(double walkReluctanceFactor) {
-        this.walkReluctanceFactor = walkReluctanceFactor;
+    public McCostParamsBuilder transitReluctanceFactors(double[] transitReluctanceFactors) {
+        this.transitReluctanceFactors = transitReluctanceFactors;
         return this;
     }
 

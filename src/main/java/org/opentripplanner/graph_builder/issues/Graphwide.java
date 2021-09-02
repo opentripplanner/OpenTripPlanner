@@ -12,7 +12,7 @@ public class Graphwide implements DataImportIssue {
 
     @Override
     public String getMessage() {
-        return String.format("graph-wide: " + message);
+        return "graph-wide: " + message;
     }
     
 }

@@ -48,4 +48,14 @@ public interface RaptorSlackProvider {
      * Unit: seconds.
      */
     int alightSlack(RaptorTripPattern pattern);
+
+    /**
+     * Return the {@link #boardSlack(RaptorTripPattern)
+     * plus {@link #alightSlack(RaptorTripPattern) slack.
+     * <p>
+     * Unit: seconds.
+     */
+    default int transitSlack(RaptorTripPattern pattern) {
+        return boardSlack(pattern) + alightSlack(pattern);
+    }
 }

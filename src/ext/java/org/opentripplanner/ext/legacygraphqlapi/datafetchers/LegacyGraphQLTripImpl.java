@@ -12,7 +12,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -140,22 +140,22 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Iterable<TripTimeShort>> stoptimes() {
+  public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
     return environment -> {
       TripPattern tripPattern = getTripPattern(environment);
       if (tripPattern == null) { return List.of(); }
-      return TripTimeShort.fromTripTimes(tripPattern.scheduledTimetable, getSource(environment));
+      return TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), getSource(environment));
     };
   }
 
   @Override
-  public DataFetcher<TripTimeShort> departureStoptime() {
+  public DataFetcher<TripTimeOnDate> departureStoptime() {
     return environment -> {
       try {
         RoutingService routingService = getRoutingService(environment);
         TripPattern tripPattern = getTripPattern(environment);
         if (tripPattern == null) { return null; }
-        Timetable timetable = tripPattern.scheduledTimetable;
+        Timetable timetable = tripPattern.getScheduledTimetable();
 
         TripTimes triptimes = timetable.getTripTimes(getSource(environment));
         ServiceDay serviceDate = null;
@@ -169,8 +169,8 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
             getSource(environment).getRoute().getAgency().getId()
         );
 
-        Stop stop = timetable.pattern.getStop(0);
-        return new TripTimeShort(triptimes, 0, stop, serviceDate
+        Stop stop = timetable.getPattern().getStop(0);
+        return new TripTimeOnDate(triptimes, 0, tripPattern, serviceDate
         );
       } catch (ParseException e) {
         //Invalid date format
@@ -180,13 +180,13 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<TripTimeShort> arrivalStoptime() {
+  public DataFetcher<TripTimeOnDate> arrivalStoptime() {
     return environment -> {
       try {
         RoutingService routingService = getRoutingService(environment);
         TripPattern tripPattern = getTripPattern(environment);
         if (tripPattern == null) { return null; }
-        Timetable timetable = tripPattern.scheduledTimetable;
+        Timetable timetable = tripPattern.getScheduledTimetable();
 
         TripTimes triptimes = timetable.getTripTimes(getSource(environment));
         ServiceDay serviceDate = null;
@@ -200,8 +200,8 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               getSource(environment).getRoute().getAgency().getId()
           );
 
-        Stop stop = timetable.pattern.getStop(triptimes.getNumStops() - 1);
-        return new TripTimeShort(triptimes, triptimes.getNumStops() - 1, stop, serviceDate
+        Stop stop = timetable.getPattern().getStop(triptimes.getNumStops() - 1);
+        return new TripTimeOnDate(triptimes, triptimes.getNumStops() - 1, tripPattern, serviceDate
         );
       } catch (ParseException e) {
         //Invalid date format
@@ -211,7 +211,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Iterable<TripTimeShort>> stoptimesForDate() {
+  public DataFetcher<Iterable<TripTimeOnDate>> stoptimesForDate() {
     return environment -> {
       try {
         RoutingService routingService = getRoutingService(environment);
@@ -234,7 +234,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
         //TODO: Pass serviceDate
         Timetable timetable = routingService.getTimetableForTripPattern(tripPattern);
-        return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
+        return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDay);
       } catch (ParseException e) {
         return null; // Invalid date format
       }

@@ -1,14 +1,14 @@
 package org.opentripplanner.model.plan;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import java.util.GregorianCalendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
@@ -34,7 +34,7 @@ public class ItineraryTest implements PlanTestConstants {
         assertEquals(420.0d, result.firstLeg().distanceMeters, 1E-3);
         assertSameLocation(B, result.lastLeg().to);
 
-        assertEquals("A ~ Walk 5m ~ B [cost: 600]", result.toStr());
+        assertEquals("A ~ Walk 5m ~ B [ $600 ]", result.toStr());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class ItineraryTest implements PlanTestConstants {
       assertEquals(new FeedScopedId("F", "55"), result.firstLeg().getTrip().getId());
         assertEquals(7500, result.firstLeg().distanceMeters, 1E-3);
 
-        assertEquals("A ~ BUS 55 11:00 11:10 ~ B [cost: 720]", result.toStr());
+        assertEquals("A ~ BUS 55 11:00 11:10 ~ B [ $720 ]", result.toStr());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class ItineraryTest implements PlanTestConstants {
         assertEquals(new FeedScopedId("F", "20"), result.firstLeg().getTrip().getId());
         assertEquals(15_000, result.firstLeg().distanceMeters, 1E-3);
 
-        assertEquals("A ~ RAIL 20 11:05 11:15 ~ B [cost: 720]", result.toStr());
+        assertEquals("A ~ RAIL 20 11:05 11:15 ~ B [ $720 ]", result.toStr());
     }
 
     @Test
@@ -124,7 +124,7 @@ public class ItineraryTest implements PlanTestConstants {
         assertFalse(result.walkOnly);
 
         assertEquals(
-            "A ~ Walk 2m ~ B ~ BUS 1 11:10 11:20 ~ C ~ Walk 3m ~ D [cost: 1464]",
+            "A ~ Walk 2m ~ B ~ BUS 1 11:10 11:20 ~ C ~ Walk 3m ~ D [ $1464 ]",
             result.toStr()
         );
     }
@@ -152,14 +152,15 @@ public class ItineraryTest implements PlanTestConstants {
 
         assertEquals(
             "A ~ Walk 2m ~ B ~ BUS 55 11:04 11:14 ~ C ~ BUS 21 11:16 11:20 ~ D "
-                + "~ Walk 3m ~ E ~ RAIL 20 11:30 11:50 ~ F ~ Walk 1m ~ G [cost: 3648]",
+                + "~ Walk 3m ~ E ~ RAIL 20 11:30 11:50 ~ F ~ Walk 1m ~ G [ $3648 ]",
             result.toStr()
         );
     }
 
     private void assertSameLocation(Place expected, Place actual) {
         assertTrue(
-            "Same location? Expected: " + expected + ", actual: " + actual,
-            expected.sameLocation(actual));
+                expected.sameLocation(actual),
+                "Same location? Expected: " + expected + ", actual: " + actual
+        );
     }
 }

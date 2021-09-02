@@ -32,11 +32,11 @@ public class ItineraryMapper {
         api.waitingTime = domain.waitingTimeSeconds;
         api.walkDistance = domain.nonTransitDistanceMeters;
         api.generalizedCost = domain.generalizedCost;
-        api.walkLimitExceeded = domain.nonTransitLimitExceeded;
         api.elevationLost = domain.elevationLost;
         api.elevationGained = domain.elevationGained;
         api.transfers = domain.nTransfers;
         api.tooSloped = domain.tooSloped;
+        api.arrivedAtDestinationWithRentedBicycle = domain.arrivedAtDestinationWithRentedBicycle;
         api.fare = domain.fare;
         api.legs = legMapper.mapLegs(domain.legs);
         api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.systemNotices);

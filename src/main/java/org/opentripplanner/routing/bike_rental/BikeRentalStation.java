@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.bike_rental;
 
+import static java.util.Locale.ROOT;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.ResourceBundleSingleton;
-
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 // TODO OTP2 - This class is used both for internal and external API representation,
 //           - a external API version should be created to decouple the internal model
@@ -32,6 +33,8 @@ public class BikeRentalStation implements Serializable, Cloneable {
     public boolean isFloatingBike = false;
     @JsonSerialize
     public boolean isCarStation = false;
+    @JsonIgnore
+    public boolean isKeepingBicycleRentalAtDestinationAllowed = false;
 
     /**
      * List of compatible network names. Null (default) to be compatible with all.
@@ -59,7 +62,10 @@ public class BikeRentalStation implements Serializable, Cloneable {
      *
      */
     @JsonIgnore
-    public Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
+    public transient Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
+
+    @JsonSerialize
+    public BikeRentalStationUris rentalUris;
 
     /**
      * FIXME nonstandard definition of equals, relying on only the station field.
@@ -78,7 +84,7 @@ public class BikeRentalStation implements Serializable, Cloneable {
     }
     
     public String toString () {
-        return String.format(Locale.US, "Bike rental station %s at %.6f, %.6f", name, y, x); 
+        return String.format(ROOT, "Bike rental station %s at %.6f, %.6f", name, y, x);
     }
 
     @Override
@@ -97,4 +103,5 @@ public class BikeRentalStation implements Serializable, Cloneable {
     public String getName() {
         return name.toString(locale);
     }
+
 }

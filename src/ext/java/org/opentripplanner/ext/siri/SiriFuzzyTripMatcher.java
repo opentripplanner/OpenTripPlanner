@@ -239,7 +239,7 @@ public class SiriFuzzyTripMatcher {
                 }
                 String lastStopId = tripPattern.getStops().get(tripPattern.getStops().size()-1).getId().getId();
 
-                TripTimes tripTimes = tripPattern.scheduledTimetable.getTripTimes(trip);
+                TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
                 if (tripTimes != null) {
                     int arrivalTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
 
@@ -360,7 +360,7 @@ public class SiriFuzzyTripMatcher {
             TripPattern tripPattern = routingService.getPatternForTrip().get(trip);
 
             if (tripPattern != null) {
-                TripTimes tripTimes = tripPattern.scheduledTimetable.getTripTimes(trip);
+                TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
                 if (tripTimes != null) {
                     return tripTimes.getArrivalTime(0);
 
@@ -375,7 +375,7 @@ public class SiriFuzzyTripMatcher {
             TripPattern tripPattern = routingService.getPatternForTrip().get(trip);
 
             if (tripPattern != null) {
-                TripTimes tripTimes = tripPattern.scheduledTimetable.getTripTimes(trip);
+                TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
                 if (tripTimes != null) {
                     return tripTimes.getArrivalTime(tripTimes.getNumStops()-1);
                 }

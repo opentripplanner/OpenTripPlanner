@@ -13,6 +13,7 @@ import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -202,9 +203,10 @@ public class BuildConfig {
     public final boolean banDiscouragedBiking;
 
     /**
-     * Transfers up to this length in meters will be pre-calculated and included in the Graph.
+     * Transfers up to this duration with the default walk speed value will be pre-calculated and
+     * included in the Graph.
      */
-    public final double maxTransferDistance;
+    public final double maxTransferDurationSeconds;
 
     /**
      * This will add extra edges when linking a stop to a platform, to prevent detours along the platform edge.
@@ -301,6 +303,11 @@ public class BuildConfig {
     public final StorageConfig storage;
 
     /**
+     * Visibility calculations for an area will not be done if there are more nodes than this limit.
+     */
+    public final int maxAreaNodes;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -329,7 +336,7 @@ public class BuildConfig {
         matchBusRoutesToStreets = c.asBoolean("matchBusRoutesToStreets", false);
         maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
         maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
-        maxTransferDistance = c.asDouble("maxTransferDistance", 2000d);
+        maxTransferDurationSeconds = c.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
         multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
         osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
         osmWayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));
@@ -347,6 +354,7 @@ public class BuildConfig {
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
         useTransfersTxt = c.asBoolean("useTransfersTxt", false);
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
+        maxAreaNodes = c.asInt("maxAreaNodes", 500);
 
         // List of complex parameters
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));

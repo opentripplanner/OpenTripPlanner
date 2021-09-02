@@ -1,25 +1,9 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.geotools.geometry.DirectPosition2D;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
@@ -41,9 +25,26 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.ProgressTracker;
-import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
+import static org.opentripplanner.util.logging.ThrottleLogger.*;
 
 /**
  * THIS CLASS IS MULTI-THREADED
@@ -64,7 +65,7 @@ public class ElevationModule implements GraphBuilderModule {
      * Wrap LOG with a Throttle logger for elevation edge warnings, this will prevent thousands
      * of log events, and just log one message every 3 second.
      */
-    private static final Logger ELEVATION_EDGE_ERROR_LOG = ThrottleLogger.throttle(LOG);
+    private static final Logger ELEVATION_EDGE_ERROR_LOG = throttle(LOG);
 
 
     /** The elevation data to be used in calculating elevations. */
@@ -764,7 +765,11 @@ public class ElevationModule implements GraphBuilderModule {
             if (Files.exists(cachedElevationsFile.toPath())) {
                 LOG.info("Cached elevations file found!");
             } else {
-                LOG.warn("No cached elevations file found or read access not allowed! Unable to load in cached elevations. This could take a while...");
+                LOG.warn(
+                        "No cached elevations file found at {} or read access not allowed! Unable "
+                        + "to load in cached elevations. This could take a while...",
+                        cachedElevationsFile.toPath().toAbsolutePath()
+                );
             }
         } else {
             LOG.warn("Not using cached elevations! This could take a while...");

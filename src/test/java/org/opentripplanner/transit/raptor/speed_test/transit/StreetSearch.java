@@ -18,7 +18,9 @@ import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -86,11 +88,16 @@ class StreetSearch {
                         new TemporaryFreeEdge(v, (TemporaryStreetLocation) t)
                 );
             }
-            linker.linkVertexForRequest(vertex, TraverseMode.WALK, direction, createEdgeOp);
+            linker.linkVertexForRequest(
+                vertex,
+                new TraverseModeSet(TraverseMode.WALK),
+                direction,
+                createEdgeOp
+            );
         }
 
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
-                Set.of(vertex), !fromOrigin, true
+                Set.of(vertex), !fromOrigin, true, new RoutingRequest(TraverseMode.WALK)
         );
 
         if(nearbyStopList.isEmpty()) {

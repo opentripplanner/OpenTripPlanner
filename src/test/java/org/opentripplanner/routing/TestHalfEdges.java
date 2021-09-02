@@ -159,7 +159,6 @@ public class TestHalfEdges {
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.dateTime = startTime;
         options.setRoutingContext(graph, br, end);
-        options.setMaxWalkDistance(Double.MAX_VALUE);
         ShortestPathTree spt1 = aStar.getShortestPathTree(options);
 
         GraphPath pathBr = spt1.getPath(end, false);
@@ -294,7 +293,6 @@ public class TestHalfEdges {
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.dateTime = startTime;
         options.setRoutingContext(graph, start, end);
-        options.setMaxWalkDistance(Double.MAX_VALUE);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         GraphPath path = spt.getPath(end, false);
@@ -332,7 +330,6 @@ public class TestHalfEdges {
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.dateTime = startTime;
         options.setRoutingContext(graph, start, end);
-        options.setMaxWalkDistance(Double.MAX_VALUE);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         GraphPath path = spt.getPath(end, false);
@@ -369,7 +366,6 @@ public class TestHalfEdges {
         // The alert should be preserved
         // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
         RoutingRequest req = new RoutingRequest();
-        req.setMaxWalkDistance(Double.MAX_VALUE);
         State traversedOne = new State(start, req);
         State currentState;
         for (Edge e : start.getOutgoing()) {

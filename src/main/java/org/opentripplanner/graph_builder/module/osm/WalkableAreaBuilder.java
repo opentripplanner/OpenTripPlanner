@@ -66,6 +66,10 @@ import java.util.Set;
  * Anyway, since we're not going to run an O(N^3) algorithm at runtime just to give people who don't
  * understand Snell's Law weird paths that they can complain about, this should be just fine.
  * </p>
+ *
+ * TODO this approach could be replaced by building a walkable grid of edges for an area, so the
+ * number of edges for an area wouldn't be determined by the nodes. The current approach can lead
+ * to an excessive number of edges, or to no edges at all if maxAreaNodes is surpassed.
  * 
  */
 public class WalkableAreaBuilder {
@@ -74,7 +78,7 @@ public class WalkableAreaBuilder {
 
     private DataImportIssueStore issueStore;
 
-    public static final int MAX_AREA_NODES = 500;
+    private final int maxAreaNodes;
 
     public static final double VISIBILITY_EPSILON = 0.000000001;
 
@@ -92,7 +96,8 @@ public class WalkableAreaBuilder {
     private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
-            StreetEdgeFactory edgeFactory, Handler handler, DataImportIssueStore issueStore
+            StreetEdgeFactory edgeFactory, Handler handler, DataImportIssueStore issueStore,
+            int maxAreaNodes
     ) {
         this.graph = graph;
         this.osmdb = osmdb;
@@ -100,6 +105,7 @@ public class WalkableAreaBuilder {
         this.edgeFactory = edgeFactory;
         this.handler = handler;
         this.issueStore = issueStore;
+        this.maxAreaNodes = maxAreaNodes;
     }
 
     /**
@@ -227,10 +233,12 @@ public class WalkableAreaBuilder {
             Environment areaEnv = new Environment(polygons);
             // FIXME: temporary hard limit on size of
             // areas to prevent way explosion
-            if (visibilityPoints.size() > MAX_AREA_NODES) {
+            if (visibilityPoints.size() > maxAreaNodes) {
                 issueStore.add(
                         new AreaTooComplicated(
-                                group.getSomeOSMObject().getId(), visibilityPoints.size()));
+                                group.getSomeOSMObject().getId(), visibilityPoints.size(),
+                                maxAreaNodes
+                        ));
                 continue;
             }
 
@@ -291,8 +299,14 @@ public class WalkableAreaBuilder {
         }
 
         @Override
-        public boolean shouldSkipEdge(Vertex origin, Vertex target, State current, Edge edge,
-                ShortestPathTree spt, RoutingRequest traverseOptions) {
+        public boolean shouldSkipEdge(
+            Set<Vertex> origins,
+            Set<Vertex> targets,
+            State current,
+            Edge edge,
+            ShortestPathTree spt,
+            RoutingRequest traverseOptions
+        ) {
             return !edges.contains(edge);
         }
     }

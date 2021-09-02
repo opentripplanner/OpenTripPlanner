@@ -64,9 +64,9 @@ public class CsvFileIO {
 
             TestCase tc = new TestCase(
                     id,
-                    TimeUtils.parseHHMM(csvReader.get("departure"), TestCase.NOT_SET),
-                    TimeUtils.parseHHMM(csvReader.get("arrival"), TestCase.NOT_SET),
-                    TimeUtils.parseHHMM(csvReader.get("window"), TestCase.NOT_SET),
+                    parseTime(csvReader.get("departure"), TestCase.NOT_SET),
+                    parseTime(csvReader.get("arrival"), TestCase.NOT_SET),
+                    parseTime(csvReader.get("window"), TestCase.NOT_SET),
                     csvReader.get("description"),
                     csvReader.get("origin"),
                     csvReader.get("fromPlace"),
@@ -155,11 +155,11 @@ public class CsvFileIO {
             Result r  = new Result(
                     csvReader.get("tcId"),
                     Integer.parseInt(csvReader.get("transfers")),
-                    time2Int(csvReader.get("duration")),
+                    parseTime(csvReader.get("duration")),
                     Integer.parseInt(csvReader.get("cost")),
                     Integer.parseInt(csvReader.get("walkDistance")),
-                    time2Int(csvReader.get("startTime")),
-                    time2Int(csvReader.get("endTime")),
+                    parseTime(csvReader.get("startTime")),
+                    parseTime(csvReader.get("endTime")),
                     csvReader.get("details")
             );
             r.modes.addAll(str2Col(csvReader.get("modes"), TraverseMode::valueOf));
@@ -180,9 +180,15 @@ public class CsvFileIO {
         return TimeUtils.timeToStrLong(timeOrDuration);
     }
 
-    static Integer time2Int(String timeOrDuration) {
-        return TimeUtils.parseTimeLong(timeOrDuration, -1);
+    static Integer parseTime(String timeOrDuration) {
+        return TimeUtils.time(timeOrDuration);
     }
+
+    static Integer parseTime(String timeOrDuration, int defaultValue) {
+        if(timeOrDuration.isBlank()) { return defaultValue; }
+        return TimeUtils.time(timeOrDuration);
+    }
+
     static String col2Str(Collection<?> c) {
         return c.stream().map(Object::toString).collect(Collectors.joining(" "));
     }

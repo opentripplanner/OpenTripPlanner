@@ -7,6 +7,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.util.EnumSet;
@@ -40,13 +41,16 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     this.bannedRoutes = bannedRoutes;
   }
 
-  public RoutingRequestTransitDataProviderFilter(RoutingRequest request) {
+  public RoutingRequestTransitDataProviderFilter(
+          RoutingRequest request,
+          GraphIndex graphIndex
+  ) {
     this(
-        request.modes.directMode == StreetMode.BIKE,
+        request.modes.transferMode == StreetMode.BIKE,
         request.wheelchairAccessible,
         request.includePlannedCancellations,
         request.modes.transitModes,
-        request.rctx.bannedRoutes
+        request.getBannedRoutes(graphIndex.getAllRoutes())
     );
   }
 
@@ -58,22 +62,22 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
     if (requireBikesAllowed) {
-      return bikeAccessForTrip(tripTimes.trip) == BikeAccess.ALLOWED;
+      return bikeAccessForTrip(tripTimes.getTrip()) == BikeAccess.ALLOWED;
     }
 
     if (requireWheelchairAccessible) {
-      return tripTimes.trip.getWheelchairAccessible() == 1;
+      return tripTimes.getTrip().getWheelchairAccessible() == 1;
     }
 
     if (!includePlannedCancellations) {
-      return !tripTimes.trip.getTripAlteration().isCanceledOrReplaced();
+      return !tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced();
     }
 
     return true;
   }
 
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
-    FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().route.getId();
+    FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().getRoute().getId();
     return !bannedRoutes.contains(routeId);
   }
 

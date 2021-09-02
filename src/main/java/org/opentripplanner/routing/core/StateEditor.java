@@ -11,9 +11,9 @@ import java.util.Set;
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- * 
+ * <p>
  * By virtue of being in the same package as States, it can modify their package private fields.
- * 
+ *
  * @author andrewbyrd
  */
 public class StateEditor {
@@ -30,8 +30,9 @@ public class StateEditor {
 
     /* CONSTRUCTORS */
 
-    protected StateEditor() {}
-    
+    protected StateEditor() {
+    }
+
     public StateEditor(RoutingRequest options, Vertex v) {
         child = new State(v, options);
     }
@@ -157,7 +158,7 @@ public class StateEditor {
     public void incrementTimeInSeconds(int seconds) {
         incrementTimeInMilliseconds(seconds * 1000L);
     }
-    
+
     public void incrementTimeInMilliseconds(long milliseconds) {
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
@@ -166,7 +167,7 @@ public class StateEditor {
             return;
         }
         child.time += (traversingBackward ? -milliseconds : milliseconds);
-    }    
+    }
 
     public void incrementWalkDistance(double length) {
         if (length < 0) {
@@ -179,27 +180,36 @@ public class StateEditor {
 
     /* Basic Setters */
 
-    public void setEnteredNoThroughTrafficArea() {
-        child.stateData.enteredNoThroughTrafficArea = true;
-    }
-
     public void resetEnteredNoThroughTrafficArea() {
+        if (!child.stateData.enteredNoThroughTrafficArea) {
+            return;
+        }
+
+        cloneStateDataAsNeeded();
         child.stateData.enteredNoThroughTrafficArea = false;
     }
-    
+
+    public void setEnteredNoThroughTrafficArea() {
+        if (child.stateData.enteredNoThroughTrafficArea) {
+            return;
+        }
+
+        cloneStateDataAsNeeded();
+        child.stateData.enteredNoThroughTrafficArea = true;
+    }
 
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backMode = mode;
     }
 
-    public void setBackWalkingBike (boolean walkingBike) {
+    public void setBackWalkingBike(boolean walkingBike) {
         if (walkingBike == child.stateData.backWalkingBike)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backWalkingBike = walkingBike;
     }
@@ -208,17 +218,62 @@ public class StateEditor {
         child.walkDistance = walkDistance;
     }
 
-    public void beginVehicleRenting(TraverseMode vehicleMode) {
+    public void beginFloatingVehicleRenting(
+            TraverseMode vehicleMode,
+            Set<String> networks,
+            boolean reverse
+    ) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = true;
-        child.stateData.hasUsedRentedBike = true;
-        child.stateData.nonTransitMode = vehicleMode;
+        if (reverse) {
+            child.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
+            child.stateData.currentMode = TraverseMode.WALK;
+            child.stateData.bikeRentalNetworks = null;
+        } else {
+            child.stateData.bikeRentalState = BikeRentalState.RENTING_FLOATING;
+            child.stateData.currentMode = vehicleMode;
+            child.stateData.bikeRentalNetworks = networks;
+        }
     }
 
-    public void doneVehicleRenting() {
+    public void beginVehicleRentingAtStation(
+            TraverseMode vehicleMode,
+            Set<String> networks,
+            boolean mayKeep,
+            boolean reverse
+    ) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = false;
-        child.stateData.nonTransitMode = TraverseMode.WALK;
+        if (reverse) {
+            child.stateData.mayKeepRentedBicycleAtDestination = mayKeep;
+            child.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
+            child.stateData.currentMode = TraverseMode.WALK;
+            child.stateData.bikeRentalNetworks = null;
+            child.stateData.backWalkingBike = false;
+        } else {
+            child.stateData.mayKeepRentedBicycleAtDestination = mayKeep;
+            child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
+            child.stateData.currentMode = vehicleMode;
+            child.stateData.bikeRentalNetworks = networks;
+        }
+    }
+
+    public void dropOffRentedVehicleAtStation(
+            TraverseMode vehicleMode,
+            Set<String> networks,
+            boolean reverse
+    ) {
+        cloneStateDataAsNeeded();
+        if (reverse) {
+            child.stateData.mayKeepRentedBicycleAtDestination = false;
+            child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
+            child.stateData.currentMode = vehicleMode;
+            child.stateData.bikeRentalNetworks = networks;
+        } else {
+            child.stateData.mayKeepRentedBicycleAtDestination = false;
+            child.stateData.bikeRentalState = BikeRentalState.HAVE_RENTED;
+            child.stateData.currentMode = TraverseMode.WALK;
+            child.stateData.bikeRentalNetworks = null;
+            child.stateData.backWalkingBike = false;
+        }
     }
 
     /**
@@ -230,9 +285,9 @@ public class StateEditor {
         child.stateData.carParked = carParked;
         if (carParked) {
             // We do not handle mixed-mode P+BIKE...
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.currentMode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.CAR;
+            child.stateData.currentMode = TraverseMode.CAR;
         }
     }
 
@@ -240,9 +295,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeParked = bikeParked;
         if (bikeParked) {
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.currentMode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
+            child.stateData.currentMode = TraverseMode.BICYCLE;
         }
     }
 
@@ -258,22 +313,23 @@ public class StateEditor {
     /**
      * Set non-incremental state values from an existing state.
      * Incremental values are not currently set.
-     * 
+     *
      * @param state
      */
     public void setFromState(State state) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = state.stateData.usingRentedBike;
+        child.stateData.carPickupState = state.stateData.carPickupState;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
+        child.stateData.backWalkingBike = state.stateData.backWalkingBike;
     }
 
-    public void setNonTransitOptionsFromState(State state){
+    public void setNonTransitOptionsFromState(State state) {
         cloneStateDataAsNeeded();
-        child.stateData.nonTransitMode = state.getNonTransitMode();
+        child.stateData.currentMode = state.getNonTransitMode();
         child.stateData.carParked = state.isCarParked();
         child.stateData.bikeParked = state.isBikeParked();
-        child.stateData.usingRentedBike = state.isBikeRenting();
+        child.stateData.bikeRentalState = state.stateData.bikeRentalState;
     }
 
     public void setCarPickupState(CarPickupState carPickupState) {
@@ -282,10 +338,10 @@ public class StateEditor {
         switch (carPickupState) {
             case WALK_TO_PICKUP:
             case WALK_FROM_DROP_OFF:
-                child.stateData.nonTransitMode = TraverseMode.WALK;
+                child.stateData.currentMode = TraverseMode.WALK;
                 break;
             case IN_CAR:
-                child.stateData.nonTransitMode = TraverseMode.CAR;
+                child.stateData.currentMode = TraverseMode.CAR;
                 break;
         }
     }
@@ -334,8 +390,7 @@ public class StateEditor {
         child.stateData.bikeRentalNetworks = networks;
     }
 
-    public boolean hasEnteredNoThroughTrafficArea() {
-        return child.hasEnteredNoThruTrafficArea();
+    public State getBackState() {
+        return child.getBackState();
     }
-
 }

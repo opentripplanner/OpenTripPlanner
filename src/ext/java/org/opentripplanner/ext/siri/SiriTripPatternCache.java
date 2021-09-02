@@ -67,7 +67,7 @@ public class SiriTripPatternCache {
             tripPattern.setServiceCodes(graph.getServiceCodes());
             
             // Finish scheduled time table
-            tripPattern.scheduledTimetable.finish();
+            tripPattern.getScheduledTimetable().finish();
             
             // Create vertices and edges for new TripPattern
             // TODO: purge these vertices and edges once in a while?
@@ -128,7 +128,9 @@ public class SiriTripPatternCache {
              * Remove previously added TripPatterns for the trip currently being updated - if the stopPattern does not match
              */
             TripPattern cachedTripPattern = updatedTripPatternsForTripCache.get(tripServiceDateKey);
-            if (cachedTripPattern != null && !tripPattern.stopPattern.equals(cachedTripPattern.stopPattern)) {
+            if (cachedTripPattern != null && !tripPattern
+                .getStopPattern()
+                .equals(cachedTripPattern.getStopPattern())) {
                 int sizeBefore = patternsForStop.values().size();
                 long t1 = System.currentTimeMillis();
                 patternsForStop.values().removeAll(Arrays.asList(cachedTripPattern));

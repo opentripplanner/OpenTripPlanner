@@ -35,7 +35,6 @@ public class AStar {
     private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
     // FIXME this is not really a factory, it's a way to fake a global variable. This should be stored at the OTPServer level.
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
-    private static final double OVERSEARCH_MULTIPLIER = 4.0;
 
     private boolean verbose = false;
 
@@ -61,7 +60,6 @@ public class AStar {
         private RoutingRequest options;
         private SearchTerminationStrategy terminationStrategy;
         public Vertex u_vertex;
-        Double foundPathWeight = null;
 
         public RunState(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
             this.options = options;
@@ -167,7 +165,14 @@ public class AStar {
         for (Edge edge : edges) {
 
             if (skipEdgeStrategy != null &&
-                    skipEdgeStrategy.shouldSkipEdge(null,null,null, edge,null,null)) {
+                    skipEdgeStrategy.shouldSkipEdge(
+                        runState.rctx.fromVertices,
+                        runState.rctx.toVertices,
+                        runState.u,
+                        edge,runState.spt,
+                        runState.options
+                    )
+            ) {
                 continue;
             }
 
@@ -194,20 +199,6 @@ public class AStar {
                     System.out.println("      " + runState.u.getWeight() + " -> " + v.getWeight()
                             + "(w) + " + remaining_w + "(heur) = " + estimate + " vert = "
                             + v.getVertex());
-                }
-
-                // avoid enqueuing useless branches 
-                if (estimate > runState.options.maxWeight) {
-                    // too expensive to get here
-                    if (verbose)
-                        System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
-                    continue;
-                }
-                if (isWorstTimeExceeded(v, runState.options)) {
-                    // too much time to get here
-                    if (verbose)
-                        System.out.println("         too much time to reach, not enqueued. time = " + v.getTimeSeconds());
-                    continue;
                 }
                 
                 // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
@@ -253,27 +244,20 @@ public class AStar {
                 continue;
             }
             
-            /*
-             * Should we terminate the search?
-             */
-            // Don't search too far past the most recently found accepted path/state
-            if (runState.foundPathWeight != null &&
-                runState.u.getWeight() > runState.foundPathWeight * OVERSEARCH_MULTIPLIER ) {
-                break;
-            }
             if (runState.terminationStrategy != null) {
-                if (runState.terminationStrategy.shouldSearchTerminate (
+                if (runState.terminationStrategy.shouldSearchTerminate(
                     runState.rctx.fromVertices, runState.rctx.toVertices, runState.u, runState.spt, runState.options)) {
                     break;
                 }
-            }  else if (runState.rctx.toVertices != null
+            }
+            if (runState.rctx.toVertices != null
                     && runState.rctx.toVertices.contains(runState.u_vertex)
                     && runState.u.isFinal()) {
                 runState.targetAcceptedStates.add(runState.u);
-                runState.foundPathWeight = runState.u.getWeight();
                 // new GraphPath(runState.u, false).dump();
 
                 /* Break out of the search if we've found the requested number of paths. */
+                // TODO Refactor. This check for getNumItineraries always returns 1
                 if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
                     break;
@@ -333,15 +317,6 @@ public class AStar {
         }
     }
 
-    private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
-        if (opt.arriveBy) {
-            return v.getTimeSeconds() < opt.worstTime;
-        }
-        else {
-            return v.getTimeSeconds() > opt.worstTime;
-        }
-    }
-
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
     }
@@ -354,7 +329,7 @@ public class AStar {
         List<GraphPath> ret = new LinkedList<>();
         for (State s : runState.targetAcceptedStates) {
             if (s.isFinal()) {
-                ret.add(new GraphPath(s, true));
+                ret.add(new GraphPath(s));
             }
         }
         return ret;

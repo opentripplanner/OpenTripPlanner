@@ -205,7 +205,12 @@ public class ApiLeg {
 
     public Boolean rentedBike;
 
-    /**
+     /**
+      * Is this leg walking with a bike?
+      */
+    public Boolean walkingBike;
+
+     /**
      * The leg's duration in seconds
      */
     public double getDuration() {

@@ -8,13 +8,18 @@ import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
     private String baseURL = null;
 
     public UIPBikeRentalDataSource(BikeRentalDataSourceParameters config) {
-        super(config, "stations", "Client-Identifier", config.getApiKey());
+        super(
+            config,
+            "stations",
+            config.getApiKey() != null ? Map.of("Client-Identifier", config.getApiKey()) : Map.of()
+        );
     }
 
     /**

@@ -1,5 +1,9 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.onebusaway.gtfs.model.Location;
+import org.onebusaway.gtfs.model.LocationGroup;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.util.MapUtils;
 
@@ -13,13 +17,27 @@ import java.util.Map;
 class StopTimeMapper {
     private final StopMapper stopMapper;
 
+    private final LocationMapper locationMapper;
+
+    private final LocationGroupMapper locationGroupMapper;
+
     private final TripMapper tripMapper;
+    private final BookingRuleMapper bookingRuleMapper;
 
-    private Map<org.onebusaway.gtfs.model.StopTime, StopTime> mappedStopTimes = new HashMap<>();
+    private final Map<org.onebusaway.gtfs.model.StopTime, StopTime> mappedStopTimes = new HashMap<>();
 
-    StopTimeMapper(StopMapper stopMapper, TripMapper tripMapper) {
+    StopTimeMapper(
+            StopMapper stopMapper,
+            LocationMapper locationMapper,
+            LocationGroupMapper locationGroupMapper,
+            TripMapper tripMapper,
+            BookingRuleMapper bookingRuleMapper
+    ) {
         this.stopMapper = stopMapper;
+        this.locationMapper = locationMapper;
+        this.locationGroupMapper = locationGroupMapper;
         this.tripMapper = tripMapper;
+        this.bookingRuleMapper = bookingRuleMapper;
     }
 
     Collection<StopTime> map(Collection<org.onebusaway.gtfs.model.StopTime> times) {
@@ -35,17 +53,29 @@ class StopTimeMapper {
         StopTime lhs = new StopTime();
 
         lhs.setTrip(tripMapper.map(rhs.getTrip()));
-        lhs.setStop(stopMapper.map(rhs.getStop()));
+        if (rhs.getStop() instanceof Stop){
+            lhs.setStop(stopMapper.map((Stop) rhs.getStop()));
+        } else if (rhs.getStop() instanceof Location) {
+            lhs.setStop(locationMapper.map((Location) rhs.getStop()));
+        } else if (rhs.getStop() instanceof LocationGroup) {
+            lhs.setStop(locationGroupMapper.map((LocationGroup) rhs.getStop()));
+        }
         lhs.setArrivalTime(rhs.getArrivalTime());
         lhs.setDepartureTime(rhs.getDepartureTime());
         lhs.setTimepoint(rhs.getTimepoint());
         lhs.setStopSequence(rhs.getStopSequence());
         lhs.setStopHeadsign(rhs.getStopHeadsign());
         lhs.setRouteShortName(rhs.getRouteShortName());
-        lhs.setPickupType(rhs.getPickupType());
-        lhs.setDropOffType(rhs.getDropOffType());
+        lhs.setPickupType(PickDrop.fromGtfsCode(rhs.getPickupType()));
+        lhs.setDropOffType(PickDrop.fromGtfsCode(rhs.getDropOffType()));
         lhs.setShapeDistTraveled(rhs.getShapeDistTraveled());
         lhs.setFarePeriodId(rhs.getFarePeriodId());
+        lhs.setFlexWindowStart(rhs.getStartPickupDropOffWindow());
+        lhs.setFlexWindowEnd(rhs.getEndPickupDropOffWindow());
+        lhs.setFlexContinuousPickup(rhs.getContinuousPickup());
+        lhs.setFlexContinuousDropOff(rhs.getContinuousDropOff());
+        lhs.setPickupBookingInfo(bookingRuleMapper.map(rhs.getPickupBookingRule()));
+        lhs.setDropOffBookingInfo(bookingRuleMapper.map(rhs.getDropOffBookingRule()));
 
         // Skip mapping of proxy
         // private transient StopTimeProxy proxy;

@@ -1,20 +1,19 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-
-import java.util.Collection;
-import java.util.Collections;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+import java.util.Collections;
+import org.junit.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Trip;
 
 public class StopTimesMapperTest {
     private static final String FEED_ID = "FEED";
@@ -68,8 +67,17 @@ public class StopTimesMapperTest {
         STOP_TIME.setTrip(TRIP);
     }
 
+    private final StopMapper stopMapper = new StopMapper();
+    private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
+    private final LocationMapper locationMapper = new LocationMapper();
+    private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);
+
     private final StopTimeMapper subject = new StopTimeMapper(
-            new StopMapper(), new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)))
+            stopMapper,
+            locationMapper,
+            locationGroupMapper,
+            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID))),
+            bookingRuleMapper
     );
 
     @Test
@@ -85,9 +93,9 @@ public class StopTimesMapperTest {
 
         assertEquals(ARRIVAL_TIME, result.getArrivalTime());
         assertEquals(DEPARTURE_TIME, result.getDepartureTime());
-        assertEquals(DROP_OFF_TYPE, result.getDropOffType());
+        assertEquals(DROP_OFF_TYPE, result.getDropOffType().getGtfsCode());
         assertEquals(FARE_PERIOD_ID, result.getFarePeriodId());
-        assertEquals(PICKUP_TYPE, result.getPickupType());
+        assertEquals(PICKUP_TYPE, result.getPickupType().getGtfsCode());
         assertEquals(ROUTE_SHORT_NAME, result.getRouteShortName());
         assertEquals(SHAPE_DIST_TRAVELED, result.getShapeDistTraveled(), 0.0001d);
         assertNotNull(result.getStop());
@@ -103,9 +111,9 @@ public class StopTimesMapperTest {
 
         assertFalse(result.isArrivalTimeSet());
         assertFalse(result.isDepartureTimeSet());
-        assertEquals(0, result.getDropOffType());
+        assertEquals(0, result.getDropOffType().getGtfsCode());
         assertNull(result.getFarePeriodId());
-        assertEquals(0, result.getPickupType());
+        assertEquals(0, result.getPickupType().getGtfsCode());
         assertNull(result.getRouteShortName());
         assertFalse(result.isShapeDistTraveledSet());
         assertNull(result.getStop());

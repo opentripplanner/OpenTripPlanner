@@ -64,9 +64,9 @@ public final class PatternRide<T extends RaptorTripSchedule> {
     public final int boardWaitTimeForCostCalculation;
     public final T trip;
 
-    // Pareto vector
+    // Pareto vector: [relativeCost, tripSortIndex]
     public final int relativeCost;
-    private final int tripId;
+    private final int tripSortIndex;
 
     public PatternRide(
         AbstractStopArrival<T> prevArrival,
@@ -75,17 +75,16 @@ public final class PatternRide<T extends RaptorTripSchedule> {
         int boardTime,
         int boardWaitTime,
         int relativeCost,
-        T trip,
-        int tripId
+        T trip
     ) {
         this.prevArrival = prevArrival;
         this.boardStopIndex = boardStopIndex;
         this.boardPos = boardPos;
         this.boardTime = boardTime;
         this.boardWaitTimeForCostCalculation = boardWaitTime;
-        this.tripId = tripId;
         this.trip = trip;
         this.relativeCost = relativeCost;
+        this.tripSortIndex = trip.tripSortIndex();
     }
 
     /**
@@ -95,10 +94,9 @@ public final class PatternRide<T extends RaptorTripSchedule> {
      * 2 criteria are needed:
      * <ul>
      *   <li>
-     *     {@code tripId} - different trips should not exclude each other. The id can be any board-/
-     *      alight-time or sequence number that is uniq for all trips within a pattern. It is only
-     *      used to check if two trips are different. The pattern trip index is used in this
-     *      implementation.
+     *     {@code tripSortIndex} - different trips should not exclude each other. The id can be
+     *     any board-/alight-time or sequence number that is uniq for all trips within a pattern.
+     *     It is only used to check if two trips are different.
      *   </li>
      *   <li>
      *     {@code relative-cost} of riding a pattern. The cost is used to compare paths that have
@@ -115,7 +113,7 @@ public final class PatternRide<T extends RaptorTripSchedule> {
      */
     public static <T extends RaptorTripSchedule>
     ParetoComparator<PatternRide<T>> paretoComparatorRelativeCost() {
-        return (l, r) -> l.tripId != r.tripId || l.relativeCost < r.relativeCost;
+        return (l, r) -> l.tripSortIndex != r.tripSortIndex || l.relativeCost < r.relativeCost;
     }
 
     @Override
@@ -124,11 +122,11 @@ public final class PatternRide<T extends RaptorTripSchedule> {
             .addNum("prevArrival", prevArrival.stop())
             .addNum("boardStop", boardStopIndex)
             .addNum("boardPos", boardPos)
-            .addServiceTime("boardTime", boardTime , -1)
+            .addServiceTime("boardTime", boardTime)
             .addDurationSec("boardWaitTime", boardWaitTimeForCostCalculation)
             .addObj("trip", trip)
             .addNum("relativeCost", relativeCost)
-            .addNum("tripId", tripId)
+            .addNum("tripSortIndex", tripSortIndex)
             .toString();
     }
 }

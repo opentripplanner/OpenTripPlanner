@@ -24,9 +24,13 @@ public interface CarPickupableEdge {
         editor.setCarPickupState(state.getOptions().arriveBy
                 ? CarPickupState.WALK_TO_PICKUP
                 : CarPickupState.WALK_FROM_DROP_OFF);
+        editor.incrementTimeInSeconds(state.getOptions().carPickupTime);
+        editor.incrementWeight(state.getOptions().carPickupCost);
     }
 
     default void driveAfterPickup(State state, StateEditor editor) {
         editor.setCarPickupState(CarPickupState.IN_CAR);
+        editor.incrementTimeInSeconds(state.getOptions().carPickupTime);
+        editor.incrementWeight(state.getOptions().carPickupCost);
     }
 }

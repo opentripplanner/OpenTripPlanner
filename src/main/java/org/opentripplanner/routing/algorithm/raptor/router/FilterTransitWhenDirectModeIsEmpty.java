@@ -59,18 +59,18 @@ public class FilterTransitWhenDirectModeIsEmpty {
   }
 
   public StreetMode resolveDirectMode() {
-    return directSearchEmpty() ? StreetMode.WALK : originalDirectMode;
+    return directSearchNotSet() ? StreetMode.WALK : originalDirectMode;
   }
 
   public boolean removeWalkAllTheWayResults() {
-    return directSearchEmpty();
+    return directSearchNotSet();
   }
 
   public StreetMode originalDirectMode() {
     return originalDirectMode;
   }
 
-  private boolean directSearchEmpty() {
-    return originalDirectMode == null;
+  private boolean directSearchNotSet() {
+    return originalDirectMode == StreetMode.NOT_SET;
   }
 }

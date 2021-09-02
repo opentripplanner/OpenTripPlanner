@@ -1,21 +1,22 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import graphql.schema.GraphQLEnumType;
-import org.opentripplanner.model.Direction;
+import java.util.Arrays;
+import java.util.function.Function;
 import org.opentripplanner.model.BookingMethod;
+import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
+import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.trippattern.RealTimeState;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public class EnumTypes {
     public static GraphQLEnumType WHEELCHAIR_BOARDING = GraphQLEnumType.newEnum()
@@ -86,14 +87,13 @@ public class EnumTypes {
             //TODO QL: .value("parkAndRide", VertexType.PARKANDRIDE)
             .build();
 
-    /* TODO QL
-    public static GraphQLEnumType serviceAlterationEnum = GraphQLEnumType.newEnum()
-            .name("ServiceAlteration")
-            .value("planned", Trip.ServiceAlteration.planned)
-            .value("cancellation", Trip.ServiceAlteration.cancellation)
-            .value("extraJourney", Trip.ServiceAlteration.extraJourney)
+    public static GraphQLEnumType INTERCHANGE_PRIORITY = GraphQLEnumType.newEnum()
+            .name("InterchangePriority")
+            .value("preferred", TransferPriority.PREFERRED)
+            .value("recommended", TransferPriority.RECOMMENDED)
+            .value("allowed", TransferPriority.ALLOWED)
+            .value("notAllowed", TransferPriority.NOT_ALLOWED)
             .build();
-    */
 
     public static GraphQLEnumType STREET_MODE = GraphQLEnumType.newEnum()
         .name("StreetMode")
@@ -264,6 +264,13 @@ public class EnumTypes {
         .value("replaced", TripAlteration.REPLACED)
         .value("extraJourney", TripAlteration.EXTRA_JOURNEY)
         .value("planned", TripAlteration.PLANNED)
+        .build();
+
+    public static GraphQLEnumType ARRIVAL_DEPARTURE = GraphQLEnumType.newEnum()
+        .name("ArrivalDeparture")
+        .value("arrivals", ArrivalDeparture.ARRIVALS, "Only show arrivals")
+        .value("departures", ArrivalDeparture.DEPARTURES, "Only show departures")
+        .value("both", ArrivalDeparture.BOTH, "Show both arrivals and departures")
         .build();
 
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {

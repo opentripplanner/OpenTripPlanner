@@ -1,8 +1,11 @@
 package org.opentripplanner.openstreetmap.model;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
 public class OSMWithTagsTest {
 
@@ -106,22 +109,4 @@ public class OSMWithTagsTest {
         o.addTag("access", "no");
         assertTrue(o.isGeneralAccessDenied());
     }
-    
-    @Test
-    public void testIsThroughTrafficExplicitlyDisallowed() {
-        OSMWithTags o = new OSMWithTags();
-        assertFalse(o.isThroughTrafficExplicitlyDisallowed());
-        
-        o.addTag("access", "something");
-        assertFalse(o.isThroughTrafficExplicitlyDisallowed());
-        
-        o.addTag("access", "destination");
-        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
-
-        o.addTag("access", "forestry");
-        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
-        
-        o.addTag("access", "private");
-        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
-    }   
 }

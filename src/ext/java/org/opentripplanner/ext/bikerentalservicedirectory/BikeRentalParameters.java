@@ -7,10 +7,9 @@ public class BikeRentalParameters extends BikeRentalUpdaterParameters {
 
   public BikeRentalParameters(
       String configRef,
-      String url,
       int frequencySec,
       BikeRentalDataSourceParameters sourceParameters
   ) {
-    super(configRef, url, null, frequencySec, sourceParameters);
+    super(configRef, null, frequencySec, sourceParameters);
   }
 }

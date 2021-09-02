@@ -108,13 +108,11 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
         callWith.argument("transitGeneralizedCostLimit", (DoubleFunction<Double> it) -> request.itineraryFilters.transitGeneralizedCostLimit = it);
-        callWith.argument("maximumWalkDistance", request::setMaxWalkDistance);
 //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
-        callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
 //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
 //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
-        callWith.argument("walkReluctance", request::setWalkReluctance);
+        callWith.argument("walkReluctance", request::setNonTransitReluctance);
         callWith.argument("waitReluctance", request::setWaitReluctance);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
 //        callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
@@ -126,21 +124,31 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
-        BicycleOptimizeType optimize = environment.getArgument("optimize");
+        BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
-        if (optimize == BicycleOptimizeType.TRIANGLE) {
+        if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
             try {
                 RoutingRequest.assertTriangleParameters(
                     request.bikeTriangleSafetyFactor,
                     request.bikeTriangleTimeFactor,
                     request.bikeTriangleSlopeFactor
                 );
+                // TODO These are not defined in the graphql schema
                 callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
                 callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
                 callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
             } catch (ParameterException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
+            bicycleOptimizeType = BicycleOptimizeType.QUICK;
+            request.transferCost += 1800;
+        }
+
+        if (bicycleOptimizeType != null) {
+            request.bicycleOptimizeType = bicycleOptimizeType;
         }
 
         callWith.argument("arriveBy", request::setArriveBy);
@@ -175,15 +183,6 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
         //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
-        if (optimize == BicycleOptimizeType.TRANSFERS) {
-            optimize = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
-
-        if (optimize != null) {
-            request.optimize = optimize;
-        }
-
         if (GqlUtil.hasArgument(environment, "modes")) {
             ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
@@ -201,6 +200,7 @@ public class TransmodelGraphQLPlanner {
 
             request.modes = new RequestModes(
                 accessMode.get(),
+                accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK,
                 egressMode.get(),
                 directMode.get(),
                 new HashSet<>(transitModes.get())

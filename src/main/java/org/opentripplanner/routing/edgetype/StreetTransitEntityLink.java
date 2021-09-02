@@ -8,7 +8,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -26,8 +25,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
     private final boolean wheelchairAccessible;
 
     public StreetTransitEntityLink(StreetVertex fromv, T tov, boolean wheelchairAccessible) {
-    	super(fromv, tov);
-    	this.transitEntityVertex = tov;
+        super(fromv, tov);
+        this.transitEntityVertex = tov;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
@@ -52,7 +51,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
     }
 
     public LineString getGeometry() {
-        Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()};
+        Coordinate[] coordinates = new Coordinate[]{fromv.getCoordinate(), tov.getCoordinate()};
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
@@ -65,6 +64,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         return getName();
     }
 
+
     public State traverse(State s0) {
 
         // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
@@ -73,9 +73,9 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
         // if they are for the same stop.
         if (
-            s0.backEdge instanceof StreetTransitEntityLink &&
-                ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex
-                    == this.transitEntityVertex
+                s0.backEdge instanceof StreetTransitEntityLink &&
+                        ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex
+                                == this.transitEntityVertex
         ) {
             return null;
         }
@@ -85,36 +85,49 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
             return null;
         }
 
-        if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
-            // Forbid taking your own bike in the station if bike P+R activated.
-            return null;
-        }
-        if (s0.isBikeRenting()) {
-            // Forbid taking a rented bike on any transit.
-            // TODO Check this condition, does this always make sense?
-            return null;
-        }
-
-        // Do not check here whether any transit modes are selected. A check for the presence of
-        // transit modes will instead be done in the following PreBoard edge.
-        // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
-        TraverseMode mode = s0.getBackMode() == null ? s0.getNonTransitMode() : s0.getBackMode();
-
-        if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            // For Kiss & Ride allow dropping of the passenger before entering the station
-            if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
-                dropOffAfterDriving(s0, s1);
-                mode = TraverseMode.WALK;
-            } else {
+        switch (s0.getNonTransitMode()) {
+            case BICYCLE:
+                // Forbid taking your own bike in the station if bike P+R activated.
+                if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
+                    return null;
+                }
+                // Forbid taking a (station) rental bike in the station. This allows taking along
+                // floating bikes.
+                else if (s0.isBikeRentingFromStation() && !(s0.mayKeepRentedBicycleAtDestination() && s0.getOptions().allowKeepingRentedBicycleAtDestination)) {
+                    return null;
+                }
+                // Allow taking an owned bike in the station
+                break;
+            case CAR:
+                // For Kiss & Ride allow dropping of the passenger before entering the station
+                if (s0.getCarPickupState() != null) {
+                    if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
+                        dropOffAfterDriving(s0, s1);
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                // If Kiss & Ride (Taxi) mode is not enabled allow car traversal so that the Stop
+                // may be reached by car
+                break;
+        case WALK:
+                break;
+            default:
                 return null;
-            }
         }
 
-        s1.setBackMode(mode);
+        if (s0.isBikeRentingFromStation()
+                && s0.mayKeepRentedBicycleAtDestination()
+                && s0.getOptions().allowKeepingRentedBicycleAtDestination) {
+            s1.incrementWeight(s0.getOptions().keepingRentedBicycleAtDestinationCost);
+        }
 
-        // We do not increase the time here, so that searching from the stop coordinates instead of
+        s1.setBackMode(null);
+
+        // streetToStopTime may be zero so that searching from the stop coordinates instead of
         // the stop id catch transit departing at that exact search time.
         int streetToStopTime = getStreetToStopTime();
         s1.incrementTimeInSeconds(streetToStopTime);
@@ -124,19 +137,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
 
     boolean isLeavingStreetNetwork(RoutingRequest req) {
         return (req.arriveBy ? fromv : tov) == getTransitEntityVertex();
-    }
-
-    public State optimisticTraverse(State s0) {
-        StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(STEL_TRAVERSE_COST);
-        return s1.makeState();
-    }
-
-    // anecdotally, the lower bound search is about 2x faster when you don't reach stops
-    // and therefore don't even consider boarding
-    @Override
-    public double weightLowerBound(RoutingRequest options) {
-        return options.transitAllowed() ? 0 : Double.POSITIVE_INFINITY;
     }
 
     public Vertex getFromVertex() {
@@ -158,6 +158,4 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
     public String toString() {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
-
-
 }

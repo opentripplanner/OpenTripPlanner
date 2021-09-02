@@ -1,9 +1,8 @@
 package org.opentripplanner.transit.raptor.api.path;
 
+import java.util.Objects;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
-import java.util.Objects;
 
 /**
  * Represent a transfer leg in a path.
@@ -16,8 +15,14 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> extends Interme
 
     private final RaptorTransfer transfer;
 
-    public TransferPathLeg(int fromStop, int fromTime, int toStop, int toTime, int cost, RaptorTransfer transfer, PathLeg<T> next) {
-        super(fromStop, fromTime, toStop, toTime, cost);
+    public TransferPathLeg(
+            int fromStop,
+            int fromTime,
+            int toTime,
+            RaptorTransfer transfer,
+            PathLeg<T> next
+    ) {
+        super(fromStop, fromTime, transfer.stop(), toTime, transfer.generalizedCost());
         this.transfer = transfer;
         this.next = next;
     }

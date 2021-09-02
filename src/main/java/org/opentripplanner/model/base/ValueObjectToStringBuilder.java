@@ -1,10 +1,9 @@
 package org.opentripplanner.model.base;
 
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
-
 import java.time.Duration;
 import java.util.function.Function;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Use this to-string-builder to build value objects. A
@@ -30,6 +29,7 @@ public class ValueObjectToStringBuilder {
     private final NumberFormat numFormat = new NumberFormat();
 
     boolean skipSep = true;
+    boolean skipNull = false;
 
     /** Use factory method: {@link #of()}. */
     private ValueObjectToStringBuilder() { }
@@ -44,6 +44,32 @@ public class ValueObjectToStringBuilder {
 
     /* General purpose formatters */
 
+    /**
+     * {@code null} values are skipped after this method is called.
+     * This is the default behavior.
+     */
+    public ValueObjectToStringBuilder skipNull() {
+        this.skipNull = true;
+        return this;
+    }
+
+    /**
+     * Use {@link #skipNull()} and {@code skipNull(false)} to turn the skip flag on and off.
+     * Example:
+     *
+     * <pre>
+     * ValueObjectToStringBuilder.of()
+     *   .skipNull().addNum(null).addText("?")
+     *   .includeNull().addNum(null).addText("!")
+     *
+     * is "?null!"
+     * </pre>
+     */
+    public ValueObjectToStringBuilder includeNull() {
+        this.skipNull = false;
+        return this;
+    }
+
     public ValueObjectToStringBuilder addNum(Number num) {
         return addIt(num, numFormat::formatNumber);
     }
@@ -56,8 +82,19 @@ public class ValueObjectToStringBuilder {
         return addIt(value, it -> it ? ifTrue : ifFalse);
     }
 
+    /** Add a quoted string value */
     public ValueObjectToStringBuilder addStr(String value) {
         return addIt(value, it -> "'" + it + "'");
+    }
+
+    /**
+     * Add plain text without quotes or any pending whitespace separator after it. Include
+     * white space if you need it.
+     */
+    public ValueObjectToStringBuilder addText(String label) {
+        sb.append(label);
+        skipSep = true;
+        return this;
     }
 
     public ValueObjectToStringBuilder addEnum(Enum<?> value) {
@@ -66,17 +103,6 @@ public class ValueObjectToStringBuilder {
 
     public ValueObjectToStringBuilder addObj(Object obj) {
         return addIt(obj, Object::toString);
-    }
-
-    /**
-     * A text/labels to your string. No separator character is writen to the buffer
-     * before or after the label - hence you need to include white space in the label if you
-     * want it.
-     */
-    public ValueObjectToStringBuilder addLbl(String label) {
-        sb.append(label);
-        skipSep = true;
-        return this;
     }
 
 
@@ -89,6 +115,7 @@ public class ValueObjectToStringBuilder {
      * exactly equals.
      */
     public ValueObjectToStringBuilder addCoordinate(Number lat, Number lon) {
+        if(skipNull && lat==null && lon==null) { return this; }
         return addIt(
             "(" + numFormat.formatCoordinate(lat) + ", "
                 + numFormat.formatCoordinate(lon) + ")"
@@ -132,6 +159,7 @@ public class ValueObjectToStringBuilder {
     }
 
     private <T> ValueObjectToStringBuilder  addIt(T value, Function<T, String> mapToString) {
+        if(skipNull && value == null) { return this; }
         if (skipSep) { skipSep = false; }
         else { sb.append(FIELD_SEPARATOR); }
         sb.append(value == null ? "null" : mapToString.apply(value));

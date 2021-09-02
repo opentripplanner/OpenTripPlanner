@@ -8,7 +8,7 @@ import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -87,13 +87,14 @@ public class TriangleInequalityTest {
         
         // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
         prototypeOptions.stairsReluctance = (1.0);
-        prototypeOptions.setWalkReluctance(1.0);
+        prototypeOptions.setNonTransitReluctance(1.0);
         prototypeOptions.turnReluctance = (1.0);
         prototypeOptions.carSpeed = 1.0;
         prototypeOptions.walkSpeed = 1.0;
         prototypeOptions.bikeSpeed = 1.0;
-        prototypeOptions.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
         prototypeOptions.dominanceFunction = new DominanceFunction.EarliestArrival();
+
+        graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
 
         
         if (traverseModes != null) {

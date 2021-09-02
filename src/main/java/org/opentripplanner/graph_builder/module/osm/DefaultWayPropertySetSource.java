@@ -1,5 +1,9 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
+
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
@@ -30,6 +34,8 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
+    private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
+
     /* Populate properties on existing WayPropertySet */
     public void populateProperties(WayPropertySet props) {
         /* no bicycle tags */
@@ -37,6 +43,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         /* NONE */
         props.setProperties("highway=raceway", StreetTraversalPermission.NONE);
         props.setProperties("highway=construction", StreetTraversalPermission.NONE);
+        props.setProperties("mtb:scale=3", StreetTraversalPermission.NONE);
+        props.setProperties("mtb:scale=4", StreetTraversalPermission.NONE);
+        props.setProperties("mtb:scale=5", StreetTraversalPermission.NONE);
+        props.setProperties("mtb:scale=6", StreetTraversalPermission.NONE);
 
         /* PEDESTRIAN */
 		props.setProperties("highway=corridor", StreetTraversalPermission.PEDESTRIAN);
@@ -47,8 +57,11 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setProperties("railway=platform", StreetTraversalPermission.PEDESTRIAN);
         props.setProperties("footway=sidewalk;highway=footway",
                 StreetTraversalPermission.PEDESTRIAN);
+        props.setProperties("mtb:scale=1", StreetTraversalPermission.PEDESTRIAN);
+        props.setProperties("mtb:scale=2", StreetTraversalPermission.PEDESTRIAN);
 
         /* PEDESTRIAN_AND_BICYCLE */
+        props.setProperties("mtb:scale=0", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
         props.setProperties("highway=cycleway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
                 0.60, 0.60);
         props.setProperties("highway=path", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
@@ -342,6 +355,13 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setProperties("highway=motorway_link;bicycle=designated",
                 StreetTraversalPermission.BICYCLE_AND_CAR, 2, 2);
 
+        // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
+        // this uses a OR since you don't want to apply the safety multiplier more than once.
+        props.setProperties(
+                "lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.7, 0.7, true
+        );
+
+
         /*
          * Automobile speeds in the United States: Based on my (mattwigway) personal experience, primarily in California
          */
@@ -543,5 +563,15 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
         props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
 
+    }
+
+    @Override
+    public DrivingDirection drivingDirection() {
+        return drivingDirection;
+    }
+
+    @Override
+    public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
+        return new SimpleIntersectionTraversalCostModel(drivingDirection);
     }
 }

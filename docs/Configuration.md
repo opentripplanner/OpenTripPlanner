@@ -81,7 +81,7 @@ deployment.
 }
 ```     
 In the example above the environment variable `GCS_SERVICE_CREDENTIALS` on the local machine where
-OTP is deployed is injected into the config. Also, the Maven version number `x.y.z` is injected.
+OTP is deployed is injected into the config. Also, the OTP serialization version id is injected.
 
 The project information variables available are:
 
@@ -126,7 +126,7 @@ serialization version id in use by the planning OPT instances you have deploied 
 This way you can roll forward and backward new OTP instances without worring about building new 
 graphs.
 
-There is various ways to acces this information. To get the `Graph.obj` serialization version id 
+There are various ways to access this information. To get the `Graph.obj` serialization version id 
 you can run the following bash command:
  - `head -c 29 Graph.obj  ==>  OpenTripPlannerGraph;0000007;` (file header)
  - `head -c 28 Graph.obj | tail -c 7  ==>  0000007`  (version id)
@@ -156,6 +156,29 @@ example:
 }
 ```
 
+## OTP Features
+Here is a list of all features witch can be toggled on/off.
+
+Feature | Description | Enabled by default | Sandbox
+--------|-------------|--------------------|-------- 
+`APIExternalGeocoder` | Enable the geocode endpoint | yes | no
+`APIBikeRental` | Enable the bike rental endpoint | yes | no
+`APIServerInfo` | Enable the server info endpoint |  yes | no
+`APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
+`APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
+`OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (witch stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
+`GuaranteedTransfers` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
+`ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
+`GoogleCloudStorage` | Enable Google Cloud Storage integration | no | yes
+`SandboxAPITransmodelApi` | Enable Entur Transmodel(NeTEx) GraphQL API | no | yes
+`SandboxAPILegacyGraphQLApi` | Enable (GTFS) GraphQL API | no | yes
+`SandboxAPIMapboxVectorTilesApi` | Enable Mapbox vector tiles API | no | yes
+`SandboxAPIParkAndRideApi` | Enable park-and-ride endpoint | no | yes
+`TransferAnalyzer` | Analyze transfers during graph build | no | yes
+`FlexRouting` | Enable FLEX routing | no | yes
+`FloatingBike` | Enable floating bike routing | no | yes
+
+
 
 # Graph Build Configuration
 
@@ -181,7 +204,7 @@ config key | description | value type | value default | notes
 `maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
 `multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
-`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`, `germany`
 `platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
 `readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
@@ -195,6 +218,7 @@ config key | description | value type | value default | notes
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
 `useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`maxAreaNodes` | Visibility calculations for an area will not be done if there are more nodes than this limit | integer | 500 |
 
 This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
 
@@ -647,6 +671,46 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
+
+### Tuning transfer optimization
+
+The main purpose of transfer optimization is to handle cases where one can transfer between two routes at more than one point (pair of stops), ensuring transfers occur at the best possible location. By post-processing all paths returned by the router, OTP can apply sophisticated calculations that are too slow or not algorithmically valid within Raptor. Transfers are optimized before the paths reach the itinerary filter chain.
+
+For a detailed description of the design and the optimization calculations see the [design documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md) (dev-2.x latest).
+
+#### Transfer optimization configuration
+
+To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on). 
+You should leave this on unless you there is a critical issue with it. The OTPFeature `GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
+
+The order of transfer priority is:
+
+1. STAY SEATED
+2. GUARANTIED
+3. PREFERRED
+4. RECOMMENDED
+5. ALLOWED
+6. NOT_ALLOWED
+
+If two paths have the same priority level, then we break the tie by looking at waiting time. The goal is to maximize the wait time, avoiding situations where very little time is available to make the transfer. This is balanced with the generalized cost. The cost is adjusted with a new cost for the wait-time. The new wait-time cost follows an inverse logarithmic cost function (see the design doc). 
+
+The defaults should work fine, but if you have results with "back-travel" try increasing the two parameters `minSafeWaitTimeFactor` and `inverseWaitReluctance`.
+
+```JSON
+// router-config.json
+{
+  "routingDefaults": {
+    "transferOptimization": {
+      "optimizeTransferWaitTime": true,
+      "minSafeWaitTimeFactor": 5.0,
+      "inverseWaitReluctance": 1.0
+    }
+  }
+}
+```
+See the [TransferOptimizationParameters](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/api/TransferOptimizationParameters.java) (dev-2.x latest) for a description of these parameters.
+
+
 ### Tuning itinerary filtering
 Nested inside `routingDefaults { itineraryFilters{...} }` in `router-config.json`.
 
@@ -665,7 +729,10 @@ config key | description | value type | value default
 `groupSimilarityKeepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
 `groupSimilarityKeepNumOfItineraries` | Reduce the number of itineraries to the requested number by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
 `minSafeTransferTimeFactor` | Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details. | double | `0.0`
-`transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `null`
+`transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `3600 + 2.0 x`
+`nonTransitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for non-transit itineraries. The max limit is calculated using ALL itineraries, but only non-transit itineraries will be filtered out. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Non-transit itineraries with a cost higher than the max-limit is dropped from the result set. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `3600 + 2.0 x`
+`bikeRentalDistanceRatio` | For routes that consist only of bike rental and walking what is the minimum fraction of _distance_ of the bike rental leg. This filters out results that consist of a long walk plus a relatively short bike rental leg. A value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order for the result to be included. | double | `0.0`
+`parkAndRideDurationRatio` | For P+R routes that consist only of driving and walking what is the minimum fraction of _time_ of the driving leg. This filters out results that consist of driving plus a very long walk leg at the end. A value of `0.3` means that a minimum of 30% of the total time must be spent in the car in order for the result to be included. However, if there is only a single result, it is never filtered. | double | `0.0`
 
 
 #### Group by similarity filters
@@ -688,7 +755,7 @@ parameter to estimate a maxLimit for each group. For example, if the `numOfItine
 elements depending on the distribution. The _max-limit_ can never be less than 1.
 
 
-#### Minimum Safe Transfer Time Additonal Cost
+#### Minimum Safe Transfer Time Additional Cost
 
 Setting the `minSafeTransferTimeFactor` will enable the `add-min-safe-transfer-cost-filter`. The
 filter adds a cost the itinerary _generalized-cost_ if for each "unsafe" transfers to better 
@@ -744,7 +811,22 @@ search-window. To set the street routing timeout use the following config:
 }
 ```
 
-This specifies a timeout in (optionally fractional) seconds. The search abort after this many seconds and any paths found are returned to the client. 
+This specifies a timeout in (optionally fractional) seconds. The search abort after this many seconds and any paths found are returned to the client.
+
+##maxAccessEgressDurationSecondsForMode
+
+Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done because 
+some street modes searches are much more resource intensive than others.
+
+```JSON
+// router-config.json
+"maxAccessEgressDurationSecondsForMode": {
+  "BIKE_RENTAL": 1200
+}
+```
+
+This will limit only the BIKE_RENTAL mode to 1200 seconds, while keeping the default limit for all
+other access/egress modes.
 
 ## Logging incoming requests
 
@@ -789,6 +871,7 @@ config key | description | value type | value default
 `searchThreadPoolSize` | Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread. | int | `0`
 `dynamicSearchWindow` | The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics. | object | `null`
 `stopTransferCost` | Use this to set a stop transfer cost for the given [TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/model/TransferPriority.java). The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | enum map | `null`
+`transferCacheMaxSize` | The maximum number of distinct transfers parameters (`RoutingRequest`s) to cache pre-calculated transfers for. If too low, requests may be slower. If too high, more memory may be used then required. | int | `25`
 
 ### Tuning transit routing - Dynamic search window
 Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.json`.
@@ -984,31 +1067,50 @@ connect to a network resource is the `url` field.
     ]
 }
 ```
+
 #### GBFS Configuration
 
-Steps to add a GBFS feed to a router:
+[GBFS](https://github.com/NABSA/gbfs) is used for a variety of shared mobility services, with partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)).
 
-- Add one entry in the `updater` field of `router-config.json` in the format
+To add a GBFS feed to the router add one entry in the `updater` field of `router-config.json` in the format:
 
 ```JSON
 // router-config.json
 {
-     "type": "bike-rental",
-     "frequencySec": 60,
-     "sourceType": "gbfs",
-     "url": "http://coast.socialbicycles.com/opendata/"
+   "type": "bike-rental",
+   "sourceType": "gbfs",
+   // frequency in seconds in which the GBFS service will be polled
+   "frequencySec": 60,
+   // The URL of the GBFS feed auto-discovery file
+   "url": "http://coast.socialbicycles.com/opendata/gbfs.json",
+   // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
+   "allowKeepingRentedBicycleAtDestination": true
 }
 ```
 
-- Follow these instructions to fill these fields:
+If there is no GBFS autodiscovery file, specify the base `url` under which the files may be found
+using their standard names:
 
+```JSON
+  "url": "http://coast.socialbicycles.com/opendata/"
 ```
-type: "bike-rental"
-frequencySec: frequency in seconds in which the GBFS service will be polled
-sourceType: "gbfs"
-url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
-```
-\* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
+
+##### Arriving with rental bikes at the destination
+
+In some cases it may be useful to not drop off the rented bicycle before arriving at the
+destination. This is useful if bicycles may only be rented for round trips, or the destination is an
+intermediate place.
+
+For this to be possible three things need to be configured:
+
+1. In the updater configuration `allowKeepingRentedBicycleAtDestination` should be set to `true`.
+
+2. `allowKeepingRentedBicycleAtDestination` should also be set for each request, either using
+   [routing defaults](#routing-defaults), or per-request.
+
+3. If keeping the bicycle at the destination should be discouraged, then
+   `keepingRentedBicycleAtDestinationCost` (default: `0`) may also be set in the
+   [routing defaults](#routing-defaults).
 
 #### Bike Rental Service Directory configuration (sandbox feature)
 

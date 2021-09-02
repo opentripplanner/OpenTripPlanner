@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,36 +34,13 @@ public class Timetable implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(Timetable.class);
     private static final long serialVersionUID = 1L;
 
-    /**
-     * A circular reference between TripPatterns and their scheduled (non-updated) timetables.
-     */
-    public final TripPattern pattern;
+    private final TripPattern pattern;
 
-    /**
-     * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
-     * additional TripTimes objects for unscheduled trips. Frequency entries are stored separately.
-     */
-    public final List<TripTimes> tripTimes = Lists.newArrayList();
+    private final List<TripTimes> tripTimes = Lists.newArrayList();
 
-    /**
-     * Contains one FrequencyEntry object for each block of frequency-based trips.
-     */
-    public final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+    private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
 
-    /**
-     * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.
-     */
-    public final ServiceDate serviceDate;
-
-    /**
-     * For each hop, the best running time. This serves to provide lower bounds on traversal time.
-     */
-    private transient int minRunningTimes[];
-
-    /**
-     * For each stop, the best dwell time. This serves to provide lower bounds on traversal time.
-     */
-    private transient int minDwellTimes[];
+    private final ServiceDate serviceDate;
 
     /** 
      * Helps determine whether a particular pattern is worth searching for departures at a given time. 
@@ -98,7 +74,7 @@ public class Timetable implements Serializable {
      */
     public boolean temporallyViable(ServiceDay sd, long searchTime, int bestWait, boolean boarding) {
         // Check whether any services are running at all on this pattern.
-        if ( ! sd.anyServiceRunning(this.pattern.services)) { return false; }
+        if ( ! sd.anyServiceRunning(this.pattern.getServices())) { return false; }
         // Make the search time relative to the given service day.
         searchTime = sd.secondsSinceMidnight(searchTime);
         // Check whether any trip can be boarded at all, given the search time
@@ -117,28 +93,12 @@ public class Timetable implements Serializable {
      * actions to compact the data structure such as trimming and deduplicating arrays.
      */
     public void finish() {
-        int nStops = pattern.stopPattern.size;
-        int nHops = nStops - 1;
-        /* Find lower bounds on dwell and running times at each stop. */
-        minDwellTimes = new int[nHops];
-        minRunningTimes = new int[nHops];
-        Arrays.fill(minDwellTimes, Integer.MAX_VALUE);
-        Arrays.fill(minRunningTimes, Integer.MAX_VALUE);
+        int nStops = pattern.getStopPattern().getSize();
+
         // Concatenate raw TripTimes and those referenced from FrequencyEntries
         List<TripTimes> allTripTimes = Lists.newArrayList(tripTimes);
         for (FrequencyEntry freq : frequencyEntries) allTripTimes.add(freq.tripTimes);
-        for (TripTimes tt : allTripTimes) {
-            for (int h = 0; h < nHops; ++h) {
-                int dt = tt.getDwellTime(h);
-                if (minDwellTimes[h] > dt) {
-                    minDwellTimes[h] = dt;
-                }
-                int rt = tt.getRunningTime(h);
-                if (minRunningTimes[h] > rt) {
-                    minRunningTimes[h] = rt;
-                }
-            }
-        }
+
         /* Find the time range over which this timetable is active. Allows departure search optimizations. */
         minTime = Integer.MAX_VALUE;
         maxTime = Integer.MIN_VALUE;
@@ -160,7 +120,7 @@ public class Timetable implements Serializable {
         for (TripTimes tt : tripTimes) {
             // could replace linear search with indexing in stoptime updater, but not necessary
             // at this point since the updater thread is far from pegged.
-            if (tt.trip.getId().equals(tripId)) { return ret; }
+            if (tt.getTrip().getId().equals(tripId)) { return ret; }
             ret += 1;
         }
         return -1;
@@ -170,7 +130,7 @@ public class Timetable implements Serializable {
     public int getTripIndex(String tripId) {
         int ret = 0;
         for (TripTimes tt : tripTimes) {
-            if (tt.trip.getId().getId().equals(tripId)) { return ret; }
+            if (tt.getTrip().getId().getId().equals(tripId)) { return ret; }
             ret += 1;
         }
         return -1;
@@ -182,7 +142,7 @@ public class Timetable implements Serializable {
 
     public TripTimes getTripTimes(Trip trip) {
         for (TripTimes tt : tripTimes) {
-            if (tt.trip == trip) { return tt; }
+            if (tt.getTrip() == trip) { return tt; }
         }
         return null;
     }
@@ -250,7 +210,7 @@ public class Timetable implements Serializable {
 
         if (tripDescriptor.hasScheduleRelationship() && tripDescriptor.getScheduleRelationship()
                 == TripDescriptor.ScheduleRelationship.CANCELED) {
-            newTimes.cancel();
+            newTimes.cancelTrip();
         } else {
             // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
             Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();
@@ -269,7 +229,7 @@ public class Timetable implements Serializable {
                 boolean match = false;
                 if (update != null) {
                     if (update.hasStopSequence()) {
-                        match = update.getStopSequence() == newTimes.getStopSequence(i);
+                        match = update.getStopSequence() == newTimes.getOriginalGtfsStopSequence(i);
                     } else if (update.hasStopId()) {
                         match = pattern.getStop(i).getId().getId().equals(update.getStopId());
                     }
@@ -309,7 +269,7 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
+                                // newTimes.cancelDropOffForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
                             } else {
                                 newTimes.updateArrivalDelay(i, delay);
                             }
@@ -335,7 +295,7 @@ public class Timetable implements Serializable {
                             }
                         } else {
                             if (delay == null) {
-                                newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                                //newTimes.cancelPickupForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
                             } else {
                                 newTimes.updateDepartureDelay(i, delay);
                             }
@@ -349,8 +309,8 @@ public class Timetable implements Serializable {
                     }
                 } else {
                     if (delay == null) {
-                        newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
-                        newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                        // newTimes.cancelDropOffForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
+                        // newTimes.cancelPickupForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
                     } else {
                         newTimes.updateArrivalDelay(i, delay);
                         newTimes.updateDepartureDelay(i, delay);
@@ -390,32 +350,6 @@ public class Timetable implements Serializable {
         frequencyEntries.add(freq);
     }
 
-    /**
-     * Check that all dwell times at the given stop are zero, which allows removing the dwell edge.
-     * TODO we should probably just eliminate dwell-deletion. It won't be important if we get rid of transit edges.
-     */
-    boolean allDwellsZero(int hopIndex) {
-        for (TripTimes tt : tripTimes) {
-            if (tt.getDwellTime(hopIndex) != 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** Returns the shortest possible running time for this stop */
-    public int getBestRunningTime(int stopIndex) {
-        return minRunningTimes[stopIndex];
-    }
-
-    /** Returns the shortest possible dwell time at this stop */
-    public int getBestDwellTime(int stopIndex) {
-        if (minDwellTimes == null) {
-            return 0;
-        }
-        return minDwellTimes[stopIndex];
-    }
-
     public boolean isValidFor(ServiceDate serviceDate) {
         return this.serviceDate == null || this.serviceDate.equals(serviceDate);
     }
@@ -424,12 +358,41 @@ public class Timetable implements Serializable {
     // TODO maybe put this is a more appropriate place
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
         for (TripTimes tt : this.tripTimes) {
-            tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
+            tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
         }
         // Repeated code... bad sign...
         for (FrequencyEntry freq : this.frequencyEntries) {
             TripTimes tt = freq.tripTimes;
-            tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
+            tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
         }
+    }
+
+    /**
+     * A circular reference between TripPatterns and their scheduled (non-updated) timetables.
+     */
+    public TripPattern getPattern() {
+        return pattern;
+    }
+
+    /**
+     * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
+     * additional TripTimes objects for unscheduled trips. Frequency entries are stored separately.
+     */
+    public List<TripTimes> getTripTimes() {
+        return tripTimes;
+    }
+
+    /**
+     * Contains one FrequencyEntry object for each block of frequency-based trips.
+     */
+    public List<FrequencyEntry> getFrequencyEntries() {
+        return frequencyEntries;
+    }
+
+    /**
+     * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.
+     */
+    public ServiceDate getServiceDate() {
+        return serviceDate;
     }
 }

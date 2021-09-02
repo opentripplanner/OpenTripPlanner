@@ -1,12 +1,14 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TransitDataProviderFilter;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -84,7 +86,7 @@ public class SpeedTest {
         this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams));
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         try {
             OtpStartupInfo.logInfo();
             // Given the following setup
@@ -374,12 +376,15 @@ public class SpeedTest {
                 Set.of()
         );
 
+        RoutingRequest routingRequest = new RoutingRequest();
+        routingRequest.walkSpeed = config.walkSpeedMeterPrSecond;
+
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),
                 1,
                 transitDataProviderFilter,
-                request.getWalkSpeedMeterPrSecond()
+                Transfer.prepareTransferRoutingRequest(routingRequest)
         );
     }
 

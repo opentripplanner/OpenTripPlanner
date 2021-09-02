@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
+import static org.opentripplanner.model.PickDrop.NONE;
 
 public class FlexTripsMapper {
 
@@ -54,7 +54,7 @@ public class FlexTripsMapper {
   private static boolean hasContinuousStops(List<StopTime> stopTimes) {
     return stopTimes
         .stream()
-        .anyMatch(st -> st.getFlexContinuousPickup() != PICKDROP_NONE || st.getFlexContinuousDropOff() != PICKDROP_NONE);
+        .anyMatch(st -> st.getFlexContinuousPickup() != NONE.getGtfsCode() || st.getFlexContinuousDropOff() != NONE.getGtfsCode());
   }
 
 }

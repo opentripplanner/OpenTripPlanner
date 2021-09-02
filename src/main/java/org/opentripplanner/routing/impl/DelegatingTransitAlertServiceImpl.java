@@ -9,6 +9,7 @@ import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
@@ -52,6 +53,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
     return transitAlertServices
         .stream()
         .map(transitAlertService -> transitAlertService.getAlertById(id))
+        .filter(Objects::nonNull)
         .findAny()
         .orElse(null);
   }

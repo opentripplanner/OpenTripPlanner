@@ -1,21 +1,9 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
-import org.opentripplanner.transit.raptor.api.request.Optimization;
-import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
-import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -26,8 +14,20 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
+import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
+import org.opentripplanner.transit.raptor.api.request.Optimization;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 
 
 public class SpeedTestRequest {
@@ -60,7 +60,7 @@ public class SpeedTestRequest {
     public Date getDepartureTimestamp() {
         return new Date(
                 date.atStartOfDay(inputZoneId).toInstant().toEpochMilli()
-                        + testCase.departureTime * 1000
+                        + testCase.departureTime * 1000L
         );
     }
 
@@ -141,6 +141,10 @@ public class SpeedTestRequest {
             mapToAccessEgress(streetRouter.getEgressTimesInSecondsByStopIndex())
         );
 
+        builder.mcCostFactors().transitReluctanceFactors(
+                RaptorRequestMapper.mapTransitReluctance(config.request.transitReluctanceForMode())
+        );
+
         addDebugOptions(builder, opts);
 
         RaptorRequest<TripSchedule> req = builder.build();
@@ -175,13 +179,13 @@ public class SpeedTestRequest {
         }
 
         TestDebugLogger logger = new TestDebugLogger(debugLoggerEnabled);
-
         builder.debug()
                 .stopArrivalListener(logger::stopArrivalLister)
                 .pathFilteringListener(logger::pathFilteringListener)
                 .logger(logger)
-                .debugPathFromStopIndex(opts.debugPathFromStopIndex());
-        builder.debug().path().addAll(path);
-        builder.debug().stops().addAll(stops);
+                .setPath(path)
+                .debugPathFromStopIndex(opts.debugPathFromStopIndex())
+                .addStops(stops);
+
     }
 }

@@ -5,7 +5,7 @@ otp.config = {
     //If enabled it shows inspector layers overlays which can be used for Graph
     //debugging
     //Can be also enabled in URL parameters as ?debug_layers=true
-    debug_layers: false,
+    debug_layers: true,
 
     //This is default locale when wanted locale isn't found
     //Locale language is set based on wanted language in url >
@@ -293,40 +293,40 @@ i18n.init(options, function(t) {
 
 otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "TRANSIT,WALK"        : _tr("Transit"),
+    "TRANSIT,WALK"             : _tr("Transit"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "BUS,WALK"         : _tr("Bus Only"),
+    "BUS,WALK"                 : _tr("Bus Only"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA,WALK"       : _tr("Rail Only"),
+    "TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA,WALK": _tr("Rail Only"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "AIRPLANE,WALK"       : _tr("Airplane Only"),
+    "AIRPLANE,WALK"            : _tr("Airplane Only"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "BUS,TRAM,RAIL,FERRY,SUBWAY,FUNICULAR,GONDOLA,WALK" : _tr("Transit, No Airplane"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "BICYCLE"             : _tr('Bicycle Only'),
+    "BICYCLE"                  : _tr('Bicycle Only'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "TRANSIT,BICYCLE"     : _tr("Bicycle &amp; Transit"),
+    "TRANSIT,BICYCLE"          : _tr("Bicycle &amp; Transit"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "WALK"                : _tr('Walk Only'),
+    "WALK"                     : _tr('Walk Only'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "CAR"                 : _tr('Drive Only'),
-    "CAR_PICKUP,WALK"     : _tr('Taxi'),
+    "CAR"                      : _tr('Car Only'),
+    "CAR_PICKUP"               : _tr('Taxi'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "CAR_PARK,WALK,TRANSIT"     : _tr('Park and Ride'),
+    "CAR_PARK,TRANSIT"         : _tr('Park and Ride'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "CAR_PICKUP,WALK,TRANSIT"   : _tr('Ride and Kiss (Car Pickup)'),
+    "CAR_PICKUP,TRANSIT"       : _tr('Ride and Kiss (Car Pickup)'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "CAR_DROPOFF,WALK,TRANSIT"   : _tr('Kiss and Ride (Car Dropoff)'),
+    "CAR_DROPOFF,TRANSIT"      : _tr('Kiss and Ride (Car Dropoff)'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "BICYCLE_PARK,WALK,TRANSIT" : _tr('Bike and Ride'),
+    "BICYCLE_PARK,TRANSIT"     : _tr('Bike and Ride'),
     //uncomment only if bike rental exists in a map
     // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
     //       (note that we've been broken for awhile here, since many agencies don't have a 'Train' mode either...this needs attention)
     // IDEA: maybe we start with a big array (like below), and the pull out modes from this array when turning off various modes...
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    'WALK,BICYCLE_RENT'        : _tr('Rented Bicycle'),
+    'BICYCLE_RENT'             : _tr('Rented Bicycle'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle'),
+    'TRANSIT,BICYCLE_RENT'     : _tr('Transit & Rented Bicycle'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEX_ACCESS,WALK,TRANSIT" : _tr('Transit with flex access'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
@@ -334,5 +334,5 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEX_ACCESS,FLEX_EGRESS,TRANSIT" : _tr('Transit with flex access and egress'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
-    "FLEX_DIRECT" : _tr('Direct flex search')
+    "FLEX_DIRECT"              : _tr('Direct flex search')
 };

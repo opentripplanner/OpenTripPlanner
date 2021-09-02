@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public class TransferStopArrivalTest {
 
@@ -17,14 +17,15 @@ public class TransferStopArrivalTest {
     private static final int ACCESS_TO_STOP = 100;
     private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
     private static final int ACCESS_DURATION = 300;
-    private static final int ACCESS_COST = 500;
+    private static final TestTransfer ACCESS_WALK = walk(ACCESS_TO_STOP, ACCESS_DURATION);
+    private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
 
 
     private static final int TRANSIT_TO_STOP = 101;
     private static final int TRANSIT_BOARD_TIME = 9 * 60 * 60;
     private static final int TRANSIT_LEG_DURATION = 1200;
     private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + TRANSIT_LEG_DURATION;
-    private static final int TRANSIT_COST = 200;
+    private static final int TRANSIT_COST = 128000;
     private static final RaptorTripSchedule TRANSIT_TRIP = null;
     private static final int ROUND = 1;
 
@@ -32,15 +33,13 @@ public class TransferStopArrivalTest {
     private static final int TRANSFER_TO_STOP = 102;
     private static final int TRANSFER_LEG_DURATION = 360;
     private static final int TRANSFER_ALIGHT_TIME = TRANSIT_ALIGHT_TIME + TRANSFER_LEG_DURATION;
-    private static final int TRANSFER_COST = 400;
+    private static final TestTransfer TRANSFER_WALK = walk(TRANSFER_TO_STOP, TRANSFER_LEG_DURATION);
+    private static final int TRANSFER_COST = TRANSFER_WALK.generalizedCost();
 
+    private static final int EXPECTED_COST = ACCESS_COST + TRANSIT_COST + TRANSFER_COST;
 
-    private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(true);
-    private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-        ACCESS_DEPARTURE_TIME,
-        ACCESS_COST,
-        walk(ACCESS_TO_STOP, ACCESS_DURATION)
-    );
+    private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL
+            = new AccessStopArrival<>(ACCESS_DEPARTURE_TIME, ACCESS_WALK);
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
             ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
@@ -50,14 +49,8 @@ public class TransferStopArrivalTest {
             TRANSIT_TRIP
     );
 
-    private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
-            TRANSIT_ARRIVAL,
-            walk(TRANSFER_TO_STOP, TRANSFER_LEG_DURATION),
-            TRANSFER_ALIGHT_TIME,
-            TRANSFER_COST
-    );
-
-
+    private final TransferStopArrival<RaptorTripSchedule> subject
+            = new TransferStopArrival<>(TRANSIT_ARRIVAL, TRANSFER_WALK, TRANSFER_ALIGHT_TIME);
 
     @Test
     public void arrivedByTransfer() {
@@ -78,7 +71,7 @@ public class TransferStopArrivalTest {
 
     @Test
     public void cost() {
-        assertEquals(ACCESS_COST + TRANSIT_COST + TRANSFER_COST, subject.cost());
+        assertEquals(EXPECTED_COST, subject.cost());
     }
 
     @Test
@@ -102,7 +95,7 @@ public class TransferStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "Walk { round: 1, stop: 102, arrival-time: 9:26, cost: 1100 }",
+                "Walk { round: 1, stop: 102, arrival-time: 9:26 $2600.00 }",
                 subject.toString()
         );
     }

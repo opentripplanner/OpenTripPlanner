@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -97,14 +96,13 @@ public class TransitPathLegBuilder<T extends RaptorTripSchedule> {
     int alightSlack = slackProvider.alightSlack(trip().pattern());
     int waitTime = boardTime() - fromStopArrivalTime + alightSlack;
     int transitTime =  alightTime() - boardTime();
-    return RaptorCostConverter.toOtpDomainCost(
-        calc.transitArrivalCost(
-            firstTransit,
-            boardStop(),
-            waitTime,
-            transitTime,
-            alightStop()
-        )
+    return calc.transitArrivalCost(
+        firstTransit,
+        boardStop(),
+        waitTime,
+        transitTime,
+        trip().transitReluctanceFactorIndex(),
+        alightStop()
     );
   }
 }

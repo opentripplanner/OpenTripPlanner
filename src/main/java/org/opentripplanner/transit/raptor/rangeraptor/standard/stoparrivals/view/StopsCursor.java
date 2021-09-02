@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -8,8 +9,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Acce
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stops;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-
-import java.util.function.ToIntFunction;
 
 
 /**
@@ -26,10 +25,14 @@ import java.util.function.ToIntFunction;
  */
 public class StopsCursor<T extends RaptorTripSchedule> {
     private final Stops<T> stops;
-    private final TransitCalculator transitCalculator;
+    private final TransitCalculator<T> transitCalculator;
     private final ToIntFunction<RaptorTripPattern> boardSlackProvider;
 
-    public StopsCursor(Stops<T> stops, TransitCalculator transitCalculator, ToIntFunction<RaptorTripPattern> boardSlackProvider) {
+    public StopsCursor(
+            Stops<T> stops,
+            TransitCalculator<T> transitCalculator,
+            ToIntFunction<RaptorTripPattern> boardSlackProvider
+    ) {
         this.stops = stops;
         this.transitCalculator = transitCalculator;
         this.boardSlackProvider = boardSlackProvider;

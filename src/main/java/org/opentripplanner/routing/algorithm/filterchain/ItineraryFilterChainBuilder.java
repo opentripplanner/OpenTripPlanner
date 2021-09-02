@@ -7,7 +7,10 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupBySimilarLegsFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveBikerentalWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
@@ -37,6 +40,9 @@ public class ItineraryFilterChainBuilder {
     private double minSafeTransferTimeFactor;
     private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
+    private double bikeRentalDistanceRatio;
+    private double parkAndRideDurationRatio;
+    private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
@@ -97,6 +103,45 @@ public class ItineraryFilterChainBuilder {
         this.transitGeneralizedCostLimit = value;
         return this;
     }
+
+    /**
+     * This is a a bit similar to {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, with
+     * a few important differences.
+     *
+     * This function is used to compute a max-limit for generalized-cost. The limit
+     * is applied to itineraries with no transit legs, however ALL itineraries (including those with
+     * transit legs) are considered when calculating the minimum cost.
+     * <p>
+     * The smallest generalized-cost value is used as input to the function.
+     * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
+     * {@code 5000}, then all non-transit itineraries with a cost larger than
+     * {@code 1800 + 2 * 5000 = 11 800} is dropped.
+     */
+    public ItineraryFilterChainBuilder withNonTransitGeneralizedCostLimit(DoubleFunction<Double> value){
+        this.nonTransitGeneralizedCostLimit = value;
+        return this;
+    }
+
+    /**
+     * This is used to filter out bike rental itineraries that contain mostly walking. The value
+     * describes the ratio of the total itinerary that has to consist of bike rental to allow the
+     * itinerary.
+     */
+    public ItineraryFilterChainBuilder withBikeRentalDistanceRatio(double value){
+        this.bikeRentalDistanceRatio = value;
+        return this;
+    }
+
+    /**
+     * This is used to filter out park and ride itineraries that contain only driving and a
+     * very long walking leg.
+     * The value describes the amount of driving vs. walking to allow the itinerary.
+     */
+    public ItineraryFilterChainBuilder withParkAndRideDurationRatio(double value){
+        this.parkAndRideDurationRatio = value;
+        return this;
+    }
+
     /**
      * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
      * cases we get "silly" transit itineraries that is marginally better on travel-duration
@@ -188,6 +233,11 @@ public class ItineraryFilterChainBuilder {
             filters.add(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit));
         }
 
+        // Filter non-transit itineraries on generalized-cost
+        if(nonTransitGeneralizedCostLimit != null) {
+            filters.add(new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit));
+        }
+
         // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
         // remove elements/ based on the given itinerary properties - not considering other
         // itineraries. This may remove itineraries in the "groupBy" filters that are considered
@@ -208,6 +258,14 @@ public class ItineraryFilterChainBuilder {
 
             if (latestDepartureTimeLimit != null) {
                 filters.add(new LatestDepartureTimeFilter(latestDepartureTimeLimit));
+            }
+
+            if (bikeRentalDistanceRatio > 0) {
+                filters.add(new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio));
+            }
+
+            if (parkAndRideDurationRatio > 0) {
+                filters.add(new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio));
             }
         }
 

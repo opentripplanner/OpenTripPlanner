@@ -3,7 +3,9 @@ package org.opentripplanner.graph_builder.module;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
@@ -13,6 +15,7 @@ import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +36,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
-  }
-
-  public Boolean getAddExtraEdgesToAreas() {
-    return addExtraEdgesToAreas;
   }
 
   private Boolean addExtraEdgesToAreas = true;
@@ -71,9 +70,25 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitStops(Graph graph) {
     LOG.info("Linking transit stops to graph...");
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
+
+      // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
+      if (tStop.hasPathways()) {
+        continue;
+      }
+
+      TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
+
+      if (OTPFeature.FlexRouting.isOn()) {
+        // If regular stops are used for flex trips, they also need to be connected to car routable
+        // street edges.
+        if (graph.getAllFlexStopsFlat().contains(tStop.getStop())) {
+          modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
+        }
+      }
+
       graph.getLinker().linkVertexPermanently(
           tStop,
-          TraverseMode.WALK,
+          modes,
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
@@ -88,7 +103,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           tEntrance,
-          TraverseMode.WALK,
+          new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetTransitEntranceLink((TransitEntranceVertex) vertex, streetVertex),
@@ -104,7 +119,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (BikeRentalStationVertex bikeRental : graph.getVerticesOfType(BikeRentalStationVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           bikeRental,
-          TraverseMode.WALK,
+          new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetBikeRentalLink((BikeRentalStationVertex) vertex, streetVertex),
@@ -120,7 +135,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (BikeParkVertex bikePark : graph.getVerticesOfType(BikeParkVertex.class)) {
       graph.getLinker().linkVertexPermanently(
           bikePark,
-          TraverseMode.WALK,
+          new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) -> List.of(
               new StreetBikeParkLink((BikeParkVertex) vertex, streetVertex),

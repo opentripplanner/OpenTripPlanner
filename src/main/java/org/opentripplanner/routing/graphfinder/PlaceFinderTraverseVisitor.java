@@ -6,7 +6,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -41,6 +41,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   private final boolean includePatternAtStops;
   private final boolean includeBikeShares;
   private final int maxResults;
+  private final double radiusMeters;
 
   /**
    *
@@ -55,7 +56,8 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   public PlaceFinderTraverseVisitor(
       RoutingService routingService, List<TransitMode> filterByModes,
       List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
-      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations, int maxResults
+      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations, int maxResults,
+      double radiusMeters
   ) {
     this.routingService = routingService;
     this.filterByModes = toSet(filterByModes);
@@ -69,6 +71,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     includeBikeShares = filterByPlaceTypes == null
         || filterByPlaceTypes.contains(PlaceType.BICYCLE_RENT);
     this.maxResults = maxResults;
+    this.radiusMeters = radiusMeters;
   }
 
   private static <T> Set<T> toSet(List<T> list) {
@@ -121,12 +124,12 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
           .stream()
           .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))
           .filter(pattern -> filterByRoutes == null
-              || filterByRoutes.contains(pattern.route.getId()))
+              || filterByRoutes.contains(pattern.getRoute().getId()))
           .filter(pattern -> pattern.canBoard(pattern.getStopIndex(stop)))
           .collect(toList());
 
       for (TripPattern pattern : patterns) {
-        String seenKey = pattern.route.getId().toString() + ":" + pattern.getId().toString();
+        String seenKey = pattern.getRoute().getId().toString() + ":" + pattern.getId().toString();
         if (!seenPatternAtStops.contains(seenKey)) {
           PatternAtStop row = new PatternAtStop(stop, pattern);
           PlaceAtDistance place = new PlaceAtDistance(row, distance);
@@ -148,28 +151,29 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   }
 
   /**
-   * @return A SearchTerminationStrategy, which can be used to terminate the search after the max
-   * number of places has been found
+   * @return A SkipEdgeStrategy to be used with this TraverseVisitor. It skips edges when either
+   *          the maximum number of places or the furthest distance has been reached. However,
+   *          when the maximum number of places has been reached, it continues searching along
+   *          other paths until the distance of the place that is furthest away. This is to account
+   *          for the fact that the a star does not traverse edges ordered by distance.
    */
-  public SearchTerminationStrategy getSearchTerminationStrategy() {
-    return (origin, target, current, spt, traverseOptions) -> {
-      // the first n stops the search visit may not be the nearest n
-      // but when we have at least n stops found, we can update the
-      // max distance to be the furthest of the places so far
-      // and let the search terminate at that distance
-      // and then return the first n
+  public SkipEdgeStrategy getSkipEdgeStrategy() {
+
+    return (origin, target, current, edge, spt, traverseOptions) -> {
+
+      double furthestDistance = radiusMeters;
+
       if (PlaceFinderTraverseVisitor.this.placesFound.size()
           >= PlaceFinderTraverseVisitor.this.maxResults) {
-        double furthestDistance = 0;
+        furthestDistance = 0;
         for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
           if (pad.distance > furthestDistance) {
             furthestDistance = pad.distance;
           }
         }
-        traverseOptions.worstTime = (traverseOptions.dateTime + (int) furthestDistance);
       }
-      return false;
 
+      return current.getWalkDistance() > furthestDistance;
     };
   }
 }

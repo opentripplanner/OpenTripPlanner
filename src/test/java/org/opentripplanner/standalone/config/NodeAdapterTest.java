@@ -230,8 +230,11 @@ public class NodeAdapterTest {
 
     @Test
     public void uri() {
-        NodeAdapter subject  = newNodeAdapterForTest("{ aUri : 'gs://bucket/path/a.obj' }");
-        assertEquals("gs://bucket/path/a.obj",  subject.asUri("aUri", null).toString());
+        var URL = "gs://bucket/a.obj";
+        NodeAdapter subject  = newNodeAdapterForTest("{ aUri : '" + URL + "' }");
+
+        assertEquals(URL,  subject.asUri("aUri").toString());
+        assertEquals(URL,  subject.asUri("aUri", null).toString());
         assertEquals("http://foo.bar/", subject.asUri("missingField", "http://foo.bar/").toString());
         assertNull(subject.asUri("missingField", null));
     }
@@ -248,6 +251,20 @@ public class NodeAdapterTest {
         }
     }
 
+    @Test
+    public void uriRequiredValueMissing() {
+        NodeAdapter subject  = newNodeAdapterForTest("{ }");
+        try {
+            subject.asUri("aUri");
+            fail("Expected an exception");
+        }
+        catch (OtpAppException e) {
+            assertTrue(
+                    e.getMessage(),
+                    e.getMessage().contains("Required parameter 'aUri' not found in 'Test'")
+            );
+        }
+    }
 
     @Test
     public void uris() {
@@ -292,5 +309,18 @@ public class NodeAdapterTest {
             subject.asLinearFunction("key", null).toString()
         );
         assertNull(subject.asLinearFunction("no-key", null));
+    }
+
+    @Test
+    public void asMap() {
+        NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
+        assertEquals(
+            Map.of("A", true, "B", false),
+            subject.asMap("key", NodeAdapter::asBoolean)
+        );
+        assertEquals(
+            Collections.<String, Boolean>emptyMap(),
+            subject.asMap("missing-key", NodeAdapter::asBoolean)
+        );
     }
 }

@@ -1,11 +1,10 @@
 package org.opentripplanner.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The purpose of this class is to be able to turn features on and off.
@@ -19,18 +18,21 @@ public enum OTPFeature {
     APIServerInfo(true),
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),
+    OptimizeTransfers(true),
+    GuaranteedTransfers(true),
 
     // Sandbox extension features - Must be turned OFF by default
     ActuatorAPI(false),
+    FlexRouting(false),
+    FloatingBike(false),
     GoogleCloudStorage(false),
+    ReportApi(false),
     SandboxAPITransmodelApi(false),
     SandboxAPILegacyGraphQLApi(false),
     SandboxAPIMapboxVectorTilesApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
-    TransferAnalyzer(false),
-    FlexRouting(false),
-    FloatingBike(false);
+    TransferAnalyzer(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 

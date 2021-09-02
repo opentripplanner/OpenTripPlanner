@@ -1,21 +1,19 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
-import org.opentripplanner.model.base.ToStringBuilder;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearch;
+
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
-
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearch;
 
 
 /**
@@ -35,13 +33,6 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     private final RaptorSlackProvider slackProvider;
     private int iterationDepartureTime = -1;
 
-    /** Current/last transit alight time needed to time-shift EgressPathLeg(access arrival)  */
-    private int alightTime;
-
-    /** Current/last trip needed to time-shift EgressPathLeg(access arrival)  */
-    private T trip;
-
-
     public ReversePathMapper(RaptorSlackProvider slackProvider, WorkerLifeCycle lifeCycle) {
         this.slackProvider = slackProvider;
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
@@ -59,35 +50,35 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         return new Path<>(
                 iterationDepartureTime,
                 accessLeg,
-                RaptorCostConverter.toOtpDomainCost(destinationArrival.cost())
+                destinationArrival.cost()
         );
     }
 
     AccessPathLeg<T> mapAccessLeg(DestinationArrival<T> destArrival) {
         ArrivalView<T> prevArrival = destArrival.previous();
         RaptorTransfer access = destArrival.egressPath().egress();
-        int targetDepartureTime = destArrival.arrivalTime();
-        int targetArrivalTime = destArrival.arrivalTime() + access.durationInSeconds();
+        int departureTime = destArrival.arrivalTime();
+
+        // Pass arrival time on to next leg (if access is flex the next leg could be a transfer)
+        int arrivalTime = destArrival.arrivalTime() + access.durationInSeconds();
 
         return new AccessPathLeg<>(
                 access,
-                prevArrival.stop(),
-                targetDepartureTime,
-                targetArrivalTime,
-                domainCost(destArrival),
-                mapNextLeg(prevArrival)
+                departureTime,
+                arrivalTime,
+                mapNextLeg(prevArrival, arrivalTime)
         );
     }
 
-    private PathLeg<T> mapNextLeg(ArrivalView<T> fromStopArrival) {
+    private PathLeg<T> mapNextLeg(ArrivalView<T> fromStopArrival, int prevStopArrivalTime) {
         if(fromStopArrival.arrivedByTransit()) {
             return mapToTransit(fromStopArrival);
         }
         else if(fromStopArrival.arrivedByTransfer()) {
-            return mapToTransfer(fromStopArrival);
+            return mapToTransfer(fromStopArrival, prevStopArrivalTime);
         }
         else if(fromStopArrival.arrivedByAccess()) {
-            return mapToEgressLeg(fromStopArrival);
+            return mapToEgressLeg(fromStopArrival, prevStopArrivalTime);
         }
         throw new IllegalStateException("Unknown path type for: " + fromStopArrival);
     }
@@ -95,76 +86,65 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     private TransitPathLeg<T> mapToTransit(ArrivalView<T> fromStopArrival) {
         // In reverse the previous is in our "toStop"
         ArrivalView<T> toStopArrival = fromStopArrival.previous();
-        trip = fromStopArrival.transitPath().trip();
 
         // Map stops and times into a forward search context
         int fromStop = fromStopArrival.stop();
         int toStop = toStopArrival.stop();
 
         BoarAndAlightTime r = findTripReverseSearch(fromStopArrival);
-
-        alightTime = r.alightTime();
+        T trip = fromStopArrival.transitPath().trip();
+        int arrivalTime = r.alightTime() + slackProvider.alightSlack(trip.pattern());
 
         return new TransitPathLeg<>(
-            fromStop,
-            r.boardTime(),
-            toStop,
-            r.alightTime(),
-            domainCost(fromStopArrival),
-            trip,
-            // Recursive call to map next leg
-            mapNextLeg(toStopArrival)
+                fromStop,
+                r.boardTime(),
+                toStop,
+                r.alightTime(),
+                legCost(fromStopArrival),
+                trip,
+                // Recursive call to map next leg
+                mapNextLeg(toStopArrival, arrivalTime)
         );
     }
 
-    private TransferPathLeg<T> mapToTransfer(ArrivalView<T> fromStopArrival) {
+    private TransferPathLeg<T> mapToTransfer(ArrivalView<T> fromStopArrival, int prevStopArrivalTime) {
         ArrivalView<T> toStopArrival = fromStopArrival.previous();
 
-        int targetArrivalTime = fromStopArrival.arrivalTime() + fromStopArrival
-            .transferPath()
-            .durationInSeconds();
-        return new TransferPathLeg<T>(
+        // time-shift transit to start immediate after previous leg stop-arrival-time
+        // including alight-slack
+        int arrivalTime = prevStopArrivalTime + fromStopArrival.transferPath().durationInSeconds();
+
+        return new TransferPathLeg<>(
                 fromStopArrival.stop(),
-                fromStopArrival.arrivalTime(),
-                toStopArrival.stop(),
-                targetArrivalTime,
-                domainCost(fromStopArrival),
+                prevStopArrivalTime,
+                arrivalTime,
                 fromStopArrival.transferPath().transfer(),
-                mapToTransit(toStopArrival)
+                mapNextLeg(toStopArrival, arrivalTime)
         );
     }
 
-    private EgressPathLeg<T> mapToEgressLeg(ArrivalView<T> accessArrival) {
+    private EgressPathLeg<T> mapToEgressLeg(ArrivalView<T> accessArrival, int prevStopArrivalTime) {
         RaptorTransfer egress = accessArrival.accessPath().access();
-        int targetFromTime = alightTime + slackProvider.alightSlack(trip.pattern());
-
-        System.out.println(
-            ToStringBuilder.of(getClass())
-                .addServiceTime("alightTime", alightTime, -1)
-                .addDurationSec("alightSlack", slackProvider.alightSlack(trip.pattern()))
-                .addServiceTime("targetFromTime", targetFromTime, 1)
-                .toString()
-        );
+        int targetFromTime = prevStopArrivalTime;
 
         if(egress.hasRides()) {
             targetFromTime += slackProvider.transferSlack();
-            targetFromTime = egress.earliestDepartureTime(targetFromTime);
         }
+
+        targetFromTime = egress.earliestDepartureTime(targetFromTime);
 
         int targetToTime = targetFromTime + egress.durationInSeconds();
 
         // No need to time-shift the egress leg, this is done when stopArrival is created
         return new EgressPathLeg<>(
-            egress,
-            accessArrival.stop(),
-            targetFromTime,
-            targetToTime,
-            RaptorCostConverter.toOtpDomainCost(accessArrival.cost())
+                egress,
+                targetFromTime,
+                targetToTime
         );
     }
 
-    private int domainCost(ArrivalView<T> from) {
+    private static int legCost(ArrivalView<?> from) {
         if(from.cost() == -1) { return -1; }
-        return RaptorCostConverter.toOtpDomainCost(from.cost() - from.previous().cost());
+        return from.cost() - from.previous().cost();
     }
 }

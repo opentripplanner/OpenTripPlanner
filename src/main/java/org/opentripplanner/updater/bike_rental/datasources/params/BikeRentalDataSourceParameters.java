@@ -4,20 +4,28 @@ import org.opentripplanner.updater.DataSourceType;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 public class BikeRentalDataSourceParameters {
   private final DataSourceType sourceType;
   private final String url;
   private final String network;
   private final String apiKey;
+  private final Map<String, String> httpHeaders;
 
   public BikeRentalDataSourceParameters(
-      DataSourceType sourceType, String url, String network, String apiKey
+      DataSourceType sourceType,
+      String url,
+      String network,
+      String apiKey,
+      @NotNull
+      Map<String, String> httpHeaders
   ) {
     this.sourceType = sourceType;
     this.url = url;
     this.network = network;
     this.apiKey = apiKey;
+    this.httpHeaders = httpHeaders;
   }
 
   @NotNull
@@ -41,5 +49,10 @@ public class BikeRentalDataSourceParameters {
   @Nullable
   public String getApiKey() {
     return apiKey;
+  }
+
+  @NotNull
+  public Map<String, String> getHttpHeaders() {
+    return httpHeaders;
   }
 }

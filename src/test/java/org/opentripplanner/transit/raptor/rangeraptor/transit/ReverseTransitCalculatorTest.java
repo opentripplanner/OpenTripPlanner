@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
+
+import org.junit.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 public class ReverseTransitCalculatorTest {
     private static final int TRIP_SEARCH_BINARY_SEARCH_THRESHOLD = 7;
@@ -18,8 +18,8 @@ public class ReverseTransitCalculatorTest {
     private int iterationStep = 60;
 
 
-    private TransitCalculator create() {
-        return new ReverseTransitCalculator(
+    private TransitCalculator<TestTripSchedule> create() {
+        return new ReverseTransitCalculator<>(
                 TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
                 latestArrivalTime,
                 searchWindowSizeInSeconds,
@@ -30,7 +30,7 @@ public class ReverseTransitCalculatorTest {
 
     @Test
     public void isBest() {
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertTrue(subject.isBest(11, 10));
         assertFalse(subject.isBest(10, 11));
@@ -40,7 +40,7 @@ public class ReverseTransitCalculatorTest {
     @Test
     public void exceedsTimeLimit() {
         earliestAcceptableDepartureTime = 1200;
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertFalse(subject.exceedsTimeLimit(200_000));
         assertFalse(subject.exceedsTimeLimit(1200));
@@ -61,7 +61,7 @@ public class ReverseTransitCalculatorTest {
 
     @Test
     public void oneIterationOnly() {
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertFalse(subject.oneIterationOnly());
 

@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class HttpUtils {
@@ -21,17 +22,25 @@ public class HttpUtils {
     private static final int TIMEOUT_SOCKET = 5000;
 
     public static InputStream getData(URI uri) throws IOException {
-        return getData(uri, null, null);
+        return getData(uri, null);
     }
 
     public static InputStream getData(String uri) throws IOException {
         return getData(URI.create(uri));
     }
 
-    public static InputStream getData(URI uri, String requestHeaderName, String requestHeaderValue, long timeout) throws IOException {
+    public static InputStream getData(String uri, Map<String, String> headers) throws IOException {
+        return getData(URI.create(uri), headers);
+    }
+
+    public static InputStream getData(
+        URI uri, long timeout, Map<String, String> requestHeaderValues
+    ) throws IOException {
         HttpGet httpget = new HttpGet(uri);
-        if (requestHeaderValue != null) {
-            httpget.addHeader(requestHeaderName, requestHeaderValue);
+        if (requestHeaderValues != null) {
+            for (Map.Entry<String, String> entry : requestHeaderValues.entrySet()) {
+                httpget.addHeader(entry.getKey(), entry.getValue());
+            }
         }
         HttpClient httpclient = getClient(timeout, timeout);
         HttpResponse response = httpclient.execute(httpget);
@@ -46,8 +55,8 @@ public class HttpUtils {
         return entity.getContent();
     }
 
-    public static InputStream getData(URI uri, String requestHeaderName, String requestHeaderValue) throws IOException {
-        return getData(uri, requestHeaderName, requestHeaderValue, TIMEOUT_CONNECTION);
+    public static InputStream getData(URI uri, Map<String, String> requestHeaderValues) throws IOException {
+        return getData(uri, TIMEOUT_CONNECTION, requestHeaderValues);
     }
 
     public static void testUrl(String url) throws IOException {
