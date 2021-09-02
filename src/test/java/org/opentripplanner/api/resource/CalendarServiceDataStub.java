@@ -22,15 +22,18 @@ public class CalendarServiceDataStub extends CalendarServiceData {
         this.timeZone = timeZone;
     }
 
-    @Override public Set<FeedScopedId> getServiceIds() {
+    @Override
+    public Set<FeedScopedId> getServiceIds() {
         return serviceIds;
     }
 
-    @Override public Set<FeedScopedId> getServiceIdsForDate(ServiceDate date) {
+    @Override
+    public Set<FeedScopedId> getServiceIdsForDate(ServiceDate date) {
         return serviceIds;
     }
 
-    @Override public TimeZone getTimeZoneForAgencyId(String agencyId) {
+    @Override
+    public TimeZone getTimeZoneForAgencyId(String agencyId) {
         return timeZone;
     }
 }

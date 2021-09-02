@@ -11,15 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The highest fare in free transfer window fare service factory requires that all standard GTFS fare attributes and
- * rules are filled. I.e., fares should be provided in GTFS.
- *
  * This fare service allows transfers between operators and, if the route transferred to is run by an operator with a
  * higher fare, the customer will be charged the higher fare. Also, the higher fare is used up until the end of the free
  * transfer window. The length of the free transfer window is configurable, but defaults to 2.5 hours.
  *
- * Additionally, there is an option to treat interlined transfers as actual transfers. This is merely a work-around for
- * transit agencies that choose to code their fares in a route-based fashion instead of a zone-based fashion.
+ * Additionally, there is an option to treat interlined transfers as actual transfers (with respect to fares). This
+ * means that interlining between two routes with different fares will result in the higher fare being charged. This is
+ * a work-around for transit agencies that choose to code their fares in a route-based fashion instead of a zone-based
+ * fashion.
  */
 public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFareServiceFactory {
 
@@ -27,6 +26,7 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
 
     // default to 150 minutes to preserve compatibility with legacy pdx fares
     private int freeTransferWindowInMinutes = 150;
+    // If true, will also analyze more than just the first trip of an interlined transfer and will use the highest fare
     private boolean analyzeInterlinedTransfers = false;
 
     public FareService makeFareService() {

@@ -102,6 +102,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             if ( ! (edge instanceof HopEdge))
                 continue;
             HopEdge hEdge = (HopEdge) edge;
+            // Determine if a new ride should be created from this HopEdge. Only do so if a Ride hasn't been created,
+            // or if the route has changed or if configured to do so for interlined transfers.
             if (ride == null || ! state.getRoute().equals(ride.route) || createRideDueToInterlining(state, ride)) {
                 ride = new Ride();
                 rides.add(ride);
