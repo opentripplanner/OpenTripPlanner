@@ -1,7 +1,7 @@
 org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_planning_with_transit=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 3821,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -14,7 +14,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 4923.150999999999,
           "endTime": "2009-11-17T19:03:41.000+0000",
@@ -38,7 +37,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:00:00.000+0000",
           "streetNotes": [ ],
@@ -53,6 +52,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -294,7 +294,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": true
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 2261,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -335,7 +335,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 920.3299999999999,
           "endTime": "2009-11-17T18:12:58.000+0000",
@@ -358,7 +357,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:01:00.000+0000",
           "streetNotes": [ ],
@@ -380,6 +379,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -456,7 +456,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 3602.7301325109484,
           "endTime": "2009-11-17T18:25:49.000+0000",
@@ -561,13 +560,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 999.0980000000001,
           "endTime": "2009-11-17T18:38:41.000+0000",
@@ -598,7 +597,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:25:49.000+0000",
           "streetNotes": [ ],
@@ -612,6 +611,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -683,7 +683,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": false
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 1470,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -724,7 +724,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 62.012,
           "endTime": "2009-11-17T18:15:40.000+0000",
@@ -747,7 +746,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:14:52.000+0000",
           "streetNotes": [ ],
@@ -769,6 +768,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -794,7 +794,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 5218.855598775394,
           "endTime": "2009-11-17T18:35:54.000+0000",
@@ -899,13 +898,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 266.211,
           "endTime": "2009-11-17T18:39:22.000+0000",
@@ -936,7 +935,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:35:54.000+0000",
           "streetNotes": [ ],
@@ -950,6 +949,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1004,7 +1004,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": false
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 2275,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -1045,7 +1045,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 920.3299999999999,
           "endTime": "2009-11-17T18:27:58.000+0000",
@@ -1068,7 +1067,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:16:00.000+0000",
           "streetNotes": [ ],
@@ -1090,6 +1089,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1166,7 +1166,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 3602.7301325109484,
           "endTime": "2009-11-17T18:41:03.000+0000",
@@ -1271,13 +1270,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 999.0980000000001,
           "endTime": "2009-11-17T18:53:55.000+0000",
@@ -1308,7 +1307,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:41:03.000+0000",
           "streetNotes": [ ],
@@ -1322,6 +1321,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1393,7 +1393,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": false
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 1540,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -1434,7 +1434,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 62.012,
           "endTime": "2009-11-17T18:30:40.000+0000",
@@ -1457,7 +1456,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:29:52.000+0000",
           "streetNotes": [ ],
@@ -1479,6 +1478,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1504,7 +1504,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 5218.855598775394,
           "endTime": "2009-11-17T18:52:04.000+0000",
@@ -1609,13 +1608,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 266.211,
           "endTime": "2009-11-17T18:55:32.000+0000",
@@ -1646,7 +1645,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:52:04.000+0000",
           "streetNotes": [ ],
@@ -1660,6 +1659,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1714,7 +1714,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": false
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 1849,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -1759,7 +1759,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 419.61499999999995,
           "endTime": "2009-11-17T18:42:54.000+0000",
@@ -1782,7 +1781,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:37:30.000+0000",
           "streetNotes": [ ],
@@ -1804,6 +1803,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1846,7 +1846,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 2347.5602438577907,
           "endTime": "2009-11-17T18:52:12.000+0000",
@@ -1951,13 +1950,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 3248.2996826174576,
           "endTime": "2009-11-17T19:07:55.000+0000",
@@ -2062,13 +2061,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 18.806,
           "endTime": "2009-11-17T19:08:19.000+0000",
@@ -2099,7 +2098,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T19:07:55.000+0000",
           "streetNotes": [ ],
@@ -2113,6 +2112,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -2156,7 +2156,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
 org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_planning_with_transit_stop=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 3451,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -2169,7 +2169,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 4442.913999999999,
           "endTime": "2009-11-17T18:57:31.000+0000",
@@ -2199,7 +2198,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:00:00.000+0000",
           "streetNotes": [ ],
@@ -2214,6 +2213,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2404,7 +2404,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": true
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 1553,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -2445,7 +2445,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 87.019,
           "endTime": "2009-11-17T18:14:00.000+0000",
@@ -2474,7 +2473,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:12:47.000+0000",
           "streetNotes": [ ],
@@ -2496,6 +2495,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2538,7 +2538,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 3729.9737283822847,
           "endTime": "2009-11-17T18:26:49.000+0000",
@@ -2643,13 +2642,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 913.815,
           "endTime": "2009-11-17T18:38:40.000+0000",
@@ -2680,7 +2679,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:26:49.000+0000",
           "streetNotes": [ ],
@@ -2694,6 +2693,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -2799,7 +2799,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": false
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 1583,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -2840,7 +2840,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 87.019,
           "endTime": "2009-11-17T18:29:00.000+0000",
@@ -2869,7 +2868,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:27:47.000+0000",
           "streetNotes": [ ],
@@ -2891,6 +2890,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2933,7 +2933,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 3729.9737283822847,
           "endTime": "2009-11-17T18:42:19.000+0000",
@@ -3038,13 +3037,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 913.815,
           "endTime": "2009-11-17T18:54:10.000+0000",
@@ -3075,7 +3074,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:42:19.000+0000",
           "streetNotes": [ ],
@@ -3089,6 +3088,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -3194,7 +3194,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": false
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 1553,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -3235,7 +3235,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 87.019,
           "endTime": "2009-11-17T18:45:00.000+0000",
@@ -3264,7 +3263,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:43:47.000+0000",
           "streetNotes": [ ],
@@ -3286,6 +3285,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3328,7 +3328,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 3729.9737283822847,
           "endTime": "2009-11-17T18:57:49.000+0000",
@@ -3433,13 +3432,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 913.815,
           "endTime": "2009-11-17T19:09:40.000+0000",
@@ -3470,7 +3469,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:57:49.000+0000",
           "streetNotes": [ ],
@@ -3484,6 +3483,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -3589,7 +3589,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": false
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 1567,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -3634,7 +3634,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 20.74,
           "endTime": "2009-11-17T18:46:00.000+0000",
@@ -3663,7 +3662,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:45:44.000+0000",
           "streetNotes": [ ],
@@ -3685,6 +3684,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3710,7 +3710,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 1667.1475209896525,
           "endTime": "2009-11-17T18:52:12.000+0000",
@@ -3815,13 +3814,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 3526.7741793792093,
           "endTime": "2009-11-17T19:08:50.000+0000",
@@ -3926,13 +3925,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 231.459,
           "endTime": "2009-11-17T19:11:51.000+0000",
@@ -3963,7 +3962,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T19:08:50.000+0000",
           "streetNotes": [ ],
@@ -3977,6 +3976,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4031,7 +4031,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "walkingAllTheWay": false
     },
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 1941,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -4072,7 +4072,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 718.722,
           "endTime": "2009-11-17T19:02:00.000+0000",
@@ -4101,7 +4100,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:52:44.000+0000",
           "streetNotes": [ ],
@@ -4123,6 +4122,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4182,7 +4182,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 4844.785407243491,
           "endTime": "2009-11-17T19:22:04.000+0000",
@@ -4287,13 +4286,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 231.459,
           "endTime": "2009-11-17T19:25:05.000+0000",
@@ -4324,7 +4323,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T19:22:04.000+0000",
           "streetNotes": [ ],
@@ -4338,6 +4337,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4398,7 +4398,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
 org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_planning_with_walk_only=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 3804,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -4411,7 +4411,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 4875.788999999999,
           "endTime": "2009-11-17T19:03:24.000+0000",
@@ -4435,7 +4434,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:00:00.000+0000",
           "streetNotes": [ ],
@@ -4450,6 +4449,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "NORTH",
@@ -4765,7 +4765,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
 org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_planning_with_walk_only_stop=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 3230,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -4778,7 +4778,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 4154.147999999998,
           "endTime": "2009-11-17T18:53:50.000+0000",
@@ -4808,7 +4807,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:00:00.000+0000",
           "streetNotes": [ ],
@@ -4823,6 +4822,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -5019,7 +5019,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
 org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_planning_with_walk_only_stop_collection=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
+      "arrivedAtDestinationWithRentedVehicle": false,
       "durationSeconds": 2361,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -5032,7 +5032,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
-          "bikeRentalNetworks": [ ],
           "departureDelay": 0,
           "distanceMeters": 2989.7960000000003,
           "endTime": "2009-11-17T18:39:21.000+0000",
@@ -5062,7 +5061,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
-          "rentedBike": false,
+          "rentedVehicle": false,
           "scheduled": false,
           "startTime": "2009-11-17T18:00:00.000+0000",
           "streetNotes": [ ],
@@ -5077,6 +5076,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
+          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "NORTHWEST",
