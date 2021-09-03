@@ -25,6 +25,10 @@ public class VehicleRentalStationService implements Serializable {
         return vehicleRentalStations.values();
     }
 
+    public VehicleRentalStation getVehicleRentalStation(FeedScopedId id) {
+        return vehicleRentalStations.get(id);
+    }
+
     public void addVehicleRentalStation(VehicleRentalStation vehicleRentalStation) {
         // Remove old reference first, as adding will be a no-op if already present
         vehicleRentalStations.remove(vehicleRentalStation.id);

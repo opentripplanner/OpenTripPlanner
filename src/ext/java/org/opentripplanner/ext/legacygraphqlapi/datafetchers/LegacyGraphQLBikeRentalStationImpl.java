@@ -14,7 +14,7 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     public DataFetcher<Relay.ResolvedGlobalId> id() {
         return environment -> new Relay.ResolvedGlobalId(
                 "BikeRentalStation",
-                getSource(environment).getStationId()
+                getSource(environment).id.toString()
         );
     }
 

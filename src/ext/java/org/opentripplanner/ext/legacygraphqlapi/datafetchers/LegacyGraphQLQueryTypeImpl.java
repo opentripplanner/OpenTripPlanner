@@ -84,12 +84,8 @@ public class LegacyGraphQLQueryTypeImpl
               .findAny()
               .orElse(null);
         case "BikeRentalStation":
-          return vehicleRentalStationService == null ? null : vehicleRentalStationService
-              .getVehicleRentalStations()
-              .stream()
-              .filter(vehicleRentalStation -> vehicleRentalStation.getStationId().equals(id))
-              .findAny()
-              .orElse(null);
+          return vehicleRentalStationService == null ? null :
+              vehicleRentalStationService.getVehicleRentalStation(FeedScopedId.parseId(id));
         case "CarPark":
           return null; //TODO
         case "Cluster":
