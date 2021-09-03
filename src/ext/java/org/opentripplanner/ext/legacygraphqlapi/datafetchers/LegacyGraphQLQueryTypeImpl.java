@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimaps;
 import graphql.relay.Connection;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
@@ -85,7 +87,7 @@ public class LegacyGraphQLQueryTypeImpl
           return vehicleRentalStationService == null ? null : vehicleRentalStationService
               .getVehicleRentalStations()
               .stream()
-              .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(id))
+              .filter(vehicleRentalStation -> vehicleRentalStation.getStationId().equals(id))
               .findAny()
               .orElse(null);
         case "CarPark":
@@ -502,13 +504,13 @@ public class LegacyGraphQLQueryTypeImpl
               environment.getArguments());
 
       if (args.getLegacyGraphQLIds() != null) {
-        Map<String, VehicleRentalStation> vehicleRentalStations =
+        ArrayListMultimap<String, VehicleRentalStation> vehicleRentalStations =
                 vehicleRentalStationService.getVehicleRentalStations()
                         .stream()
-                        .collect(Collectors.toMap(station -> station.id, station -> station));
+                        .collect(Multimaps.toMultimap(VehicleRentalStation::getStationId, station -> station, ArrayListMultimap::create));
         return ((List<String>) args.getLegacyGraphQLIds())
                 .stream()
-                .map(vehicleRentalStations::get)
+                .flatMap(id -> vehicleRentalStations.get(id).stream())
                 .collect(Collectors.toList());
       }
 
@@ -529,7 +531,7 @@ public class LegacyGraphQLQueryTypeImpl
       return vehicleRentalStationService
               .getVehicleRentalStations()
               .stream()
-              .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(args.getLegacyGraphQLId()))
+              .filter(vehicleRentalStation -> vehicleRentalStation.getStationId().equals(args.getLegacyGraphQLId()))
               .findAny()
               .orElse(null);
     };

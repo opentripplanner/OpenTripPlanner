@@ -2,7 +2,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by demory on 2017-03-14.
@@ -86,7 +85,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
     public List<VehicleRentalStation> getStations() {
 
         // Index all the station status entries on their station ID.
-        Map<String, VehicleRentalStation> statusLookup = new HashMap<>();
+        Map<FeedScopedId, VehicleRentalStation> statusLookup = new HashMap<>();
         for (VehicleRentalStation station : stationStatusSource.getStations()) {
             statusLookup.put(station.id, station);
         }
@@ -103,11 +102,6 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         List<VehicleRentalStation> stations = new LinkedList<>(stationInformationSource.getStations());
         if (OTPFeature.FloatingBike.isOn()) {
             stations.addAll(floatingBikeSource.getStations());
-        }
-
-        // Set identical network ID on all stations
-        for (VehicleRentalStation station : stations) {
-            station.network = networkName;
         }
 
         return stations;
@@ -180,7 +174,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         @Override
         public VehicleRentalStation makeStation(JsonNode stationNode) {
             VehicleRentalStation brstation = new VehicleRentalStation();
-            brstation.id = stationNode.path("station_id").asText();
+            brstation.id = new FeedScopedId(networkName, stationNode.path("station_id").asText());
             brstation.longitude = stationNode.path("lon").asDouble();
             brstation.latitude = stationNode.path("lat").asDouble();
             brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
@@ -208,7 +202,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         @Override
         public VehicleRentalStation makeStation(JsonNode stationNode) {
             VehicleRentalStation brstation = new VehicleRentalStation();
-            brstation.id = stationNode.path("station_id").asText();
+            brstation.id = new FeedScopedId(networkName, stationNode.path("station_id").asText());
             brstation.vehiclesAvailable = stationNode.path("num_bikes_available").asInt();
             brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
             brstation.isKeepingVehicleRentalAtDestinationAllowed = config.allowKeepingRentedVehicleAtDestination();
@@ -231,7 +225,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
                     stationNode.has("lat")
             ) {
                 VehicleRentalStation brstation = new VehicleRentalStation();
-                brstation.id = stationNode.path("bike_id").asText();
+                brstation.id = new FeedScopedId(networkName, stationNode.path("bike_id").asText());
                 brstation.name = new NonLocalizedString(stationNode.path("name").asText());
                 brstation.longitude = stationNode.path("lon").asDouble();
                 brstation.latitude = stationNode.path("lat").asDouble();

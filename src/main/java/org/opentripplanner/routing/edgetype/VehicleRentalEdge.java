@@ -30,7 +30,7 @@ public class VehicleRentalEdge extends Edge {
         RoutingRequest options = s0.getOptions();
 
         VehicleRentalStationVertex stationVertex = (VehicleRentalStationVertex) tov;
-        String network = stationVertex.getStation().network;
+        String network = stationVertex.getStation().getNetwork();
 
         boolean pickedUp;
         if (options.arriveBy) {
@@ -142,7 +142,7 @@ public class VehicleRentalEdge extends Edge {
         /*
          * Special case for "null" networks ("catch-all" network defined).
          */
-        if (stationNetwork == null || rentedNetwork == null) {
+        if (rentedNetwork == null) {
             return true;
         }
 

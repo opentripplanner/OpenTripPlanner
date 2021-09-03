@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
@@ -298,10 +298,9 @@ public abstract class GraphRoutingTest {
                 String network
         ) {
             var vehicleRentalStation = new VehicleRentalStation();
-            vehicleRentalStation.id = id;
+            vehicleRentalStation.id = new FeedScopedId(network, id);
             vehicleRentalStation.longitude = longitude;
             vehicleRentalStation.latitude = latitude;
-            vehicleRentalStation.network = network;
             vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
             return vehicleRentalStation;
         }

@@ -5,7 +5,6 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import com.csvreader.CsvReader;
 import com.google.common.collect.Lists;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -27,6 +26,7 @@ import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -43,7 +43,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.updater.vehicle_rental.datasources.GenericJsonVehicleRentalDataSource;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class ConstantsForTests {
@@ -269,11 +268,10 @@ public class ConstantsForTests {
             reader.readHeaders();
             while (reader.readRecord()) {
                 VehicleRentalStation station = new VehicleRentalStation();
-                station.id = reader.get("osm_id");
+                station.id = new FeedScopedId(reader.get("network"), reader.get("osm_id"));
                 station.latitude = Double.parseDouble(reader.get("lat"));
                 station.longitude = Double.parseDouble(reader.get("lon"));
                 station.name = new NonLocalizedString(reader.get("osm_id"));
-                station.network = reader.get("network");
                 station.realTimeData = false;
                 station.isKeepingVehicleRentalAtDestinationAllowed = true;
 

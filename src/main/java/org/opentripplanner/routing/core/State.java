@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
-import java.util.Set;
+
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -572,7 +572,7 @@ public class State implements Cloneable {
                 var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
                 editor.dropOffRentedVehicleAtStation(
                         stationVertex.getVehicleMode(),
-                        stationVertex.getStation().network,
+                        stationVertex.getStation().getNetwork(),
                         false
                 );
             }
@@ -581,7 +581,7 @@ public class State implements Cloneable {
                 if (orig.getBackState().isBikeRentingFromStation()) {
                     editor.beginVehicleRentingAtStation(
                             stationVertex.getVehicleMode(),
-                            stationVertex.getStation().network,
+                            stationVertex.getStation().getNetwork(),
                             orig.backState.mayKeepRentedVehicleAtDestination(),
                             false
                     );
@@ -589,7 +589,7 @@ public class State implements Cloneable {
                 else if (orig.getBackState().isBikeRentingFloating()) {
                     editor.beginFloatingVehicleRenting(
                             stationVertex.getVehicleMode(),
-                            stationVertex.getStation().network,
+                            stationVertex.getStation().getNetwork(),
                             false
                     );
                 }
