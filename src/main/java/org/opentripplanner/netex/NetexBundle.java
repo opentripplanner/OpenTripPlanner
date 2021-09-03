@@ -3,6 +3,7 @@ package org.opentripplanner.netex;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import javax.xml.bind.JAXBException;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
@@ -52,15 +53,18 @@ public class NetexBundle implements Closeable {
 
     private NetexXmlParser xmlParser;
 
+    private final Set<String> ferryWithoutBicycleIds;
+
     public NetexBundle(
             String netexFeedId,
             CompositeDataSource source,
-            NetexDataSourceHierarchy hierarchy
-
+            NetexDataSourceHierarchy hierarchy,
+            Set<String> ferryWithoutBicycleIds
     ) {
         this.netexFeedId = netexFeedId;
         this.source = source;
         this.hierarchy = hierarchy;
+        this.ferryWithoutBicycleIds = ferryWithoutBicycleIds;
     }
 
     /** load the bundle, map it to the OTP transit model and return */
@@ -77,7 +81,9 @@ public class NetexBundle implements Closeable {
 
         // init parser and mapper
         xmlParser = new NetexXmlParser();
-        mapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore);
+        mapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore,
+                ferryWithoutBicycleIds
+        );
 
         // Load data
         loadFileEntries();

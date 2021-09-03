@@ -58,13 +58,15 @@ public class NetexConfig {
                 buildParams.getSubwayAccessTimeSeconds(),
                 buildParams.maxInterlineDistance,
                 buildParams.getTransitServicePeriod(),
-                netexBundles
+                netexBundles,
+                buildParams.netex.ferryWithoutBicycleIds
         );
     }
 
     /** public to enable testing */
     private NetexBundle netexBundle(CompositeDataSource source) {
-        return new NetexBundle(buildParams.netex.netexFeedId, source, hierarchy(source));
+        return new NetexBundle(buildParams.netex.netexFeedId, source, hierarchy(source),
+                buildParams.netex.ferryWithoutBicycleIds);
     }
 
     private NetexDataSourceHierarchy hierarchy(CompositeDataSource source){

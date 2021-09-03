@@ -168,6 +168,11 @@ public class NodeAdapter {
         return param(paramName).asText(defaultValue);
     }
 
+    public List<String> asTexts(String paramName, List<String> defaultValue) {
+        if(!exist(paramName)) return defaultValue;
+        return arrayAsList(paramName, JsonNode::asText);
+    }
+
     /**
      * Get a required parameter as a text String value.
      * @throws OtpAppException if parameter is missing.

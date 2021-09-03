@@ -1,5 +1,6 @@
 package org.opentripplanner.netex;
 
+import java.util.Set;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
@@ -45,18 +46,22 @@ public class NetexModule implements GraphBuilderModule {
 
     private final FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
 
+    private final Set<String> ferryWithoutBicycleIds;
+
     public NetexModule(
             String netexFeedId,
             int subwayAccessTime,
             int maxInterlineDistance,
             ServiceDateInterval transitPeriodLimit,
-            List<NetexBundle> netexBundles
+            List<NetexBundle> netexBundles,
+            Set<String> ferryWithoutBicycleIds
     ) {
         this.netexFeedId = netexFeedId;
         this.subwayAccessTime = subwayAccessTime;
         this.maxInterlineDistance = maxInterlineDistance;
         this.transitPeriodLimit = transitPeriodLimit;
         this.netexBundles = netexBundles;
+        this.ferryWithoutBicycleIds = ferryWithoutBicycleIds;
     }
 
     @Override
