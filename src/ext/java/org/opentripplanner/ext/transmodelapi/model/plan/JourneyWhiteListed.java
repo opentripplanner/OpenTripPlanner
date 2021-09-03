@@ -2,7 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectType;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
