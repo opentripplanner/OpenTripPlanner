@@ -106,8 +106,9 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         }
 
         // Set identical network ID on all stations
-        Set<String> networkIdSet = Sets.newHashSet(this.networkName);
-        for (VehicleRentalStation station : stations) station.networks = networkIdSet;
+        for (VehicleRentalStation station : stations) {
+            station.network = networkName;
+        }
 
         return stations;
     }

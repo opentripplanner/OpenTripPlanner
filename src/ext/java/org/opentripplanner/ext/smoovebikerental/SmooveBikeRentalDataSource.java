@@ -17,6 +17,8 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
+    public static final String DEFAULT_NETWORK_NAME = "smoove";
+
     public SmooveBikeRentalDataSource(VehicleRentalDataSourceParameters config) {
         super(config,"result");
     }
@@ -43,6 +45,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
         VehicleRentalStation station = new VehicleRentalStation();
         station.id = node.path("name").asText().split("\\s", 2)[0];
         station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
+        station.network = config.getNetwork(DEFAULT_NETWORK_NAME);
         String[] coordinates = node.path("coordinates").asText().split(",");
         try {
             station.latitude = Double.parseDouble(coordinates[0].trim());

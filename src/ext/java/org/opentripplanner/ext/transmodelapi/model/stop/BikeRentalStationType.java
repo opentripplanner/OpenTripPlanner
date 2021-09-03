@@ -9,6 +9,7 @@ import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BikeRentalStationType {
 
@@ -56,7 +57,7 @@ public class BikeRentalStationType {
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("networks")
                   .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-                  .dataFetcher(environment -> new ArrayList<>(((VehicleRentalStation) environment.getSource()).networks))
+                  .dataFetcher(environment -> List.of(((VehicleRentalStation) environment.getSource()).network))
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("longitude")

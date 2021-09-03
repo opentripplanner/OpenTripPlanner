@@ -295,13 +295,13 @@ public abstract class GraphRoutingTest {
                 String id,
                 double latitude,
                 double longitude,
-                Set<String> networks
+                String network
         ) {
             var vehicleRentalStation = new VehicleRentalStation();
             vehicleRentalStation.id = id;
             vehicleRentalStation.longitude = longitude;
             vehicleRentalStation.latitude = latitude;
-            vehicleRentalStation.networks = networks;
+            vehicleRentalStation.network = network;
             vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
             return vehicleRentalStation;
         }
@@ -310,11 +310,11 @@ public abstract class GraphRoutingTest {
                 String id,
                 double latitude,
                 double longitude,
-                Set<String> networks
+                String network
         ) {
             var vertex = new VehicleRentalStationVertex(
                     graph,
-                    vehicleRentalStationEntity(id, latitude, longitude, networks)
+                    vehicleRentalStationEntity(id, latitude, longitude, network)
             );
             new VehicleRentalEdge(vertex);
             return vertex;
@@ -325,7 +325,7 @@ public abstract class GraphRoutingTest {
                 double latitude,
                 double longitude
         ) {
-            return vehicleRentalStation(id, latitude, longitude, Set.of(TEST_VEHICLE_RENTAL_NETWORK));
+            return vehicleRentalStation(id, latitude, longitude, TEST_VEHICLE_RENTAL_NETWORK);
         }
 
         public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalStationVertex to) {

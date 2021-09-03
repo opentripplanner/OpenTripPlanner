@@ -18,7 +18,7 @@ public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<Vehic
     return List.of(
         new T2<>("id", station.id),
         new T2<>("name", station.name),
-        new T2<>("networks", String.join(",", station.networks))
+        new T2<>("networks", station.network)
     );
   }
 }

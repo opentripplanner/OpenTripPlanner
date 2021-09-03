@@ -530,8 +530,8 @@ public class State implements Cloneable {
         return foundAlternatePaths;
     }
 
-    public Set<String> getVehicleRentalNetworks() {
-        return stateData.vehicleRentalNetworks;
+    public String getVehicleRentalNetwork() {
+        return stateData.vehicleRentalNetwork;
     }
 
     /**
@@ -572,7 +572,7 @@ public class State implements Cloneable {
                 var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
                 editor.dropOffRentedVehicleAtStation(
                         stationVertex.getVehicleMode(),
-                        stationVertex.getStation().networks,
+                        stationVertex.getStation().network,
                         false
                 );
             }
@@ -581,7 +581,7 @@ public class State implements Cloneable {
                 if (orig.getBackState().isBikeRentingFromStation()) {
                     editor.beginVehicleRentingAtStation(
                             stationVertex.getVehicleMode(),
-                            stationVertex.getStation().networks,
+                            stationVertex.getStation().network,
                             orig.backState.mayKeepRentedVehicleAtDestination(),
                             false
                     );
@@ -589,7 +589,7 @@ public class State implements Cloneable {
                 else if (orig.getBackState().isBikeRentingFloating()) {
                     editor.beginFloatingVehicleRenting(
                             stationVertex.getVehicleMode(),
-                            stationVertex.getStation().networks,
+                            stationVertex.getStation().network,
                             false
                     );
                 }

@@ -1,8 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
-import com.google.common.collect.Sets;
 import java.util.Locale;
-import java.util.Set;
+
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -31,7 +30,7 @@ public class VehicleRentalEdge extends Edge {
         RoutingRequest options = s0.getOptions();
 
         VehicleRentalStationVertex stationVertex = (VehicleRentalStationVertex) tov;
-        var networks = stationVertex.getStation().networks;
+        String network = stationVertex.getStation().network;
 
         boolean pickedUp;
         if (options.arriveBy) {
@@ -42,12 +41,12 @@ public class VehicleRentalEdge extends Edge {
                     if (options.useVehicleRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
                         return null;
                     }
-                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), networks, true);
+                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), network, true);
                     pickedUp = false;
                     break;
                 case RENTING_FLOATING:
                     if (stationVertex.getStation().isFloatingBike) {
-                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), networks, true);
+                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), network, true);
                         pickedUp = true;
                     } else {
                         return null;
@@ -62,8 +61,8 @@ public class VehicleRentalEdge extends Edge {
                     if (s0.mayKeepRentedVehicleAtDestination() && !stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed) {
                         return null;
                     }
-                    if (!hasCompatibleNetworks(networks, s0.getVehicleRentalNetworks())) { return null; }
-                    s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), networks, false, true);
+                    if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {  return null; }
+                    s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), network, false, true);
                     pickedUp = true;
                     break;
                 default:
@@ -76,13 +75,13 @@ public class VehicleRentalEdge extends Edge {
                         return null;
                     }
                     if (stationVertex.getStation().isFloatingBike) {
-                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), networks,
+                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), network,
                                 false);
                     } else {
                         var mayKeep =
                                 stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed
                                         && options.allowKeepingRentedVehicleAtDestination;
-                        s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), networks,
+                        s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), network,
                                 mayKeep, false);
                     }
                     pickedUp = true;
@@ -91,11 +90,11 @@ public class VehicleRentalEdge extends Edge {
                     return null;
                 case RENTING_FLOATING:
                 case RENTING_FROM_STATION:
-                    if (!hasCompatibleNetworks(networks, s0.getVehicleRentalNetworks())) { return null; }
+                    if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) { return null; }
                     if (options.useVehicleRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
                         return null;
                     }
-                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), networks, false);
+                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), network, false);
                     pickedUp = false;
                     break;
                 default:
@@ -135,17 +134,18 @@ public class VehicleRentalEdge extends Edge {
     }
 
     /**
-     * @param stationNetworks The station where we want to drop the bike off.
-     * @param rentedNetworks The set of networks of the station we rented the bike from.
+     * @param stationNetwork The station network where we want to drop the bike off.
+     * @param rentedNetwork The networks of the station we rented the bike from.
      * @return true if the bike can be dropped off here, false if not.
      */
-    private boolean hasCompatibleNetworks(Set<String> stationNetworks, Set<String> rentedNetworks) {
+    private boolean hasCompatibleNetworks(String stationNetwork, String rentedNetwork) {
         /*
-         * Two stations are compatible if they share at least one network. Special case for "null"
-         * networks ("catch-all" network defined).
+         * Special case for "null" networks ("catch-all" network defined).
          */
-        if (stationNetworks == null || rentedNetworks == null)
-            return true; // Always a match
-        return !Sets.intersection(stationNetworks, rentedNetworks).isEmpty();
+        if (stationNetwork == null || rentedNetwork == null) {
+            return true;
+        }
+
+        return rentedNetwork.equals(stationNetwork);
     }
 }

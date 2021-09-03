@@ -46,8 +46,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private VehicleRentalStationService service;
 
-    private final String network;
-
     public VehicleRentalUpdater(VehicleRentalUpdaterParameters parameters) throws IllegalArgumentException {
         super(parameters);
         // Configure updater
@@ -56,7 +54,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         VehicleRentalDataSource source = VehicleRentalDataSourceFactory.create(parameters.sourceParameters());
 
         this.source = source;
-        this.network = parameters.getNetworks();
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating vehicle-rental updater running once only (non-polling): {}", source);
         } else {
@@ -107,14 +104,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         public void run(Graph graph) {
             // Apply stations to graph
             Set<String> stationSet = new HashSet<>();
-            Set<String> defaultNetworks = new HashSet<>(Collections.singletonList(network));
 
             /* add any new stations and update vehicle counts for existing stations */
             for (VehicleRentalStation station : stations) {
-                if (station.networks == null) {
-                    /* API did not provide a network list, use default */
-                    station.networks = defaultNetworks;
-                }
                 service.addVehicleRentalStation(station);
                 stationSet.add(station.id);
                 VehicleRentalStationVertex vehicleRentalVertex = verticesByStation.get(station.id);

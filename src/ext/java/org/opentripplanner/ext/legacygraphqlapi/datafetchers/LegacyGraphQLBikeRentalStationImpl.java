@@ -7,6 +7,8 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 
+import java.util.List;
+
 public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBikeRentalStation {
     @Override
     public DataFetcher<Relay.ResolvedGlobalId> id() {
@@ -54,7 +56,7 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<Iterable<String>> networks() {
-        return environment -> getSource(environment).networks;
+        return environment -> List.of(getSource(environment).network);
     }
 
     @Override
