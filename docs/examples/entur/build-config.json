@@ -28,7 +28,8 @@
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
     "groupFilePattern": "(\\w{3})_.*\\.xml",
-    "netexFeedId": "RB"
+    "netexFeedId": "RB",
+    "ferryWithoutBicyleIds": []
   },
   "storage" : {
     "gsCredentials": "/etc/otp2/credentials.json",
