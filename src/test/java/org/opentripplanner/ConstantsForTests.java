@@ -2,9 +2,12 @@ package org.opentripplanner;
 
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
+import com.csvreader.CsvReader;
 import com.google.common.collect.Lists;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +15,8 @@ import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
@@ -29,9 +34,17 @@ import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.updater.vehicle_rental.datasources.GenericJsonVehicleRentalDataSource;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class ConstantsForTests {
 
@@ -42,6 +55,8 @@ public class ConstantsForTests {
     private static final String PORTLAND_GTFS = "src/test/resources/google_transit.zip";
 
     private static final String PORTLAND_CENTRAL_OSM = "src/test/resources/portland-central-filtered.osm.pbf";
+
+    private static final String PORTLAND_BIKE_SHARE_CSV = "src/test/resources/portland-vehicle-rental.csv";
 
     private static final String OSLO_EAST_OSM = "src/test/resources/oslo-east-filtered.osm.pbf";
 
@@ -148,10 +163,9 @@ public class ConstantsForTests {
             graph.hasStreets = true;
             graph.hasTransit = true;
 
-            graph.index();
+            addPortlandVehicleRentals(graph);
 
-            graph.getVehicleRentalStationService().getVehicleRentalStations()
-                    .forEach(vehicleRentalStation -> vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = true);
+            graph.index();
 
             return graph;
         } catch (Exception e) {
@@ -247,6 +261,39 @@ public class ConstantsForTests {
         return graph;
     }
 
+
+    private static void addPortlandVehicleRentals(Graph graph) {
+        try {
+            VertexLinker linker = graph.getLinker();
+            CsvReader reader = new CsvReader(PORTLAND_BIKE_SHARE_CSV, ',', StandardCharsets.UTF_8);
+            reader.readHeaders();
+            while (reader.readRecord()) {
+                VehicleRentalStation station = new VehicleRentalStation();
+                station.id = reader.get("osm_id");
+                station.latitude = Double.parseDouble(reader.get("lat"));
+                station.longitude = Double.parseDouble(reader.get("lon"));
+                station.name = new NonLocalizedString(reader.get("osm_id"));
+                station.network = reader.get("network");
+                station.realTimeData = false;
+                station.isKeepingVehicleRentalAtDestinationAllowed = true;
+
+                VehicleRentalStationVertex stationVertex = new VehicleRentalStationVertex(graph, station);
+                new VehicleRentalEdge(stationVertex);
+
+                linker.linkVertexPermanently(
+                        stationVertex,
+                        new TraverseModeSet(TraverseMode.WALK),
+                        LinkingDirection.BOTH_WAYS,
+                        (vertex, streetVertex) -> List.of(
+                                new StreetVehicleRentalLink((VehicleRentalStationVertex) vertex, streetVertex),
+                                new StreetVehicleRentalLink(streetVertex, (VehicleRentalStationVertex) vertex)
+                        )
+                );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static BuildConfig createNetexBuilderParameters() {
         return new ConfigLoader(new File(ConstantsForTests.NETEX_DIR)).loadBuildConfig();
