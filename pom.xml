@@ -452,26 +452,6 @@
             <version>${geotools.version}</version>
         </dependency>
 
-        <!-- TODO: this should be replaced by Jackson serialization -->
-        <dependency>
-            <groupId>de.grundid.opendatalab</groupId>
-            <artifactId>geojson-jackson</artifactId>
-            <version>1.2</version>
-            <!-- We explicitly exclude jackson-core/databind as we use a more recent
-                 version than the one geojson-jackson depends on, and the two seems to
-                 be somehow incompatible. -->
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!--
             Netex XML document - JAXB generated Java model.
             This is generated using the official Netex schema(v1.0) and support the entire model,
