@@ -43,7 +43,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     	// may not match fare attribute agency IDs (which are feed IDs).
     	
     	Map<FeedScopedId, FareRuleSet> feedFareRules = new HashMap<>();
-    	fillFareRules(null, transitService.getAllFareAttributes(),
+    	fillFareRules(transitService.getAllFareAttributes(),
                 transitService.getAllFareRules(), feedFareRules);
     	
     	regularFareRules.putAll(feedFareRules);

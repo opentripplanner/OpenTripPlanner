@@ -22,7 +22,7 @@ public class OrcaFareServiceFactory extends DefaultFareServiceFactory {
      */
     @Override
     public void processGtfs(OtpTransitService transitService) {
-        fillFareRules(null, transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
+        fillFareRules(transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
     }
 
     /**
