@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.index.model.RealtimeVehiclePosition;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.Graph;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -18,6 +19,18 @@ import static org.junit.Assert.assertNotEquals;
 
 public class RealtimeVehiclePositionTest extends GtfsTest {
 
+    /**
+     * Reset the graph upon tests finishing
+     */
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        this.graph = new Graph();
+    }
+
+    /**
+     * Helper method to generate a fake router-config.json to allow methods to operate
+     */
     private JsonNode generateConfig(String fileName) throws IOException {
         String jsonString = "{\"feedId\":\"" + this.getFeedName() + "\",\"file\":\"src/test/resources/" + fileName + "\"}";
         ObjectMapper mapper = new ObjectMapper();
