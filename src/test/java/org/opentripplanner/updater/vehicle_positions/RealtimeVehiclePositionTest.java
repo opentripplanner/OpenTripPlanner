@@ -24,6 +24,10 @@ public class RealtimeVehiclePositionTest extends GtfsTest {
         return mapper.readTree(jsonString);
     }
 
+    /**
+     * This helper method iterates over a collection of patterns, collecting a running total of
+     * the number of realtime vehicles observed.
+     */
     private int getRealtimeVehicleCountForPatterns(Collection<TripPattern> patterns) {
         AtomicInteger realtimeVehicleCount = new AtomicInteger();
 
@@ -35,8 +39,15 @@ public class RealtimeVehiclePositionTest extends GtfsTest {
         return realtimeVehicleCount.get();
     }
 
+    /**
+     * This tests the vehicle positions updater. First, a normal GTFS feed is imported to match
+     * the realtime positions on to. A realtime vehicle position feed is then imported and matched to
+     * the trips defined in the non-realtime GTFS feed. Next, an updated vehicle position feed is
+     * imported matched, including overwriting previous vehicles.
+     */
+
     @Test
-    public void testRealtimeTest() throws Exception {
+    public void testCanImportRealtimeVehiclePositions() throws Exception {
         // Initialize updater
         GtfsRealtimeFileVehiclePositionSource vehiclePositionSource = new GtfsRealtimeFileVehiclePositionSource();
 
@@ -60,7 +71,9 @@ public class RealtimeVehiclePositionTest extends GtfsTest {
         // Count number of vehicles across all patterns
         int realtimeVehicleCount = this.getRealtimeVehicleCountForPatterns(patterns);
 
-        Assert.assertEquals(627, realtimeVehicleCount);
+        // Ensure every position in the realtime positions feed was imported
+        // and matched to an OTP pattern correctly
+        Assert.assertEquals(positions.size(), realtimeVehicleCount);
 
         // Update positions
         JsonNode updated_config = this.generateConfig("kcm_rt_gtfs_2.pb");
@@ -69,26 +82,29 @@ public class RealtimeVehiclePositionTest extends GtfsTest {
         vehiclePositionSource.configure(this.graph, updated_config);
         List<GtfsRealtime.VehiclePosition> updated_positions = vehiclePositionSource.getPositions();
 
-        // Ensure feed was parsed and that it was correctly different
+        // Ensure new feed was parsed. The updated position feed contains a different number of vehicles,
+        // so make sure that they are not the same
         assertNotEquals(positions.size(), updated_positions.size());
 
-        // In the test data, updated_positions is smaller
-        for (int i = 0; i < updated_positions.size(); i++) {
-            Assert.assertNotEquals(positions.get(i), updated_positions.get(i));
-        }
-
-        // Execute the same update step as the runner
+        // Execute the same match-to-pattern step as the runner
         vehiclePositionPatternMatcher.wipeSeenTripIds();
         vehiclePositionPatternMatcher.applyVehiclePositionUpdates(updated_positions, this.feedId.getId());
 
-        // Ensure that without cleaning the number of active vehicles is wrong
+        // Ensure that without cleaning the number of active vehicles is wrong (the previous positions have not been wiped)
         int updatedRealtimeVehicleCount = getRealtimeVehicleCountForPatterns(patterns);
+
+        // This is the number of vehicle positions across all patterns when the previous updates have
+        // not been removed. This is a bad state to be in, as it results in many duplicate vehicles.
+        // The number of total vehicle positions in this state is difficult to predict, but given the
+        // test data is 1016. After cleaning, the number is predictable again and should be the same
+        // as the number of realtime vehicles in the imported feed
         Assert.assertEquals(1016, updatedRealtimeVehicleCount);
 
         // "clean" patterns
         vehiclePositionPatternMatcher.cleanPatternVehiclePositions(this.feedId.getId());
 
-        // Ensure that after cleaning it is correct
+        // Ensure that after cleaning it is correct, and that the number of vehicles matched to
+        // patterns equals the number of vehicles in the feed
         updatedRealtimeVehicleCount = getRealtimeVehicleCountForPatterns(patterns);
         Assert.assertEquals(updated_positions.size(), updatedRealtimeVehicleCount);
     }

@@ -50,9 +50,8 @@ public class GtfsRealtimeHttpVehiclePositionSource implements VehiclePositionSou
                 url,
                 "Accept",
                 "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*")) {
-            if (is != null) {
-                return this.getPositions(is);
-            }
+
+            return this.getPositions(is);
         } catch (Exception e) {
             LOG.warn("Failed to parse gtfs-rt feed from {}:", url, e);
         }
