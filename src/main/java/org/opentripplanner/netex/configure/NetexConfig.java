@@ -58,8 +58,7 @@ public class NetexConfig {
                 buildParams.getSubwayAccessTimeSeconds(),
                 buildParams.maxInterlineDistance,
                 buildParams.getTransitServicePeriod(),
-                netexBundles,
-                buildParams.netex.ferryIdsNotAllowedForBicycle
+                netexBundles
         );
     }
 
