@@ -53,18 +53,18 @@ public class NetexBundle implements Closeable {
 
     private NetexXmlParser xmlParser;
 
-    private final Set<String> ferryWithoutBicycleIds;
+    private final Set<String> ferryIdsNotAllowedForBicycle;
 
     public NetexBundle(
             String netexFeedId,
             CompositeDataSource source,
             NetexDataSourceHierarchy hierarchy,
-            Set<String> ferryWithoutBicycleIds
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.netexFeedId = netexFeedId;
         this.source = source;
         this.hierarchy = hierarchy;
-        this.ferryWithoutBicycleIds = ferryWithoutBicycleIds;
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     }
 
     /** load the bundle, map it to the OTP transit model and return */
@@ -82,7 +82,7 @@ public class NetexBundle implements Closeable {
         // init parser and mapper
         xmlParser = new NetexXmlParser();
         mapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore,
-                ferryWithoutBicycleIds
+                ferryIdsNotAllowedForBicycle
         );
 
         // Load data

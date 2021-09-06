@@ -35,7 +35,7 @@ class RouteMapper {
     private final EntityById<Operator> operatorsById;
     private final NetexEntityIndexReadOnlyView netexIndex;
     private final AuthorityToAgencyMapper authorityMapper;
-    private final Set<String> ferryWithoutBicyleIds;
+    private final Set<String> ferryIdsNotAllowedForBicycle;
 
     RouteMapper(
             FeedScopedIdFactory idFactory,
@@ -43,14 +43,14 @@ class RouteMapper {
             EntityById<Operator> operatorsById,
             NetexEntityIndexReadOnlyView netexIndex,
             String timeZone,
-            Set<String> ferryWithoutBicycleIds
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.idFactory = idFactory;
         this.agenciesById = agenciesById;
         this.operatorsById = operatorsById;
         this.netexIndex = netexIndex;
         this.authorityMapper = new AuthorityToAgencyMapper(idFactory, timeZone);
-        this.ferryWithoutBicyleIds = ferryWithoutBicycleIds;
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     }
 
     org.opentripplanner.model.Route mapRoute(Line_VersionStructure line){
@@ -93,7 +93,7 @@ class RouteMapper {
         // until there is better information from the operators we assume that all ferries allow
         // bicycles on board.
         if(mode == TransitMode.FERRY) {
-            if(ferryWithoutBicyleIds.contains(line.getId())) {
+            if(ferryIdsNotAllowedForBicycle.contains(line.getId())) {
                 otpRoute.setBikesAllowed(BikeAccess.NOT_ALLOWED);
             } else {
                 otpRoute.setBikesAllowed(BikeAccess.ALLOWED);

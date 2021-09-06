@@ -95,7 +95,7 @@ public class NetexConfig {
      * For this reason we allow bicycles on ferries by default and allow to override the rare
      * case where this is not the case.
      */
-    public final Set<String> ferryWithoutBicycleIds;
+    public final Set<String> ferryIdsNotAllowedForBicycle;
 
     NetexConfig(NodeAdapter config) {
         ignoreFilePattern = config.asPattern("ignoreFilePattern", IGNORE_FILE_PATTERN);
@@ -103,7 +103,7 @@ public class NetexConfig {
         sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);
         groupFilePattern = config.asPattern("groupFilePattern", GROUP_FILE_PATTERN);
         netexFeedId = config.asText("netexFeedId", NETEX_FEED_ID);
-        ferryWithoutBicycleIds = config.asTexts("ferryWithoutBicycleIds", FERRY_WITHOUT_BICYCLE_IDS)
+        ferryIdsNotAllowedForBicycle = config.asTexts("ferryIdsNotAllowedForBicycle", FERRY_WITHOUT_BICYCLE_IDS)
                 .stream()
                 .collect(Collectors.toSet());
     }

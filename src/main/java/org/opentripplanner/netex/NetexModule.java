@@ -46,7 +46,7 @@ public class NetexModule implements GraphBuilderModule {
 
     private final FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
 
-    private final Set<String> ferryWithoutBicycleIds;
+    private final Set<String> ferryIdsNotAllowedForBicycle;
 
     public NetexModule(
             String netexFeedId,
@@ -54,14 +54,14 @@ public class NetexModule implements GraphBuilderModule {
             int maxInterlineDistance,
             ServiceDateInterval transitPeriodLimit,
             List<NetexBundle> netexBundles,
-            Set<String> ferryWithoutBicycleIds
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.netexFeedId = netexFeedId;
         this.subwayAccessTime = subwayAccessTime;
         this.maxInterlineDistance = maxInterlineDistance;
         this.transitPeriodLimit = transitPeriodLimit;
         this.netexBundles = netexBundles;
-        this.ferryWithoutBicycleIds = ferryWithoutBicycleIds;
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     }
 
     @Override

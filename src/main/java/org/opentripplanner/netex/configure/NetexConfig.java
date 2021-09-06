@@ -59,14 +59,14 @@ public class NetexConfig {
                 buildParams.maxInterlineDistance,
                 buildParams.getTransitServicePeriod(),
                 netexBundles,
-                buildParams.netex.ferryWithoutBicycleIds
+                buildParams.netex.ferryIdsNotAllowedForBicycle
         );
     }
 
     /** public to enable testing */
     private NetexBundle netexBundle(CompositeDataSource source) {
         return new NetexBundle(buildParams.netex.netexFeedId, source, hierarchy(source),
-                buildParams.netex.ferryWithoutBicycleIds);
+                buildParams.netex.ferryIdsNotAllowedForBicycle);
     }
 
     private NetexDataSourceHierarchy hierarchy(CompositeDataSource source){

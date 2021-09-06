@@ -61,7 +61,7 @@ public class NetexMapper {
     private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
     private final CalendarServiceBuilder calendarServiceBuilder;
     private final TripCalendarBuilder tripCalendarBuilder;
-    private final Set<String> ferryWithoutBicycleIds;
+    private final Set<String> ferryIdsNotAllowedForBicycle;
 
     /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
     private GroupNetexMapper groupMapper;
@@ -81,13 +81,13 @@ public class NetexMapper {
             String feedId,
             Deduplicator deduplicator,
             DataImportIssueStore issueStore,
-            Set<String> ferryWithoutBicycleIds
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
         this.idFactory = new FeedScopedIdFactory(feedId);
         this.issueStore = issueStore;
-        this.ferryWithoutBicycleIds = ferryWithoutBicycleIds;
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
         this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
         this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
     }
@@ -320,7 +320,7 @@ public class NetexMapper {
                 transitBuilder.getOperatorsById(),
                 currentNetexIndex,
                 currentNetexIndex.getTimeZone(),
-                ferryWithoutBicycleIds
+                ferryIdsNotAllowedForBicycle
         );
         for (Line line : currentNetexIndex.getLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
