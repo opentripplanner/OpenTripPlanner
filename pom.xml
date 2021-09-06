@@ -26,7 +26,7 @@
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>25.2</geotools.version>
         <jackson.version>2.12.5</jackson.version>
-        <jersey.version>2.18</jersey.version>
+        <jersey.version>2.34</jersey.version>
         <junit.version>5.7.1</junit.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -483,12 +483,6 @@
             <artifactId>jaxb-api</artifactId>
             <version>2.3.1</version>
         </dependency>
-        <!-- JAXB API Implementation no longer supplied with Java 11+ -->
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.2</version>
-        </dependency>
 
         <!-- TESTING -->
         <dependency>
@@ -533,6 +527,25 @@
             <artifactId>jersey-container-grizzly2-http</artifactId>
             <version>${jersey.version}</version>
         </dependency>
+        <!-- Jackson modules to serialize Jersey response objects to JSON. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- HK2 dependency injection framework for injecting context -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <!-- JAXB API Implementation no longer supplied with Java 11+ -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.5</version>
+        </dependency>
 
         <!-- Jackson modules. -->
         <dependency>
@@ -553,12 +566,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <!-- Jackson modules to serialize Jersey response objects to JSON. -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 

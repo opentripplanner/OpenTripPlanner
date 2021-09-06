@@ -16,7 +16,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 4923.150999999999,
-          "endTime": "2009-11-17T19:03:41.000+0000",
+          "endTime": "2009-11-17T19:03:41.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -39,7 +39,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:00:00.000+0000",
+          "startTime": "2009-11-17T18:00:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -337,7 +337,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 920.3299999999999,
-          "endTime": "2009-11-17T18:12:58.000+0000",
+          "endTime": "2009-11-17T18:12:58.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -359,7 +359,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:01:00.000+0000",
+          "startTime": "2009-11-17T18:01:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -458,7 +458,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 3602.7301325109484,
-          "endTime": "2009-11-17T18:25:49.000+0000",
+          "endTime": "2009-11-17T18:25:49.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -495,7 +495,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:12:58.000+0000",
+          "startTime": "2009-11-17T18:12:58.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -569,7 +569,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 999.0980000000001,
-          "endTime": "2009-11-17T18:38:41.000+0000",
+          "endTime": "2009-11-17T18:38:41.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -599,7 +599,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:25:49.000+0000",
+          "startTime": "2009-11-17T18:25:49.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -726,7 +726,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 62.012,
-          "endTime": "2009-11-17T18:15:40.000+0000",
+          "endTime": "2009-11-17T18:15:40.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -748,7 +748,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:14:52.000+0000",
+          "startTime": "2009-11-17T18:14:52.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -796,7 +796,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 5218.855598775394,
-          "endTime": "2009-11-17T18:35:54.000+0000",
+          "endTime": "2009-11-17T18:35:54.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -833,7 +833,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:15:40.000+0000",
+          "startTime": "2009-11-17T18:15:40.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -907,7 +907,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 266.211,
-          "endTime": "2009-11-17T18:39:22.000+0000",
+          "endTime": "2009-11-17T18:39:22.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -937,7 +937,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:35:54.000+0000",
+          "startTime": "2009-11-17T18:35:54.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1047,7 +1047,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 920.3299999999999,
-          "endTime": "2009-11-17T18:27:58.000+0000",
+          "endTime": "2009-11-17T18:27:58.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1069,7 +1069,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:16:00.000+0000",
+          "startTime": "2009-11-17T18:16:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1168,7 +1168,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 3602.7301325109484,
-          "endTime": "2009-11-17T18:41:03.000+0000",
+          "endTime": "2009-11-17T18:41:03.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1205,7 +1205,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:27:58.000+0000",
+          "startTime": "2009-11-17T18:27:58.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1279,7 +1279,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 999.0980000000001,
-          "endTime": "2009-11-17T18:53:55.000+0000",
+          "endTime": "2009-11-17T18:53:55.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1309,7 +1309,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:41:03.000+0000",
+          "startTime": "2009-11-17T18:41:03.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1436,7 +1436,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 62.012,
-          "endTime": "2009-11-17T18:30:40.000+0000",
+          "endTime": "2009-11-17T18:30:40.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1458,7 +1458,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:29:52.000+0000",
+          "startTime": "2009-11-17T18:29:52.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1506,7 +1506,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 5218.855598775394,
-          "endTime": "2009-11-17T18:52:04.000+0000",
+          "endTime": "2009-11-17T18:52:04.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1543,7 +1543,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:30:40.000+0000",
+          "startTime": "2009-11-17T18:30:40.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1617,7 +1617,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 266.211,
-          "endTime": "2009-11-17T18:55:32.000+0000",
+          "endTime": "2009-11-17T18:55:32.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1647,7 +1647,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:52:04.000+0000",
+          "startTime": "2009-11-17T18:52:04.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1761,7 +1761,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 419.61499999999995,
-          "endTime": "2009-11-17T18:42:54.000+0000",
+          "endTime": "2009-11-17T18:42:54.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1783,7 +1783,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:37:30.000+0000",
+          "startTime": "2009-11-17T18:37:30.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1848,7 +1848,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 2347.5602438577907,
-          "endTime": "2009-11-17T18:52:12.000+0000",
+          "endTime": "2009-11-17T18:52:12.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1885,7 +1885,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:42:54.000+0000",
+          "startTime": "2009-11-17T18:42:54.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1959,7 +1959,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 3248.2996826174576,
-          "endTime": "2009-11-17T19:07:55.000+0000",
+          "endTime": "2009-11-17T19:07:55.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1996,7 +1996,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:56:09.000+0000",
+          "startTime": "2009-11-17T18:56:09.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -2070,7 +2070,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 18.806,
-          "endTime": "2009-11-17T19:08:19.000+0000",
+          "endTime": "2009-11-17T19:08:19.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -2100,7 +2100,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T19:07:55.000+0000",
+          "startTime": "2009-11-17T19:07:55.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -2171,7 +2171,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 4442.913999999999,
-          "endTime": "2009-11-17T18:57:31.000+0000",
+          "endTime": "2009-11-17T18:57:31.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -2200,7 +2200,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:00:00.000+0000",
+          "startTime": "2009-11-17T18:00:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -2447,7 +2447,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 87.019,
-          "endTime": "2009-11-17T18:14:00.000+0000",
+          "endTime": "2009-11-17T18:14:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -2475,7 +2475,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:12:47.000+0000",
+          "startTime": "2009-11-17T18:12:47.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -2540,7 +2540,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 3729.9737283822847,
-          "endTime": "2009-11-17T18:26:49.000+0000",
+          "endTime": "2009-11-17T18:26:49.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -2577,7 +2577,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:14:00.000+0000",
+          "startTime": "2009-11-17T18:14:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -2651,7 +2651,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 913.815,
-          "endTime": "2009-11-17T18:38:40.000+0000",
+          "endTime": "2009-11-17T18:38:40.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -2681,7 +2681,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:26:49.000+0000",
+          "startTime": "2009-11-17T18:26:49.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -2842,7 +2842,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 87.019,
-          "endTime": "2009-11-17T18:29:00.000+0000",
+          "endTime": "2009-11-17T18:29:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -2870,7 +2870,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:27:47.000+0000",
+          "startTime": "2009-11-17T18:27:47.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -2935,7 +2935,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 3729.9737283822847,
-          "endTime": "2009-11-17T18:42:19.000+0000",
+          "endTime": "2009-11-17T18:42:19.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -2972,7 +2972,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:29:00.000+0000",
+          "startTime": "2009-11-17T18:29:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -3046,7 +3046,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 913.815,
-          "endTime": "2009-11-17T18:54:10.000+0000",
+          "endTime": "2009-11-17T18:54:10.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3076,7 +3076,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:42:19.000+0000",
+          "startTime": "2009-11-17T18:42:19.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -3237,7 +3237,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 87.019,
-          "endTime": "2009-11-17T18:45:00.000+0000",
+          "endTime": "2009-11-17T18:45:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3265,7 +3265,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:43:47.000+0000",
+          "startTime": "2009-11-17T18:43:47.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -3330,7 +3330,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 3729.9737283822847,
-          "endTime": "2009-11-17T18:57:49.000+0000",
+          "endTime": "2009-11-17T18:57:49.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3367,7 +3367,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:45:00.000+0000",
+          "startTime": "2009-11-17T18:45:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -3441,7 +3441,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 913.815,
-          "endTime": "2009-11-17T19:09:40.000+0000",
+          "endTime": "2009-11-17T19:09:40.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3471,7 +3471,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:57:49.000+0000",
+          "startTime": "2009-11-17T18:57:49.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -3636,7 +3636,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 20.74,
-          "endTime": "2009-11-17T18:46:00.000+0000",
+          "endTime": "2009-11-17T18:46:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3664,7 +3664,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:45:44.000+0000",
+          "startTime": "2009-11-17T18:45:44.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -3712,7 +3712,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 1667.1475209896525,
-          "endTime": "2009-11-17T18:52:12.000+0000",
+          "endTime": "2009-11-17T18:52:12.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3749,7 +3749,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:46:00.000+0000",
+          "startTime": "2009-11-17T18:46:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -3823,7 +3823,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 3526.7741793792093,
-          "endTime": "2009-11-17T19:08:50.000+0000",
+          "endTime": "2009-11-17T19:08:50.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3860,7 +3860,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:56:09.000+0000",
+          "startTime": "2009-11-17T18:56:09.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -3934,7 +3934,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 231.459,
-          "endTime": "2009-11-17T19:11:51.000+0000",
+          "endTime": "2009-11-17T19:11:51.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -3964,7 +3964,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T19:08:50.000+0000",
+          "startTime": "2009-11-17T19:08:50.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -4074,7 +4074,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 718.722,
-          "endTime": "2009-11-17T19:02:00.000+0000",
+          "endTime": "2009-11-17T19:02:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -4102,7 +4102,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:52:44.000+0000",
+          "startTime": "2009-11-17T18:52:44.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -4184,7 +4184,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 4844.785407243491,
-          "endTime": "2009-11-17T19:22:04.000+0000",
+          "endTime": "2009-11-17T19:22:04.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -4221,7 +4221,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T19:02:00.000+0000",
+          "startTime": "2009-11-17T19:02:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -4295,7 +4295,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 231.459,
-          "endTime": "2009-11-17T19:25:05.000+0000",
+          "endTime": "2009-11-17T19:25:05.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -4325,7 +4325,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T19:22:04.000+0000",
+          "startTime": "2009-11-17T19:22:04.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -4413,7 +4413,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 4875.788999999999,
-          "endTime": "2009-11-17T19:03:24.000+0000",
+          "endTime": "2009-11-17T19:03:24.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -4436,7 +4436,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:00:00.000+0000",
+          "startTime": "2009-11-17T18:00:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -4780,7 +4780,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 4154.147999999998,
-          "endTime": "2009-11-17T18:53:50.000+0000",
+          "endTime": "2009-11-17T18:53:50.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -4809,7 +4809,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:00:00.000+0000",
+          "startTime": "2009-11-17T18:00:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -5034,7 +5034,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distanceMeters": 2989.7960000000003,
-          "endTime": "2009-11-17T18:39:21.000+0000",
+          "endTime": "2009-11-17T18:39:21.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -5063,7 +5063,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:00:00.000+0000",
+          "startTime": "2009-11-17T18:00:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
