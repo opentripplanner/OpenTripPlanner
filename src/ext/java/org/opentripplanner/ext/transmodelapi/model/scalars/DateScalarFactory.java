@@ -21,7 +21,7 @@ public class DateScalarFactory {
     }
 
     public static GraphQLScalarType createSecondsSinceEpochAsDateStringScalar(TimeZone timeZone) {
-        return new GraphQLScalarType("Date", DOCUMENTATION, new Coercing<>() {
+        return GraphQLScalarType.newScalar().name("Date").description(DOCUMENTATION).coercing(new Coercing<>() {
             @Override
             public String serialize(Object input) {
                 if (input instanceof Long) {
@@ -49,6 +49,6 @@ public class DateScalarFactory {
                 }
                 return null;
             }
-        });
+        }).build();
     }
 }
