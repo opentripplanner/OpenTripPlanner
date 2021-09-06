@@ -45,6 +45,7 @@
 - Remove non-GBFS bicycle rental updaters [#3562](https://github.com/opentripplanner/OpenTripPlanner/issues/3562)
 - When importing Netex, allow bicycles on ferries by default [#3596](https://github.com/opentripplanner/OpenTripPlanner/pull/3596)
 
+
 ## 2.0.0 (2020-11-27)
 
 See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
