@@ -13,10 +13,17 @@ import org.slf4j.Marker;
  * </ul>
  * DEBUG and TRACE events are not throttled.
  * <p>
- * It will log just one event for every
- * 3 second interval. The implementation is very simple and do not do any synchronization, so
- * it is possible that less then or more than 1 log event is logged for each period, but that is
- * the only thread safety issue. It is safe to use in multi-threaded cases.
+ * The primary use-case for this class is to prevent a logger for degrading the performance,
+ * because too many events are logged during a short period of time. This could happen if you are
+ * parsing thousands or millions of records and each of them will cause a log event to happen.
+ * <p>
+ * This class is used to wrap the original logger and it will forward only one log event for pr
+ * second.
+ * <p>
+ * THREAD SAFETY - The implementation is very simple and do not do any synchronization, so it is
+ * possible that more than 1 log event is logged for each second, but that is the only thread
+ * safety issue. It is safe to use in multi-threaded cases. See the JavaDoc on the private
+ * {@code throttle()} method for implementation details.
  */
 public class ThrottleLogger implements Logger {
 
@@ -33,27 +40,10 @@ public class ThrottleLogger implements Logger {
     }
 
     /**
-     * Create a new logger and wrap it.
+     * Wrap given logger, and throttle INFO, WARN and ERROR messages.
      */
     public static Logger throttle(Logger log) {
         return new ThrottleLogger(log);
-    }
-
-    /**
-     * This method check if the throttle timeout is set and return {@code true} if it is. It also
-     * set the next timeout. The write/read operations are NOT synchronized witch may cause two
-     * or more concurrent calls to both return {@code false}, hence causing two log events for
-     * the same throttle time period - witch is a minor drawback. The throttle do however
-     * guarantee that at least one event is logged for each throttle time period.
-     */
-    private boolean throttle() {
-        long time = System.currentTimeMillis();
-
-        if(time < timeout) {
-            return true;
-        }
-        timeout = time + STALL_PERIOD_MILLISECONDS;
-        return false;
     }
 
     @Override
@@ -189,31 +179,31 @@ public class ThrottleLogger implements Logger {
 
     @Override
     public void info(String msg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(msg);
     }
 
     @Override
     public void info(String format, Object arg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(format, arg);
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(format, arg1, arg2);
     }
 
     @Override
     public void info(String format, Object... arguments) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(format, arguments);
     }
 
     @Override
     public void info(String msg, Throwable t) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(msg, t);
     }
 
@@ -224,31 +214,31 @@ public class ThrottleLogger implements Logger {
 
     @Override
     public void info(Marker marker, String msg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(marker, msg);
     }
 
     @Override
     public void info(Marker marker, String format, Object arg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(marker, format, arg);
     }
 
     @Override
     public void info(Marker marker, String format, Object arg1, Object arg2) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(marker, format, arg1, arg2);
     }
 
     @Override
     public void info(Marker marker, String format, Object... arguments) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(marker, format, arguments);
     }
 
     @Override
     public void info(Marker marker, String msg, Throwable t) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.info(marker, msg, t);
     }
 
@@ -259,31 +249,31 @@ public class ThrottleLogger implements Logger {
 
     @Override
     public void warn(String msg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(msg);
     }
 
     @Override
     public void warn(String format, Object arg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(format, arg);
     }
 
     @Override
     public void warn(String format, Object... arguments) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(format, arguments);
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(format, arg1, arg2);
     }
 
     @Override
     public void warn(String msg, Throwable t) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(msg, t);
     }
 
@@ -294,31 +284,31 @@ public class ThrottleLogger implements Logger {
 
     @Override
     public void warn(Marker marker, String msg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(marker, msg);
     }
 
     @Override
     public void warn(Marker marker, String format, Object arg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(marker, format, arg);
     }
 
     @Override
     public void warn(Marker marker, String format, Object arg1, Object arg2) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(marker, format, arg1, arg2);
     }
 
     @Override
     public void warn(Marker marker, String format, Object... arguments) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(marker, format, arguments);
     }
 
     @Override
     public void warn(Marker marker, String msg, Throwable t) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.warn(marker, msg, t);
     }
 
@@ -329,31 +319,31 @@ public class ThrottleLogger implements Logger {
 
     @Override
     public void error(String msg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(msg);
     }
 
     @Override
     public void error(String format, Object arg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(format, arg);
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(format, arg1, arg2);
     }
 
     @Override
     public void error(String format, Object... arguments) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(format, arguments);
     }
 
     @Override
     public void error(String msg, Throwable t) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(msg, t);
     }
 
@@ -364,31 +354,53 @@ public class ThrottleLogger implements Logger {
 
     @Override
     public void error(Marker marker, String msg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(marker, msg);
     }
 
     @Override
     public void error(Marker marker, String format, Object arg) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(marker, format, arg);
     }
 
     @Override
     public void error(Marker marker, String format, Object arg1, Object arg2) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(marker, format, arg1, arg2);
     }
 
     @Override
     public void error(Marker marker, String format, Object... arguments) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(marker, format, arguments);
     }
 
     @Override
     public void error(Marker marker, String msg, Throwable t) {
-        if(throttle()) { return; }
+        if (throttle()) { return; }
         delegate.error(marker, msg, t);
+    }
+
+    /**
+     * This method check if the throttle timeout is set and return {@code true} if it is. It also
+     * set the next timeout. The write/read operations are NOT synchronized witch may cause two or
+     * more concurrent calls to both return {@code false}, hence causing two log events for the same
+     * throttle time period - witch is a minor drawback. The throttle do however guarantee that at
+     * least one event is logged for each throttle time period. This is guaranteed based on the
+     * assumption that writing to the {@code timeout} (primitive long) is an atomic operation.
+     * <p>
+     * In a worst case scenario, each thread keep their local version of the {@code timeout} and
+     * one log message from each thread is printed every second. This can behave differently
+     * from one JVM to anther.
+     */
+    private boolean throttle() {
+        long time = System.currentTimeMillis();
+
+        if (time < timeout) {
+            return true;
+        }
+        timeout = time + STALL_PERIOD_MILLISECONDS;
+        return false;
     }
 }
