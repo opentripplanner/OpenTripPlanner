@@ -1,10 +1,8 @@
 package org.opentripplanner.standalone.config;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class NetexConfig {
 
@@ -20,7 +18,7 @@ public class NetexConfig {
 
     private static final String NETEX_FEED_ID = "DefaultFeed";
 
-    private static final List<String> FERRY_WITHOUT_BICYCLE_IDS = Collections.emptyList();
+    private static final Set<String> FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
 
     /**
      * This field is used to identify the specific NeTEx feed. It is used instead of the feed_id
@@ -103,8 +101,6 @@ public class NetexConfig {
         sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);
         groupFilePattern = config.asPattern("groupFilePattern", GROUP_FILE_PATTERN);
         netexFeedId = config.asText("netexFeedId", NETEX_FEED_ID);
-        ferryIdsNotAllowedForBicycle = config.asTexts("ferryIdsNotAllowedForBicycle", FERRY_WITHOUT_BICYCLE_IDS)
-                .stream()
-                .collect(Collectors.toSet());
+        ferryIdsNotAllowedForBicycle = config.asTextSet("ferryIdsNotAllowedForBicycle", FERRY_WITHOUT_BICYCLE_IDS);
     }
 }

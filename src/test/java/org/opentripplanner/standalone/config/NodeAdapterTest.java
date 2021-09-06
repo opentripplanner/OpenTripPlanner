@@ -328,12 +328,12 @@ public class NodeAdapterTest {
     public void asTexts() {
         NodeAdapter subject = newNodeAdapterForTest("{ ids : ['A', 'C', 'F'] }");
         assertEquals(
-                List.of("A", "C", "F"),
-                subject.asTexts("ids", Collections.emptyList())
+                Set.of("A", "C", "F"),
+                subject.asTextSet("ids", Collections.emptySet())
         );
         assertEquals(
-                List.of("X"),
-                subject.asTexts("nonExisting", List.of("X"))
+                Set.of("X"),
+                subject.asTextSet("nonExisting", Set.of("X"))
         );
     }
 }
