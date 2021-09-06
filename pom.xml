@@ -709,7 +709,7 @@
                         <configuration>
                             <filesets>
                                 <fileset>
-                                    <directory>${build.testSourceDirectory}</directory>
+                                    <directory>${project.build.testSourceDirectory}</directory>
                                     <includes>
                                         <include>**/__snapshots__/*</include>
                                         <include>**/__snapshots__</include>
