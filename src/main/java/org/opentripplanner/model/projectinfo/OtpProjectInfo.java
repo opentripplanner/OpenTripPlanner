@@ -22,7 +22,7 @@ public class OtpProjectInfo implements Serializable {
      */
     public final GraphFileHeader graphFileHeaderInfo;
 
-    /** Other info from git-commit-id-plugin via otp-project-info.properties */
+    /** Other info from git-commit-id-maven-plugin via otp-project-info.properties */
     public final VersionControlInfo versionControl;
 
 

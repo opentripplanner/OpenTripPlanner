@@ -107,8 +107,8 @@
                                 </pluginExecution>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
-                                        <groupId>pl.project13.maven</groupId>
-                                        <artifactId>git-commit-id-plugin</artifactId>
+                                        <groupId>io.github.git-commit-id</groupId>
+                                        <artifactId>git-commit-id-maven-plugin</artifactId>
                                         <versionRange>[1.0,)</versionRange>
                                         <goals>
                                             <goal>revision</goal>
@@ -244,9 +244,9 @@
                   Commit information is stored in Maven variables, which are then substituted
                   into the properties file. The plugin has a mode to generate a git.properties file,
                   but we need the Maven project version as well, so we perform substitution. -->
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-                <version>4.0.0</version>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>5.0.0</version>
                 <executions>
                     <execution>
                         <goals>
