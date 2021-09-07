@@ -18,7 +18,7 @@ public class NetexConfig {
 
     private static final String NETEX_FEED_ID = "DefaultFeed";
 
-    private static final Set<String> FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
+    private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
 
     /**
      * This field is used to identify the specific NeTEx feed. It is used instead of the feed_id
@@ -101,6 +101,9 @@ public class NetexConfig {
         sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);
         groupFilePattern = config.asPattern("groupFilePattern", GROUP_FILE_PATTERN);
         netexFeedId = config.asText("netexFeedId", NETEX_FEED_ID);
-        ferryIdsNotAllowedForBicycle = config.asTextSet("ferryIdsNotAllowedForBicycle", FERRY_WITHOUT_BICYCLE_IDS);
+        ferryIdsNotAllowedForBicycle = config.asTextSet(
+                "ferryIdsNotAllowedForBicycle",
+                FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE
+        );
     }
 }

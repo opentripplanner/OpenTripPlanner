@@ -64,8 +64,12 @@ public class NetexConfig {
 
     /** public to enable testing */
     private NetexBundle netexBundle(CompositeDataSource source) {
-        return new NetexBundle(buildParams.netex.netexFeedId, source, hierarchy(source),
-                buildParams.netex.ferryIdsNotAllowedForBicycle);
+        return new NetexBundle(
+                buildParams.netex.netexFeedId,
+                source,
+                hierarchy(source),
+                buildParams.netex.ferryIdsNotAllowedForBicycle
+        );
     }
 
     private NetexDataSourceHierarchy hierarchy(CompositeDataSource source){

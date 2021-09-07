@@ -325,7 +325,7 @@ public class NodeAdapterTest {
     }
 
     @Test
-    public void asTexts() {
+    public void asTextSet() {
         NodeAdapter subject = newNodeAdapterForTest("{ ids : ['A', 'C', 'F'] }");
         assertEquals(
                 Set.of("A", "C", "F"),
