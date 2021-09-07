@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.collections.CollectionUtils;
+
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
@@ -553,7 +553,7 @@ public class TransmodelGraphQLSchema {
                 stops = List.of();
               }
 
-              if (CollectionUtils.isEmpty(stops)) {
+              if (stops.isEmpty()) {
                 return new DefaultConnection<>(
                     Collections.emptyList(),
                     new DefaultPageInfo(null, null, false, false)
@@ -638,7 +638,7 @@ public class TransmodelGraphQLSchema {
 
             List<TransitMode> filterByTransportModes = environment.getArgument("filterByModes");
             List<TransmodelPlaceType> placeTypes = environment.getArgument("filterByPlaceTypes");
-            if (CollectionUtils.isEmpty(placeTypes)) {
+            if (placeTypes == null || placeTypes.isEmpty()) {
               placeTypes = Arrays.asList(TransmodelPlaceType.values());
             }
             List<PlaceType> filterByPlaceTypes = PlaceMapper.mapToDomain(placeTypes);
@@ -673,7 +673,7 @@ public class TransmodelGraphQLSchema {
                     GqlUtil.getRoutingService(environment)
                 )
                 .stream().limit(orgMaxResults).collect(Collectors.toList());
-            if (CollectionUtils.isEmpty(places)) {
+            if (places.isEmpty()) {
               return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
             }
             return new SimpleListConnection(places).get(environment);
@@ -903,17 +903,17 @@ public class TransmodelGraphQLSchema {
                   .getTripForId()
                   .values()
                   .stream()
-                  .filter(t -> CollectionUtils.isEmpty(lineIds) || lineIds.contains(t
+                  .filter(t -> lineIds == null || lineIds.isEmpty() || lineIds.contains(t
                       .getRoute()
                       .getId()))
                   //.filter(t -> CollectionUtils.isEmpty(privateCodes) || privateCodes.contains(t.getTripPrivateCode()))
-                  .filter(t -> CollectionUtils.isEmpty(authorities) || authorities.contains(t
+                  .filter(t -> authorities == null || authorities.isEmpty()  || authorities.contains(t
                       .getRoute()
                       .getAgency()
                       .getId()
                       .getId()))
                   .filter(t -> {
-                    return CollectionUtils.isEmpty(activeDates)
+                    return activeDates == null || activeDates.isEmpty()
                         || GqlUtil.getRoutingService(environment)
                         .getCalendarService()
                         .getServiceDatesForServiceId(t.getServiceId())
@@ -940,7 +940,7 @@ public class TransmodelGraphQLSchema {
                   .getVehicleRentalStationService()
                   .getVehicleRentalStations());
               List<String> filterByIds = environment.getArgument("ids");
-              if (!CollectionUtils.isEmpty(filterByIds)) {
+              if (filterByIds != null && !filterByIds.isEmpty()) {
                 return all
                     .stream()
                     .filter(station -> filterByIds.contains(station.getStationId()))

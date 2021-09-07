@@ -30,7 +30,7 @@ public final class DateTimeScalarFactory {
 
     public static GraphQLScalarType createMillisecondsSinceEpochAsDateTimeStringScalar(TimeZone timeZone) {
 
-        return new GraphQLScalarType("DateTime", DOCUMENTATION, new Coercing<>() {
+        return GraphQLScalarType.newScalar().name("DateTime").description(DOCUMENTATION).coercing(new Coercing<>() {
             @Override
             public String serialize(Object input) {
                 if (input instanceof Long) {
@@ -67,7 +67,7 @@ public final class DateTimeScalarFactory {
                 }
                 return null;
             }
-        });
+        }).build();
     }
 
 }

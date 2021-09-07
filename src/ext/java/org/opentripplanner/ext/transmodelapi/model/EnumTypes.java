@@ -275,7 +275,7 @@ public class EnumTypes {
         .build();
 
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {
-        return type.getCoercing().serialize(value);
+        return type.serialize(value);
     }
 
 
