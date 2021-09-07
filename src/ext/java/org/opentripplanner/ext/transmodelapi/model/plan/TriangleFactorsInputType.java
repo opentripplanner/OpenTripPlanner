@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.transmodelapi.model.framework;
+package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLInputObjectField;

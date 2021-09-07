@@ -11,7 +11,6 @@ import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
-import org.opentripplanner.ext.transmodelapi.model.framework.TriangleFactorsInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 

@@ -658,19 +658,14 @@ public class LegacyGraphQLQueryTypeImpl
         if (optimize == BicycleOptimizeType.TRIANGLE) {
 
           // because we must use a final variable in the lambda we have to use this ugly crutch.
-          final AtomicReference<Double> safety = new AtomicReference<>((double) 0);
-          final AtomicReference<Double> slope = new AtomicReference<>((double) 0);
-          final AtomicReference<Double> time = new AtomicReference<>((double) 0);
+          // Arguments: [ safety, slope, time ]
+          final double[] args = new double[3];
 
-          callWith.argument("triangle.safetyFactor", safety::set);
-          callWith.argument("triangle.slopeFactor", slope::set);
-          callWith.argument("triangle.timeFactor", time::set);
+          callWith.argument("triangle.safetyFactor", (Double v) -> args[0] = v);
+          callWith.argument("triangle.slopeFactor", (Double v) -> args[1] = v);
+          callWith.argument("triangle.timeFactor", (Double v) -> args[2] = v);
 
-          request.setTriangleNormalized(
-                  safety.get(),
-                  slope.get(),
-                  time.get()
-          );
+          request.setTriangleNormalized(args[0], args[1], args[2]);
         }
 
         if (optimize == BicycleOptimizeType.TRANSFERS) {

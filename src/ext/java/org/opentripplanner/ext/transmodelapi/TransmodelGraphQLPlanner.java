@@ -135,20 +135,14 @@ public class TransmodelGraphQLPlanner {
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
 
-            // because we must use a final variable in the lambda we have to use this ugly crutch.
-            final AtomicReference<Double> safety = new AtomicReference<>((double) 0);
-            final AtomicReference<Double> slope = new AtomicReference<>((double) 0);
-            final AtomicReference<Double> time = new AtomicReference<>((double) 0);
+            // Arguments: [ safety, slope, time ]
+            final double[] args = new double[3];
 
-            callWith.argument("triangleFactors.safety", safety::set);
-            callWith.argument("triangleFactors.slope", slope::set);
-            callWith.argument("triangleFactors.time", time::set);
+            callWith.argument("triangleFactors.safety", (Double v) -> args[0] = v);
+            callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
+            callWith.argument("triangleFactors.time", (Double v) -> args[2] = v);
 
-            request.setTriangleNormalized(
-                    safety.get(),
-                    slope.get(),
-                    time.get()
-            );
+            request.setTriangleNormalized(args[0], args[1], args[2]);
         }
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
