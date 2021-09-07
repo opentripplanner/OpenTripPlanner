@@ -2,7 +2,6 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectType;
-import org.apache.commons.collections4.CollectionUtils;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -51,7 +50,7 @@ public class JourneyWhiteListed {
         Collection<FeedScopedId> authorityIds,
         Collection<FeedScopedId> lineIds
     ) {
-        if (CollectionUtils.isEmpty(authorityIds) && CollectionUtils.isEmpty(lineIds)) {
+        if (authorityIds.isEmpty() && lineIds.isEmpty()) {
             return stream;
         }
         return stream.filter(it -> isTripTimeShortAcceptable(
