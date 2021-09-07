@@ -62,9 +62,6 @@ public class OSMDatabase {
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
     private TLongObjectMap<OSMNode> nodesById = new TLongObjectHashMap<>();
 
-    /* Map of all bike-rental nodes, keyed by their OSM ID */
-    private TLongObjectMap<OSMNode> bikeRentalNodes = new TLongObjectHashMap<>();
-
     /* Map of all bike parking nodes, keyed by their OSM ID */
     private TLongObjectMap<OSMNode> bikeParkingNodes = new TLongObjectHashMap<>();
 
@@ -155,10 +152,6 @@ public class OSMDatabase {
         return waysById.size();
     }
 
-    public Collection<OSMNode> getBikeRentalNodes() {
-        return Collections.unmodifiableCollection(bikeRentalNodes.valueCollection());
-    }
-
     public Collection<OSMNode> getBikeParkingNodes() {
         return Collections.unmodifiableCollection(bikeParkingNodes.valueCollection());
     }
@@ -209,9 +202,6 @@ public class OSMDatabase {
     }
 
     public void addNode(OSMNode node) {
-        if (node.isBikeRental()) {
-            bikeRentalNodes.put(node.getId(), node);
-        }
         if (node.isBikeParking()) {
             bikeParkingNodes.put(node.getId(), node);
         }

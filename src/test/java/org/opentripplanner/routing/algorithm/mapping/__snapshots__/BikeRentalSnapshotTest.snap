@@ -69,17 +69,19 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "startTime": "2009-10-21T23:14:55.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -134,7 +136,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehicleRentalOnStation": {
                 "id": "-102309",
                 "lat": 45.5277374,
-                "lon": -122.70038790000001,
+                "lon": -122.7003879,
                 "name": "-102309"
               }
             }
@@ -150,10 +152,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "endTime": "2009-10-21T23:17:37.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
@@ -182,9 +187,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -237,9 +240,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "startTime": "2009-10-21T23:17:37.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -247,9 +253,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -280,9 +284,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "endTime": "2009-10-21T23:20:25.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -320,7 +327,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -340,7 +346,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ],
               "vehicleRentalOffStation": {
                 "id": "-102323",
-                "lat": 45.527849100000005,
+                "lat": 45.5278491,
                 "lon": -122.6942362,
                 "name": "-102323"
               }
@@ -473,7 +479,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -524,7 +529,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -647,7 +651,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -845,7 +848,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -896,7 +898,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -1070,7 +1071,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1268,7 +1268,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -1319,7 +1318,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1493,7 +1491,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "NORTH",
@@ -1640,7 +1637,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -1691,7 +1687,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1797,17 +1792,19 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "startTime": "2009-10-21T23:27:55.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1862,7 +1859,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehicleRentalOnStation": {
                 "id": "-102309",
                 "lat": 45.5277374,
-                "lon": -122.70038790000001,
+                "lon": -122.7003879,
                 "name": "-102309"
               }
             }
@@ -1878,10 +1875,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "endTime": "2009-10-21T23:30:37.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
@@ -1910,9 +1910,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1965,9 +1963,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "startTime": "2009-10-21T23:30:37.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -1975,9 +1976,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -2008,9 +2007,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "endTime": "2009-10-21T23:33:25.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -2048,7 +2050,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -2068,7 +2069,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ],
               "vehicleRentalOffStation": {
                 "id": "-102323",
-                "lat": 45.527849100000005,
+                "lat": 45.5278491,
                 "lon": -122.6942362,
                 "name": "-102323"
               }
@@ -2201,7 +2202,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -2252,7 +2252,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -2358,17 +2357,19 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "startTime": "2009-10-21T23:36:55.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2423,7 +2424,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehicleRentalOnStation": {
                 "id": "-102309",
                 "lat": 45.5277374,
-                "lon": -122.70038790000001,
+                "lon": -122.7003879,
                 "name": "-102309"
               }
             }
@@ -2439,10 +2440,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "endTime": "2009-10-21T23:39:37.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
@@ -2471,9 +2475,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2526,9 +2528,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "startTime": "2009-10-21T23:39:37.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -2536,9 +2541,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -2569,9 +2572,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "endTime": "2009-10-21T23:42:25.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -2609,7 +2615,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -2629,7 +2634,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "streetNotes": [ ],
               "vehicleRentalOffStation": {
                 "id": "-102323",
-                "lat": 45.527849100000005,
+                "lat": 45.5278491,
                 "lon": -122.6942362,
                 "name": "-102323"
               }
@@ -2762,7 +2767,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -2813,7 +2817,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -2898,17 +2901,19 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "startTime": "2009-10-21T23:10:00.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2963,7 +2968,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehicleRentalOnStation": {
                 "id": "-102309",
                 "lat": 45.5277374,
-                "lon": -122.70038790000001,
+                "lon": -122.7003879,
                 "name": "-102309"
               }
             }
@@ -2979,10 +2984,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "endTime": "2009-10-21T23:12:42.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
@@ -3011,9 +3019,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3066,9 +3072,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "startTime": "2009-10-21T23:12:42.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -3076,9 +3085,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -3109,9 +3116,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "endTime": "2009-10-21T23:17:57.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -3142,7 +3152,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -3162,7 +3171,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "streetNotes": [ ],
               "vehicleRentalOffStation": {
                 "id": "-102323",
-                "lat": 45.527849100000005,
+                "lat": 45.5278491,
                 "lon": -122.6942362,
                 "name": "-102323"
               }
@@ -3267,17 +3276,19 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "startTime": "2009-10-21T23:04:22.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3332,7 +3343,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehicleRentalOnStation": {
                 "id": "-102309",
                 "lat": 45.5277374,
-                "lon": -122.70038790000001,
+                "lon": -122.7003879,
                 "name": "-102309"
               }
             }
@@ -3348,10 +3359,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "endTime": "2009-10-21T23:07:18.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
@@ -3380,9 +3394,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3445,9 +3457,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -3566,17 +3576,19 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "startTime": "2009-10-21T23:10:00.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3631,7 +3643,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehicleRentalOnStation": {
                 "id": "-102309",
                 "lat": 45.5277374,
-                "lon": -122.70038790000001,
+                "lon": -122.7003879,
                 "name": "-102309"
               }
             }
@@ -3647,10 +3659,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "endTime": "2009-10-21T23:12:42.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
@@ -3679,9 +3694,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3744,9 +3757,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "EAST",
@@ -3909,7 +3920,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -4073,7 +4083,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -4115,9 +4124,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "startTime": "2009-10-21T23:23:32.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -4125,7 +4137,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "NORTH",
@@ -4162,7 +4173,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ],
               "vehicleRentalOnStation": {
                 "id": "-102323",
-                "lat": 45.527849100000005,
+                "lat": 45.5278491,
                 "lon": -122.6942362,
                 "name": "-102323"
               }
@@ -4179,9 +4190,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "endTime": "2009-10-21T23:26:39.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -4211,9 +4225,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -4266,19 +4278,20 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "startTime": "2009-10-21T23:26:39.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "NORTH",
@@ -4309,10 +4322,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "endTime": "2009-10-21T23:28:51.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
@@ -4341,7 +4357,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4362,7 +4377,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehicleRentalOffStation": {
                 "id": "-102309",
                 "lat": 45.5277374,
-                "lon": -122.70038790000001,
+                "lon": -122.7003879,
                 "name": "-102309"
               }
             },
@@ -4504,7 +4519,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -4668,7 +4682,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -4719,7 +4732,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -4893,7 +4905,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -5074,7 +5085,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -5125,7 +5135,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -5282,7 +5291,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -5446,7 +5454,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -5488,9 +5495,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "startTime": "2009-10-21T23:38:32.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -5498,7 +5508,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "NORTH",
@@ -5535,7 +5544,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "streetNotes": [ ],
               "vehicleRentalOnStation": {
                 "id": "-102323",
-                "lat": 45.527849100000005,
+                "lat": 45.5278491,
                 "lon": -122.6942362,
                 "name": "-102323"
               }
@@ -5552,9 +5561,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "endTime": "2009-10-21T23:41:39.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102323",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102323"
+            },
             "coordinate": {
-              "latitude": 45.527849100000005,
+              "latitude": 45.5278491,
               "longitude": -122.6942362
             },
             "name": "-102323",
@@ -5584,9 +5596,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -5639,19 +5649,20 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "startTime": "2009-10-21T23:41:39.000+00:00",
           "streetNotes": [ ],
           "to": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [
-            "test-network"
-          ],
+          "vehicleRentalNetwork": "test-network",
           "walkSteps": [
             {
               "absoluteDirection": "NORTH",
@@ -5682,10 +5693,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "endTime": "2009-10-21T23:43:51.000+00:00",
           "flexibleTrip": false,
           "from": {
-            "bikeShareId": "-102309",
+            "bikeShareId": {
+              "feedId": "test-network",
+              "id": "-102309"
+            },
             "coordinate": {
               "latitude": 45.5277374,
-              "longitude": -122.70038790000001
+              "longitude": -122.7003879
             },
             "name": "-102309",
             "vertexType": "BIKESHARE"
@@ -5714,7 +5728,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -5735,7 +5748,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehicleRentalOffStation": {
                 "id": "-102309",
                 "lat": 45.5277374,
-                "lon": -122.70038790000001,
+                "lon": -122.7003879,
                 "name": "-102309"
               }
             },
@@ -5877,7 +5890,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -6041,7 +6053,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -6092,7 +6103,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -6266,7 +6276,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -6447,7 +6456,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -6498,7 +6506,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
