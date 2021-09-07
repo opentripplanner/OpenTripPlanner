@@ -161,7 +161,6 @@ Here is a list of all features witch can be toggled on/off.
 
 Feature | Description | Enabled by default | Sandbox
 --------|-------------|--------------------|-------- 
-`APIExternalGeocoder` | Enable the geocode endpoint | yes | no
 `APIBikeRental` | Enable the bike rental endpoint | yes | no
 `APIServerInfo` | Enable the server info endpoint |  yes | no
 `APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no

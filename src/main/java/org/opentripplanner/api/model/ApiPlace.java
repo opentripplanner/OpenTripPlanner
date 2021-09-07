@@ -1,7 +1,5 @@
 package org.opentripplanner.api.model;
 
-import org.opentripplanner.util.Constants;
-
 import java.util.Calendar;
 
 /** 
@@ -75,11 +73,4 @@ public class ApiPlace {
      * In case the vertex is of type Bike sharing station.
      */
     public String bikeShareId;
-
-    /**
-     * Returns the geometry in GeoJSON format
-     */
-    String getGeometry() {
-        return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
-    }
 }
