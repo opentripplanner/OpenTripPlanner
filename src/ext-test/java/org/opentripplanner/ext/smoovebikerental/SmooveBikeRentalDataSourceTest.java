@@ -31,7 +31,7 @@ class SmooveBikeRentalDataSourceTest {
 
         VehicleRentalStation hamn = rentalStations.get(0);
         assertEquals("Hamn", hamn.name.toString());
-        assertEquals("A04", hamn.id);
+        assertEquals("A04", hamn.getStationId());
         // Ignore whitespace in coordinates string
         assertEquals(24.952269, hamn.longitude);
         assertEquals(60.167913, hamn.latitude);
@@ -40,7 +40,7 @@ class SmooveBikeRentalDataSourceTest {
 
         VehicleRentalStation fake = rentalStations.get(1);
         assertEquals("Fake", fake.name.toString());
-        assertEquals("B05", fake.id);
+        assertEquals("B05", fake.getStationId());
         assertEquals(24.0, fake.longitude);
         assertEquals(60.0, fake.latitude);
         // operative: false overrides available bikes and slots
@@ -49,7 +49,7 @@ class SmooveBikeRentalDataSourceTest {
 
         VehicleRentalStation foo = rentalStations.get(2);
         assertEquals("Foo", foo.name.toString());
-        assertEquals("B06", foo.id);
+        assertEquals("B06", foo.getStationId());
         assertEquals(25.0, foo.longitude);
         assertEquals(61.0, foo.latitude);
         assertEquals(5, foo.spacesAvailable);

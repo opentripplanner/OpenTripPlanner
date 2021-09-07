@@ -10,7 +10,6 @@ public class VehicleRentalUpdaterConfig {
     String sourceType = c.asText("sourceType");
     return new VehicleRentalUpdaterParameters(
         configRef + "." + sourceType,
-        c.asText("networks", null),
         c.asInt("frequencySec", 60),
         VehicleRentalSourceFactory.create(sourceType, c)
     );

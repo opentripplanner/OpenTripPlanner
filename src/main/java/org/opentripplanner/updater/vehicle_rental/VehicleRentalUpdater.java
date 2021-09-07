@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_rental;
 
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -19,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,17 +36,15 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private GraphUpdaterManager updaterManager;
 
-    Map<String, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
+    Map<FeedScopedId, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
 
-    Map<String, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
+    Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
 
     private final VehicleRentalDataSource source;
 
     private VertexLinker linker;
 
     private VehicleRentalStationService service;
-
-    private final String network;
 
     public VehicleRentalUpdater(VehicleRentalUpdaterParameters parameters) throws IllegalArgumentException {
         super(parameters);
@@ -56,7 +54,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         VehicleRentalDataSource source = VehicleRentalDataSourceFactory.create(parameters.sourceParameters());
 
         this.source = source;
-        this.network = parameters.getNetworks();
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating vehicle-rental updater running once only (non-polling): {}", source);
         } else {
@@ -106,15 +103,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 		@Override
         public void run(Graph graph) {
             // Apply stations to graph
-            Set<String> stationSet = new HashSet<>();
-            Set<String> defaultNetworks = new HashSet<>(Collections.singletonList(network));
+            Set<FeedScopedId> stationSet = new HashSet<>();
 
             /* add any new stations and update vehicle counts for existing stations */
             for (VehicleRentalStation station : stations) {
-                if (station.networks == null) {
-                    /* API did not provide a network list, use default */
-                    station.networks = defaultNetworks;
-                }
                 service.addVehicleRentalStation(station);
                 stationSet.add(station.id);
                 VehicleRentalStationVertex vehicleRentalVertex = verticesByStation.get(station.id);
@@ -142,15 +134,15 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                 }
             }
             /* remove existing stations that were not present in the update */
-            List<String> toRemove = new ArrayList<>();
-            for (Entry<String, VehicleRentalStationVertex> entry : verticesByStation.entrySet()) {
-                String station = entry.getKey();
+            List<FeedScopedId> toRemove = new ArrayList<>();
+            for (Entry<FeedScopedId, VehicleRentalStationVertex> entry : verticesByStation.entrySet()) {
+                FeedScopedId station = entry.getKey();
                 if (stationSet.contains(station))
                     continue;
                 toRemove.add(station);
                 service.removeVehicleRentalStation(station);
             }
-            for (String station : toRemove) {
+            for (FeedScopedId station : toRemove) {
                 // post-iteration removal to avoid concurrent modification
                 verticesByStation.remove(station);
                 tempEdgesByStation.get(station).disposeEdges();

@@ -52,7 +52,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -379,7 +378,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -560,7 +558,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -611,7 +608,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -768,7 +764,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -898,7 +893,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -949,7 +943,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1089,7 +1082,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1270,7 +1262,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -1321,7 +1312,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1478,7 +1468,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1608,7 +1597,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -1659,7 +1647,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1803,7 +1790,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -1950,7 +1936,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -2061,7 +2046,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -2112,7 +2096,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -2213,7 +2196,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2495,7 +2477,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2642,7 +2623,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -2693,7 +2673,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -2890,7 +2869,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3037,7 +3015,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -3088,7 +3065,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -3285,7 +3261,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3432,7 +3407,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -3483,7 +3457,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "WEST",
@@ -3684,7 +3657,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -3814,7 +3786,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -3925,7 +3896,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -3976,7 +3946,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4122,7 +4091,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4286,7 +4254,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "wheelchairAccessible": 0
           },
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [ ],
           "walkingLeg": false
         },
@@ -4337,7 +4304,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -4449,7 +4415,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "NORTH",
@@ -4822,7 +4787,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "SOUTH",
@@ -5076,7 +5040,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           },
           "transitAlerts": [ ],
           "transitLeg": false,
-          "vehicleRentalNetworks": [ ],
           "walkSteps": [
             {
               "absoluteDirection": "NORTHWEST",

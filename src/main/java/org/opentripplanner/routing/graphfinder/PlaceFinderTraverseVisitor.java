@@ -36,7 +36,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   private final Set<String> filterByBikeRentalStation;
   private final Set<String> seenPatternAtStops = new HashSet<>();
   private final Set<FeedScopedId> seenStops = new HashSet<>();
-  private final Set<String> seenBicycleRentalStations = new HashSet<>();
+  private final Set<FeedScopedId> seenBicycleRentalStations = new HashSet<>();
   private final boolean includeStops;
   private final boolean includePatternAtStops;
   private final boolean includeBikeShares;
@@ -142,7 +142,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
   private void handleBikeRentalStation(VehicleRentalStation station, double distance) {
     if (!includeBikeShares) { return; }
-    if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.id)) {
+    if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.getStationId())) {
       return;
     }
     if (seenBicycleRentalStations.contains(station.id)) { return; }
