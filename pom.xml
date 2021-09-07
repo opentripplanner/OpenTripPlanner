@@ -109,7 +109,7 @@
                                     <pluginExecutionFilter>
                                         <groupId>io.github.git-commit-id</groupId>
                                         <artifactId>git-commit-id-maven-plugin</artifactId>
-                                        <versionRange>[1.0,)</versionRange>
+                                        <versionRange>5.0.0</versionRange>
                                         <goals>
                                             <goal>revision</goal>
                                         </goals>
