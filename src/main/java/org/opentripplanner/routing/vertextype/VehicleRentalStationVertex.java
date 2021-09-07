@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.vertextype;
 
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -21,7 +22,7 @@ public class VehicleRentalStationVertex extends Vertex {
 
     private int spacesAvailable;
 
-    private String id;
+    private FeedScopedId id;
 
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean isCarStation;
@@ -58,11 +59,11 @@ public class VehicleRentalStationVertex extends Vertex {
         this.spacesAvailable = spaces;
     }
 
-    public String getId() {
+    public FeedScopedId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(FeedScopedId id) {
         this.id = id;
     }
 

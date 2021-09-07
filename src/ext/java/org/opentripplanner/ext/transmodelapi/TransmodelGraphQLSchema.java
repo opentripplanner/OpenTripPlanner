@@ -943,7 +943,7 @@ public class TransmodelGraphQLSchema {
               if (!CollectionUtils.isEmpty(filterByIds)) {
                 return all
                     .stream()
-                    .filter(station -> filterByIds.contains(station.id))
+                    .filter(station -> filterByIds.contains(station.getStationId()))
                     .collect(Collectors.toList());
               }
               return all;
@@ -964,7 +964,7 @@ public class TransmodelGraphQLSchema {
                   .getVehicleRentalStationService()
                   .getVehicleRentalStations()
                   .stream()
-                  .filter(bikeRentalStation -> bikeRentalStation.id.equals(environment.getArgument(
+                  .filter(bikeRentalStation -> bikeRentalStation.getStationId().equals(environment.getArgument(
                       "id")))
                   .findFirst()
                   .orElse(null);

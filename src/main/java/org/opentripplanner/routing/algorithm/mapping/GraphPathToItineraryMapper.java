@@ -296,9 +296,9 @@ public abstract class GraphPathToItineraryMapper {
         leg.rentedVehicle = states[0].isBikeRenting();
 
         if (leg.rentedVehicle) {
-            Set<String> vehicleRentalNetworks = states[0].getVehicleRentalNetworks();
-            if (vehicleRentalNetworks != null) {
-                leg.addVehicleRentalNetworks(states[0].getVehicleRentalNetworks());
+            String vehicleRentalNetwork = states[0].getVehicleRentalNetwork();
+            if (vehicleRentalNetwork != null) {
+                leg.setVehicleRentalNetwork(vehicleRentalNetwork);
             }
         }
 

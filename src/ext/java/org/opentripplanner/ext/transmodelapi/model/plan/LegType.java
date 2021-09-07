@@ -299,6 +299,9 @@ public class LegType {
             .newFieldDefinition()
             .name("bikeRentalNetworks")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+            .dataFetcher(env ->
+                    leg(env).vehicleRentalNetwork == null ? List.of() : List.of(leg(env).vehicleRentalNetwork)
+            )
             .build())
         .build();
   }
