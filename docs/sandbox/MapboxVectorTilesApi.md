@@ -42,7 +42,7 @@ The feature must be configured in `router-config.json` as follows
     },
     {
       "name": "citybikes",
-      "type": "BikeRental",
+      "type": "VehicleRental",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
