@@ -9,6 +9,7 @@
 ## Changelog
 - 2020-07-09: Initial version of Mapbox vector tiles API
 - 2021-05-12: Make expansion factor configurable
+- 2021-09-07: Rename `BikeRental` to `VehicleRental`
 
 ## Documentation
 
@@ -42,7 +43,7 @@ The feature must be configured in `router-config.json` as follows
     },
     {
       "name": "citybikes",
-      "type": "BikeRental",
+      "type": "VehicleRental",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
