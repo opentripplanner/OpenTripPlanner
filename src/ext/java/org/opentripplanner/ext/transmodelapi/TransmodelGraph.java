@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 class TransmodelGraph {
 
     static final Logger LOG = LoggerFactory.getLogger(TransmodelGraph.class);
+
+    static private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final GraphQLSchema indexSchema;
 
@@ -83,7 +87,11 @@ class TransmodelGraph {
         HashMap<String, Object> content = getGraphQLExecutionResult(
                 query, router, variables, operationName, maxResolves
         );
-        return res.entity(content).build();
+        try {
+            return res.entity(objectMapper.writeValueAsString(content)).build();
+        } catch (JsonProcessingException e) {
+            return Response.serverError().build();
+        }
     }
 
     private List<Map<String, Object>> mapErrors(Collection<?> errors) {

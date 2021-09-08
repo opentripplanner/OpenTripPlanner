@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.util.Charsets;
 import com.google.common.io.Resources;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -35,6 +37,8 @@ import java.util.stream.Collectors;
 class LegacyGraphQLIndex {
 
   static final Logger LOG = LoggerFactory.getLogger(LegacyGraphQLIndex.class);
+
+  static private final ObjectMapper objectMapper = new ObjectMapper();
 
   static private final GraphQLSchema indexSchema = buildSchema();
 
@@ -157,7 +161,12 @@ class LegacyGraphQLIndex {
         timeoutMs,
         locale
     );
-    return res.entity(content).build();
+
+    try {
+      return res.entity(objectMapper.writeValueAsString(content)).build();
+    } catch (JsonProcessingException e) {
+      return Response.serverError().build();
+    }
   }
 
   static private List<Map<String, Object>> mapErrors(Collection<?> errors) {
