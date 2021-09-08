@@ -2,12 +2,17 @@ package org.opentripplanner.index.model;
 
 import com.beust.jcommander.internal.Lists;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Represents a pattern but only showing a subset of the available information. Optionally includes
+ * geometry of the pattern.
+ */
 public class PatternShort {
 
     public String id;
@@ -15,37 +20,27 @@ public class PatternShort {
     public EncodedPolylineBean geometry;
 
     /**
-     * Constructor for maintaining backwards compatibility
+     * Constructor for when includeGeometry parameter is not passed
      */
     public PatternShort (TripPattern pattern) {
-        this(pattern, null);
+        this(pattern, false);
     }
 
     /**
      * Constructor for when geometry is passed
      */
-    public PatternShort (TripPattern pattern, EncodedPolylineBean geometries) {
+    public PatternShort (TripPattern pattern, boolean includeGeometry) {
         id = pattern.code;
         desc = pattern.name;
-        geometry = geometries;
-    }
-
-    /**
-     * If geometry is passed, pattern input must also be List to allow indexing.
-     */
-    public static List<PatternShort> list (List<TripPattern> in, List<EncodedPolylineBean> geometries) {
-        List<PatternShort> out = Lists.newArrayList();
-        for (int i = 0; i < in.size(); i++) {
-            out.add(new PatternShort(in.get(i), geometries == null ? null : geometries.get(i)));
+        if (includeGeometry) {
+            geometry = PolylineEncoder.createEncodings(pattern.geometry);
         }
-        return out;
     }
 
-    /**
-     * Maintain backwards compatibility for when geometry is not supplied
-     */
-    public static List<PatternShort> list (Collection<TripPattern> in) {
-        return list(new ArrayList<>(in), null);
+    public static List<PatternShort> list (Collection<TripPattern> in, boolean includeGeometry) {
+        List<PatternShort> out = Lists.newArrayList();
+        for (TripPattern pattern : in) out.add(new PatternShort(pattern, includeGeometry));
+        return out;
     }
 
 }

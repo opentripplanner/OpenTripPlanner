@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Responsible for importing file of GTFS-RT into memory
+ * Responsible for reading GTFS-rt vehicle positions from a local file and loading into memory.
  */
 public class GtfsRealtimeFileVehiclePositionSource implements VehiclePositionSource, JsonConfigurable {
     private static final Logger LOG =

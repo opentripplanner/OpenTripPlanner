@@ -241,7 +241,7 @@ public class IndexAPI {
        Stop stop = index.stopForId.get(id);
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        Collection<TripPattern> patterns = index.patternsForStop.get(stop);
-       return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
+       return Response.status(Status.OK).entity(PatternShort.list(patterns, false)).build();
    }
 
     /** Return upcoming vehicle arrival/departure times at the given stop.
@@ -363,18 +363,7 @@ public class IndexAPI {
        Route route = index.routeForId.get(routeId);
        if (route != null) {
            Collection<TripPattern> patterns = index.patternsForRoute.get(route);
-           List<PatternShort> output;
-
-           if (includeGeometry) {
-               List<EncodedPolylineBean> patternGeometries = patterns
-                       .stream()
-                       .map(pattern -> PolylineEncoder.createEncodings(pattern.geometry))
-                       .collect(Collectors.toList());
-               output = PatternShort.list(new ArrayList<>(patterns), patternGeometries);
-           } else {
-               output = PatternShort.list(patterns);
-           }
-
+           List<PatternShort> output = PatternShort.list(patterns, includeGeometry);
            return Response.status(Status.OK).entity(output).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -514,7 +503,7 @@ public class IndexAPI {
    @Path("/patterns")
    public Response getPatterns () {
        Collection<TripPattern> patterns = index.patternForId.values();
-       return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
+       return Response.status(Status.OK).entity(PatternShort.list(patterns, false)).build();
    }
 
    @GET

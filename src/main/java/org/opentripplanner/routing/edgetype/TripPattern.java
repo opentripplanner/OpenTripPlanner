@@ -92,8 +92,8 @@ public class TripPattern implements Cloneable, Serializable {
      */
     public final Timetable scheduledTimetable = new Timetable(this);
 
-    /** Map of trip IDs to current vehicle positions. Will be an empty array if none are found. */
-    public HashMap<String, RealtimeVehiclePosition> vehiclePositions = new HashMap<>();
+    /** Map of trip IDs to current vehicle positions. If no vehicle positions are mapped, will be empty. */
+    public Map<String, RealtimeVehiclePosition> vehiclePositions = new HashMap<>();
 
     /** The human-readable, unique name for this trip pattern. */
     public String name;
