@@ -2,7 +2,6 @@ package org.opentripplanner.ext.transmodelapi;
 
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
-import java.util.concurrent.atomic.AtomicReference;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
