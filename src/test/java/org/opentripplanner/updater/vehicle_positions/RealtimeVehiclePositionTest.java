@@ -111,6 +111,7 @@ public class RealtimeVehiclePositionTest extends GtfsTest {
         // The number of total vehicle positions in this state is difficult to predict, but given the
         // test data is 1016. After cleaning, the number is predictable again and should be the same
         // as the number of realtime vehicles in the imported feed
+        Assert.assertNotEquals(realtimeVehicleCount, updatedRealtimeVehicleCount);
         Assert.assertEquals(1016, updatedRealtimeVehicleCount);
 
         // "clean" patterns
