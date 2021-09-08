@@ -19,6 +19,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
@@ -125,10 +126,18 @@ public class GraphBuilder implements Runnable {
             osmModule.banDiscouragedBiking = config.banDiscouragedBiking;
             osmModule.maxAreaNodes = config.maxAreaNodes;
             graphBuilder.addModule(osmModule);
-            PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
-            pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-            pruneFloatingIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-            graphBuilder.addModule(pruneFloatingIslands);
+	    if (OTPFeature.PruneIslands.isOn()) { // original pruning
+                PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
+                pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+                pruneFloatingIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+                graphBuilder.addModule(pruneFloatingIslands);
+            }
+            if (OTPFeature.PruneNoThru.isOn()) { // more advanced island pruning
+                PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands();
+                pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+                pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+                graphBuilder.addModule(pruneNoThruIslands);
+            }
         }
         if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();

@@ -14,14 +14,6 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
 
-    private static final Color THRU_TRAFFIC_COLOR = Color.LIGHT_GRAY;
-
-    private static final Color NO_THRU_TRAFFIC_COLOR = Color.RED;
-
-    private static final Color NO_BICYCLE_THRU_TRAFFIC_COLOR = Color.BLUE;
-
-    private static final Color NO_CAR_THRU_TRAFFIC_COLOR = Color.ORANGE;
-
     public NoThruTrafficEdgeRenderer() {
     }
 
@@ -29,22 +21,28 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
     public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
         if (e instanceof StreetEdge) {
             StreetEdge pse = (StreetEdge) e;
-            if (pse.isBicycleNoThruTraffic() && pse.isMotorVehicleNoThruTraffic()) {
-                attrs.color = NO_THRU_TRAFFIC_COLOR;
-                attrs.label = "no thru traffic";
+	    int r = 200, g = 0, b = 0;
+
+	    attrs.label = "";
+
+	    if (pse.isWalkNoThruTraffic()) {
+                attrs.label = " walk ";
+	    } else {
+	        g = 200;
+	    }
+	    if (pse.isBicycleNoThruTraffic()) {
+                attrs.label += " bike";
+            } else {
+	        b = 200;
+	    }
+            if (pse.isMotorVehicleNoThruTraffic()) {
+                attrs.label += " car";
+		r = 255;
             }
-            else if (pse.isBicycleNoThruTraffic()) {
-                attrs.color = NO_BICYCLE_THRU_TRAFFIC_COLOR;
-                attrs.label = "no bicycle thru traffic";
-            }
-            else if (pse.isMotorVehicleNoThruTraffic()) {
-                attrs.color = NO_CAR_THRU_TRAFFIC_COLOR;
-                attrs.label = "no car thru traffic";
-            }
-            else {
-                attrs.color = THRU_TRAFFIC_COLOR;
-                attrs.label = "";
-            }
+            attrs.color = new Color(r, g, b);
+            if (!attrs.label.equals("")) {
+		attrs.label = "No" + attrs.label + " thru traffic";
+	    }
         }
         else {
             return false;

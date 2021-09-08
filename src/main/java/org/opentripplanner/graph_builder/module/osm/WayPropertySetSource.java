@@ -61,14 +61,22 @@ public interface WayPropertySetSource {
 		return isGeneralNoThroughTraffic(way) || "destination".equals(motorVehicle);
 	}
 
+	/**
+	 * Returns true if through traffic for bicycle is not allowed.
+	 */
 	default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
 		String bicycle = way.getTag("bicycle");
 		return isGeneralNoThroughTraffic(way) || "destination".equals(bicycle);
 	}
 
 	/**
-	 * Returns true if through traffic for bicycle is not allowed.
+	 * Returns true if through traffic for walk is not allowed.
 	 */
+	default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+		String foot = way.getTag("foot");
+		return isGeneralNoThroughTraffic(way) || "destination".equals(foot);
+	}
+
 	default boolean isGeneralNoThroughTraffic(OSMWithTags way) {
 		String access = way.getTag("access");
 		return "destination".equals(access) || "private".equals(access)

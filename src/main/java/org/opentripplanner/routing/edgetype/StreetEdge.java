@@ -72,9 +72,10 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
     private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
     private static final int BICYCLE_NOTHRUTRAFFIC = 7;
+    private static final int WALK_NOTHRUTRAFFIC = 8;
 
     /** back, roundabout, stairs, ... */
-    private byte flags;
+    private short flags;
 
     /**
      * Length is stored internally as 32-bit fixed-point (millimeters). This allows edges of up to ~2100km.
@@ -495,6 +496,10 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             return isMotorVehicleNoThruTraffic();
         }
 
+	if (traverseMode.isWalking()) {
+            return isWalkNoThruTraffic();
+        }
+	
         return false;
     }
 
@@ -682,7 +687,15 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 	    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
 	}
 
-	public boolean isMotorVehicleNoThruTraffic() {
+	public boolean isWalkNoThruTraffic() {
+            return BitSetUtils.get(flags, WALK_NOTHRUTRAFFIC);
+	}
+
+	public void setWalkNoThruTraffic(boolean noThruTraffic) {
+	    flags = BitSetUtils.set(flags, WALK_NOTHRUTRAFFIC, noThruTraffic);
+	}
+
+        public boolean isMotorVehicleNoThruTraffic() {
             return BitSetUtils.get(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC);
 	}
 
@@ -690,13 +703,13 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 	    flags = BitSetUtils.set(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC, noThruTraffic);
 	}
 
-    public boolean isBicycleNoThruTraffic() {
-        return BitSetUtils.get(flags, BICYCLE_NOTHRUTRAFFIC);
-    }
+        public boolean isBicycleNoThruTraffic() {
+            return BitSetUtils.get(flags, BICYCLE_NOTHRUTRAFFIC);
+        }
 
-    public void setBicycleNoThruTraffic(boolean noThruTraffic) {
-        flags = BitSetUtils.set(flags, BICYCLE_NOTHRUTRAFFIC, noThruTraffic);
-    }
+        public void setBicycleNoThruTraffic(boolean noThruTraffic) {
+            flags = BitSetUtils.set(flags, BICYCLE_NOTHRUTRAFFIC, noThruTraffic);
+        }
 
 	/**
 	 * This street is a staircase
@@ -834,15 +847,17 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
         if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
             e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
-                e1.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
-                e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
+            e1.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
+            e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
+            e1.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e1.setStreetClass(this.getStreetClass());
             tempEdges.addEdge(e1);
         }
         if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
             e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
-                e2.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
-                e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
+            e2.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
+            e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
+            e2.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e2.setStreetClass(this.getStreetClass());
             tempEdges.addEdge(e2);
         }

@@ -681,6 +681,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             Set<T2<StreetNote, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
             boolean motorVehicleNoThrough = wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
             boolean bicycleNoThrough = wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
+            boolean walkNoThrough = wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(way);
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().first;
@@ -694,6 +695,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
                 street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
                 street.setBicycleNoThruTraffic(bicycleNoThrough);
+		street.setWalkNoThruTraffic(walkNoThrough);
             }
 
             if (backStreet != null) {
@@ -708,6 +710,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
                 backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
                 backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
+		backStreet.setWalkNoThruTraffic(walkNoThrough);
             }
         }
 
