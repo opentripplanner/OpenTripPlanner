@@ -220,7 +220,7 @@ public class ItineraryFilterChainBuilder {
                 filters.add(
                     new GroupBySimilarLegsFilter(
                         it.groupByP,
-                        it.maxNumOfItinerariesPrGroup,
+                        it.maxNumOfItinerariesPerGroup,
                         new SortOnGeneralizedCost()
                     )
                 );

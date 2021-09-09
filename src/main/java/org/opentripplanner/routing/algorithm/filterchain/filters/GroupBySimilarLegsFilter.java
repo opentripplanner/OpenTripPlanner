@@ -20,20 +20,20 @@ public class GroupBySimilarLegsFilter extends GroupByFilter<GroupByTripIdAndDist
    *
    * @param groupByP                   The percentage of the distance the main-legs must
    *                                   constitute to make up the "main" part of the itinerary.
-   * @param maxNumOfItinerariesPrGroup The number of elements we reduce each group down to.
+   * @param maxNumOfItinerariesPerGroup The number of elements we reduce each group down to.
    * @param sortOrder                  Each group is sorted using the {@code sortOrder}, before
    *                                   elements are removed from the tail of the sorted list.
    */
-  public GroupBySimilarLegsFilter(double groupByP, int maxNumOfItinerariesPrGroup, SortFilter sortOrder) {
+  public GroupBySimilarLegsFilter(double groupByP, int maxNumOfItinerariesPerGroup, SortFilter sortOrder) {
     super(
-        name(groupByP, maxNumOfItinerariesPrGroup),
+        name(groupByP, maxNumOfItinerariesPerGroup),
         it -> new GroupByTripIdAndDistance(it, groupByP),
         sortOrder,
-        maxNumOfItinerariesPrGroup
+        maxNumOfItinerariesPerGroup
     );
   }
 
-  private static String name(double groupByP, int maxNumOfItinerariesPrGroup) {
-    return "similar-legs-filter-" + (int)(100d * groupByP) + "p-" + maxNumOfItinerariesPrGroup + "x";
+  private static String name(double groupByP, int maxNumOfItinerariesPerGroup) {
+    return "similar-legs-filter-" + (int)(100d * groupByP) + "p-" + maxNumOfItinerariesPerGroup + "x";
   }
 }

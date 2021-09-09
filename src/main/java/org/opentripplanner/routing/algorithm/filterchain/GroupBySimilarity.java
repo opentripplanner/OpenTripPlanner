@@ -4,7 +4,7 @@ import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
  * Group itineraries by similarity and reduce the number of itineraries down to an given
- * maximum number of itineraries pr group.
+ * maximum number of itineraries per group.
  * <p>
  * Group itineraries by the main legs and keeping approximately the given total number of
  * itineraries. The itineraries are grouped by the legs that account for more then 'p' % for the
@@ -45,19 +45,19 @@ public class GroupBySimilarity {
   /**
    * Set a maximum number of itineraries to keep for each group.
    */
-  public final int maxNumOfItinerariesPrGroup;
+  public final int maxNumOfItinerariesPerGroup;
 
 
-  public GroupBySimilarity(double groupByP, int maxNumOfItinerariesPrGroup) {
+  public GroupBySimilarity(double groupByP, int maxNumOfItinerariesPerGroup) {
     this.groupByP = groupByP;
-    this.maxNumOfItinerariesPrGroup = maxNumOfItinerariesPrGroup;
+    this.maxNumOfItinerariesPerGroup = maxNumOfItinerariesPerGroup;
   }
 
   @Override
   public String toString() {
     return ToStringBuilder.of(GroupBySimilarity.class)
         .addNum("groupByP", groupByP)
-        .addNum("approximateMinLimit", maxNumOfItinerariesPrGroup)
+        .addNum("maxNumOfItinerariesPerGroup", maxNumOfItinerariesPerGroup)
         .toString();
   }
 }
