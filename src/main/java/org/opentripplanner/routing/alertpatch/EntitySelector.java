@@ -65,7 +65,7 @@ public interface EntitySelector {
     public final FeedScopedId tripId;
     public final ServiceDate serviceDate;
 
-    private transient int hash = 0;
+    private transient int hash = -1;
 
     public Trip(FeedScopedId tripId) {this(tripId, null);}
     public Trip(FeedScopedId tripId, ServiceDate serviceDate) {
@@ -90,7 +90,7 @@ public interface EntitySelector {
 
     @Override
     public int hashCode() {
-      if ( hash == 0) {
+      if ( hash == -1) {
         int serviceDateResult = serviceDate == null ? 0 : serviceDate.hashCode();
         hash = 31 * serviceDateResult + tripId.hashCode();
       }
@@ -167,7 +167,7 @@ public interface EntitySelector {
     private final FeedScopedId stop;
     private final FeedScopedId routeOrTrip;
     private final ServiceDate serviceDate;
-    private transient int hash = 0;
+    private transient int hash = -1;
 
     public StopAndRouteOrTripKey(FeedScopedId stop, FeedScopedId routeOrTrip) {
       this(stop, routeOrTrip, null);
@@ -202,7 +202,7 @@ public interface EntitySelector {
 
     @Override
     public int hashCode() {
-      if (hash == 0) {
+      if (hash == -1) {
         int stopResult = stop.hashCode();
         int serviceDateResult = serviceDate == null ? 0:serviceDate.hashCode();
         hash = 31 * stopResult + 31 * serviceDateResult + routeOrTrip.hashCode();
