@@ -7,9 +7,10 @@ import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 /**
  * A reference to a pattern at a specific stop.
@@ -61,13 +62,13 @@ public class PatternAtStop {
    * @param startTime          Start time for the search. Seconds from UNIX epoch
    * @param timeRange          Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch
-   * @param omitNonPickups     If true, do not include vehicles that will not pick up passengers.
+   * @param arrivalDeparture   Filter by arrivals, departures, or both
    * @param omitCanceled       If true, do not include trips which have been cancelled.
    * @return                   A list of stop times
    */
-  public List<TripTimeShort> getStoptimes(
+  public List<TripTimeOnDate> getStoptimes(
       RoutingService routingService, long startTime, int timeRange, int numberOfDepartures,
-      boolean omitNonPickups, boolean omitCanceled
+      ArrivalDeparture arrivalDeparture, boolean omitCanceled
   ) {
     return routingService.stopTimesForPatternAtStop(
         stop,
@@ -75,7 +76,7 @@ public class PatternAtStop {
         startTime,
         timeRange,
         numberOfDepartures,
-        omitNonPickups
+        arrivalDeparture
     );
   }
 

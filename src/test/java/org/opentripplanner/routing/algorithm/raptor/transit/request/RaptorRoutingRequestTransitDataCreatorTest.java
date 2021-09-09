@@ -38,7 +38,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
   @Before
   public void setup() {
-    TP.route.setMode(TransitMode.BUS);
+    TP.getRoute().setMode(TransitMode.BUS);
   }
 
 

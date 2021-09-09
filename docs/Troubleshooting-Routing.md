@@ -51,7 +51,7 @@ Currently you can choose between:
 - [Bicycle safety](Troubleshooting-Routing.md#Bicycle-safety-factor) (colors street edges based on how good are for cycling [smaller is better])
 - Traversal permissions (colors street edges based on what types of transit modes are allowed to
  travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer also
- draws links from transit stops/bike rentals and P+R to graph. And also draws transit stops, bike rentals
+ draws links from transit stops/vehicle rentals and P+R to graph. And also draws transit stops, vehicle rentals
   and P+R vertices with different color.
 - No thru traffic - streets are colored if the edge has thru traffic restrictions (car and bicycle = `red`, car only = `orange`, bicycle only = `blue`, and no-restriction = `light gray`)
 
@@ -85,15 +85,25 @@ As a default, foot and bicycle traffic is ''not'' allowed on `highway=trunk`, `h
 
 Both *are* allowed on `highway=pedestrian`, `highway=cycleway`, and `highway=footway`. 
 
-Finally, bicycles are *not*allowed on *highway=footway* when any of the following tags appear on a footway: `footway=sidewalk`, `public_transport=platform`, or `railway=platform`.
+Finally, bicycles are *not* allowed on *highway=footway* when any of the following tags appear on a footway: `footway=sidewalk`, `public_transport=platform`, or `railway=platform`.
 
 Other access tags (such as `access=no` and `access=private` affect routing as well, and can be overridden similarly. While `access=no` prohibits all traffic, `access=private` disallows through traffic.
 
 ### Bicycle safety factor
 
 Bicycle routing is even more configurable than the other traverse modes: during graph build a so-called bicycle safety score is
-computed for each street. How this is calculated depends on the slope of the way and its OSM tags. At request time you can
-then use the `triangleFactors` to decide how important bicycle safety is compared to speed and flatness.
+computed for each street. You can think of this score as a penalty for traversing this way so the lower the score the better.
+
+For example if a way is tagged with `surface=sand` it receives a safety score of 100 which means that it's 100 times worse to 
+cycle on when compared to a way which has a safety score of 1.
+
+How this is calculated depends on two things
+
+- the incline of the way (not read from OSM but from the [separately configured elevation data](Configuration.md#Elevation data))
+- its OSM tags
+ 
+At request time you can then use the `triangleFactors` to decide how important bicycle safety 
+is compared to shorter distances and flatness.
 
 Each `WayPropertySet` contains rules for a given set of tag matchers that influence the bicycle safety score. For example, a rule looks like this:
 
@@ -102,8 +112,16 @@ props.setProperties("highway=track", StreetTraversalPermission.ALL, 1.3, 1.3);
 ```
 
 This means that an OSM way with the tag `highway=track` is traversable by all modes (pedestrian, bicycle, car) and that
-its bicycle safety score is `1.3` (smaller is better). If there is a more specific matcher like `highway=track;bicycle=no`
-and it matches a given OSM way, it is chosen instead and its settings applied.
+its bicycle safety score when you traverse in order of the way is `1.3` and also `1.3` when going the other way 
+(smaller means more cycle-friendly).
+
+If there is a more specific matcher like `highway=track;bicycle=no` and it matches a given OSM way, 
+it is chosen instead and its settings applied.
+
+The score can be any positive number but the range (as of writing this) goes from `0.6` for bike lanes
+to `100` for ways that consist of sand. To figure out a good value for your set of tags you should
+read the bicycle safety report (see below) or the source code of your `WayPropertySetSource` to get
+a feeling for how much certain tags are penalised or rewarded.
 
 There are also so-called mixins. These are applied on top of the most specific matchers and a single
 OSM way can match many mixins. The mixins' safety values are multiplied with the value of the base 

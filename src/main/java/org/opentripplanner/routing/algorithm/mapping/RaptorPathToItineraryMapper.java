@@ -118,7 +118,7 @@ public class RaptorPathToItineraryMapper {
 
         // Map general itinerary fields
         itinerary.generalizedCost = path.otpDomainCost();
-        itinerary.arrivedAtDestinationWithRentedBicycle = mapped != null && mapped.arrivedAtDestinationWithRentedBicycle;
+        itinerary.arrivedAtDestinationWithRentedVehicle = mapped != null && mapped.arrivedAtDestinationWithRentedVehicle;
 
         if(optimizedPath != null) {
             itinerary.waitTimeAdjustedGeneralizedCost = RaptorCostConverter.toOtpDomainCost(
@@ -159,7 +159,7 @@ public class RaptorPathToItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
         TripTimes tripTimes = tripSchedule.getOriginalTripTimes();
 
-        Leg leg = new Leg(tripTimes.trip);
+        Leg leg = new Leg(tripTimes.getTrip());
 
         // Find stop positions in pattern where this leg boards and alights.
         // We cannot assume every stop appears only once in a pattern, so we
@@ -349,7 +349,7 @@ public class RaptorPathToItineraryMapper {
     private Place mapStopToPlace(Stop stop, Integer stopIndex, TripTimes tripTimes) {
         Place place = mapStopToPlace(stop);
         place.stopIndex = stopIndex;
-        place.stopSequence = tripTimes.getStopSequence(stopIndex);
+        place.stopSequence = tripTimes.getOriginalGtfsStopSequence(stopIndex);
         return place;
     }
 
@@ -366,7 +366,7 @@ public class RaptorPathToItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
 
         for (int i = boardStopIndexInPattern + 1; i < alightStopIndexInPattern; i++) {
-            Stop stop = tripPattern.stopPattern.stops[i];
+            Stop stop = tripPattern.getStopPattern().getStops()[i];
 
             Place place = mapStopToPlace(stop, i, tripSchedule.getOriginalTripTimes());
             StopArrival visit = new StopArrival(

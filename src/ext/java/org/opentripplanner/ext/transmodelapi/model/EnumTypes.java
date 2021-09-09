@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model;
 import graphql.schema.GraphQLEnumType;
 import java.util.Arrays;
 import java.util.function.Function;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TransitMode;
@@ -15,6 +16,7 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 
 public class EnumTypes {
@@ -35,9 +37,9 @@ public class EnumTypes {
 
     public static GraphQLEnumType BIKES_ALLOWED = GraphQLEnumType.newEnum()
             .name("BikesAllowed")
-            .value("noInformation", 0, "There is no bike information for the trip.")
-            .value("allowed", 1, "The vehicle being used on this particular trip can accommodate at least one bicycle.")
-            .value("notAllowed", 2, "No bicycles are allowed on this trip.")
+            .value("noInformation", BikeAccess.UNKNOWN, "There is no bike information for the trip.")
+            .value("allowed", BikeAccess.ALLOWED, "The vehicle being used on this particular trip can accommodate at least one bicycle.")
+            .value("notAllowed", BikeAccess.NOT_ALLOWED, "No bicycles are allowed on this trip.")
             .build();
 
     public static GraphQLEnumType REPORT_TYPE = GraphQLEnumType.newEnum()
@@ -265,8 +267,15 @@ public class EnumTypes {
         .value("planned", TripAlteration.PLANNED)
         .build();
 
+    public static GraphQLEnumType ARRIVAL_DEPARTURE = GraphQLEnumType.newEnum()
+        .name("ArrivalDeparture")
+        .value("arrivals", ArrivalDeparture.ARRIVALS, "Only show arrivals")
+        .value("departures", ArrivalDeparture.DEPARTURES, "Only show departures")
+        .value("both", ArrivalDeparture.BOTH, "Show both arrivals and departures")
+        .build();
+
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {
-        return type.getCoercing().serialize(value);
+        return type.serialize(value);
     }
 
 

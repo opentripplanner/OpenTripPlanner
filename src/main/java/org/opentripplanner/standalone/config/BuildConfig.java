@@ -159,11 +159,6 @@ public class BuildConfig {
     public final boolean osmCacheDataInMem;
 
     /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
-     */
-    public boolean staticBikeRental;
-
-    /**
      * Whether we should create car P+R stations from OSM data.
      */
     public boolean staticParkAndRide;
@@ -344,7 +339,6 @@ public class BuildConfig {
         platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
         readCachedElevations = c.asBoolean("readCachedElevations", true);
         staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
-        staticBikeRental = c.asBoolean("staticBikeRental", false);
         staticParkAndRide = c.asBoolean("staticParkAndRide", true);
         stationTransfers = c.asBoolean("stationTransfers", false);
         streets = c.asBoolean("streets", true);

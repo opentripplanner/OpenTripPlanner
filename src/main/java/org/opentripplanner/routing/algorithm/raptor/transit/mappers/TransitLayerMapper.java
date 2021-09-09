@@ -128,7 +128,7 @@ public class TransitLayerMapper {
                 for (org.opentripplanner.model.TripPattern oldTripPattern : allTripPatterns) {
                     TripPatternForDate tripPatternForDate =
                         tripPatternForDateMapper.map(
-                            oldTripPattern.scheduledTimetable,
+                            oldTripPattern.getScheduledTimetable(),
                             serviceDate
                     );
                     if (tripPatternForDate != null) {
@@ -147,7 +147,7 @@ public class TransitLayerMapper {
     // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
     //      optimized for sorting nearly sorted list
     static List<TripTimes> getSortedTripTimes (Timetable timetable) {
-        return timetable.tripTimes.stream()
+        return timetable.getTripTimes().stream()
                 .sorted(Comparator.comparing(TripTimes::sortIndex))
                 .collect(Collectors.toList());
     }

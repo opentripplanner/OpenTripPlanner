@@ -1,5 +1,8 @@
 package org.opentripplanner.netex.loader.parser;
 
+import java.util.Collection;
+import java.util.List;
+import javax.xml.bind.JAXBElement;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
@@ -14,10 +17,6 @@ import org.rutebanken.netex.model.TimetableFrame;
 import org.rutebanken.netex.model.VersionFrameDefaultsStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.JAXBElement;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * This is the root parser for a Netex XML Document. The parser ONLY read the document and

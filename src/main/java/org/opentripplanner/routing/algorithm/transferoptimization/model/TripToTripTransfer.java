@@ -21,20 +21,12 @@ public class TripToTripTransfer<T extends RaptorTripSchedule> {
       TripStopTime<T> from,
       TripStopTime<T> to,
       RaptorTransfer pathTransfer,
-      Transfer guaranteedTransfer
+      @Nullable Transfer guaranteedTransfer
   ) {
     this.from = from;
     this.to = to;
     this.pathTransfer = pathTransfer;
     this.guaranteedTransfer = guaranteedTransfer;
-  }
-
-  public TripToTripTransfer(
-          TripStopTime<T> from,
-          TripStopTime<T> to,
-          RaptorTransfer pathTransfer
-  ) {
-    this(from, to, pathTransfer, null);
   }
 
   public TripStopTime<T> from() {

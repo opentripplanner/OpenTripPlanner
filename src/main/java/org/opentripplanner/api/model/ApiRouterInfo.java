@@ -5,7 +5,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.TraverseModeMapper;
 import org.opentripplanner.common.geometry.GeometrySerializer;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.TravelOption;
 import org.opentripplanner.util.TravelOptionsMaker;
@@ -46,8 +46,8 @@ public class ApiRouterInfo {
 
 
     public ApiRouterInfo(String routerId, Graph graph) {
-        BikeRentalStationService service = graph.getService(
-                BikeRentalStationService.class, false
+        VehicleRentalStationService service = graph.getService(
+                VehicleRentalStationService.class, false
         );
 
         this.routerId = routerId;
@@ -64,16 +64,16 @@ public class ApiRouterInfo {
         addCenter(graph.getCenter());
     }
 
-    public boolean mapHasBikeSharing(BikeRentalStationService service) {
+    public boolean mapHasBikeSharing(VehicleRentalStationService service) {
         if (service == null) {
             return false;
         }
 
         //at least 2 bike sharing stations are needed for useful bike sharing
-        return service.getBikeRentalStations().size() > 1;
+        return service.getVehicleRentalStations().size() > 1;
     }
 
-    public boolean mapHasBikePark(BikeRentalStationService service) {
+    public boolean mapHasBikePark(VehicleRentalStationService service) {
         if (service == null) {
             return false;
         }

@@ -1,8 +1,13 @@
 package org.opentripplanner.netex.mapping;
 
+import javax.annotation.Nullable;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import java.util.Set;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -13,9 +18,6 @@ import org.rutebanken.netex.model.OperatorRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 /**
  * Maps NeTEx line to OTP Route.
@@ -32,19 +34,22 @@ class RouteMapper {
     private final EntityById<Operator> operatorsById;
     private final NetexEntityIndexReadOnlyView netexIndex;
     private final AuthorityToAgencyMapper authorityMapper;
+    private final Set<String> ferryIdsNotAllowedForBicycle;
 
     RouteMapper(
             FeedScopedIdFactory idFactory,
             EntityById<Agency> agenciesById,
             EntityById<Operator> operatorsById,
             NetexEntityIndexReadOnlyView netexIndex,
-            String timeZone
+            String timeZone,
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.idFactory = idFactory;
         this.agenciesById = agenciesById;
         this.operatorsById = operatorsById;
         this.netexIndex = netexIndex;
         this.authorityMapper = new AuthorityToAgencyMapper(idFactory, timeZone);
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     }
 
     org.opentripplanner.model.Route mapRoute(Line_VersionStructure line){
@@ -60,7 +65,8 @@ class RouteMapper {
                 line.getTransportSubmode()
         );
         otpRoute.setType(transportType);
-        otpRoute.setMode(TransitModeMapper.mapMode(transportType));
+        TransitMode mode = TransitModeMapper.mapMode(transportType);
+        otpRoute.setMode(mode);
         if (line instanceof FlexibleLine_VersionStructure) {
             otpRoute.setFlexibleLineType(((FlexibleLine_VersionStructure) line)
                 .getFlexibleLineType().value());
@@ -73,6 +79,23 @@ class RouteMapper {
             }
             if (presentation.getTextColour() != null) {
                 otpRoute.setTextColor(hexBinaryAdapter.marshal(presentation.getTextColour()));
+            }
+        }
+
+        // we would love to read this information from the actual feed but it's unclear where
+        // this information would be located.
+        // the standard defines the following enum for baggage
+        // https://github.com/NeTEx-CEN/NeTEx/blob/0436cb774778ae68a682c28e0a21013e4886c883/xsd/netex_part_3/part3_fares/netex_usageParameterLuggage_support.xsd#L120
+        // and there is a usage of that in one of the Entur examples
+        // https://github.com/entur/profile-examples/blob/7f45e036c870205102d96ef58c7ce5008f4edcf1/netex/fares-sales/Entur_PARTIAL_EXAMPLE_INCOMPLETE_FinnmarkFullExample.xml#L1598-L1611
+        // but currently it doesn't look it is being parsed.
+        // until there is better information from the operators we assume that all ferries allow
+        // bicycles on board.
+        if(mode == TransitMode.FERRY) {
+            if(ferryIdsNotAllowedForBicycle.contains(line.getId())) {
+                otpRoute.setBikesAllowed(BikeAccess.NOT_ALLOWED);
+            } else {
+                otpRoute.setBikesAllowed(BikeAccess.ALLOWED);
             }
         }
 

@@ -13,6 +13,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -111,8 +112,8 @@ public class TimetableSnapshotSourceTest {
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.getTripForId().get(tripId);
         final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
-        final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
-        final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
+        final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
+        final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
         updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), feedId);
 
@@ -125,8 +126,8 @@ public class TimetableSnapshotSourceTest {
 
         final TripTimes tripTimes = forToday.getTripTimes(tripIndex);
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
-            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getDepartureTime(i));
-            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getArrivalTime(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getPickup(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getDropoff(i));
         }
         assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
     }
@@ -137,8 +138,8 @@ public class TimetableSnapshotSourceTest {
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
         final Trip trip = graph.index.getTripForId().get(tripId);
         final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
-        final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
-        final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
+        final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
+        final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
         final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

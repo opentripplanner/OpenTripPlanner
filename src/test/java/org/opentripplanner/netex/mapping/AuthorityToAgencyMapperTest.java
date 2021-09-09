@@ -1,14 +1,14 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
+
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.ContactStructure;
 import org.rutebanken.netex.model.MultilingualString;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
 public class AuthorityToAgencyMapperTest {
     private static final String ID = "ID";

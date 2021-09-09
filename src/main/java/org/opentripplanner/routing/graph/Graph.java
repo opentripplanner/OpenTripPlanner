@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
@@ -80,7 +79,7 @@ import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
@@ -183,6 +182,7 @@ public class Graph implements Serializable {
     /** List of transit modes that are availible in GTFS data used in this graph**/
     private final HashSet<TransitMode> transitModes = new HashSet<>();
 
+    // TODO OTP2: This is only enabled with static bike rental
     public boolean hasBikeSharing = false;
 
     public boolean hasParkRide = false;
@@ -632,7 +632,7 @@ public class Graph implements Serializable {
         LOG.debug("Rebuilding edge and vertex indices.");
         for (TripPattern tp : tripPatternForId.values()) {
             // Skip frequency-based patterns which have no timetable (null)
-            if (tp != null) tp.scheduledTimetable.finish();
+            if (tp != null) tp.getScheduledTimetable().finish();
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
@@ -950,8 +950,8 @@ public class Graph implements Serializable {
         return services;
     }
 
-    public BikeRentalStationService getBikerentalStationService() {
-        return getService(BikeRentalStationService.class);
+    public VehicleRentalStationService getVehicleRentalStationService() {
+        return getService(VehicleRentalStationService.class);
     }
 
     public Collection<Notice> getNoticesByEntity(TransitEntity entity) {

@@ -31,7 +31,7 @@ public class GeoJSONCoordinatesScalar {
         return INSTANCE;
     }
 
-    private final static GraphQLScalarType INSTANCE = new GraphQLScalarType("Coordinates", DOCUMENTATION, new Coercing() {
+    private final static GraphQLScalarType INSTANCE = GraphQLScalarType.newScalar().name("Coordinates").description(DOCUMENTATION).coercing(new Coercing() {
         @Override
         public List<List<Double>> serialize(Object input) {
             if (input instanceof Coordinate[]) {
@@ -80,5 +80,5 @@ public class GeoJSONCoordinatesScalar {
             }
             return null;
         }
-    });
+    }).build();
 }

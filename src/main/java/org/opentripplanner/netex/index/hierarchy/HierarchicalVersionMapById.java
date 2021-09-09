@@ -1,14 +1,17 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import com.google.common.collect.Multimap;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
-import org.rutebanken.netex.model.EntityInVersionStructure;
-
-import java.util.Collection;
-
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionedElementIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
+
+import com.google.common.collect.Multimap;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
+import org.rutebanken.netex.model.EntityInVersionStructure;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 /**
  * A hierarchical multimap indexing a collections of {@link EntityInVersionStructure} values by
@@ -76,7 +79,44 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
     }
 
     @Override
+    public V lookup(VersionOfObjectRefStructure ref, LocalDateTime timestamp) {
+        String id = ref.getRef();
+        String version = ref.getVersion();
+
+        if(version != null) {
+            for (V value : lookup(id)) {
+                if(version.equals(value.getVersion())) {
+                    return value;
+                }
+            }
+            throw new IllegalArgumentException(
+                    "Inconsistent version. " + ref.getNameOfRefClass() + " with id " + id +
+                            " and version " + version + " not found."
+            );
+        }
+        // Fallback to the latest version of the element.
+        return firstValidBestVersion(lookup(id), timestamp);
+    }
+
+    @Override
+    public Collection<V> localListCurrentVersionEntities(final LocalDateTime timestamp) {
+        return localValues().stream()
+                .map(c -> firstValidBestVersion(c, timestamp))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Override
     public boolean isNewerOrSameVersionComparedWithExistingValues(V value) {
         return versionOf(value) >= latestVersionIn(lookup(value.getId()));
+    }
+
+    private V firstValidBestVersion(Collection<V> entities, LocalDateTime timestamp) {
+        return entities.stream()
+                .map(it -> new ValidOnDate<>(it, timestamp))
+                .filter(ValidOnDate::isValid)
+                .reduce((a, b) -> a.bestVersion(b) ? a : b)
+                .map(ValidOnDate::entity)
+                .orElse(null);
     }
 }

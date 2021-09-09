@@ -7,9 +7,10 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 public class LegacyGraphQLDepartureRowImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLDepartureRow {
@@ -40,7 +41,7 @@ public class LegacyGraphQLDepartureRowImpl
   }
 
   @Override
-  public DataFetcher<Iterable<TripTimeShort>> stoptimes() {
+  public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
     return environment -> {
       LegacyGraphQLTypes.LegacyGraphQLDepartureRowStoptimesArgs args = new LegacyGraphQLTypes.LegacyGraphQLDepartureRowStoptimesArgs(environment.getArguments());
       return getSource(environment).getStoptimes(
@@ -48,7 +49,7 @@ public class LegacyGraphQLDepartureRowImpl
           args.getLegacyGraphQLStartTime(),
           args.getLegacyGraphQLTimeRange(),
           args.getLegacyGraphQLNumberOfDepartures(),
-          args.getLegacyGraphQLOmitNonPickups(),
+          args.getLegacyGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
           args.getLegacyGraphQLOmitCanceled()
       );
     };

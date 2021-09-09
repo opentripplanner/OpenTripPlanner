@@ -1,6 +1,5 @@
 package org.opentripplanner.visualizer;
 
-import javassist.Modifier;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
@@ -36,6 +35,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1363,7 +1363,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
         options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
         // there should be a ui element for walk distance and optimize type
-        options.setOptimize( getSelectedOptimizeType() );
+        options.setBicycleOptimizeType( getSelectedOptimizeType() );
         options.setDateTime(when);
         options.setFromString(from);
         options.setToString(to);

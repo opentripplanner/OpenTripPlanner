@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class NetexConfig {
@@ -15,6 +17,8 @@ public class NetexConfig {
     private static final String GROUP_FILE_PATTERN = "(\\w{3})-.*\\.xml";
 
     private static final String NETEX_FEED_ID = "DefaultFeed";
+
+    private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
 
     /**
      * This field is used to identify the specific NeTEx feed. It is used instead of the feed_id
@@ -82,11 +86,24 @@ public class NetexConfig {
      */
     public final Pattern groupFilePattern;
 
+    /**
+     * Bicycles are allowed on most ferries however Nordic profile doesn't contain a place where
+     * bicycle conveyance can be defined.
+     * <p>
+     * For this reason we allow bicycles on ferries by default and allow to override the rare
+     * case where this is not the case.
+     */
+    public final Set<String> ferryIdsNotAllowedForBicycle;
+
     NetexConfig(NodeAdapter config) {
         ignoreFilePattern = config.asPattern("ignoreFilePattern", IGNORE_FILE_PATTERN);
         sharedFilePattern = config.asPattern("sharedFilePattern", SHARED_FILE_PATTERN);
         sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);
         groupFilePattern = config.asPattern("groupFilePattern", GROUP_FILE_PATTERN);
         netexFeedId = config.asText("netexFeedId", NETEX_FEED_ID);
+        ferryIdsNotAllowedForBicycle = config.asTextSet(
+                "ferryIdsNotAllowedForBicycle",
+                FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE
+        );
     }
 }

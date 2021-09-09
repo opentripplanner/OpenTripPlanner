@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.tx;
 import static org.opentripplanner.util.time.TimeUtils.time;
@@ -16,43 +17,24 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
-/**
- * The {@code TransfersPermutationService} is tested using a fixed set of trips/routes, but we
- * construct paths and transfers for each case. All tests use this set of trips:
- *
- * <pre>
- * DEPARTURE TIMES
- * Stop        A      B      C      D      E      F      G
- * Trip 1    10:02  10:10         10:20
- * Trip 2           10:12  10:15  10:22         10:35
- * Trip 3                                10:24  10:37  10:49
- *
- * Note! The ARRIVAL TIMES are 1 minute BEFORE the departure times for all stops.
- * </pre>
- *
- * <p>This set allow us to construct all desired testcases using different paths with different
- * sets of transfers.
- *
- * <p>The test starts with the simple cases and builds up to more and more complicated cases.
- */
+
 public class OptimizePathServiceTest implements RaptorTestConstants {
 
     /**
      * The exact start time to walk to stop A to catch Trip_1 with 40s board slack
      */
-    private final int START_TIME_T1 = time("10:00:20");
-    private final int TRANSFER_SLACK = D1m;
-    private final int BOARD_SLACK = D40s;
-    private final int ALIGHT_SLACK = D20s;
-    private final int BOARD_COST_SEC = 10;
-    private final int TRANSFER_COST_SEC = 20;
-    private final double WALK_RELUCTANCE = 2.0;
-    private final double WAIT_RELUCTANCE = 1.0;
+    private static final int START_TIME_T1 = time("10:00:20");
+    private static final int TRANSFER_SLACK = D1m;
+    private static final int BOARD_SLACK = D40s;
+    private static final int ALIGHT_SLACK = D20s;
+    private static final int BOARD_COST_SEC = 10;
+    private static final int TRANSFER_COST_SEC = 20;
+    private static final double WAIT_RELUCTANCE = 1.0;
 
-    private final RaptorSlackProvider SLACK_PROVIDER = RaptorSlackProvider
+    private static final RaptorSlackProvider SLACK_PROVIDER = RaptorSlackProvider
             .defaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK);
 
-    public final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+    public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE,
@@ -60,7 +42,9 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
             null
     );
 
-    private final PathBuilder PATH_BUILDER = new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+    static PathBuilder pathBuilder() {
+        return new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+    }
 
     /**
      * A Path without any transfers should be returned without any change.
@@ -76,7 +60,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         var transfers = dummyTransferGenerator();
 
         // and a path: Walk ~ B ~ T1 ~ C ~ Walk
-        var original = PATH_BUILDER
+        var original = pathBuilder()
                 .access(START_TIME_T1, D1m, STOP_B)
                 .bus(trip1, STOP_C)
                 .egress(D1m);
@@ -100,12 +84,12 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
     public void testTripWithOneTransfer() {
         // Given
         var trip1 = TestTripSchedule.schedule()
-                .arrDepOffset(0)
+                .arrDepOffset(D0s)
                 .pattern("T1", STOP_A, STOP_B, STOP_C, STOP_D)
                 .times("10:02 10:10 10:20 10:30").build();
 
         var trip2 = TestTripSchedule.schedule()
-                .arrDepOffset(0)
+                .arrDepOffset(D0s)
                 .pattern("T2", STOP_E, STOP_F, STOP_G)
                 .times( "10:12 10:22 10:50").build();
 
@@ -114,7 +98,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         );
 
         // Path:  Access ~ B ~ T1 ~ C ~ Walk 30s ~ D ~ T2 ~ E ~ Egress
-        var original = PATH_BUILDER
+        var original = pathBuilder()
                 .access(START_TIME_T1, D1m, STOP_B)
                 .bus(trip1, STOP_C)
                 .walk(D30s, STOP_F)
@@ -164,13 +148,13 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
                 )
         );
 
-        var original = PATH_BUILDER
-                .access(START_TIME_T1, 0, STOP_A)
+        var original = pathBuilder()
+                .access(START_TIME_T1, D0s, STOP_A)
                 .bus(trip1, STOP_B)
                 .bus(trip2, STOP_D)
                 .walk(D30s, STOP_E)
                 .bus(trip3, STOP_G)
-                .egress(0);
+                .egress(D0s);
 
         var subject = subject(transfers);
 
@@ -184,7 +168,63 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         );
     }
 
-    private OptimizePathService<TestTripSchedule> subject(
+    /**
+     * DEPARTURE TIMES
+     * Stop        A      B      C      D
+     * Trip 1    10:02  10:10  10:15
+     * Trip 2           10:13  10:17  10:30
+     *
+     * Case: Transfer at stop B is returned, but transfer at stop C i guaranteed
+     * Expect: Transfer at C and transfer info attached
+     */
+    @Test
+    public void testGuaranteedTransferIsPreferred() {
+        // Given
+        var trip1 = TestTripSchedule.schedule()
+                .pattern("T1", STOP_A, STOP_B, STOP_C)
+                .times("10:02 10:10 10:15").build();
+
+        var trip2 = TestTripSchedule.schedule()
+                .pattern("T2", STOP_B, STOP_C, STOP_D)
+                .times("10:13 10:17 10:30").build();
+
+        var transfers = dummyTransferGenerator(
+                List.of(
+                        tx(trip1, STOP_B, trip2),
+                        tx(txConstrained(trip1, STOP_C, trip2, STOP_C).guaranteed())
+                )
+        );
+
+        var original = pathBuilder()
+                .access(START_TIME_T1, 0, STOP_A)
+                .bus(trip1, STOP_B)
+                .bus(trip2, STOP_D)
+                .egress(D0s);
+
+        var subject = subject(transfers);
+
+        // Find the path with the lowest cost
+        var result = subject.findBestTransitPath(original);
+
+        assertEquals(1, result.size(), result.toString());
+
+        var it = result.iterator().next();
+
+        assertEquals(
+                "1 ~ BUS T1 10:02 10:15 ~ 3 ~ BUS T2 10:17 10:30 ~ 4 [10:00:20 10:30:20 30m $1840]",
+                it.toString()
+        );
+        // Verify the attached Transfer is exist and is valid
+        assertEquals(
+                "Transfer{from: (trip: BUS T1:10:02, stopPos: 2), to: (trip: BUS T2:10:13, stopPos: 1), guaranteed}",
+                it.getTransferTo(it.accessLeg().nextLeg().nextLeg()).toString()
+        );
+    }
+
+
+    /* private methods */
+
+    static OptimizePathService<TestTripSchedule> subject(
             TransferGenerator<TestTripSchedule> generator
     ) {
         return new OptimizePathService<>(

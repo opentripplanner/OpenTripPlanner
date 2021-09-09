@@ -1,7 +1,7 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
-import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
+import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
@@ -15,8 +15,8 @@ import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -52,9 +52,9 @@ public abstract class GraphUpdaterConfigurator {
             createUpdatersFromConfig(updatersParameters)
         );
         updaters.addAll(
-            // Setup updaters using the BikeRentalServiceDirectoryFetcher(Sandbox)
-            fetchBikeRentalServicesFromOnlineDirectory(
-                updatersParameters.getBikeRentalServiceDirectoryFetcherParameters()
+            // Setup updaters using the VehicleRentalServiceDirectoryFetcher(Sandbox)
+            fetchVehicleRentalServicesFromOnlineDirectory(
+                updatersParameters.getVehicleRentalServiceDirectoryFetcherParameters()
             )
         );
 
@@ -94,13 +94,13 @@ public abstract class GraphUpdaterConfigurator {
     /* private methods */
 
     /**
-     * Use the online UpdaterDirectoryService to fetch BikeRental updaters.
+     * Use the online UpdaterDirectoryService to fetch VehicleRental updaters.
      */
-    private static List<GraphUpdater> fetchBikeRentalServicesFromOnlineDirectory(
-        BikeRentalServiceDirectoryFetcherParameters parameters
+    private static List<GraphUpdater> fetchVehicleRentalServicesFromOnlineDirectory(
+        VehicleRentalServiceDirectoryFetcherParameters parameters
     ) {
         if (parameters == null) { return List.of(); }
-        return BikeRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(parameters);
+        return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(parameters);
     }
 
     /**
@@ -111,8 +111,8 @@ public abstract class GraphUpdaterConfigurator {
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        for (BikeRentalUpdaterParameters configItem : config.getBikeRentalParameters()) {
-            updaters.add(new BikeRentalUpdater(configItem));
+        for (VehicleRentalUpdaterParameters configItem : config.getVehicleRentalParameters()) {
+            updaters.add(new VehicleRentalUpdater(configItem));
         }
         for (GtfsRealtimeAlertsUpdaterParameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {
             updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
