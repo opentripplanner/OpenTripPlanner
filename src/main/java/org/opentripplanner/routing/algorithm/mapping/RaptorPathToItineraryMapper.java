@@ -118,7 +118,7 @@ public class RaptorPathToItineraryMapper {
 
         // Map general itinerary fields
         itinerary.generalizedCost = path.otpDomainCost();
-        itinerary.arrivedAtDestinationWithRentedBicycle = mapped != null && mapped.arrivedAtDestinationWithRentedBicycle;
+        itinerary.arrivedAtDestinationWithRentedVehicle = mapped != null && mapped.arrivedAtDestinationWithRentedVehicle;
 
         if(optimizedPath != null) {
             itinerary.waitTimeAdjustedGeneralizedCost = RaptorCostConverter.toOtpDomainCost(

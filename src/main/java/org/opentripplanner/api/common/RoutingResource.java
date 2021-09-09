@@ -734,21 +734,16 @@ public abstract class RoutingResource {
             request.bikeSwitchCost = bikeSwitchCost;
 
         if (allowKeepingRentedBicycleAtDestination != null)
-            request.allowKeepingRentedBicycleAtDestination = allowKeepingRentedBicycleAtDestination;
+            request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
 
         if (keepingRentedBicycleAtDestinationCost != null)
-            request.keepingRentedBicycleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+            request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setBicycleOptimizeType(optimize);
             if (optimize == BicycleOptimizeType.TRIANGLE) {
-                RoutingRequest.assertTriangleParameters(
-                        triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
-                );
-                request.setBikeTriangleSafetyFactor(triangleSafetyFactor);
-                request.setBikeTriangleSlopeFactor(triangleSlopeFactor);
-                request.setBikeTriangleTimeFactor(triangleTimeFactor);
+                request.setTriangleNormalized(triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor);
             }
         }
 
@@ -845,7 +840,7 @@ public abstract class RoutingResource {
 
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useBikeRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
+        request.useVehicleRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);

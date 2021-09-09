@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
+import graphql.scalars.ExtendedScalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
@@ -74,21 +75,21 @@ public class TripPatternType {
                         .newFieldDefinition()
                         .name("duration")
                         .description("Duration of the trip, in seconds.")
-                        .type(Scalars.GraphQLLong)
+                        .type(ExtendedScalars.GraphQLLong)
                         .dataFetcher(env -> itinerary(env).durationSeconds)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
                         .name("directDuration")
                         .description("NOT IMPLEMENTED.")
-                        .type(Scalars.GraphQLLong)
+                        .type(ExtendedScalars.GraphQLLong)
                         .dataFetcher(env -> itinerary(env).durationSeconds)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
                         .name("waitingTime")
                         .description("How much time is spent waiting for transit to arrive, in seconds.")
-                        .type(Scalars.GraphQLLong)
+                        .type(ExtendedScalars.GraphQLLong)
                         .dataFetcher(env -> itinerary(env).waitingTimeSeconds)
                         .build())
                 .field(GraphQLFieldDefinition
@@ -102,7 +103,7 @@ public class TripPatternType {
                         .newFieldDefinition()
                         .name("walkTime")
                         .description("How much time is spent walking, in seconds.")
-                        .type(Scalars.GraphQLLong)
+                        .type(ExtendedScalars.GraphQLLong)
                         // TODO This unfortunately include BIKE and CAR
                         .dataFetcher(env -> itinerary(env).nonTransitTimeSeconds)
                         .build())

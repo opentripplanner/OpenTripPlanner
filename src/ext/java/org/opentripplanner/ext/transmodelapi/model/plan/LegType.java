@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
 
 import graphql.Scalars;
+import graphql.scalars.ExtendedScalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
@@ -93,13 +94,13 @@ public class LegType {
             .newFieldDefinition()
             .name("duration")
             .description("The legs's duration in seconds")
-            .type(Scalars.GraphQLLong)
+            .type(ExtendedScalars.GraphQLLong)
             .dataFetcher(env -> leg(env).getDuration())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("directDuration")
-            .type(Scalars.GraphQLLong)
+            .type(ExtendedScalars.GraphQLLong)
             .description("NOT IMPLEMENTED")
             .dataFetcher(env -> leg(env).getDuration())
             .build())
@@ -165,7 +166,7 @@ public class LegType {
             .name("rentedBike")
             .description("Whether this leg is with a rented bike.")
             .type(Scalars.GraphQLBoolean)
-            .dataFetcher(env -> leg(env).rentedBike)
+            .dataFetcher(env -> leg(env).rentedVehicle)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -299,6 +300,9 @@ public class LegType {
             .newFieldDefinition()
             .name("bikeRentalNetworks")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+            .dataFetcher(env ->
+                    leg(env).vehicleRentalNetwork == null ? List.of() : List.of(leg(env).vehicleRentalNetwork)
+            )
             .build())
         .build();
   }

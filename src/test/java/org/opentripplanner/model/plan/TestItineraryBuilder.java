@@ -98,7 +98,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
     cost += cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to);
-    this.legs.get(0).rentedBike = true;
+    this.legs.get(0).rentedVehicle = true;
     return this;
   }
 

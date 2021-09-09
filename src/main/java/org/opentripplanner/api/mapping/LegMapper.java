@@ -101,7 +101,7 @@ public class LegMapper {
         );
         api.boardRule = domain.boardRule;
         api.alightRule = domain.alightRule;
-        api.rentedBike = domain.rentedBike;
+        api.rentedBike = domain.rentedVehicle;
         api.walkingBike = domain.walkingBike;
 
         return api;

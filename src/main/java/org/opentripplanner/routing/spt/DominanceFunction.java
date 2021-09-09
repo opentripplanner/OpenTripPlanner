@@ -39,13 +39,14 @@ public abstract class DominanceFunction implements Serializable {
     public boolean betterOrEqualAndComparable(State a, State b) {
 
         // Does one state represent riding a rented bike and the other represent walking before/after rental?
-        if (!a.isCompatibleBikeRentalState(b)) {
+        if (!a.isCompatibleVehicleRentalState(b)) {
             return false;
         }
 
         // In case of bike renting, different networks (ie incompatible bikes) are not comparable
+        // TODO: Check for vehicle type
         if (a.isBikeRenting()) {
-            if (!Objects.equals(a.getBikeRentalNetworks(), b.getBikeRentalNetworks())) {
+            if (!Objects.equals(a.getVehicleRentalNetwork(), b.getVehicleRentalNetwork())) {
                 return false;
             }
         }

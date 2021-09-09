@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
+import graphql.scalars.ExtendedScalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -76,7 +77,7 @@ public class TripType {
                 .name("debugOutput")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("totalTime")
-                    .type(Scalars.GraphQLLong)
+                    .type(ExtendedScalars.GraphQLLong)
                     .build())
                 .build()))
             .dataFetcher(env -> ((PlanResponse) env.getSource()).debugOutput)

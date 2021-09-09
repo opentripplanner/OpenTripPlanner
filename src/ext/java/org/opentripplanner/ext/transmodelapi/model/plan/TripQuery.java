@@ -12,6 +12,7 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 public class TripQuery {
 
@@ -206,13 +207,23 @@ public class TripQuery {
             .build()
         )
         .argument(GraphQLArgument.newArgument()
+                .name("triangleFactors")
+                .description(
+                        "When setting the " + EnumTypes.BICYCLE_OPTIMISATION_METHOD.getName() + " to '" + enumValAsString(EnumTypes.BICYCLE_OPTIMISATION_METHOD,
+                                BicycleOptimizeType.TRIANGLE
+                        )+ "', use these values to tell the routing engine how important each of the factors is compared to the others. All values should add up to 1."
+                )
+                .type(TriangleFactorsInputType.INPUT_TYPE)
+                .build()
+        )
+        .argument(GraphQLArgument.newArgument()
             .name("useBikeRentalAvailabilityInformation")
             .description(
                 "Whether or not bike rental availability information will be used to plan bike "
                     + "rental trips."
             )
             .type(Scalars.GraphQLBoolean)
-            .defaultValue(routing.request.useBikeRentalAvailabilityInformation)
+            .defaultValue(routing.request.useVehicleRentalAvailabilityInformation)
             .build()
         )
         .argument(GraphQLArgument.newArgument()

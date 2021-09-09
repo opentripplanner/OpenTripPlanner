@@ -46,6 +46,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -554,25 +555,25 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double bikeTriangleSafetyFactor;
 
     /**
-     * Whether or not bike rental availability information will be used to plan bike rental trips
+     * Whether or not vehicle rental availability information will be used to plan vehicle rental trips
      */
-    public boolean useBikeRentalAvailabilityInformation = false;
+    public boolean useVehicleRentalAvailabilityInformation = false;
 
     /**
      * Whether arriving at the destination with a rented (station) bicycle is allowed without
      * dropping it off.
      *
-     * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
-     * @see org.opentripplanner.routing.bike_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
+     * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
+     * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
      */
-    public boolean allowKeepingRentedBicycleAtDestination = false;
+    public boolean allowKeepingRentedVehicleAtDestination = false;
 
     /**
      * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
      *
-     * @see RoutingRequest#allowKeepingRentedBicycleAtDestination
+     * @see RoutingRequest#allowKeepingRentedVehicleAtDestination
      */
-    public double keepingRentedBicycleAtDestinationCost = 0;
+    public double keepingRentedVehicleAtDestinationCost = 0;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.
@@ -983,19 +984,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.intermediatePlaces.add(location);
     }
 
-    public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
-        this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
-    }
-
-    public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
-        this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
-    }
-
-    public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
-        this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
-    }
-
-
     /* INSTANCE METHODS */
 
     public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
@@ -1078,7 +1066,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
         ret.setArriveBy(!ret.arriveBy);
-        ret.useBikeRentalAvailabilityInformation = false;
+        ret.useVehicleRentalAvailabilityInformation = false;
         return ret;
     }
 
@@ -1337,14 +1325,32 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
      * This setter function accepts any three numbers and will normalize them to add up to 1.
      */
-    public void setTriangleNormalized (double safe, double slope, double time) {
+    public void setTriangleNormalized(double safe, double slope, double time) {
+        if(safe == 0 && slope == 0 && time == 0) {
+            var oneThird = 1f /3;
+            safe = oneThird;
+            slope = oneThird;
+            time = oneThird;
+        }
+        safe = setMinValue(safe);
+        slope = setMinValue(slope);
+        time = setMinValue(time);
+
         double total = safe + slope + time;
+        if(total != 1) {
+            LOG.warn("Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other.");
+        }
+
         safe /= total;
         slope /= total;
         time /= total;
         this.bikeTriangleSafetyFactor = safe;
         this.bikeTriangleSlopeFactor = slope;
         this.bikeTriangleTimeFactor = time;
+    }
+
+    private double setMinValue(double value) {
+        return Math.max(0, value);
     }
 
     public static void assertTriangleParameters(

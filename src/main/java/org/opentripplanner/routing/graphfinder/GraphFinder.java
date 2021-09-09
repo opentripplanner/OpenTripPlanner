@@ -34,7 +34,7 @@ public interface GraphFinder {
    * @param filterByPlaceTypes A list of PlaceTypes to search for. Use null to disable the filtering, and search for all types.
    * @param filterByStops A list of Stop ids for which to find Stops and PatternAtStops. Use null to disable the filtering.
    * @param filterByRoutes A list of Route ids used for filtering Stops. Only the stops which are served by the route are returned. Use null to disable the filtering.
-   * @param filterByBikeRentalStations A list of BikeRentalStation ids to use in filtering. Use null to disable the filtering.
+   * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering. Use null to disable the filtering.
    * @param filterByBikeParks A list of BikePark ids to use in filtering. Use null to disable the filtering.
    * @param filterByCarParks A list of CarPark ids to use in filtering. Use null to disable the filtering.
    * @param routingService A RoutingService used in finding information about the various places.

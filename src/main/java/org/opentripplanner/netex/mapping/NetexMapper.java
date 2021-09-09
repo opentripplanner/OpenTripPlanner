@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
@@ -65,6 +66,7 @@ public class NetexMapper {
     private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
     private final CalendarServiceBuilder calendarServiceBuilder;
     private final TripCalendarBuilder tripCalendarBuilder;
+    private final Set<String> ferryIdsNotAllowedForBicycle;
 
     /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
     private GroupNetexMapper groupMapper;
@@ -83,12 +85,14 @@ public class NetexMapper {
             OtpTransitServiceBuilder transitBuilder,
             String feedId,
             Deduplicator deduplicator,
-            DataImportIssueStore issueStore
+            DataImportIssueStore issueStore,
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
         this.idFactory = new FeedScopedIdFactory(feedId);
         this.issueStore = issueStore;
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
         this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
         this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
     }
@@ -328,7 +332,8 @@ public class NetexMapper {
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
                 currentNetexIndex,
-                currentNetexIndex.getTimeZone()
+                currentNetexIndex.getTimeZone(),
+                ferryIdsNotAllowedForBicycle
         );
         for (Line line : currentNetexIndex.getLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);

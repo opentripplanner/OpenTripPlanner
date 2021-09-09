@@ -420,7 +420,7 @@ otp.widgets.tripoptions.WheelChairSelector =
 
     id           :  null,
     //TRANSLATORS: label for checkbox
-    label        : _tr("Wheelchair accesible trip:"),
+    label        : _tr("Wheelchair accessible trip:"),
 
     initialize : function(tripWidget) {
 
@@ -445,9 +445,7 @@ otp.widgets.tripoptions.WheelChairSelector =
     },
 
     restorePlan : function(data) {
-        if(data.queryParams.wheelchair) {
-            $("#"+this.id+"-wheelchair-input").prop("checked", data.queryParams.wheelchair);
-        }
+        $("#"+this.id+"-wheelchair-input").prop("checked", data.queryParams.wheelchair === 'true');
     },
 
     isApplicableForMode : function(mode) {
@@ -485,9 +483,7 @@ otp.widgets.tripoptions.DebugItineraryFiltersSelector = otp.Class(
             });
         },
         restorePlan: function (data) {
-            if (data.queryParams.debugItineraryFilter) {
-                $("#" + this.id + "-debug-filters-input").prop("checked", data.queryParams.debugItineraryFilter);
-            }
+            $("#" + this.id + "-debug-filters-input").prop("checked", data.queryParams.debugItineraryFilter === 'true');
         },
         isApplicableForMode : function(mode) { return true; }
     }
@@ -1078,10 +1074,34 @@ otp.widgets.tripoptions.AdditionalTripParameters =
                     }
                 })
 
-                this_.tripWidget.module.additionalParameters = params;
+                var keys = _(params).keys().join(',');
+                if (keys) {
+                    params['additionalParameters'] = keys;
+                    this_.tripWidget.module.additionalParameters = params;
+                } else {
+                    this_.tripWidget.module.additionalParameters = null;
+                }
             });
         },
-});
+
+        restorePlan : function(data) {
+            if (data.queryParams.additionalParameters) {
+                var str = '';
+                var keys = data.queryParams.additionalParameters.split(',');
+                var params = {};
+
+                _.each(keys, function (key) {
+                    str += key + '=' + data.queryParams[key] + '\n';
+                    params[key] = data.queryParams[key];
+                });
+
+                $('#'+this.id+'-value').val(str);
+
+                this.tripWidget.module.additionalParameters = params;
+            }
+        },
+    }
+);
 
 /*otp.widgets.TW_GroupTripSubmit =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
