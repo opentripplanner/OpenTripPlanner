@@ -4001,7 +4001,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
     },
     {
       "arrivedAtDestinationWithRentedVehicle": false,
-      "durationSeconds": 1941,
+      "durationSeconds": 1940,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
       "fare": {
@@ -4036,7 +4036,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 3245,
+      "generalizedCost": 3290,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -4151,8 +4151,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 4844.785407243491,
-          "endTime": "2009-11-17T19:22:04.000+00:00",
+          "distanceMeters": 4569.033127779713,
+          "endTime": "2009-11-17T19:21:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -4170,12 +4170,12 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 1804,
+          "generalizedCost": 1740,
           "headsign": "NW 27th & Thurman",
           "intermediateStops": [ ],
           "legGeometry": {
-            "length": 126,
-            "points": "oaytG|zrkV?tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB??S?oCDmCDmCBo@@"
+            "length": 120,
+            "points": "oaytG|zrkV?tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
           },
           "mode": "BUS",
           "onStreetNonTransit": false,
@@ -4193,17 +4193,17 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "streetNotes": [ ],
           "to": {
             "coordinate": {
-              "latitude": 45.532159,
-              "longitude": -122.698634
+              "latitude": 45.529681,
+              "longitude": -122.698529
             },
-            "name": "NW 23rd & Overton",
-            "stopCode": "8981",
+            "name": "NW 23rd & Lovejoy",
+            "stopCode": "7163",
             "stopId": {
               "feedId": "prt",
-              "id": "8981"
+              "id": "7163"
             },
-            "stopIndex": 74,
-            "stopSequence": 75,
+            "stopIndex": 73,
+            "stopSequence": 74,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4261,30 +4261,30 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 231.459,
-          "endTime": "2009-11-17T19:25:05.000+00:00",
+          "distanceMeters": 297.11,
+          "endTime": "2009-11-17T19:25:04.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
-              "latitude": 45.532159,
-              "longitude": -122.698634
+              "latitude": 45.529681,
+              "longitude": -122.698529
             },
-            "name": "NW 23rd & Overton",
-            "stopCode": "8981",
+            "name": "NW 23rd & Lovejoy",
+            "stopCode": "7163",
             "stopId": {
               "feedId": "prt",
-              "id": "8981"
+              "id": "7163"
             },
-            "stopIndex": 74,
-            "stopSequence": 75,
+            "stopIndex": 73,
+            "stopSequence": 74,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 353,
+          "generalizedCost": 462,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 10,
-            "points": "}~{tGnq{kV?LVAF?J?L?rBCLA?RDpH"
+            "length": 15,
+            "points": "oo{tGxp{kVG@?NM?M?_CD?B?FM?G@K?GBwADK?DpH"
           },
           "mode": "WALK",
           "onStreetNonTransit": true,
@@ -4292,7 +4292,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T19:22:04.000+00:00",
+          "startTime": "2009-11-17T19:21:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -4306,17 +4306,34 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": 3.117146926361324,
+              "absoluteDirection": "WEST",
+              "angle": -1.5896261859144973,
               "area": false,
-              "bogusName": false,
-              "distance": 104.452,
+              "bogusName": true,
+              "distance": 6.44,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "DEPART",
               "startLocation": {
-                "latitude": 45.53215782420268,
-                "longitude": -122.69870264831422
+                "latitude": 45.529726790620664,
+                "longitude": -122.69853023095405
+              },
+              "stayOn": false,
+              "streetName": "way 158083864 from 0",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "angle": -0.02639098155686617,
+              "area": false,
+              "bogusName": false,
+              "distance": 87.181,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "RIGHT",
+              "startLocation": {
+                "latitude": 45.5297257,
+                "longitude": -122.69861290000001
               },
               "stayOn": false,
               "streetName": "Northwest 23rd Avenue",
@@ -4324,16 +4341,84 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             {
               "absoluteDirection": "WEST",
-              "angle": -1.576477897189337,
+              "angle": -1.5917857716676513,
               "area": false,
               "bogusName": false,
-              "distance": 127.007,
+              "distance": 4.768,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "LEFT",
+              "startLocation": {
+                "latitude": 45.5305094,
+                "longitude": -122.69864600000001
+              },
+              "stayOn": false,
+              "streetName": "Northwest Marshall Street",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "angle": -0.023560834241705943,
+              "area": false,
+              "bogusName": true,
+              "distance": 7.274,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "RIGHT",
               "startLocation": {
-                "latitude": 45.531218800000005,
-                "longitude": -122.69866750000001
+                "latitude": 45.5305085,
+                "longitude": -122.6987072
+              },
+              "stayOn": false,
+              "streetName": "way 158083033 from 0",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "angle": -0.014157951861867555,
+              "area": false,
+              "bogusName": false,
+              "distance": 64.974,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "CONTINUE",
+              "startLocation": {
+                "latitude": 45.5305739,
+                "longitude": -122.69870940000001
+              },
+              "stayOn": false,
+              "streetName": "Northwest 23rd Avenue",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "angle": -0.07909846198417768,
+              "area": false,
+              "bogusName": true,
+              "distance": 7.294,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "CONTINUE",
+              "startLocation": {
+                "latitude": 45.531153,
+                "longitude": -122.69876060000001
+              },
+              "stayOn": false,
+              "streetName": "way 158083032 from 0",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "WEST",
+              "angle": -1.598333529851037,
+              "area": false,
+              "bogusName": false,
+              "distance": 119.179,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "LEFT",
+              "startLocation": {
+                "latitude": 45.5312184,
+                "longitude": -122.698768
               },
               "stayOn": false,
               "streetName": "Northwest Northrup Street",
@@ -4345,13 +4430,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         }
       ],
       "nTransfers": 0,
-      "nonTransitDistanceMeters": 950.181,
-      "nonTransitTimeSeconds": 737,
+      "nonTransitDistanceMeters": 1015.832,
+      "nonTransitTimeSeconds": 800,
       "onStreetAllTheWay": false,
       "streetOnly": false,
       "systemNotices": [ ],
       "tooSloped": false,
-      "transitTimeSeconds": 1204,
+      "transitTimeSeconds": 1140,
       "waitTimeAdjustedGeneralizedCost": 0,
       "waitingTimeSeconds": 0,
       "walkOnly": false,
