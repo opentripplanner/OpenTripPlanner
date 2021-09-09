@@ -984,19 +984,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.intermediatePlaces.add(location);
     }
 
-    public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
-        this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
-    }
-
-    public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
-        this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
-    }
-
-    public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
-        this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
-    }
-
-
     /* INSTANCE METHODS */
 
     public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
@@ -1338,14 +1325,32 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
      * This setter function accepts any three numbers and will normalize them to add up to 1.
      */
-    public void setTriangleNormalized (double safe, double slope, double time) {
+    public void setTriangleNormalized(double safe, double slope, double time) {
+        if(safe == 0 && slope == 0 && time == 0) {
+            var oneThird = 1f /3;
+            safe = oneThird;
+            slope = oneThird;
+            time = oneThird;
+        }
+        safe = setMinValue(safe);
+        slope = setMinValue(slope);
+        time = setMinValue(time);
+
         double total = safe + slope + time;
+        if(total != 1) {
+            LOG.warn("Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other.");
+        }
+
         safe /= total;
         slope /= total;
         time /= total;
         this.bikeTriangleSafetyFactor = safe;
         this.bikeTriangleSlopeFactor = slope;
         this.bikeTriangleTimeFactor = time;
+    }
+
+    private double setMinValue(double value) {
+        return Math.max(0, value);
     }
 
     public static void assertTriangleParameters(
