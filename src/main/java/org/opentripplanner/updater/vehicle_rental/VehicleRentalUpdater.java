@@ -72,6 +72,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         linker = graph.getLinker();
         // Adding a vehicle rental station service needs a graph writer runnable
         service = graph.getService(VehicleRentalStationService.class, true);
+        // Do any setup if needed
+        source.setup();
     }
 
     @Override

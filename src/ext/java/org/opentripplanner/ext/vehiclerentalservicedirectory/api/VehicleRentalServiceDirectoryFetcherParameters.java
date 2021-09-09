@@ -40,17 +40,21 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
    */
   private final Map<String, String> headers;
 
+  private String language;
+
   public VehicleRentalServiceDirectoryFetcherParameters(
       URI url,
       String sourcesName,
       String updaterUrlName,
       String networkName,
+      String language,
       Map<String, String> headers
   ) {
     this.url = url;
     this.sourcesName = sourcesName;
     this.sourceUrlName = updaterUrlName;
     this.sourceNetworkName = networkName;
+    this.language = language;
     this.headers = headers;
   }
 
@@ -73,4 +77,8 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
   public Map<String, String> getHeaders() {
     return headers;
   }
+
+    public String getLanguage() {
+        return language;
+    }
 }
