@@ -1,6 +1,8 @@
 package org.opentripplanner.netex.index.api;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 /**
  * A hierarchical read-only view on a multimap indexing a collections of
@@ -17,6 +19,26 @@ public interface ReadOnlyHierarchicalVersionMapById<V> {
      * {@code null} if not element is found.
      */
     V lookupLastVersionById(String id);
+
+    /**
+     * Find the entity based on given {@code ref.id} and {@code ref.version} number. If the {@code
+     * ref.version} number is empty, then the given {@code timestamp} is used to find the entity
+     * valid at that time. If no entities are valid at the given {@code timestamp}, then the first
+     * to become valid is chosen. If there is a tie with respect to the validity periods, then the
+     * version number for the entities are used.
+     *
+     * {@code null} if not element is found.
+     */
+    V lookup(VersionOfObjectRefStructure ref, LocalDateTime timestamp);
+
+
+    /**
+     * List one entity for each key. To select an entity we first look at the validation period,
+     * then the version number. An entity is valid, if it has a validity period with a time equals
+     * to or after the given {@code timestamp}. No validation periods is treated as an open ended
+     * period; hence always valid.
+     */
+    Collection<V> localListCurrentVersionEntities(LocalDateTime timestamp);
 
     /**
      * Return {@code true} if the given {@code value.version} is larger or equals to all the
