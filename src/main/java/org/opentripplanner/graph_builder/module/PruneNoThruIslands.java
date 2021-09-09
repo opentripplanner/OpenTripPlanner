@@ -250,7 +250,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 }
             }
             if (log != null) {
-                WriteNodesInSubGraph(island, log, hadRemoved);
+                writeNodesInSubGraph(island, log, hadRemoved);
             }
         }
         if (markIsolated) {
@@ -388,8 +388,8 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                         }
                         else {
                             StreetTraversalPermission permission = pse.getPermission();
-			    if (traverseMode == TraverseMode.CAR) {
-			        permission = permission.remove(StreetTraversalPermission.CAR);
+                            if (traverseMode == TraverseMode.CAR) {
+                                permission = permission.remove(StreetTraversalPermission.CAR);
                             } else if (traverseMode == TraverseMode.BICYCLE) {
                                 permission = permission.remove(StreetTraversalPermission.BICYCLE);
                             } else if (traverseMode == TraverseMode.WALK) {
@@ -464,7 +464,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         return subgraph;
     }
 
-    private static void WriteNodesInSubGraph(
+    private static void writeNodesInSubGraph(
             Subgraph subgraph,
             PrintWriter islandLog,
             boolean hadRemoved

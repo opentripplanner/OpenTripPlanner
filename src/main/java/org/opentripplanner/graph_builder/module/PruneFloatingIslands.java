@@ -212,7 +212,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
                 }
             }
             if (islandLog != null) {
-                WriteNodesInSubGraph(island, islandLog, hadRemoved);
+                writeNodesInSubGraph(island, islandLog, hadRemoved);
             }
         }
         if (graph.removeEdgelessVertices() > 0) {
@@ -283,7 +283,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
 //        return null;
     }
 
-    private static void WriteNodesInSubGraph(
+    private static void writeNodesInSubGraph(
             Subgraph subgraph,
             PrintWriter islandLog,
             boolean hadRemoved
