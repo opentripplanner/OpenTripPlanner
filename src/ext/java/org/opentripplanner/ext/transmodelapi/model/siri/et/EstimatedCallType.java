@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.transmodelapi.model.siri.et;
 
+import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
+import static org.opentripplanner.model.PickDrop.NONE;
+
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
@@ -7,26 +10,23 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
-import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.alertpatch.StopCondition;
-import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.services.TransitAlertService;
-
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
+import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.services.TransitAlertService;
 
 public class EstimatedCallType {
   private static final String NAME = "EstimatedCall";
@@ -259,16 +259,18 @@ public class EstimatedCallType {
 
     TransitAlertService alertPatchService = routingService.getTransitAlertService();
 
+    final ServiceDate serviceDate = new ServiceDate(LocalDate.ofEpochDay(1+tripTimeOnDate.getServiceDay()/(24*3600)));
+
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId));
+    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId, serviceDate));
     allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId));
     // StopPlace
     allAlerts.addAll(alertPatchService.getStopAlerts(parentStopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(parentStopId, tripId));
+    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate));
     allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(parentStopId, routeId));
     // Trip
-    allAlerts.addAll(alertPatchService.getTripAlerts(tripId));
+    allAlerts.addAll(alertPatchService.getTripAlerts(tripId, serviceDate));
     // Route
     allAlerts.addAll(alertPatchService.getRouteAlerts(routeId));
     // Agency
@@ -277,9 +279,9 @@ public class EstimatedCallType {
     // TripPattern
     allAlerts.addAll(alertPatchService.getTripPatternAlerts(routingService.getPatternForTrip().get(trip).getId()));
 
-    long serviceDayMillis = 1000 * tripTimeOnDate.getServiceDay();
-    long arrivalMillis = 1000 * tripTimeOnDate.getRealtimeArrival();
-    long departureMillis = 1000 * tripTimeOnDate.getRealtimeDeparture();
+    long serviceDayMillis = 1000L * tripTimeOnDate.getServiceDay();
+    long arrivalMillis = 1000L * tripTimeOnDate.getRealtimeArrival();
+    long departureMillis = 1000L * tripTimeOnDate.getRealtimeDeparture();
 
     filterSituationsByDateAndStopConditions(allAlerts,
         new Date(serviceDayMillis + arrivalMillis),
