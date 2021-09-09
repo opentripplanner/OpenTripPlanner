@@ -64,8 +64,7 @@ public class ItineraryFiltersInputType {
                 .newInputObjectField()
                 .type(Scalars.GraphQLFloat)
                 .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
-                .description(
-                        "DEPRECATED! Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
+                .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
                 .defaultValue(dft.groupSimilarityKeepThree)
                 .build())
         .build();
