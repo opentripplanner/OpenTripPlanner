@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.alertpatch;
 
+import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
 
@@ -167,7 +168,7 @@ public interface EntitySelector {
     private final FeedScopedId stop;
     private final FeedScopedId routeOrTrip;
     private final ServiceDate serviceDate;
-    private transient int hash = -1;
+    private final transient int hash;
 
     public StopAndRouteOrTripKey(FeedScopedId stop, FeedScopedId routeOrTrip) {
       this(stop, routeOrTrip, null);
@@ -176,6 +177,7 @@ public interface EntitySelector {
       this.stop = stop;
       this.routeOrTrip = routeOrTrip;
       this.serviceDate = serviceDate;
+      this.hash = Objects.hash(stop, serviceDate, routeOrTrip);
     }
 
     @Override
@@ -202,13 +204,7 @@ public interface EntitySelector {
 
     @Override
     public int hashCode() {
-      if (hash == -1) {
-        int stopResult = stop.hashCode();
-        int serviceDateResult = serviceDate == null ? 0:serviceDate.hashCode();
-        hash = 31 * stopResult + 31 * serviceDateResult + routeOrTrip.hashCode();
-      }
       return hash;
     }
-
   }
 }
