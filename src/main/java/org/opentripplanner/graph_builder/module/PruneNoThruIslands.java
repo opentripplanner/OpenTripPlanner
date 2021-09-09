@@ -235,7 +235,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 //for islands with stops
                 if (island.streetSize() < islandWithStopMaxSize) {
                     restrictOrRemove(
-                            graph, island, issueStore, isolated, stats, markIsolated, traverseMode);
+                            graph, island, isolated, stats, markIsolated, traverseMode);
                     hadRemoved = true;
                     count++;
                 }
@@ -244,12 +244,12 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 //for islands without stops
                 if (island.streetSize() < maxIslandSize) {
                     restrictOrRemove(
-                            graph, island, issueStore, isolated, stats, markIsolated, traverseMode);
+                            graph, island, isolated, stats, markIsolated, traverseMode);
                     hadRemoved = true;
                     count++;
                 }
             }
-            if (log != null) {
+            if (log != null && !markIsolated) {
                 writeNodesInSubGraph(island, log, hadRemoved);
             }
         }
@@ -260,6 +260,9 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             LOG.info("Removed {} edges", stats.get("removed"));
             LOG.info("Removed traversal mode from {} edges", stats.get("restricted"));
             LOG.info("Converted {} edges to noThruTraffic", stats.get("noThru"));
+            issueStore.add(new GraphConnectivity(
+                traverseMode, islands.size(), stats.get("removed"), stats.get("restricted"), stats.get("noThru")
+            ));
         }
         return count;
     }
@@ -356,7 +359,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     private static void restrictOrRemove(
             Graph graph,
             Subgraph island,
-            DataImportIssueStore issueStore,
             Map<Edge, Boolean> isolated,
             Map<String, Integer> stats,
             boolean markIsolated,
@@ -428,8 +430,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 }
             }
         }
-        issueStore.add(
-                new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize()));
     }
 
     private static Subgraph computeConnectedSubgraph(

@@ -1,40 +1,33 @@
 package org.opentripplanner.graph_builder.issues;
 
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.routing.graph.Vertex;
 
 public class GraphConnectivity implements DataImportIssue {
 
-    public static final String FMT = "Removed/depedestrianized disconnected subgraph containing vertex '%s' at (%f, %f), with %d edges";
-    public static final String HTMLFMT = "Removed/depedestrianized disconnected subgraph containing vertex <a href='http://www.openstreetmap.org/node/%s'>'%s'</a>, with %d edges";
+    public static final String FMT = "%s graph connectivity: found %d islands, removed %d isolated edges, removed traverse mode from %d edges, converted %d edges to no through traffic";
 
-    final Vertex vertex;
-    final int size;
-    
-    public GraphConnectivity(Vertex vertex, int size){
-    	this.vertex = vertex;
-    	this.size = size;
+    final TraverseMode traverseMode;
+    final long size;
+    final long removed;
+    final long restricted;
+    final long nothru;
+
+    public GraphConnectivity(TraverseMode traverseMode, long size, long removed, long restricted, long nothru) {
+        this.traverseMode = traverseMode;
+            this.size = size;
+        this.removed = removed;
+        this.restricted = restricted;
+        this.nothru = nothru;
     }
 
     @Override
     public String getMessage() {
-        return String.format(FMT, vertex, vertex.getCoordinate().x, vertex.getCoordinate().y, size);
+        return String.format(FMT,this.traverseMode.toString(), this.size, this.removed, this.restricted, this.nothru);
     }
 
     @Override
     public String getHTMLMessage() {
-        String label = vertex.getLabel();
-        if (label.startsWith("osm:")) {
-            String osmNodeId = label.split(":")[2];
-            return String.format(HTMLFMT, osmNodeId, osmNodeId, size);
-        } else {
-            return this.getMessage();
-        }
+        return this.getMessage();
     }
-
-    @Override
-    public Vertex getReferencedVertex() {
-        return vertex;
-    }
-
 }
