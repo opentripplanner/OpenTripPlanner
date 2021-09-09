@@ -12,6 +12,7 @@
 - Fix bug querying stopPlaces [#3591](https://github.com/opentripplanner/OpenTripPlanner/pull/3591)
 - Fix the field bikesAllowed [#3586](https://github.com/opentripplanner/OpenTripPlanner/pull/3586)
 - Add triangle factors for bicycle routing [#3585](https://github.com/opentripplanner/OpenTripPlanner/pull/3585)
+- Fix correct type for BookingArrangementType#latestBookingDay
 
 ## Documentation
 
