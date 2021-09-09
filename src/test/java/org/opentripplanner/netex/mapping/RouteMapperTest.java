@@ -1,10 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
 import java.util.TimeZone;
-import org.junit.Test;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collections;
 import java.util.Set;
@@ -24,10 +22,8 @@ import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OrganisationRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
 
-import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
 public class RouteMapperTest {
 
