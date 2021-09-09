@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.SneakyThrows;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -40,10 +41,6 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
         var capacity = parseCapacity(jsonNode);
         var availability = parseAvailability(jsonNode);
 
-        if (capacity == null) {
-            return null;
-        }
-
         I18NString note = null;
         if (jsonNode.has("notes") && !jsonNode.get("notes").isEmpty()) {
             var noteFieldIterator = jsonNode.path("notes").fields();
@@ -75,6 +72,11 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
         var tags = parseTags(jsonNode, "lot_type", "address", "forecast", "state");
         tags.addAll(staticTags);
 
+        var maybeCapacity = Optional.ofNullable(capacity);
+        var bicyclePlaces = maybeCapacity.map(c -> hasPlaces(capacity.getBicycleSpaces())).orElse(false);
+        var carPlaces= maybeCapacity.map(c -> hasPlaces(capacity.getCarSpaces())).orElse(true);
+        var wheelChairAccessiblePlaces= maybeCapacity.map(c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces())).orElse(false);
+
         return VehicleParking.builder()
                 .id(vehicleParkId)
                 .name(new NonLocalizedString(jsonNode.path("name").asText()))
@@ -88,9 +90,9 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
                 .note(note)
                 .capacity(capacity)
                 .availability(availability)
-                .bicyclePlaces(hasPlaces(capacity.getBicycleSpaces()))
-                .carPlaces(hasPlaces(capacity.getCarSpaces()))
-                .wheelchairAccessibleCarPlaces(hasPlaces(capacity.getWheelchairAccessibleCarSpaces()))
+                .bicyclePlaces(bicyclePlaces)
+                .carPlaces(carPlaces)
+                .wheelchairAccessibleCarPlaces(wheelChairAccessiblePlaces)
                 .entrance(entrance)
                 .tags(tags)
                 .build();
