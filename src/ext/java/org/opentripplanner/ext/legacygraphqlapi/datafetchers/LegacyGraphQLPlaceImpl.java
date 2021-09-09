@@ -65,12 +65,7 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
       if (vehicleRentalStationService == null) { return null; }
 
-      return vehicleRentalStationService
-          .getVehicleRentalStations()
-          .stream()
-          .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(place.bikeShareId))
-          .findAny()
-          .orElse(null);
+      return vehicleRentalStationService.getVehicleRentalStation(place.bikeShareId);
     };
   }
 

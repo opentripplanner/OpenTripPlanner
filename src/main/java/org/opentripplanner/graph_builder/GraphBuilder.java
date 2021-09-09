@@ -119,7 +119,6 @@ public class GraphBuilder implements Runnable {
             osmModule.setDefaultWayPropertySetSource(config.osmWayPropertySet);
             osmModule.skipVisibility = !config.areaVisibility;
             osmModule.platformEntriesLinking = config.platformEntriesLinking;
-            osmModule.staticBikeRental = config.staticBikeRental;
             osmModule.staticBikeParkAndRide = config.staticBikeParkAndRide;
             osmModule.staticParkAndRide = config.staticParkAndRide;
             osmModule.banDiscouragedWalking = config.banDiscouragedWalking;

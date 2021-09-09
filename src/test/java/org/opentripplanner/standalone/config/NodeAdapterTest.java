@@ -323,4 +323,17 @@ public class NodeAdapterTest {
             subject.asMap("missing-key", NodeAdapter::asBoolean)
         );
     }
+
+    @Test
+    public void asTextSet() {
+        NodeAdapter subject = newNodeAdapterForTest("{ ids : ['A', 'C', 'F'] }");
+        assertEquals(
+                Set.of("A", "C", "F"),
+                subject.asTextSet("ids", Collections.emptySet())
+        );
+        assertEquals(
+                Set.of("X"),
+                subject.asTextSet("nonExisting", Set.of("X"))
+        );
+    }
 }

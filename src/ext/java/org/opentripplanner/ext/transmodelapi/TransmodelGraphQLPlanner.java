@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
@@ -63,6 +64,10 @@ public class TransmodelGraphQLPlanner {
 
             response.debugOutput = res.getDebugAggregator().finishedRendering();
         }
+        catch (ParameterException e) {
+            var msg = e.message.get();
+            throw new GraphQLException(msg, e);
+        }
         catch (Exception e) {
             LOG.warn("System error");
             LOG.error("Root cause: " + e.getMessage(), e);
@@ -90,7 +95,8 @@ public class TransmodelGraphQLPlanner {
         return new GenericLocation(name, stopId, lat, lon);
     }
 
-    private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+    private RoutingRequest createRequest(DataFetchingEnvironment environment)
+    throws ParameterException {
         TransmodelRequestContext context = environment.getContext();
         Router router = context.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
@@ -127,19 +133,15 @@ public class TransmodelGraphQLPlanner {
         BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
-            try {
-                RoutingRequest.assertTriangleParameters(
-                    request.bikeTriangleSafetyFactor,
-                    request.bikeTriangleTimeFactor,
-                    request.bikeTriangleSlopeFactor
-                );
-                // TODO These are not defined in the graphql schema
-                callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
-                callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
-                callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
-            } catch (ParameterException e) {
-                throw new RuntimeException(e);
-            }
+
+            // Arguments: [ safety, slope, time ]
+            final double[] args = new double[3];
+
+            callWith.argument("triangleFactors.safety", (Double v) -> args[0] = v);
+            callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
+            callWith.argument("triangleFactors.time", (Double v) -> args[2] = v);
+
+            request.setTriangleNormalized(args[0], args[1], args[2]);
         }
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {

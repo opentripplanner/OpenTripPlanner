@@ -220,24 +220,24 @@ public class StateEditor {
 
     public void beginFloatingVehicleRenting(
             TraverseMode vehicleMode,
-            Set<String> networks,
+            String network,
             boolean reverse
     ) {
         cloneStateDataAsNeeded();
         if (reverse) {
             child.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
             child.stateData.currentMode = TraverseMode.WALK;
-            child.stateData.vehicleRentalNetworks = null;
+            child.stateData.vehicleRentalNetwork = null;
         } else {
             child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
             child.stateData.currentMode = vehicleMode;
-            child.stateData.vehicleRentalNetworks = networks;
+            child.stateData.vehicleRentalNetwork = network;
         }
     }
 
     public void beginVehicleRentingAtStation(
             TraverseMode vehicleMode,
-            Set<String> networks,
+            String network,
             boolean mayKeep,
             boolean reverse
     ) {
@@ -246,19 +246,19 @@ public class StateEditor {
             child.stateData.mayKeepRentedVehicleAtDestination = mayKeep;
             child.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
             child.stateData.currentMode = TraverseMode.WALK;
-            child.stateData.vehicleRentalNetworks = null;
+            child.stateData.vehicleRentalNetwork = null;
             child.stateData.backWalkingBike = false;
         } else {
             child.stateData.mayKeepRentedVehicleAtDestination = mayKeep;
             child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
             child.stateData.currentMode = vehicleMode;
-            child.stateData.vehicleRentalNetworks = networks;
+            child.stateData.vehicleRentalNetwork = network;
         }
     }
 
     public void dropOffRentedVehicleAtStation(
             TraverseMode vehicleMode,
-            Set<String> networks,
+            String network,
             boolean reverse
     ) {
         cloneStateDataAsNeeded();
@@ -266,12 +266,12 @@ public class StateEditor {
             child.stateData.mayKeepRentedVehicleAtDestination = false;
             child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
             child.stateData.currentMode = vehicleMode;
-            child.stateData.vehicleRentalNetworks = networks;
+            child.stateData.vehicleRentalNetwork = network;
         } else {
             child.stateData.mayKeepRentedVehicleAtDestination = false;
             child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
             child.stateData.currentMode = TraverseMode.WALK;
-            child.stateData.vehicleRentalNetworks = null;
+            child.stateData.vehicleRentalNetwork = null;
             child.stateData.backWalkingBike = false;
         }
     }
@@ -385,9 +385,9 @@ public class StateEditor {
         child.stateData.opt = options;
     }
 
-    public void setBikeRentalNetwork(Set<String> networks) {
+    public void setBikeRentalNetwork(String network) {
         cloneStateDataAsNeeded();
-        child.stateData.vehicleRentalNetworks = networks;
+        child.stateData.vehicleRentalNetwork = network;
     }
 
     public State getBackState() {

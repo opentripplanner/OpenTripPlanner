@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimaps;
 import graphql.relay.Connection;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
@@ -9,7 +11,6 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
@@ -82,12 +83,8 @@ public class LegacyGraphQLQueryTypeImpl
               .findAny()
               .orElse(null);
         case "BikeRentalStation":
-          return vehicleRentalStationService == null ? null : vehicleRentalStationService
-              .getVehicleRentalStations()
-              .stream()
-              .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(id))
-              .findAny()
-              .orElse(null);
+          return vehicleRentalStationService == null ? null :
+              vehicleRentalStationService.getVehicleRentalStation(FeedScopedId.parseId(id));
         case "CarPark":
           return null; //TODO
         case "Cluster":
@@ -502,13 +499,13 @@ public class LegacyGraphQLQueryTypeImpl
               environment.getArguments());
 
       if (args.getLegacyGraphQLIds() != null) {
-        Map<String, VehicleRentalStation> vehicleRentalStations =
+        ArrayListMultimap<String, VehicleRentalStation> vehicleRentalStations =
                 vehicleRentalStationService.getVehicleRentalStations()
                         .stream()
-                        .collect(Collectors.toMap(station -> station.id, station -> station));
+                        .collect(Multimaps.toMultimap(VehicleRentalStation::getStationId, station -> station, ArrayListMultimap::create));
         return ((List<String>) args.getLegacyGraphQLIds())
                 .stream()
-                .map(vehicleRentalStations::get)
+                .flatMap(id -> vehicleRentalStations.get(id).stream())
                 .collect(Collectors.toList());
       }
 
@@ -529,7 +526,7 @@ public class LegacyGraphQLQueryTypeImpl
       return vehicleRentalStationService
               .getVehicleRentalStations()
               .stream()
-              .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(args.getLegacyGraphQLId()))
+              .filter(vehicleRentalStation -> vehicleRentalStation.getStationId().equals(args.getLegacyGraphQLId()))
               .findAny()
               .orElse(null);
     };
@@ -657,19 +654,16 @@ public class LegacyGraphQLQueryTypeImpl
         BicycleOptimizeType optimize = BicycleOptimizeType.valueOf(environment.getArgument("optimize"));
 
         if (optimize == BicycleOptimizeType.TRIANGLE) {
-          callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
-          callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
-          callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
-          try {
-            RoutingRequest.assertTriangleParameters(
-                request.bikeTriangleSafetyFactor,
-                request.bikeTriangleTimeFactor,
-                request.bikeTriangleSlopeFactor
-            );
-          }
-          catch (ParameterException e) {
-            throw new RuntimeException(e);
-          }
+
+          // because we must use a final variable in the lambda we have to use this ugly crutch.
+          // Arguments: [ safety, slope, time ]
+          final double[] args = new double[3];
+
+          callWith.argument("triangle.safetyFactor", (Double v) -> args[0] = v);
+          callWith.argument("triangle.slopeFactor", (Double v) -> args[1] = v);
+          callWith.argument("triangle.timeFactor", (Double v) -> args[2] = v);
+
+          request.setTriangleNormalized(args[0], args[1], args[2]);
         }
 
         if (optimize == BicycleOptimizeType.TRANSFERS) {

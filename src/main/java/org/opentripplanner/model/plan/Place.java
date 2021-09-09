@@ -59,7 +59,7 @@ public class Place {
     /**
      * In case the vertex is of type Bike sharing station.
      */
-    public String bikeShareId;
+    public FeedScopedId bikeShareId;
 
     public Place(Double lat, Double lon, String name) {
         this.name = name;
@@ -107,7 +107,7 @@ public class Place {
                 .addNum("stopIndex", stopIndex)
                 .addNum("stopSequence", stopSequence)
                 .addEnum("vertexType", vertexType)
-                .addStr("bikeShareId", bikeShareId)
+                .addObj("bikeShareId", bikeShareId)
                 .toString();
     }
 }

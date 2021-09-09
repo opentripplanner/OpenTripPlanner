@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
@@ -295,13 +295,12 @@ public abstract class GraphRoutingTest {
                 String id,
                 double latitude,
                 double longitude,
-                Set<String> networks
+                String network
         ) {
             var vehicleRentalStation = new VehicleRentalStation();
-            vehicleRentalStation.id = id;
+            vehicleRentalStation.id = new FeedScopedId(network, id);
             vehicleRentalStation.longitude = longitude;
             vehicleRentalStation.latitude = latitude;
-            vehicleRentalStation.networks = networks;
             vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
             return vehicleRentalStation;
         }
@@ -310,11 +309,11 @@ public abstract class GraphRoutingTest {
                 String id,
                 double latitude,
                 double longitude,
-                Set<String> networks
+                String network
         ) {
             var vertex = new VehicleRentalStationVertex(
                     graph,
-                    vehicleRentalStationEntity(id, latitude, longitude, networks)
+                    vehicleRentalStationEntity(id, latitude, longitude, network)
             );
             new VehicleRentalEdge(vertex);
             return vertex;
@@ -325,7 +324,7 @@ public abstract class GraphRoutingTest {
                 double latitude,
                 double longitude
         ) {
-            return vehicleRentalStation(id, latitude, longitude, Set.of(TEST_VEHICLE_RENTAL_NETWORK));
+            return vehicleRentalStation(id, latitude, longitude, TEST_VEHICLE_RENTAL_NETWORK);
         }
 
         public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalStationVertex to) {

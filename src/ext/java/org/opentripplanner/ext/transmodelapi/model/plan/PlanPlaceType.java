@@ -82,11 +82,7 @@ public class PlanPlaceType {
                   ? GqlUtil
                   .getRoutingService(environment)
                   .getVehicleRentalStationService()
-                  .getVehicleRentalStations()
-                  .stream()
-                  .filter(vehicleRentalStation -> vehicleRentalStation.id.equals(((Place) environment.getSource()).bikeShareId))
-                  .findFirst()
-                  .orElse(null)
+                  .getVehicleRentalStation(((Place) environment.getSource()).bikeShareId)
                   : null;
             })
             .build())

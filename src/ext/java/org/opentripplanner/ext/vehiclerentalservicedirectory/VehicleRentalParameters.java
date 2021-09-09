@@ -10,6 +10,6 @@ public class VehicleRentalParameters extends VehicleRentalUpdaterParameters {
       int frequencySec,
       VehicleRentalDataSourceParameters sourceParameters
   ) {
-    super(configRef, null, frequencySec, sourceParameters);
+    super(configRef, frequencySec, sourceParameters);
   }
 }
