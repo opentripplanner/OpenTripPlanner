@@ -94,7 +94,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Boolean> rentedBike() {
-    return environment -> getSource(environment).rentedBike;
+    return environment -> getSource(environment).rentedVehicle;
   }
 
   @Override

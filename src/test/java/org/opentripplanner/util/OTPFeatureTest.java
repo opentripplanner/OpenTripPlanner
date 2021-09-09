@@ -72,7 +72,6 @@ public class OTPFeatureTest {
         OTPFeature.APIBikeRental.set(true);
 
         // And features missing in the config file
-        OTPFeature.APIExternalGeocoder.set(true);
         OTPFeature.APIGraphInspectorTile.set(false);
 
         // When
@@ -81,6 +80,5 @@ public class OTPFeatureTest {
         // Then
         assertTrue(OTPFeature.APIServerInfo.isOn());
         assertTrue(OTPFeature.APIBikeRental.isOff());
-        assertTrue(OTPFeature.APIExternalGeocoder.isOn());
     }
 }

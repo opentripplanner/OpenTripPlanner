@@ -20,9 +20,9 @@ public class StateData implements Cloneable {
 
     protected boolean bikeParked;
 
-    protected BikeRentalState bikeRentalState;
+    protected VehicleRentalState vehicleRentalState;
 
-    protected boolean mayKeepRentedBicycleAtDestination;
+    protected boolean mayKeepRentedVehicleAtDestination;
 
     protected CarPickupState carPickupState;
 
@@ -41,7 +41,7 @@ public class StateData implements Cloneable {
 
     protected boolean backWalkingBike;
 
-    public Set<String> bikeRentalNetworks;
+    public String vehicleRentalNetwork;
 
     /* This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
     protected boolean enteredNoThroughTrafficArea;

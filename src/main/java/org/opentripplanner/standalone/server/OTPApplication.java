@@ -1,9 +1,9 @@
 package org.opentripplanner.standalone.server;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;

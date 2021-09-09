@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
  * level 'otp-config.json' file.
  */
 public enum OTPFeature {
-    APIExternalGeocoder(true),
     APIBikeRental(true),
     APIServerInfo(true),
     APIGraphInspectorTile(true),

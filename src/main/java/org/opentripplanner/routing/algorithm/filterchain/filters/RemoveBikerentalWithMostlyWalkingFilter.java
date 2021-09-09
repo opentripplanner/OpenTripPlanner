@@ -35,7 +35,7 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryFilter 
 
             double bikeRentalDistance = itinerary.legs
                     .stream()
-                    .filter(l -> l.rentedBike != null && l.rentedBike)
+                    .filter(l -> l.rentedVehicle != null && l.rentedVehicle)
                     .mapToDouble(l -> l.distanceMeters)
                     .sum();
             double totalDistance = itinerary.distanceMeters();

@@ -26,7 +26,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
     private static final Color TRANSIT_STOP_COLOR_VERTEX = new Color(0.0f, 0.0f, 0.8f);
 
-    private static final Color BIKE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
+    private static final Color VEHICLE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
 
     private static final Color PARK_AND_RIDE_COLOR_VERTEX = Color.RED;
 
@@ -67,8 +67,8 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
         } else if (v instanceof TransitStopVertex || v instanceof TransitEntranceVertex || v instanceof TransitPathwayNodeVertex || v instanceof TransitBoardingAreaVertex) {
             attrs.color = TRANSIT_STOP_COLOR_VERTEX;
             attrs.label = v.getName();
-        } else if (v instanceof BikeRentalStationVertex) {
-            attrs.color = BIKE_RENTAL_COLOR_VERTEX;
+        } else if (v instanceof VehicleRentalStationVertex) {
+            attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
             attrs.label = v.getName();
         } else if (v instanceof ParkAndRideVertex || v instanceof BikeParkVertex) {
             attrs.color = PARK_AND_RIDE_COLOR_VERTEX;

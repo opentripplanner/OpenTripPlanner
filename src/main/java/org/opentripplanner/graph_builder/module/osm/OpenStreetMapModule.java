@@ -30,14 +30,14 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.BikeRentalEdge;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -54,7 +54,7 @@ import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
@@ -124,11 +124,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * around.
      */
     public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
-
-    /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs. (default false)
-     */
-    public boolean staticBikeRental;
 
     /**
      * Whether we should create car P+R stations from OSM data. The default value is true. In normal
@@ -266,10 +261,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         public void buildGraph(HashMap<Class<?>, Object> extra) {
-            if (staticBikeRental) {
-                processBikeRentalNodes();
-            }
-
             if (staticBikeParkAndRide) {
                 processBikeParkAndRideNodes();
             }
@@ -309,70 +300,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             applyBikeSafetyFactor(graph);
         } // END buildGraph()
 
-        private void processBikeRentalNodes() {
-            LOG.info("Processing bike rental nodes...");
-            int n = 0;
-            BikeRentalStationService bikeRentalService = graph.getService(
-                    BikeRentalStationService.class, true);
-            graph.putService(BikeRentalStationService.class, bikeRentalService);
-            for (OSMNode node : osmdb.getBikeRentalNodes()) {
-                n++;
-                //Gets name tag and translations if they exists
-                //TODO: use wayPropertySet.getCreativeNameForWay(node)
-                //Currently this names them as platform n
-                I18NString creativeName = node.getAssumedName();
-                if (creativeName == null) {
-                    creativeName = new NonLocalizedString("" + node.getId());
-                }
-
-                int capacity = Integer.MAX_VALUE;
-                if (node.hasTag("capacity")) {
-                    try {
-                        capacity = node.getCapacity();
-                    } catch (NumberFormatException e) {
-                        LOG.warn("Capacity for osm node " + node.getId() + " (" + creativeName
-                                + ") is not a number: " + node.getTag("capacity"));
-                    }
-                }
-                String networks = node.getTag("network");
-                String operators = node.getTag("operator");
-                Set<String> networkSet = new HashSet<String>();
-                if (networks != null)
-                    networkSet.addAll(Arrays.asList(networks.split(";")));
-                if (operators != null)
-                    networkSet.addAll(Arrays.asList(operators.split(";")));
-                if (networkSet.isEmpty()) {
-                    LOG.warn("Bike rental station at osm node " + node.getId() + " ("
-                            + creativeName + ") with no network; including as compatible-with-all.");
-                    networkSet = null; // Special "catch-all" value
-                }
-                BikeRentalStation station = new BikeRentalStation();
-                station.id = "" + node.getId();
-                station.name = creativeName;
-                station.x = node.lon;
-                station.y = node.lat;
-                // The following make sure that spaces+bikes=capacity, always.
-                // Also, for the degenerate case of capacity=1, we should have 1
-                // bike available, not 0.
-                station.spacesAvailable = capacity / 2;
-                station.bikesAvailable = capacity - station.spacesAvailable;
-                station.realTimeData = false;
-                station.networks = networkSet;
-                bikeRentalService.addBikeRentalStation(station);
-                BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
-                new BikeRentalEdge(stationVertex);
-            }
-            if (n > 1) {
-                graph.hasBikeSharing = true;
-            }
-            LOG.info("Created " + n + " bike rental stations.");
-        }
-
         private void processBikeParkAndRideNodes() {
             LOG.info("Processing bike P+R nodes...");
             int n = 0;
-            BikeRentalStationService bikeRentalService = graph.getService(
-                    BikeRentalStationService.class, true);
+            VehicleRentalStationService bikeRentalService = graph.getService(
+                    VehicleRentalStationService.class, true);
             for (OSMNode node : osmdb.getBikeParkingNodes()) {
                 n++;
                 I18NString creativeName = wayPropertySet.getCreativeNameForWay(node);
@@ -419,8 +351,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * @param area
          */
         private void buildBikeParkAndRideForArea(Area area) {
-            BikeRentalStationService bikeRentalService = graph.getService(
-                    BikeRentalStationService.class, true);
+            VehicleRentalStationService bikeRentalService = graph.getService(
+                    VehicleRentalStationService.class, true);
             Envelope envelope = new Envelope();
             long osmId = area.parent.getId();
             I18NString creativeName = wayPropertySet.getCreativeNameForWay(area.parent);

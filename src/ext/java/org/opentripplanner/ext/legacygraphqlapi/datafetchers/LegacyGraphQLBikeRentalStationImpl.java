@@ -4,31 +4,33 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationUris;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
+
+import java.util.List;
 
 public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBikeRentalStation {
     @Override
     public DataFetcher<Relay.ResolvedGlobalId> id() {
         return environment -> new Relay.ResolvedGlobalId(
                 "BikeRentalStation",
-                getSource(environment).id
+                getSource(environment).id.toString()
         );
     }
 
     @Override
     public DataFetcher<String> stationId() {
-        return environment -> getSource(environment).id;
+        return environment -> getSource(environment).getStationId();
     }
 
     @Override
     public DataFetcher<String> name() {
-        return environment -> getSource(environment).getName();
+        return environment -> getSource(environment).name.toString(environment.getLocale());
     }
 
     @Override
     public DataFetcher<Integer> bikesAvailable() {
-        return environment -> getSource(environment).bikesAvailable;
+        return environment -> getSource(environment).vehiclesAvailable;
     }
 
     @Override
@@ -54,17 +56,17 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<Iterable<String>> networks() {
-        return environment -> getSource(environment).networks;
+        return environment -> List.of(getSource(environment).getNetwork());
     }
 
     @Override
     public DataFetcher<Double> lon() {
-        return environment -> getSource(environment).x;
+        return environment -> getSource(environment).longitude;
     }
 
     @Override
     public DataFetcher<Double> lat() {
-        return environment -> getSource(environment).y;
+        return environment -> getSource(environment).latitude;
     }
 
     @Override
@@ -80,11 +82,11 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     }
 
     @Override
-    public DataFetcher<BikeRentalStationUris> rentalUris() {
+    public DataFetcher<VehicleRentalStationUris> rentalUris() {
         return environment -> getSource(environment).rentalUris;
     }
 
-    private BikeRentalStation getSource(DataFetchingEnvironment environment) {
+    private VehicleRentalStation getSource(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
 }

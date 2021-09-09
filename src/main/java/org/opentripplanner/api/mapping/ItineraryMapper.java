@@ -36,7 +36,7 @@ public class ItineraryMapper {
         api.elevationGained = domain.elevationGained;
         api.transfers = domain.nTransfers;
         api.tooSloped = domain.tooSloped;
-        api.arrivedAtDestinationWithRentedBicycle = domain.arrivedAtDestinationWithRentedBicycle;
+        api.arrivedAtDestinationWithRentedBicycle = domain.arrivedAtDestinationWithRentedVehicle;
         api.fare = domain.fare;
         api.legs = legMapper.mapLegs(domain.legs);
         api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.systemNotices);
