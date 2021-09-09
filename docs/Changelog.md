@@ -45,6 +45,7 @@
 - Remove non-GBFS bicycle rental updaters [#3562](https://github.com/opentripplanner/OpenTripPlanner/issues/3562)
 - Remove possibility to import vehicle rental stations from OSM, make vehicle rental stations feed scoped [#3601](https://github.com/opentripplanner/OpenTripPlanner/pull/3601)
 - When importing Netex, allow bicycles on ferries by default [#3596](https://github.com/opentripplanner/OpenTripPlanner/pull/3596)
+- Add basic version-support for importing tariffzones [#3590](https://github.com/opentripplanner/OpenTripPlanner/pull/3590)
 
 
 ## 2.0.0 (2020-11-27)
