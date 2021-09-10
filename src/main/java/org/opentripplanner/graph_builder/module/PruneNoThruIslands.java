@@ -63,7 +63,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
      * that were found and whether they were pruned. If the value is an empty string or null there
      * will be no output file.
      */
-    private String islandLogFile;
+    private String islandLogFile = null;
 
     private StreetLinkerModule transitToStreetNetwork;
 
@@ -91,7 +91,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         LOG.info("Pruning islands and areas isolated by nothru edges in street network");
 
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
-                pruningThresholdIslandWithStops, islandLogFile,
+                pruningThresholdIslandWithStops, null,
                 issueStore, TraverseMode.BICYCLE
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
@@ -99,7 +99,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 issueStore, TraverseMode.WALK
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
-                pruningThresholdIslandWithStops, islandLogFile,
+                pruningThresholdIslandWithStops, null,
                 issueStore, TraverseMode.CAR
         );
         if (transitToStreetNetwork == null) {
@@ -151,9 +151,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             }
         }
         if (islandLog != null) {
-            islandLog.printf("%s\t%s\t%s\t%s\t%s\n", "id", "stopCount", "streetCount", "wkt",
-                    "hadRemoved"
-            );
+            islandLog.printf("%s\t%s\t%s\t%s\t%s\n", "id", "stops", "streets", "changed", "node");
         }
         Map<Vertex, Subgraph> subgraphs = new HashMap<Vertex, Subgraph>();
         Map<Vertex, Subgraph> extgraphs = new HashMap<Vertex, Subgraph>();
@@ -207,6 +205,9 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         if (graph.removeEdgelessVertices() > 0) {
             LOG.warn("Removed edgeless vertices after pruning islands");
         }
+        if (islandLog != null) {
+            islandLog.close();
+        }
     }
 
     private static int processIslands(
@@ -230,27 +231,25 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
         int count = 0;
         for (Subgraph island : islands) {
-            boolean hadRemoved = false;
+            boolean changed = false;
             if (island.stopSize() > 0) {
                 //for islands with stops
                 if (island.streetSize() < islandWithStopMaxSize) {
-                    restrictOrRemove(
-                            graph, island, isolated, stats, markIsolated, traverseMode);
-                    hadRemoved = true;
+                    restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode);
+                    changed = true;
                     count++;
                 }
             }
             else {
                 //for islands without stops
                 if (island.streetSize() < maxIslandSize) {
-                    restrictOrRemove(
-                            graph, island, isolated, stats, markIsolated, traverseMode);
-                    hadRemoved = true;
+                    restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode);
+                    changed = true;
                     count++;
                 }
             }
-            if (log != null && !markIsolated) {
-                writeNodesInSubGraph(island, log, hadRemoved);
+            if (log != null) {
+                writeNodesInSubGraph(island, log, changed);
             }
         }
         if (markIsolated) {
@@ -281,16 +280,16 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             for (Edge e : gv.getOutgoing()) {
                 Vertex in = gv;
                 if (!(
-                        e instanceof StreetEdge || e instanceof StreetTransitStopLink ||
-                                e instanceof StreetTransitEntranceLink || e instanceof ElevatorEdge
-                                ||
-                                e instanceof FreeEdge
+                    e instanceof StreetEdge || e instanceof StreetTransitStopLink ||
+                    e instanceof StreetTransitEntranceLink || e instanceof ElevatorEdge ||
+                    e instanceof FreeEdge
                 )
                 ) {
                     continue;
                 }
                 if (e instanceof StreetEdge
-                        && shouldMatchNoThruType != ((StreetEdge) e).isNoThruTraffic(traverseMode)) {
+                    && shouldMatchNoThruType != ((StreetEdge) e).isNoThruTraffic(traverseMode)
+                ) {
                     continue;
                 }
                 State s1 = e.traverse(s0);
@@ -467,14 +466,13 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     private static void writeNodesInSubGraph(
             Subgraph subgraph,
             PrintWriter islandLog,
-            boolean hadRemoved
+            boolean changed
     ) {
-        Geometry convexHullGeom = subgraph.getConvexHull();
-        if (convexHullGeom != null && !(convexHullGeom instanceof Polygon)) {
-            convexHullGeom = convexHullGeom.buffer(0.0001, 5);
-        }
-        islandLog.printf("%d\t%d\t%d\t%s\t%b\n", islandCounter, subgraph.stopSize(),
-                subgraph.streetSize(), convexHullGeom, hadRemoved
+
+        String label = subgraph.getRepresentativeVertex().getLabel();
+
+        islandLog.printf(
+            "%d\t%d\t%d\t%b\t%s\n", islandCounter, subgraph.stopSize(), subgraph.streetSize(), changed, label
         );
         islandCounter++;
     }
