@@ -55,22 +55,25 @@ jobs:
           aws s3 cp ./deploy s3://otp-repo --recursive --acl public-read
       # Install mkdocs using pip for use by subsequent steps.
       - name: Install mkdocs
-        if: github.event_name == 'push' && (
-          env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
-        )
+        if: |
+          github.event_name == 'push' && (
+            env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
+          )
         run: |
           pip install mkdocs
       # Using mkdocs produce docs for deployment.
       - name: Prepare doc files for deployment to s3
-        if: github.event_name == 'push' && (
-          env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
-        )
+        if: |
+          github.event_name == 'push' && (
+            env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
+          )
         run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
       # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront.
       - name: Upload docs to IBI s3 buckets & cloudfront
-        if: github.event_name == 'push' && (
-          env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
-        )
+        if: |
+          github.event_name == 'push' && (
+            env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
+          )
         run: |
           aws s3 cp ./target/mkdocs s3://otp-docs.ibi-transit.com --recursive --acl public-read
       # Push notification to Teams.
