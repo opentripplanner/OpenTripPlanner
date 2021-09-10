@@ -200,7 +200,7 @@ public class ServiceJourneyType {
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment)
                             .getTransitAlertService()
-                            .getTripAlerts(trip(environment).getId())
+                            .getTripAlerts(trip(environment).getId(), null)
                     )
                 .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()

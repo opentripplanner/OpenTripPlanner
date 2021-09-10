@@ -92,7 +92,7 @@ public class NetexEntityIndex {
     public final HierarchicalMapById<ServiceJourneyInterchange> serviceJourneyInterchangeById;
     public final HierarchicalMapById<ServiceLink> serviceLinkById;
     public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
-    public final HierarchicalMapById<TariffZone> tariffZonesById;
+    public final HierarchicalVersionMapById<TariffZone> tariffZonesById;
 
 
     // Relations between entities - The Netex XML sometimes rely on the the
@@ -138,7 +138,7 @@ public class NetexEntityIndex {
         this.serviceLinkById = new HierarchicalMapById<>();
         this.serviceJourneyInterchangeById = new HierarchicalMapById<>();
         this.stopPlaceById = new HierarchicalVersionMapById<>();
-        this.tariffZonesById = new HierarchicalMapById<>();
+        this.tariffZonesById = new HierarchicalVersionMapById<>();
         this.timeZone = new HierarchicalElement<>();
     }
 
@@ -175,7 +175,7 @@ public class NetexEntityIndex {
         this.serviceLinkById = new HierarchicalMapById<>(parent.serviceLinkById);
         this.serviceJourneyInterchangeById = new HierarchicalMapById<>(parent.serviceJourneyInterchangeById);
         this.stopPlaceById = new HierarchicalVersionMapById<>(parent.stopPlaceById);
-        this.tariffZonesById = new HierarchicalMapById<>(parent.tariffZonesById);
+        this.tariffZonesById = new HierarchicalVersionMapById<>(parent.tariffZonesById);
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
 
@@ -343,7 +343,7 @@ public class NetexEntityIndex {
             }
 
             @Override
-            public ReadOnlyHierarchicalMapById<TariffZone> getTariffZonesById() {
+            public ReadOnlyHierarchicalVersionMapById<TariffZone> getTariffZonesById() {
                 return tariffZonesById;
             }
 
