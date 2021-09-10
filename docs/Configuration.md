@@ -1032,6 +1032,8 @@ To add a GBFS feed to the router add one entry in the `updater` field of `router
    "frequencySec": 60,
    // The URL of the GBFS feed auto-discovery file
    "url": "http://coast.socialbicycles.com/opendata/gbfs.json",
+   // Optionally specify the language version of the feed to use. If no language is set, the first language in the feed is used. 
+   "language": "en",
    // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
    "allowKeepingRentedBicycleAtDestination": true
 }
