@@ -1,43 +1,85 @@
 name: OTP CI Build
-# On [push, pull_request] causes double-builds when creating PRs.
-# But triggering on push only will miss pull requests from outside authors.
-# The push event's ref is the name of the pushed branch;
-# The pull_request event's branch name is the merge target branch.
+
 on:
   push:
-    branches:
-      - master
-      - dev-1.x
-      - dev-2.x
   pull_request:
     branches:
-      - master
-      - dev-1.x
-      - dev-2.x
+      - ibi-dev
+      - ibi-dev-2.x
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      MAVEN_OPTS: -Xmx2g
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
       - uses: actions/checkout@v2.3.2
         with:
           fetch-depth: 0
-      # Java setup step completes very fast, no need to run in a preconfigured docker container
+      # Java setup step completes very fast, no need to run in a preconfigured docker container.
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Cache local Maven repository
+      # Retain the local Maven repository to speed up builds.
+      - name: Setup Maven Cache
         uses: actions/cache@v2
+        id: cache
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - name: Build and Test
-        run: mvn --batch-mode --update-snapshots verify
-      - name: Deploy to Github Package Registry
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
+          path: ~/.m2
+          key: maven-local-repo
+      # So that the branch name can be reference via $GITHUB_HEAD_REF_SLUG.
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      # Define AWS profile credentials for use by subsequent steps.
+      - name: Add profile credentials to ~/.aws/credentials
+        if: github.event_name == 'push'
+        run: ./scripts/add-aws-credentials.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+      # Build and test deployment.
+      - name: Build and Test
+        run: mvn clean verify --batch-mode --show-version --update-snapshots -Dgpg.skip
+      # Only prepare deploy files on push events to avoid duplicate pushes to s3 when a commit is
+      # pushed to a branch with an open pull request.
+      - name: Prepare build files for deployment to s3
+        if: github.event_name == 'push'
+        run: ./scripts/prep-build-for-deploy-from-github-actions.sh
+      # Copy build files to AWS.
+      - name: Copy build files to the otp-repo bucket
+        if: github.event_name == 'push'
+        run: |
+          aws s3 cp ./deploy s3://otp-repo --recursive --acl public-read
+      # Install mkdocs using pip for use by subsequent steps.
+      - name: Install mkdocs
+        if: github.event_name == 'push' && (
+          env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
+        )
+        run: |
+          pip install mkdocs
+      # Using mkdocs produce docs for deployment.
+      - name: Prepare doc files for deployment to s3
+        if: github.event_name == 'push' && (
+          env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
+        )
+        run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
+      # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront.
+      - name: Upload docs to IBI s3 buckets & cloudfront
+        if: github.event_name == 'push' && (
+          env.GITHUB_HEAD_REF_SLUG == 'ibi-dev' || env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
+        )
+        run: |
+          aws s3 cp ./target/mkdocs s3://otp-docs.ibi-transit.com --recursive --acl public-read
+      # Push notification to Teams.
+      - name: Notify us of the build status on MS Teams
+        # Release https://github.com/toko-bifrost/ms-teams-deploy-card/releases/tag/3.1.2 this matches
+        # the full length commit SHA below. This must not be changed without first reviewing the code of the newer
+        # version for potential security risks.
+        uses: toko-bifrost/ms-teams-deploy-card@dcc94e4ce4088b1e6b6de5c9a3cda4ddcbe97d2e
+        if: always()
+        with:
+          github-token: ${{ github.token }}
+          webhook-uri: ${{ secrets.MSTEAMS_WEBHOOK }}
