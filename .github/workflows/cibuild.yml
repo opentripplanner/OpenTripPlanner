@@ -29,7 +29,7 @@ jobs:
         with:
           path: ~/.m2
           key: maven-local-repo
-      # So that the branch name can be reference via $GITHUB_HEAD_REF_SLUG.
+      # So that the branch name can be reference via $GITHUB_REF_SLUG.
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
       # Define AWS profile credentials for use by subsequent steps.
@@ -55,17 +55,18 @@ jobs:
           aws s3 cp ./deploy s3://otp-repo --recursive --acl public-read
       # Install mkdocs using pip for use by subsequent steps.
       - name: Install mkdocs
-        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
+        if: github.event_name == 'push' && env.GITHUB_REF_SLUG == 'ibi-dev-2.x'
         run: |
           pip install mkdocs
       # Using mkdocs produce docs for deployment.
-      - name: Prepare doc files for deployment to s3
-        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
-        run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
-      # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront.
+# FIXME: there is an error while trying to run enunciate to generate the docs
+#      - name: Prepare doc files for deployment to s3
+#        if: github.event_name == 'push' && env.GITHUB_REF_SLUG == 'ibi-dev-2.x'
+#        run: ./scripts/prep-docs-for-deploy-from-github-actions.sh
+#      # If on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront.
 # FIXME: figure out whether the same bucket should be used, or a different one should be used for 2.x docs
 #      - name: Upload docs to IBI s3 buckets & cloudfront
-#        if: github.event_name == 'push' && env.GITHUB_HEAD_REF_SLUG == 'ibi-dev-2.x'
+#        if: github.event_name == 'push' && env.GITHUB_REF_SLUG == 'ibi-dev-2.x'
 #        run: |
 #          aws s3 cp ./target/mkdocs s3://otp-docs.ibi-transit.com --recursive --acl public-read
       # Push notification to Teams.
