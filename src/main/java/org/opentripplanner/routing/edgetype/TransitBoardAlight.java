@@ -129,11 +129,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             return null;
         }
 
-        /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
-        if (options.wheelchairAccessible && ! getPattern().wheelchairAccessible(stopIndex)) {
-            return null;
-        }
-
         // if eligibility-restricted services are disallowed, check this route. Only supports 0/1 values.
         if (!options.flexUseEligibilityServices) {
             Route route = getPattern().route;
@@ -160,6 +155,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return null;
             }
             StateEditor s1 = s0.edit(this);
+
+            addWheelchairPenalties(options, s1);
+
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(s0.getTimeSeconds());
             // Store the stop we are alighting at, for computing stop-to-stop transfer times,
@@ -285,6 +283,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
+
+            addWheelchairPenalties(options, s1);
+
             s1.setBackMode(getMode());
             s1.setServiceDay(bestServiceDay);
             // Save the trip times in the State to ensure that router has a consistent view 
@@ -348,6 +349,16 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             /* If we didn't return an optimized path, return an unoptimized one. */
             return s1.makeState();
+        }
+    }
+
+    private void addWheelchairPenalties(RoutingRequest options, StateEditor s1) {
+        /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
+        if (options.wheelchairAccessible ) {
+            boolean stopIsWheelchairAccessible = getPattern().wheelchairAccessible(stopIndex);
+            if(!stopIsWheelchairAccessible) {
+               s1.incrementWeight(options.noWheelchairAccessAtStopPenalty);
+            }
         }
     }
 

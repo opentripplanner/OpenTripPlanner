@@ -125,6 +125,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether the trip must be wheelchair accessible. */
     public boolean wheelchairAccessible = false;
 
+    public int unknownWheelchairAccessAtStopPenalty = 600;
+    public int noWheelchairAccessAtStopPenalty = 3 * unknownWheelchairAccessAtStopPenalty;
+    public int unknownWheelchairAccessAtTripPenalty = 600;
+    public int noWheelchairAccessAtTripPenalty = 3 * unknownWheelchairAccessAtTripPenalty;
+
     /** The maximum number of itineraries to return. */
     public int numItineraries = 3;
 

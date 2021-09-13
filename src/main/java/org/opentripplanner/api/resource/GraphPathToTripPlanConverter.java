@@ -8,7 +8,6 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.RentalInfo;
 import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
@@ -24,8 +23,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.car_rental.CarRentalStationService;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -62,7 +59,6 @@ import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
@@ -71,19 +67,15 @@ import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
-import org.opentripplanner.updater.RentalUpdaterError;
-import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -847,6 +839,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.flexDrtDropOffMessage = trip.getDrtDropOffMessage();
             leg.flexFlagStopPickupMessage = trip.getContinuousPickupMessage();
             leg.flexFlagStopDropOffMessage = trip.getContinuousDropOffMessage();
+            leg.accessibilityScore = computeAccessibilityScore(trip);
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
@@ -879,6 +872,17 @@ public abstract class GraphPathToTripPlanConverter {
                 }
             }
 
+        }
+    }
+
+    private static float computeAccessibilityScore(Trip trip) {
+        switch(trip.getWheelchairAccessible()) {
+            case 1: // is accessible
+                return 1;
+            case 2: // not accessible
+                return 0;
+            default: // don't know
+                return 0.5f;
         }
     }
 

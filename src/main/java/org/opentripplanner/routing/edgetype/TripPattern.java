@@ -56,6 +56,7 @@ public class TripPattern implements Cloneable, Serializable {
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
+
     public static final int MASK_PICKUP = 2|4;
     public static final int SHIFT_PICKUP = 1;
     public static final int MASK_DROPOFF = 8|16;
