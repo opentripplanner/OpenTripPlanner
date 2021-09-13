@@ -151,7 +151,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             }
         }
         if (islandLog != null) {
-            islandLog.printf("%s\t%s\t%s\t%s\t%s\n", "id", "stops", "streets", "changed", "node");
+            islandLog.printf("%s\t%s\t%s\t%s\n", "id", "streets", "changed", "node");
         }
         Map<Vertex, Subgraph> subgraphs = new HashMap<Vertex, Subgraph>();
         Map<Vertex, Subgraph> extgraphs = new HashMap<Vertex, Subgraph>();
@@ -472,7 +472,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         String label = subgraph.getRepresentativeVertex().getLabel();
 
         islandLog.printf(
-            "%d\t%d\t%d\t%b\t%s\n", islandCounter, subgraph.stopSize(), subgraph.streetSize(), changed, label
+            "%d\t%d\t%b\t%s\n", islandCounter, subgraph.streetSize(), changed, label
         );
         islandCounter++;
     }
