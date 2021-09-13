@@ -14,9 +14,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class GbfsVehicleRentalDataSourceTest {
     @Test
-    void makeStation() {
+    void makeStationFromV22() {
         var dataSource = new GbfsVehicleRentalDataSource(new GbfsVehicleRentalDataSourceParameters(
-                "file:src/test/resources/gbfs/gbfs.json",
+                "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
                 "nb",
                 false,
                 false,
@@ -31,6 +31,30 @@ class GbfsVehicleRentalDataSourceTest {
         assertEquals(6, stations.size());
         assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.name.toString().equals("TORVGATA")));
         assertTrue(stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.allowDropoff));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isFloatingBike));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed));
+
+    }
+
+    @Test
+    void makeStationFromV10() {
+        var dataSource = new GbfsVehicleRentalDataSource(new GbfsVehicleRentalDataSourceParameters(
+                "file:src/test/resources/gbfs/helsinki/gbfs.json",
+                "en",
+                false,
+                false,
+                new HashMap<>()
+        ));
+
+        dataSource.setup();
+
+        assertTrue(dataSource.update());
+
+        List<VehicleRentalStation> stations = dataSource.getStations();
+        assertEquals(10, stations.size());
+        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.name.toString().equals("Kasarmitori")));
+        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.allowDropoff));
         assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isFloatingBike));
         assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation));
         assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed));
