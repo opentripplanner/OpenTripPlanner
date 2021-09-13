@@ -132,8 +132,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                     verticesByStation.put(station.id, vehicleRentalVertex);
                     tempEdgesByStation.put(station.id, tempEdges);
                 } else {
-                    vehicleRentalVertex.setVehiclesAvailable(station.vehiclesAvailable);
-                    vehicleRentalVertex.setSpacesAvailable(station.spacesAvailable);
+                    vehicleRentalVertex.setStation(station);
                 }
             }
             /* remove existing stations that were not present in the update */

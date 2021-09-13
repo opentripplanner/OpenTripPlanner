@@ -138,7 +138,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testNoBikesAvailable() {
-        B1.setVehiclesAvailable(0);
+        B1.getStation().vehiclesAvailable = 0;
 
         assertPath(
                 S1, E1, true,
@@ -159,7 +159,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testNoSpacesAvailable() {
-        B2.setSpacesAvailable(0);
+        B2.getStation().spacesAvailable = 0;
 
         assertPath(
                 S1, E1, true,
@@ -180,7 +180,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testIgnoreAvailabilityNoBikesAvailable() {
-        B1.setVehiclesAvailable(0);
+        B1.getStation().vehiclesAvailable = 0;
 
         assertPath(
                 S1, E1, false,
@@ -193,7 +193,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testIgnoreAvailabilityNoSpacesAvailable() {
-        B2.setSpacesAvailable(0);
+        B2.getStation().spacesAvailable = 0;
 
         assertPath(
                 S1, E1, false,
