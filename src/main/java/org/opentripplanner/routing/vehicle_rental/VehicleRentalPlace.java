@@ -23,6 +23,8 @@ public interface VehicleRentalPlace {
 
     boolean isAllowDropoff();
 
+    boolean isRenting();
+
     boolean isFloatingBike();
 
     boolean isCarStation();

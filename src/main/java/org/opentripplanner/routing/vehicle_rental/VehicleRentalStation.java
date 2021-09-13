@@ -98,6 +98,11 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     }
 
     @Override
+    public boolean isRenting() {
+        return isRenting;
+    }
+
+    @Override
     public boolean isFloatingBike() {
         return false;
     }

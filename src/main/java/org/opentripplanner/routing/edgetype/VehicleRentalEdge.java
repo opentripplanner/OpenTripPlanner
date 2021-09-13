@@ -38,7 +38,9 @@ public class VehicleRentalEdge extends Edge {
                 case BEFORE_RENTING:
                     return null;
                 case HAVE_RENTED:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().getSpacesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && (
+                            stationVertex.getStation().getSpacesAvailable() == 0 || !stationVertex.getStation().isAllowDropoff()
+                    )) {
                         return null;
                     }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), network, true);
@@ -53,7 +55,9 @@ public class VehicleRentalEdge extends Edge {
                     }
                     break;
                 case RENTING_FROM_STATION:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().getVehiclesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && (
+                            stationVertex.getStation().getVehiclesAvailable() == 0 || !stationVertex.getStation().isRenting()
+                    )) {
                         return null;
                     }
                     // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in State#getInitialStates(),
@@ -71,7 +75,9 @@ public class VehicleRentalEdge extends Edge {
         } else {
             switch (s0.getVehicleRentalState()) {
                 case BEFORE_RENTING:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().getVehiclesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && (
+                            stationVertex.getStation().getVehiclesAvailable() == 0 || !stationVertex.getStation().isRenting()
+                    )) {
                         return null;
                     }
                     if (stationVertex.getStation().isFloatingBike()) {
@@ -91,7 +97,9 @@ public class VehicleRentalEdge extends Edge {
                 case RENTING_FLOATING:
                 case RENTING_FROM_STATION:
                     if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) { return null; }
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().getSpacesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && (
+                            stationVertex.getStation().getSpacesAvailable() == 0 || !stationVertex.getStation().isAllowDropoff()
+                    )) {
                         return null;
                     }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), network, false);
