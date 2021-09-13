@@ -41,8 +41,8 @@ public class PlaceMapper {
         api.stopIndex = domain.stopIndex;
         api.stopSequence = domain.stopSequence;
         api.vertexType = VertexTypeMapper.mapVertexType(domain.vertexType);
-        if (domain.bikeShareId != null) {
-            api.bikeShareId = domain.bikeShareId.getId();
+        if (domain.vehicleRentalStation != null) {
+            api.bikeShareId = domain.vehicleRentalStation.getStationId();
         }
 
         return api;

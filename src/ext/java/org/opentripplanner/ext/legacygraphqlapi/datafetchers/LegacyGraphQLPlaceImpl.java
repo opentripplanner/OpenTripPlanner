@@ -10,7 +10,6 @@ import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 
 public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlace {
 
@@ -60,12 +59,7 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
       if (!place.vertexType.equals(VertexType.BIKESHARE)) { return null; }
 
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
-          .getVehicleRentalStationService();
-
-      if (vehicleRentalStationService == null) { return null; }
-
-      return vehicleRentalStationService.getVehicleRentalStation(place.bikeShareId);
+      return place.vehicleRentalStation;
     };
   }
 

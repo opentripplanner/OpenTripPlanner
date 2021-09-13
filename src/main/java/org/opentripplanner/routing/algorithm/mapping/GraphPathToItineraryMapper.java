@@ -484,9 +484,9 @@ public abstract class GraphPathToItineraryMapper {
             place.zoneId = stop.getFirstZoneAsString();
             place.vertexType = VertexType.TRANSIT;
         } else if(vertex instanceof VehicleRentalStationVertex) {
-            LOG.trace("Added bike share Id {} to place", place.bikeShareId);
+            place.vehicleRentalStation = ((VehicleRentalStationVertex) vertex).getStation();
+            LOG.trace("Added bike share Id {} to place", place.vehicleRentalStation.id);
             place.vertexType = VertexType.BIKESHARE;
-            place.bikeShareId = ((VehicleRentalStationVertex) vertex).getStation().id;
         } else if (vertex instanceof BikeParkVertex) {
             place.vertexType = VertexType.BIKEPARK;
         } else {

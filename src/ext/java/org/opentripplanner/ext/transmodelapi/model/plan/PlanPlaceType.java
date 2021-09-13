@@ -77,14 +77,9 @@ public class PlanPlaceType {
             .name("bikeRentalStation")
             .type(bikeRentalStationType)
             .description("The bike rental station related to the place")
-            .dataFetcher(environment -> {
-              return ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
-                  ? GqlUtil
-                  .getRoutingService(environment)
-                  .getVehicleRentalStationService()
-                  .getVehicleRentalStation(((Place) environment.getSource()).bikeShareId)
-                  : null;
-            })
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
+                ? ((Place) environment.getSource()).vehicleRentalStation
+                : null)
             .build())
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("bikePark")

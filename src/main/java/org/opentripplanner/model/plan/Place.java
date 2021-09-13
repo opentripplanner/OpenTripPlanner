@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -57,9 +58,9 @@ public class Place {
     public VertexType vertexType;
 
     /**
-     * In case the vertex is of type Bike sharing station.
+     * In case the vertex is of type vehicle sharing station.
      */
-    public FeedScopedId bikeShareId;
+    public VehicleRentalStation vehicleRentalStation;
 
     public Place(Double lat, Double lon, String name) {
         this.name = name;
@@ -107,7 +108,7 @@ public class Place {
                 .addNum("stopIndex", stopIndex)
                 .addNum("stopSequence", stopSequence)
                 .addEnum("vertexType", vertexType)
-                .addObj("bikeShareId", bikeShareId)
+                .addObj("vehicleRentalId", vehicleRentalStation)
                 .toString();
     }
 }
