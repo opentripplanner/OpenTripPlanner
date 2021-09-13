@@ -20,7 +20,6 @@ class GbfsVehicleRentalDataSourceTest {
                 "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
                 "nb",
                 false,
-                false,
                 new HashMap<>()
         ));
 
@@ -43,7 +42,6 @@ class GbfsVehicleRentalDataSourceTest {
         var dataSource = new GbfsVehicleRentalDataSource(new GbfsVehicleRentalDataSourceParameters(
                 "file:src/test/resources/gbfs/helsinki/gbfs.json",
                 "en",
-                false,
                 false,
                 new HashMap<>()
         ));

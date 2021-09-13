@@ -15,6 +15,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
@@ -215,6 +216,7 @@ public class BikeRentalTest extends GraphRoutingTest {
         vehicle.longitude = station.getLongitude();
         vehicle.id = station.getId();
         vehicle.name = station.getName();
+        vehicle.vehicleType = RentalVehicleType.getDefaultType(station.getId().getFeedId());
         B1.setStation(vehicle);
 
         assertPath(

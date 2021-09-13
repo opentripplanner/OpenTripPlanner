@@ -3,15 +3,25 @@ package org.opentripplanner.routing.vehicle_rental;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
+import java.time.ZonedDateTime;
+
 public class VehicleRentalVehicle implements VehicleRentalPlace {
 
     public FeedScopedId id;
     public I18NString name;
     public double longitude;
     public double latitude;
-    public boolean isCarStation = false;
 
+    public VehicleRentalSystem system;
+    public RentalVehicleType vehicleType;
     public VehicleRentalStationUris rentalUris;
+    public Boolean isReserved;
+    public Boolean isDisabled;
+    public ZonedDateTime lastReported;
+    public Double currentRangeMeters;
+    public VehicleRentalStation station;
+    public String pricingPlanId;
+
 
     @Override
     public FeedScopedId getId() {
@@ -65,7 +75,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
 
     @Override
     public boolean isCarStation() {
-        return isCarStation;
+        return vehicleType.formFactor.equals(RentalVehicleType.FormFactor.CAR);
     }
 
     @Override

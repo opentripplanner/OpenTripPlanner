@@ -2,24 +2,54 @@ package org.opentripplanner.routing.vehicle_rental;
 
 import static java.util.Locale.ROOT;
 
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
+import java.time.ZonedDateTime;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
 public class VehicleRentalStation implements VehicleRentalPlace {
 
+    // GBFS  Static information
     public FeedScopedId id;
     public I18NString name;
+    public String shortName;
     public double longitude;
     public double latitude;
-    public int vehiclesAvailable = Integer.MAX_VALUE;
-    public int spacesAvailable = Integer.MAX_VALUE;
-    public boolean allowDropoff = true;
-    public boolean isCarStation = false;
-    public boolean isKeepingVehicleRentalAtDestinationAllowed = false;
+    public String address;
+    public String crossStreet;
+    public String regionId;
+    public String postCode;
+    public Set<String> rentalMethods;
+    public boolean isVirtualStation = false;
+    public Geometry stationArea;
+    public Integer capacity;
+    public Map<RentalVehicleType, Integer> vehicleTypeAreaCapacity;
+    public Map<RentalVehicleType, Integer> vehicleTypeDockCapacity;
+    public boolean isValetStation = false;
+    public VehicleRentalSystem system;
+    public VehicleRentalStationUris rentalUris;
 
+    // GBFS Dynamic information
+    public int vehiclesAvailable = 0;
+    public int vehiclesDisabled = 0;
+    public Map<RentalVehicleType, Integer> vehicleTypesAvailable;
+    public int spacesAvailable = 0;
+    public int spacesDisabled = 0;
+    public Map<RentalVehicleType, Integer> vehicleSpacesAvailable;
+
+    public boolean isInstalled = true;
+    public boolean isRenting = true;
+    public boolean isReturning = true;
+    public ZonedDateTime lastReported;
+
+    // OTP internal data
+    public boolean isKeepingVehicleRentalAtDestinationAllowed = false;
     public boolean realTimeData = true;
 
-    public VehicleRentalStationUris rentalUris;
 
     @Override
     public FeedScopedId getId() {
@@ -64,7 +94,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
 
     @Override
     public boolean isAllowDropoff() {
-        return allowDropoff;
+        return isReturning;
     }
 
     @Override
@@ -74,7 +104,12 @@ public class VehicleRentalStation implements VehicleRentalPlace {
 
     @Override
     public boolean isCarStation() {
-        return isCarStation;
+        return false;
+//        return Stream.concat(
+//                vehicleTypesAvailable.keySet().stream(),
+//                vehicleSpacesAvailable.keySet().stream()
+//            )
+//            .anyMatch(rentalVehicleType -> rentalVehicleType.formFactor.equals(RentalVehicleType.FormFactor.CAR));
     }
 
     @Override
