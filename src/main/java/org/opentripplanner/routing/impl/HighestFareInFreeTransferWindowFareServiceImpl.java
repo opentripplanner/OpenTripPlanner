@@ -40,24 +40,29 @@ public class HighestFareInFreeTransferWindowFareServiceImpl extends DefaultFareS
                                    Collection<FareRuleSet> fareRules) {
         float cost = 0;
         float currentTransferWindowCost = 0;
-        long freeTransferWindowEndTime = -1;
+        // The initial value of -1 indicates that the free transfer window end time has not yet been set
+        long freeTransferWindowEndTimeEpochSeconds = -1;
         for (Ride ride : rides) {
             List<Ride> leg = new ArrayList<>();
             leg.add(ride);
             float rideCost = calculateCost(fareType, leg, fareRules);
 
-            if (ride.startTime > freeTransferWindowEndTime) {
-                // free transfer window has expired, add to overall cost
+            if (ride.startTime > freeTransferWindowEndTimeEpochSeconds) {
+                // free transfer window has expired or has not yet been initialized. Reset some items and add to the
+                // overall cost. This is fine to do if the free transfer window hasn't been initialized since the
+                // overall cost will be 0.
                 cost += currentTransferWindowCost;
                 // reset current window cost
                 currentTransferWindowCost = 0;
                 // reset transfer window end time to trigger recalculation in next block
-                freeTransferWindowEndTime = -1;
+                freeTransferWindowEndTimeEpochSeconds = -1;
             }
 
             // recalculate free transfer window if needed
-            if (freeTransferWindowEndTime == -1) {
-                freeTransferWindowEndTime = ride.startTime + freeTransferWindowInMinutes * 60;
+            if (freeTransferWindowEndTimeEpochSeconds == -1) {
+                // the new transfer window end time should be calculated by adding the ride's start time (which is in
+                // seconds past the epoch) and the number of equivalent seconds in the free transfer window minutes.
+                freeTransferWindowEndTimeEpochSeconds = ride.startTime + freeTransferWindowInMinutes * 60;
             }
 
             currentTransferWindowCost = Float.max(currentTransferWindowCost, rideCost);

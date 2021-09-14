@@ -18,9 +18,10 @@ import java.util.List;
 
 public class HighestFareInFreeTransferWindowFareServiceTest {
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("createTestCases")
     public void canCalculateFare(
+        String testCaseName, // used to create parameterized test name
         FareService fareService,
         GraphPath path,
         float expectedFare
@@ -82,14 +83,16 @@ public class HighestFareInFreeTransferWindowFareServiceTest {
         GraphPath singleTransitLegPath = new GraphPathBuilder()
             .addTransitLeg(routeA, 30, 60)
             .build();
-        args.add(Arguments.of(defaultFareService, singleTransitLegPath, oneDollar));
+        args.add(Arguments.of("Single transit leg", defaultFareService, singleTransitLegPath, oneDollar));
 
         // a two transit leg itinerary with same route costs within free-transfer window should calculate default fare
         GraphPath twoTransitLegPath = new GraphPathBuilder()
             .addTransitLeg(routeA, 30, 60)
             .addTransitLeg(routeB, 90, 120)
             .build();
-        args.add(Arguments.of(defaultFareService, twoTransitLegPath, oneDollar));
+        args.add(
+            Arguments.of("Two transit legs in free transfer window", defaultFareService, twoTransitLegPath, oneDollar)
+        );
 
         // a two transit leg itinerary where the first route costs more than the second route, but both are within
         // the free transfer window should calculate the first route cost
@@ -97,7 +100,14 @@ public class HighestFareInFreeTransferWindowFareServiceTest {
             .addTransitLeg(routeC, 30, 60)
             .addTransitLeg(routeB, 90, 120)
             .build();
-        args.add(Arguments.of(defaultFareService, twoTransitLegFirstRouteCostsTwoDollarsPath, twoDollars));
+        args.add(
+            Arguments.of(
+                "Two transit legs in free transfer window, first leg more expensive",
+                defaultFareService,
+                twoTransitLegFirstRouteCostsTwoDollarsPath,
+                twoDollars
+            )
+        );
 
         // a two transit leg itinerary where the second route costs more than the first route, but both are within
         // the free transfer window should calculate the second route cost
@@ -105,7 +115,14 @@ public class HighestFareInFreeTransferWindowFareServiceTest {
             .addTransitLeg(routeB, 30, 60)
             .addTransitLeg(routeC, 90, 120)
             .build();
-        args.add(Arguments.of(defaultFareService, twoTransitLegSecondRouteCostsTwoDollarsPath, twoDollars));
+        args.add(
+            Arguments.of(
+                "Two transit legs in free transfer window, second leg more expensive",
+                defaultFareService,
+                twoTransitLegSecondRouteCostsTwoDollarsPath,
+                twoDollars
+            )
+        );
 
         // a two transit leg itinerary with same route costs but where the second leg begins after the free transfer
         // window should calculate double the default fare
@@ -115,6 +132,7 @@ public class HighestFareInFreeTransferWindowFareServiceTest {
             .build();
         args.add(
             Arguments.of(
+                "Two transit legs, second leg starts outside free transfer window",
                 defaultFareService,
                 twoTransitLegSecondRouteHappensAfterFreeTransferWindowPath,
                 oneDollar + oneDollar
@@ -130,9 +148,26 @@ public class HighestFareInFreeTransferWindowFareServiceTest {
             .build();
         args.add(
             Arguments.of(
+                "Three transit legs, second leg starts outside free transfer window, third leg within second free transfer window",
                 defaultFareService,
                 threeTransitLegSecondRouteHappensAfterFreeTransferWindowPath,
                 oneDollar + oneDollar
+            )
+        );
+
+        // a three transit leg itinerary with same route costs but where each leg begins after the free transfer window,
+        // should calculate triple the default fare
+        GraphPath threeTransitLegAllOutsideFreeTransferWindowPath = new GraphPathBuilder()
+            .addTransitLeg(routeA, 30, 60)
+            .addTransitLeg(routeB, 10000, 10120)
+            .addTransitLeg(routeA, 20000, 20180)
+            .build();
+        args.add(
+            Arguments.of(
+                "Three transit legs, all starting outside free transfer window",
+                defaultFareService,
+                threeTransitLegAllOutsideFreeTransferWindowPath,
+                oneDollar + oneDollar + oneDollar
             )
         );
 
@@ -142,7 +177,14 @@ public class HighestFareInFreeTransferWindowFareServiceTest {
             .addInterlinedTransitLeg(routeB, 30, 60)
             .addTransitLeg(routeC, 90, 120)
             .build();
-        args.add(Arguments.of(defaultFareService, twoTransitLegInterlinedSecondRouteCostsTwoDollarsPath, oneDollar));
+        args.add(
+            Arguments.of(
+                "Two interlined transit legs, second leg more expensive should calculate first leg fare with default config",
+                defaultFareService,
+                twoTransitLegInterlinedSecondRouteCostsTwoDollarsPath,
+                oneDollar
+            )
+        );
 
         // a two transit leg itinerary with an interlined transfer where the second route costs more than the first
         // route, but both are within the free transfer window and the fare service is configured with the
@@ -156,6 +198,7 @@ public class HighestFareInFreeTransferWindowFareServiceTest {
 
         args.add(
             Arguments.of(
+                "Two interlined transit legs, second leg more expensive should calculate second leg fare with alternate config",
                 fareServiceWithAnalyzedInterlinedTransfersConfig,
                 twoTransitLegInterlinedSecondRouteCostsTwoDollarsPath,
                 twoDollars
