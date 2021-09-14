@@ -157,7 +157,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
             StateEditor s1 = s0.edit(this);
 
-            addWheelchairPenalties(options, s1);
+            addStopWheelchairPenalty(options, s1);
 
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(s0.getTimeSeconds());
@@ -285,7 +285,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
 
-            addWheelchairPenalties(options, s1);
+            addStopWheelchairPenalty(options, s1);
+            addTripWheelchairPenalty(options, trip, s1);
 
             s1.setBackMode(getMode());
             s1.setServiceDay(bestServiceDay);
@@ -353,14 +354,26 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         }
     }
 
-    private void addWheelchairPenalties(RoutingRequest options, StateEditor s1) {
+    private void addTripWheelchairPenalty(RoutingRequest options, Trip trip, StateEditor s1) {
+        if (options.wheelchairAccessible) {
+            final WheelchairAccess wa = WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible());
+            if(wa == WheelchairAccess.NOT_ALLOWED) {
+                s1.incrementWeight(options.noWheelchairAccessAtTripPenalty);
+            }
+            else if (wa == WheelchairAccess.UNKNOWN) {
+                s1.incrementWeight(options.unknownWheelchairAccessAtTripPenalty);
+            }
+        }
+    }
+
+    private void addStopWheelchairPenalty(RoutingRequest options, StateEditor s1) {
         /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
         if (options.wheelchairAccessible) {
-            WheelchairAccess wa = getPattern().wheelchairAccessible(stopIndex);
-            if(wa == WheelchairAccess.NOT_ALLOWED) {
+            final WheelchairAccess stopWa = getPattern().wheelchairAccessible(stopIndex);
+            if(stopWa == WheelchairAccess.NOT_ALLOWED) {
                 s1.incrementWeight(options.noWheelchairAccessAtStopPenalty);
             }
-            else if(wa == WheelchairAccess.UNKNOWN) {
+            else if(stopWa == WheelchairAccess.UNKNOWN) {
                 s1.incrementWeight(options.unknownWheelchairAccessAtStopPenalty);
             }
         }

@@ -139,9 +139,8 @@ public class AccessibilityRoutingTest {
         // near Ashby station
         GenericLocation end = new GenericLocation(33.75744, -84.41754);
 
-        Itinerary i = getTripPlan(start, end, r -> {
-            r.setBannedRoutes("1_BLUE");
-        }).itinerary.get(0);
+        // we are banning the blue line even though it is accessible to force getting on the green one
+        Itinerary i = getTripPlan(start, end, r -> r.setBannedRoutes("1_BLUE")).itinerary.get(0);
         List<Leg> transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
 
         Leg leg = transitLegs.get(0);
