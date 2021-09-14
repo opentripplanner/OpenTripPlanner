@@ -132,6 +132,29 @@ public class AccessibilityRoutingTest {
 
     }
 
+    @Test
+    public void badTripScore() {
+        // near Georgia State station
+        GenericLocation start = new GenericLocation(33.75054, -84.38409);
+        // near Ashby station
+        GenericLocation end = new GenericLocation(33.75744, -84.41754);
+
+        Itinerary i = getTripPlan(start, end, r -> {
+            r.setBannedRoutes("1_BLUE");
+        }).itinerary.get(0);
+        List<Leg> transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
+
+        Leg leg = transitLegs.get(0);
+        assertEquals("GREEN", leg.routeShortName);
+
+        assertEquals("GEORGIA STATE STATION", leg.from.name);
+        assertEquals("ASHBY STATION", leg.to.name);
+
+        // because are using a trip that has unknown accessibility, it has a lower score
+        assertEquals(0.8333f, leg.accessibilityScore, DELTA);
+
+    }
+
     private static TripPlan getTripPlan(GenericLocation from, GenericLocation to, Consumer<RoutingRequest> func) {
         RoutingRequest request = new RoutingRequest();
         request.dateTime = dateTime;
