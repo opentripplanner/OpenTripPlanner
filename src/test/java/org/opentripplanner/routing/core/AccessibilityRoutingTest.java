@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -37,7 +38,7 @@ public class AccessibilityRoutingTest {
         // near Ashby station
         GenericLocation end = new GenericLocation(33.75744, -84.41754);
 
-        Itinerary i = getTripPlan(graph, start, end).itinerary.get(0);
+        Itinerary i = getTripPlan(start, end).itinerary.get(0);
         List<Leg> transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
 
         assertEquals(1, transitLegs.size());
@@ -58,7 +59,7 @@ public class AccessibilityRoutingTest {
         // near Ashby station
         GenericLocation end = new GenericLocation(33.75744, -84.41754);
 
-        Itinerary i = getTripPlan(graph, start, end).itinerary.get(0);
+        Itinerary i = getTripPlan(start, end).itinerary.get(0);
         List<Leg> transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
 
         assertEquals(1, transitLegs.size());
@@ -71,9 +72,26 @@ public class AccessibilityRoutingTest {
 
         // the start is not accessible, so we get a lowered accessibility score
         assertEquals(0.666666f, leg.accessibilityScore, DELTA);
+
+
+        // if we increase the cost of boarding at a stop which we know to be inaccessible, then
+        // long walks will be chosen instead
+
+        i = getTripPlan(start, end, r -> r.noWheelchairAccessAtStopPenalty = 10000).itinerary.get(0);
+        transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
+
+        leg = transitLegs.get(0);
+        assertEquals("BLUE", leg.routeShortName);
+
+        assertEquals("GEORGIA STATE STATION", leg.from.name);
+        assertEquals("ASHBY STATION", leg.to.name);
+
+        // because we are walking to a station with a good score, we get a perfect score again
+        assertEquals(1, leg.accessibilityScore);
+
     }
 
-    private static TripPlan getTripPlan(Graph graph, GenericLocation from, GenericLocation to) {
+    private static TripPlan getTripPlan(GenericLocation from, GenericLocation to, Consumer<RoutingRequest> func) {
         RoutingRequest request = new RoutingRequest();
         request.dateTime = dateTime;
         request.from = from;
@@ -87,10 +105,16 @@ public class AccessibilityRoutingTest {
         request.wheelchairAccessible = true;
         request.setNumItineraries(3);
 
+        func.accept(request);
+
         GraphPathFinder gpf = new GraphPathFinder(new Router(graph.routerId, graph));
         List<GraphPath> paths = gpf.graphPathFinderEntryPoint(request);
 
         return GraphPathToTripPlanConverter.generatePlan(paths, request);
+    }
+
+    private static TripPlan getTripPlan(GenericLocation from, GenericLocation to) {
+        return getTripPlan(from, to, (r) -> {});
     }
 
 }
