@@ -163,7 +163,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             retval = new OrcaFareServiceFactory();
             break;
         case "pdx":
-            retval = new PdxFareServiceFactory();
+            LOG.warn("The `pdx` fare factory is deprecated. Please switch to `highestFareInFreeTransferWindow`.");
+        case "highestFareInFreeTransferWindow":
+            retval = new HighestFareInFreeTransferWindowFareServiceFactory();
             break;
         case "san-francisco":
             retval = new SFBayFareServiceFactory();
