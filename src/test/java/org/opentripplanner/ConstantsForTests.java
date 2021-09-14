@@ -36,6 +36,9 @@ public class ConstantsForTests {
 
     public static final String VERMONT_OSM = "/vermont/vermont-rct.osm.pbf";
 
+    public static final String CENTRAL_ATLANTA_OSM = "/atlanta/central-atlanta-filtered.osm.pbf";
+    public static final String ATLANTA_BLUE_GREEN_LINE = "/atlanta/atlanta-blue-green-line.gtfs.zip";
+
     private static ConstantsForTests instance = null;
 
     private Graph portlandGraph = null;
@@ -100,7 +103,7 @@ public class ConstantsForTests {
         return vermontGraph;
     }
 
-    private Graph getGraph(String osmFile, String gtfsFile) {
+    public static Graph getGraph(String osmFile, String gtfsFile) {
         try {
             Graph g = new Graph();
             OpenStreetMapModule loader = new OpenStreetMapModule();
@@ -108,7 +111,7 @@ public class ConstantsForTests {
             AnyFileBasedOpenStreetMapProviderImpl provider = new AnyFileBasedOpenStreetMapProviderImpl();
 
             File file = new File(
-                    URLDecoder.decode(this.getClass().getResource(osmFile).getFile(),
+                    URLDecoder.decode(ConstantsForTests.class.getResource(osmFile).getFile(),
                             "UTF-8"));
 
             provider.setPath(file);
@@ -117,7 +120,7 @@ public class ConstantsForTests {
             loader.buildGraph(g, new GraphBuilderModuleSummary(loader));
 
             GtfsContext ctx = GtfsLibrary.readGtfs(new File(
-                    URLDecoder.decode(this.getClass().getResource(gtfsFile).getFile(),
+                    URLDecoder.decode(ConstantsForTests.class.getResource(gtfsFile).getFile(),
                             "UTF-8")));
             PatternHopFactory factory = new PatternHopFactory(ctx);
             factory.run(g);
