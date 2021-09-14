@@ -22,12 +22,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
   @Override
   public void populateProperties(WayPropertySet props) {
 
-    // Do not drive on cycleWays
-    props.setProperties("highway=cycleway;bicycle=designated",
-        StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-        0.97,
-        0.97
-    );
     props.setProperties("highway=motorway", StreetTraversalPermission.CAR);
     props.setProperties("highway=motorway_link", StreetTraversalPermission.CAR);
     // Patch missing vehicle=no check
@@ -203,6 +197,42 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=unclassified;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.87);
     props.setProperties("highway=residential;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.77);
     props.setProperties("highway=living_street;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.77);
+
+    /* Pedestrian, living and cyclestreet */
+    props.setProperties("highway=living_street", StreetTraversalPermission.ALL, 1, 1);
+    props.setProperties("highway=pedestrian", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
+    props.setProperties("highway=pedestrian;bicycle=designated", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.7, 0.7);
+    props.setProperties("highway=residential;cyclestreet=yes;motor_vehicle=*", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.7, 0.7);
+
+    props.setProperties("highway=footway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.8, 0.8);
+    // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
+    props.setProperties("highway=footway;motor_vehicle=destination", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9,  0.9);
+
+    props.setProperties("highway=footway;footway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
+    props.setProperties("highway=footway;footway=crossing", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
+    props.setProperties("highway=cycleway;footway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.85, 0.85);
+    props.setProperties("highway=cycleway;footway=crossing", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
+    props.setProperties("highway=cycleway;cycleway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.85, 0.85);
+    props.setProperties("highway=cycleway;cycleway=crossing", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
+
+    props.setProperties("highway=cycleway", StreetTraversalPermission.BICYCLE, 0.7, 0.7);
+    props.setProperties("highway=cycleway;lanes=2", StreetTraversalPermission.BICYCLE, 0.6, 0.6);
+    props.setProperties("highway=cycleway;oneway=yes", StreetTraversalPermission.BICYCLE,0.6,0.6);
+    // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
+    props.setProperties("highway=cycleway;motor_vehicle=destination", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9,  0.9);
+
+    // segregated=no takes' precedence if there is no "segregated" key. There is no penalty for a tag mismatch
+    props.setProperties("highway=cycleway;foot=designated;segregated=no", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.8, 0.8);
+    props.setProperties("highway=cycleway;foot=designated;segregated=yes", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.7, 0.7);
+    props.setProperties("highway=path;foot=designated;bicycle=designated;segregated=no", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.8,  0.8);
+    props.setProperties("highway=path;foot=designated;bicycle=designated;segregated=yes", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.7,  0.7);
+    props.setProperties("highway=cycleway;foot=designated;segregated=*;motor_vehicle=destination", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
+    props.setProperties("highway=path;foot=designated;bicycle=designated;segregated=*;motor_vehicle=destination", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9,  0.9);
+
+    //relation properties are copied over to ways
+    props.setProperties(
+            "route=bicycle", StreetTraversalPermission.ALL, 0.8, 0.8, true
+    );
 
     // Disallow paths that are not fit for walking
     props.setProperties("smoothness=horrible", StreetTraversalPermission.NONE);
