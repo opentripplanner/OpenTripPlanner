@@ -23,7 +23,7 @@ public class AccessibilityRoutingTest {
 
     private static final float DELTA = 0.1f;
 
-    static long dateTime = OffsetDateTime.parse("2021-09-14T09:56:29-04:00").toEpochSecond();
+    static long dateTime = OffsetDateTime.parse("2021-09-14T10:15:29-04:00").toEpochSecond();
 
     static Graph graph = getDefaultGraph();
 
@@ -86,8 +86,49 @@ public class AccessibilityRoutingTest {
         assertEquals("GEORGIA STATE STATION", leg.from.name);
         assertEquals("ASHBY STATION", leg.to.name);
 
-        // because we are walking to a station with a good score, we get a perfect score again
+        // because we are walking to a station with good accessibility, we get a perfect score again
         assertEquals(1, leg.accessibilityScore);
+
+    }
+
+    @Test
+    public void tripWhereStartHasUnknownAccessibility() {
+        // near CNN Center station
+        GenericLocation start = new GenericLocation(33.7565, -84.3958);
+        // near Ashby station
+        GenericLocation end = new GenericLocation(33.75744, -84.41754);
+
+        Itinerary i = getTripPlan(start, end).itinerary.get(0);
+
+        List<Leg> transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
+
+        assertEquals(1, transitLegs.size());
+
+        Leg leg = transitLegs.get(0);
+        assertEquals("BLUE", leg.routeShortName);
+
+        assertEquals("GWCC-CNN CENTER STATION", leg.from.name);
+        assertEquals("ASHBY STATION", leg.to.name);
+
+        // the start has unknown access, so we get a lowered score
+        assertEquals(0.833333, leg.accessibilityScore, DELTA);
+
+
+        // if we increase the walking distance and the penalty another stop is used instead
+
+        i = getTripPlan(start, end, r -> {
+            r.unknownWheelchairAccessAtStopPenalty = 10000;
+        }).itinerary.get(0);
+        transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
+
+        leg = transitLegs.get(0);
+        assertEquals("BLUE", leg.routeShortName);
+
+        assertEquals("FIVE POINTS STATION", leg.from.name);
+        assertEquals("ASHBY STATION", leg.to.name);
+
+        // because we are walking to a station with bad accessibility we get a lower score
+        assertEquals(0.666f, leg.accessibilityScore, DELTA);
 
     }
 
