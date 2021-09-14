@@ -146,6 +146,64 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=service;service=parking_aisle", StreetTraversalPermission.ALL, 1.5, 1.5);
     props.setProperties("highway=service;service=drive-through", StreetTraversalPermission.ALL, 1.5, 1.5);
 
+    /* bicycle infrastructure */
+    props.setProperties("highway=trunk;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL, 0.62, 0.62);
+    props.setProperties("highway=trunk_link;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL, 0.62, 0.62);
+    props.setProperties("highway=primary;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL, 0.62, 0.62);
+    props.setProperties("highway=primary_link;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL,0.62, 0.62);
+    props.setProperties("highway=secondary;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL,0.62, 0.62);
+    props.setProperties("highway=secondary_link;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL,0.62, 0.62);
+    props.setProperties("highway=tertiary;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL,0.62, 0.62);
+    props.setProperties("highway=tertiary_link;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL,0.62, 0.62);
+    props.setProperties("highway=unclassified;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL,0.62, 0.62);
+    props.setProperties("highway=residential;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL,0.62, 0.62);
+    props.setProperties("highway=living_street;cycleway=track;maxspeed=*", StreetTraversalPermission.ALL,0.62, 0.62);
+
+    props.setProperties("highway=trunk;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL, 0.87, 0.87);
+    props.setProperties("highway=trunk_link;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL, 0.87, 0.87);
+    props.setProperties("highway=primary;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL, 0.87, 0.87);
+    props.setProperties("highway=primary_link;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL,0.87, 0.87);
+    props.setProperties("highway=secondary;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL,0.87, 0.87);
+    props.setProperties("highway=secondary_link;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL,0.87, 0.87);
+    props.setProperties("highway=secondary;cycleway=lane;maxspeed=40", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=secondary;cycleway=lane;maxspeed=40", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=secondary;cycleway=lane;maxspeed=30", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=secondary;cycleway=lane;maxspeed=30", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=tertiary;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL,0.87, 0.87);
+    props.setProperties("highway=tertiary_link;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL,0.87, 0.87);
+    props.setProperties("highway=tertiary;cycleway=lane;maxspeed=40", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=tertiary_link;cycleway=lane;maxspeed=40", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=tertiary;cycleway=lane;maxspeed=30", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=tertiary_link;cycleway=lane;maxspeed=30", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=unclassified;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL,0.87, 0.87);
+    props.setProperties("highway=residential;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL,0.77, 0.77);
+    props.setProperties("highway=living_street;cycleway=lane;maxspeed=*", StreetTraversalPermission.ALL,0.77, 0.77);
+
+    /* opposite */
+    props.setProperties("highway=trunk;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL, 2.25, 0.62);
+    props.setProperties("highway=trunk_link;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL, 2.25, 0.62);
+    props.setProperties("highway=primary;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL, 2.25, 0.62);
+    props.setProperties("highway=primary_link;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,2.25, 0.62);
+    props.setProperties("highway=secondary;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,2.06, 0.62);
+    props.setProperties("highway=secondary_link;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,2.06, 0.62);
+    props.setProperties("highway=tertiary;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
+    props.setProperties("highway=tertiary_link;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
+    props.setProperties("highway=unclassified;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
+    props.setProperties("highway=residential;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
+    props.setProperties("highway=living_street;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
+
+    props.setProperties("highway=trunk;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL, 2.25, 0.87);
+    props.setProperties("highway=trunk_link;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL, 2.25, 0.87);
+    props.setProperties("highway=primary;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL, 2.25, 0.87);
+    props.setProperties("highway=primary_link;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,2.25, 0.87);
+    props.setProperties("highway=secondary;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL, 2.06, 0.87);
+    props.setProperties("highway=secondary_link;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,2.06, 0.87);
+    props.setProperties("highway=tertiary;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.87);
+    props.setProperties("highway=tertiary_link;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.87);
+    props.setProperties("highway=unclassified;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.87);
+    props.setProperties("highway=residential;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.77);
+    props.setProperties("highway=living_street;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.77);
+
     // Disallow paths that are not fit for walking
     props.setProperties("smoothness=horrible", StreetTraversalPermission.NONE);
     props.setProperties("smoothness=impassable", StreetTraversalPermission.NONE);
