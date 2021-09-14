@@ -20,6 +20,8 @@ import org.opentripplanner.standalone.Router;
 
 public class AccessibilityRoutingTest {
 
+    private static final float DELTA = 0.1f;
+
     static long dateTime = OffsetDateTime.parse("2021-09-14T09:56:29-04:00").toEpochSecond();
 
     static Graph graph = getDefaultGraph();
@@ -68,7 +70,7 @@ public class AccessibilityRoutingTest {
         assertEquals("ASHBY STATION", leg.to.name);
 
         // the start is not accessible so we get a lowered accessibility score
-        assertEquals(1, leg.accessibilityScore); // TODO: lower score because start is not accessible
+        assertEquals(0.666666f, leg.accessibilityScore, DELTA);
     }
 
     private static TripPlan getTripPlan(Graph graph, GenericLocation from, GenericLocation to) {

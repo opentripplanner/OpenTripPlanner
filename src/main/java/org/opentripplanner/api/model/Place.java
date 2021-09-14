@@ -3,6 +3,7 @@ package org.opentripplanner.api.model;
 import java.util.Calendar;
 import java.util.Set;
 
+import org.opentripplanner.gtfs.WheelchairAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.Constants;
 
@@ -23,6 +24,8 @@ public class Place {
      * The ID of the stop. This is often something that users don't care about.
      */
     public FeedScopedId stopId = null;
+
+    public WheelchairAccess wheelchairBoarding = WheelchairAccess.UNKNOWN;
 
     /**
      * The "code" of the stop. Depending on the transit agency, this is often

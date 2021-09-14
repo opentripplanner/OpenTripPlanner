@@ -16,6 +16,7 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.gtfs.WheelchairAccess;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -401,9 +402,9 @@ public abstract class GraphPathToTripPlanConverter {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addTripFields(leg, states, requestedLocale);
-
         addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
+
+        addTripFields(leg, states, requestedLocale);
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
@@ -839,7 +840,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.flexDrtDropOffMessage = trip.getDrtDropOffMessage();
             leg.flexFlagStopPickupMessage = trip.getContinuousPickupMessage();
             leg.flexFlagStopDropOffMessage = trip.getContinuousDropOffMessage();
-            leg.accessibilityScore = computeAccessibilityScore(trip);
+            leg.accessibilityScore = computeAccessibilityScore(trip, leg);
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
@@ -875,11 +876,19 @@ public abstract class GraphPathToTripPlanConverter {
         }
     }
 
-    private static float computeAccessibilityScore(Trip trip) {
-        switch(trip.getWheelchairAccessible()) {
-            case 1: // is accessible
+    private static float computeAccessibilityScore(Trip trip, Leg leg) {
+        float fromScore = computeAccessibilityScore(leg.from.wheelchairBoarding);
+        float toScore = computeAccessibilityScore(leg.to.wheelchairBoarding);
+        float tripScore = computeAccessibilityScore(WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible()));
+
+        return (fromScore + toScore + tripScore) / 3;
+    }
+
+    private static float computeAccessibilityScore(WheelchairAccess access) {
+        switch(access) {
+            case ALLOWED: // is accessible
                 return 1;
-            case 2: // not accessible
+            case NOT_ALLOWED: // not accessible
                 return 0;
             default: // don't know
                 return 0.5f;
@@ -983,6 +992,7 @@ public abstract class GraphPathToTripPlanConverter {
         // share (or other vehicle rental types) will get information about the vehicle ID and networks served.
         if (vertex instanceof TransitVertex && edge instanceof OnboardEdge) {
             place.stopId = stop.getId();
+            place.wheelchairBoarding = WheelchairAccess.fromGtfsValue(stop.getWheelchairBoarding());
             place.stopCode = stop.getCode();
             place.platformCode = stop.getPlatformCode();
             place.zoneId = stop.getZoneId();
