@@ -70,7 +70,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
 
     @Override
     public boolean isRenting() {
-        return true;
+        return !isReserved && !isDisabled;
     }
 
     @Override
