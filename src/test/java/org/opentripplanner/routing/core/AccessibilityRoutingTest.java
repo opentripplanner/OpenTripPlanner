@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.PolylineAssert;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
@@ -152,6 +154,17 @@ public class AccessibilityRoutingTest {
         // because are using a trip that has unknown accessibility, it has a lower score
         assertEquals(0.8333f, leg.accessibilityScore, DELTA);
 
+    }
+
+    @Test
+    public void stairsPenalty() {
+        GenericLocation start = new GenericLocation(33.75630, -84.39527);
+        GenericLocation end = new GenericLocation(33.75649, -84.39580);
+
+        Itinerary i = getTripPlan(start, end, r -> r.setMode(TraverseMode.WALK)).itinerary.get(0);
+        Leg leg = i.legs.get(0);
+        assertEquals("WALK", leg.mode);
+        assertThatPolylinesAreEqual("y_`mEmbbObA}@U]{@wAIMEOMHwBz@^p@Zn@Zx@Ld@DJLd@?@", leg.legGeometry.getPoints());
     }
 
     private static TripPlan getTripPlan(GenericLocation from, GenericLocation to, Consumer<RoutingRequest> func) {
