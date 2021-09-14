@@ -272,9 +272,9 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     // paved but unfavorable
     props.setProperties("surface=grass_paver", StreetTraversalPermission.ALL, 1.2, 1.2, true);
     props.setProperties("surface=sett", StreetTraversalPermission.ALL, 1.2, 1.2, true);
+    props.setProperties("surface=cobblestone", StreetTraversalPermission.ALL, 1.2, 1.2, true);
     props.setProperties("surface=metal_grid", StreetTraversalPermission.ALL, 1.2, 1.2, true);
-    props.setProperties("surface=cobblestone", StreetTraversalPermission.ALL, 1.4, 1.4, true);
-    props.setProperties("surface=unhewn_cobblestone", StreetTraversalPermission.ALL, 1.4, 1.4, true);
+    props.setProperties("surface=unhewn_cobblestone", StreetTraversalPermission.ALL, 1.5, 1.5, true);
     // Can be slick if wet, but otherwise not unfavorable to bikes
 
     // unpaved
