@@ -69,7 +69,7 @@ public class AccessibilityRoutingTest {
         assertEquals("FIVE POINTS STATION", leg.from.name);
         assertEquals("ASHBY STATION", leg.to.name);
 
-        // the start is not accessible so we get a lowered accessibility score
+        // the start is not accessible, so we get a lowered accessibility score
         assertEquals(0.666666f, leg.accessibilityScore, DELTA);
     }
 
