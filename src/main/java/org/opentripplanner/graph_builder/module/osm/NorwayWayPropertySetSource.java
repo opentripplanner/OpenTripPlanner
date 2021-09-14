@@ -100,8 +100,13 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     props.defaultSpeed = 22.22f; // 80kph
 
-    // Read the rest from the default set
-    new DefaultWayPropertySetSource().populateProperties(props);
+    new DefaultWayPropertySetSource().populateNotesAndNames(props);
+
+    props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
+    props.setSlopeOverride(new OSMSpecifier("embankment=*"), false);
+    props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
+    props.setSlopeOverride(new OSMSpecifier("location=underground"), true);
+    props.setSlopeOverride(new OSMSpecifier("indoor=yes"), true);
   }
 
   @Override
