@@ -226,9 +226,6 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
-            if (!isWheelchairAccessible()) {
-                return false;
-            }
             if (getMaxSlope() > options.maxSlope) {
                 return false;
             }
@@ -660,7 +657,9 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
-        if (isStairs()) {
+        if (isStairs() && options.wheelchairAccessible) {
+            weight += options.wheelchairStairsPenalty;
+        } else if(isStairs()) {
             weight *= options.stairsReluctance;
         } else {
             // TODO: this is being applied even when biking or driving.

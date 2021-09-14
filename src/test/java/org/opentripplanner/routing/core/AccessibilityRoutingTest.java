@@ -164,7 +164,17 @@ public class AccessibilityRoutingTest {
         Itinerary i = getTripPlan(start, end, r -> r.setMode(TraverseMode.WALK)).itinerary.get(0);
         Leg leg = i.legs.get(0);
         assertEquals("WALK", leg.mode);
-        assertThatPolylinesAreEqual("y_`mEmbbObA}@U]{@wAIMEOMHwBz@^p@Zn@Zx@Ld@DJLd@?@", leg.legGeometry.getPoints());
+        assertThatPolylinesAreEqual("y_`mEnmbbObA}@U]{@wAIMEOMHwBz@^p@Zn@Zx@Ld@DJLd@?@", leg.legGeometry.getPoints());
+
+        // if we reduce the stair penalty for wheelchairs we get a route that goes up the stairs
+        i = getTripPlan(start, end, r -> {
+            r.setMode(TraverseMode.WALK);
+            r.wheelchairStairsPenalty = 0;
+        }).itinerary.get(0);
+
+        leg = i.legs.get(0);
+        assertEquals("WALK", leg.mode);
+        assertThatPolylinesAreEqual("y_`mEnmbbO[XIHBFUTLd@?@", leg.legGeometry.getPoints());
     }
 
     private static TripPlan getTripPlan(GenericLocation from, GenericLocation to, Consumer<RoutingRequest> func) {
