@@ -234,30 +234,61 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "route=bicycle", StreetTraversalPermission.ALL, 0.8, 0.8, true
     );
 
-    // Disallow paths that are not fit for walking
-    props.setProperties("smoothness=horrible", StreetTraversalPermission.NONE);
-    props.setProperties("smoothness=impassable", StreetTraversalPermission.NONE);
-    props.setProperties("smoothness=very_horrible", StreetTraversalPermission.NONE);
-    props.setProperties("smoothness=very_bad", StreetTraversalPermission.NONE);
-    props.setProperties("smoothness=bad", StreetTraversalPermission.NONE);
-    props.setProperties("smoothness=rough", StreetTraversalPermission.NONE);
+    props.setProperties("highway=busway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1,  1);
+    props.setProperties("highway=track", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1,  1.1);
+    props.setProperties("highway=bridleway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9,  0.9);
+    props.setProperties("highway=path", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9,  0.9);
+    props.setProperties("highway=steps", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=corridor", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=footway;indoor=yes", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=platform", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("public_transport=platform", StreetTraversalPermission.PEDESTRIAN);
 
-    props.setProperties("trail_visibility=bad", StreetTraversalPermission.NONE);
-    props.setProperties("trail_visibility=no", StreetTraversalPermission.NONE);
-    props.setProperties("trail_visibility=low", StreetTraversalPermission.NONE);
-    props.setProperties("trail_visibility=poor", StreetTraversalPermission.NONE);
+    props.setProperties("smoothness=intermediate", StreetTraversalPermission.ALL, 1.1, 1.1, true);
+    props.setProperties("smoothness=bad", StreetTraversalPermission.ALL, 2, 2, true);
+    props.setProperties("highway=*;smoothness=very_bad", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=*;smoothness=horrible", StreetTraversalPermission.NONE);
+    props.setProperties("highway=*;smoothness=very_horrible", StreetTraversalPermission.NONE);
+    props.setProperties("highway=*;smoothness=impassable", StreetTraversalPermission.NONE);
 
-    props.setProperties("sac_scale=mountain_hiking", StreetTraversalPermission.NONE);
-    props.setProperties("sac_scale=demanding_mountain_hiking", StreetTraversalPermission.NONE);
-    props.setProperties("sac_scale=alpine_hiking", StreetTraversalPermission.NONE);
-    props.setProperties("sac_scale=demanding_alpine_hiking", StreetTraversalPermission.NONE);
-    props.setProperties("sac_scale=difficult_alpine_hiking", StreetTraversalPermission.NONE);
+    props.setProperties("highway=*;tracktype=grade1", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
+    props.setProperties("highway=*;tracktype=grade2", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
+    props.setProperties("highway=*;tracktype=grade3", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
+    props.setProperties("highway=*;tracktype=grade3", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.5, 1.5);
+    props.setProperties("highway=*;tracktype=grade4", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=*;tracktype=grade5", StreetTraversalPermission.PEDESTRIAN);
 
-    // Allow bikes on sidewalks
-    props.setProperties(
-        "footway=sidewalk;highway=footway",
-        StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
-    );
+    props.setProperties("highway=path;trail_visibility=bad", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;trail_visibility=no", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;trail_visibility=low", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;trail_visibility=poor", StreetTraversalPermission.NONE);
+
+    props.setProperties("highway=path;sac_scale=mountain_hiking", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;sac_scale=demanding_mountain_hiking", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;sac_scale=alpine_hiking", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;sac_scale=demanding_alpine_hiking", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;sac_scale=difficult_alpine_hiking", StreetTraversalPermission.NONE);
+
+    // paved but unfavorable
+    props.setProperties("surface=grass_paver", StreetTraversalPermission.ALL, 1.2, 1.2, true);
+    props.setProperties("surface=sett", StreetTraversalPermission.ALL, 1.2, 1.2, true);
+    props.setProperties("surface=metal_grid", StreetTraversalPermission.ALL, 1.2, 1.2, true);
+    props.setProperties("surface=cobblestone", StreetTraversalPermission.ALL, 1.4, 1.4, true);
+    props.setProperties("surface=unhewn_cobblestone", StreetTraversalPermission.ALL, 1.4, 1.4, true);
+    // Can be slick if wet, but otherwise not unfavorable to bikes
+
+    // unpaved
+    props.setProperties("surface=unpaved", StreetTraversalPermission.ALL, 1.2, 1.2, true);
+    props.setProperties("surface=compacted", StreetTraversalPermission.ALL, 1.2, 1.2, true);
+    props.setProperties("surface=fine_gravel", StreetTraversalPermission.ALL, 1.3, 1.3, true);
+    props.setProperties("surface=pebblestone", StreetTraversalPermission.ALL, 1.3, 1.3, true);
+    props.setProperties("surface=gravel", StreetTraversalPermission.ALL, 1.3, 1.3, true);
+    props.setProperties("surface=woodchip", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+    props.setProperties("surface=ground", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+    props.setProperties("surface=dirt", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+    props.setProperties("surface=earth", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+    props.setProperties("surface=grass", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+    props.setProperties("surface=mud", StreetTraversalPermission.ALL, 1.5, 1.5, true);
 
     /*
      * Automobile speeds in Norway. General speed limit is 80kph unless signs says otherwise
