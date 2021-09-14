@@ -37,9 +37,6 @@ public class AccessibilityRoutingTest {
         GenericLocation end = new GenericLocation(33.75744, -84.41754);
 
         Itinerary i = getTripPlan(graph, start, end).itinerary.get(0);
-
-        assertNotNull(i);
-
         List<Leg> transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
 
         assertEquals(1, transitLegs.size());
@@ -47,9 +44,33 @@ public class AccessibilityRoutingTest {
         Leg leg = transitLegs.get(0);
         assertEquals("BLUE", leg.routeShortName);
 
+        assertEquals("GEORGIA STATE STATION", leg.from.name);
+        assertEquals("ASHBY STATION", leg.to.name);
         // since both the start and end stops and the trip are accessible, we get a perfect score
         assertEquals(1, leg.accessibilityScore);
 
+    }
+
+    @Test
+    public void tripWhereStartIsNotAccessible() {
+        // near Five Points station
+        GenericLocation start = new GenericLocation(33.75374, -84.39228);
+        // near Ashby station
+        GenericLocation end = new GenericLocation(33.75744, -84.41754);
+
+        Itinerary i = getTripPlan(graph, start, end).itinerary.get(0);
+        List<Leg> transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
+
+        assertEquals(1, transitLegs.size());
+
+        Leg leg = transitLegs.get(0);
+        assertEquals("BLUE", leg.routeShortName);
+
+        assertEquals("FIVE POINTS STATION", leg.from.name);
+        assertEquals("ASHBY STATION", leg.to.name);
+
+        // the start is not accessible so we get a lowered accessibility score
+        assertEquals(1, leg.accessibilityScore); // TODO: lower score because start is not accessible
     }
 
     private static TripPlan getTripPlan(Graph graph, GenericLocation from, GenericLocation to) {
