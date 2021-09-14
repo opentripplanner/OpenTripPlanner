@@ -28,16 +28,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     // Don't recommend walking in trunk road tunnels (although actually legal unless explicitly forbidden)
     props.setProperties("highway=trunk;tunnel=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
     props.setProperties("highway=trunk_link;tunnel=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
-
-    // Various highway tags that should not be routed on
-    props.setProperties("highway=razed", StreetTraversalPermission.NONE);
-    props.setProperties("highway=proposed", StreetTraversalPermission.NONE);
-    props.setProperties("highway=construction", StreetTraversalPermission.NONE);
-    props.setProperties("highway=abandoned", StreetTraversalPermission.NONE);
-    props.setProperties("highway=winter_road", StreetTraversalPermission.NONE);
-    props.setProperties("highway=historic", StreetTraversalPermission.NONE);
-    props.setProperties("highway=proposal_alternative", StreetTraversalPermission.NONE);
-
+    
     // Do not walk on "Motortrafikkvei" ("motorvei klasse b")
     props.setProperties("motorroad=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
 
