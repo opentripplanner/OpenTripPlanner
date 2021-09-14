@@ -29,8 +29,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=trunk;tunnel=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
     props.setProperties("highway=trunk_link;tunnel=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
     
-    // Do not walk on "Motortrafikkvei" ("motorvei klasse b")
-    props.setProperties("motorroad=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
 
     // Do not drive on cycleWays
     props.setProperties("highway=cycleway;bicycle=designated",
@@ -38,6 +36,24 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
         0.97,
         0.97
     );
+    props.setProperties("highway=motorway", StreetTraversalPermission.CAR);
+    props.setProperties("highway=motorway_link", StreetTraversalPermission.CAR);
+    // Patch missing vehicle=no check
+    props.setProperties("highway=motorway_link;vehicle=no", StreetTraversalPermission.NONE);
+    props.setProperties("highway=motorway_link=yes;vehicle=no", StreetTraversalPermission.NONE);
+
+    // Do not walk on "Motortrafikkvei" ("motorvei klasse b")
+    props.setProperties("highway=trunk;motorroad=yes", StreetTraversalPermission.CAR);
+    props.setProperties("highway=trunk_link;motorroad=yes", StreetTraversalPermission.CAR);
+    // Patch missing vehicle=no check
+    props.setProperties("highway=trunk;motorroad=yes;vehicle=no", StreetTraversalPermission.NONE);
+    props.setProperties("highway=trunk_link;motorroad=yes;vehicle=no", StreetTraversalPermission.NONE);
+
+    props.setProperties("highway=primary;motorroad=yes", StreetTraversalPermission.CAR);
+    props.setProperties("highway=primary_link;motorroad=yes", StreetTraversalPermission.CAR);
+    // Patch missing vehicle=no check
+    props.setProperties("highway=primary_link;motorroad=yes;vehicle=no", StreetTraversalPermission.NONE);
+    props.setProperties("highway=primary_link;motorroad=yes;vehicle=no", StreetTraversalPermission.NONE);
 
     // Disallow paths that are not fit for walking
     props.setProperties("smoothness=horrible", StreetTraversalPermission.NONE);
