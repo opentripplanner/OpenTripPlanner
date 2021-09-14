@@ -126,18 +126,6 @@ public class GraphBuilder implements Runnable {
             osmModule.banDiscouragedBiking = config.banDiscouragedBiking;
             osmModule.maxAreaNodes = config.maxAreaNodes;
             graphBuilder.addModule(osmModule);
-	    if (OTPFeature.PruneIslands.isOn()) { // original pruning
-                PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
-                pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-                pruneFloatingIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-                graphBuilder.addModule(pruneFloatingIslands);
-            }
-            if (OTPFeature.PruneNoThru.isOn()) { // more advanced island pruning
-                PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands();
-                pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-                pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-                graphBuilder.addModule(pruneNoThruIslands);
-            }
         }
         if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
@@ -181,6 +169,22 @@ public class GraphBuilder implements Runnable {
         StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
         streetLinkerModule.setAddExtraEdgesToAreas(config.areaVisibility);
         graphBuilder.addModule(streetLinkerModule);
+
+        if ( hasOsm ) {
+            if (OTPFeature.PruneIslands.isOn()) { // original pruning
+                PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
+                pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+                pruneFloatingIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+                graphBuilder.addModule(pruneFloatingIslands);
+            }
+            if (OTPFeature.PruneNoThru.isOn()) { // more advanced island pruning
+                PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands();
+                pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+                pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+                graphBuilder.addModule(pruneNoThruIslands);
+            }
+        }
+
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
         List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
@@ -246,4 +250,3 @@ public class GraphBuilder implements Runnable {
         return graphBuilder;
     }
 }
-
