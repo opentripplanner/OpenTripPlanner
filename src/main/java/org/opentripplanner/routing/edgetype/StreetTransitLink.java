@@ -93,9 +93,6 @@ public class StreetTransitLink extends Edge {
         }
 
         RoutingRequest req = s0.getOptions();
-        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
-            return null;
-        }
         if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
             // Forbid taking your own bike in the station if bike P+R activated.
             return null;
