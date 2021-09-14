@@ -2,7 +2,6 @@ package org.opentripplanner.routing.core;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -48,7 +47,6 @@ public class AccessibilityRoutingTest {
         assertEquals("ASHBY STATION", leg.to.name);
         // since both the start and end stops and the trip are accessible, we get a perfect score
         assertEquals(1, leg.accessibilityScore);
-
     }
 
     @Test

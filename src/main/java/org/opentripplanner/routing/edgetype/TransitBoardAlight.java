@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import java.util.BitSet;
 
 import java.util.Locale;
+import org.opentripplanner.gtfs.WheelchairAccess;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -354,10 +355,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     private void addWheelchairPenalties(RoutingRequest options, StateEditor s1) {
         /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
-        if (options.wheelchairAccessible ) {
-            boolean stopIsWheelchairAccessible = getPattern().wheelchairAccessible(stopIndex);
-            if(!stopIsWheelchairAccessible) {
-               s1.incrementWeight(options.noWheelchairAccessAtStopPenalty);
+        if (options.wheelchairAccessible) {
+            WheelchairAccess wa = getPattern().wheelchairAccessible(stopIndex);
+            if(wa == WheelchairAccess.NOT_ALLOWED) {
+                s1.incrementWeight(options.noWheelchairAccessAtStopPenalty);
+            }
+            else if(wa == WheelchairAccess.UNKNOWN) {
+                s1.incrementWeight(options.unknownWheelchairAccessAtStopPenalty);
             }
         }
     }
