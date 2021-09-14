@@ -16,6 +16,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
+import org.opentripplanner.routing.edgetype.StreetTransitEntityLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -103,11 +104,12 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 issueStore, TraverseMode.CAR
         );
         if (transitToStreetNetwork == null) {
-            LOG.debug(
-                    "TransitToStreetNetworkGraphBuilder was not provided to PruneFloatingIslands. Not attempting to reconnect stops.");
+            LOG.info("StreetLinkerModule not provided, not attempting to reconnect stops.");
         }
         else {
-            //reconnect stops on small islands (that removed)
+            // reconnect stops on small islands (that removed)
+            // this currently does not work!
+            LOG.info("Reconnecting stops with StreetLinkerModule");
             transitToStreetNetwork.buildGraph(graph, extra, issueStore);
         }
         LOG.debug("Done pruning nothru islands");
@@ -151,7 +153,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             }
         }
         if (islandLog != null) {
-            islandLog.printf("%s\t%s\t%s\t%s\n", "id", "streets", "changed", "node");
+            islandLog.printf("%s\t%s\t%s\t%s\n", "id", "streets", "stops", "changed", "node");
         }
         Map<Vertex, Subgraph> subgraphs = new HashMap<Vertex, Subgraph>();
         Map<Vertex, Subgraph> extgraphs = new HashMap<Vertex, Subgraph>();
@@ -230,10 +232,12 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         stats.put("restricted", 0);
 
         int count = 0;
+        int islandsWithStops = 0;
         for (Subgraph island : islands) {
             boolean changed = false;
             if (island.stopSize() > 0) {
                 //for islands with stops
+                islandsWithStops++;
                 if (island.streetSize() < islandWithStopMaxSize) {
                     restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode);
                     changed = true;
@@ -256,6 +260,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             LOG.info("Detected {} isolated edges", stats.get("isolated"));
         }
         else {
+            LOG.info("Number of islands with stops: {}", islandsWithStops);
             LOG.info("Removed {} edges", stats.get("removed"));
             LOG.info("Removed traversal mode from {} edges", stats.get("restricted"));
             LOG.info("Converted {} edges to noThruTraffic", stats.get("noThru"));
@@ -282,7 +287,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 if (!(
                     e instanceof StreetEdge || e instanceof StreetTransitStopLink ||
                     e instanceof StreetTransitEntranceLink || e instanceof ElevatorEdge ||
-                    e instanceof FreeEdge
+                    e instanceof FreeEdge || e instanceof StreetTransitEntityLink
                 )
                 ) {
                     continue;
@@ -418,17 +423,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 graph.remove(v);
             }
         }
-        //remove street connection form
-        for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext(); ) {
-            Vertex v = vIter.next();
-            Collection<Edge> edges = new ArrayList<Edge>(v.getOutgoing());
-            edges.addAll(v.getIncoming());
-            for (Edge e : edges) {
-                if (e instanceof StreetTransitStopLink || e instanceof StreetTransitEntranceLink) {
-                    graph.removeEdge(e);
-                }
-            }
-        }
     }
 
     private static Subgraph computeConnectedSubgraph(
@@ -472,7 +466,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         String label = subgraph.getRepresentativeVertex().getLabel();
 
         islandLog.printf(
-            "%d\t%d\t%b\t%s\n", islandCounter, subgraph.streetSize(), changed, label
+            "%d\t%d\t%d\t%b\t%s\n", islandCounter, subgraph.streetSize(), subgraph.stopSize(), changed, label
         );
         islandCounter++;
     }
