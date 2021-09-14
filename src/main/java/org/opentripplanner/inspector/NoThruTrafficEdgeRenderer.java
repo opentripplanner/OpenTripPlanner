@@ -20,29 +20,38 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
     @Override
     public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
         if (e instanceof StreetEdge) {
+            int [][] colors = {
+                { 200, 200, 200 }, // no limitations = light gray
+                { 200, 200, 0},    // no walk thru traffic = yellow
+                { 0, 200, 200 },   // no bike thru = cyan
+                { 0, 200, 0 },     // no walk & bike thru = green
+                { 0, 0, 200},      // no car thru = blue
+                { 200, 100, 0},    // no car & walk thru = orange
+                { 200, 0, 200 },   // no car & bike thru = purple
+                { 200, 0, 0 }      // no for all = red
+            };
+
             StreetEdge pse = (StreetEdge) e;
-	    int r = 200, g = 0, b = 0;
+            int bits = 0;
 
-	    attrs.label = "";
+            attrs.label = "";
 
-	    if (pse.isWalkNoThruTraffic()) {
+            if (pse.isWalkNoThruTraffic()) {
                 attrs.label = " walk ";
-	    } else {
-	        g = 200;
-	    }
-	    if (pse.isBicycleNoThruTraffic()) {
+                bits += 1;
+            }
+            if (pse.isBicycleNoThruTraffic()) {
                 attrs.label += " bike";
-            } else {
-	        b = 200;
-	    }
+                bits += 2;
+            }
             if (pse.isMotorVehicleNoThruTraffic()) {
                 attrs.label += " car";
-		r = 255;
+                bits += 4;
             }
-            attrs.color = new Color(r, g, b);
+            attrs.color = new Color(colors[bits][0], colors[bits][1], colors[bits][2]);
             if (!attrs.label.equals("")) {
-		attrs.label = "No" + attrs.label + " thru traffic";
-	    }
+                attrs.label = "No" + attrs.label + " thru traffic";
+            }
         }
         else {
             return false;
