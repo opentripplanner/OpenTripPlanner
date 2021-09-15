@@ -92,7 +92,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         LOG.info("Pruning islands and areas isolated by nothru edges in street network");
 
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
-                pruningThresholdIslandWithStops, null,
+           pruningThresholdIslandWithStops, null,
                 issueStore, TraverseMode.BICYCLE
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
@@ -233,6 +233,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
         int count = 0;
         int islandsWithStops = 0;
+        int islandsWithStopsChanged = 0;
         for (Subgraph island : islands) {
             boolean changed = false;
             if (island.stopSize() > 0) {
@@ -241,6 +242,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 if (island.streetSize() < islandWithStopMaxSize) {
                     restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode);
                     changed = true;
+                    islandsWithStopsChanged++;
                     count++;
                 }
             }
@@ -261,11 +263,13 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         }
         else {
             LOG.info("Number of islands with stops: {}", islandsWithStops);
+            LOG.warn("Modified connectivity of {} islands with stops", islandsWithStopsChanged);
             LOG.info("Removed {} edges", stats.get("removed"));
             LOG.info("Removed traversal mode from {} edges", stats.get("restricted"));
             LOG.info("Converted {} edges to noThruTraffic", stats.get("noThru"));
             issueStore.add(new GraphConnectivity(
-                traverseMode, islands.size(), stats.get("removed"), stats.get("restricted"), stats.get("noThru")
+                traverseMode, islands.size(), islandsWithStops, islandsWithStopsChanged,
+                stats.get("removed"), stats.get("restricted"), stats.get("noThru")
             ));
         }
         return count;
