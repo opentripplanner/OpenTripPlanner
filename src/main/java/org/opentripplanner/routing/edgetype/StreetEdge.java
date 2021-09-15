@@ -657,6 +657,10 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
+        if(options.wheelchairAccessible && !isWheelchairAccessible()) {
+            weight *= options.noWheelchairAccessOnStreetReluctance;
+        }
+
         if (isStairs() && options.wheelchairAccessible) {
             weight += options.wheelchairStairsPenalty;
         } else if(isStairs()) {
