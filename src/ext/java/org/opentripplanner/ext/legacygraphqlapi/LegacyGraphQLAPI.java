@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import graphql.ExecutionResult;
+import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -24,8 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
@@ -137,9 +137,7 @@ public class LegacyGraphQLAPI {
       @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
       @Context HttpHeaders headers
   ) {
-    List<Map<String, Object>> responses = new ArrayList<>();
-    List<Callable<Map>> futures = new ArrayList();
-
+    List<Callable<ExecutionResult>> futures = new ArrayList<>();
     Locale locale = headers.getAcceptableLanguages().size() > 0
         ? headers.getAcceptableLanguages().get(0)
         : router.defaultRoutingRequest.locale;
@@ -178,18 +176,11 @@ public class LegacyGraphQLAPI {
     }
 
     try {
-      List<Future<Map>> results = LegacyGraphQLIndex.threadPool.invokeAll(futures);
-
-      for (int i = 0; i < queries.size(); i++) {
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("id", queries.get(i).get("id"));
-        response.put("payload", results.get(i).get());
-        responses.add(response);
-      }
+      List<Future<ExecutionResult>> results = LegacyGraphQLIndex.threadPool.invokeAll(futures);
+      return Response.status(Response.Status.OK).entity(GraphQLResponseSerializer.serializeBatch(queries, results)).build();
+    } catch (InterruptedException e) {
+      LOG.error("Batch query interrupted", e);
+      throw new RuntimeException(e);
     }
-    catch (CancellationException | ExecutionException | InterruptedException e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    }
-    return Response.status(Response.Status.OK).entity(responses).build();
   }
 }
