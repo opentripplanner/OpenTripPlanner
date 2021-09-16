@@ -4,13 +4,14 @@ import org.entur.gbfs.v2_2.free_bike_status.GBFSBike;
 import org.entur.gbfs.v2_2.free_bike_status.GBFSFreeBikeStatus;
 import org.entur.gbfs.v2_2.station_information.GBFSRentalUris;
 import org.entur.gbfs.v2_2.station_information.GBFSStationInformation;
-import org.entur.gbfs.v2_2.station_status.GBFSStation;
 import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
 import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
@@ -68,32 +69,37 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
     }
 
     @Override
-    public List<VehicleRentalStation> getStations() {
+    public List<VehicleRentalPlace> getStations() {
 
         // Get system information
         String system = loader.getFeed(GBFSSystemInformation.class).getData().getSystemId();
 
-        List<VehicleRentalStation> stations = new LinkedList<>();
+        List<VehicleRentalPlace> stations = new LinkedList<>();
 
         // Index all the station status entries on their station ID.
-        Map<FeedScopedId, VehicleRentalStation> statusLookup = new HashMap<>();
+        Map<String, org.entur.gbfs.v2_2.station_status.GBFSStation> statusLookup = new HashMap<>();
 
         // Station status is required for all systems using stations
         GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
         if (stationStatus != null) {
             for (var element : stationStatus.getData().getStations()) {
-                VehicleRentalStation station = mapStationStatus(element, system);
-                statusLookup.put(station.id, station);
+                statusLookup.put(element.getStationId(), element);
             }
 
             // Iterate over all known stations, and if we have any status information add it to those station objects.
             for (var element : loader.getFeed(GBFSStationInformation.class).getData().getStations()) {
                 VehicleRentalStation station = mapStationInformation(element, system);
                 stations.add(station);
-                if (!statusLookup.containsKey(station.id)) { continue; }
-                VehicleRentalStation status = statusLookup.get(station.id);
-                station.vehiclesAvailable = status.vehiclesAvailable;
-                station.spacesAvailable = status.spacesAvailable;
+                if (!statusLookup.containsKey(element.getStationId())) {
+                    station.realTimeData = false;
+                    continue;
+                }
+                org.entur.gbfs.v2_2.station_status.GBFSStation status = statusLookup.get(element.getStationId());
+                station.vehiclesAvailable = (int) (double) status.getNumBikesAvailable();
+                if (status.getNumDocksAvailable() != null) {
+                    station.spacesAvailable = (int) (double) status.getNumDocksAvailable();
+                }
+                station.allowDropoff = status.getIsReturning();
             }
         }
 
@@ -102,7 +108,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
             GBFSFreeBikeStatus freeBikeStatus = loader.getFeed(GBFSFreeBikeStatus.class);
             if (freeBikeStatus != null) {
                 for (GBFSBike element : freeBikeStatus.getData().getBikes()) {
-                    VehicleRentalStation bike = mapFreeBike(element, system);
+                    VehicleRentalPlace bike = mapFreeBike(element, system);
                     if (bike != null) {
                         stations.add(bike);
                     }
@@ -133,36 +139,18 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         return rentalStation;
     }
 
-    public VehicleRentalStation mapStationStatus(GBFSStation station, String system) {
-        VehicleRentalStation rentalStation = new VehicleRentalStation();
-        rentalStation.id = new FeedScopedId(system, station.getStationId());
-        rentalStation.vehiclesAvailable = (int) (double) station.getNumBikesAvailable();
-
-        if (station.getNumDocksAvailable() != null) {
-            rentalStation.spacesAvailable = (int) (double) station.getNumDocksAvailable();
-        }
-
-        rentalStation.isKeepingVehicleRentalAtDestinationAllowed = allowKeepingRentedVehicleAtDestination;
-        rentalStation.isCarStation = routeAsCar;
-        return rentalStation;
-    }
-
-    public VehicleRentalStation mapFreeBike(GBFSBike bike, String system) {
+    public VehicleRentalVehicle mapFreeBike(GBFSBike bike, String system) {
         if ((bike.getStationId() == null || bike.getStationId().isBlank()) &&
             bike.getLon() != null &&
             bike.getLat() != null
         ) {
-            VehicleRentalStation rentalStation = new VehicleRentalStation();
-            rentalStation.id = new FeedScopedId(system, bike.getBikeId());
-            rentalStation.name = new NonLocalizedString(bike.getBikeId());
-            rentalStation.longitude = bike.getLon();
-            rentalStation.latitude = bike.getLat();
-            rentalStation.vehiclesAvailable = 1;
-            rentalStation.spacesAvailable = 0;
-            rentalStation.allowDropoff = false;
-            rentalStation.isFloatingBike = true;
-            rentalStation.isCarStation = routeAsCar;
-            return rentalStation;
+            VehicleRentalVehicle rentalVehicle = new VehicleRentalVehicle();
+            rentalVehicle.id = new FeedScopedId(system, bike.getBikeId());
+            rentalVehicle.name = new NonLocalizedString(bike.getBikeId());
+            rentalVehicle.longitude = bike.getLon();
+            rentalVehicle.latitude = bike.getLat();
+            rentalVehicle.isCarStation = routeAsCar;
+            return rentalVehicle;
         } else {
             return null;
         }

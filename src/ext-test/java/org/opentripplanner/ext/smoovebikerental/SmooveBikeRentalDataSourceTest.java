@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 class SmooveBikeRentalDataSourceTest {
 
@@ -20,39 +19,39 @@ class SmooveBikeRentalDataSourceTest {
                 )
         );
         assertTrue(source.update());
-        List<VehicleRentalStation> rentalStations = source.getStations();
+        List<VehicleRentalPlace> rentalStations = source.getStations();
 
         // Invalid station without coordinates shoulf be ignored, so only 3
         assertEquals(3, rentalStations.size());
-        for (VehicleRentalStation rentalStation : rentalStations) {
+        for (VehicleRentalPlace rentalStation : rentalStations) {
             System.out.println(rentalStation);
         }
 
-        VehicleRentalStation hamn = rentalStations.get(0);
-        assertEquals("Hamn", hamn.name.toString());
+        VehicleRentalPlace hamn = rentalStations.get(0);
+        assertEquals("Hamn", hamn.getName().toString());
         assertEquals("A04", hamn.getStationId());
         // Ignore whitespace in coordinates string
-        assertEquals(24.952269, hamn.longitude);
-        assertEquals(60.167913, hamn.latitude);
-        assertEquals(11, hamn.spacesAvailable);
-        assertEquals(1, hamn.vehiclesAvailable);
+        assertEquals(24.952269, hamn.getLongitude());
+        assertEquals(60.167913, hamn.getLatitude());
+        assertEquals(11, hamn.getSpacesAvailable());
+        assertEquals(1, hamn.getVehiclesAvailable());
 
-        VehicleRentalStation fake = rentalStations.get(1);
-        assertEquals("Fake", fake.name.toString());
+        VehicleRentalPlace fake = rentalStations.get(1);
+        assertEquals("Fake", fake.getName().toString());
         assertEquals("B05", fake.getStationId());
-        assertEquals(24.0, fake.longitude);
-        assertEquals(60.0, fake.latitude);
+        assertEquals(24.0, fake.getLongitude());
+        assertEquals(60.0, fake.getLatitude());
         // operative: false overrides available bikes and slots
-        assertEquals(0, fake.spacesAvailable);
-        assertEquals(0, fake.vehiclesAvailable);
+        assertEquals(0, fake.getSpacesAvailable());
+        assertEquals(0, fake.getVehiclesAvailable());
 
-        VehicleRentalStation foo = rentalStations.get(2);
-        assertEquals("Foo", foo.name.toString());
+        VehicleRentalPlace foo = rentalStations.get(2);
+        assertEquals("Foo", foo.getName().toString());
         assertEquals("B06", foo.getStationId());
-        assertEquals(25.0, foo.longitude);
-        assertEquals(61.0, foo.latitude);
-        assertEquals(5, foo.spacesAvailable);
-        assertEquals(5, foo.vehiclesAvailable);
+        assertEquals(25.0, foo.getLongitude());
+        assertEquals(61.0, foo.getLatitude());
+        assertEquals(5, foo.getSpacesAvailable());
+        assertEquals(5, foo.getVehiclesAvailable());
         // Ignores mismatch with total_slots
     }
 }

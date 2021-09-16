@@ -1,23 +1,15 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import static java.util.Locale.ROOT;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
-public class VehicleRentalStation implements VehicleRentalPlace {
+public class VehicleRentalVehicle implements VehicleRentalPlace {
 
     public FeedScopedId id;
     public I18NString name;
     public double longitude;
     public double latitude;
-    public int vehiclesAvailable = Integer.MAX_VALUE;
-    public int spacesAvailable = Integer.MAX_VALUE;
-    public boolean allowDropoff = true;
     public boolean isCarStation = false;
-    public boolean isKeepingVehicleRentalAtDestinationAllowed = false;
-
-    public boolean realTimeData = true;
 
     public VehicleRentalStationUris rentalUris;
 
@@ -36,7 +28,6 @@ public class VehicleRentalStation implements VehicleRentalPlace {
         return getId().getFeedId();
     }
 
-
     @Override
     public I18NString getName() {
         return name;
@@ -54,22 +45,22 @@ public class VehicleRentalStation implements VehicleRentalPlace {
 
     @Override
     public int getVehiclesAvailable() {
-        return vehiclesAvailable;
+        return 1;
     }
 
     @Override
     public int getSpacesAvailable() {
-        return spacesAvailable;
+        return 0;
     }
 
     @Override
     public boolean isAllowDropoff() {
-        return allowDropoff;
+        return false;
     }
 
     @Override
     public boolean isFloatingBike() {
-        return false;
+        return true;
     }
 
     @Override
@@ -79,25 +70,16 @@ public class VehicleRentalStation implements VehicleRentalPlace {
 
     @Override
     public boolean isKeepingVehicleRentalAtDestinationAllowed() {
-        return isKeepingVehicleRentalAtDestinationAllowed;
+        return false;
     }
 
-    /**
-     * Whether this station is static (usually coming from OSM data) or a real-time source. If no real-time data, users should take
-     * bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity divided by two. Only the total is meaningful.
-     */
     @Override
     public boolean isRealTimeData() {
-        return realTimeData;
+        return true;
     }
 
     @Override
     public VehicleRentalStationUris getRentalUris() {
         return rentalUris;
-    }
-
-    @Override
-    public String toString () {
-        return String.format(ROOT, "Vehicle rental station %s at %.6f, %.6f", name, latitude, longitude);
     }
 }

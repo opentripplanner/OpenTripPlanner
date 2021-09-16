@@ -38,14 +38,14 @@ public class VehicleRentalEdge extends Edge {
                 case BEFORE_RENTING:
                     return null;
                 case HAVE_RENTED:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().spacesAvailable == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().getSpacesAvailable() == 0) {
                         return null;
                     }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), network, true);
                     pickedUp = false;
                     break;
                 case RENTING_FLOATING:
-                    if (stationVertex.getStation().isFloatingBike) {
+                    if (stationVertex.getStation().isFloatingBike()) {
                         s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), network, true);
                         pickedUp = true;
                     } else {
@@ -53,12 +53,12 @@ public class VehicleRentalEdge extends Edge {
                     }
                     break;
                 case RENTING_FROM_STATION:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().vehiclesAvailable == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().getVehiclesAvailable() == 0) {
                         return null;
                     }
                     // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in State#getInitialStates(),
                     // and so here it is checked if this bicycle could have been kept at the destination
-                    if (s0.mayKeepRentedVehicleAtDestination() && !stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed) {
+                    if (s0.mayKeepRentedVehicleAtDestination() && !stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed()) {
                         return null;
                     }
                     if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {  return null; }
@@ -71,15 +71,15 @@ public class VehicleRentalEdge extends Edge {
         } else {
             switch (s0.getVehicleRentalState()) {
                 case BEFORE_RENTING:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().vehiclesAvailable == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().getVehiclesAvailable() == 0) {
                         return null;
                     }
-                    if (stationVertex.getStation().isFloatingBike) {
+                    if (stationVertex.getStation().isFloatingBike()) {
                         s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), network,
                                 false);
                     } else {
                         var mayKeep =
-                                stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed
+                                stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed()
                                         && options.allowKeepingRentedVehicleAtDestination;
                         s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), network,
                                 mayKeep, false);
@@ -91,7 +91,7 @@ public class VehicleRentalEdge extends Edge {
                 case RENTING_FLOATING:
                 case RENTING_FROM_STATION:
                     if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) { return null; }
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().spacesAvailable == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getStation().getSpacesAvailable() == 0) {
                         return null;
                     }
                     s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), network, false);

@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -18,19 +17,19 @@ public class VehicleRentalStationVertex extends Vertex {
 
     private static final long serialVersionUID = 2L;
 
-    private VehicleRentalStation station;
+    private VehicleRentalPlace station;
 
-    public VehicleRentalStationVertex(Graph g, VehicleRentalStation station) {
+    public VehicleRentalStationVertex(Graph g, VehicleRentalPlace station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
-        super(g, "bike rental station " + station.id, station.longitude, station.latitude, station.name);
+        super(g, "bike rental station " + station.getId(), station.getLongitude(), station.getLatitude(), station.getName());
         this.station = station;
     }
 
-    public VehicleRentalStation getStation() {
+    public VehicleRentalPlace getStation() {
         return station;
     }
 
-    public void setStation(VehicleRentalStation station) {
+    public void setStation(VehicleRentalPlace station) {
         this.station = station;
     }
 
@@ -40,7 +39,7 @@ public class VehicleRentalStationVertex extends Vertex {
      * We can model them as bike rental systems by changing only this one detail.
      */
     public TraverseMode getVehicleMode () {
-         return station.isCarStation ? TraverseMode.CAR : TraverseMode.BICYCLE;
+         return station.isCarStation() ? TraverseMode.CAR : TraverseMode.BICYCLE;
     }
 
 }

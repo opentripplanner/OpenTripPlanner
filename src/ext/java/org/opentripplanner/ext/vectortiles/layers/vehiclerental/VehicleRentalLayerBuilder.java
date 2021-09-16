@@ -8,7 +8,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalStation> {
+public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> {
   enum MapperType { Digitransit }
 
-  static Map<MapperType, Function<Graph, PropertyMapper<VehicleRentalStation>>> mappers = Map.of(
+  static Map<MapperType, Function<Graph, PropertyMapper<VehicleRentalPlace>>> mappers = Map.of(
       MapperType.Digitransit, DigitransitVehicleRentalPropertyMapper::create
   );
 
@@ -42,7 +42,7 @@ public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalStation
     return service.getVehicleRentalStations()
         .stream()
         .map(vehicleRentalStation -> {
-          Coordinate coordinate = new Coordinate(vehicleRentalStation.longitude, vehicleRentalStation.latitude);
+          Coordinate coordinate = new Coordinate(vehicleRentalStation.getLongitude(), vehicleRentalStation.getLatitude());
           Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
           point.setUserData(vehicleRentalStation);
           return point;
