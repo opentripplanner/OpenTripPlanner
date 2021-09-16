@@ -269,6 +269,14 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=path;sac_scale=demanding_alpine_hiking", StreetTraversalPermission.NONE);
     props.setProperties("highway=path;sac_scale=difficult_alpine_hiking", StreetTraversalPermission.NONE);
 
+    props.setProperties("highway=path;mtb:scale=0", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    props.setProperties("highway=path;mtb:scale=1", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=path;mtb:scale=2", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=path;mtb:scale=3", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;mtb:scale=4", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;mtb:scale=5", StreetTraversalPermission.NONE);
+    props.setProperties("highway=path;mtb:scale=6", StreetTraversalPermission.NONE);
+
     // paved but unfavorable
     props.setProperties("surface=grass_paver", StreetTraversalPermission.ALL, 1.2, 1.2, true);
     props.setProperties("surface=sett", StreetTraversalPermission.ALL, 1.2, 1.2, true);
