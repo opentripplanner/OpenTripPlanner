@@ -112,25 +112,25 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=tertiary;maxspeed=30", StreetTraversalPermission.ALL, 0.92, 0.92);
     props.setProperties("highway=tertiary_link;maxspeed=30", StreetTraversalPermission.ALL, 0.92, 0.92);
 
-    props.setProperties("highway=unclassified", StreetTraversalPermission.ALL, 1.0, 1.0);
+    props.setProperties("highway=unclassified", StreetTraversalPermission.ALL, 0.97, 0.97);
     props.setProperties("highway=unclassified;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR, 6, 6);
     // These access tags indicates low traffic
-    props.setProperties("highway=unclassified;motor_vehicle=no", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
-    props.setProperties("highway=unclassified;motor_vehicle=private", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
-    props.setProperties("highway=unclassified;motor_vehicle=permit", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
-    props.setProperties("highway=unclassified;motor_vehicle=destination", StreetTraversalPermission.ALL, 0.97, 0.97);
+    props.setProperties("highway=unclassified;motor_vehicle=no", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.92, 0.92);
+    props.setProperties("highway=unclassified;motor_vehicle=private", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.92, 0.92);
+    props.setProperties("highway=unclassified;motor_vehicle=permit", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.92, 0.92);
+    props.setProperties("highway=unclassified;motor_vehicle=destination", StreetTraversalPermission.ALL, 0.92, 0.92);
     props.setProperties("highway=unclassified;maxspeed=70", StreetTraversalPermission.ALL, 2.06, 2.06);
     props.setProperties("highway=unclassified;maxspeed=80", StreetTraversalPermission.ALL, 2.06, 2.06);
 
-    props.setProperties("highway=residential", StreetTraversalPermission.ALL, 1.0, 1.0);
+    props.setProperties("highway=residential", StreetTraversalPermission.ALL, 0.97, 0.97);
     // These access tags indicates low traffic
-    props.setProperties("highway=residential;motor_vehicle=no", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
-    props.setProperties("highway=residential;motor_vehicle=private", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
-    props.setProperties("highway=residential;motor_vehicle=permit", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
-    props.setProperties("highway=residential;motor_vehicle=destination", StreetTraversalPermission.ALL, 0.97, 0.97);
+    props.setProperties("highway=residential;motor_vehicle=no", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.92, 0.92);
+    props.setProperties("highway=residential;motor_vehicle=private", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.92, 0.92);
+    props.setProperties("highway=residential;motor_vehicle=permit", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.92, 0.92);
+    props.setProperties("highway=residential;motor_vehicle=destination", StreetTraversalPermission.ALL, 0.92, 0.92);
 
-    props.setProperties("highway=service", StreetTraversalPermission.ALL, 1.0, 1.0);
-    props.setProperties("highway=service;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR, 6, 6);
+    props.setProperties("highway=service", StreetTraversalPermission.ALL, 0.97, 0.97);
+    props.setProperties("highway=service;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR, 1.5, 1.5);
     // These access tags indicates low traffic
     props.setProperties("highway=service;motor_vehicle=no", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
     props.setProperties("highway=service;motor_vehicle=private", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
@@ -182,9 +182,9 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=secondary_link;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,2.06, 0.62);
     props.setProperties("highway=tertiary;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
     props.setProperties("highway=tertiary_link;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
-    props.setProperties("highway=unclassified;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
-    props.setProperties("highway=residential;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
-    props.setProperties("highway=living_street;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,1, 0.62);
+    props.setProperties("highway=unclassified;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,0.97, 0.62);
+    props.setProperties("highway=residential;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,0.97, 0.62);
+    props.setProperties("highway=living_street;cycleway=opposite_track;maxspeed=*", StreetTraversalPermission.ALL,0.97, 0.62);
 
     props.setProperties("highway=trunk;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL, 2.25, 0.87);
     props.setProperties("highway=trunk_link;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL, 2.25, 0.87);
@@ -194,12 +194,12 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=secondary_link;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,2.06, 0.87);
     props.setProperties("highway=tertiary;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.87);
     props.setProperties("highway=tertiary_link;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.87);
-    props.setProperties("highway=unclassified;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.87);
-    props.setProperties("highway=residential;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.77);
-    props.setProperties("highway=living_street;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,1, 0.77);
+    props.setProperties("highway=unclassified;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,0.97, 0.87);
+    props.setProperties("highway=residential;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,0.97, 0.77);
+    props.setProperties("highway=living_street;cycleway=opposite_lane;maxspeed=*", StreetTraversalPermission.ALL,0.97, 0.77);
 
     /* Pedestrian, living and cyclestreet */
-    props.setProperties("highway=living_street", StreetTraversalPermission.ALL, 1, 1);
+    props.setProperties("highway=living_street", StreetTraversalPermission.ALL, 0.97, 0.97);
     props.setProperties("highway=pedestrian", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
     props.setProperties("highway=pedestrian;bicycle=designated", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.7, 0.7);
     props.setProperties("highway=residential;cyclestreet=yes;motor_vehicle=*", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.7, 0.7);
@@ -208,11 +208,11 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
     props.setProperties("highway=footway;motor_vehicle=destination", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9,  0.9);
 
-    props.setProperties("highway=footway;footway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
+    props.setProperties("highway=footway;footway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1, 1);
     props.setProperties("highway=footway;footway=crossing", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
-    props.setProperties("highway=cycleway;footway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.85, 0.85);
+    props.setProperties("highway=cycleway;footway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
     props.setProperties("highway=cycleway;footway=crossing", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
-    props.setProperties("highway=cycleway;cycleway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.85, 0.85);
+    props.setProperties("highway=cycleway;cycleway=sidewalk", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
     props.setProperties("highway=cycleway;cycleway=crossing", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
 
     props.setProperties("highway=cycleway", StreetTraversalPermission.BICYCLE, 0.7, 0.7);
