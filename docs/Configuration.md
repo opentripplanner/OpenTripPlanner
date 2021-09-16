@@ -725,7 +725,7 @@ config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
 `debug` | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters. | boolean | `false`
 `groupSimilarityKeepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
-`groupSimilarityKeepNumOfItineraries` | Reduce the number of itineraries to the requested number by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
+`groupSimilarityKeepThree` | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
 `minSafeTransferTimeFactor` | Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details. | double | `0.0`
 `transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `3600 + 2.0 x`
 `nonTransitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for non-transit itineraries. The max limit is calculated using ALL itineraries, but only non-transit itineraries will be filtered out. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Non-transit itineraries with a cost higher than the max-limit is dropped from the result set. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `3600 + 2.0 x`
@@ -737,20 +737,17 @@ config key | description | value type | value default
 
 The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
 with `searchWindow` and the two group-by parameters(`groupSimilarityKeepOne` and 
-`groupSimilarityKeepNumOfItineraries`). 
+`groupSimilarityKeepThree`). 
 
 The group-by-filter work by grouping itineraries together and then reducing the number of 
 itineraries in each group, keeping the itinerary/itineraries with the best itinerary 
 _generalized-cost_. The group-by function first pick all transit legs that account for more than N%
-of the itinerary based on distance traveled. This become the group-key. To keys are the same if all
+of the itinerary based on distance traveled. This become the group-key. Two keys are the same if all
 legs in one of the keys also exist in the other. Note, one key may have a lager set of legs than 
 the other, but they can still be the same. When comparing two legs we compare the `tripId` and make
 sure the legs overlap in place and time. Two legs are the same if both legs ride at least a common
 subsection of the same trip. The `keepOne` filter will keep ONE itinerary in each group. The 
-`keepNumOfItineraries` is a bit more complex, because it uses the `numOfItineraries` request 
-parameter to estimate a maxLimit for each group. For example, if the `numOfItineraries` is set to 
-5 and there is 3 groups, we set the _max-limit_ for each group to 2, returning between 4 and 6 
-elements depending on the distribution. The _max-limit_ can never be less than 1.
+`keepThree` keeps 3 itineraries for each group.
 
 
 #### Minimum Safe Transfer Time Additional Cost
