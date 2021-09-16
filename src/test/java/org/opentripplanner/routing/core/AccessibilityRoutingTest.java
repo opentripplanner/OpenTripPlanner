@@ -217,7 +217,7 @@ public class AccessibilityRoutingTest {
     }
 
     @Test
-    public void createAccessibleTransfers() {
+    public void accessibleTransfers() {
         // Memorial Drive
         GenericLocation start = new GenericLocation(33.74684, -84.37910);
 
@@ -228,15 +228,19 @@ public class AccessibilityRoutingTest {
         Leg leg = i.legs.get(1);
 
         // take bus 21 to near Georgia State station
+        // line 21 is trimmed to force non-wheelchair users to transfer at Georgia State as it would be
+        // quicker to stay on the bus and get on the metro at Five Points
         assertEquals("MEMORIAL DR SE @ HILL ST SE", leg.from.name);
         assertEquals("MEMORIAL DR SE @ FRASER ST SE", leg.to.name);
         assertEquals("BUS", leg.mode);
         assertEquals("21", leg.routeShortName);
 
-        // we get
+        // we get a path full of detours because we have made Capitol Avenue Southeast
+        // (https://www.openstreetmap.org/way/849819590) wheelchair-inaccessible (manually in the osm.pbf file) and have to go around it
         leg = i.legs.get(2);
+        assertEquals("WALK", leg.mode);
         assertThatPolylinesAreEqual(
-                "ge~lEtu`bO@vA?D?D@pC?XY?q@@_CAOCWEO?[@_@CSGQEGA{@Yo@UQGWMc@U{@g@??w@o@]]SSz@uA",
+                "ge~lEtu`bO@vA?DULA?AJ?rA?b@C?cBCGDk@?ECM`@IVGBG?EAIAI?A@CEo@GOCQEMEOECAcA]ICIAGAI@IBMMSO[Qs@e@k@g@y@u@JMSSz@uA",
                 leg.legGeometry.getPoints()
         );
 
