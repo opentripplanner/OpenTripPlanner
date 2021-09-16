@@ -15,9 +15,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- * This class is responsible for serializing GraphQL {@link ExecutionResult} into Strings, which can be returned as the
- * body of the HTTP response. This differs from the mapper provided by {@link JSONObjectMapperProvider}, by serializing
- * all fields in the objects, including null fields.
+ * This class is responsible for serializing a GraphQL {@link ExecutionResult} into a String, which can be returned as 
+ * the body of the HTTP response. This differs from the mapper provided by {@link JSONObjectMapperProvider}, by 
+ * serializing all fields in the objects, including null fields.
  */
 public class GraphQLResponseSerializer {
     static final Logger LOG = LoggerFactory.getLogger(GraphQLResponseSerializer.class);
