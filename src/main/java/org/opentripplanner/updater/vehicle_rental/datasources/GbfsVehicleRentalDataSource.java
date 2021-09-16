@@ -135,7 +135,9 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         VehicleRentalStation brstation = new VehicleRentalStation();
         brstation.id = new FeedScopedId(system, station.getStationId());
         brstation.vehiclesAvailable = (int) (double) station.getNumBikesAvailable();
-        brstation.spacesAvailable = (int) (double) station.getNumDocksAvailable();
+        if (station.getNumDocksAvailable() != null) {
+            brstation.spacesAvailable = (int) (double) station.getNumDocksAvailable();
+        }
         brstation.isKeepingVehicleRentalAtDestinationAllowed = allowKeepingRentedVehicleAtDestination;
         brstation.isCarStation = routeAsCar;
         return brstation;
