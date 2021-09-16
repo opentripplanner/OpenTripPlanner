@@ -21,23 +21,42 @@ public class SimpleTransfer extends Edge {
     private static final long serialVersionUID = 20140408L;
 
     private double distance;
+
+    private boolean wheelchairAccessible;
     
     private LineString geometry;
     private List<Edge> edges;
 
-    public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry, List<Edge> edges) {
+    public SimpleTransfer(
+            TransitStop from,
+            TransitStop to,
+            double distance,
+            boolean wheelchairAccessible,
+            LineString geometry,
+            List<Edge> edges
+    ) {
         super(from, to);
         this.distance = distance;
+        this.wheelchairAccessible = wheelchairAccessible;
         this.geometry = geometry;
         this.edges = edges;
     }
 
-    public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry) {
-        this(from, to, distance, geometry, null);
+    public SimpleTransfer(
+            TransitStop from,
+            TransitStop to,
+            double distance,
+            LineString geometry,
+            boolean wheelchairAccessible
+    ) {
+        this(from, to, distance, wheelchairAccessible, geometry, null);
     }
 
     @Override
     public State traverse(State s0) {
+        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
+            return null;
+        }
         // Forbid taking shortcuts composed of two transfers in a row
         if (s0.backEdge instanceof SimpleTransfer) {
             return null;

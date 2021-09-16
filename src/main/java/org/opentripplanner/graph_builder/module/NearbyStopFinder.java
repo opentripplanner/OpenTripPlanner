@@ -77,14 +77,14 @@ public class NearbyStopFinder {
      * This is intentional: we don't want to return the next stop down the line for trip patterns that pass through the
      * origin vertex.
      */
-    public Set<StopAtDistance> findNearbyStopsConsideringPatterns (Vertex vertex) {
+    public Set<StopAtDistance> findNearbyStopsConsideringPatterns (Vertex vertex, boolean wheelchairAccessible) {
 
         /* Track the closest stop on each pattern passing nearby. */
         SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closestStopForPattern =
                 new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
-        for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
+        for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex, wheelchairAccessible)) {
             /* Filter out destination stops that are already reachable via pathways or transfers. */
             // FIXME why is the above comment relevant here? how does the next line achieve this?
             TransitStop ts1 = stopAtDistance.tstop;
@@ -122,8 +122,8 @@ public class NearbyStopFinder {
      * If the origin vertex is a TransitStop, the result will include it; this characteristic is essential for
      * associating the correct stop with each trip pattern in the vicinity.
      */
-    public List<StopAtDistance> findNearbyStops (Vertex vertex) {
-        return useStreets ? findNearbyStopsViaStreets(vertex) : findNearbyStopsEuclidean(vertex);
+    public List<StopAtDistance> findNearbyStops (Vertex vertex, boolean wheelchairAccessible) {
+        return useStreets ? findNearbyStopsViaStreets(vertex, wheelchairAccessible) : findNearbyStopsEuclidean(vertex);
     }
 
 
@@ -131,11 +131,12 @@ public class NearbyStopFinder {
      * Return all stops within a certain radius of the given vertex, using network distance along streets.
      * If the origin vertex is a TransitStop, the result will include it.
      */
-    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
+    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex, boolean wheelchairAccessible) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
         routingRequest.setRoutingContext(graph, originVertex, null);
+        routingRequest.wheelchairAccessible = wheelchairAccessible;
         ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
