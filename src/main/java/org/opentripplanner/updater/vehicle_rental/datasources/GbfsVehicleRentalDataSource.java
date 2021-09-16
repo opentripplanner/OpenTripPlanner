@@ -43,6 +43,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private final boolean routeAsCar;
 
+    /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
     private final boolean allowKeepingRentedVehicleAtDestination;
 
     private GbfsFeedLoader loader;
@@ -113,35 +114,37 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
     }
 
     public VehicleRentalStation mapStationInformation(org.entur.gbfs.v2_2.station_information.GBFSStation station, String system) {
-        VehicleRentalStation brstation = new VehicleRentalStation();
-        brstation.id = new FeedScopedId(system, station.getStationId());
-        brstation.longitude = station.getLon();
-        brstation.latitude = station.getLat();
-        brstation.name = new NonLocalizedString(station.getName());
-        brstation.isKeepingVehicleRentalAtDestinationAllowed = allowKeepingRentedVehicleAtDestination;
-        brstation.isCarStation = routeAsCar;
+        VehicleRentalStation rentalStation = new VehicleRentalStation();
+        rentalStation.id = new FeedScopedId(system, station.getStationId());
+        rentalStation.longitude = station.getLon();
+        rentalStation.latitude = station.getLat();
+        rentalStation.name = new NonLocalizedString(station.getName());
+        rentalStation.isKeepingVehicleRentalAtDestinationAllowed = allowKeepingRentedVehicleAtDestination;
+        rentalStation.isCarStation = routeAsCar;
 
         GBFSRentalUris rentalUris = station.getRentalUris();
         if (rentalUris != null) {
             String androidUri = rentalUris.getAndroid();
             String iosUri = rentalUris.getIos();
             String webUri = rentalUris.getWeb();
-            brstation.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
+            rentalStation.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
         }
 
-        return brstation;
+        return rentalStation;
     }
 
     public VehicleRentalStation mapStationStatus(GBFSStation station, String system) {
-        VehicleRentalStation brstation = new VehicleRentalStation();
-        brstation.id = new FeedScopedId(system, station.getStationId());
-        brstation.vehiclesAvailable = (int) (double) station.getNumBikesAvailable();
+        VehicleRentalStation rentalStation = new VehicleRentalStation();
+        rentalStation.id = new FeedScopedId(system, station.getStationId());
+        rentalStation.vehiclesAvailable = (int) (double) station.getNumBikesAvailable();
+
         if (station.getNumDocksAvailable() != null) {
-            brstation.spacesAvailable = (int) (double) station.getNumDocksAvailable();
+            rentalStation.spacesAvailable = (int) (double) station.getNumDocksAvailable();
         }
-        brstation.isKeepingVehicleRentalAtDestinationAllowed = allowKeepingRentedVehicleAtDestination;
-        brstation.isCarStation = routeAsCar;
-        return brstation;
+
+        rentalStation.isKeepingVehicleRentalAtDestinationAllowed = allowKeepingRentedVehicleAtDestination;
+        rentalStation.isCarStation = routeAsCar;
+        return rentalStation;
     }
 
     public VehicleRentalStation mapFreeBike(GBFSBike bike, String system) {
@@ -149,17 +152,17 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
             bike.getLon() != null &&
             bike.getLat() != null
         ) {
-            VehicleRentalStation brstation = new VehicleRentalStation();
-            brstation.id = new FeedScopedId(system, bike.getBikeId());
-            brstation.name = new NonLocalizedString(bike.getBikeId());
-            brstation.longitude = bike.getLon();
-            brstation.latitude = bike.getLat();
-            brstation.vehiclesAvailable = 1;
-            brstation.spacesAvailable = 0;
-            brstation.allowDropoff = false;
-            brstation.isFloatingBike = true;
-            brstation.isCarStation = routeAsCar;
-            return brstation;
+            VehicleRentalStation rentalStation = new VehicleRentalStation();
+            rentalStation.id = new FeedScopedId(system, bike.getBikeId());
+            rentalStation.name = new NonLocalizedString(bike.getBikeId());
+            rentalStation.longitude = bike.getLon();
+            rentalStation.latitude = bike.getLat();
+            rentalStation.vehiclesAvailable = 1;
+            rentalStation.spacesAvailable = 0;
+            rentalStation.allowDropoff = false;
+            rentalStation.isFloatingBike = true;
+            rentalStation.isCarStation = routeAsCar;
+            return rentalStation;
         } else {
             return null;
         }

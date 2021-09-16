@@ -132,9 +132,9 @@ public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRental
             if (node == null) {
                 continue;
             }
-            VehicleRentalStation brstation = makeStation(node);
-            if (brstation != null) {
-                out.add(brstation);
+            VehicleRentalStation rentalStation = makeStation(node);
+            if (rentalStation != null) {
+                out.add(rentalStation);
             }
         }
         synchronized(this) {

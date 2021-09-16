@@ -44,7 +44,7 @@ public class GbfsFeedLoader {
         // Fetch autoconfiguration file
         GBFS data = fetchFeed(uri, httpHeaders, GBFS.class);
         if (data == null) {
-            throw new RuntimeException("Could not fetch feed " + uri + " autoconfiguration file");
+            throw new RuntimeException("Could not fetch the feed auto-configuration file from " + uri);
         }
 
         // Pick first language if none defined
@@ -59,12 +59,18 @@ public class GbfsFeedLoader {
         for (GBFSFeed feed : feeds.getFeeds()) {
             GBFSFeedName feedName = feed.getName();
             if (feedUpdaters.containsKey(feedName)) {
-                throw new RuntimeException("Feed " + url + " contains duplicate url for feed " + feedName);
+                throw new RuntimeException(
+                        "Feed contains duplicate url for feed " + feedName + ". " +
+                        "Urls: " + feed.getUrl() + ", " + feedUpdaters.get(feedName).url
+                );
             }
             feedUpdaters.put(feedName, new GBFSFeedUpdater<>(feed));
         }
     }
 
+    /**
+     * Checks if any of the feeds should be updated base on the TTL and fetches. Returns true, if any feeds were updated.
+     */
     public boolean update() {
         boolean didUpdate = false;
 
@@ -78,11 +84,48 @@ public class GbfsFeedLoader {
         return didUpdate;
     }
 
+    /**
+     * Gets the most recent contents of the feed, which contains an object of type T.
+     */
     public <T> T getFeed(Class<T> feed) {
-        var updater = feedUpdaters.get(GBFSFeedName.fromClass(feed));
+        GBFSFeedUpdater<?> updater = feedUpdaters.get(GBFSFeedName.fromClass(feed));
         if (updater == null) { return null; }
         return feed.cast(updater.getData());
     }
+
+    /* private static methods */
+
+    private static <T> T fetchFeed(URI uri, Map<String, String> httpHeaders, Class<T> clazz) {
+        try {
+            InputStream is;
+
+            String proto = uri.getScheme();
+            if (proto.equals("http") || proto.equals("https")) {
+                is = HttpUtils.getData(uri, httpHeaders);
+            } else {
+                // Local file probably, try standard java
+                is = uri.toURL().openStream();
+            }
+            if (is == null) {
+                LOG.warn("Failed to get data from url {}", uri);
+                return null;
+            }
+            T data = objectMapper.readValue(is, clazz);
+            is.close();
+            return data;
+        } catch (IllegalArgumentException e) {
+            LOG.warn("Error parsing vehicle rental feed from " + uri, e);
+            return null;
+        } catch (JsonProcessingException e) {
+            LOG.warn("Error parsing vehicle rental feed from " + uri + "(bad JSON of some sort)", e);
+            return null;
+        } catch (IOException e) {
+            LOG.warn("Error reading vehicle rental feed from " + uri, e);
+            return null;
+        }
+    }
+
+    /* private static classes */
 
     private class GBFSFeedUpdater<T> {
         private final URI url;
@@ -124,36 +167,6 @@ public class GbfsFeedLoader {
 
         private int getCurrentTimeSeconds() {
             return (int) (System.currentTimeMillis() / 1000);
-        }
-    }
-
-    private static <T> T fetchFeed(URI uri, Map<String, String> httpHeaders, Class<T> clazz) {
-        try {
-            InputStream is;
-
-            String proto = uri.getScheme();
-            if (proto.equals("http") || proto.equals("https")) {
-                is = HttpUtils.getData(uri, httpHeaders);
-            } else {
-                // Local file probably, try standard java
-                is = uri.toURL().openStream();
-            }
-            if (is == null) {
-                LOG.warn("Failed to get data from url {}", uri);
-                return null;
-            }
-            T data = objectMapper.readValue(is, clazz);
-            is.close();
-            return data;
-        } catch (IllegalArgumentException e) {
-            LOG.warn("Error parsing vehicle rental feed from " + uri, e);
-            return null;
-        } catch (JsonProcessingException e) {
-            LOG.warn("Error parsing vehicle rental feed from " + uri + "(bad JSON of some sort)", e);
-            return null;
-        } catch (IOException e) {
-            LOG.warn("Error reading vehicle rental feed from " + uri, e);
-            return null;
         }
     }
 }
