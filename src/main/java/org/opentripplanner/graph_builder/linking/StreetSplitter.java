@@ -178,6 +178,8 @@ public class StreetSplitter {
      * permanent edges.
      */
     public void linkAllStationsToGraph() {
+        int linksMade = 0;
+        LOG.info("Linking the street network to transit stops, static bike rentals and static bike parks.");
         for (Vertex v : graph.getVertices()) {
             if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex) {
                 boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
@@ -189,9 +191,15 @@ public class StreetSplitter {
                         LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked((BikeRentalStationVertex) v)));
                     else if (v instanceof BikeParkVertex)
                         LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v)));
-                };
+                } else {
+                    linksMade++;
+                    if (linksMade % 5000 == 0) {
+                        LOG.info("Made {} links from street network to transit stops, static bike rentals or static bike parks.", linksMade);
+                    }
+                }
             }
         }
+        LOG.info("{} total links made.", linksMade);
     }
 
     /**
