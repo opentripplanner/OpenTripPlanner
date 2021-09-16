@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     private static final Logger LOG =
@@ -43,9 +44,12 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
         fullDataset = true;
         try {
             InputStream is = HttpUtils.getData(
-                    URI.create(url),
+                URI.create(url),
+                Map.of(
                     "Accept",
-                    "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*");
+                    "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+                )
+            );
             if (is != null) {
                 // Decode message
                 feedMessage = FeedMessage.PARSER.parseFrom(is);

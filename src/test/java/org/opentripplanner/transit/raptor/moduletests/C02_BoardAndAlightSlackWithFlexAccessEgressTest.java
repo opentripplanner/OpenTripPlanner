@@ -36,9 +36,9 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
 
   /** The expected result is tha same for all tests */
   private static final String EXPECTED_RESULT
-      = "Flex 2m 1tx ~ 2 ~ "
+      = "Flex 2m 1x ~ 2 ~ "
       + "BUS R1 0:04 0:06 ~ 3 ~ "
-      + "Flex 2m 1tx "
+      + "Flex 2m 1x "
       + "[0:00:30 0:09:10 8m40s]";
 
   @Before
@@ -65,9 +65,9 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
     );
     requestBuilder.searchParams()
         // Start walking 1m before: 30s walk + 30s board-slack
-        .addAccessPaths(flexAndWalk(STOP_B, D2m))
+        .addAccessPaths(flexAndWalk(STOP_B, D2m, ONE_RIDE, 40_000))
         // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
-        .addEgressPaths(flex(STOP_C, D2m))
+        .addEgressPaths(flex(STOP_C, D2m, ONE_RIDE, 56_000))
         .earliestDepartureTime(T00_00)
         .latestArrivalTime(T00_10)
         // Only one iteration is needed - the access should be time-shifted

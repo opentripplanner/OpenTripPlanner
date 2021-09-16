@@ -1,7 +1,14 @@
 package org.opentripplanner.netex.mapping;
 
-import org.junit.Test;
+import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
+
+import java.util.TimeZone;
+import com.google.common.collect.ImmutableSet;
+import java.util.Collections;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -15,18 +22,19 @@ import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OrganisationRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
 
-import java.util.TimeZone;
 
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RouteMapperTest {
 
     private static final String NETWORK_ID = "RUT:Network:1";
     private static final String AUTHORITY_ID = "RUT:Authority:1";
     private static final String RUT_LINE_ID = "RUT:Line:1";
+    private static final String RUT_FERRY_WITHOUT_BICYCLES_ID = "RUT:Line:2:NoBicycles";
 
     private static final String TIME_ZONE = "GMT";
+
+    private static final Set<String> EMPTY_FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
 
     @Test
     public void mapRouteWithDefaultAgency() {
@@ -38,7 +46,8 @@ public class RouteMapperTest {
                 new EntityById<>(),
                 new EntityById<>(),
                 netexEntityIndex.readOnlyView(),
-                TimeZone.getDefault().toString()
+                TimeZone.getDefault().toString(),
+                EMPTY_FERRY_WITHOUT_BICYCLE_IDS
         );
 
         Route route = routeMapper.mapRoute(line);
@@ -71,7 +80,8 @@ public class RouteMapperTest {
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
                 netexIndex.readOnlyView(),
-                TIME_ZONE
+                TIME_ZONE,
+                EMPTY_FERRY_WITHOUT_BICYCLE_IDS
         );
 
         Route route = routeMapper.mapRoute(line);
@@ -95,13 +105,36 @@ public class RouteMapperTest {
                 new EntityById<>(),
                 new EntityById<>(),
                 netexEntityIndex.readOnlyView(),
-                TimeZone.getDefault().toString()
+                TimeZone.getDefault().toString(),
+                EMPTY_FERRY_WITHOUT_BICYCLE_IDS
         );
 
         Route route = routeMapper.mapRoute(line);
 
         assertEquals( route.getColor(), "7F0000");
         assertEquals(route.getTextColor(), "007F00");
+    }
+
+    @Test
+    public void allowBicyclesOnFerries() {
+        NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
+        Line lineWithBicycles = createExampleFerry(RUT_LINE_ID);
+        Line lineWithOutBicycles = createExampleFerry(RUT_FERRY_WITHOUT_BICYCLES_ID);
+
+        RouteMapper routeMapper = new RouteMapper(
+                MappingSupport.ID_FACTORY,
+                new EntityById<>(),
+                new EntityById<>(),
+                netexEntityIndex.readOnlyView(),
+                TimeZone.getDefault().toString(),
+                ImmutableSet.of(RUT_FERRY_WITHOUT_BICYCLES_ID)
+        );
+
+        Route ferryWithBicycles = routeMapper.mapRoute(lineWithBicycles);
+        assertEquals(BikeAccess.ALLOWED, ferryWithBicycles.getBikesAllowed());
+
+        Route ferryWithOutBicycles = routeMapper.mapRoute(lineWithOutBicycles);
+        assertEquals(BikeAccess.NOT_ALLOWED, ferryWithOutBicycles.getBikesAllowed());
     }
 
     private Line createExampleLine() {
@@ -112,6 +145,13 @@ public class RouteMapperTest {
         line.setPublicCode("L1");
         line.setRepresentedByGroupRef(new GroupOfLinesRefStructure().withRef(NETWORK_ID));
         return line;
+    }
+
+    private Line createExampleFerry(String id) {
+        var ferry = createExampleLine();
+        ferry.setId(id);
+        ferry.setTransportMode(AllVehicleModesOfTransportEnumeration.WATER);
+        return ferry;
     }
 
     private Agency createAgency() {

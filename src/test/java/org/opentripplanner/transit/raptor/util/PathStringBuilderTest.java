@@ -34,8 +34,8 @@ public class PathStringBuilderTest {
 
     @Test
     public void flex() {
-        assertEquals("Flex 0s 0tx", new PathStringBuilder().flex(0, 0).toString());
-        assertEquals("Flex 5m12s 2tx", new PathStringBuilder().flex(D_5_12, 2).toString());
+        assertEquals("Flex 0s 0x", new PathStringBuilder().flex(0, 0).toString());
+        assertEquals("Flex 5m12s 2x", new PathStringBuilder().flex(D_5_12, 2).toString());
     }
 
     @Test

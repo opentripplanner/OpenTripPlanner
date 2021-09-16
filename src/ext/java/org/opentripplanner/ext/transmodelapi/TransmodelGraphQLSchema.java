@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.collections.CollectionUtils;
+
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
@@ -65,6 +65,7 @@ import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeRentalStationType;
+import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceAtDistanceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceInterfaceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.QuayAtDistanceType;
@@ -83,7 +84,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -305,7 +306,15 @@ public class TransmodelGraphQLSchema {
                     )
                     .collect(Collectors.toList());
               }
-              return new ArrayList<>(GqlUtil.getRoutingService(env).getStations());
+              RoutingService routingService = GqlUtil.getRoutingService(env);
+              return routingService
+                  .getStations()
+                  .stream()
+                  .map(station -> new MonoOrMultiModalStation(
+                          station,
+                          routingService.getMultiModalStationForStations().get(station)
+                  ))
+                  .collect(Collectors.toList());
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -544,7 +553,7 @@ public class TransmodelGraphQLSchema {
                 stops = List.of();
               }
 
-              if (CollectionUtils.isEmpty(stops)) {
+              if (stops.isEmpty()) {
                 return new DefaultConnection<>(
                     Collections.emptyList(),
                     new DefaultPageInfo(null, null, false, false)
@@ -629,7 +638,7 @@ public class TransmodelGraphQLSchema {
 
             List<TransitMode> filterByTransportModes = environment.getArgument("filterByModes");
             List<TransmodelPlaceType> placeTypes = environment.getArgument("filterByPlaceTypes");
-            if (CollectionUtils.isEmpty(placeTypes)) {
+            if (placeTypes == null || placeTypes.isEmpty()) {
               placeTypes = Arrays.asList(TransmodelPlaceType.values());
             }
             List<PlaceType> filterByPlaceTypes = PlaceMapper.mapToDomain(placeTypes);
@@ -664,7 +673,7 @@ public class TransmodelGraphQLSchema {
                     GqlUtil.getRoutingService(environment)
                 )
                 .stream().limit(orgMaxResults).collect(Collectors.toList());
-            if (CollectionUtils.isEmpty(places)) {
+            if (places.isEmpty()) {
               return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
             }
             return new SimpleListConnection(places).get(environment);
@@ -894,17 +903,17 @@ public class TransmodelGraphQLSchema {
                   .getTripForId()
                   .values()
                   .stream()
-                  .filter(t -> CollectionUtils.isEmpty(lineIds) || lineIds.contains(t
+                  .filter(t -> lineIds == null || lineIds.isEmpty() || lineIds.contains(t
                       .getRoute()
                       .getId()))
                   //.filter(t -> CollectionUtils.isEmpty(privateCodes) || privateCodes.contains(t.getTripPrivateCode()))
-                  .filter(t -> CollectionUtils.isEmpty(authorities) || authorities.contains(t
+                  .filter(t -> authorities == null || authorities.isEmpty()  || authorities.contains(t
                       .getRoute()
                       .getAgency()
                       .getId()
                       .getId()))
                   .filter(t -> {
-                    return CollectionUtils.isEmpty(activeDates)
+                    return activeDates == null || activeDates.isEmpty()
                         || GqlUtil.getRoutingService(environment)
                         .getCalendarService()
                         .getServiceDatesForServiceId(t.getServiceId())
@@ -926,15 +935,15 @@ public class TransmodelGraphQLSchema {
                 .build())
             .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
             .dataFetcher(environment -> {
-              Collection<BikeRentalStation> all = new ArrayList<>(GqlUtil
+              Collection<VehicleRentalStation> all = new ArrayList<>(GqlUtil
                   .getRoutingService(environment)
-                  .getBikerentalStationService()
-                  .getBikeRentalStations());
+                  .getVehicleRentalStationService()
+                  .getVehicleRentalStations());
               List<String> filterByIds = environment.getArgument("ids");
-              if (!CollectionUtils.isEmpty(filterByIds)) {
+              if (filterByIds != null && !filterByIds.isEmpty()) {
                 return all
                     .stream()
-                    .filter(station -> filterByIds.contains(station.id))
+                    .filter(station -> filterByIds.contains(station.getStationId()))
                     .collect(Collectors.toList());
               }
               return all;
@@ -952,10 +961,10 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
-                  .getBikeRentalStations()
+                  .getVehicleRentalStationService()
+                  .getVehicleRentalStations()
                   .stream()
-                  .filter(bikeRentalStation -> bikeRentalStation.id.equals(environment.getArgument(
+                  .filter(bikeRentalStation -> bikeRentalStation.getStationId().equals(environment.getArgument(
                       "id")))
                   .findFirst()
                   .orElse(null);
@@ -990,7 +999,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> GqlUtil
                 .getRoutingService(environment)
-                .getBikerentalStationService().getBikeRentalStationForEnvelope(
+                .getVehicleRentalStationService().getVehicleRentalStationForEnvelope(
                     environment.getArgument("minimumLongitude"),
                     environment.getArgument("minimumLatitude"),
                     environment.getArgument("maximumLongitude"),
@@ -1009,7 +1018,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
+                  .getVehicleRentalStationService()
                   .getBikeParks()
                   .stream()
                   .filter(bikePark -> bikePark.id.equals(environment.getArgument("id")))
@@ -1024,7 +1033,7 @@ public class TransmodelGraphQLSchema {
             .type(new GraphQLNonNull(new GraphQLList(bikeParkType)))
             .dataFetcher(environment -> {
               return new ArrayList<>(GqlUtil.getRoutingService(environment)
-                  .getBikerentalStationService()
+                  .getVehicleRentalStationService()
                   .getBikeParks());
             })
             .build())

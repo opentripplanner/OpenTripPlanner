@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -45,7 +45,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
    * Egress (fromStop & duration):
    *   3  20s
    */
-  @Before
+  @BeforeEach
   public void setup() {
     data.withRoute(
         route(
@@ -103,7 +103,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
     var response = raptorService.route(request, data);
 
     assertEquals(
-        "Walk 30s ~ 2 ~ BUS R1 0:01 0:05 ~ 4 ~ Walk 20s [0:00:30 0:05:20 4m50s $1040]",
+        "Walk 30s ~ 2 ~ BUS R1 0:01 0:05 ~ 4 ~ Walk 20s [0:00:30 0:05:20 4m50s $940]",
         pathsToString(response)
     );
   }

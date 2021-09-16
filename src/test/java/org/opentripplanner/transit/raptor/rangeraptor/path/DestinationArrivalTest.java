@@ -1,30 +1,32 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class DestinationArrivalTest {
 
     private static final int BOARD_SLACK = 60;
     private static final int ACCESS_STOP = 100;
     private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
-    private static final int ACCESS_DURATION_TIME =  72;
-    private static final int ACCESS_COST = 420;
+    private static final int ACCESS_DURATION =  72;
+    private static final TestTransfer ACCESS_WALK = walk(ACCESS_STOP, ACCESS_DURATION);
+    private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
 
     private static final int TRANSIT_STOP = 101;
     private static final int TRANSIT_BOARD_TIME = ACCESS_DEPARTURE_TIME + 10 * 60;
     private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + 4 * 60;
     private static final RaptorTripSchedule A_TRIP = null;
-    private static final int TRANSIT_COST = 200;
+    private static final int TRANSIT_COST = 84000;
 
     private static final int DESTINATION_DURATION_TIME = 50;
-    private static final int DESTINATION_COST = 500;
+    private static final int DESTINATION_COST = 50000;
 
     private static final int EXPECTED_ARRIVAL_TIME = TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME;
     private static final int EXPECTED_TOTAL_COST = ACCESS_COST + TRANSIT_COST + DESTINATION_COST;
@@ -33,9 +35,7 @@ public class DestinationArrivalTest {
      * Setup a simple journey with an access leg, one transit and a egress leg.
      */
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            ACCESS_DEPARTURE_TIME,
-            ACCESS_COST,
-            walk(ACCESS_STOP, ACCESS_DURATION_TIME)
+            ACCESS_DEPARTURE_TIME, ACCESS_WALK
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
@@ -76,7 +76,7 @@ public class DestinationArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-            "Egress { round: 1, from-stop: 101, duration: 50s, arrival-time: 8:14:50 $1120 }",
+            "Egress { round: 1, from-stop: 101, duration: 50s, arrival-time: 8:14:50 $1484.00 }",
             subject.toString()
         );
     }

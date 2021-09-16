@@ -9,8 +9,8 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 public class CostCalculatorTest {
 
-    private static final int BOARD_COST = 5;
-    private static final int TRANSFER_COST = 2;
+    private static final int BOARD_COST_SEC = 5;
+    private static final int TRANSFER_COST_SEC = 2;
     private static final double WAIT_RELUCTANCE_FACTOR = 0.5;
     private static final double TRANSIT_RELUCTANCE_FACTOR_1 = 1.0;
     private static final double TRANSIT_RELUCTANCE_FACTOR_2 = 0.8;
@@ -18,8 +18,8 @@ public class CostCalculatorTest {
     private static final int TRANSIT_RELUCTANCE_2 = 1;
 
     private final CostCalculator<TestTripSchedule> subject = new DefaultCostCalculator<>(
-            BOARD_COST,
-            TRANSFER_COST,
+            BOARD_COST_SEC,
+            TRANSFER_COST_SEC,
             WAIT_RELUCTANCE_FACTOR,
             new int[] { 0, 25 },
             new double[] { TRANSIT_RELUCTANCE_FACTOR_1, TRANSIT_RELUCTANCE_FACTOR_2 }
@@ -76,12 +76,12 @@ public class CostCalculatorTest {
     @Test
     public void testConvertBetweenRaptorAndMainOtpDomainModel() {
         assertEquals(
-            BOARD_COST,
-            RaptorCostConverter.toOtpDomainCost(subject.calculateMinCost(0,0))
+                RaptorCostConverter.toRaptorCost(BOARD_COST_SEC),
+                subject.calculateMinCost(0,0)
         );
         assertEquals(
-            20 * 4/5 + BOARD_COST,
-            RaptorCostConverter.toOtpDomainCost(subject.calculateMinCost(20,0))
+            RaptorCostConverter.toRaptorCost(0.8 * 20 + BOARD_COST_SEC),
+            subject.calculateMinCost(20,0)
         );
     }
 }

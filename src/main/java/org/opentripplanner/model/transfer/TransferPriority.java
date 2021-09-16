@@ -35,7 +35,6 @@ public enum TransferPriority {
    */
   RECOMMENDED(-1),
 
-
   /**
    * The highest priority there exist.
    * <p>

@@ -1,5 +1,10 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
+import static org.opentripplanner.routing.core.TraverseMode.WALK;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -16,12 +21,6 @@ import org.opentripplanner.transit.raptor.speed_test.SpeedTestRequest;
 import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.model.Leg;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 public class ItineraryMapper {
     private SpeedTestRequest request;
@@ -71,7 +70,7 @@ public class ItineraryMapper {
         itinerary.walkDistance = 0.0;
         itinerary.transitTime = 0;
         itinerary.waitingTime = 0;
-        itinerary.weight = path.generalizedCost();
+        itinerary.weight = path.otpDomainCost();
 
         int numberOfTransits = 0;
 
@@ -122,7 +121,7 @@ public class ItineraryMapper {
 
                 TripSchedule tripSchedule = it.trip();
                 TripPattern tripPattern = tripSchedule.getOriginalTripPattern();
-                Route routeInfo = tripPattern.route;
+                Route routeInfo = tripPattern.getRoute();
 
 
                 leg.from = mapToPlace(it.fromStop());
@@ -130,7 +129,7 @@ public class ItineraryMapper {
 
                 leg.route = routeInfo.getShortName();
                 leg.agencyName = routeInfo.getAgency().getName();
-                leg.tripShortName = tripSchedule.getOriginalTripPattern().name;
+                leg.tripShortName = tripSchedule.getOriginalTripPattern().getName();
                 leg.agencyId = routeInfo.getAgency().getId();
                 leg.routeShortName = routeInfo.getShortName()   ;
                 leg.routeLongName = routeInfo.getLongName();

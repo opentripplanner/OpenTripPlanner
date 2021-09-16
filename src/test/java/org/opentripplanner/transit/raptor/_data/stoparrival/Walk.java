@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
-import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.walkCost;
-
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -15,25 +14,23 @@ public class Walk extends AbstractStopArrival {
         int stop,
         int departureTime,
         int arrivalTime,
-        int cost,
+        int extraCost,
         ArrivalView<TestTripSchedule> previous
     ) {
-        super(round, stop, arrivalTime, cost, previous);
+        super(round, stop, arrivalTime, extraCost, previous);
         // In a reverse search we the arrival is before the departure
-        this.transfer = new RaptorTransfer() {
-            @Override public int stop() {
-                return stop;
-            }
+        int durationInSeconds = Math.abs(arrivalTime - departureTime);
+        this.transfer = TestTransfer.walk(stop, durationInSeconds, extraCost);
+    }
 
-            @Override public int durationInSeconds() {
-                return Math.abs(arrivalTime - departureTime);
-            }
-
-            @Override
-            public int generalizedCost() {
-                return walkCost(durationInSeconds());
-            }
-        };
+    public Walk(
+            int round,
+            int arrivalTime,
+            RaptorTransfer transfer,
+            ArrivalView<TestTripSchedule> previous
+    ) {
+        super(round, transfer.stop(), arrivalTime, transfer.generalizedCost(), previous);
+        this.transfer = transfer;
     }
 
     @Override public boolean arrivedByTransfer() {

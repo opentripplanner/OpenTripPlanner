@@ -1,7 +1,6 @@
 package org.opentripplanner.api.configuration;
 
 import static org.opentripplanner.util.OTPFeature.APIBikeRental;
-import static org.opentripplanner.util.OTPFeature.APIExternalGeocoder;
 import static org.opentripplanner.util.OTPFeature.APIGraphInspectorTile;
 import static org.opentripplanner.util.OTPFeature.APIServerInfo;
 import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
@@ -18,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.api.resource.BikeRental;
-import org.opentripplanner.api.resource.ExternalGeocoderResource;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.api.resource.PlannerResource;
 import org.opentripplanner.api.resource.Routers;
@@ -49,7 +47,6 @@ public class APIEndpoints {
 
         // Add feature enabled APIs, these can be enabled by default, some is not.
         // See the OTPFeature enum for details.
-        addIfEnabled(APIExternalGeocoder, ExternalGeocoderResource.class);
         addIfEnabled(APIBikeRental, BikeRental.class);
         addIfEnabled(APIServerInfo, ServerInfo.class);
         addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);

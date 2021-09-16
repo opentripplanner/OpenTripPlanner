@@ -68,7 +68,7 @@ public class TimetableTest {
         }
         
         pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
-        timetable = pattern.scheduledTimetable;
+        timetable = pattern.getScheduledTimetable();
     }
 
     @Test
@@ -191,9 +191,12 @@ public class TimetableTest {
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
         TripTimes tripTimes = timetable.getTripTimes(trip_1_1_index);
+
+        // TODO This will not work since individual stops cannot be cancelled using GTFS updates
+        //      yet
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
-            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getDepartureTime(i));
-            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getArrivalTime(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getPickup(i) );
+            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getDropoff(i) );
         }
 
         //---

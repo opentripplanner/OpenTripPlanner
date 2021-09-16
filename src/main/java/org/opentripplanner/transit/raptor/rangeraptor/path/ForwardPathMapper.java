@@ -6,7 +6,6 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -41,7 +40,8 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         lastLeg = createEgressPathLeg(destinationArrival);
 
-        for (ArrivalView<T> arrival = destinationArrival.previous(); true; arrival = arrival.previous()) {
+        ArrivalView<T> arrival = destinationArrival.previous();
+        while (true) {
             if (arrival.arrivedByTransit()) {
                 lastLeg = createTransitLeg(arrival, lastLeg);
             } else if (arrival.arrivedByTransfer()) {
@@ -52,9 +52,10 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
             } else {
                 throw new RuntimeException("Unknown arrival type");
             }
+            arrival = arrival.previous();
         }
 
-        return new Path<>(iterationDepartureTime, accessLeg, RaptorCostConverter.toOtpDomainCost(destinationArrival.cost()));
+        return new Path<>(iterationDepartureTime, accessLeg, destinationArrival.cost());
     }
 
     private EgressPathLeg<T> createEgressPathLeg(DestinationArrival<T> destinationArrival) {
@@ -63,10 +64,8 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         return new EgressPathLeg<>(
             egress,
-            destinationArrival.previous().stop(),
             departureTime,
-            destinationArrival.arrivalTime(),
-            domainCost(destinationArrival)
+            destinationArrival.arrivalTime()
         );
     }
 
@@ -78,7 +77,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
                 r.boardTime(),
                 arrival.stop(),
                 r.alightTime(),
-                domainCost(arrival),
+                transitCost(arrival),
                 arrival.transitPath().trip(),
                 lastLeg
         );
@@ -90,9 +89,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         return new TransferPathLeg<>(
                 arrival.previous().stop(),
                 departureTime,
-                arrival.stop(),
                 arrival.arrivalTime(),
-                domainCost(arrival),
                 arrival.transferPath().transfer(),
                 nextLeg
         );
@@ -130,15 +127,14 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         return new AccessPathLeg<>(
             access,
-            from.stop(),
             targetFromTime,
             targetToTime,
-            RaptorCostConverter.toOtpDomainCost(from.cost()),
             nextLeg
         );
     }
 
-    private static int domainCost(ArrivalView<?> to) {
-        return RaptorCostConverter.toOtpDomainCost(to.cost() - to.previous().cost());
+    private static int transitCost(ArrivalView<?> curr) {
+        if(curr.cost() == -1) { return -1; }
+        return curr.cost() - curr.previous().cost();
     }
 }

@@ -31,10 +31,11 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -226,7 +227,7 @@ public class IndexAPI {
         return routingService
                 .getPatternsForStop(stop)
                 .stream()
-                .map(it -> it.route)
+                .map(it -> it.getRoute())
                 .map(RouteMapper::mapToApiShort)
                 .collect(Collectors.toList());
     }
@@ -269,7 +270,7 @@ public class IndexAPI {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups,
+                omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
                 false
         )
                 .stream()
@@ -294,7 +295,7 @@ public class IndexAPI {
         List<StopTimesInPattern> stopTimes = routingService.getStopTimesForStop(
                 stop,
                 serviceDate,
-                omitNonPickups
+                omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
         );
         return StopTimesInPatternMapper.mapToApi(stopTimes);
     }
@@ -342,7 +343,7 @@ public class IndexAPI {
                 Stop stop = getStop(routingService, stopId);
                 Set<Route> routesHere = new HashSet<>();
                 for (TripPattern pattern : routingService.getPatternsForStop(stop)) {
-                    routesHere.add(pattern.route);
+                    routesHere.add(pattern.getRoute());
                 }
                 routes.retainAll(routesHere);
             }
@@ -439,13 +440,13 @@ public class IndexAPI {
 
     @GET
     @Path("/trips/{tripId}/stoptimes")
-    public List<TripTimeShort> getStoptimesForTrip(@PathParam("tripId") String tripId) {
+    public List<TripTimeOnDate> getStoptimesForTrip(@PathParam("tripId") String tripId) {
         RoutingService routingService = createRoutingService();
         Trip trip = getTrip(routingService, tripId);
         TripPattern pattern = getTripPattern(routingService, trip);
         // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
         Timetable table = routingService.getTimetableForTripPattern(pattern);
-        return TripTimeShort.fromTripTimes(table, trip);
+        return TripTimeOnDate.fromTripTimes(table, trip);
     }
 
     /** Return geometry for the trip as a packed coordinate sequence */
@@ -465,7 +466,7 @@ public class IndexAPI {
         RoutingService routingService = createRoutingService();
         AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
         FeedScopedId id = createId("tripId", tripId);
-        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id));
+        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id, null));
     }
 
     @GET

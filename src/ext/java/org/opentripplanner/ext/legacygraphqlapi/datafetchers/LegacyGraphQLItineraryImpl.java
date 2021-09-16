@@ -86,7 +86,7 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
-    return environment -> getSource(environment).arrivedAtDestinationWithRentedBicycle;
+    return environment -> getSource(environment).arrivedAtDestinationWithRentedVehicle;
   }
 
   @Override

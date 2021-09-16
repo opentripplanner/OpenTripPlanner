@@ -161,7 +161,6 @@ Here is a list of all features witch can be toggled on/off.
 
 Feature | Description | Enabled by default | Sandbox
 --------|-------------|--------------------|-------- 
-`APIExternalGeocoder` | Enable the geocode endpoint | yes | no
 `APIBikeRental` | Enable the bike rental endpoint | yes | no
 `APIServerInfo` | Enable the server info endpoint |  yes | no
 `APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
@@ -208,7 +207,6 @@ config key | description | value type | value default | notes
 `platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
 `readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
-`staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
 `staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
 `streets` | Include street input files (OSM/PBF) | boolean | true | 
 `storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
@@ -218,6 +216,7 @@ config key | description | value type | value default | notes
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
 `useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`maxAreaNodes` | Visibility calculations for an area will not be done if there are more nodes than this limit | integer | 500 |
 
 This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
 
@@ -529,9 +528,9 @@ For unknown reasons that seem to depend on data and machine settings, it might b
 
 By default OTP will compute fares according to the GTFS specification if fare data is provided in
 your GTFS input. It is possible to turn off this by setting the fare to "off". For more complex 
-scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
+scenarios or to handle vehicle rental fares, it is necessary to manually configure fares using the
 `fares` section in `build-config.json`. You can combine different fares (for example transit and
-bike-rental) by defining a `combinationStrategy` parameter, and a list of sub-fares to combine 
+vehicle-rental) by defining a `combinationStrategy` parameter, and a list of sub-fares to combine 
 (all fields starting with `fare` are considered to be sub-fares).
 
 ```JSON
@@ -556,7 +555,7 @@ bike-rental) by defining a `combinationStrategy` parameter, and a list of sub-fa
     "fare0": "new-york",
     // Second fare to combine
     "fare1": {
-      "type": "bike-rental-time-based",
+      "type": "vehicle-rental-time-based",
       "currency": "USD",
       "prices": {
           // For trip shorter than 30', $4 fare
@@ -581,9 +580,9 @@ Turning the fare service _off_, this will ignore any fare data in the provided G
 
 The current list of custom fare type is:
 
-- `bike-rental-time-based` - accepting the following parameters:
+- `vehicle-rental-time-based` - accepting the following parameters:
     - `currency` - the ISO 4217 currency code to use, such as `"EUR"` or `"USD"`,
-    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed time of bike rental is lower than the defined time.
+    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed time of vehicle rental is lower than the defined time.
 - `san-francisco` (no parameters)
 - `new-york` (no parameters)
 - `seattle` (no parameters)
@@ -669,6 +668,46 @@ Any public field or setter method in this class can be given a default value usi
     }
 }
 ```
+
+
+### Tuning transfer optimization
+
+The main purpose of transfer optimization is to handle cases where one can transfer between two routes at more than one point (pair of stops), ensuring transfers occur at the best possible location. By post-processing all paths returned by the router, OTP can apply sophisticated calculations that are too slow or not algorithmically valid within Raptor. Transfers are optimized before the paths reach the itinerary filter chain.
+
+For a detailed description of the design and the optimization calculations see the [design documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md) (dev-2.x latest).
+
+#### Transfer optimization configuration
+
+To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on). 
+You should leave this on unless you there is a critical issue with it. The OTPFeature `GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
+
+The order of transfer priority is:
+
+1. STAY SEATED
+2. GUARANTIED
+3. PREFERRED
+4. RECOMMENDED
+5. ALLOWED
+6. NOT_ALLOWED
+
+If two paths have the same priority level, then we break the tie by looking at waiting time. The goal is to maximize the wait time, avoiding situations where very little time is available to make the transfer. This is balanced with the generalized cost. The cost is adjusted with a new cost for the wait-time. The new wait-time cost follows an inverse logarithmic cost function (see the design doc). 
+
+The defaults should work fine, but if you have results with "back-travel" try increasing the two parameters `minSafeWaitTimeFactor` and `inverseWaitReluctance`.
+
+```JSON
+// router-config.json
+{
+  "routingDefaults": {
+    "transferOptimization": {
+      "optimizeTransferWaitTime": true,
+      "minSafeWaitTimeFactor": 5.0,
+      "inverseWaitReluctance": 1.0
+    }
+  }
+}
+```
+See the [TransferOptimizationParameters](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/api/TransferOptimizationParameters.java) (dev-2.x latest) for a description of these parameters.
+
 
 ### Tuning itinerary filtering
 Nested inside `routingDefaults { itineraryFilters{...} }` in `router-config.json`.
@@ -770,7 +809,22 @@ search-window. To set the street routing timeout use the following config:
 }
 ```
 
-This specifies a timeout in (optionally fractional) seconds. The search abort after this many seconds and any paths found are returned to the client. 
+This specifies a timeout in (optionally fractional) seconds. The search abort after this many seconds and any paths found are returned to the client.
+
+##maxAccessEgressDurationSecondsForMode
+
+Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done because 
+some street modes searches are much more resource intensive than others.
+
+```JSON
+// router-config.json
+"maxAccessEgressDurationSecondsForMode": {
+  "BIKE_RENTAL": 1200
+}
+```
+
+This will limit only the BIKE_RENTAL mode to 1200 seconds, while keeping the default limit for all
+other access/egress modes.
 
 ## Logging incoming requests
 
@@ -894,32 +948,10 @@ departure times for the remainder of the trip.
 - **VehiclePositions** give the location of some or all vehicles currently in service, in terms of geographic coordinates
 or position relative to their scheduled stops.
 
-### Bicycle rental systems
+### Vehicle rental systems using GBFS
 
-Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental networks including the number
-of bikes and free parking spaces at each station. We support bike rental systems from JCDecaux, BCycle, VCub, Keolis,
-Bixi, the Dutch OVFiets system, ShareBike, GBFS and a generic KML format.
-It is straightforward to extend OTP to support any bike rental system that
-exposes a JSON API or provides KML place markers, though it requires writing a little code.
-
-The generic KML needs to be in format like
-
-```XML
-<?xml version="1.0" encoding="utf-8" ?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
-<Document id="root_doc">
-<Schema name="citybikes" id="citybikes">
-    <SimpleField name="ID" type="int"></SimpleField>
-</Schema>
-  <Placemark>
-    <name>A Bike Station</name>
-    <ExtendedData><SchemaData schemaUrl="#citybikes">
-        <SimpleData name="ID">0</SimpleData>
-    </SchemaData></ExtendedData>
-      <Point><coordinates>24.950682884886643,60.155923430488102</coordinates></Point>
-  </Placemark>
-</Document></kml>
-```
+Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks including the number
+of bikes and free parking spaces at each station. We support vehicle rental systems from using GBFS feed format.
 
 ### Configuring real-time updaters
 
@@ -954,39 +986,12 @@ connect to a network resource is the `url` field.
             "feedId": "TriMet"
         },
 
-        // Polling bike rental updater.
-        // sourceType can be: jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets,
-        // city-bikes, citi-bike-nyc, next-bike, vcub, kml
+        //<!--- Tampa Area GBFS bike share -->
         {
-            "type": "bike-rental",
-            "frequencySec": 300,
-            "sourceType": "city-bikes",
-            "url": "http://host.domain.tld"
-        },
-
-        //<!--- San Francisco Bay Area bike share -->
-        {
-          "type": "bike-rental",
-          "frequencySec": 300,
-          "sourceType": "sf-bay-area",
-          "url": "http://www.bayareabikeshare.com/stations/json"
-        },
-
-        //<!--- Tampa Area bike share -->
-        {
-          "type": "bike-rental",
+          "type": "vehicle-rental",
           "frequencySec": 300,
           "sourceType": "gbfs",
-          "url": "http://coast.socialbicycles.com/opendata/"
-        },
-
-        // Polling bike rental updater for DC bikeshare (a Bixi system)
-        // Negative update frequency means to run once and then stop updating (essentially static data)
-        {
-            "type": "bike-rental",
-            "sourceType": "bixi",
-            "url": "https://www.capitalbikeshare.com/data/stations/bikeStations.xml",
-            "frequencySec": -1
+          "url": "http://coast.socialbicycles.com/opendata/gbfs.json"
         },
 
         // Bike parking availability
@@ -1021,7 +1026,7 @@ To add a GBFS feed to the router add one entry in the `updater` field of `router
 ```JSON
 // router-config.json
 {
-   "type": "bike-rental",
+   "type": "vehicle-rental",
    "sourceType": "gbfs",
    // frequency in seconds in which the GBFS service will be polled
    "frequencySec": 60,
@@ -1030,13 +1035,6 @@ To add a GBFS feed to the router add one entry in the `updater` field of `router
    // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
    "allowKeepingRentedBicycleAtDestination": true
 }
-```
-
-If there is no GBFS autodiscovery file, specify the base `url` under which the files may be found
-using their standard names:
-
-```JSON
-  "url": "http://coast.socialbicycles.com/opendata/"
 ```
 
 ##### Arriving with rental bikes at the destination
@@ -1056,14 +1054,16 @@ For this to be possible three things need to be configured:
    `keepingRentedBicycleAtDestinationCost` (default: `0`) may also be set in the
    [routing defaults](#routing-defaults).
 
-#### Bike Rental Service Directory configuration (sandbox feature)
+#### Vehicle Rental Service Directory configuration (sandbox feature)
 
-To configure and url for the [BikeRentalServiceDirectory](sandbox/BikeRentalServiceDirectory.md).
+To configure and url for the [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md).
 
 ```JSON
 // router-config.json
 {
-  "bikeRentalServiceDirectoryUrl": "https://api.dev.entur.io/mobility/v1/bikes"
+  "vehicleRentalServiceDirectory": {
+    "url": "https://api.dev.entur.io/mobility/v1/bikes"
+  }
 }
 ```
 

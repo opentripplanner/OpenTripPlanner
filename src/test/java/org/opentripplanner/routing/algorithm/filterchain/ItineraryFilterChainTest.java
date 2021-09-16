@@ -1,16 +1,15 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
-import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
@@ -95,7 +94,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
 
   @Test
   public void removeTransitWithHigherCostThanBestOnStreetOnly() {
-    val builder= createBuilder(true, false, 20);
+    var builder= createBuilder(true, false, 20);
     ItineraryFilter chain;
 
     // given
@@ -124,7 +123,6 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
 
     assertEquals(toStr(List.of(bus)), toStr(chain.filter(List.of(walk, bus))));
   }
-
 
 
   /* private methods */

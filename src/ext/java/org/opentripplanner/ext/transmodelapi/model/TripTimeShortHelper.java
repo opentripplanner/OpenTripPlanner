@@ -3,7 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
@@ -21,12 +21,12 @@ public class TripTimeShortHelper {
      * Find trip time short for the from place in transit leg, or null.
      */
     @Nullable
-    public static TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
+    public static TripTimeOnDate getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
         if (leg.flexibleTrip) { return null; }
 
         ServiceDate serviceDate = leg.serviceDate;
-        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
+        List<TripTimeOnDate> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
         /* TODO OTP2 This method is only used for EstimatedCalls for from place. We have to decide
@@ -52,12 +52,12 @@ public class TripTimeShortHelper {
      * Find trip time short for the to place in transit leg, or null.
      */
     @Nullable
-    public static TripTimeShort getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
+    public static TripTimeOnDate getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
         if (leg.flexibleTrip) { return null; }
 
         ServiceDate serviceDate = leg.serviceDate;
-        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
+        List<TripTimeOnDate> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long endTimeSeconds = (leg.endTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
         /* TODO OTP2 This method is only used for EstimatedCalls for to place. We have to decide
@@ -83,7 +83,7 @@ public class TripTimeShortHelper {
     /**
      * Find trip time shorts for all stops for the full trip of a leg.
      */
-    public static List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
+    public static List<TripTimeOnDate> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
         if (leg.flexibleTrip) { return List.of(); }
 
@@ -94,19 +94,19 @@ public class TripTimeShortHelper {
     /**
      * Find trip time shorts for all intermediate stops for a leg.
      */
-    public static List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
+    public static List<TripTimeOnDate> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
         if (leg.flexibleTrip) { return List.of(); }
 
         ServiceDate serviceDate = leg.serviceDate;
 
-        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
-        List<TripTimeShort> filteredTripTimes = new ArrayList<>();
+        List<TripTimeOnDate> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
+        List<TripTimeOnDate> filteredTripTimes = new ArrayList<>();
 
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
         long endTimeSeconds = (leg.endTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
         boolean boardingStopFound = false;
-        for (TripTimeShort tripTime : tripTimes) {
+        for (TripTimeOnDate tripTime : tripTimes) {
 
             long boardingTime = leg.realTime ? tripTime.getRealtimeDeparture()
                 : tripTime.getScheduledDeparture();

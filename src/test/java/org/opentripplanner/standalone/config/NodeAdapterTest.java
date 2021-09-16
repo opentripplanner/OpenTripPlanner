@@ -310,4 +310,30 @@ public class NodeAdapterTest {
         );
         assertNull(subject.asLinearFunction("no-key", null));
     }
+
+    @Test
+    public void asMap() {
+        NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
+        assertEquals(
+            Map.of("A", true, "B", false),
+            subject.asMap("key", NodeAdapter::asBoolean)
+        );
+        assertEquals(
+            Collections.<String, Boolean>emptyMap(),
+            subject.asMap("missing-key", NodeAdapter::asBoolean)
+        );
+    }
+
+    @Test
+    public void asTextSet() {
+        NodeAdapter subject = newNodeAdapterForTest("{ ids : ['A', 'C', 'F'] }");
+        assertEquals(
+                Set.of("A", "C", "F"),
+                subject.asTextSet("ids", Collections.emptySet())
+        );
+        assertEquals(
+                Set.of("X"),
+                subject.asTextSet("nonExisting", Set.of("X"))
+        );
+    }
 }

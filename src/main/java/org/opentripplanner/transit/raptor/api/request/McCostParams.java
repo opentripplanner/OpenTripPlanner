@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.request;
 
 
 import javax.annotation.Nullable;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import java.util.Objects;
@@ -68,11 +69,12 @@ public class McCostParams {
 
     @Override
     public String toString() {
-        return "McCostParams{" +
-                "boardCost=" + boardCost +
-                ", transferCost=" + transferCost +
-                ", waitReluctanceFactor=" + waitReluctanceFactor +
-                '}';
+        return ToStringBuilder.of(McCostParams.class)
+                .addNum("boardCost", boardCost, 0)
+                .addNum("transferCost", transferCost, 0)
+                .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
+                .addDoubles("transitReluctanceFactors",  transitReluctanceFactors, 1.0)
+                .toString();
     }
 
     @Override

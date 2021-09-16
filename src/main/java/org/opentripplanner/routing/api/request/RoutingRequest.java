@@ -46,6 +46,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +125,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
     /**
+     * Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is
+     * done because some street modes searches are much more resource intensive than others.
+     */
+    public Map<StreetMode, Double> maxAccessEgressDurationSecondsForMode = new HashMap<>();
+
+    /**
      * The access/egress/direct/transit modes allowed for this main request. The parameter
      * "streetSubRequestModes" below is used for a single A Star sub request.
      *
@@ -144,17 +151,9 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public TraverseModeSet streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK); // defaults in constructor overwrite this
 
     /**
-     * The set of characteristics that the user wants to optimize for -- defaults to QUICK, or
-     * optimize for transit time.
-     *
-     * @deprecated TODO OTP2 this should be completely removed and done only with individual cost
-     *                       parameters
-     *                       Also: apparently OptimizeType only affects BICYCLE mode traversal of
-     *                       street segments. If this is the case it should be very well
-     *                       documented and carried over into the Enum name.
+     * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
      */
-    @Deprecated
-    public BicycleOptimizeType optimize = BicycleOptimizeType.QUICK;
+    public BicycleOptimizeType bicycleOptimizeType = BicycleOptimizeType.SAFE;
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
@@ -556,25 +555,25 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double bikeTriangleSafetyFactor;
 
     /**
-     * Whether or not bike rental availability information will be used to plan bike rental trips
+     * Whether or not vehicle rental availability information will be used to plan vehicle rental trips
      */
-    public boolean useBikeRentalAvailabilityInformation = false;
+    public boolean useVehicleRentalAvailabilityInformation = false;
 
     /**
      * Whether arriving at the destination with a rented (station) bicycle is allowed without
      * dropping it off.
      *
-     * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
-     * @see org.opentripplanner.routing.bike_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
+     * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
+     * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
      */
-    public boolean allowKeepingRentedBicycleAtDestination = false;
+    public boolean allowKeepingRentedVehicleAtDestination = false;
 
     /**
      * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
      *
-     * @see RoutingRequest#allowKeepingRentedBicycleAtDestination
+     * @see RoutingRequest#allowKeepingRentedVehicleAtDestination
      */
-    public double keepingRentedBicycleAtDestinationCost = 0;
+    public double keepingRentedVehicleAtDestinationCost = 0;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.
@@ -725,13 +724,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.setStreetSubRequestModes(new TraverseModeSet(mode));
     }
 
-    public RoutingRequest(TraverseMode mode, BicycleOptimizeType optimize) {
-        this(new TraverseModeSet(mode), optimize);
+    public RoutingRequest(TraverseMode mode, BicycleOptimizeType bicycleOptimizeType) {
+        this(new TraverseModeSet(mode), bicycleOptimizeType);
     }
 
-    public RoutingRequest(TraverseModeSet modeSet, BicycleOptimizeType optimize) {
+    public RoutingRequest(TraverseModeSet modeSet, BicycleOptimizeType bicycleOptimizeType) {
         this();
-        this.optimize = optimize;
+        this.bicycleOptimizeType = bicycleOptimizeType;
         this.setStreetSubRequestModes(modeSet);
     }
 
@@ -757,8 +756,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.streetSubRequestModes = streetSubRequestModes;
     }
 
-    public void setOptimize(BicycleOptimizeType optimize) {
-        this.optimize = optimize;
+    public void setBicycleOptimizeType(BicycleOptimizeType bicycleOptimizeType) {
+        this.bicycleOptimizeType = bicycleOptimizeType;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
@@ -943,7 +942,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public String toString(String sep) {
         return from + sep + to + sep + getDateTime() + sep
-                + arriveBy + sep + optimize + sep + streetSubRequestModes.getAsStr() + sep
+                + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr() + sep
                 + getNumItineraries();
     }
 
@@ -984,19 +983,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         }
         this.intermediatePlaces.add(location);
     }
-
-    public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
-        this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
-    }
-
-    public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
-        this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
-    }
-
-    public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
-        this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
-    }
-
 
     /* INSTANCE METHODS */
 
@@ -1080,7 +1066,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
         ret.setArriveBy(!ret.arriveBy);
-        ret.useBikeRentalAvailabilityInformation = false;
+        ret.useVehicleRentalAvailabilityInformation = false;
         return ret;
     }
 
@@ -1260,6 +1246,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return bannedRoutes;
     }
 
+    public double getMaxAccessEgressDurationSecondsForMode(StreetMode mode) {
+        return maxAccessEgressDurationSecondsForMode.getOrDefault(
+            mode,
+            maxAccessEgressDurationSeconds
+        );
+    }
+
     /**
      * Checks if the route is banned. Also, if whitelisting is used, the route (or its agency) has
      * to be whitelisted in order to not count as banned.
@@ -1332,14 +1325,32 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
      * This setter function accepts any three numbers and will normalize them to add up to 1.
      */
-    public void setTriangleNormalized (double safe, double slope, double time) {
+    public void setTriangleNormalized(double safe, double slope, double time) {
+        if(safe == 0 && slope == 0 && time == 0) {
+            var oneThird = 1f /3;
+            safe = oneThird;
+            slope = oneThird;
+            time = oneThird;
+        }
+        safe = setMinValue(safe);
+        slope = setMinValue(slope);
+        time = setMinValue(time);
+
         double total = safe + slope + time;
+        if(total != 1) {
+            LOG.warn("Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other.");
+        }
+
         safe /= total;
         slope /= total;
         time /= total;
         this.bikeTriangleSafetyFactor = safe;
         this.bikeTriangleSlopeFactor = slope;
         this.bikeTriangleTimeFactor = time;
+    }
+
+    private double setMinValue(double value) {
+        return Math.max(0, value);
     }
 
     public static void assertTriangleParameters(

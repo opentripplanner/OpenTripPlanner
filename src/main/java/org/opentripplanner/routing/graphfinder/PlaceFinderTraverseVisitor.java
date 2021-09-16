@@ -7,11 +7,11 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   private final Set<String> filterByBikeRentalStation;
   private final Set<String> seenPatternAtStops = new HashSet<>();
   private final Set<FeedScopedId> seenStops = new HashSet<>();
-  private final Set<String> seenBicycleRentalStations = new HashSet<>();
+  private final Set<FeedScopedId> seenBicycleRentalStations = new HashSet<>();
   private final boolean includeStops;
   private final boolean includePatternAtStops;
   private final boolean includeBikeShares;
@@ -50,7 +50,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
    * @param filterByPlaceTypes A list of PlaceTypes to search for. Use null to disable the filtering, and search for all types.
    * @param filterByStops A list of Stop ids for which to find Stops and PatternAtStops. Use null to disable the filtering.
    * @param filterByRoutes A list of Route ids used for filtering Stops. Only the stops which are served by the route are returned. Use null to disable the filtering.
-   * @param filterByBikeRentalStations A list of BikeRentalStation ids to use in filtering.  Use null to disable the filtering.
+   * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering.  Use null to disable the filtering.
    * @param maxResults Maximum number of results to return.
    */
   public PlaceFinderTraverseVisitor(
@@ -102,8 +102,8 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
       handleStop(stop, distance);
       handlePatternsAtStop(stop, distance);
     }
-    else if (vertex instanceof BikeRentalStationVertex) {
-      handleBikeRentalStation(((BikeRentalStationVertex) vertex).getStation(), distance);
+    else if (vertex instanceof VehicleRentalStationVertex) {
+      handleBikeRentalStation(((VehicleRentalStationVertex) vertex).getStation(), distance);
     }
   }
 
@@ -124,12 +124,12 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
           .stream()
           .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))
           .filter(pattern -> filterByRoutes == null
-              || filterByRoutes.contains(pattern.route.getId()))
+              || filterByRoutes.contains(pattern.getRoute().getId()))
           .filter(pattern -> pattern.canBoard(pattern.getStopIndex(stop)))
           .collect(toList());
 
       for (TripPattern pattern : patterns) {
-        String seenKey = pattern.route.getId().toString() + ":" + pattern.getId().toString();
+        String seenKey = pattern.getRoute().getId().toString() + ":" + pattern.getId().toString();
         if (!seenPatternAtStops.contains(seenKey)) {
           PatternAtStop row = new PatternAtStop(stop, pattern);
           PlaceAtDistance place = new PlaceAtDistance(row, distance);
@@ -140,9 +140,9 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
-  private void handleBikeRentalStation(BikeRentalStation station, double distance) {
+  private void handleBikeRentalStation(VehicleRentalStation station, double distance) {
     if (!includeBikeShares) { return; }
-    if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.id)) {
+    if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.getStationId())) {
       return;
     }
     if (seenBicycleRentalStations.contains(station.id)) { return; }

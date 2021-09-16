@@ -42,9 +42,9 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
 
     String patterns = JSONArray.toJSONString(patternsForStop.stream().map(tripPattern -> {
       JSONObject pattern = new JSONObject();
-      pattern.put("headsign", tripPattern.scheduledTimetable.tripTimes.get(0).getHeadsign(tripPattern.getStopIndex(stop)));
-      pattern.put("type", tripPattern.route.getMode().name());
-      pattern.put("shortName", tripPattern.route.getShortName());
+      pattern.put("headsign", tripPattern.getScheduledTimetable().getTripTimes().get(0).getHeadsign(tripPattern.getStopIndex(stop)));
+      pattern.put("type", tripPattern.getRoute().getMode().name());
+      pattern.put("shortName", tripPattern.getRoute().getShortName());
       return pattern;
     }).collect(Collectors.toList()));
 

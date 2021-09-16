@@ -2,6 +2,7 @@ package org.opentripplanner.routing.impl;
 
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -77,10 +78,10 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip) {
+  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, ServiceDate serviceDate) {
     return transitAlertServices
         .stream()
-        .map(transitAlertService -> transitAlertService.getTripAlerts(trip))
+        .map(transitAlertService -> transitAlertService.getTripAlerts(trip, serviceDate))
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }
@@ -107,11 +108,11 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getStopAndTripAlerts(
-      FeedScopedId stop, FeedScopedId trip
+      FeedScopedId stop, FeedScopedId trip, ServiceDate serviceDate
   ) {
     return transitAlertServices
         .stream()
-        .map(transitAlertService -> transitAlertService.getStopAndTripAlerts(stop, trip))
+        .map(transitAlertService -> transitAlertService.getStopAndTripAlerts(stop, trip, serviceDate))
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }

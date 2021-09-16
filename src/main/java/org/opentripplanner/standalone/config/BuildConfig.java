@@ -159,11 +159,6 @@ public class BuildConfig {
     public final boolean osmCacheDataInMem;
 
     /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
-     */
-    public boolean staticBikeRental;
-
-    /**
      * Whether we should create car P+R stations from OSM data.
      */
     public boolean staticParkAndRide;
@@ -303,6 +298,11 @@ public class BuildConfig {
     public final StorageConfig storage;
 
     /**
+     * Visibility calculations for an area will not be done if there are more nodes than this limit.
+     */
+    public final int maxAreaNodes;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -339,7 +339,6 @@ public class BuildConfig {
         platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
         readCachedElevations = c.asBoolean("readCachedElevations", true);
         staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
-        staticBikeRental = c.asBoolean("staticBikeRental", false);
         staticParkAndRide = c.asBoolean("staticParkAndRide", true);
         stationTransfers = c.asBoolean("stationTransfers", false);
         streets = c.asBoolean("streets", true);
@@ -349,6 +348,7 @@ public class BuildConfig {
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
         useTransfersTxt = c.asBoolean("useTransfersTxt", false);
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
+        maxAreaNodes = c.asInt("maxAreaNodes", 500);
 
         // List of complex parameters
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));

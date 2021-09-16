@@ -187,6 +187,8 @@ type Leg {
     pointsOnLink: PointsOnLink
     "Whether there is real-time data about this leg"
     realtime: Boolean
+    "Whether this leg is walking with a bike."
+    walkingBike: Boolean
     "Whether this leg is with a rented bike."
     rentedBike: Boolean
     "Whether this leg is a ride leg or not."

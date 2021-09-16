@@ -13,7 +13,7 @@ public final class Transfer implements Serializable {
     /**
      * Regular street transfers should be given this cost.
      */
-    public static final int NEUTRAL_TRANSFER_COST = 0;
+    public static final int NEUTRAL_PRIORITY_COST = 0;
 
     /**
      * Regular street transfers should be given this cost.
@@ -52,14 +52,14 @@ public final class Transfer implements Serializable {
 
     /**
      * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
-     * transfers. This cost should not be mixed with the path generalized-cost.
+     * transfers. This cost is not related in any way to the path generalized-cost.
      *
      * @param t The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
      *          street generated transfer.
      * @see TransferPriority#cost(boolean, boolean)
      */
     public static int priorityCost(@Nullable Transfer t) {
-        return t == null ? NEUTRAL_TRANSFER_COST : t.priority.cost(t.staySeated, t.guaranteed);
+        return t == null ? NEUTRAL_PRIORITY_COST : t.priority.cost(t.staySeated, t.guaranteed);
     }
 
     public TransferPoint getFrom() {
@@ -80,6 +80,14 @@ public final class Transfer implements Serializable {
 
     public boolean isGuaranteed() {
         return guaranteed;
+    }
+
+    public boolean includeSlack() {
+        return !(guaranteed || staySeated);
+    }
+
+    public boolean matchesStopPos(int fromStopPos, int toStopPos) {
+        return from.getStopPosition() == fromStopPos && to.getStopPosition() == toStopPos;
     }
 
     /**

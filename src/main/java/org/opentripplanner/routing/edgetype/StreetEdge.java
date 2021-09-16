@@ -331,7 +331,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         switch (traverseMode) {
             case BICYCLE:
                 time = getEffectiveBikeDistance() / speed;
-                switch (options.optimize) {
+                switch (options.bicycleOptimizeType) {
                     case SAFE:
                         weight = bicycleSafetyFactor * getDistanceMeters() / speed;
                         break;

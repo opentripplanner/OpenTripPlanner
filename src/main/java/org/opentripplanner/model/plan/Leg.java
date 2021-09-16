@@ -2,7 +2,6 @@ package org.opentripplanner.model.plan;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -177,9 +176,14 @@ public class Leg {
 
     public Transfer transferToNextLeg = null;
 
-    public Boolean rentedBike;
+    /**
+     * Is this leg walking with a bike?
+     */
+    public Boolean walkingBike;
 
-   public List<String> bikeRentalNetworks = new ArrayList<>();
+    public Boolean rentedVehicle;
+
+    public String vehicleRentalNetwork;
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
@@ -258,8 +262,8 @@ public class Leg {
       transitAlerts.add(alert);
     }
 
-    public void addBikeRentalNetworks(Collection<String> networks) {
-      bikeRentalNetworks.addAll(networks);
+    public void setVehicleRentalNetwork(String network) {
+      vehicleRentalNetwork = network;
     }
 
     /**
@@ -335,8 +339,9 @@ public class Leg {
                 .addCol("transitAlerts", transitAlerts)
                 .addStr("boardRule", boardRule)
                 .addStr("alightRule", alightRule)
-                .addBool("rentedBike", rentedBike)
-                .addCol("bikeRentalNetworks", bikeRentalNetworks)
+                .addBool("walkingBike", walkingBike)
+                .addBool("rentedVehicle", rentedVehicle)
+                .addStr("bikeRentalNetwork", vehicleRentalNetwork)
                 .toString();
     }
 }

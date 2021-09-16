@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 
 public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptime {
@@ -63,7 +63,7 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      switch (getSource(environment).getPickupType()) {
+      switch (getSource(environment).getPickupType().getGtfsCode()) {
         case 0: return "SCHEDULED";
         case 1: return "NONE";
         case 2: return "CALL_AGENCY";
@@ -76,7 +76,7 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      switch (getSource(environment).getDropoffType()) {
+      switch (getSource(environment).getDropoffType().getGtfsCode()) {
         case 0: return "SCHEDULED";
         case 1: return "NONE";
         case 2: return "CALL_AGENCY";
@@ -105,7 +105,7 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }
 
-  private TripTimeShort getSource(DataFetchingEnvironment environment) {
+  private TripTimeOnDate getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

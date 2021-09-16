@@ -6,9 +6,9 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class BikeRentalStationType {
 
@@ -21,52 +21,52 @@ public class BikeRentalStationType {
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("id")
                   .type(new GraphQLNonNull(Scalars.GraphQLID))
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).id)
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).getStationId())
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("name")
                   .type(new GraphQLNonNull(Scalars.GraphQLString))
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).getName())
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).name.toString())
                   .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("description")
 //                        .type(Scalars.GraphQLString)
-//                        .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).description)
+//                        .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).description)
 //                        .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("bikesAvailable")
                   .type(Scalars.GraphQLInt)
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).bikesAvailable)
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).vehiclesAvailable)
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("spacesAvailable")
                   .type(Scalars.GraphQLInt)
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).spacesAvailable)
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).spacesAvailable)
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("realtimeOccupancyAvailable")
                   .type(Scalars.GraphQLBoolean)
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).realTimeData)
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).realTimeData)
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("allowDropoff")
                   .type(Scalars.GraphQLBoolean)
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).allowDropoff)
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).allowDropoff)
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("networks")
                   .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-                  .dataFetcher(environment -> new ArrayList<>(((BikeRentalStation) environment.getSource()).networks))
+                  .dataFetcher(environment -> List.of(((VehicleRentalStation) environment.getSource()).getNetwork()))
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("longitude")
                   .type(Scalars.GraphQLFloat)
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).x)
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).longitude)
                   .build())
           .field(GraphQLFieldDefinition.newFieldDefinition()
                   .name("latitude")
                   .type(Scalars.GraphQLFloat)
-                  .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).y)
+                  .dataFetcher(environment -> ((VehicleRentalStation) environment.getSource()).latitude)
                   .build())
           .build();
 }

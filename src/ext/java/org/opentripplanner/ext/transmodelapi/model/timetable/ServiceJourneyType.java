@@ -15,7 +15,7 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.PolylineEncoder;
 
@@ -138,8 +138,12 @@ public class ServiceJourneyType {
                     .description("Returns scheduled passing times only - without realtime-updates, for realtime-data use 'estimatedCalls'")
                     .dataFetcher(env -> {
                         Trip trip = trip(env);
-                        return TripTimeShort.fromTripTimes(
-                            GqlUtil.getRoutingService(env).getPatternForTrip().get(trip).scheduledTimetable,
+                        return TripTimeOnDate.fromTripTimes(
+                            GqlUtil
+                                .getRoutingService(env)
+                                .getPatternForTrip()
+                                .get(trip)
+                                .getScheduledTimetable(),
                             trip
                         );
                     })
@@ -196,7 +200,7 @@ public class ServiceJourneyType {
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment)
                             .getTransitAlertService()
-                            .getTripAlerts(trip(environment).getId())
+                            .getTripAlerts(trip(environment).getId(), null)
                     )
                 .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()

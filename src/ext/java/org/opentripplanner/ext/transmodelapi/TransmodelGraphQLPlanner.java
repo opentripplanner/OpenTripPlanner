@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
@@ -63,6 +64,10 @@ public class TransmodelGraphQLPlanner {
 
             response.debugOutput = res.getDebugAggregator().finishedRendering();
         }
+        catch (ParameterException e) {
+            var msg = e.message.get();
+            throw new GraphQLException(msg, e);
+        }
         catch (Exception e) {
             LOG.warn("System error");
             LOG.error("Root cause: " + e.getMessage(), e);
@@ -90,7 +95,8 @@ public class TransmodelGraphQLPlanner {
         return new GenericLocation(name, stopId, lat, lon);
     }
 
-    private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+    private RoutingRequest createRequest(DataFetchingEnvironment environment)
+    throws ParameterException {
         TransmodelRequestContext context = environment.getContext();
         Router router = context.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
@@ -124,21 +130,27 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
-        BicycleOptimizeType optimize = environment.getArgument("optimize");
+        BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
-        if (optimize == BicycleOptimizeType.TRIANGLE) {
-            try {
-                RoutingRequest.assertTriangleParameters(
-                    request.bikeTriangleSafetyFactor,
-                    request.bikeTriangleTimeFactor,
-                    request.bikeTriangleSlopeFactor
-                );
-                callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
-                callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
-                callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
-            } catch (ParameterException e) {
-                throw new RuntimeException(e);
-            }
+        if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
+
+            // Arguments: [ safety, slope, time ]
+            final double[] args = new double[3];
+
+            callWith.argument("triangleFactors.safety", (Double v) -> args[0] = v);
+            callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
+            callWith.argument("triangleFactors.time", (Double v) -> args[2] = v);
+
+            request.setTriangleNormalized(args[0], args[1], args[2]);
+        }
+
+        if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
+            bicycleOptimizeType = BicycleOptimizeType.QUICK;
+            request.transferCost += 1800;
+        }
+
+        if (bicycleOptimizeType != null) {
+            request.bicycleOptimizeType = bicycleOptimizeType;
         }
 
         callWith.argument("arriveBy", request::setArriveBy);
@@ -172,15 +184,6 @@ public class TransmodelGraphQLPlanner {
 
         //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
         //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
-
-        if (optimize == BicycleOptimizeType.TRANSFERS) {
-            optimize = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
-
-        if (optimize != null) {
-            request.optimize = optimize;
-        }
 
         if (GqlUtil.hasArgument(environment, "modes")) {
             ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
@@ -233,7 +236,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
         callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
-        callWith.argument("useBikeRentalAvailabilityInformation", (Boolean v) -> request.useBikeRentalAvailabilityInformation = v);
+        callWith.argument("useBikeRentalAvailabilityInformation", (Boolean v) -> request.useVehicleRentalAvailabilityInformation = v);
         callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
         callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
         //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);

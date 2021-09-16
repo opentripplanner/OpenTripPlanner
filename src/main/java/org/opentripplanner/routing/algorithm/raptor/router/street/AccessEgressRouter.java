@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * This uses a street search to find paths to all the access/egress stop within range
  */
 public class AccessEgressRouter {
-    private static Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
 
     private AccessEgressRouter() {}
 
@@ -43,7 +43,7 @@ public class AccessEgressRouter {
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
             rr.rctx.graph,
-            rr.maxAccessEgressDurationSeconds,
+            rr.getMaxAccessEgressDurationSecondsForMode(streetMode),
             true
         );
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(

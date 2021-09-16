@@ -221,14 +221,10 @@ public class AddTransitModelEntitiesToGraph {
             }
             else {
                 if (fromVertex == null) {
-                    LOG.warn("The 'fromVertex' is missing for pathway from stop: " + pathway
-                        .getFromStop()
-                        .getId());
+                    LOG.warn("The 'fromVertex' is missing for pathway from stop {}", pathway.getFromStop());
                 }
                 if (toVertex == null) {
-                    LOG.warn("The 'toVertex' is missing for pathway to stop: " + pathway
-                        .getToStop()
-                        .getId());
+                    LOG.warn("The 'toVertex' is missing for pathway to stop {}", pathway.getToStop());
                 }
             }
         }

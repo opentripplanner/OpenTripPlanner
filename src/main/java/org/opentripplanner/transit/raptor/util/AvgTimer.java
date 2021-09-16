@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.util;
 
+import static java.util.Locale.ROOT;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -310,7 +312,7 @@ public abstract class AvgTimer {
 
         @Override
         String toSec(long time) {
-            return String.format("%.2f", time / 1000d);
+            return String.format(ROOT, "%.2f", time / 1000d);
         }
     }
 
@@ -331,7 +333,7 @@ public abstract class AvgTimer {
 
         @Override
         String toSec(long time) {
-            return String.format("%.2f", time / 1_000_000d);
+            return String.format(ROOT, "%.2f", time / 1_000_000d);
         }
     }
 

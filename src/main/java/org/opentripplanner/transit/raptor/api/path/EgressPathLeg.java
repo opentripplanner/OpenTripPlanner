@@ -1,9 +1,8 @@
 package org.opentripplanner.transit.raptor.api.path;
 
+import java.util.Objects;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
-import java.util.Objects;
 
 /**
  * Represent a egress leg in a path. The egress leg is the last leg arriving at the destination. The previous leg
@@ -13,17 +12,13 @@ import java.util.Objects;
  */
 public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLeg<T> {
     private final RaptorTransfer egress;
-    private final int fromStop;
     private final int fromTime;
     private final int toTime;
-    private final int cost;
 
-    public EgressPathLeg(RaptorTransfer egress, int fromStop, int fromTime, int toTime, int cost) {
+    public EgressPathLeg(RaptorTransfer egress, int fromTime, int toTime) {
         this.egress = egress;
-        this.fromStop = fromStop;
         this.fromTime = fromTime;
         this.toTime = toTime;
-        this.cost = cost;
     }
 
     /**
@@ -31,7 +26,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
      */
     @Override
     public final int fromStop() {
-        return fromStop;
+        return egress.stop();
     }
 
     @Override
@@ -46,7 +41,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public int generalizedCost() {
-        return cost;
+        return egress.generalizedCost();
     }
 
     public RaptorTransfer egress() {
@@ -78,13 +73,13 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         EgressPathLeg<?> that = (EgressPathLeg<?>) o;
-        return fromStop == that.fromStop &&
+        return fromStop() == that.fromStop() &&
                 fromTime == that.fromTime &&
                 toTime == that.toTime;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fromStop, fromTime, toTime);
+        return Objects.hash(fromStop(), fromTime, toTime);
     }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.util.Collections;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
@@ -388,4 +389,7 @@ public class WayPropertySet {
 		addSpeedPicker(picker);
 	}
 
+    public List<WayPropertyPicker> getWayProperties() {
+	    return Collections.unmodifiableList(wayProperties);
+    }
 }

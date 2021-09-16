@@ -162,6 +162,24 @@ public class NearbyStopFinder {
             boolean removeTempEdges,
             RoutingRequest routingRequest
     ) {
+        List<NearbyStop> stopsFound = Lists.newArrayList();
+
+        /* Add the origin vertices if they are stops */
+        for (Vertex vertex : originVertices) {
+            if (vertex instanceof TransitStopVertex) {
+                stopsFound.add(
+                    new NearbyStop(
+                        (TransitStopVertex) vertex,
+                        0,
+                        Collections.emptyList(),
+                        new State(vertex, routingRequest)
+                    ));
+            }
+        }
+
+        // Return only the origin vertices if there are no valid street modes
+        if (!routingRequest.streetSubRequestModes.isValid()) { return stopsFound; }
+
         routingRequest.setArriveBy(reverseDirection);
         if (!reverseDirection) {
             routingRequest.setRoutingContext(graph, originVertices, null);
@@ -173,8 +191,6 @@ public class NearbyStopFinder {
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
         astar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(durationLimitInSeconds));
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
-
-        List<NearbyStop> stopsFound = Lists.newArrayList();
 
         // Only used if OTPFeature.FlexRouting.isOn()
         Multimap<FlexStopLocation, State> locationsMap = ArrayListMultimap.create();
@@ -222,23 +238,10 @@ public class NearbyStopFinder {
             }
         }
 
-        /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
-        for (Vertex vertex : originVertices) {
-            if (vertex instanceof TransitStopVertex) {
-                stopsFound.add(
-                    new NearbyStop(
-                        (TransitStopVertex) vertex,
-                        0,
-                        Collections.emptyList(),
-                        new State(vertex, routingRequest)
-                    ));
-            }
-        }
         if (removeTempEdges) {
             routingRequest.cleanup();
         }
         return stopsFound;
-
     }
 
     public List<NearbyStop> findNearbyStopsViaStreets (
