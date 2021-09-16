@@ -240,7 +240,7 @@ public class AccessibilityRoutingTest {
         leg = i.legs.get(2);
         assertEquals("WALK", leg.mode);
         assertThatPolylinesAreEqual(
-                "ge~lEtu`bO@vA?DULA?AJ?rA?b@C?cBCGDk@?ECM`@IVGBG?EAIAI?A@CEo@GOCQEMEOECAcA]ICIAGAI@IBMMSO[Qs@e@k@g@y@u@JMSSz@uA",
+                "ge~lEtu`bO@vA?DULA?AJ?rA?b@C?cBCGDk@?ECCCODSFI??KC?CACCMFS@Q?QEQIKCGEMEUMKIGPKEKEICGIOKOIIBGBGJc@U{@g@??w@o@]]SSz@uA",
                 leg.legGeometry.getPoints()
         );
 
@@ -249,6 +249,24 @@ public class AccessibilityRoutingTest {
         assertEquals("GEORGIA STATE STATION", leg.from.name);
         assertEquals("ASHBY STATION", leg.to.name);
         assertEquals("BLUE", leg.routeShortName);
+
+        // we plan the same trip again but this time we are not in a wheelchair
+        i = getTripPlan(start, end, r -> r.wheelchairAccessible = false).itinerary.get(0);
+        leg = i.legs.get(1);
+
+        // same as above, take the bus to near Georgia state
+        assertEquals("21", leg.routeShortName);
+        assertEquals("MEMORIAL DR SE @ HILL ST SE", leg.from.name);
+
+        leg = i.legs.get(2);
+        assertEquals("WALK", leg.mode);
+        // here we are not in a wheelchair and hence can use the street segments that are inaccessible
+        // for a wheelchair
+        assertThatPolylinesAreEqual(
+                "ge~lEtu`bO@vA?D?D@pC?XY?q@@_CAOCWEO?[@_@CSGQEGA{@Yo@UQGWMc@U{@g@??w@o@]]SSz@uA",
+                leg.legGeometry.getPoints()
+        );
+
     }
 
     private static TripPlan getTripPlan(GenericLocation from, GenericLocation to, Consumer<RoutingRequest> func) {

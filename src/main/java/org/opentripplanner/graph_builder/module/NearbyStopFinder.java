@@ -135,8 +135,8 @@ public class NearbyStopFinder {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
-        routingRequest.setRoutingContext(graph, originVertex, null);
         routingRequest.wheelchairAccessible = wheelchairAccessible;
+        routingRequest.setRoutingContext(graph, originVertex, null);
         ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();

@@ -659,6 +659,10 @@ public class StreetEdge extends Edge implements Cloneable {
 
         if(options.wheelchairAccessible && !isWheelchairAccessible()) {
             weight *= options.noWheelchairAccessOnStreetReluctance;
+            // why do we have to increase the time?
+            // because when we compute accessible transfers we only look at the time of the travel
+            // not at the cost. perhaps we should? See EarliestArrivalSearch.java
+            time *= options.noWheelchairAccessOnStreetReluctance;
         }
 
         if (isStairs() && options.wheelchairAccessible) {
