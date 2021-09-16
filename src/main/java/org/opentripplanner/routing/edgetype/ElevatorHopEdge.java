@@ -32,10 +32,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
 
-        if (options.wheelchairAccessible && !wheelchairAccessible) {
-            return null;
-        }
-        
         TraverseMode mode = s0.getNonTransitMode();
 
         if (mode == TraverseMode.WALK && 
@@ -59,8 +55,15 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
         }
 
         StateEditor s1 = s0.edit(this);
+
         s1.setBackMode(TraverseMode.WALK);
-        s1.incrementWeight(options.elevatorHopCost);
+
+        if (options.wheelchairAccessible && !wheelchairAccessible) {
+            s1.incrementWeight(options.noWheelchairAccessOnElevatorPenalty);
+        } else {
+            s1.incrementWeight(options.elevatorHopCost);
+        }
+
         s1.incrementTimeInSeconds(options.elevatorHopTime);
         return s1.makeState();
     }

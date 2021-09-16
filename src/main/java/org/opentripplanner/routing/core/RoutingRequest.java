@@ -130,6 +130,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int unknownWheelchairAccessAtTripPenalty = 1200;
     public int noWheelchairAccessAtTripPenalty = 3 * unknownWheelchairAccessAtTripPenalty;
     public int wheelchairStairsPenalty = 600;
+    public int noWheelchairAccessOnElevatorPenalty = 600;
     public int noWheelchairAccessOnStreetReluctance = 15;
 
     /** The maximum number of itineraries to return. */
