@@ -8,6 +8,7 @@ import org.entur.gbfs.v2_2.station_status.GBFSStation;
 import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
 import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
@@ -162,5 +163,15 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(GbfsVehicleRentalDataSource.class)
+                .addStr("url", url)
+                .addStr("language", language)
+                .addBoolIfTrue("routeAsCar", routeAsCar)
+                .addBoolIfTrue("allowKeepingRentedVehicleAtDestination", allowKeepingRentedVehicleAtDestination)
+                .toString();
     }
 }
