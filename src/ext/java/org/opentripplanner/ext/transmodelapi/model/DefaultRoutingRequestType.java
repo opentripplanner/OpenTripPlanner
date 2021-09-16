@@ -279,7 +279,7 @@ public class DefaultRoutingRequestType {
                         .dataFetcher(e -> false).build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("compactLegsByReversedSearch")
-                        .deprecate("docsNOT IN USE IN OTP2.")
+                        .deprecate("NOT IN USE IN OTP2.")
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(e -> false).build())
                 .field(GraphQLFieldDefinition
