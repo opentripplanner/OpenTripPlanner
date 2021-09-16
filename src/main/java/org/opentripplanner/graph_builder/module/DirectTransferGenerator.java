@@ -81,6 +81,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                 }
             }
 
+            // we build two transfers: one which is wheelchair accessible and one which isn't
             nTransfersTotal += createTransfer(graph, nearbyStopFinder, true, ts0, pathwayDestinations);
             nTransfersTotal += createTransfer(graph, nearbyStopFinder, false, ts0, pathwayDestinations);
         }

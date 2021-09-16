@@ -130,11 +130,11 @@ public class ConstantsForTests {
             g.updateTransitFeedValidity(csd);
             g.hasTransit = true;
 
-            DirectTransferGenerator dtg = new DirectTransferGenerator(2000);
-            dtg.buildGraph(g, new GraphBuilderModuleSummary(dtg));
-
             StreetLinkerModule slm = new StreetLinkerModule();
             slm.buildGraph(g, new GraphBuilderModuleSummary(slm));
+
+            DirectTransferGenerator dtg = new DirectTransferGenerator(2000);
+            dtg.buildGraph(g, new GraphBuilderModuleSummary(dtg));
 
             g.index(true);
 

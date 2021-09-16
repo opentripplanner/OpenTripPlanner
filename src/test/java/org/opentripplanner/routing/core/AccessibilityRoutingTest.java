@@ -29,7 +29,7 @@ public class AccessibilityRoutingTest {
 
     private static final float DELTA = 0.1f;
 
-    static long dateTime = OffsetDateTime.parse("2021-09-14T10:15:29-04:00").toEpochSecond();
+    static long dateTime = OffsetDateTime.parse("2021-09-16T10:15:29-04:00").toEpochSecond();
 
     static Graph graph = getDefaultGraph();
 
@@ -214,6 +214,37 @@ public class AccessibilityRoutingTest {
         leg = i.legs.get(0);
         assertEquals("WALK", leg.mode);
         assertThatPolylinesAreEqual("sz_mE`v}aO?@M?cA?}A?uFCM??L?R", leg.legGeometry.getPoints());
+    }
+
+    @Test
+    public void createAccessibleTransfers() {
+        // Memorial Drive
+        GenericLocation start = new GenericLocation(33.74684, -84.37910);
+
+        // near Ashby station
+        GenericLocation end = new GenericLocation(33.75744, -84.41754);
+
+        Itinerary i = getTripPlan(start, end).itinerary.get(0);
+        Leg leg = i.legs.get(1);
+
+        // take bus 21 to near Georgia State station
+        assertEquals("MEMORIAL DR SE @ HILL ST SE", leg.from.name);
+        assertEquals("MEMORIAL DR SE @ FRASER ST SE", leg.to.name);
+        assertEquals("BUS", leg.mode);
+        assertEquals("21", leg.routeShortName);
+
+        // we get
+        leg = i.legs.get(2);
+        assertThatPolylinesAreEqual(
+                "ge~lEtu`bO@vA?D?D@pC?XY?q@@_CAOCWEO?[@_@CSGQEGA{@Yo@UQGWMc@U{@g@??w@o@]]SSz@uA",
+                leg.legGeometry.getPoints()
+        );
+
+        // we get on the blue line at Georgia State and ride to Ashby
+        leg = i.legs.get(3);
+        assertEquals("GEORGIA STATE STATION", leg.from.name);
+        assertEquals("ASHBY STATION", leg.to.name);
+        assertEquals("BLUE", leg.routeShortName);
     }
 
     private static TripPlan getTripPlan(GenericLocation from, GenericLocation to, Consumer<RoutingRequest> func) {
