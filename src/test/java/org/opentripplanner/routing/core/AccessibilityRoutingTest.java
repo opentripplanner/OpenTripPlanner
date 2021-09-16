@@ -9,12 +9,17 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -174,6 +179,41 @@ public class AccessibilityRoutingTest {
         leg = i.legs.get(0);
         assertEquals("WALK", leg.mode);
         assertThatPolylinesAreEqual("y_`mEnmbbO[XIHBFUTLd@?@", leg.legGeometry.getPoints());
+    }
+
+    @Test
+    public void noWheelchairAccessStreetPenalty() {
+        // since i cannot find a real-life example of an inaccessible street in central Atlanta
+        // we are pretending that Hogue Street Northeast (https://www.openstreetmap.org/way/9254841)
+        // is not wheelchair-accessible
+        GeometryFactory fac = new GeometryFactory();
+        Point p = fac.createPoint(new Coordinate(-84.37106, 33.75662));
+        Envelope e = p.getEnvelopeInternal();
+        e.expandBy(0.0003);
+        graph.streetIndex.getEdgesForEnvelope(e).stream()
+                .filter(StreetEdge.class::isInstance)
+                .map(s -> (StreetEdge) s)
+                .filter(s -> s.wayId == 9254841L)
+                .forEach(s -> s.setWheelchairAccessible(false));
+
+        GenericLocation start = new GenericLocation(33.75545, -84.37105);
+        GenericLocation end = new GenericLocation(33.75767, -84.37120);
+
+        Itinerary i = getTripPlan(start, end, r -> r.setMode(TraverseMode.WALK)).itinerary.get(0);
+        Leg leg = i.legs.get(0);
+        assertEquals("WALK", leg.mode);
+        assertThatPolylinesAreEqual("sz_mE`v}aO?@?L?|AAzAM?A?G@SA[?I?E?C?E?oDCG?E?A?U?[?I??_@iAA@cAM?@o@?O", leg.legGeometry.getPoints());
+
+        // if we reduce the reduce the reluctance for wheelchair-inaccessible streets we get a route that uses
+        // Hogue Street Northeast
+        i = getTripPlan(start, end, r -> {
+            r.setMode(TraverseMode.WALK);
+            r.noWheelchairAccessOnStreetReluctance = 0;
+        }).itinerary.get(0);
+
+        leg = i.legs.get(0);
+        assertEquals("WALK", leg.mode);
+        assertThatPolylinesAreEqual("sz_mE`v}aO?@M?cA?}A?uFCM??L?R", leg.legGeometry.getPoints());
     }
 
     private static TripPlan getTripPlan(GenericLocation from, GenericLocation to, Consumer<RoutingRequest> func) {
