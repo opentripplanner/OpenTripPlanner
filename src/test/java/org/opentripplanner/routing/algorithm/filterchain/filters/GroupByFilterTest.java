@@ -1,16 +1,14 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.model.plan.Itinerary.toStr;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+
+import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.plan.Itinerary.toStr;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter.groupMaxLimit;
 
 public class GroupByFilterTest implements PlanTestConstants {
 
@@ -19,7 +17,7 @@ public class GroupByFilterTest implements PlanTestConstants {
      * works properly. It do not merge any groups.
      */
     @Test
-    public void aSimpleTestGrpupByMatchingTripIdsNoMerge() {
+    public void aSimpleTestGroupByMatchingTripIdsNoMerge() {
         List<Itinerary> result;
 
         // Group 1
@@ -37,7 +35,7 @@ public class GroupByFilterTest implements PlanTestConstants {
 
         // With min Limit = 2, also one from each group
         result = createFilter(2).filter(all);
-        assertEquals(toStr(List.of(i1, i2a)), toStr(result));
+        assertEquals(toStr(List.of(i1, i2a, i2b)), toStr(result));
 
         // With min Limit = 3, we get all 3 itineraries
         result = createFilter(3).filter(all);
@@ -72,45 +70,15 @@ public class GroupByFilterTest implements PlanTestConstants {
         }
     }
 
-    @Test
-    public void testGroupMaxLimit() {
-        // min limit = 1
-        assertEquals(1, groupMaxLimit(1, 1));
-        assertEquals(1, groupMaxLimit(1, 100));
-
-        // min limit = 2
-        assertEquals(2, groupMaxLimit(2, 1));
-        assertEquals(1, groupMaxLimit(2, 2));
-        assertEquals(1, groupMaxLimit(2, 100));
-
-        // min limit = 3
-        assertEquals(3, groupMaxLimit(3, 1));
-        assertEquals(2, groupMaxLimit(3, 2));
-        assertEquals(1, groupMaxLimit(3, 3));
-
-        // min limit = 4
-        assertEquals(4, groupMaxLimit(4, 1));
-        assertEquals(2, groupMaxLimit(4, 2));
-        assertEquals(1, groupMaxLimit(4, 3));
-        assertEquals(1, groupMaxLimit(4, 100));
-
-        // min limit = 5
-        assertEquals(5, groupMaxLimit(5, 1));
-        assertEquals(3, groupMaxLimit(5, 2));
-        assertEquals(2, groupMaxLimit(5, 3));
-        assertEquals(1, groupMaxLimit(5, 4));
-        assertEquals(1, groupMaxLimit(5, 100));
-    }
-
     /**
      * Create a filter that group by the first leg trip-id, and uses the default sort for each
      * group.
      */
-    private GroupByFilter<AGroupId> createFilter(int minLimit) {
+    private GroupByFilter<AGroupId> createFilter(int maxNumberOfItinerariesPrGroup) {
         return new GroupByFilter<>(
             "test", i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
             new OtpDefaultSortOrder(false),
-            minLimit
+            maxNumberOfItinerariesPrGroup
         );
     }
 
