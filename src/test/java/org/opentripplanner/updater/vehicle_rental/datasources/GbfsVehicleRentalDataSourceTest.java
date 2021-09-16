@@ -9,6 +9,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station models.
+ */
 class GbfsVehicleRentalDataSourceTest {
     @Test
     void makeStation() {

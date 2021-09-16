@@ -20,6 +20,12 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+/**
+ * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly, that the optional
+ * language paraameter works correctly, and that the different files in a GBFS bundle are all included, with all
+ * information in them.
+ */
 class GbfsFeedLoaderTest {
 
     public static final String LANGUAGE_NB = "nb";
