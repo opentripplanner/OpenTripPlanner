@@ -1,5 +1,12 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.DoubleFunction;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.AddMinSafeTransferCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
@@ -15,14 +22,6 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIf
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
-import java.util.stream.Collectors;
 
 
 /**
@@ -221,7 +220,7 @@ public class ItineraryFilterChainBuilder {
                 filters.add(
                     new GroupBySimilarLegsFilter(
                         it.groupByP,
-                        it.approximateMinLimit,
+                        it.maxNumOfItinerariesPerGroup,
                         new SortOnGeneralizedCost()
                     )
                 );
