@@ -60,6 +60,12 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
 
         if (options.wheelchairAccessible && !wheelchairAccessible) {
             s1.incrementWeight(options.noWheelchairAccessOnElevatorPenalty);
+            // why do we have to increase the time?
+            // because when we compute accessible transfers we only look at the time of the travel
+            // not at the cost. perhaps we should? See EarliestArrivalSearch.java
+            // https://github.com/ibi-group/OpenTripPlanner/blob/f2b375364985b8dd83f791950d955e3ec5c9cb34/src/main/java/org/opentripplanner/routing/algorithm/EarliestArrivalSearch.java#L76
+            s1.incrementTimeInSeconds(options.noWheelchairAccessOnElevatorPenalty);
+
         } else {
             s1.incrementWeight(options.elevatorHopCost);
         }
