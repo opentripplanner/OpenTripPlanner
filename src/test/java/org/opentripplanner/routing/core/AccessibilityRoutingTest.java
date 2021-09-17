@@ -9,17 +9,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.junit.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -184,17 +179,8 @@ public class AccessibilityRoutingTest {
     @Test
     public void noWheelchairAccessStreetPenalty() {
         // since i cannot find a real-life example of an inaccessible street in central Atlanta
-        // we are pretending that Hogue Street Northeast (https://www.openstreetmap.org/way/9254841)
-        // is not wheelchair-accessible
-        GeometryFactory fac = new GeometryFactory();
-        Point p = fac.createPoint(new Coordinate(-84.37106, 33.75662));
-        Envelope e = p.getEnvelopeInternal();
-        e.expandBy(0.0003);
-        graph.streetIndex.getEdgesForEnvelope(e).stream()
-                .filter(StreetEdge.class::isInstance)
-                .map(s -> (StreetEdge) s)
-                .filter(s -> s.wayId == 9254841L)
-                .forEach(s -> s.setWheelchairAccessible(false));
+        // i manually set Hogue Street Northeast (https://www.openstreetmap.org/way/9254841)
+        // to be inaccessible in the OSM data
 
         GenericLocation start = new GenericLocation(33.75545, -84.37105);
         GenericLocation end = new GenericLocation(33.75767, -84.37120);
