@@ -552,7 +552,7 @@ public class GraphPathToTripPlanConverterTest {
 
         // Edges for legs 3 and 4
         SimpleTransfer e25 = new SimpleTransfer(
-                v24, v26, 7, l25, true);
+                v24, v26, 7, l25, false);
         PreBoardEdge e27 = new PreBoardEdge(
                 v26, v28);
         TransitBoardAlight e29 = new TransitBoardAlight(
