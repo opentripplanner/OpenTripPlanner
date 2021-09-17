@@ -285,7 +285,7 @@ public class Leg {
      * 1 = great accessibility
      */
     @JsonSerialize
-    public Float accessibilityScore;
+    public Float accessibilityScore = 0.5f;
 
     /**
      * Whether this leg is a transit leg or not.

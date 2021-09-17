@@ -199,6 +199,7 @@ public class AccessibilityRoutingTest {
 
         leg = i.legs.get(0);
         assertEquals("WALK", leg.mode);
+        assertEquals(0.5f, leg.accessibilityScore);
         assertThatPolylinesAreEqual("sz_mE`v}aO?@M?cA?}A?uFCM??L?R", leg.legGeometry.getPoints());
     }
 
