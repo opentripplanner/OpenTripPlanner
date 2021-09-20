@@ -52,23 +52,6 @@ public abstract class GenericJsonVehicleRentalDataSource<T extends VehicleRental
         headers = config.getHttpHeaders();
     }
 
-    /**
-     *
-     * @param jsonPath path to get from enclosing elements to nested rental list.
-     *        Separate path levels with '/' For example "d/list"
-     * @param headers http headers
-     */
-    public GenericJsonVehicleRentalDataSource(
-        T config,
-        String jsonPath,
-        Map<String, String> headers
-    ) {
-        this.config = config;
-        this.url = config.getUrl();
-        this.jsonParsePath = jsonPath;
-        this.headers = headers;
-    }
-
     @Override
     public boolean update() {
         if (url == null) { return false; }
