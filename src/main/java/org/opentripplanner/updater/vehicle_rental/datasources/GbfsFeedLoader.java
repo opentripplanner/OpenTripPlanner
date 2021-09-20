@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.entur.gbfs.v2_2.gbfs.GBFS;
 import org.entur.gbfs.v2_2.gbfs.GBFSFeed;
@@ -26,6 +27,8 @@ public class GbfsFeedLoader {
     private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoader.class);
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static { objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true); }
 
     /** One updater per feed type(?)*/
     private final Map<GBFSFeedName, GBFSFeedUpdater<?>> feedUpdaters = new HashMap<>();
@@ -64,7 +67,12 @@ public class GbfsFeedLoader {
                         "Urls: " + feed.getUrl() + ", " + feedUpdaters.get(feedName).url
                 );
             }
-            feedUpdaters.put(feedName, new GBFSFeedUpdater<>(feed));
+
+            // name is null, if the file is of unknown type, skip those
+            if (feed.getName() != null) {
+                feedUpdaters.put(feedName, new GBFSFeedUpdater<>(feed));
+            }
+
         }
     }
 
