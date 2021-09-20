@@ -122,10 +122,6 @@ public class VehicleRentalStation implements VehicleRentalPlace {
         return isKeepingVehicleRentalAtDestinationAllowed;
     }
 
-    /**
-     * Whether this station is static (usually coming from OSM data) or a real-time source. If no real-time data, users should take
-     * bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity divided by two. Only the total is meaningful.
-     */
     @Override
     public boolean isRealTimeData() {
         return realTimeData;
