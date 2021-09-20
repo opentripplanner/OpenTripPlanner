@@ -42,7 +42,7 @@ public abstract class GtfsTest extends TestCase {
     TimetableSnapshotSource timetableSnapshotSource;
     AlertPatchServiceImpl alertPatchServiceImpl;
     public Router router;
-    private GtfsFeedId feedId;
+    public GtfsFeedId feedId;
 
     public abstract String getFeedName();
 

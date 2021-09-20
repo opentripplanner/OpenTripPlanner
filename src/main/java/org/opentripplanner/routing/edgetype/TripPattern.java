@@ -9,17 +9,18 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.model.RealtimeVehiclePosition;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopPatternFlexFields;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -90,6 +91,9 @@ public class TripPattern implements Cloneable, Serializable {
      * searches will be conducted using a different, updated timetable in a snapshot.
      */
     public final Timetable scheduledTimetable = new Timetable(this);
+
+    /** Map of trip IDs to current vehicle positions. If no vehicle positions are mapped, will be empty. */
+    public Map<String, RealtimeVehiclePosition> vehiclePositions = new HashMap<>();
 
     /** The human-readable, unique name for this trip pattern. */
     public String name;
@@ -202,6 +206,18 @@ public class TripPattern implements Cloneable, Serializable {
 
     public List<Stop> getStops() {
         return Arrays.asList(stopPattern.stops);
+    }
+
+    /**
+     * Returns a list of realtime vehicle positions, or an empty array if none are available
+     * @return  A list of realtime vehicle positions, or an empty array if none are available
+     */
+    public List<RealtimeVehiclePosition> getVehiclePositions() {
+        if (vehiclePositions == null) {
+            return new ArrayList<>();
+        }
+        // Convert from hashmap to arraylist
+        return new ArrayList<>(vehiclePositions.values());
     }
 
     public List<PatternHop> getPatternHops() {
