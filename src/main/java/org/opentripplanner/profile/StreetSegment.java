@@ -54,7 +54,8 @@ public class StreetSegment {
         }
         //TODO: localize
         try {
-            Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false, true, new Locale("en"));
+            Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false, true,
+                    state.getOptions().wheelchairAccessible, new Locale("en"));
             for (Leg leg : itin.legs) {
                 // populate the streetEdges array
                 for (WalkStep walkStep : leg.walkSteps) {

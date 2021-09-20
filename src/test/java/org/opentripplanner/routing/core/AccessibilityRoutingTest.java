@@ -1,7 +1,9 @@
 package org.opentripplanner.routing.core;
 
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.OffsetDateTime;
@@ -30,6 +32,28 @@ public class AccessibilityRoutingTest {
 
     public static Graph getDefaultGraph() {
         return ConstantsForTests.getGraph(ConstantsForTests.CENTRAL_ATLANTA_OSM, ConstantsForTests.ATLANTA_BLUE_GREEN_LINE);
+    }
+
+    @Test
+    public void accessibilityScoreOnlyForAccessibleRoutes() {
+        GenericLocation start = new GenericLocation(33.74703, -84.39440);
+        GenericLocation end = new GenericLocation(33.75029, -84.39188);
+
+        Itinerary i = getTripPlan(start, end, r -> r.setMode(TraverseMode.WALK)).itinerary.get(0);
+        List<Leg> legs = i.legs;
+
+        assertEquals(1, legs.size());
+
+        Leg leg = legs.get(0);
+        assertNotNull(leg.accessibilityScore);
+
+        i = getTripPlan(start, end, r -> {
+            r.setMode(TraverseMode.WALK);
+            r.wheelchairAccessible = false;
+        }).itinerary.get(0);
+        leg = i.legs.get(0);
+        assertNull(leg.accessibilityScore);
+
     }
 
     @Test

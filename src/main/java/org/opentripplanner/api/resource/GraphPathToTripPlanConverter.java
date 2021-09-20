@@ -1,5 +1,16 @@
 package org.opentripplanner.api.resource;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -46,9 +57,9 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
+import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -71,18 +82,6 @@ import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
@@ -126,7 +125,7 @@ public abstract class GraphPathToTripPlanConverter {
         long bestNonTransitTime = Long.MAX_VALUE;
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
+            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, request.wheelchairAccessible, requestedLocale);
             itinerary = adjustItinerary(request, itinerary);
             if(itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
                 bestNonTransitTime = itinerary.walkTime;
@@ -209,9 +208,16 @@ public abstract class GraphPathToTripPlanConverter {
      *
      * @param path The graph path to base the itinerary on
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
+     * @param wheelchairAccessible
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
+    public static Itinerary generateItinerary(
+            GraphPath path,
+            boolean showIntermediateStops,
+            boolean disableAlertFiltering,
+            boolean wheelchairAccessible,
+            Locale requestedLocale
+    ) {
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
@@ -236,6 +242,13 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
+
+        itinerary.legs.forEach(leg -> {
+            if(leg.mode.equals("WALK") && wheelchairAccessible) {
+                leg.accessibilityScore = 0.5f;
+            }
+        });
+
         fixupLegs(itinerary.legs, legsStates);
 
         itinerary.duration = lastState.getElapsedTimeSeconds();
@@ -405,6 +418,7 @@ public abstract class GraphPathToTripPlanConverter {
         addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
 
         addTripFields(leg, states, requestedLocale);
+
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
@@ -840,7 +854,7 @@ public abstract class GraphPathToTripPlanConverter {
             leg.flexDrtDropOffMessage = trip.getDrtDropOffMessage();
             leg.flexFlagStopPickupMessage = trip.getContinuousPickupMessage();
             leg.flexFlagStopDropOffMessage = trip.getContinuousDropOffMessage();
-            leg.accessibilityScore = computeAccessibilityScore(trip, leg);
+            leg.accessibilityScore = computeAccessibilityScore(trip, leg, states[states.length - 1].getOptions());
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
@@ -876,12 +890,22 @@ public abstract class GraphPathToTripPlanConverter {
         }
     }
 
-    private static float computeAccessibilityScore(Trip trip, Leg leg) {
-        float fromScore = computeAccessibilityScore(leg.from.wheelchairBoarding);
-        float toScore = computeAccessibilityScore(leg.to.wheelchairBoarding);
-        float tripScore = computeAccessibilityScore(WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible()));
+    private static Float computeAccessibilityScore(
+            Trip trip,
+            Leg leg,
+            RoutingRequest options
+    ) {
+        if (options.wheelchairAccessible) {
+            float fromScore = computeAccessibilityScore(leg.from.wheelchairBoarding);
+            float toScore = computeAccessibilityScore(leg.to.wheelchairBoarding);
+            float tripScore = computeAccessibilityScore(
+                    WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible()));
 
-        return (fromScore + toScore + tripScore) / 3;
+            return (fromScore + toScore + tripScore) / 3;
+        }
+        else {
+            return null;
+        }
     }
 
     private static float computeAccessibilityScore(WheelchairAccess access) {
