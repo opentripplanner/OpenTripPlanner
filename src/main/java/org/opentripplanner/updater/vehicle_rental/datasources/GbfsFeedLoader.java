@@ -125,10 +125,12 @@ public class GbfsFeedLoader {
             LOG.warn("Error parsing vehicle rental feed from " + uri, e);
             return null;
         } catch (JsonProcessingException e) {
-            LOG.warn("Error parsing vehicle rental feed from " + uri + "(bad JSON of some sort)", e);
+            LOG.warn("Error parsing vehicle rental feed from (bad JSON of some sort)" + uri);
+            LOG.warn(e.getMessage());
             return null;
         } catch (IOException e) {
-            LOG.warn("Error reading vehicle rental feed from " + uri, e);
+            LOG.warn("Error reading vehicle rental feed from (connection error)" + uri);
+            LOG.warn(e.getMessage());
             return null;
         }
     }
@@ -136,7 +138,11 @@ public class GbfsFeedLoader {
     /* private static classes */
 
     private class GBFSFeedUpdater<T> {
+
+        /** URL for the individual GBFS file */
         private final URI url;
+
+        /** To which class should the file be deserialized to */
         private final Class<T> implementingClass;
 
         private int nextUpdate;
@@ -158,13 +164,20 @@ public class GbfsFeedLoader {
                 nextUpdate = getCurrentTimeSeconds();
                 return;
             }
+            data = newData;
+
             try {
+                // Fetch lastUpdated and ttl from the resulting class. Due to type erasure we don't know the actual
+                // class, and have to use introspection to get the method references, as they do not share a supertype.
                 Integer lastUpdated = (Integer) implementingClass.getMethod("getLastUpdated").invoke(newData);
                 Integer ttl = (Integer) implementingClass.getMethod("getTtl").invoke(newData);
-                nextUpdate = lastUpdated + ttl;
-                data = newData;
+                if (lastUpdated == null || ttl == null) {
+                    nextUpdate = getCurrentTimeSeconds();
+                } else {
+                    nextUpdate = lastUpdated + ttl;
+                }
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassCastException e) {
-                LOG.error("Invalid data for {}", url);
+                LOG.error("Invalid lastUpdated or ttl for {}", url);
                 nextUpdate = getCurrentTimeSeconds();
             }
         }
