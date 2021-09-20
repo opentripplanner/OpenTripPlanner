@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
+import com.csvreader.CsvReader;
 import org.entur.gbfs.v2_2.free_bike_status.GBFSFreeBikeStatus;
 import org.entur.gbfs.v2_2.geofencing_zones.GBFSGeofencingZones;
 import org.entur.gbfs.v2_2.station_information.GBFSStation;
@@ -13,10 +14,19 @@ import org.entur.gbfs.v2_2.system_pricing_plans.GBFSSystemPricingPlans;
 import org.entur.gbfs.v2_2.system_regions.GBFSSystemRegions;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.util.HttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,6 +40,7 @@ class GbfsFeedLoaderTest {
 
     public static final String LANGUAGE_NB = "nb";
     public static final String LANGUAGE_EN = "en";
+    private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderTest.class);
 
     @Test
     void getV22FeedWithExplicitLanguage() {
@@ -71,6 +82,33 @@ class GbfsFeedLoaderTest {
         );
 
         validateV10Feed(loader);
+    }
+
+    @Test
+    @Ignore
+    void fetchAllPublicFeeds() throws IOException {
+        InputStream is = HttpUtils.getData("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv");
+        CsvReader reader = new CsvReader(is, StandardCharsets.UTF_8);
+        reader.readHeaders();
+        List<Exception> exceptions = new ArrayList<>();
+
+        while (reader.readRecord()) {
+            try {
+                String url = reader.get("Auto-Discovery URL");
+                if (url.contains("gbfs.spin.pm"))
+                new GbfsFeedLoader(url, Map.of(), null).update();
+            } catch (Exception e) {
+                exceptions.add(e);
+            }
+
+        }
+        assertTrue(exceptions.isEmpty(), exceptions.stream().map(Exception::getMessage).collect(Collectors.joining("\n")));
+    }
+
+    @Test
+    @Ignore
+    void testSpin() {
+        new GbfsFeedLoader("https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs", Map.of(), null).update();
     }
 
     private void validateV22Feed(GbfsFeedLoader loader) {
