@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of a VehicleRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
  * @see VehicleRentalDataSource
  */
-public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSource<VehicleRentalDataSourceParameters> {
+public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSource<SmooveBikeRentalDataSourceParameters> {
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
@@ -22,7 +22,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
 
     private final String networkName;
 
-    public SmooveBikeRentalDataSource(VehicleRentalDataSourceParameters config) {
+    public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
         super(config,"result");
         networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     }

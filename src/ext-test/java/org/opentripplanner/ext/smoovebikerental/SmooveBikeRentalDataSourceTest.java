@@ -13,8 +13,7 @@ class SmooveBikeRentalDataSourceTest {
     @Test
     void makeStation() {
         SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(
-                new VehicleRentalDataSourceParameters(
-                        null,
+                new SmooveBikeRentalDataSourceParameters(
                         "file:src/test/resources/bike/smoove.json",
                         null,
                         Map.of()

@@ -62,7 +62,7 @@ public class VehicleRentalServiceDirectoryFetcher {
             DEFAULT_FREQUENCY_SEC,
             new GbfsDataSourceParameters(
                 updaterUrl.asText(),
-                network.asText(),
+                parameters.getLanguage(),
                 parameters.getHeaders()
             )
         );
