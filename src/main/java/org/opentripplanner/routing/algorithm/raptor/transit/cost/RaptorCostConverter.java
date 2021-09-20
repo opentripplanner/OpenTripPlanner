@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
-import java.util.Locale;
+import org.opentripplanner.model.base.OtpNumberFormat;
 
 /**
  * Convert Raptor internal cost to OTP domain model cost, and back.
@@ -32,7 +32,7 @@ public final class RaptorCostConverter {
    * Convert Raptor internal cost to a string with format $###.## (in seconds)
    */
   public static String toString(int raptorCost) {
-    return String.format(Locale.ROOT, "$%.2f",  raptorCost / (double) PRECISION);
+      return OtpNumberFormat.formatCost(raptorCost);
   }
 
   /**

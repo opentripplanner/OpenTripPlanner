@@ -101,7 +101,7 @@ public class TransitStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "Transit { round: 1, stop: 101, pattern: BUS T1, arrival-time: 9:20 $1880.00 }",
+                "Transit { round: 1, stop: 101, pattern: BUS T1, arrival-time: 9:20 $1880 }",
                 subject.toString()
         );
     }

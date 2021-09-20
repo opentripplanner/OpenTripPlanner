@@ -3,9 +3,9 @@ package org.opentripplanner.transit.raptor.util;
 import java.util.Calendar;
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
+import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -96,7 +96,7 @@ public class PathStringBuilder {
 
     public PathStringBuilder costCentiSec(int generalizedCost) {
         if(generalizedCost <= 0) { return this; }
-        space().append(ArrivalView.costToString(generalizedCost));
+        space().append(OtpNumberFormat.formatCost(generalizedCost));
         return this;
     }
 

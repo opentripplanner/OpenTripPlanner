@@ -32,6 +32,6 @@ public class RaptorCostConverterTest {
 
   @Test
   public void testToString() {
-    assertEquals("$120.00", RaptorCostConverter.toString(12_000));
+    assertEquals("$120", RaptorCostConverter.toString(12_000));
   }
 }

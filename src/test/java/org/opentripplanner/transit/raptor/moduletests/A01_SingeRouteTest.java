@@ -103,7 +103,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
     var response = raptorService.route(request, data);
 
     assertEquals(
-        "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s $940.00]",
+        "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s $940]",
         pathsToString(response)
     );
   }

@@ -169,7 +169,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
 
         assertEquals(
                 "[1 ~ BUS T1 10:02 10:10 ~ 2 ~ BUS T2 10:12 10:35 ~ 6 ~ "
-                        + "BUS T3 10:37 10:49 ~ 7 [10:00:20 10:49:20 49m $3010.00]]",
+                        + "BUS T3 10:37 10:49 ~ 7 [10:00:20 10:49:20 49m $3010]]",
                 result.toString()
         );
     }
@@ -217,7 +217,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         var it = result.iterator().next();
 
         assertEquals(
-                "1 ~ BUS T1 10:02 10:15 ~ 3 ~ BUS T2 10:17 10:30 ~ 4 [10:00:20 10:30:20 30m $1840.00]",
+                "1 ~ BUS T1 10:02 10:15 ~ 3 ~ BUS T2 10:17 10:30 ~ 4 [10:00:20 10:30:20 30m $1840]",
                 it.toString()
         );
         // Verify the attached Transfer is exist and is valid

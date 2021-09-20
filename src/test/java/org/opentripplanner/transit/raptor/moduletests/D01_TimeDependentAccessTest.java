@@ -75,11 +75,11 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860]",
                 pathsToString(response)
         );
     }
@@ -97,14 +97,14 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:23+1d 0:41+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:30+1d 0:45+1d ~ E ~ Walk 1m [0:28+1d 0:46+1d 18m $1860.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:23+1d 0:41+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:30+1d 0:45+1d ~ E ~ Walk 1m [0:28+1d 0:46+1d 18m $1860]",
                 pathsToString(response)
         );
     }
@@ -122,10 +122,10 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:23+1d 0:41+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:30+1d 0:45+1d ~ E ~ Walk 1m [0:28+1d 0:46+1d 18m $1860.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:23+1d 0:41+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:30+1d 0:45+1d ~ E ~ Walk 1m [0:28+1d 0:46+1d 18m $1860]",
                 pathsToString(response)
         );
     }
@@ -146,12 +146,12 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m $1860.00]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m $1860]\n"
                         // This bus may only be reached by waiting at the stop between 01:00 and 24:15:00,
                         // since the access only opens at 0:18, which is too late to catch the bus.
-                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [1:00 0:31+1d 23h31m $85440.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [1:00 0:31+1d 23h31m $85440]",
                 pathsToString(response)
         );
     }
@@ -169,13 +169,13 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [1:00 0:31+1d 23h31m $85440.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:23+1d 0:41+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:30+1d 0:45+1d ~ E ~ Walk 1m [0:28+1d 0:46+1d 18m $1860.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:23 0:41 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:30 0:45 ~ E ~ Walk 1m [0:28 0:46 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [1:00 0:31+1d 23h31m $85440]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:23+1d 0:41+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:30+1d 0:45+1d ~ E ~ Walk 1m [0:28+1d 0:46+1d 18m $1860]",
                 pathsToString(response)
         );
     }
@@ -193,9 +193,9 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:23+1d 0:41+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:30+1d 0:45+1d ~ E ~ Walk 1m [0:28+1d 0:46+1d 18m $1860.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:23+1d 0:41+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:30+1d 0:45+1d ~ E ~ Walk 1m [0:28+1d 0:46+1d 18m $1860]",
                 pathsToString(response)
         );
     }
@@ -215,10 +215,10 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:20 0:41 21m $2040.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:20 0:41 21m $2040]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860]",
                 pathsToString(response)
         );
     }
@@ -235,12 +235,12 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
         var response = raptorService.route(requestBuilder.build(), data);
 
         assertEquals( ""
-                        + "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:20 0:41 21m $2040.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:20+1d 0:41+1d 21m $2040.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:15 0:30 ~ E ~ Walk 1m [0:13 0:31 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:20 0:41 21m $2040]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:20+1d 0:41+1d 21m $2040]",
                 pathsToString(response)
         );
     }
@@ -257,9 +257,9 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
         var response = raptorService.route(requestBuilder.build(), data);
 
         assertEquals( ""
-                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:20+1d 0:41+1d 21m $2040.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:15+1d 0:30+1d ~ E ~ Walk 1m [0:13+1d 0:31+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:20+1d 0:41+1d 21m $2040]",
                 pathsToString(response)
         );
     }
@@ -280,9 +280,9 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:20 0:41 21m $2040.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:20 0:41 21m $2040]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]",
                 pathsToString(response)
         );
     }
@@ -300,10 +300,10 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:20 0:41 21m $2040.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:20+1d 0:41+1d 21m $2040.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:20 0:35 ~ E ~ Walk 1m [0:18 0:36 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25 0:40 ~ E ~ Walk 1m [0:20 0:41 21m $2040]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:20+1d 0:41+1d 21m $2040]",
                 pathsToString(response)
         );
     }
@@ -321,8 +321,8 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
 
         assertEquals(
                 ""
-                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860.00]\n"
-                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:20+1d 0:41+1d 21m $2040.00]",
+                        + "Walk 2m ~ B ~ BUS R1 0:20+1d 0:35+1d ~ E ~ Walk 1m [0:18+1d 0:36+1d 18m $1860]\n"
+                        + "Walk 2m ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m [0:20+1d 0:41+1d 21m $2040]",
                 pathsToString(response)
         );
     }

@@ -49,18 +49,18 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
  */
 public class BasicPathTestCase implements RaptorTestConstants {
     public static final String BASIC_PATH_AS_DETAILED_STRING =
-            "Walk 3m15s 10:00 10:03:15 $390.00 "
+            "Walk 3m15s 10:00 10:03:15 $390 "
             + "~ A 45s ~ "
-            + "BUS L11 10:04 10:35 31m $1998.00 "
+            + "BUS L11 10:04 10:35 31m $1998 "
             + "~ B 15s ~ "
-            + "Walk 3m45s 10:35:15 10:39 $450.00 "
+            + "Walk 3m45s 10:35:15 10:39 $450 "
             + "~ C 21m ~ "
-            + "BUS L21 11:00 11:23 23m $2640.00 "
+            + "BUS L21 11:00 11:23 23m $2640 "
             + "~ D 17m ~ "
-            + "BUS L31 11:40 11:52 12m $1776.00 "
+            + "BUS L31 11:40 11:52 12m $1776 "
             + "~ E 15s ~ "
-            + "Walk 7m45s 11:52:15 12:00 $930.00 "
-            + "[10:00 12:00 2h $8184.00]";
+            + "Walk 7m45s 11:52:15 12:00 $930 "
+            + "[10:00 12:00 2h $8184]";
 
     public static final String BASIC_PATH_AS_STRING =
         "Walk 3m15s ~ A"
@@ -69,7 +69,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
         + " ~ BUS L21 11:00 11:23 ~ D"
         + " ~ BUS L31 11:40 11:52 ~ E"
         + " ~ Walk 7m45s "
-        + "[10:00 12:00 2h $8184.00]";
+        + "[10:00 12:00 2h $8184]";
 
     private static final int BOARD_COST_SEC = 60;
     private static final int TRANSFER_COST_SEC = 120;

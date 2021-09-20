@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-class OtpNumberFormat {
+public class OtpNumberFormat {
 
   private static final String NULL_VALUE = "null";
   private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(
@@ -44,5 +44,11 @@ class OtpNumberFormat {
       decimalFormat = new DecimalFormat("#,##0.0##", DECIMAL_SYMBOLS);
     }
     return decimalFormat.format(value);
+  }
+
+  /** Used to format integer cost types like generalized-cost used by Raptor. */
+  public static String formatCost(int cost) {
+    if(cost % 100 == 0) { return "$" + cost/100; }
+    return String.format(Locale.ROOT, "$%.2f",  cost / 100.0);
   }
 }

@@ -97,7 +97,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
   @Test
   public void multiCriteria() {
     // Add cost to result string
-    String expected = EXPECTED_RESULT.replace("]", " $1840.00]");
+    String expected = EXPECTED_RESULT.replace("]", " $1840]");
     var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
     var response = raptorService.route(request, data);
     assertEquals(expected, pathsToString(response));

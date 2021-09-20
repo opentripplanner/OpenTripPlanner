@@ -51,10 +51,19 @@ public class ToStringBuilder {
 
     /**
      * Create a ToStringBuilder for a regular POJO type. This builder
-     * will include metadata(class and field names) when building the to sting.
+     * will include metadata(class and field names) when building the to string.
      */
     public static ToStringBuilder of(Class<?> clazz) {
         return new ToStringBuilder(clazz.getSimpleName());
+    }
+
+    /**
+     * Create a ToStringBuilder for a regular POJO type without including the type in the name.
+     * Some classes are always embedded in other classes and the type is given, for these cases
+     * this builder make the toString a bit easier to read.
+     */
+    public static ToStringBuilder of() {
+        return new ToStringBuilder("");
     }
 
 
