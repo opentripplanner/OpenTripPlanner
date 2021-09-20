@@ -40,7 +40,7 @@ public class ToStringBuilder {
     private static final String NULL_VALUE = "null";
 
     private final StringBuilder sb = new StringBuilder();
-    private final NumberFormat numFormat = new NumberFormat();
+    private final OtpNumberFormat numFormat = new OtpNumberFormat();
 
     private SimpleDateFormat calendarTimeFormat;
     boolean first = true;

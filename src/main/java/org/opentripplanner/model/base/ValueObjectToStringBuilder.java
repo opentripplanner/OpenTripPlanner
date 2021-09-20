@@ -26,7 +26,7 @@ public class ValueObjectToStringBuilder {
     private static final String FIELD_SEPARATOR = " ";
 
     private final StringBuilder sb = new StringBuilder();
-    private final NumberFormat numFormat = new NumberFormat();
+    private final OtpNumberFormat numFormat = new OtpNumberFormat();
 
     boolean skipSep = true;
     boolean skipNull = false;

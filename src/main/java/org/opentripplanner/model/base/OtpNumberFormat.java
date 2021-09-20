@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-class NumberFormat {
+class OtpNumberFormat {
 
   private static final String NULL_VALUE = "null";
   private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(
