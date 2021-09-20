@@ -30,7 +30,7 @@ public class GbfsStationStatusMapper {
         station.vehicleTypesAvailable = status.getVehicleTypesAvailable() != null
                 ? status.getVehicleTypesAvailable().stream()
                     .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> (int) (double) e.getCount()))
-                : null;
+                : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.vehiclesAvailable);
         station.vehiclesDisabled = status.getNumBikesDisabled() != null ? (int) (double) status.getNumBikesDisabled(): 0;
 
         station.spacesAvailable = status.getNumDocksAvailable() != null ? (int) (double) status.getNumDocksAvailable() : Integer.MAX_VALUE;
@@ -39,7 +39,7 @@ public class GbfsStationStatusMapper {
                     .flatMap(available -> available.getVehicleTypeIds().stream()
                             .map(t -> new T2<>(vehicleTypes.get(t), (int) (double) available.getCount())))
                     .collect(Collectors.toMap(t -> t.first, t -> t.second))
-                : null;
+                : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.spacesAvailable);
         station.spacesDisabled = status.getNumDocksDisabled() != null ? (int) (double) status.getNumDocksDisabled() : 0;
 
         station.isInstalled = status.getIsInstalled() != null ? status.getIsInstalled() : true;

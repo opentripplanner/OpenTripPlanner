@@ -36,10 +36,10 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     // GBFS Dynamic information
     public int vehiclesAvailable = 0;
     public int vehiclesDisabled = 0;
-    public Map<RentalVehicleType, Integer> vehicleTypesAvailable;
+    public Map<RentalVehicleType, Integer> vehicleTypesAvailable = Map.of();
     public int spacesAvailable = 0;
     public int spacesDisabled = 0;
-    public Map<RentalVehicleType, Integer> vehicleSpacesAvailable;
+    public Map<RentalVehicleType, Integer> vehicleSpacesAvailable = Map.of();
 
     public boolean isInstalled = true;
     public boolean isRenting = true;
@@ -109,12 +109,11 @@ public class VehicleRentalStation implements VehicleRentalPlace {
 
     @Override
     public boolean isCarStation() {
-        return false;
-//        return Stream.concat(
-//                vehicleTypesAvailable.keySet().stream(),
-//                vehicleSpacesAvailable.keySet().stream()
-//            )
-//            .anyMatch(rentalVehicleType -> rentalVehicleType.formFactor.equals(RentalVehicleType.FormFactor.CAR));
+        return Stream.concat(
+                vehicleTypesAvailable.keySet().stream(),
+                vehicleSpacesAvailable.keySet().stream()
+            )
+            .anyMatch(rentalVehicleType -> rentalVehicleType.formFactor.equals(RentalVehicleType.FormFactor.CAR));
     }
 
     @Override
