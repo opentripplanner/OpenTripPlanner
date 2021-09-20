@@ -31,7 +31,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
           RaptorConfig.defaultConfigForTest()
   );
 
-  private final static String EXPECTED =  "Walk 30s ~ 1 ~ BUS %s 0:01 0:02:40 ~ 2 ~ Walk 20s "
+  private final static String EXPECTED =  "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s "
           + "[0:00:30 0:03 2m30s $%d.00]";
 
   @BeforeEach

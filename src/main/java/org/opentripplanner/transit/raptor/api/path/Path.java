@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -178,17 +179,21 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                 .map(PathLeg::asTransitLeg);
     }
 
-    public String toStringDetailed() {
-        return toString(true);
+    public String toStringDetailed(IntFunction<String> stopNameTranslator) {
+        return toString(true, stopNameTranslator);
+    }
+
+    public String toString(IntFunction<String> stopNameTranslator) {
+        return toString(false, stopNameTranslator);
     }
 
     @Override
     public String toString() {
-        return toString(false);
+        return toString(false, Integer::toString);
     }
 
-    public String toString(boolean detailed) {
-        PathStringBuilder buf = new PathStringBuilder();
+    public String toString(boolean detailed, IntFunction<String> stopNameTranslator) {
+        PathStringBuilder buf = new PathStringBuilder(stopNameTranslator);
         if(accessLeg != null) {
             int prevToTime = 0;
             for (PathLeg<T> leg : accessLeg.iterator()) {

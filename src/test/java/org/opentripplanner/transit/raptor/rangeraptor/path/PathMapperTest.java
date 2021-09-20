@@ -124,7 +124,7 @@ public class PathMapperTest implements RaptorTestConstants {
         // When:
         Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
         // Then:
-        assertEquals(expected, path.toStringDetailed());
+        assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
     }
 
     private void runtTestFlexReverse(
@@ -136,10 +136,10 @@ public class PathMapperTest implements RaptorTestConstants {
         // When:
         Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
         // Then:
-        assertEquals(expected, path.toStringDetailed());
+        assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
     }
 
     private void assertPath(Path<TestTripSchedule> path) {
-        assertEquals(BASIC_PATH_AS_DETAILED_STRING, path.toStringDetailed());
+        assertEquals(BASIC_PATH_AS_DETAILED_STRING, path.toStringDetailed(this::stopIndexToName));
     }
 }

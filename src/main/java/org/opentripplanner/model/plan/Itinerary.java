@@ -217,8 +217,8 @@ public class Itinerary {
      * A itinerary can be tagged with a system notice. System notices should only be added to a
      * response if explicit asked for in the request.
      * <p>
-     * For example when tuning or manually testing the itinerary-filter-chain it you can enable
-     * the {@link org.opentripplanner.routing.api.request.RoutingRequest#debugItineraryFilter} and instead
+     * For example when tuning or manually testing the itinerary-filter-chain it you can enable the
+     * {@link org.opentripplanner.routing.api.request.ItineraryFilterParameters#debug} and instead
      * of removing itineraries from the result the itineraries would be tagged by the filters
      * instead. This enable investigating, why an expected itinerary is missing from the result
      * set.
@@ -304,7 +304,8 @@ public class Itinerary {
      * 12:14 ...
      */
     public String toStr() {
-        PathStringBuilder buf = new PathStringBuilder();
+        // No translater needed, stop indexes are never passed to the builder
+        PathStringBuilder buf = new PathStringBuilder(null);
         buf.stop(firstLeg().from.name);
 
         for (Leg leg : legs) {

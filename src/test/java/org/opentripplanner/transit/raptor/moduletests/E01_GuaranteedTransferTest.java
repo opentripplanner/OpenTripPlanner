@@ -33,8 +33,8 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
     private final RaptorService<TestTripSchedule> raptorService =
             new RaptorService<>(RaptorConfig.defaultConfigForTest());
 
-    private static final String EXP_PATH = "Walk 30s ~ 1 ~ BUS R1 0:02 0:05 ~ 2 "
-            + "~ BUS R2 0:05 0:10 ~ 3 ~ Walk 30s [0:01:10 0:10:40 9m30s";
+    private static final String EXP_PATH = "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B "
+            + "~ BUS R2 0:05 0:10 ~ C ~ Walk 30s [0:01:10 0:10:40 9m30s";
     private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
     private static final String EXP_PATH_WITH_COST = EXP_PATH + " $1830.00]";
 

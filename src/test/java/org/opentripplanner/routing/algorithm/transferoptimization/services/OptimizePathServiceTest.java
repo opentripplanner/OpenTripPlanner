@@ -71,7 +71,10 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         var result = subject.findBestTransitPath(original);
 
         // Then expect a set containing the original path
-        assertEquals(original.toStringDetailed(), first(result).toStringDetailed());
+        assertEquals(
+                original.toStringDetailed(this::stopIndexToName),
+                first(result).toStringDetailed(this::stopIndexToName)
+        );
         assertEquals(1, result.size());
     }
 
@@ -110,7 +113,10 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         // When
         var result = subject.findBestTransitPath(original);
 
-        assertEquals(original.toStringDetailed(), first(result).toStringDetailed());
+        assertEquals(
+                original.toStringDetailed(this::stopIndexToName),
+                first(result).toStringDetailed(this::stopIndexToName)
+        );
         assertEquals(1, result.size());
     }
 

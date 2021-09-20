@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.util;
 
 import java.util.Calendar;
+import java.util.function.IntFunction;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -12,15 +14,28 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class PathStringBuilder {
+    private final IntFunction<String> stopNameTranslator;
     private final StringBuilder buf = new StringBuilder();
     private final boolean padDuration;
     private boolean elementAdded = false;
     private boolean sepAdded = false;
 
-    public PathStringBuilder() {
-        this(false);
+    public PathStringBuilder(@Nullable IntFunction<String> stopNameTranslator) {
+        this(stopNameTranslator, false);
     }
-    public PathStringBuilder(boolean padDuration) {
+
+    /**
+     * @param stopNameTranslator Used to translate stopIndexes to stopNames, if {@code null} the
+     *                           index is used in the result string.
+     * @param padDuration        This can be set to {@code true} for padding the duration output.
+     *                           This would be used in cases were several similar paths are listed.
+     *                           If the legs are similar, the path elements is more likely to be
+     *                           aligned.
+     */
+    public PathStringBuilder(@Nullable IntFunction<String> stopNameTranslator, boolean padDuration) {
+        this.stopNameTranslator = stopNameTranslator == null
+                ? Integer::toString
+                : stopNameTranslator;
         this.padDuration = padDuration;
     }
 
@@ -29,8 +44,12 @@ public class PathStringBuilder {
         return this;
     }
 
-    public PathStringBuilder stop(int stop) {
-        return start().append(stop).end();
+    /**
+     * The given {@code stopIndex} is translated to stop name using the {@code stopNameTranslator}
+     * set in the constructor. If not translater is set the stopIndex is used.
+     */
+    public PathStringBuilder stop(int stopIndex) {
+        return stop(stopNameTranslator.apply(stopIndex));
     }
 
     public PathStringBuilder stop(String stop) {

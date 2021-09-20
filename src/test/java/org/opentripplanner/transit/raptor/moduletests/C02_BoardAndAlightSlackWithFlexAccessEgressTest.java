@@ -36,8 +36,8 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
 
   /** The expected result is tha same for all tests */
   private static final String EXPECTED_RESULT
-      = "Flex 2m 1x ~ 2 ~ "
-      + "BUS R1 0:04 0:06 ~ 3 ~ "
+      = "Flex 2m 1x ~ B ~ "
+      + "BUS R1 0:04 0:06 ~ C ~ "
       + "Flex 2m 1x "
       + "[0:00:30 0:09:10 8m40s]";
 

@@ -50,24 +50,24 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
 public class BasicPathTestCase implements RaptorTestConstants {
     public static final String BASIC_PATH_AS_DETAILED_STRING =
             "Walk 3m15s 10:00 10:03:15 $390.00 "
-            + "~ 1 45s ~ "
+            + "~ A 45s ~ "
             + "BUS L11 10:04 10:35 31m $1998.00 "
-            + "~ 2 15s ~ "
+            + "~ B 15s ~ "
             + "Walk 3m45s 10:35:15 10:39 $450.00 "
-            + "~ 3 21m ~ "
+            + "~ C 21m ~ "
             + "BUS L21 11:00 11:23 23m $2640.00 "
-            + "~ 4 17m ~ "
+            + "~ D 17m ~ "
             + "BUS L31 11:40 11:52 12m $1776.00 "
-            + "~ 5 15s ~ "
+            + "~ E 15s ~ "
             + "Walk 7m45s 11:52:15 12:00 $930.00 "
             + "[10:00 12:00 2h $8184.00]";
 
     public static final String BASIC_PATH_AS_STRING =
-        "Walk 3m15s ~ 1"
-        + " ~ BUS L11 10:04 10:35 ~ 2"
-        + " ~ Walk 3m45s ~ 3"
-        + " ~ BUS L21 11:00 11:23 ~ 4"
-        + " ~ BUS L31 11:40 11:52 ~ 5"
+        "Walk 3m15s ~ A"
+        + " ~ BUS L11 10:04 10:35 ~ B"
+        + " ~ Walk 3m45s ~ C"
+        + " ~ BUS L21 11:00 11:23 ~ D"
+        + " ~ BUS L31 11:40 11:52 ~ E"
         + " ~ Walk 7m45s "
         + "[10:00 12:00 2h $8184.00]";
 
@@ -289,9 +289,9 @@ public class BasicPathTestCase implements RaptorTestConstants {
             transitArrivalCost(TRIP_3, L31_WAIT_DURATION, L31_DURATION, STOP_D, STOP_E)
         );
 
-        assertEquals(BASIC_PATH_AS_STRING, basicTripAsPath().toString());
+        assertEquals(BASIC_PATH_AS_STRING, basicTripAsPath().toString(this::stopIndexToName));
 
-        assertEquals(BASIC_PATH_AS_DETAILED_STRING, basicTripAsPath().toStringDetailed());
+        assertEquals(BASIC_PATH_AS_DETAILED_STRING, basicTripAsPath().toStringDetailed(this::stopIndexToName));
     }
 
     private static int transitArrivalCost(

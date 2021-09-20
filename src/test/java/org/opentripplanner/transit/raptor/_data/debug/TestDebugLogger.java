@@ -182,7 +182,7 @@ public class TestDebugLogger implements DebugLogger {
     }
 
     private static String path(ArrivalView<?> a) {
-        return path(a, new PathStringBuilder())
+        return path(a, new PathStringBuilder(null))
                 .space().space().append("[ ")
                 .costCentiSec(a.cost())
                 .append(" ]")

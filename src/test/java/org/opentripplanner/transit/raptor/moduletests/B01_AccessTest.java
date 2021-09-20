@@ -68,7 +68,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     // expect: one path with the latest departure time.
     assertEquals(
-        "Walk 7m ~ 4 ~ BUS R1 0:18 0:25 ~ 6 ~ Walk 1s [0:11 0:25:01 14m1s]",
+        "Walk 7m ~ D ~ BUS R1 0:18 0:25 ~ F ~ Walk 1s [0:11 0:25:01 14m1s]",
         PathUtils.pathsToString(response)
     );
   }
@@ -83,7 +83,7 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     // expect: one path with the latest departure time, same as found in the forward search.
     assertEquals(
-        "Walk 7m ~ 4 ~ BUS R1 0:18 0:25 ~ 6 ~ Walk 1s [0:11 0:25:01 14m1s]",
+        "Walk 7m ~ D ~ BUS R1 0:18 0:25 ~ F ~ Walk 1s [0:11 0:25:01 14m1s]",
         PathUtils.pathsToString(response)
     );
   }
@@ -97,9 +97,9 @@ public class B01_AccessTest implements RaptorTestConstants {
 
     // expect: All pareto optimal paths
     assertEquals(""
-            + "Walk 7m 0:11 0:18 $840.00 ~ 4 0s ~ BUS R1 0:18 0:25 7m $1020.00 ~ 6 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:11 0:25:01 14m1s $1862.00]\n"
-            + "Walk 4m 0:10 0:14 $480.00 ~ 3 0s ~ BUS R1 0:14 0:25 11m $1260.00 ~ 6 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:10 0:25:01 15m1s $1742.00]\n"
-            + "Walk 1s 0:09:59 0:10 $2.00 ~ 2 0s ~ BUS R1 0:10 0:25 15m $1500.00 ~ 6 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:09:59 0:25:01 15m2s $1504.00]",
+            + "Walk 7m 0:11 0:18 $840.00 ~ D 0s ~ BUS R1 0:18 0:25 7m $1020.00 ~ F 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:11 0:25:01 14m1s $1862.00]\n"
+            + "Walk 4m 0:10 0:14 $480.00 ~ C 0s ~ BUS R1 0:14 0:25 11m $1260.00 ~ F 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:10 0:25:01 15m1s $1742.00]\n"
+            + "Walk 1s 0:09:59 0:10 $2.00 ~ B 0s ~ BUS R1 0:10 0:25 15m $1500.00 ~ F 0s ~ Walk 1s 0:25 0:25:01 $2.00 [0:09:59 0:25:01 15m2s $1504.00]",
         PathUtils.pathsToStringDetailed(response)
     );
   }
