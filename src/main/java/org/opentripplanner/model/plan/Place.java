@@ -1,5 +1,7 @@
 package org.opentripplanner.model.plan;
 
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
@@ -14,22 +16,10 @@ public class Place {
      */
     public final String name;
 
-    /** 
-     * The ID of the stop. This is often something that users don't care about.
-     */
-    public FeedScopedId stopId = null;
-
-    /** 
-     * The "code" of the stop. Depending on the transit agency, this is often
-     * something that users care about.
-     */
-    public String stopCode = null;
-
     /**
-      * The code or name identifying the quay/platform the vehicle will arrive at or depart from
-      *
-    */
-    public String platformCode = null;
+     * Reference to the stop.
+     */
+    public StopLocation stop;
 
     /**
      * The coordinate of the place.
@@ -37,8 +27,6 @@ public class Place {
     public final WgsCoordinate coordinate;
 
     public String orig;
-
-    public String zoneId;
 
     /**
      * For transit trips, the stop index (numbered from zero from the start of the trip).
@@ -67,6 +55,13 @@ public class Place {
         this.coordinate = WgsCoordinate.creatOptionalCoordinate(lat, lon);
     }
 
+    public Place(Stop stop) {
+        this.name = stop.getName();
+        this.stop = stop;
+        this.coordinate = stop.getCoordinate();
+        this.vertexType = VertexType.TRANSIT;
+    }
+
     /**
      * Test if the place is likely to be at the same location. First check the coordinates
      * then check the stopId [if it exist].
@@ -76,7 +71,7 @@ public class Place {
         if(coordinate != null) {
             return coordinate.sameLocation(other.coordinate);
         }
-        return stopId != null && stopId.equals(other.stopId);
+        return stop != null && stop.equals(other.stop);
     }
 
     /**
@@ -85,8 +80,8 @@ public class Place {
      */
     public String toStringShort() {
         StringBuilder buf = new StringBuilder(name);
-        if(stopId != null) {
-            buf.append(" (").append(stopId).append(")");
+        if(stop != null) {
+            buf.append(" (").append(stop.getId()).append(")");
         } else {
             buf.append(" ").append(coordinate.toString());
         }
@@ -98,12 +93,9 @@ public class Place {
     public String toString() {
         return ToStringBuilder.of(Place.class)
                 .addStr("name", name)
-                .addObj("stopId", stopId)
-                .addStr("stopCode", stopCode)
-                .addStr("platformCode", platformCode)
+                .addObj("stop", stop)
                 .addObj("coordinate", coordinate)
                 .addStr("orig", orig)
-                .addStr("zoneId", zoneId)
                 .addNum("stopIndex", stopIndex)
                 .addNum("stopSequence", stopSequence)
                 .addEnum("vertexType", vertexType)
