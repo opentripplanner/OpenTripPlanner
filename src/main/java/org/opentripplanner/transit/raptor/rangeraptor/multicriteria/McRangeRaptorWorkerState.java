@@ -36,7 +36,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     private final DestinationArrivalPaths<T> paths;
     private final HeuristicsProvider<T> heuristics;
     private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
-    private final CostCalculator<T> costCalculator;
+    private final CostCalculator costCalculator;
     private final TransitCalculator<T> transitCalculator;
 
     /**
@@ -47,7 +47,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
             Stops<T> stops,
             DestinationArrivalPaths<T> paths,
             HeuristicsProvider<T> heuristics,
-            CostCalculator<T> costCalculator,
+            CostCalculator costCalculator,
             TransitCalculator<T> transitCalculator,
             WorkerLifeCycle lifeCycle
     ) {

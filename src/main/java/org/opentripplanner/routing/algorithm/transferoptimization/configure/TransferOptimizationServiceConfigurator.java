@@ -104,7 +104,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
           TransferGenerator<T> transferGenerator,
           MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
           ToIntFunction<PathLeg<?>> costCalcForWaitOptimization,
-          CostCalculator<T> costCalculator
+          CostCalculator costCalculator
   ) {
     return new OptimizePathService<>(
             transferGenerator,

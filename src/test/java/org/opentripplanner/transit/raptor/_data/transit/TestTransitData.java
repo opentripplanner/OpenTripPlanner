@@ -52,8 +52,8 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   @Override
-  public CostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
-    return new DefaultCostCalculator<>(
+  public CostCalculator multiCriteriaCostCalculator() {
+    return new DefaultCostCalculator(
             costParamsBuilder.build(),
             stopBoarAlightCost()
     );

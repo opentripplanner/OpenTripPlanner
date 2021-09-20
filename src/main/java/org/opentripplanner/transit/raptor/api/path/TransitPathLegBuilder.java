@@ -8,8 +8,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 /**
  * Modifying a {@link TransitPathLeg} requires recalculating. This builder help cashing
  * new fields and calculating the cost for the caller.
- *
- * @param <T>
  */
 public class TransitPathLegBuilder<T extends RaptorTripSchedule> {
 
@@ -62,7 +60,7 @@ public class TransitPathLegBuilder<T extends RaptorTripSchedule> {
   }
 
   public TransitPathLeg<T> build(
-      CostCalculator<T> costCalculator,
+      CostCalculator costCalculator,
       RaptorSlackProvider slackProvider,
       boolean firstTransit,
       int fromStopArrivalTime
@@ -88,7 +86,7 @@ public class TransitPathLegBuilder<T extends RaptorTripSchedule> {
   /* private methods */
 
   private int cost(
-      CostCalculator<T> calc,
+      CostCalculator calc,
       RaptorSlackProvider slackProvider,
       boolean firstTransit,
       int fromStopArrivalTime

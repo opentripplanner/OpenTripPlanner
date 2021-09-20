@@ -39,7 +39,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   private final ZonedDateTime startOfTime;
 
-  private final CostCalculator<TripSchedule> generalizedCostCalculator;
+  private final CostCalculator generalizedCostCalculator;
 
 
   public RaptorRoutingRequestTransitData(
@@ -64,7 +64,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
         filter
     );
     this.transfers = transitLayer.getRaptorTransfersForRequest(routingRequest);
-    this.generalizedCostCalculator = new DefaultCostCalculator<>(
+    this.generalizedCostCalculator = new DefaultCostCalculator(
             McCostParamsMapper.map(routingRequest),
             transitLayer.getStopIndex().stopBoardAlightCosts
     );
@@ -96,7 +96,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public CostCalculator<TripSchedule> multiCriteriaCostCalculator() {
+  public CostCalculator multiCriteriaCostCalculator() {
     return generalizedCostCalculator;
   }
 

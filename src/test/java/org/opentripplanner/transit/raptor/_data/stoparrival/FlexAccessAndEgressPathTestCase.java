@@ -46,7 +46,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
     // The COST_CALCULATOR is not under test, so we use it to calculate correct cost values.
-    public static final DefaultCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+    public static final DefaultCostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, null, null
     );
 

@@ -26,7 +26,7 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 public final class McTransitWorker<T extends RaptorTripSchedule> implements RoutingStrategy<T> {
 
     private final McRangeRaptorWorkerState<T> state;
-    private final CostCalculator<T> costCalculator;
+    private final CostCalculator costCalculator;
     private final SlackProvider slackProvider;
     private final ParetoSet<PatternRide<T>> patternRides;
 
@@ -35,7 +35,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     public McTransitWorker(
         McRangeRaptorWorkerState<T> state,
         SlackProvider slackProvider,
-        CostCalculator<T> costCalculator,
+        CostCalculator costCalculator,
         DebugHandlerFactory<T> debugHandlerFactory
     ) {
         this.state = state;

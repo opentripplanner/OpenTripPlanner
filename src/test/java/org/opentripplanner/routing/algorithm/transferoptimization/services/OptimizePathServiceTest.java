@@ -34,7 +34,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
     private static final RaptorSlackProvider SLACK_PROVIDER = RaptorSlackProvider
             .defaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK);
 
-    public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+    public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE,

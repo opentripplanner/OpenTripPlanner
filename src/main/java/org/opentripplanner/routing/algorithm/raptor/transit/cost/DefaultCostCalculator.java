@@ -3,14 +3,13 @@ package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
  * <P/>
  * This class is immutable and thread safe.
  */
-public final class DefaultCostCalculator<T extends RaptorTripSchedule> implements CostCalculator<T> {
+public final class DefaultCostCalculator implements CostCalculator {
     private final int boardCostOnly;
     private final int boardAndTransferCost;
     private final int waitFactor;

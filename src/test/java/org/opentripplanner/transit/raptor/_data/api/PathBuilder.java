@@ -26,12 +26,12 @@ public class PathBuilder {
   private static final int BOARD_ALIGHT_OFFSET = 30;
 
   private final int alightSlack;
-  private final CostCalculator<TestTripSchedule> costCalculator;
+  private final CostCalculator costCalculator;
 
   private final List<Leg> legs = new ArrayList<>();
   private int startTime;
 
-  public PathBuilder(int alightSlack, CostCalculator<TestTripSchedule> costCalculator) {
+  public PathBuilder(int alightSlack, CostCalculator costCalculator) {
     this.alightSlack = alightSlack;
     this.costCalculator = costCalculator;
   }

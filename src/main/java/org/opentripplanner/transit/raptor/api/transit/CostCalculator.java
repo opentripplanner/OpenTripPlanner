@@ -1,13 +1,11 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-
 /**
  * The responsibility is to calculate multi-criteria value (like the generalized cost).
  * <P/>
  * The implementation should be immutable and thread safe.
  */
-public interface CostCalculator<T extends RaptorTripSchedule> {
+public interface CostCalculator {
 
     /**
      * Calculate cost when on-board of a trip. The cost is only used to compare to paths on the

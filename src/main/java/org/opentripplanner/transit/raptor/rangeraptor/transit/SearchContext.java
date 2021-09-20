@@ -46,7 +46,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     protected final RaptorTransitDataProvider<T> transit;
 
     private final TransitCalculator<T> calculator;
-    private final CostCalculator<T> costCalculator;
+    private final CostCalculator costCalculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final PathMapper<T> pathMapper;
@@ -138,7 +138,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return pathMapper;
     }
 
-    public CostCalculator<T> costCalculator() {
+    public CostCalculator costCalculator() {
         return costCalculator;
     }
 
