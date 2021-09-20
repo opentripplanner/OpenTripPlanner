@@ -5,6 +5,7 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
@@ -34,7 +35,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
      * when searching FORWARD. Hence, searching in the same direction as the trip travel
      * direction.
      */
-    public static <S extends RaptorTripSchedule> BoarAndAlightTime findTripForwardSearch(
+    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripForwardSearch(
         ArrivalView<S> arrival
     ) {
         S trip = arrival.transitPath().trip();
@@ -50,7 +51,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
      * when searching in REVERSE. Hence, searching in the opposite direction of the trip
      * travel direction.
      */
-    public static <S extends RaptorTripSchedule> BoarAndAlightTime findTripReverseSearch(
+    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripReverseSearch(
         ArrivalView<S> arrival
     ) {
         S trip = arrival.transitPath().trip();
@@ -66,14 +67,14 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
      * when searching FORWARD. Hence, searching in the same direction as the trip travel
      * direction.
      */
-    public static <S extends RaptorTripSchedule> BoarAndAlightTime findTripTimes(TransitPathLeg<S> leg) {
+    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripTimes(TransitPathLeg<S> leg) {
         return new TripTimesSearch<>(leg.trip(), leg.fromStop(), leg.toStop())
             .findTripBefore(leg.toTime());
     }
 
     /* private methods */
 
-    private BoarAndAlightTime findTripAfter(final int earliestDepartureTime) {
+    private BoardAndAlightTime findTripAfter(final int earliestDepartureTime) {
         RaptorTripPattern p = schedule.pattern();
         final int size = p.numberOfStopsInPattern();
 
@@ -102,10 +103,10 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
                 earliestDepartureTime
             );
         }
-        return new BoarAndAlightTime(schedule, boardStopPos, i);
+        return new BoardAndAlightTime(schedule, boardStopPos, i);
     }
 
-    private BoarAndAlightTime findTripBefore(int latestArrivalTime) {
+    private BoardAndAlightTime findTripBefore(int latestArrivalTime) {
         RaptorTripPattern p = schedule.pattern();
         int i = schedule.findArrivalStopPosition(latestArrivalTime, toStop);
 
@@ -132,7 +133,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
                     latestArrivalTime
             );
         }
-        return new BoarAndAlightTime(schedule, i, alightStopPos);
+        return new BoardAndAlightTime(schedule, i, alightStopPos);
     }
 
     private IllegalStateException notFoundException(String hint, String lbl, int time) {

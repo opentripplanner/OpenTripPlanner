@@ -12,8 +12,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
 
 
 /**
@@ -91,7 +91,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         int fromStop = fromStopArrival.stop();
         int toStop = toStopArrival.stop();
 
-        BoarAndAlightTime r = findTripReverseSearch(fromStopArrival);
+        BoardAndAlightTime r = findTripReverseSearch(fromStopArrival);
         T trip = fromStopArrival.transitPath().trip();
         int arrivalTime = r.alightTime() + slackProvider.alightSlack(trip.pattern());
 
