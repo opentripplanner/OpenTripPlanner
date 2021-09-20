@@ -145,14 +145,25 @@ public class TripPatternType {
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
-                        .name("waitTimeAdjustedGeneralizedCost")
+                        .name("waitTimeOptimizedCost")
                         .description(
-                                "Adjusted generalized cost to distribute wait-time and avoid very " 
-                                + "short transfers. Used for debugging."
+                                "A cost calculated to distribute wait-time and avoid very "
+                                + "short transfers. This field is ment for debugging only."
                         )
                         .type(Scalars.GraphQLInt)
                         .dataFetcher(
-                                env -> itinerary(env).waitTimeAdjustedGeneralizedCost)
+                                env -> itinerary(env).waitTimeOptimizedCost)
+                        .build())
+                .field(GraphQLFieldDefinition
+                        .newFieldDefinition()
+                        .name("transferPriorityCost")
+                        .description(
+                                "A cost calculated to favor transfer with higher priority. This "
+                                        + "field is ment for debugging only."
+                        )
+                        .type(Scalars.GraphQLInt)
+                        .dataFetcher(
+                                env -> itinerary(env).transferPriorityCost)
                         .build())
                 .build();
     }

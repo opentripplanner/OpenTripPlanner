@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toOtpDomainCost;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +23,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -117,13 +118,12 @@ public class RaptorPathToItineraryMapper {
         Itinerary itinerary = new Itinerary(legs);
 
         // Map general itinerary fields
-        itinerary.generalizedCost = RaptorCostConverter.toOtpDomainCost(path.generalizedCost());
+        itinerary.generalizedCost = toOtpDomainCost(path.generalizedCost());
         itinerary.arrivedAtDestinationWithRentedVehicle = mapped != null && mapped.arrivedAtDestinationWithRentedVehicle;
 
         if(optimizedPath != null) {
-            itinerary.waitTimeAdjustedGeneralizedCost = RaptorCostConverter.toOtpDomainCost(
-                    optimizedPath.waitTimeOptimizedCost()
-            );
+            itinerary.waitTimeOptimizedCost = toOtpDomainCost(optimizedPath.waitTimeOptimizedCost());
+            itinerary.transferPriorityCost = toOtpDomainCost(optimizedPath.transferPriorityCost());
         }
 
         return itinerary;
@@ -194,7 +194,7 @@ public class RaptorPathToItineraryMapper {
 
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
-        leg.generalizedCost = RaptorCostConverter.toOtpDomainCost(pathLeg.generalizedCost());
+        leg.generalizedCost = toOtpDomainCost(pathLeg.generalizedCost());
 
         leg.dropOffBookingInfo = tripTimes.getDropOffBookingInfo(boardStopIndexInPattern);
         leg.pickupBookingInfo = tripTimes.getPickupBookingInfo(boardStopIndexInPattern);
@@ -269,7 +269,7 @@ public class RaptorPathToItineraryMapper {
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
             leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();
-            leg.generalizedCost = RaptorCostConverter.toOtpDomainCost(pathLeg.generalizedCost());
+            leg.generalizedCost = toOtpDomainCost(pathLeg.generalizedCost());
 
             if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
                 return List.of(leg);

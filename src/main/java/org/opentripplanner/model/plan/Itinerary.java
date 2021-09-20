@@ -70,14 +70,25 @@ public class Itinerary {
     public int generalizedCost = -1;
 
     /**
-     * This is the wait-time-adjusted-generalized-cost. The aim is to distribute wait-time and
-     * adding a high penalty on short transfers. Do not use this to compare or filter itineraries.
+     * This is the transfer-wait-time-cost. The aim is to distribute wait-time and adding a high penalty
+     * on short transfers. Do not use this to compare or filter itineraries.
      * The filtering on this parameter is done on paths, before mapping to itineraries and is
      * provided here as reference information.
      * <p>
      * -1 indicate that the cost is not set/computed.
      */
-    public int waitTimeAdjustedGeneralizedCost = -1;
+    public int waitTimeOptimizedCost = -1;
+
+    /**
+     * This is the transfer-priority-cost. If two paths ride the same trips with different
+     * transfers, this cost is used to pick the one with the best transfer constraints (guaranteed,
+     * stay-seated, not-allowed ...). Do not use this to compare or filter itineraries.
+     * The filtering on this parameter is done on paths, before mapping to itineraries and is
+     * provided here as reference information.
+     * <p>
+     * -1 indicate that the cost is not set/computed.
+     */
+    public int transferPriorityCost = -1;
 
     /**
      * This itinerary has a greater slope than the user requested (but there are no possible
