@@ -14,7 +14,7 @@ import org.entur.gbfs.v2_2.system_pricing_plans.GBFSSystemPricingPlans;
 import org.entur.gbfs.v2_2.system_regions.GBFSSystemRegions;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ class GbfsFeedLoaderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     void fetchAllPublicFeeds() throws IOException {
         InputStream is = HttpUtils.getData("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv");
         CsvReader reader = new CsvReader(is, StandardCharsets.UTF_8);
@@ -95,7 +95,6 @@ class GbfsFeedLoaderTest {
         while (reader.readRecord()) {
             try {
                 String url = reader.get("Auto-Discovery URL");
-                if (url.contains("gbfs.spin.pm"))
                 new GbfsFeedLoader(url, Map.of(), null).update();
             } catch (Exception e) {
                 exceptions.add(e);
@@ -106,7 +105,7 @@ class GbfsFeedLoaderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     void testSpin() {
         new GbfsFeedLoader("https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs", Map.of(), null).update();
     }
