@@ -7,15 +7,17 @@ import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
 
     private final TestTripPattern pattern;
     private final List<TestTripSchedule> schedules = new ArrayList<>();
-    private final TestTransferProvider transfersFrom = new TestTransferProvider();
-    private final TestTransferProvider transfersTo = new TestTransferProvider();
+    private final TestTransferConstraintSearch
+            transferConstraintsForwardSearch = new TestTransferConstraintSearch();
+    private final TestTransferConstraintSearch
+            transferConstraintsReverseSearch = new TestTransferConstraintSearch();
 
 
     private TestRoute(TestTripPattern pattern) {
@@ -51,13 +53,13 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     }
 
     @Override
-    public RaptorTransferConstraintsProvider<TestTripSchedule> getTransferConstraintsTo() {
-        return transfersTo;
+    public RaptorTransferConstraintSearch<TestTripSchedule> transferConstraintsForwardSearch() {
+        return transferConstraintsForwardSearch;
     }
 
     @Override
-    public RaptorTransferConstraintsProvider<TestTripSchedule> getTransferConstraintsFrom() {
-        return transfersFrom;
+    public RaptorTransferConstraintSearch<TestTripSchedule> transferConstraintsReverseSearch() {
+        return transferConstraintsReverseSearch;
     }
 
     public TestRoute withTimetable(TestTripSchedule ... trips) {
@@ -89,7 +91,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
             int toStopPos
     ) {
         int fromTime = fromTrip.arrival(fromStopPos);
-        this.transfersFrom.addGuaranteedTransfers(
+        this.transferConstraintsForwardSearch.addGuaranteedTransfers(
                 toTrip, toStopPos, fromTrip, fromTripIndex, fromStopPos, fromTime
         );
     }
@@ -103,7 +105,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
             ) {
         final int toTime = toTrip.departure(toStopPos);
         // This is used in the revers search
-        this.transfersTo.addGuaranteedTransfers(
+        this.transferConstraintsReverseSearch.addGuaranteedTransfers(
                 fromTrip, fromStopPos, toTrip, toTripIndex, toStopPos, toTime
         );
     }

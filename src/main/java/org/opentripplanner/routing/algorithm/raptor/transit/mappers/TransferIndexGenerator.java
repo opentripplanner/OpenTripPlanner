@@ -49,8 +49,8 @@ public class TransferIndexGenerator {
                         if (fromTrip != null && toTrip != null) {
                             var fromPattern = patternByTrip.get(fromTrip);
                             if (fromPattern != null) {
-                                pattern.addTransferConstraintsTo(tx);
-                                fromPattern.addTransferConstraintsFrom(tx);
+                                pattern.addTransferConstraintsForwardSearch(tx);
+                                fromPattern.addTransferConstraintsReverseSearch(tx);
                             }
                         }
                     }

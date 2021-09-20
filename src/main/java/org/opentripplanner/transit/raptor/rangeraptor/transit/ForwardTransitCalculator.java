@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
@@ -116,8 +116,10 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public RaptorTransferConstraintsProvider<T> transferConstraints(RaptorRoute<T> route) {
-        return route.getTransferConstraintsTo();
+    public RaptorTransferConstraintSearch<T> transferConstraintsSearch(RaptorRoute<T> route) {
+        // TODO TGR - this is clearly wrong, the fix will be in a later commit - not in this
+        //          - refactor.
+        return route.transferConstraintsReverseSearch();
     }
 
     @Override

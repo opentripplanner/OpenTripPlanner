@@ -8,7 +8,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -157,11 +157,11 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
 
     /**
-     * Return a guaranteed transfer provider for the given pattern. When searching forward the
+     * Return a transfer provider for the given pattern. When searching forward the
      * given {@code target} is the TO pattern/stop, while when searching in reverse the given
      * target is the FROM pattern/stop.
      */
-    RaptorTransferConstraintsProvider<T> transferConstraints(RaptorRoute<T> route);
+    RaptorTransferConstraintSearch<T> transferConstraintsSearch(RaptorRoute<T> route);
 
     /**
      * Return a calculator for test purpose. The following parameters are fixed:

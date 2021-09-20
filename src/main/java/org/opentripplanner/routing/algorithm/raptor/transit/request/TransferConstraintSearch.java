@@ -7,20 +7,20 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
 /**
- * The responsibility of this class is to provide guaranteed transfers to the Raptor search
+ * The responsibility of this class is to provide transfer constraints to the Raptor search
  * for a given pattern. The instance is stateful and not thread-safe. The current stop
  * position is checked for transfers, then the provider is asked to list all transfers
  * between the current pattern and the source trip stop arrival. The source is the "from"
  * point in a transfer for a forward search, and the "to" point in the reverse search.
  */
 public final class TransferConstraintSearch
-        implements RaptorTransferConstraintsProvider<TripSchedule> {
+        implements RaptorTransferConstraintSearch<TripSchedule> {
 
     private static final int NOT_FOUND = -999_999_999;
     private static final DirectionHelper FORWARD_HELPER = new ForwardDirectionHelper();
@@ -136,9 +136,7 @@ public final class TransferConstraintSearch
                 int departureTime = it.departure(stopPos);
                 if(departureTime < sourceArrivalTime) { continue; }
                 if(departureTime > maxLimit) { return NOT_FOUND; }
-                if(it.getOriginalTripTimes().getTrip() == trip) {
-                    return i;
-                }
+                if(it.getOriginalTripTimes().getTrip() == trip) { return i; }
             }
             return NOT_FOUND;
         }
@@ -169,9 +167,7 @@ public final class TransferConstraintSearch
                 int arrivalTime = time(it, stopPos);
                 if(arrivalTime < minLimit) { continue; }
                 if(arrivalTime > toDepartureTime) { return NOT_FOUND; }
-                if(it.getOriginalTripTimes().getTrip() == trip) {
-                    return i;
-                }
+                if(it.getOriginalTripTimes().getTrip() == trip) { return i; }
             }
             return NOT_FOUND;
         }

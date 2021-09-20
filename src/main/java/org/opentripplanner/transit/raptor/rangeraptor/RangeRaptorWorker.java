@@ -12,7 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
@@ -94,7 +94,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private final int minNumberOfRounds;
 
-    private final boolean enableConstrainedTransfers;
+    private final boolean enableTransferConstraints;
 
     private boolean inFirstIteration = true;
 
@@ -115,7 +115,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             TransitCalculator<T> calculator,
             LifeCycleEventPublisher lifeCyclePublisher,
             WorkerPerformanceTimers timers,
-            boolean enableConstrainedTransfers
+            boolean enableTransferConstraints
     ) {
         this.transitWorker = transitWorker;
         this.state = state;
@@ -126,7 +126,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         this.accessArrivedByWalking = groupByRound(accessPaths, Predicate.not(RaptorTransfer::stopReachedOnBoard));
         this.accessArrivedOnBoard = groupByRound(accessPaths, RaptorTransfer::stopReachedOnBoard);
         this.minNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
-        this.enableConstrainedTransfers = enableConstrainedTransfers;
+        this.enableTransferConstraints = enableTransferConstraints;
 
         // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
         // "everyone" by providing access to it in the context.
@@ -213,8 +213,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 var route = routeIterator.next();
                 var pattern = route.pattern();
                 var tripSearch = createTripSearch(route.timetable());
-                var txService = enableConstrainedTransfers
-                        ? calculator.transferConstraints(route) : null;
+                var txService = enableTransferConstraints
+                        ? calculator.transferConstraintsSearch(route) : null;
 
                 slackProvider.setCurrentPattern(pattern);
                 transitWorker.prepareForTransitWith(pattern);
@@ -279,11 +279,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private boolean boardWithConstrainedTransfer(
             RaptorTimeTable<T> timetable,
-            RaptorTransferConstraintsProvider<T> txService,
+            RaptorTransferConstraintSearch<T> txService,
             int targetStopIndex,
             int targetStopPos
     ) {
-        if(!enableConstrainedTransfers) { return false; }
+        if(!enableTransferConstraints) { return false; }
 
         if(!txService.transferExist(targetStopPos)) { return false; }
 

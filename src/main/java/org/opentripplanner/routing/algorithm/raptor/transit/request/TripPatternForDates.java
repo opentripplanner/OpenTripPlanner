@@ -8,7 +8,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRapto
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 /**
@@ -56,16 +56,14 @@ public class TripPatternForDates
         return this;
     }
 
-
-    // TODO
     @Override
-    public RaptorTransferConstraintsProvider<TripSchedule> getTransferConstraintsTo() {
-        return getTripPattern().getTransferConstraintsTo();
+    public RaptorTransferConstraintSearch<TripSchedule> transferConstraintsForwardSearch() {
+        return getTripPattern().constrainedTransferForwardSearch();
     }
 
     @Override
-    public RaptorTransferConstraintsProvider<TripSchedule> getTransferConstraintsFrom() {
-        return getTripPattern().getTransferConstraintsFrom();
+    public RaptorTransferConstraintSearch<TripSchedule> transferConstraintsReverseSearch() {
+        return getTripPattern().constrainedTransferReverseSearch();
     }
 
     // Implementing RaptorTripPattern

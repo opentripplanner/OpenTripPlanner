@@ -7,10 +7,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
-public class TestTransferProvider implements RaptorTransferConstraintsProvider<TestTripSchedule> {
+public class TestTransferConstraintSearch implements RaptorTransferConstraintSearch<TestTripSchedule> {
 
     /** Index of guaranteed transfers by fromStopPos */
     private final TIntObjectMap<List<GuaranteedTransfer>> transfersByFromStopPos = new TIntObjectHashMap<>();
@@ -65,7 +65,7 @@ public class TestTransferProvider implements RaptorTransferConstraintsProvider<T
 
     @Override
     public String toString() {
-        return ToStringBuilder.of(TestTransferProvider.class)
+        return ToStringBuilder.of(TestTransferConstraintSearch.class)
                 .addNum("currentTargetStopPos", currentTargetStopPos)
                 .addObj("index", transfersByFromStopPos)
                 .toString();
