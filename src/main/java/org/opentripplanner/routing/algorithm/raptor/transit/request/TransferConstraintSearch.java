@@ -19,7 +19,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  * between the current pattern and the source trip stop arrival. The source is the "from"
  * point in a transfer for a forward search, and the "to" point in the reverse search.
  */
-public final class PatternTransferConstraintsProvider
+public final class TransferConstraintSearch
         implements RaptorTransferConstraintsProvider<TripSchedule> {
 
     private static final int NOT_FOUND = -999_999_999;
@@ -35,7 +35,7 @@ public final class PatternTransferConstraintsProvider
 
     private List<ConstrainedTransfer> currentTransfers;
 
-    public PatternTransferConstraintsProvider(
+    public TransferConstraintSearch(
             boolean forwardSearch,
             TIntObjectMap<List<ConstrainedTransfer>> transfers
     ) {

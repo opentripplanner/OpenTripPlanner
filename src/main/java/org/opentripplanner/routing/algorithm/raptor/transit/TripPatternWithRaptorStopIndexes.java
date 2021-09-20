@@ -9,7 +9,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.PatternTransferConstraintsProvider;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintsProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
@@ -59,11 +59,11 @@ public class TripPatternWithRaptorStopIndexes {
     }
 
     public RaptorTransferConstraintsProvider<TripSchedule> getTransferConstraintsTo() {
-        return new PatternTransferConstraintsProvider(true, transferConstraintsTo);
+        return new TransferConstraintSearch(true, transferConstraintsTo);
     }
 
     public RaptorTransferConstraintsProvider<TripSchedule> getTransferConstraintsFrom() {
-        return new PatternTransferConstraintsProvider(false, transferConstraintsFrom);
+        return new TransferConstraintSearch(false, transferConstraintsFrom);
     }
 
 
