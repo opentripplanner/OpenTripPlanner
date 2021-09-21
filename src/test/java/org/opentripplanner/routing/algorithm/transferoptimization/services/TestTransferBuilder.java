@@ -23,7 +23,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     private boolean staySeated = false;
     private boolean guaranteed = false;
     private TransferPriority priority = TransferPriority.ALLOWED;
-    private int maxWaitTime = ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET;
+    private int maxWaitTime = TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 
     private TestTransferBuilder(
             T fromTrip,

@@ -18,12 +18,6 @@ public final class ConstrainedTransfer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Regular street transfers should be given this cost.
-     */
-    public static final int MAX_WAIT_TIME_NOT_SET = -1;
-
-
     private final TransferPoint from;
 
     private final TransferPoint to;

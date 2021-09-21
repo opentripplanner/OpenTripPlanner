@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import static org.opentripplanner.model.transfer.ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET;
+import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -3,7 +3,7 @@ package org.opentripplanner.model.transfer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.model.transfer.ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET;
+import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 
 import org.junit.Before;
@@ -11,8 +11,12 @@ import org.junit.Test;
 
 public class ConstrainedTransferTest implements TransferTestData {
 
-  private static final TransferConstraint NO_CONSTRAINS = new TransferConstraint(ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
-  private static final TransferConstraint GUARANTIED = new TransferConstraint(ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET);
+  private static final TransferConstraint NO_CONSTRAINS = new TransferConstraint(
+          ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET
+  );
+  private static final TransferConstraint GUARANTIED = new TransferConstraint(
+          ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET
+  );
 
   private final ConstrainedTransfer TX_A_TO_B = new ConstrainedTransfer(STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
   private final ConstrainedTransfer TX_A_TO_R22 = new ConstrainedTransfer(STOP_POINT_A, ROUTE_POINT_22, NO_CONSTRAINS);

@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import static org.opentripplanner.model.transfer.ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET;
+import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 
 import java.util.List;

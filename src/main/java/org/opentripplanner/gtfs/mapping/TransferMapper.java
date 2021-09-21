@@ -1,5 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -157,7 +159,7 @@ class TransferMapper {
                 transferPriority,
                 staySeated,
                 guaranteed,
-                ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET
+                MAX_WAIT_TIME_NOT_SET
         );
         var transfer = new ConstrainedTransfer(
                 fromPoint,
