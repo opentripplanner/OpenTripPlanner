@@ -1092,7 +1092,9 @@ otp.widgets.tripoptions.AdditionalTripParameters =
             if (data.queryParams.additionalParameters) {
                 var str = '';
                 var keys = data.queryParams.additionalParameters.split(',');
-                var params = {};
+                var params = {
+                  additionalParameters: data.queryParams.additionalParameters
+                };
 
                 _.each(keys, function (key) {
                     str += key + '=' + data.queryParams[key] + '\n';
