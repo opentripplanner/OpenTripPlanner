@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.api.PathBuilder;
+import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -34,7 +34,7 @@ class TransferGeneratorTest implements RaptorTestConstants {
             TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK
     );
 
-    private final PathBuilder pathBuilder = new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+    private final TestPathBuilder pathBuilder = new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
 
     private final TestTransitData data = new TestTransitData();
 

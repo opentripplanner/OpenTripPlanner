@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.api.PathBuilder;
+import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
@@ -42,8 +42,8 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
             null
     );
 
-    static PathBuilder pathBuilder() {
-        return new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+    static TestPathBuilder pathBuilder() {
+        return new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
     }
 
     /**

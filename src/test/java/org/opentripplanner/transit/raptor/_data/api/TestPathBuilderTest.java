@@ -31,9 +31,9 @@ import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 /**
  * Test the PathBuilder to be sure that it works properly before using it in other tests.
  */
-public class PathBuilderTest implements RaptorTestConstants {
+public class TestPathBuilderTest implements RaptorTestConstants {
 
-  private final PathBuilder subject = new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+  private final TestPathBuilder subject = new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
 
   @Test
   public void testSimplePathWithOneTransit() {

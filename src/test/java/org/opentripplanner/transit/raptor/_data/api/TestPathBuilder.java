@@ -21,7 +21,7 @@ import org.opentripplanner.util.time.TimeUtils;
  * Utility to help build paths for testing. The path builder is "reusable",
  * every time the {@code access(...)} methods are called the builder reset it self.
  */
-public class PathBuilder {
+public class TestPathBuilder {
   private static final int NOT_SET = -1;
   private static final int BOARD_ALIGHT_OFFSET = 30;
 
@@ -31,30 +31,30 @@ public class PathBuilder {
   private final List<Leg> legs = new ArrayList<>();
   private int startTime;
 
-  public PathBuilder(int alightSlack, CostCalculator costCalculator) {
+  public TestPathBuilder(int alightSlack, CostCalculator costCalculator) {
     this.alightSlack = alightSlack;
     this.costCalculator = costCalculator;
   }
 
-  public PathBuilder access(int startTime, int duration, int toStop) {
+  public TestPathBuilder access(int startTime, int duration, int toStop) {
     return access(startTime, TestTransfer.walk(toStop, duration));
   }
 
-  public PathBuilder access(int startTime, TestTransfer transfer) {
+  public TestPathBuilder access(int startTime, TestTransfer transfer) {
     reset(startTime);
     legs.add(new Leg(startTime, NOT_SET, transfer));
     return this;
   }
 
-  public PathBuilder walk(int duration, int toStop) {
+  public TestPathBuilder walk(int duration, int toStop) {
     return transfer(TestTransfer.walk(toStop, duration));
   }
 
-  public PathBuilder walk(int duration, int toStop, int cost) {
+  public TestPathBuilder walk(int duration, int toStop, int cost) {
     return transfer(TestTransfer.walk(toStop, duration, cost));
   }
 
-  public PathBuilder bus(TestTripSchedule trip, int toStop) {
+  public TestPathBuilder bus(TestTripSchedule trip, int toStop) {
     int fromStop = prev().toStop;
     int fromTime = trip.departure(trip.pattern().findStopPositionAfter(0, fromStop));
     int toTime = trip.arrival(trip.pattern().findStopPositionAfter(0, toStop));
@@ -62,7 +62,7 @@ public class PathBuilder {
     return transit(fromStop, fromTime, toStop, toTime, trip);
   }
 
-  public PathBuilder bus(String patternName, int fromTime, int duration, int toStop) {
+  public TestPathBuilder bus(String patternName, int fromTime, int duration, int toStop) {
     int fromStop = prev().toStop;
     int toTime = fromTime + duration;
 
@@ -125,14 +125,14 @@ public class PathBuilder {
     }
   }
 
-  private PathBuilder transfer(TestTransfer transfer) {
+  private TestPathBuilder transfer(TestTransfer transfer) {
     int fromStop = prev().toStop;
     int fromTime = prev().toTime + alightSlack;
     legs.add(new Leg(fromTime, fromStop, transfer));
     return this;
   }
 
-  private PathBuilder transit(
+  private TestPathBuilder transit(
           int fromStop, int fromTime, int toStop, int toTime, @NotNull TestTripSchedule trip
   ) {
     legs.add(new Leg(fromTime, fromStop, toTime, toStop, trip));
