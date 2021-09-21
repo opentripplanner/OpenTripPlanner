@@ -82,7 +82,7 @@ public final class TransferConstraintSearch
         var trip = timetable.getTripSchedule(tripIndex);
         int departureTime = translator.time(trip, targetStopPos);
 
-        return new Result(tripIndex, trip, targetStopPos, departureTime);
+        return new ConstrainedTransferBoarding(tripIndex, trip, targetStopPos, departureTime);
     }
 
     private ConstrainedTransfer findMatchingTargetPoint(
@@ -173,22 +173,4 @@ public final class TransferConstraintSearch
         }
     }
 
-    private static class Result implements RaptorTripScheduleBoardOrAlightEvent<TripSchedule> {
-        private final int tripIndex;
-        private final TripSchedule trip;
-        private final int stopPositionInPattern;
-        private final int time;
-
-        private Result(int tripIndex, TripSchedule trip, int stopPositionInPattern, int time) {
-            this.tripIndex = tripIndex;
-            this.trip = trip;
-            this.stopPositionInPattern = stopPositionInPattern;
-            this.time = time;
-        }
-
-        @Override public int getTripIndex() { return tripIndex; }
-        @Override public TripSchedule getTrip() { return trip; }
-        @Override public int getStopPositionInPattern() { return stopPositionInPattern; }
-        @Override public int getTime() { return time; }
-    }
 }
