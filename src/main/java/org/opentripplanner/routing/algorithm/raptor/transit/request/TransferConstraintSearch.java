@@ -157,16 +157,16 @@ public final class TransferConstraintSearch
                 RaptorTimeTable<TripSchedule> timetable,
                 Trip trip,
                 int stopPos,
-                int toDepartureTime
+                int sourceDepartureTime
         ) {
             // Abort after 6 hours
-            int minLimit = toDepartureTime - 3600 * 6;
+            int minLimit = sourceDepartureTime - 3600 * 6;
 
             for (int i = 0; i < timetable.numberOfTripSchedules(); i++) {
                 var it = timetable.getTripSchedule(i);
-                int arrivalTime = time(it, stopPos);
+                int arrivalTime = it.arrival(stopPos);
                 if(arrivalTime < minLimit) { continue; }
-                if(arrivalTime > toDepartureTime) { return NOT_FOUND; }
+                if(arrivalTime > sourceDepartureTime) { return NOT_FOUND; }
                 if(it.getOriginalTripTimes().getTrip() == trip) { return i; }
             }
             return NOT_FOUND;

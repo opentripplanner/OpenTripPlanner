@@ -14,10 +14,10 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
 
     private final TestTripPattern pattern;
     private final List<TestTripSchedule> schedules = new ArrayList<>();
-    private final TestTransferConstraintSearch
-            transferConstraintsForwardSearch = new TestTransferConstraintSearch();
-    private final TestTransferConstraintSearch
-            transferConstraintsReverseSearch = new TestTransferConstraintSearch();
+    private final TestTransferConstraintSearch transferConstraintsForwardSearch =
+            new TestTransferConstraintSearch();
+    private final TestTransferConstraintSearch transferConstraintsReverseSearch =
+            new TestTransferConstraintSearch();
 
 
     private TestRoute(TestTripPattern pattern) {
@@ -83,30 +83,35 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
                 .toString();
     }
 
-    void addGuaranteedTxFrom(
-            TestTripSchedule fromTrip,
-            int fromTripIndex,
-            int fromStopPos,
-            TestTripSchedule toTrip,
-            int toStopPos
+    void addGuaranteedTxForwardSearch(
+            TestTripSchedule sourceTrip,
+            int sourceStopPos,
+            TestTripSchedule targetTrip,
+            int targetTripIndex,
+            int targetStopPos
     ) {
-        int fromTime = fromTrip.arrival(fromStopPos);
+        final int targetTime = targetTrip.arrival(targetStopPos);
+
         this.transferConstraintsForwardSearch.addGuaranteedTransfers(
-                toTrip, toStopPos, fromTrip, fromTripIndex, fromStopPos, fromTime
+                sourceTrip, sourceStopPos, targetTrip, targetTripIndex, targetStopPos, targetTime
         );
     }
 
-    void addGuaranteedTxTo(
-            TestTripSchedule fromTrip,
-            int fromStopPos,
-            TestTripSchedule toTrip,
-            int toTripIndex,
-            int toStopPos
-            ) {
-        final int toTime = toTrip.departure(toStopPos);
+    /**
+     * Reverse search transfer, the {@code source/target} is the trips in order of the reverse
+     * search, which is opposite from {@code from/to} in the result path.
+     */
+    void addGuaranteedTxReverseSearch(
+            TestTripSchedule sourceTrip,
+            int sourceStopPos,
+            TestTripSchedule targetTrip,
+            int targetTripIndex,
+            int targetStopPos
+    ) {
+        final int targetTime = targetTrip.departure(targetStopPos);
         // This is used in the revers search
         this.transferConstraintsReverseSearch.addGuaranteedTransfers(
-                fromTrip, fromStopPos, toTrip, toTripIndex, toStopPos, toTime
+                sourceTrip, sourceStopPos, targetTrip, targetTripIndex, targetStopPos, targetTime
         );
     }
 }

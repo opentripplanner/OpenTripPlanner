@@ -117,9 +117,7 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
 
     @Override
     public RaptorTransferConstraintSearch<T> transferConstraintsSearch(RaptorRoute<T> route) {
-        // TODO TGR - this is clearly wrong, the fix will be in a later commit - not in this
-        //          - refactor.
-        return route.transferConstraintsReverseSearch();
+        return route.transferConstraintsForwardSearch();
     }
 
     @Override

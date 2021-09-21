@@ -64,11 +64,6 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     );
   }
 
-  private int[] stopBoarAlightCost() {
-    // Not implemented, no test for this yet.
-    return null;
-  }
-
   public TestRoute getRoute(int index) {
     return routes.get(index);
   }
@@ -121,11 +116,11 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     for (TestRoute route : routes) {
       for (int i = 0; i < route.timetable().numberOfTripSchedules(); i++) {
         var trip = route.timetable().getTripSchedule(i);
-        if(fromTrip == trip) {
-          route.addGuaranteedTxFrom(trip, i, fromStopPos, toTrip, toStopPos);
-        }
         if(toTrip == trip) {
-          route.addGuaranteedTxTo(fromTrip, fromStopPos, trip, i, toStopPos);
+          route.addGuaranteedTxForwardSearch(fromTrip, fromStopPos, trip, i, toStopPos);
+        }
+        if(fromTrip == trip) {
+          route.addGuaranteedTxReverseSearch(toTrip, toStopPos, trip, i, fromStopPos);
         }
       }
     }
@@ -169,6 +164,14 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
       }
     };
   };
+
+
+  /* private methods */
+
+  private int[] stopBoarAlightCost() {
+    // Not implemented, no test for this yet.
+    return null;
+  }
 
   private void expandNumOfStops(int stopIndex) {
     for (int i=numberOfStops(); i<=stopIndex; ++i) {
