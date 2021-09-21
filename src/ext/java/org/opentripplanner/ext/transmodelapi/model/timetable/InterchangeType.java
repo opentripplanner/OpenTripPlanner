@@ -7,6 +7,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.TransferConstraint;
 
 public class InterchangeType {
 
@@ -18,12 +19,12 @@ public class InterchangeType {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("staySeated")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> transfer(env).isStaySeated())
+                        .dataFetcher(env -> constraint(env).isStaySeated())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("guaranteed")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> transfer(env).isGuaranteed())
+                        .dataFetcher(env -> constraint(env).isGuaranteed())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("priority")
@@ -34,7 +35,7 @@ public class InterchangeType {
                                 + "transfer is preferred over a PREFERRED none-guarantied transfer."
                         )
                         .type(EnumTypes.INTERCHANGE_PRIORITY)
-                        .dataFetcher(env -> transfer(env).getPriority())
+                        .dataFetcher(env -> constraint(env).getPriority())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("maximumWaitTime")
@@ -44,7 +45,7 @@ public class InterchangeType {
                                 + "RESPECTED DURING ROUTING, JUST PASSED THROUGH]"
                         )
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(env -> transfer(env).getMaxWaitTime())
+                        .dataFetcher(env -> constraint(env).getMaxWaitTime())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("FromLine")
@@ -75,5 +76,9 @@ public class InterchangeType {
 
     private static ConstrainedTransfer transfer(DataFetchingEnvironment environment) {
         return environment.getSource();
+    }
+
+    private static TransferConstraint constraint(DataFetchingEnvironment environment) {
+        return transfer(environment).getConstraint();
     }
 }

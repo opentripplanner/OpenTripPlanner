@@ -108,13 +108,13 @@ public class OtpTransitServiceImplTest {
         // There is 9 transfers, but because of the route to trip we get more
         // TODO TGR - Support Route to trip expansion
         assertEquals(
-                //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), guaranteed}\n"
-                //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), guaranteed}\n"
-                "ConstrainedTransfer{from: (stop: K), to: (stop: L), priority: RECOMMENDED}\n"
-                + "ConstrainedTransfer{from: (stop: K), to: (stop: M), priority: NOT_ALLOWED}\n"
-                + "ConstrainedTransfer{from: (stop: L), to: (stop: K), priority: RECOMMENDED}\n"
-                + "ConstrainedTransfer{from: (stop: M), to: (stop: K), priority: NOT_ALLOWED}\n"
-                + "ConstrainedTransfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), guaranteed}",
+                //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
+                //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
+                "ConstrainedTransfer{from: (stop: K), to: (stop: L), constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: (stop: K), to: (stop: M), constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: (stop: L), to: (stop: K), constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: (stop: M), to: (stop: K), constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), constraint: {guaranteed}}",
                 result
         );
     }

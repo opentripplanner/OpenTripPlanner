@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.val;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBuilder;
@@ -24,6 +25,10 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule> {
+
+  private static final TransferConstraint GUARANTEED = new TransferConstraint(
+          TransferPriority.ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET
+  );
 
   private final List<List<RaptorTransfer>> transfersByStop = new ArrayList<>();
   private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
@@ -124,14 +129,13 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
         }
       }
     }
-    guaranteedTransfers.add(new ConstrainedTransfer(
+    guaranteedTransfers.add(
+        new ConstrainedTransfer(
             new TestTransferPoint(fromStop, fromTrip),
             new TestTransferPoint(toStop, toTrip),
-            TransferPriority.ALLOWED,
-            false,
-            true,
-            MAX_WAIT_TIME_NOT_SET
-    ));
+            GUARANTEED
+        )
+    );
     return this;
   }
 

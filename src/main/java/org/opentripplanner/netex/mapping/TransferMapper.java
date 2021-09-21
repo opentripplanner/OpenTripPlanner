@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
+import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 
 import com.google.common.collect.ArrayListMultimap;
 import javax.annotation.Nullable;
@@ -9,6 +10,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.netex.issues.InterchangePointMappingFailed;
@@ -64,9 +66,10 @@ public class TransferMapper {
         var staySeated = isTrue(it.isStaySeated());
         var guaranteed = isTrue(it.isGuaranteed());
         var priority = mapPriority(it.getPriority());
-        var maxWaitTime = DurationMapper.mapDurationToSec(it.getMaximumWaitTime(), ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET);
+        var maxWaitTime = DurationMapper.mapDurationToSec(it.getMaximumWaitTime(), MAX_WAIT_TIME_NOT_SET);
 
-        var tx = new ConstrainedTransfer(from, to, priority, staySeated, guaranteed, maxWaitTime);
+        var c = new TransferConstraint(priority, staySeated, guaranteed, maxWaitTime);
+        var tx = new ConstrainedTransfer(from, to, c);
 
         if(tx.noConstraints()) {
             issueStore.add(new InterchangeWithoutConstraint(tx));

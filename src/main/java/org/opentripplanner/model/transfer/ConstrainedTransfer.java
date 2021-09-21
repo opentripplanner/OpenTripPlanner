@@ -1,8 +1,6 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.transfer;
 
-import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
-
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -18,44 +16,28 @@ import org.opentripplanner.model.base.ToStringBuilder;
  */
 public final class ConstrainedTransfer implements Serializable {
 
-    /**
-     * Regular street transfers should be given this cost.
-     */
-    public static final int NEUTRAL_PRIORITY_COST = 0;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Regular street transfers should be given this cost.
      */
     public static final int MAX_WAIT_TIME_NOT_SET = -1;
 
-    private static final long serialVersionUID = 1L;
 
     private final TransferPoint from;
 
     private final TransferPoint to;
 
-    private final TransferPriority priority;
-
-    private final boolean staySeated;
-
-    private final boolean guaranteed;
-
-    private final int maxWaitTime;
+    private final TransferConstraint constraint;
 
     public ConstrainedTransfer(
             TransferPoint from,
             TransferPoint to,
-            TransferPriority priority,
-            boolean staySeated,
-            boolean guaranteed,
-            int maxWaitTime
+            TransferConstraint constraint
     ) {
         this.from = from;
         this.to = to;
-        this.priority = priority;
-        this.staySeated = staySeated;
-        this.guaranteed = guaranteed;
-        this.maxWaitTime = maxWaitTime;
+        this.constraint = constraint;
     }
 
     /**
@@ -67,7 +49,7 @@ public final class ConstrainedTransfer implements Serializable {
      * @see TransferPriority#cost(boolean, boolean)
      */
     public static int priorityCost(@Nullable ConstrainedTransfer t) {
-        return t == null ? NEUTRAL_PRIORITY_COST : t.priority.cost(t.staySeated, t.guaranteed);
+        return t==null ? TransferPriority.NEUTRAL_PRIORITY_COST : t.constraint.priorityCost();
     }
 
     public TransferPoint getFrom() {
@@ -78,20 +60,16 @@ public final class ConstrainedTransfer implements Serializable {
         return to;
     }
 
-    public TransferPriority getPriority() {
-        return priority;
-    }
-
-    public boolean isStaySeated() {
-        return staySeated;
-    }
-
-    public boolean isGuaranteed() {
-        return guaranteed;
+    public TransferConstraint getConstraint() {
+        return constraint;
     }
 
     public boolean includeSlack() {
-        return !(guaranteed || staySeated);
+        return !constraint.isFacilitated();
+    }
+
+    public boolean noConstraints() {
+        return constraint.noConstraints();
     }
 
     public boolean matchesStopPos(int fromStopPos, int toStopPos) {
@@ -103,7 +81,7 @@ public final class ConstrainedTransfer implements Serializable {
      * for the delayed trip.
      */
     public int getMaxWaitTime() {
-        return maxWaitTime;
+        return getConstraint().getMaxWaitTime();
     }
 
     /**
@@ -117,7 +95,7 @@ public final class ConstrainedTransfer implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(from, to, priority, staySeated, guaranteed);
+        return Objects.hash(from, to, constraint);
     }
 
     @Override
@@ -125,9 +103,7 @@ public final class ConstrainedTransfer implements Serializable {
         if (this == o) { return true; }
         if (!(o instanceof ConstrainedTransfer)) { return false; }
         final ConstrainedTransfer transfer = (ConstrainedTransfer) o;
-        return staySeated == transfer.staySeated
-                && guaranteed == transfer.guaranteed
-                && priority == transfer.priority
+        return Objects.equals(constraint, transfer.constraint)
                 && Objects.equals(from, transfer.from)
                 && Objects.equals(to, transfer.to);
     }
@@ -136,16 +112,7 @@ public final class ConstrainedTransfer implements Serializable {
         return ToStringBuilder.of(ConstrainedTransfer.class)
                 .addObj("from", from)
                 .addObj("to", to)
-                .addEnum("priority", priority, ALLOWED)
-                .addDurationSec("maxWaitTime", maxWaitTime, MAX_WAIT_TIME_NOT_SET)
-                .addBoolIfTrue("staySeated", staySeated)
-                .addBoolIfTrue("guaranteed", guaranteed)
+                .addObj("constraint", constraint)
                 .toString();
-    }
-
-    public boolean noConstraints() {
-        boolean prioritySet = priority != ALLOWED;
-        boolean maxWaitTimeSet = maxWaitTime != MAX_WAIT_TIME_NOT_SET;
-        return !(staySeated || guaranteed || prioritySet || maxWaitTimeSet);
     }
 }

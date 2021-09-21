@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
+import static org.opentripplanner.model.transfer.TransferPriority.NEUTRAL_PRIORITY_COST;
+
 import java.util.Map;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -30,7 +32,7 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
                 originalPath,
                 originalPath,
                 Map.of(),
-                ConstrainedTransfer.NEUTRAL_PRIORITY_COST,
+                NEUTRAL_PRIORITY_COST,
                 NEUTRAL_COST,
                 NEUTRAL_COST
         );

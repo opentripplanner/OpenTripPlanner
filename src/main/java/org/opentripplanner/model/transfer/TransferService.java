@@ -110,7 +110,7 @@ public class TransferService implements Serializable {
         TransferPoint from = transfer.getFrom();
         TransferPoint to = transfer.getTo();
 
-        addGuaranteedTransfer(transfer);
+        addFacilitatedTransfer(transfer);
 
         if (from instanceof TripTransferPoint) {
             var fromTrip = (TripTransferPoint) from;
@@ -177,9 +177,11 @@ public class TransferService implements Serializable {
         return false;
     }
 
-    private void addGuaranteedTransfer(ConstrainedTransfer transfer) {
+    private void addFacilitatedTransfer(ConstrainedTransfer transfer) {
+        var c = transfer.getConstraint();
         var toPoint = transfer.getTo();
-        if(transfer.isStaySeated() || transfer.isGuaranteed()) {
+
+        if(c.isFacilitated()) {
             if(toPoint instanceof TripTransferPoint) {
                 guaranteedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
             }

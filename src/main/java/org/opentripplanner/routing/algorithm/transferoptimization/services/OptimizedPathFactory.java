@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
+import static org.opentripplanner.model.transfer.TransferPriority.NEUTRAL_PRIORITY_COST;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.ToIntFunction;
@@ -48,7 +50,7 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
         return new OptimizedPathTail<>(
                 leg,
                 Map.of(),
-                ConstrainedTransfer.NEUTRAL_PRIORITY_COST,
+                NEUTRAL_PRIORITY_COST,
                 costCalcForWaitOptimization.applyAsInt(leg)
         );
     }

@@ -15,6 +15,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.StopTransferPoint;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
@@ -152,13 +153,16 @@ class TransferMapper {
 
     for (TransferPoint fromPoint : fromPoints) {
       for (TransferPoint toPoint : toPoints) {
-        var transfer = new ConstrainedTransfer(
-                fromPoint,
-                toPoint,
+        var constraint = new TransferConstraint(
                 transferPriority,
                 staySeated,
                 guaranteed,
                 ConstrainedTransfer.MAX_WAIT_TIME_NOT_SET
+        );
+        var transfer = new ConstrainedTransfer(
+                fromPoint,
+                toPoint,
+                constraint
         );
         result.add(transfer);
       }

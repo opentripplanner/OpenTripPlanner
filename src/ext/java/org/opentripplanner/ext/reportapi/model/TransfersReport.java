@@ -57,6 +57,7 @@ public class TransfersReport {
                     );
             var duration = (from.time == NOT_SET || to.time == NOT_SET)
                     ? "" : durationToStr(to.time - from.time);
+            var c = t.getConstraint();
 
             buf.addText(t.getFrom().getTrip().getOperator().getId().getId());
             buf.addText(from.tripId);
@@ -69,10 +70,10 @@ public class TransfersReport {
             buf.addTime(to.time, NOT_SET);
             buf.addText(duration);
             buf.addText(dist);
-            buf.addEnum(t.getPriority());
-            buf.addDuration(t.getMaxWaitTime(), MAX_WAIT_TIME_NOT_SET);
-            buf.addOptText(t.isStaySeated(), "YES");
-            buf.addOptText(t.isGuaranteed(), "YES");
+            buf.addEnum(c.getPriority());
+            buf.addDuration(c.getMaxWaitTime(), MAX_WAIT_TIME_NOT_SET);
+            buf.addOptText(c.isStaySeated(), "YES");
+            buf.addOptText(c.isGuaranteed(), "YES");
             buf.newLine();
         });
         return buf.toString();

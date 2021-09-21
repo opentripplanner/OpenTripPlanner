@@ -43,7 +43,8 @@ public class TransferIndexGenerator {
             for (int stopPos=0; stopPos < nStops; ++stopPos) {
                 var transfers= transferService.listGuaranteedTransfersTo(trip, stopPos);
                 for (ConstrainedTransfer tx : transfers) {
-                    if(tx.isGuaranteed() || tx.isStaySeated()) {
+                    var c = tx.getConstraint();
+                    if(c.isFacilitated()) {
                         var fromTrip = tx.getFrom().getTrip();
                         var toTrip = tx.getTo().getTrip();
                         if (fromTrip != null && toTrip != null) {

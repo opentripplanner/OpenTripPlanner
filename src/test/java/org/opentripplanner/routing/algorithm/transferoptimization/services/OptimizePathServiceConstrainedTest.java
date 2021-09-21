@@ -158,9 +158,9 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
             assertNotNull(transfer);
         }
         if (transfer != null) {
-            assertEquals(expPriority, transfer.getPriority(), transfer.toString());
-            assertEquals(expStaySeated, transfer.isStaySeated(), transfer.toString());
-            assertEquals(expGuaranteed, transfer.isGuaranteed(), transfer.toString());
+            assertEquals(expPriority, transfer.getConstraint().getPriority(), transfer.toString());
+            assertEquals(expStaySeated, transfer.getConstraint().isStaySeated(), transfer.toString());
+            assertEquals(expGuaranteed, transfer.getConstraint().isGuaranteed(), transfer.toString());
         }
     }
 }
