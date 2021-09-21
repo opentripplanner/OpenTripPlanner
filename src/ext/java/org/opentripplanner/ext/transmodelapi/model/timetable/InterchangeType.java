@@ -79,6 +79,6 @@ public class InterchangeType {
     }
 
     private static TransferConstraint constraint(DataFetchingEnvironment environment) {
-        return transfer(environment).getConstraint();
+        return transfer(environment).getTransferConstraint();
     }
 }

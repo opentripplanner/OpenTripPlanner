@@ -17,7 +17,6 @@ import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
@@ -184,7 +183,7 @@ public class TestDebugLogger implements DebugLogger {
     private static String path(ArrivalView<?> a) {
         return path(a, new PathStringBuilder(null))
                 .space().space().append("[ ")
-                .costCentiSec(a.cost())
+                .generalizedCostSentiSec(a.cost())
                 .append(" ]")
                 .toString();
     }
@@ -202,12 +201,12 @@ public class TestDebugLogger implements DebugLogger {
             // forward search
             String tripInfo = a.transitPath().trip().pattern().debugInfo();
             if(a.arrivalTime() > a.previous().arrivalTime()) {
-                BoardAndAlightTime t = TripTimesSearch.findTripForwardSearch(a);
+                var t = TripTimesSearch.findTripForwardSearch(a);
                 buf.transit(tripInfo, t.boardTime(), t.alightTime());
             }
             // reverse search
             else {
-                BoardAndAlightTime t = TripTimesSearch.findTripReverseSearch(a);
+                var t = TripTimesSearch.findTripReverseSearch(a);
                 buf.transit(tripInfo, t.alightTime(), t.boardTime());
             }
         } else if(a.arrivedByTransfer()) {

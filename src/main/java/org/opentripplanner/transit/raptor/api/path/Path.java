@@ -2,9 +2,11 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -180,20 +182,28 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     }
 
     public String toStringDetailed(IntFunction<String> stopNameTranslator) {
-        return toString(true, stopNameTranslator);
+        return buildString(true, stopNameTranslator, null);
     }
 
     public String toString(IntFunction<String> stopNameTranslator) {
-        return toString(false, stopNameTranslator);
+        return buildString(false, stopNameTranslator, null);
     }
 
     @Override
     public String toString() {
-        return toString(false, Integer::toString);
+        return buildString(false, null, null);
     }
 
-    public String toString(boolean detailed, IntFunction<String> stopNameTranslator) {
-        PathStringBuilder buf = new PathStringBuilder(stopNameTranslator);
+    protected String toString(boolean detailed, IntFunction<String> stopNameTranslator) {
+        return buildString(detailed, stopNameTranslator, null);
+    }
+
+    protected String buildString(
+            boolean detailed,
+            @Nullable IntFunction<String> stopNameTranslator,
+            @Nullable Consumer<PathStringBuilder> appendToSummary
+    ) {
+        var buf = new PathStringBuilder(stopNameTranslator);
         if(accessLeg != null) {
             int prevToTime = 0;
             for (PathLeg<T> leg : accessLeg.iterator()) {
@@ -216,7 +226,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                         );
                         if (detailed) {
                             buf.duration(leg.duration());
-                            buf.costCentiSec(leg.generalizedCost());
+                            buf.generalizedCostSentiSec(leg.generalizedCost());
                         }
                     }
                     else if (leg.isTransferLeg()) {
@@ -238,8 +248,13 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             buf.append("[")
                     .time(startTime, endTime)
                     .duration(endTime - startTime)
-                    .costCentiSec(generalizedCost)
-                    .append("]");
+                    .generalizedCostSentiSec(generalizedCost);
+
+            if(appendToSummary != null) {
+                appendToSummary.accept(buf);
+            }
+
+            buf.append("]");
         }
         return buf.toString();
     }

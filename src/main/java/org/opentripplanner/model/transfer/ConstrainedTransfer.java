@@ -54,7 +54,7 @@ public final class ConstrainedTransfer implements Serializable {
         return to;
     }
 
-    public TransferConstraint getConstraint() {
+    public TransferConstraint getTransferConstraint() {
         return constraint;
     }
 
@@ -68,14 +68,6 @@ public final class ConstrainedTransfer implements Serializable {
 
     public boolean matchesStopPos(int fromStopPos, int toStopPos) {
         return from.getStopPosition() == fromStopPos && to.getStopPosition() == toStopPos;
-    }
-
-    /**
-     * Maximum time after scheduled departure time the connecting transport is guarantied to wait
-     * for the delayed trip.
-     */
-    public int getMaxWaitTime() {
-        return getConstraint().getMaxWaitTime();
     }
 
     /**

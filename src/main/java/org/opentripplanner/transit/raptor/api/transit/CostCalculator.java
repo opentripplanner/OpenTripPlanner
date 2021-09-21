@@ -8,6 +8,12 @@ package org.opentripplanner.transit.raptor.api.transit;
 public interface CostCalculator {
 
     /**
+     * The cost is zero(0) it it is not calculated or if the cost "element" have no cost associated
+     * with it.
+     */
+    int ZERO_COST = 0;
+
+    /**
      * Calculate cost when on-board of a trip. The cost is only used to compare to paths on the
      * same trip - so any cost that is constant for a given trip can be dropped, but it will make
      * debugging easier if the cost can be compared with the "stop-arrival-cost". The cost must
@@ -24,10 +30,10 @@ public interface CostCalculator {
     );
 
     /**
-     * Calculate cost when on-board of a trip. The cost is only used to compare to paths on the
-     * same trip - so any cost that is constant for a given trip can be dropped, but it will make
-     * debugging easier if the cost can be compared with the "stop-arrival-cost". The cost must
-     * incorporate the fact that 2 boarding may happen at 2 different stops.
+     * Calculate cost of boarding a trip. This should be the cost of the waiting time,
+     * any board and transfer cost, and the penalty for the board stop visit. This cost should
+     * NOT include the previous stop arrival cost, but the incremental cost to be added to the
+     * previous stop arrival cost.
      *
      * @param boardTime          The time of boarding
      * @param transitFactorIndex The index used to look up the transit reluctance/factor

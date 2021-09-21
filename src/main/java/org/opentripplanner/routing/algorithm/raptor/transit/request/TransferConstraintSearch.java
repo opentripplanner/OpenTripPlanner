@@ -172,5 +172,4 @@ public final class TransferConstraintSearch
             return NOT_FOUND;
         }
     }
-
 }

@@ -178,7 +178,7 @@ public class TransferService implements Serializable {
     }
 
     private void addFacilitatedTransfer(ConstrainedTransfer transfer) {
-        var c = transfer.getConstraint();
+        var c = transfer.getTransferConstraint();
         var toPoint = transfer.getTo();
 
         if(c.isFacilitated()) {

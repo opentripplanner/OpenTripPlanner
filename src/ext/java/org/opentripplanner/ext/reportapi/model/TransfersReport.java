@@ -57,7 +57,7 @@ public class TransfersReport {
                     );
             var duration = (from.time == NOT_SET || to.time == NOT_SET)
                     ? "" : durationToStr(to.time - from.time);
-            var c = t.getConstraint();
+            var c = t.getTransferConstraint();
 
             buf.addText(t.getFrom().getTrip().getOperator().getId().getId());
             buf.addText(from.tripId);

@@ -34,7 +34,6 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
     ) {
         var accessPathLeg = new AccessPathLeg<>(originalPath.accessLeg(), tail.getLeg());
         return new OptimizedPath<>(
-                originalPath,
                 new Path<>(originalPath.rangeRaptorIterationDepartureTime(), accessPathLeg),
                 tail.getTransfersTo(),
                 tail.transferPriorityCost(),

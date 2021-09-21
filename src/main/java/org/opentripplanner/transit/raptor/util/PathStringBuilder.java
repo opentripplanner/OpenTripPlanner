@@ -91,12 +91,29 @@ public class PathStringBuilder {
     }
 
     public PathStringBuilder timeAndCostCentiSec(int fromTime, int toTime, int generalizedCost) {
-        return space().time(fromTime, toTime).costCentiSec(generalizedCost);
+        return space().time(fromTime, toTime).generalizedCostSentiSec(generalizedCost);
     }
 
-    public PathStringBuilder costCentiSec(int generalizedCost) {
-        if(generalizedCost <= 0) { return this; }
-        space().append(OtpNumberFormat.formatCost(generalizedCost));
+    /** Add generalizedCostCentiSec {@link #costCentiSec(int, String)} */
+    public PathStringBuilder generalizedCostSentiSec(int cost) {
+        return costCentiSec(cost, null);
+    }
+
+    /**
+     * Add a cost to the string with an optional unit. Try to be consistent with unit naming,
+     * use lower-case:
+     * <ul>
+     *     <li>{@code null} - Generalized-cost (no unit used)</li>
+     *     <li>{@code "wtc"} - Wait-time cost</li>
+     *     <li>{@code "pri"} - Transfer priority cost</li>
+     * </ul>
+     */
+    public PathStringBuilder costCentiSec(int cost, String unit) {
+        if(cost <= 0) { return this; }
+        space().append(OtpNumberFormat.formatCost(cost));
+        if(unit != null) {
+            append(unit);
+        }
         return this;
     }
 

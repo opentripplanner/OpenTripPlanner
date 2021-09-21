@@ -86,10 +86,10 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     public void board(
             final int stopIndex,
             final int earliestBoardTime,
-            final RaptorTripScheduleBoardOrAlightEvent<T> result
+            final RaptorTripScheduleBoardOrAlightEvent<T> boarding
     ) {
-        final T trip = result.getTrip();
-        final int boardTime = result.getTime();
+        final T trip = boarding.getTrip();
+        final int boardTime = boarding.getTime();
 
         if(prevArrival.arrivedByAccess()) {
             // What if access is FLEX with rides, should not FLEX alightSlack and
@@ -106,7 +106,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
             new PatternRide<>(
                 prevArrival,
                 stopIndex,
-                result.getStopPositionInPattern(),
+                boarding.getStopPositionInPattern(),
                 boardTime,
                 boardCost,
                 relativeBoardCost,
@@ -122,23 +122,19 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
 
     /**
      * Calculate a cost for riding a trip. It should include the cost from the beginning of the
-     * journey all the way until a trip is boarded. The cost is used to compare trips boarding
-     * the same pattern with the same number of transfers. It is ok for the cost to be relative
-     * to any point in place or time - as long as it can be used to compare to paths that started
-     * at the origin in the same iteration, having used the same number-of-rounds to board the same
-     * trip.
+     * journey all the way until a trip is boarded.
      *
      * @param prevArrival The stop-arrival where the trip was boarded.
      */
     private int calculateCostAtBoardTime(AbstractStopArrival<T> prevArrival, int boardTime) {
-        // Calculate the wait-time before the boarding witch should be accounted for in the cost
-        // calculation. Any slack at the end of the last leg is not part of this, because that is
-        // already accounted for. If the previous leg is an access-leg, then it is already
-        // time-shifted, witch is important for this calculation to be correct.
+        // Calculate the wait-time before the boarding.Any slack at the end of the last leg is not
+        // part of this, because that is already accounted for. If the previous leg is an
+        // access-leg, then it is already time-shifted, witch is important for this calculation to
+        // be correct.
         final int boardWaitTime = boardTime - prevArrival.arrivalTime();
 
-        boolean firstRide = prevArrival.arrivedByAccess()
-                && !prevArrival.accessPath().access().hasRides();
+        boolean firstRide = prevArrival.arrivedByAccess() &&
+                !prevArrival.accessPath().access().hasRides();
 
         return prevArrival.cost() + costCalculator.boardCost(
                 firstRide,

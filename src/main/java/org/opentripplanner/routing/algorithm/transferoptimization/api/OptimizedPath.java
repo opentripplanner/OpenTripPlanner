@@ -20,7 +20,6 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
 {
 
 
-    private final Path<T> originalPath;
     private final Map<PathLeg<T>, ConstrainedTransfer> transfersTo;
     private final int transferPriorityCost;
     private final int waitTimeOptimizedCost;
@@ -30,7 +29,6 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
     public OptimizedPath(Path<T> originalPath) {
         this(
                 originalPath,
-                originalPath,
                 Map.of(),
                 NEUTRAL_PRIORITY_COST,
                 NEUTRAL_COST,
@@ -39,7 +37,6 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
     }
 
     public OptimizedPath(
-            Path<T> originalPath,
             Path<T> path,
             Map<PathLeg<T>, ConstrainedTransfer> transfersTo,
             int transferPriorityCost,
@@ -47,7 +44,6 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
             int breakTieCost
     ) {
         super(path);
-        this.originalPath = originalPath;
         this.transfersTo = transfersTo;
         this.transferPriorityCost = transferPriorityCost;
         this.waitTimeOptimizedCost = waitTimeOptimizedCost;
@@ -71,19 +67,5 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
 
     public ConstrainedTransfer getTransferTo(PathLeg<?> leg) {
         return transfersTo.get(leg);
-    }
-
-    public boolean isSameAsOriginal() {
-        PathLeg<T> originalLeg = originalPath.accessLeg();
-        PathLeg<T> newLeg = accessLeg();
-
-        while (!originalLeg.isEgressLeg() && !newLeg.isEgressLeg()) {
-            if(originalLeg.toStop() != newLeg.toStop()) {
-                return false;
-            }
-            originalLeg = originalLeg.nextLeg();
-            newLeg = newLeg.nextLeg();
-        }
-        return true;
     }
 }

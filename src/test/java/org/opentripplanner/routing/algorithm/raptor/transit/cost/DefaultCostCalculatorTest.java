@@ -3,9 +3,8 @@ package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 
-public class CostCalculatorTest {
+public class DefaultCostCalculatorTest {
 
     private static final int BOARD_COST_SEC = 5;
     private static final int TRANSFER_COST_SEC = 2;
@@ -17,7 +16,7 @@ public class CostCalculatorTest {
     private static final int STOP_A = 0;
     private static final int STOP_B = 1;
 
-    private final CostCalculator subject = new DefaultCostCalculator(
+    private final DefaultCostCalculator subject = new DefaultCostCalculator(
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE_FACTOR,

@@ -19,13 +19,13 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 
 /**
- * This class is responsible for finding all possible transfers between two trips. The configured
- * slack should be respected, and the transfers found here should be equivalent to the transfers
- * explored during routing (in Raptor).
+ * This class is responsible for finding all possible transfers between each pair of transit legs
+ * passed in. The configured slack should be respected, and the transfers found here should be
+ * equivalent to the transfers explored during routing (in Raptor).
  * <p>
  * This class also filters away transfers which cannot be used due to time constraints. For example,
  * if a transfer point is before the the earliest possible boarding or after the latest possible
- * arrival.
+ * arrival. Transfer constraints should also be respected.
  * <p>
  * This service does NOT combine transfers between various trips to form full paths. There are
  * potentially millions of permutations, so we do that later when we can prune the result.
@@ -62,7 +62,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     for (int i = 1; i < transitLegs.size(); i++) {
       toLeg = transitLegs.get(i);
 
-      var transfers = findTransfers(fromLeg.trip(), earliestDeparture, toLeg.trip());
+      var transfers = findTransfers(
+              fromLeg.trip(), earliestDeparture, toLeg.trip()
+      );
 
       result.add(transfers);
 
@@ -157,7 +159,11 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     return result;
   }
 
-  private int earliestDepartureTime(int  fromTime, int transferDurationInSeconds, @Nullable ConstrainedTransfer tx) {
+  private int earliestDepartureTime(
+          int fromTime,
+          int transferDurationInSeconds,
+          @Nullable ConstrainedTransfer tx
+  ) {
     return earliestDepartureTime(fromTime, tx) + transferDurationInSeconds;
   }
 

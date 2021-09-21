@@ -20,7 +20,7 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.util.time.TimeUtils;
 
-class TransferGeneratorTest implements RaptorTestConstants {
+public class TransferGeneratorTest implements RaptorTestConstants {
 
     // Given a total slack of 30 seconds
     private static final int BOARD_SLACK = 10;

@@ -55,9 +55,7 @@ public class TransferServiceTest implements TransferTestData {
 
 
     ConstrainedTransfer transfer(TransferPoint from, TransferPoint to) {
-        var c = new TransferConstraint(
-                ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET
-        );
+        var c = new TransferConstraint(ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
         return new ConstrainedTransfer(from, to, c);
     }
 }

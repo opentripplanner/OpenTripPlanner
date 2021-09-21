@@ -34,6 +34,6 @@ public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule> {
 
         filters.add(OptimizedPathTail::breakTieCost);
 
-        return new MinCostFilterChain<>(List.copyOf(filters));
+        return new MinCostFilterChain<>(filters);
     }
 }

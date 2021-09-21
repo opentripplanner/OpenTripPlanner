@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.api.PathUtils;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
@@ -162,15 +163,19 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
                 .bus(trip3, STOP_G)
                 .egress(D0s);
 
+        // First we do the test without a wait-time cost calculator, which should pick the
+        // option with the lowest cost and as early as possible. So the preferred transfer
+        // between Trip 1 and 2 is at stop B - no walking (B to C) and before D. The preferred
+        // transfer between Trip 2 and 3 is at stop F.
         var subject = subject(transfers);
 
         // Find the path with the lowest cost
         var result = subject.findBestTransitPath(original);
 
         assertEquals(
-                "[1 ~ BUS T1 10:02 10:10 ~ 2 ~ BUS T2 10:12 10:35 ~ 6 ~ "
-                        + "BUS T3 10:37 10:49 ~ 7 [10:00:20 10:49:20 49m $3010]]",
-                result.toString()
+                "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ "
+                        + "BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3010]",
+                PathUtils.pathsToString(result)
         );
     }
 
@@ -217,8 +222,8 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         var it = result.iterator().next();
 
         assertEquals(
-                "1 ~ BUS T1 10:02 10:15 ~ 3 ~ BUS T2 10:17 10:30 ~ 4 [10:00:20 10:30:20 30m $1840]",
-                it.toString()
+                "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:00:20 10:30:20 30m $1840]",
+                it.toString(this::stopIndexToName)
         );
         // Verify the attached Transfer is exist and is valid
         assertEquals(

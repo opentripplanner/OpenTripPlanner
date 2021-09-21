@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 
@@ -19,11 +18,15 @@ public class PathUtils {
   /** Util class, private constructor */
   private PathUtils() { }
 
-  public static String pathsToString(RaptorResponse<TestTripSchedule> response) {
-    return pathsToString(response.paths(), p -> p.toString(TRANSLATOR::stopIndexToName));
+  public static String pathsToString(RaptorResponse<?> response) {
+    return pathsToString(response.paths());
   }
 
-  public static String pathsToStringDetailed(RaptorResponse<TestTripSchedule> response) {
+  public static String pathsToString(Collection<? extends Path<?>> paths) {
+    return pathsToString(paths, p -> p.toString(TRANSLATOR::stopIndexToName));
+  }
+
+  public static String pathsToStringDetailed(RaptorResponse<?> response) {
     return pathsToString(response.paths(), p -> p.toStringDetailed(TRANSLATOR::stopIndexToName));
   }
 
@@ -31,7 +34,7 @@ public class PathUtils {
   /* private methods */
 
   private static String pathsToString(
-          Collection<Path<TestTripSchedule>> paths,
+          Collection<? extends Path<?>> paths,
           Function<Path<?>, String> mapToStr
   ) {
     return paths.stream()

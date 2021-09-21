@@ -36,7 +36,6 @@ public class TransferConstraint implements Serializable {
         this.maxWaitTime = maxWaitTime;
     }
 
-
     /**
      * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
      * transfers. This cost is not related in any way to the path generalized-cost.

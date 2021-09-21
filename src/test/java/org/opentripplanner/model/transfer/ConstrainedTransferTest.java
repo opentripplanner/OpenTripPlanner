@@ -11,12 +11,8 @@ import org.junit.Test;
 
 public class ConstrainedTransferTest implements TransferTestData {
 
-  private static final TransferConstraint NO_CONSTRAINS = new TransferConstraint(
-          ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET
-  );
-  private static final TransferConstraint GUARANTIED = new TransferConstraint(
-          ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET
-  );
+  private static final TransferConstraint NO_CONSTRAINS = new TransferConstraint(ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
+  private static final TransferConstraint GUARANTIED = new TransferConstraint(ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET);
 
   private final ConstrainedTransfer TX_A_TO_B = new ConstrainedTransfer(STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
   private final ConstrainedTransfer TX_A_TO_R22 = new ConstrainedTransfer(STOP_POINT_A, ROUTE_POINT_22, NO_CONSTRAINS);
@@ -58,9 +54,9 @@ public class ConstrainedTransferTest implements TransferTestData {
 
   @Test
   public void priorityCost() {
-    assertEquals(0, ConstrainedTransfer.priorityCost(null));
-    assertEquals(0, ConstrainedTransfer.priorityCost(TX_NO_CONSTRAINS));
-    assertEquals(-10, ConstrainedTransfer.priorityCost(TX_GUARANTIED));
+    assertEquals(NO_CONSTRAINS.priorityCost(), ConstrainedTransfer.priorityCost(null));
+    assertEquals(NO_CONSTRAINS.priorityCost(), ConstrainedTransfer.priorityCost(TX_NO_CONSTRAINS));
+    assertEquals(GUARANTIED.priorityCost(), ConstrainedTransfer.priorityCost(TX_GUARANTIED));
   }
 
   @Test

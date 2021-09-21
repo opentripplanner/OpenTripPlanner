@@ -38,7 +38,7 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
      */
     @Override
     public void notifyElementAccepted(ArrivalView<T> newElement) {
-        if(newElement instanceof TransitStopArrival) {
+        if(newElement.arrivedByTransit()) {
             TransitStopArrival<T> transitStopArrival = (TransitStopArrival<T>) newElement;
             for (RaptorTransfer egress : egressPaths) {
                 destinationArrivals.add(
@@ -47,7 +47,7 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
                     egress.generalizedCost()
                 );
             }
-        } else if (newElement instanceof TransferStopArrival) {
+        } else if (newElement.arrivedByTransfer()) {
             for (RaptorTransfer egress : egressPaths) {
                 if (egress.stopReachedOnBoard()) {
                     TransferStopArrival<T> transferStopArrival = (TransferStopArrival<T>) newElement;

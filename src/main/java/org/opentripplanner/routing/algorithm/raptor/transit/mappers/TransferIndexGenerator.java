@@ -43,7 +43,7 @@ public class TransferIndexGenerator {
             for (int stopPos=0; stopPos < nStops; ++stopPos) {
                 var transfers= transferService.listConstrainedTransfersTo(trip, stopPos);
                 for (ConstrainedTransfer tx : transfers) {
-                    var c = tx.getConstraint();
+                    var c = tx.getTransferConstraint();
                     if(c.isFacilitated()) {
                         var fromTrip = tx.getFrom().getTrip();
                         var toTrip = tx.getTo().getTrip();
