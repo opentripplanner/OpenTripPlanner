@@ -41,7 +41,7 @@ public class TransferIndexGenerator {
         for (Trip trip : pattern.getPattern().getTrips()) {
             int nStops = pattern.getPattern().getStops().size();
             for (int stopPos=0; stopPos < nStops; ++stopPos) {
-                var transfers= transferService.listGuaranteedTransfersTo(trip, stopPos);
+                var transfers= transferService.listConstrainedTransfersTo(trip, stopPos);
                 for (ConstrainedTransfer tx : transfers) {
                     var c = tx.getConstraint();
                     if(c.isFacilitated()) {

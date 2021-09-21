@@ -15,7 +15,7 @@ public class TransferOptimizationRequest implements TransferOptimizationParamete
 
   @Override
   public boolean optimizeTransferPriority() {
-    return OTPFeature.ConstrainedTransfers.isOn();
+    return OTPFeature.TransferConstraints.isOn();
   }
 
   @Override

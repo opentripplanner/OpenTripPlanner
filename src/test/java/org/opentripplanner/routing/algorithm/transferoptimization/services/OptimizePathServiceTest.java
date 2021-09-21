@@ -184,7 +184,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
      * Expect: Transfer at C and transfer info attached
      */
     @Test
-    public void testGuaranteedTransferIsPreferred() {
+    public void testConstrainedTransferIsPreferred() {
         // Given
         var trip1 = TestTripSchedule.schedule()
                 .pattern("T1", STOP_A, STOP_B, STOP_C)

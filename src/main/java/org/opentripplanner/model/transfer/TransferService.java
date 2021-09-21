@@ -28,7 +28,7 @@ public class TransferService implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(TransferService.class);
 
     /** Index of guaranteed transfers by the to/destination point. */
-    private final Multimap<TripTransferPoint, ConstrainedTransfer> guaranteedTransferByToPoint;
+    private final Multimap<TripTransferPoint, ConstrainedTransfer> constrainedTransferByToPoint;
 
     /**
      * Table which contains transfers between two trips/routes
@@ -51,7 +51,7 @@ public class TransferService implements Serializable {
     private final Map<P2<Stop>, ConstrainedTransfer> stop2StopTransfers;
 
     public TransferService() {
-        this.guaranteedTransferByToPoint = ArrayListMultimap.create();
+        this.constrainedTransferByToPoint = ArrayListMultimap.create();
         this.trip2tripTransfers = new HashMap<>();
         this.trip2StopTransfers = new HashMap<>();
         this.stop2TripTransfers = new HashMap<>();
@@ -73,8 +73,8 @@ public class TransferService implements Serializable {
         return list;
     }
 
-    public Collection<ConstrainedTransfer> listGuaranteedTransfersTo(Trip toTrip, int toStopIndex) {
-        return guaranteedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
+    public Collection<ConstrainedTransfer> listConstrainedTransfersTo(Trip toTrip, int toStopIndex) {
+        return constrainedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
     }
 
     @Nullable
@@ -183,7 +183,7 @@ public class TransferService implements Serializable {
 
         if(c.isFacilitated()) {
             if(toPoint instanceof TripTransferPoint) {
-                guaranteedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
+                constrainedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
             }
         }
     }
