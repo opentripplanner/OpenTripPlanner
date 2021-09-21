@@ -1,5 +1,17 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.net.URI;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -28,19 +40,6 @@ import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 import org.opentripplanner.util.OtpAppException;
-
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.net.URI;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * Test response times for a large batch of origin/destination points.
@@ -380,6 +379,7 @@ public class SpeedTest {
         routingRequest.walkSpeed = config.walkSpeedMeterPrSecond;
 
         return new RaptorRoutingRequestTransitData(
+                null,
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),
                 1,

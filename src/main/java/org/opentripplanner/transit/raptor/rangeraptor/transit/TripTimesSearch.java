@@ -63,6 +63,16 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     }
 
     /**
+     * Search for board- and alight-times for the trip matching the given trip, stop pair and
+     * departure-time when searching in REVERSE.
+     */
+    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripAfter(
+            S trip, int fromStop, int toStop, int earliestBoardTime
+    ) {
+        return new TripTimesSearch<>(trip, fromStop, toStop).findTripAfter(earliestBoardTime);
+    }
+
+    /**
      * Search for board- and alight-times for the trip matching the given stop-arrival
      * when searching FORWARD. Hence, searching in the same direction as the trip travel
      * direction.

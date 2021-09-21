@@ -59,7 +59,7 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
         Set<OptimizedPathTail<T>> rest = new HashSet<>();
 
         for (OptimizedPathTail<T> it : remindingLegs) {
-            if (earliestBoardingTime < it.getLeg().toTime()) {
+            if (earliestBoardingTime < it.latestPossibleBoardingTime()) {
                 candidates.add(it);
             }
             else {

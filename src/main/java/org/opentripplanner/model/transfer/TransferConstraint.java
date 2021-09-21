@@ -4,9 +4,11 @@ import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
-public class TransferConstraint implements Serializable {
+public class TransferConstraint implements Serializable, RaptorTransferConstraint {
 
     private static final long serialVersionUID = 1L;
 
@@ -77,7 +79,7 @@ public class TransferConstraint implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(priority, staySeated, guaranteed);
+        return Objects.hash(priority, staySeated, guaranteed, maxWaitTime);
     }
 
     @Override
@@ -87,7 +89,8 @@ public class TransferConstraint implements Serializable {
         final TransferConstraint that = (TransferConstraint) o;
         return staySeated == that.staySeated
                 && guaranteed == that.guaranteed
-                && priority == that.priority;
+                && priority == that.priority
+                && maxWaitTime == that.maxWaitTime;
     }
 
     public String toString() {
@@ -95,9 +98,9 @@ public class TransferConstraint implements Serializable {
 
         return ToStringBuilder.of()
                 .addEnum("priority", priority, ALLOWED)
-                .addDurationSec("maxWaitTime", maxWaitTime, MAX_WAIT_TIME_NOT_SET)
                 .addBoolIfTrue("staySeated", staySeated)
                 .addBoolIfTrue("guaranteed", guaranteed)
+                .addDurationSec("maxWaitTime", maxWaitTime, MAX_WAIT_TIME_NOT_SET)
                 .toString();
     }
 
@@ -106,4 +109,17 @@ public class TransferConstraint implements Serializable {
         boolean maxWaitTimeSet = maxWaitTime != MAX_WAIT_TIME_NOT_SET;
         return !(staySeated || guaranteed || prioritySet || maxWaitTimeSet);
     }
+
+    /**
+     * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
+     * transfers. This cost is not related in any way to the path generalized-cost.
+     *
+     * @param c The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
+     *          street generated transfer.
+     * @see TransferPriority#cost(boolean, boolean)
+     */
+    public static int priorityCost(@Nullable TransferConstraint c) {
+        return c == null ? TransferPriority.NEUTRAL_PRIORITY_COST : c.priorityCost();
+    }
+
 }

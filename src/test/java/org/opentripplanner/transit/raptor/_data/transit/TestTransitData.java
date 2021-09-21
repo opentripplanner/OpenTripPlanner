@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.val;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -19,6 +21,8 @@ import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
@@ -62,6 +66,32 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
             costParamsBuilder.build(),
             stopBoarAlightCost()
     );
+  }
+
+  @Override
+  public RaptorPathConstrainedTransferSearch<TestTripSchedule> transferConstraintsSearch() {
+    return new RaptorPathConstrainedTransferSearch<>() {
+      @Nullable
+      @Override
+      public RaptorConstrainedTransfer findConstrainedTransfer(
+              TestTripSchedule fromTrip,
+              int fromStopPosition,
+              TestTripSchedule toTrip,
+              int toStopPosition
+      ) {
+        var list = routes.stream()
+                .flatMap(r -> r.listTransferConstraintsForwardSearch().stream())
+                .filter(tx -> tx.getSourceTrip().equals(fromTrip))
+                .filter(tx -> tx.getSourceStopPos() == fromStopPosition)
+                .filter(tx -> tx.getTrip().equals(toTrip))
+                .filter(tx -> tx.getStopPositionInPattern() == toStopPosition)
+                .collect(Collectors.toList());
+
+        if(list.isEmpty()) { return null; }
+        if(list.size() == 1) { return list.get(0); }
+        throw new IllegalStateException("More than on transfers found: " + list);
+      }
+    };
   }
 
   public TestRoute getRoute(int index) {

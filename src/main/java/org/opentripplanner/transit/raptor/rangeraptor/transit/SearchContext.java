@@ -5,6 +5,7 @@ import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProvid
 
 import java.util.Collection;
 import java.util.function.ToIntFunction;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -12,6 +13,8 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -66,13 +69,20 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.transit = transit;
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
-        this.costCalculator = transit.multiCriteriaCostCalculator();
+        this.costCalculator = request.profile().is(RaptorProfile.MULTI_CRITERIA)
+                ? transit.multiCriteriaCostCalculator() : null;
         this.roundTracker = new RoundTracker(
-            nRounds(),
-            request.searchParams().numberOfAdditionalTransfers(),
-            lifeCycle()
+                nRounds(),
+                request.searchParams().numberOfAdditionalTransfers(),
+                lifeCycle()
         );
-        this.pathMapper = createPathMapper(request, lifeCycle());
+        this.pathMapper = createPathMapper(
+                this.transit.transferConstraintsSearch(),
+                request.slackProvider(),
+                costCalculator,
+                lifeCycle(),
+                request.searchDirection().isForward()
+        );
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
@@ -138,6 +148,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return pathMapper;
     }
 
+    @Nullable
     public CostCalculator costCalculator() {
         return costCalculator;
     }
@@ -231,11 +242,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
-            RaptorRequest<S> request,
-            WorkerLifeCycle lifeCycle
+            RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
+            RaptorSlackProvider slackProvider,
+            CostCalculator costCalc,
+            WorkerLifeCycle lifeCycle,
+            boolean searchForward
     ) {
-        return request.searchDirection().isForward()
-                ? new ForwardPathMapper<>(request.slackProvider(), lifeCycle)
-                : new ReversePathMapper<>(request.slackProvider(), lifeCycle);
+        return searchForward
+                ? new ForwardPathMapper<>(txConstraintsSearch, slackProvider, costCalc, lifeCycle)
+                : new ReversePathMapper<>(txConstraintsSearch, slackProvider, costCalc, lifeCycle);
     }
 }

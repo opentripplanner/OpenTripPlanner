@@ -44,7 +44,10 @@ public class TestPathBuilderTest implements RaptorTestConstants {
         .bus("L1", time("10:02"), transitDuration, STOP_B)
         .egress(D2m);
 
-    int boardCost = COST_CALCULATOR.boardCost(true, BOARD_SLACK, STOP_A);
+    var transitLeg = path.accessLeg().nextLeg().asTransitLeg();
+    int boardCost = COST_CALCULATOR.boardingCost(
+        true, path.accessLeg().toTime(), STOP_A, transitLeg.fromTime(), transitLeg.trip(), null
+    );
 
     int transitCost = COST_CALCULATOR.transitArrivalCost(
             boardCost, ALIGHT_SLACK, transitDuration, TRANSIT_RELUCTANCE_INDEX, STOP_B

@@ -1,10 +1,17 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
-class GuaranteedTransfer implements RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> {
+class TestConstrainedTransferBoarding
+        implements RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule>, RaptorConstrainedTransfer
+{
 
+    private final RaptorTransferConstraint transferConstraints;
     private final TestTripSchedule sourceTrip;
     private final int sourceStopPos;
     private final TestTripSchedule targetTrip;
@@ -12,7 +19,8 @@ class GuaranteedTransfer implements RaptorTripScheduleBoardOrAlightEvent<TestTri
     private final int targetStopPos;
     private final int targetTime;
 
-    GuaranteedTransfer(
+    TestConstrainedTransferBoarding(
+            TransferConstraint transferConstraints,
             TestTripSchedule sourceTrip,
             int sourceStopPos,
             TestTripSchedule targetTrip,
@@ -20,6 +28,7 @@ class GuaranteedTransfer implements RaptorTripScheduleBoardOrAlightEvent<TestTri
             int targetStopPos,
             int targetTime
     ) {
+        this.transferConstraints = transferConstraints;
         this.sourceTrip = sourceTrip;
         this.sourceStopPos = sourceStopPos;
         this.targetTrip = targetTrip;
@@ -28,29 +37,31 @@ class GuaranteedTransfer implements RaptorTripScheduleBoardOrAlightEvent<TestTri
         this.targetTime = targetTime;
     }
 
-    @Override
     public int getTripIndex() {
         return targetTripIndex;
     }
 
-    @Override
     public TestTripSchedule getTrip() {
         return targetTrip;
     }
 
-    @Override
     public int getStopPositionInPattern() {
         return targetStopPos;
     }
 
-    @Override
     public int getTime() {
         return targetTime;
     }
 
+    @Nullable
+    @Override
+    public RaptorTransferConstraint getTransferConstraint() {
+        return transferConstraints;
+    }
+
     @Override
     public String toString() {
-        return ToStringBuilder.of(GuaranteedTransfer.class)
+        return ToStringBuilder.of(TestConstrainedTransferBoarding.class)
                 .addObj("sourceTrip", sourceTrip)
                 .addNum("sourceStopPos", sourceStopPos)
                 .addObj("targetTrip", targetTrip)

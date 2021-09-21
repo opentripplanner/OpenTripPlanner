@@ -73,4 +73,15 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      * Create/provide the cost criteria calculator.
      */
     CostCalculator multiCriteriaCostCalculator();
+
+
+    /**
+     * Implement this method to provide a service to search for {@link RaptorTransferConstraint}.
+     * This is not used during the routing, but after a path is found to attach constraint
+     * information to the path.
+     * <p>
+     * The search should have good performance, but it is not a critical part of the overall
+     * performance.
+     */
+    RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch();
 }

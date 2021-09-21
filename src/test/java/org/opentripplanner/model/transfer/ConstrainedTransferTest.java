@@ -53,13 +53,6 @@ public class ConstrainedTransferTest implements TransferTestData {
   }
 
   @Test
-  public void priorityCost() {
-    assertEquals(NO_CONSTRAINS.priorityCost(), ConstrainedTransfer.priorityCost(null));
-    assertEquals(NO_CONSTRAINS.priorityCost(), ConstrainedTransfer.priorityCost(TX_NO_CONSTRAINS));
-    assertEquals(GUARANTIED.priorityCost(), ConstrainedTransfer.priorityCost(TX_GUARANTIED));
-  }
-
-  @Test
   public void noConstraints() {
     assertTrue(TX_NO_CONSTRAINS.noConstraints());
     assertFalse(TX_GUARANTIED.noConstraints());

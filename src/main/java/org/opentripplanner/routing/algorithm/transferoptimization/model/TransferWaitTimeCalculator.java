@@ -194,6 +194,7 @@ public class TransferWaitTimeCalculator {
   }
 
   int calculateOptimizedWaitCost(int waitTime) {
+    if(waitTime < 0 ) { return 0; }
     assertMinSafeTransferTimeSet();
     return RaptorCostConverter.toRaptorCost(n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime)));
   }

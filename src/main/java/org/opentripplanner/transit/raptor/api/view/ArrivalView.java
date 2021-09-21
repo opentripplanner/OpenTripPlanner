@@ -52,6 +52,17 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     int round();
 
     /**
+     * {@code true} if this arrival represent a simple access arrival without
+     * any embedded rides. FLEX access should not be added in round 0 (the first round).
+     * <p>
+     * This method is used to add special functionality for the first transit leg, the
+     * next leg, For example adding transfer cost to all boardings exept the fist one.
+     */
+    default boolean isFirstRound() {
+        return round() == 0;
+    }
+
+    /**
      * The arrival time for when the stop is reached including alight-slack.
      */
     int arrivalTime();

@@ -67,8 +67,15 @@ public class TransferConstraintTest implements TransferTestData {
   public void testToString() {
     assertEquals("{ NONE }", NO_CONSTRAINS.toString());
     assertEquals(
-            "{priority: PREFERRED, maxWaitTime: 1h, staySeated, guaranteed}",
+            "{priority: PREFERRED, staySeated, guaranteed, maxWaitTime: 1h}",
             EVERYTHING.toString()
     );
+  }
+
+  @Test
+  public void staticPriorityCost() {
+    assertEquals(NO_CONSTRAINS.priorityCost(), TransferConstraint.priorityCost(null));
+    assertEquals(NO_CONSTRAINS.priorityCost(), TransferConstraint.priorityCost(NO_CONSTRAINS));
+    assertEquals(GUARANTIED.priorityCost(), TransferConstraint.priorityCost(GUARANTIED));
   }
 }

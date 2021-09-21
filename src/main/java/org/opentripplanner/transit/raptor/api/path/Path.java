@@ -202,7 +202,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             boolean detailed,
             @Nullable IntFunction<String> stopNameTranslator,
             @Nullable Consumer<PathStringBuilder> appendToSummary
-    ) {
+            ) {
         var buf = new PathStringBuilder(stopNameTranslator);
         if(accessLeg != null) {
             int prevToTime = 0;
@@ -227,6 +227,10 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                         if (detailed) {
                             buf.duration(leg.duration());
                             buf.generalizedCostSentiSec(leg.generalizedCost());
+                        }
+                        var c = transitLeg.getConstrainedTransferAfterLeg();
+                        if(detailed && c != null) {
+                            buf.sep().append(c.toString());
                         }
                     }
                     else if (leg.isTransferLeg()) {

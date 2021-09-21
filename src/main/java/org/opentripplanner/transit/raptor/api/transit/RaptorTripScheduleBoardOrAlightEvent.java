@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
+import javax.annotation.Nullable;
+
 /**
  * The purpose of the TripScheduleBoardAlight is to represent the board/alight for a
  * given trip at a specific stop. This is used as a result for the trip search, but may also
@@ -34,9 +36,22 @@ public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedu
     int getStopPositionInPattern();
 
     /**
+     * Return the stop index for the boarding position.
+     */
+    default int getBoardStopIndex() {
+        return getTrip().pattern().stopIndex(getStopPositionInPattern());
+    }
+
+    /**
      * Get the board/alight time for the trip found.
      * In the case of a normal search the boarding time should be returned,
      * and in the case of a reverse search the alight time should be returned.
      */
     int getTime();
+
+    /**
+     * Return the transfer constrains for the transfer before this boarding, if it exist.
+     */
+    @Nullable
+    RaptorTransferConstraint getTransferConstraint();
 }
