@@ -66,7 +66,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
      */
     private String islandLogFile = null;
 
-    private StreetLinkerModule transitToStreetNetwork;
+    private StreetLinkerModule streetLinkerModule;
 
     private static int islandCounter = 0;
 
@@ -92,7 +92,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         LOG.info("Pruning islands and areas isolated by nothru edges in street network");
 
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
-           pruningThresholdIslandWithStops, null,
+	        pruningThresholdIslandWithStops, null,
                 issueStore, TraverseMode.BICYCLE
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
@@ -103,15 +103,11 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 pruningThresholdIslandWithStops, null,
                 issueStore, TraverseMode.CAR
         );
-        if (transitToStreetNetwork == null) {
-            LOG.info("StreetLinkerModule not provided, not attempting to reconnect stops.");
-        }
-        else {
-            // reconnect stops on small islands (that removed)
-            // this currently does not work!
-            LOG.info("Reconnecting stops with StreetLinkerModule");
-            transitToStreetNetwork.buildGraph(graph, extra, issueStore);
-        }
+        // TODO: selectively reconnect stops on small islands (that removed)
+        // running the full StreetLinkerModule is most likely not OK (crashes on npe)
+        // LOG.info("Reconnecting stops");
+        // streetLinkerModule.*todoFixMethod*(graph, extra, issueStore);
+
         LOG.debug("Done pruning nothru islands");
     }
 
@@ -204,9 +200,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         );
         LOG.info("Modified {} islands", count);
 
-        if (graph.removeEdgelessVertices() > 0) {
-            LOG.warn("Removed edgeless vertices after pruning islands");
-        }
         if (islandLog != null) {
             islandLog.close();
         }
@@ -425,6 +418,19 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             Vertex v = vIter.next();
             if (v.getDegreeOut() + v.getDegreeIn() == 0) {
                 graph.remove(v);
+            }
+        }
+         //remove street connection form
+        if (traverseMode == TraverseMode.WALK) {
+            for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext(); ) {
+                Vertex v = vIter.next();
+                Collection<Edge> edges = new ArrayList<Edge>(v.getOutgoing());
+                edges.addAll(v.getIncoming());
+                for (Edge e : edges) {
+                    if (e instanceof StreetTransitStopLink || e instanceof StreetTransitEntranceLink) {
+                        graph.removeEdge(e);
+                    }
+                }
             }
         }
     }
