@@ -4,11 +4,16 @@ import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @see <a href="https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS Specification</a>
+ */
 public class RentalVehicleType {
-    static final Map<String, RentalVehicleType> defaultVehicleForSystem = new HashMap<>();
+
+    // This is a ConcurrentHashMap in order to be thread safe, as it is used from different updater threads.
+    static final Map<String, RentalVehicleType> defaultVehicleForSystem = new ConcurrentHashMap<>();
 
     public final FeedScopedId id;
     public final String name;
