@@ -616,6 +616,14 @@ otp.widgets.ItinerariesWidget =
 
             $('<span><i>' + _tr("Time in transit") + ": " + otp.util.Time.secsToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
 
+            $('<div class="otp-itin-leg-ids"></div>')
+                .append($('<table></table>').append([
+                    '<tr><td>' + _tr("Route ID") + ":</td><td>" + leg.routeId + '</td></tr>',
+                    '<tr><td>' + _tr("Trip ID") + ":</td><td>" + leg.tripId + '</td></tr>',
+                    '<tr><td>' + _tr("Service Date") + ":</td><td>" + leg.serviceDate + '</td></tr>'
+                ]))
+                .appendTo(legDiv);
+
             $('<span>&nbsp;[<a href="#">' + _tr("Trip Viewer") + '</a>]</span>')
             .appendTo(inTransitDiv)
             .click(function(evt) {
