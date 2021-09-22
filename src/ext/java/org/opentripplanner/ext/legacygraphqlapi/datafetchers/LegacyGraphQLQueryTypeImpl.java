@@ -6,6 +6,7 @@ import com.google.common.collect.Multimaps;
 import graphql.relay.Connection;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
+import graphql.schema.AsyncDataFetcher;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
@@ -584,6 +585,12 @@ public class LegacyGraphQLQueryTypeImpl
 
   @Override
   public DataFetcher<RoutingResponse> plan() {
+    var syncFetcher = planFetcher();
+    DataFetcher f = AsyncDataFetcher.async(syncFetcher);
+    return f;
+  }
+
+  public DataFetcher<RoutingResponse> planFetcher() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
       RoutingRequest request = context.getRouter().defaultRoutingRequest.clone();
