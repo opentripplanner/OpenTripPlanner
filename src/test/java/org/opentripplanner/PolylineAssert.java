@@ -6,6 +6,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * A helper class to aid comparing polylines with each other.
+ *
+ * When they are not identical it gives detailed debugging output to help figuring out
+ * where they differ.
+ */
 public class PolylineAssert {
 
     public static String makeUrl(String line) {

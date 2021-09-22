@@ -354,6 +354,10 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         }
     }
 
+    /**
+     * If in wheelchair mode add penalties for boarding a trip when the accessibility
+     * information is not known or when it's known to be inaccessible.
+     */
     private void addTripWheelchairPenalty(RoutingRequest options, Trip trip, StateEditor s1) {
         if (options.wheelchairAccessible) {
             final WheelchairAccess wa = WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible());
@@ -366,8 +370,11 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         }
     }
 
+    /**
+     * If in wheelchair mode add penalties for traversing the stop when the accessibility
+     * information is not known or when it's known to be inaccessible.
+     */
     private void addStopWheelchairPenalty(RoutingRequest options, StateEditor s1) {
-        /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
         if (options.wheelchairAccessible) {
             final WheelchairAccess stopWa = getPattern().wheelchairAccessible(stopIndex);
             if(stopWa == WheelchairAccess.NOT_ALLOWED) {

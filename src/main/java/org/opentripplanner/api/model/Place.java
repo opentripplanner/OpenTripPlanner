@@ -25,6 +25,9 @@ public class Place {
      */
     public FeedScopedId stopId = null;
 
+    /**
+     * Whether this place allows wheelchair users to board a vehicle.
+     */
     public WheelchairAccess wheelchairBoarding = WheelchairAccess.UNKNOWN;
 
     /**

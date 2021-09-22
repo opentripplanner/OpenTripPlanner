@@ -82,14 +82,20 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             }
 
             // we build two transfers: one which is wheelchair accessible and one which isn't
-            nTransfersTotal += createTransfer(graph, nearbyStopFinder, true, ts0, pathwayDestinations);
-            nTransfersTotal += createTransfer(graph, nearbyStopFinder, false, ts0, pathwayDestinations);
+            nTransfersTotal += createTransfers(graph, nearbyStopFinder, true, ts0, pathwayDestinations);
+            nTransfersTotal += createTransfers(graph, nearbyStopFinder, false, ts0, pathwayDestinations);
         }
         LOG.info("Done connecting stops to one another. Created a total of {} transfers from {} stops.", nTransfersTotal, nLinkableStops);
         graph.hasDirectTransfers = true;
     }
 
-    private int createTransfer(
+    /**
+     * Create a set of transfers from the input TransitStop to all possible stops nearby. What is considered
+     * "nearby" is defined by the paramters radiusMeters.
+     *
+     * These transfers are also added to the graph.
+     */
+    private int createTransfers(
             Graph graph,
             NearbyStopFinder nearbyStopFinder,
             boolean wheelchairAccessible,
@@ -97,18 +103,20 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             Set<TransitStop> pathwayDestinations
     ) {
         /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
-        int n = 0;
+        int numTransfersCreated = 0;
         for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, wheelchairAccessible)) {
             /* Skip the origin stop, loop transfers are not needed. */
             if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
             new SimpleTransfer(ts0, sd.tstop, sd.dist, wheelchairAccessible, sd.geom, sd.edges);
-            n += 1;
+            numTransfersCreated += 1;
         }
-        LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(), n);
-        if (n == 0) {
+        LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(),
+                numTransfersCreated
+        );
+        if (numTransfersCreated == 0) {
             LOG.debug(graph.addBuilderAnnotation(new StopNotLinkedForTransfers(ts0)));
         }
-        return n;
+        return numTransfersCreated;
     }
 
     @Override

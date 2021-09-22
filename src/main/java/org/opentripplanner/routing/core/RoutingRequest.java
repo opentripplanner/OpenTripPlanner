@@ -125,12 +125,40 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether the trip must be wheelchair accessible. */
     public boolean wheelchairAccessible = false;
 
+    /**
+     * When in wheelchair-accessible mode we add some penalties when traversing places where we don't
+     * have accessibility information or we know to be wheelchair inaccessible.
+     *
+     * This is the cost of traversing a stop without accessibility information.
+     */
     public int unknownWheelchairAccessAtStopPenalty = 600;
+    /**
+     * The cost of traversing a stop which is wheelchair-inaccessible.
+     */
     public int noWheelchairAccessAtStopPenalty = 3 * unknownWheelchairAccessAtStopPenalty;
+    /**
+     * The cost of boarding a trip without accessibility information.
+     */
     public int unknownWheelchairAccessAtTripPenalty = 1200;
+    /**
+     * The cost of boarding a trip which we know to be wheelchair-inaccessible.
+     */
     public int noWheelchairAccessAtTripPenalty = 3 * unknownWheelchairAccessAtTripPenalty;
+    /**
+     * The cost of using stairs in a wheelchair.
+     */
     public int wheelchairStairsPenalty = 600;
+    /**
+     * The cost of using an elevator which is not wheelchair-accessible.
+     */
     public int noWheelchairAccessOnElevatorPenalty = 600;
+    /**
+     * The cost of traversing a street which we know to be wheelchair-inaccessible.
+     *
+     * This is called a reluctance rather than a penalty because we multiply it with the length
+     * of the street. This means traversing a 100 meter street (without wheelchair access) is 10
+     * times worse than a 10 meter street.
+     */
     public int noWheelchairAccessOnStreetReluctance = 15;
 
     /** The maximum number of itineraries to return. */

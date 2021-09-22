@@ -54,10 +54,12 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public State traverse(State s0) {
-        // we need to make sure that we only use the transfer for the accessibility that we use
+        // when not in wheelchair mode we need to make sure to use the transfer for walking
         if (!s0.getOptions().wheelchairAccessible && wheelchairAccessible) {
             return null;
         }
+        // we need to make sure that we when in wheelchair mode we only use the transfer
+        // generated for the wheelchair
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }

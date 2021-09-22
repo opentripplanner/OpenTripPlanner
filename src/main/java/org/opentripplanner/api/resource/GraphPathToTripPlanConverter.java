@@ -125,7 +125,12 @@ public abstract class GraphPathToTripPlanConverter {
         long bestNonTransitTime = Long.MAX_VALUE;
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, request.wheelchairAccessible, requestedLocale);
+            Itinerary itinerary = generateItinerary(
+                    path,
+                    request.showIntermediateStops,
+                    request.disableAlertFiltering,
+                    requestedLocale
+            );
             itinerary = adjustItinerary(request, itinerary);
             if(itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
                 bestNonTransitTime = itinerary.walkTime;
@@ -197,6 +202,11 @@ public abstract class GraphPathToTripPlanConverter {
         if (itinerary.walkDistance > request.maxWalkDistance) {
             itinerary.walkLimitExceeded = true;
         }
+        itinerary.legs.forEach(leg -> {
+            if(leg.mode.equals("WALK") && request.wheelchairAccessible) {
+                leg.accessibilityScore = 0.5f;
+            }
+        });
         // Return itinerary
         return itinerary;
     }
@@ -208,14 +218,12 @@ public abstract class GraphPathToTripPlanConverter {
      *
      * @param path The graph path to base the itinerary on
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
-     * @param wheelchairAccessible
      * @return The generated itinerary
      */
     public static Itinerary generateItinerary(
             GraphPath path,
             boolean showIntermediateStops,
             boolean disableAlertFiltering,
-            boolean wheelchairAccessible,
             Locale requestedLocale
     ) {
         Itinerary itinerary = new Itinerary();
@@ -242,12 +250,6 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
-
-        itinerary.legs.forEach(leg -> {
-            if(leg.mode.equals("WALK") && wheelchairAccessible) {
-                leg.accessibilityScore = 0.5f;
-            }
-        });
 
         fixupLegs(itinerary.legs, legsStates);
 
@@ -417,6 +419,8 @@ public abstract class GraphPathToTripPlanConverter {
 
         addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
 
+        // since this method also computes the accessibility scores it needs to be run after
+        // addPlaces() because for stop information is needed for this computation.
         addTripFields(leg, states, requestedLocale);
 
 
@@ -890,6 +894,10 @@ public abstract class GraphPathToTripPlanConverter {
         }
     }
 
+    /**
+     * Computes how easy a leg is to use for a wheelchair user on a scale from 0 to 1 where
+     * 0 is bad and 1 is good.
+     */
     private static Float computeAccessibilityScore(
             Trip trip,
             Leg leg,
@@ -908,6 +916,11 @@ public abstract class GraphPathToTripPlanConverter {
         }
     }
 
+    /**
+     * Converts a WheelchairAccess value into a numeric score between 0 and 1. These individual
+     * score (for stops for example) can then be added up to compute a compound score for a leg
+     * or an itinerary.
+     */
     private static float computeAccessibilityScore(WheelchairAccess access) {
         switch(access) {
             case ALLOWED: // is accessible

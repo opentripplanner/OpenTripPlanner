@@ -1,5 +1,10 @@
 package org.opentripplanner.gtfs;
 
+/**
+ * Describes the level of wheelchair access for a given place.
+ *
+ * Used to decide if wheelchair users can use a certain stop or trip.
+ */
 public enum WheelchairAccess {
     UNKNOWN,ALLOWED,NOT_ALLOWED;
 
