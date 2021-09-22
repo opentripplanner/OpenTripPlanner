@@ -586,6 +586,8 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<RoutingResponse> plan() {
     var syncFetcher = planFetcher();
+    // yes the extra variable is necessary to "remove" the type information
+    // https://www.graphql-java.com/documentation/v17/execution/
     DataFetcher f = AsyncDataFetcher.async(syncFetcher);
     return f;
   }
