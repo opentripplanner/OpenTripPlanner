@@ -255,9 +255,15 @@ h3.sysNotice {
 
 .otp-itin-leg-intStopsListItem {
     padding-bottom: .3em;
+}
+
+.otp-itin-leg-intStopsListItem span {
     cursor: pointer;
 }
 
+.otp-itin-leg-intStopsListItem i {
+    font-size: 0.8em;
+}
 
 .otp-itin-iconModeSymbol {
     width: 16px;

@@ -607,7 +607,6 @@ otp.widgets.ItinerariesWidget =
                 this_.module.stopViewerWidget.bringToFront();
             });
 
-
             $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);
 
             // show the "time in transit" line
@@ -639,7 +638,7 @@ otp.widgets.ItinerariesWidget =
 
             // show the intermediate stops, if applicable -- REPLACED BY TRIP VIEWER
 
-            /*if(this.module.showIntermediateStops) {
+            if(this.module.showIntermediateStops) {
 
                 $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);
                 var intStopsDiv = $('<div class="otp-itin-leg-intStops"></div>').appendTo(legDiv);
@@ -656,8 +655,12 @@ otp.widgets.ItinerariesWidget =
 
                 for(var i=0; i < leg.intermediateStops.length; i++) {
                     var stop = leg.intermediateStops[i];
-                    $('<div class="otp-itin-leg-intStopsListItem">'+(i+1)+'. '+stop.name+' (ID #'+stop.stopId.id+')</div>').
-                    appendTo(intStopsListDiv)
+                    var time = stop.arrival === stop.departure
+                                ? otp.util.Time.formatItinTime(stop.arrival, otp.config.locale.time.time_format)
+                                : otp.util.Time.formatItinTime(stop.arrival, otp.config.locale.time.time_format) + " - " + otp.util.Time.formatItinTime(stop.departure, otp.config.locale.time.time_format);
+                    $('<div class="otp-itin-leg-intStopsListItem"><span>'+time+' '+stop.name+' <i>(#'+(stop.stopCode || stop.stopId)+')</i></span></div>')
+                    .appendTo(intStopsListDiv)
+                    .children('span')
                     .data("stop", stop)
                     .click(function(evt) {
                         var stop = $(this).data("stop");
@@ -665,7 +668,7 @@ otp.widgets.ItinerariesWidget =
                     }).hover(function(evt) {
                         var stop = $(this).data("stop");
                         $(this).css('color', 'red');
-                        var popup = L.popup()
+                        L.popup()
                             .setLatLng(new L.LatLng(stop.lat, stop.lon))
                             .setContent(stop.name)
                             .openOn(this_.module.webapp.map.lmap);
@@ -675,7 +678,7 @@ otp.widgets.ItinerariesWidget =
                     });
                 }
                 intStopsListDiv.hide();
-            }*/
+            }
 
             // show the end time and stop
 
