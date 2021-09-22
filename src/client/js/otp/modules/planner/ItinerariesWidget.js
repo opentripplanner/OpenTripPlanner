@@ -587,14 +587,15 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
 
-            var stopHtml = '<div class="otp-itin-leg-endpointDescSub">';
-            if( typeof leg.from.stopCode != 'undefined' ) {
-                stopHtml += _tr("Stop") + ' #'+leg.from.stopCode+ ' ';
-            }
-            stopHtml += '[<a href="#">' + _tr("Stop Viewer") +'</a>]</div>';
-
-            $(stopHtml)
+            $(
+                '<div class="otp-itin-leg-endpointDescSub">'
+                 + _tr("Stop")
+                 + ' #' + (leg.from.stopCode || leg.from.stopId)
+                 + ' [<a href="#">' + _tr("Stop Viewer") + '</a>]'
+                 + '</div>'
+            )
             .appendTo(legDiv)
+            .children('a')
             .click(function(evt) {
                 if(!this_.module.stopViewerWidget) {
                     this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
@@ -699,6 +700,25 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
 
+            $(
+                '<div class="otp-itin-leg-endpointDescSub">'
+                + _tr("Stop")
+                + ' #' + (leg.to.stopCode || leg.to.stopId)
+                + ' [<a href="#">' + _tr("Stop Viewer") + '</a>]'
+                + '</div>'
+            )
+                .appendTo(legDiv)
+                .children('a')
+                .click(function(evt) {
+                    if(!this_.module.stopViewerWidget) {
+                        this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
+                        this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
+                    }
+                    this_.module.stopViewerWidget.show();
+                    this_.module.stopViewerWidget.setActiveTime(leg.endTime);
+                    this_.module.stopViewerWidget.setStop(leg.to.stopId, leg.to.name);
+                    this_.module.stopViewerWidget.bringToFront();
+                });
 
             // render any alerts
 
