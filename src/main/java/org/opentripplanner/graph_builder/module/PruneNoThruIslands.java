@@ -6,6 +6,9 @@ import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
+import org.opentripplanner.graph_builder.issues.GraphIsland;
+import org.opentripplanner.graph_builder.issues.IsolatedStop;
+import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -112,10 +115,11 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         if (streetLinkerModule != null) {
             LOG.info("Reconnecting stops");
             long count = streetLinkerModule.linkTransitStops(graph);
-            LOG.debug("Tried to reconnect {} stops", count);
+            LOG.info("Tried to reconnect {} stops", count);
             int isolated = 0;
             for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
                 if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {
+                    issueStore.add(new IsolatedStop(tStop));
                     isolated++;
                 }
             }
@@ -247,7 +251,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 //for islands with stops
                 islandsWithStops++;
                 if (island.streetSize() < islandWithStopMaxSize) {
-                    restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode);
+                    restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode, issueStore);
                     changed = true;
                     islandsWithStopsChanged++;
                     count++;
@@ -256,7 +260,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             else {
                 //for islands without stops
                 if (island.streetSize() < maxIslandSize) {
-                    restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode);
+                    restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode, issueStore);
                     changed = true;
                     count++;
                 }
@@ -377,7 +381,8 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             Map<Edge, Boolean> isolated,
             Map<String, Integer> stats,
             boolean markIsolated,
-            TraverseMode traverseMode
+            TraverseMode traverseMode,
+            DataImportIssueStore issueStore
     ) {
         //iterate over the street vertex of the subgraph
         for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext(); ) {
@@ -451,8 +456,10 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                         graph.removeEdge(e);
                     }
                 }
+                issueStore.add(new PrunedIslandStop(v));
             }
         }
+        issueStore.add(new GraphIsland(island.getRepresentativeVertex(), island.streetSize()));
     }
 
     private static Subgraph computeConnectedSubgraph(
