@@ -1,19 +1,18 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.time.Instant;
+import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
-import java.time.Instant;
-import java.util.function.Consumer;
-
 public class RoutingRequestToFilterChainMapper {
   private static final int KEEP_ONE = 1;
 
   /** Filter itineraries down to this limit, but not below. */
-  private static final int MIN_NUMBER_OF_ITINERARIES = 3;
+  private static final int KEEP_THREE = 3;
 
   /** Never return more that this limit of itineraries. */
   private static final int MAX_NUMBER_OF_ITINERARIES = 200;
@@ -38,15 +37,9 @@ public class RoutingRequestToFilterChainMapper {
         );
       }
 
-      if (p.groupSimilarityKeepNumOfItineraries >= 0.5) {
-        int minLimit = request.numItineraries;
-
-        if (minLimit < 0 || minLimit > MIN_NUMBER_OF_ITINERARIES) {
-          minLimit = MIN_NUMBER_OF_ITINERARIES;
-        }
-
+      if (p.groupSimilarityKeepThree >= 0.5) {
         builder.addGroupBySimilarity(
-            new GroupBySimilarity(p.groupSimilarityKeepNumOfItineraries, minLimit)
+            new GroupBySimilarity(p.groupSimilarityKeepThree, KEEP_THREE)
         );
       }
     }

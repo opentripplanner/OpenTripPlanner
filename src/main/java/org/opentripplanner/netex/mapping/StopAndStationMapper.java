@@ -1,21 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FareZone;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
-import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.StopPlace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,8 +12,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.FareZone;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
+import org.rutebanken.netex.model.Quay;
+import org.rutebanken.netex.model.Quays_RelStructure;
+import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TariffZoneRef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx also contains
@@ -45,8 +44,7 @@ class StopAndStationMapper {
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
     private final StationMapper stationMapper;
     private final StopMapper stopMapper;
-    private final EntityById<FareZone> tariffZonesById;
-    private final FeedScopedIdFactory idFactory;
+    private final TariffZoneMapper tariffZoneMapper;
 
     /**
      * Quay ids for all processed stop places
@@ -61,14 +59,13 @@ class StopAndStationMapper {
     StopAndStationMapper(
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
-            EntityById<FareZone> tariffZonesById,
+            TariffZoneMapper tariffZoneMapper,
             DataImportIssueStore issueStore
     ) {
         this.stationMapper = new StationMapper(idFactory);
         this.stopMapper = new StopMapper(idFactory, issueStore);
+        this.tariffZoneMapper = tariffZoneMapper;
         this.quayIndex = quayIndex;
-        this.tariffZonesById = tariffZonesById;
-        this.idFactory = idFactory;
     }
 
     /**
@@ -80,11 +77,13 @@ class StopAndStationMapper {
         // TODO OTP2 - This should pushed up into the ReadOnlyHierarchicalVersionMapById as part of
         //           - Issue: Netex import resolve version for all entities , not just stops #2781
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
-        Station station = mapStopPlaceAllVersionsToStation(stopPlaceAllVersions);
-        List<FareZone> fareZones = mapTariffZones(stopPlaceAllVersions);
+        StopPlace selectedStopPlace = first(stopPlaceAllVersions);
 
-        // Loop through all versions of the StopPlace in order to collect all quays, even if they were deleted in
-        // never versions of the StopPlace
+        Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
+        Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
+
+        // Loop through all versions of the StopPlace in order to collect all quays, even if they
+        // were deleted in never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
                 addNewStopToParentIfNotPresent(quay, station, fareZones);
@@ -92,14 +91,11 @@ class StopAndStationMapper {
         }
     }
 
-    private Station mapStopPlaceAllVersionsToStation(List<StopPlace> stopPlaceAllVersions) {
-        // Map the highest priority StopPlace version to station
-        StopPlace selectedStopPlace = first(stopPlaceAllVersions);
-
-        Station station = stationMapper.map(selectedStopPlace);
-        if (selectedStopPlace.getParentSiteRef() != null) {
+    private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
+        Station station = stationMapper.map(stopPlace);
+        if (stopPlace.getParentSiteRef() != null) {
             resultStationByMultiModalStationRfs.put(
-                    selectedStopPlace.getParentSiteRef().getRef(),
+                    stopPlace.getParentSiteRef().getRef(),
                     station
             );
         }
@@ -107,15 +103,25 @@ class StopAndStationMapper {
         return station;
     }
 
-    private List<FareZone> mapTariffZones(List<StopPlace> stopPlaceAllVersions) {
-        StopPlace selectedStopPlace = first(stopPlaceAllVersions);
-        return selectedStopPlace.getTariffZones() != null ? selectedStopPlace
-            .getTariffZones()
+    private Collection<FareZone> mapTariffZones(StopPlace stopPlace) {
+        if(stopPlace.getTariffZones() == null) { return List.of(); }
+
+        return stopPlace.getTariffZones()
             .getTariffZoneRef()
             .stream()
-            .map(t -> tariffZonesById.get(idFactory.createId(t.getRef())))
+            .map(ref -> findTariffZone(stopPlace, ref))
             .filter(Objects::nonNull)
-            .collect(Collectors.toList()) : Collections.emptyList();
+            .collect(Collectors.toList());
+    }
+
+    private FareZone findTariffZone(StopPlace stopPlace, TariffZoneRef ref) {
+        if(ref == null) { return null; }
+        var result = tariffZoneMapper.findAndMapTariffZone(ref);
+
+        if(result == null) {
+            LOG.warn("StopPlace {} has unsupported tariff zone reference: {}", stopPlace.getId(), ref);
+        }
+        return result;
     }
 
     /**
@@ -130,7 +136,7 @@ class StopAndStationMapper {
     private void addNewStopToParentIfNotPresent(
         Quay quay,
         Station station,
-        List<FareZone> fareZones
+        Collection<FareZone> fareZones
     ) {
         // TODO OTP2 - This assumtion is only valid because Norway have a
         //           - national stop register, we should add all stops/quays

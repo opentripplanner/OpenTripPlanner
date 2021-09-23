@@ -1,0 +1,31 @@
+{
+  "last_updated": 1631258451,
+  "ttl": 15,
+  "version": "2.2",
+  "data": {
+    "nb": {
+      "feeds": [
+        {
+          "name": "system_information",
+          "url": "file:src/test/resources/gbfs/lillestrombysykkel/system_information.json"
+        },
+        {
+          "name": "station_information",
+          "url": "file:src/test/resources/gbfs/lillestrombysykkel/station_information.json"
+        },
+        {
+          "name": "station_status",
+          "url": "file:src/test/resources/gbfs/lillestrombysykkel/station_status.json"
+        },
+        {
+          "name": "system_pricing_plans",
+          "url": "file:src/test/resources/gbfs/lillestrombysykkel/system_pricing_plans.json"
+        },
+        {
+          "name": "vehicle_types",
+          "url": "file:src/test/resources/gbfs/lillestrombysykkel/vehicle_types.json"
+        }
+      ]
+    }
+  }
+}

@@ -8,9 +8,11 @@ public class GbfsVehicleRentalDataSourceParameters extends VehicleRentalDataSour
 
   private final boolean allowKeepingRentedVehicleAtDestination;
   private final boolean routeAsCar;
+  private final String language;
 
-  public GbfsVehicleRentalDataSourceParameters(String url, String network, boolean routeAsCar, boolean allowKeepingRentedVehicleAtDestination, Map<String, String> httpHeaders) {
-    super(DataSourceType.GBFS, url, network, httpHeaders);
+  public GbfsVehicleRentalDataSourceParameters(String url, String language, boolean routeAsCar, boolean allowKeepingRentedVehicleAtDestination, Map<String, String> httpHeaders) {
+    super(DataSourceType.GBFS, url, httpHeaders);
+    this.language = language;
     this.allowKeepingRentedVehicleAtDestination = allowKeepingRentedVehicleAtDestination;
     this.routeAsCar = routeAsCar;
   }
@@ -21,5 +23,9 @@ public class GbfsVehicleRentalDataSourceParameters extends VehicleRentalDataSour
 
   public boolean allowKeepingRentedVehicleAtDestination() {
     return allowKeepingRentedVehicleAtDestination;
+  }
+
+  public String language() {
+    return language;
   }
 }

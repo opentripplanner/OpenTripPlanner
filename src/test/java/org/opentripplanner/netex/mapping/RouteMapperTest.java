@@ -1,5 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
+
+import java.util.TimeZone;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collections;
 import java.util.Set;
@@ -19,10 +22,8 @@ import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OrganisationRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
 
-import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
 public class RouteMapperTest {
 
@@ -32,7 +33,7 @@ public class RouteMapperTest {
     private static final String RUT_FERRY_WITHOUT_BICYCLES_ID = "RUT:Line:2:NoBicycles";
 
     private static final String TIME_ZONE = "GMT";
-    
+
     private static final Set<String> EMPTY_FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
 
     @Test

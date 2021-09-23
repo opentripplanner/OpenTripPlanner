@@ -13,6 +13,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
         c.asText("sourcesName", "systems"),
         c.asText("updaterUrlName", "url"),
         c.asText("updaterNetworkName", "id"),
+        c.asText("language", null),
         c.asMap("headers", NodeAdapter::asText)
     );
   }

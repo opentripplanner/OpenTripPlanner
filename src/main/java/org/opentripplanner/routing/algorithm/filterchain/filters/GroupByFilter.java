@@ -1,25 +1,24 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
 
 /**
  * This filter group the itineraries using a group-id and filter each group
- * by the given {@code filter}. It ensure that {@code minLimit} requirement
- * is meat by limiting each group so the total become less than the min-limit.
+ * by the given {@code filter}. It ensure that {@code maxNumberOfItinerariesPrGroup} requirement
+ * is meat by reducing each group down to the given limit.
  *
  * @see GroupId on how to group itineraries
  */
 public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
 
     private final String name;
-    private final int minLimit;
+    private final int maxNumberOfItinerariesPrGroup;
     private final Function<Itinerary, T> groupingBy;
     private final ItineraryFilter arrangeBy;
 
@@ -27,12 +26,12 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
             String name,
             Function<Itinerary, T> groupingBy,
             ItineraryFilter arrangeBy,
-            int minLimit
+            int maxNumberOfItinerariesPrGroup
     ) {
         this.name = name;
         this.groupingBy = groupingBy;
         this.arrangeBy = arrangeBy;
-        this.minLimit = minLimit;
+        this.maxNumberOfItinerariesPrGroup = maxNumberOfItinerariesPrGroup;
     }
 
     @Override
@@ -42,7 +41,7 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
 
     @Override
     public final List<Itinerary> filter(List<Itinerary> itineraries) {
-        if(itineraries.size() <= minLimit) { return itineraries; }
+        if(itineraries.size() <= maxNumberOfItinerariesPrGroup) { return itineraries; }
 
         List<Entry<T>> groups = new ArrayList<>();
 
@@ -71,8 +70,9 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
         // Remove leftover of group mergeAndClear operations
         groups.removeIf(g -> g.itineraries.isEmpty());
 
-        final int groupMaxLimit = groupMaxLimit(minLimit, groups.size());
-        final ItineraryFilter maxLimitFilter = new MaxLimitFilter(name(), groupMaxLimit);
+        final ItineraryFilter maxLimitFilter = new MaxLimitFilter(name(),
+                maxNumberOfItinerariesPrGroup
+        );
 
         List<Itinerary> result = new ArrayList<>();
         for (Entry<T> e : groups) {
@@ -87,17 +87,6 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
     @Override
     public final boolean removeItineraries() {
         return true;
-    }
-
-    /**
-     * Get a approximate max limit for each group so that the total
-     * minLimit is respected. For example, if the min limit is 5 elements
-     * and there is 3 groups, we set the maxLimit for each group to 2,
-     * returning between 4 and 6 elements depending on the distribution.
-     */
-    static int groupMaxLimit(int minLimit, int nGroups) {
-
-        return Math.max(1, Math.round((float) minLimit / nGroups));
     }
 
     private static class Entry<T extends GroupId<T>> {

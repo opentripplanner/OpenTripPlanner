@@ -158,7 +158,6 @@ public class ServiceJourneyType {
                             .name("date")
                             .type(gqlUtil.dateScalar)
                             .description("Date to get estimated calls for. Defaults to today.")
-                            .defaultValue(null)
                             .build())
                     .dataFetcher(environment -> {
                         final Trip trip = trip(environment);
@@ -200,7 +199,7 @@ public class ServiceJourneyType {
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment)
                             .getTransitAlertService()
-                            .getTripAlerts(trip(environment).getId())
+                            .getTripAlerts(trip(environment).getId(), null)
                     )
                 .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
