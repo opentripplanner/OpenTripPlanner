@@ -65,15 +65,19 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.calculateConvexHull();
   }
 
-  private void linkTransitStops(Graph graph) {
+  public long linkTransitStops(Graph graph) {
     LOG.info("Linking transit stops to graph...");
+    long count = 0;
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
 
       // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
       if (tStop.hasPathways()) {
         continue;
       }
-
+      // check if stop is already linked, to allow multiple linking cycles
+      if (tStop.getDegreeOut() + tStop.getDegreeIn() > 0) {
+        continue;
+      }
       TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
 
       if (OTPFeature.FlexRouting.isOn()) {
@@ -93,10 +97,12 @@ public class StreetLinkerModule implements GraphBuilderModule {
               new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
           )
       );
+      count++;
     }
+    return count;
   }
 
-  private void linkTransitEntrances(Graph graph) {
+  public void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
       graph.getLinker().linkVertexPermanently(

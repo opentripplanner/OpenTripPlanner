@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -66,9 +67,13 @@ public class PruneNoThruIslands implements GraphBuilderModule {
      */
     private String islandLogFile = null;
 
-    private StreetLinkerModule streetLinkerModule;
+    private final StreetLinkerModule streetLinkerModule;
 
     private static int islandCounter = 0;
+
+    public PruneNoThruIslands(StreetLinkerModule streetLinkerModule) {
+        this.streetLinkerModule = streetLinkerModule;
+    }
 
     public List<String> provides() {
         return Collections.emptyList();
@@ -92,7 +97,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         LOG.info("Pruning islands and areas isolated by nothru edges in street network");
 
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
-	        pruningThresholdIslandWithStops, null,
+                pruningThresholdIslandWithStops, null,
                 issueStore, TraverseMode.BICYCLE
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
@@ -103,10 +108,19 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 pruningThresholdIslandWithStops, null,
                 issueStore, TraverseMode.CAR
         );
-        // TODO: selectively reconnect stops on small islands (that removed)
-        // running the full StreetLinkerModule is most likely not OK (crashes on npe)
-        // LOG.info("Reconnecting stops");
-        // streetLinkerModule.*todoFixMethod*(graph, extra, issueStore);
+        // reconnect stops that got disconnected
+        if (streetLinkerModule != null) {
+            LOG.info("Reconnecting stops");
+            long count = streetLinkerModule.linkTransitStops(graph);
+            LOG.debug("Tried to reconnect {} stops", count);
+            int isolated = 0;
+            for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
+                if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {
+                    isolated++;
+                }
+            }
+            LOG.info("{} stops remain isolated", isolated);
+        }
 
         LOG.debug("Done pruning nothru islands");
     }
@@ -399,6 +413,8 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                                 permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                             }
                             if (permission == StreetTraversalPermission.NONE) {
+                                // currently we must update spatial index manually, graph.removeEdge does not do that
+                                graph.getLinker().removePermanentEdgeFromIndex(pse);
                                 graph.removeEdge(pse);
                                 stats.put("removed", stats.get("removed") + 1);
                             }
@@ -414,14 +430,18 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         if (markIsolated) {
             return;
         }
+
         for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext(); ) {
             Vertex v = vIter.next();
             if (v.getDegreeOut() + v.getDegreeIn() == 0) {
                 graph.remove(v);
             }
         }
+
          //remove street connection form
         if (traverseMode == TraverseMode.WALK) {
+            // note: do not unlink stop if only CAR mode is pruned
+            // maybe this needs more logic for flex routing cases
             for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext(); ) {
                 Vertex v = vIter.next();
                 Collection<Edge> edges = new ArrayList<Edge>(v.getOutgoing());

@@ -178,7 +178,7 @@ public class GraphBuilder implements Runnable {
                 graphBuilder.addModule(pruneFloatingIslands);
             }
             if (OTPFeature.PruneNoThru.isOn()) { // more advanced island pruning
-                PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands();
+                PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
                 pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
                 pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
                 graphBuilder.addModule(pruneNoThruIslands);
