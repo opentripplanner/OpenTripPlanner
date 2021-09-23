@@ -41,7 +41,7 @@ public class TestTripPattern implements RaptorTripPattern {
    *   W : Wheelchair
    *   * : Board, Alight, Wheelchair
    *
-   * Example:   B BA BAW AW
+   * Example:   B BA * AW
    */
   public void restrictions(String codes) {
     String[] split = codes.split(" ");
