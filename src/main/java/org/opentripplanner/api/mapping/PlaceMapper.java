@@ -31,7 +31,7 @@ public class PlaceMapper {
 
         if (domain.stop != null) {
             api.stopId = FeedScopedIdMapper.mapToApi(domain.stop.getId());
-            api.stopCode = domain.stop != null ? domain.stop.getCode() : null;
+            api.stopCode = domain.stop.getCode();
             api.platformCode = domain.stop instanceof Stop ? ((Stop) domain.stop).getPlatformCode() : null;
             api.zoneId = domain.stop instanceof Stop ? ((Stop) domain.stop).getFirstZoneAsString() : null;
         }
