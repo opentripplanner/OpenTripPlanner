@@ -376,7 +376,7 @@ otp.widgets.ItinerariesWidget =
             }
 
             if(leg.mode === "WALK" || leg.mode === "BICYCLE" || leg.mode === "CAR") {
-                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
+                headerHtml += " "+otp.util.Itin.distanceString(leg.distance) + ", " + otp.util.Itin.durationString(leg.startTime, leg.endTime) + pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
                 if(otp.config.municoderHostname) {
                     var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
                     headerHtml += '<span id="'+spanId+'"></span>';
