@@ -5,6 +5,7 @@ package fi.metatavu.airquality.configuration_parsing;
  */
 public class IndexVariable {
     private String name;
+    private String displayName;
     private String variable;
 
     /**
@@ -17,12 +18,30 @@ public class IndexVariable {
     }
 
     /**
+     * Gets display name.
+     *
+     * @return the display name
+     */
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    /**
      * Sets name.
      *
      * @param name the name
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Sets display name.
+     *
+     * @param displayName the display name
+     */
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**
@@ -42,6 +61,4 @@ public class IndexVariable {
     public void setVariable(String variable) {
         this.variable = variable;
     }
-
 }
-
