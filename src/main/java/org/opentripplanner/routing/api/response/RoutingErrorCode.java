@@ -14,7 +14,6 @@ public enum RoutingErrorCode {
   /**
    * The time provided was outside the available service period.
    */
-  //TODO Currently not in use
   OUTSIDE_SERVICE_PERIOD,
 
   /**
@@ -25,5 +24,7 @@ public enum RoutingErrorCode {
   /**
    * The location was found, but no stops could be found within the search radius.
    */
-  NO_STOPS_IN_RANGE
+  NO_STOPS_IN_RANGE,
+
+  SYSTEM_ERROR
 }

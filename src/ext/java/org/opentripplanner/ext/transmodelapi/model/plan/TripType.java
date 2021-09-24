@@ -6,8 +6,10 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
+import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 import java.util.stream.Collectors;
 
@@ -56,16 +58,19 @@ public class TripType {
             .name("messageEnums")
             .description("A list of possible error messages as enum")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages
-                .stream().map(Enum::name).collect(Collectors.toList()))
+            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages.stream()
+                    .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
+                    .map(Enum::name)
+                    .collect(Collectors.toList()))
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("messageStrings")
             .description("A list of possible error messages in cleartext")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-            .dataFetcher(
-                env -> ((PlanResponse) env.getSource())
-                    .listErrorMessages(env.getArgument("locale"))
+            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages.stream()
+                    .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
+                    .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(env.getArgument("locale"))))
+                    .collect(Collectors.toList())
             )
             .build())
         // TODO OTP2 - Next version: Wrap errors, include data like witch parameter
