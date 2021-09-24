@@ -101,7 +101,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                     // Skip the origin stop, loop transfers are not needed.
                     if (sd.stop == stop) { continue; }
                     distinctTransfers.put(
-                        new TransferKey(sd.stop, sd.edges),
+                        new TransferKey(ts0.getStop(), sd.stop, sd.edges),
                         new SimpleTransfer(ts0.getStop(), sd.stop, sd.distance, sd.edges)
                     );
                 }
@@ -113,7 +113,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                         if (sd.stop == ts0.getStop()) { continue; }
                         if (sd.stop instanceof Stop) { continue; }
                         distinctTransfers.put(
-                            new TransferKey(sd.stop, sd.edges),
+                            new TransferKey(sd.stop, ts0.getStop(), sd.edges),
                             new SimpleTransfer(sd.stop, ts0.getStop(), sd.distance, sd.edges)
                         );
                     }
@@ -148,10 +148,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
 
     private static class TransferKey {
+        private final StopLocation source;
         private final StopLocation target;
         private final List<Edge> edges;
 
-        private TransferKey(StopLocation target, List<Edge> edges) {
+        private TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {
+            this.source = source;
             this.target = target;
             this.edges = edges;
         }
@@ -161,12 +163,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             if (this == o) { return true; }
             if (o == null || getClass() != o.getClass()) { return false; }
             final TransferKey that = (TransferKey) o;
-            return target.equals(that.target) && Objects.equals(edges, that.edges);
+            return source.equals(that.source) && target.equals(that.target) && Objects.equals(edges, that.edges);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(target, edges);
+            return Objects.hash(source, target, edges);
         }
     }
 }
