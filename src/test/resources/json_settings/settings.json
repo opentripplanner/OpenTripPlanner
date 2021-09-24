@@ -1,49 +1,123 @@
-[{
-  "fileName": "graphs/airquality.nc",
+{
+  "fileName": "data/airquality.nc",
   "latitudeVariable": "lat",
   "longitudeVariable": "lon",
   "timeVariable": "time",
+  "timeFormat": "HR",
   "indexVariables": [
     {
-      "name": "co2",
-      "variable": "daymax_cnc_CO"
-    },
-    {
-      "name": "no",
-      "variable": "daymax_cnc_NO"
-    },
-    {
-      "name": "so2",
-      "variable": "daymax_cnc_SO2"
-    },
-    {
-      "name": "o3",
-      "variable": "daymax_cnc_O3"
-    },
-    {
-      "name": "pm2",
-      "variable": "daymax_cnc_PM2_5"
-    },
-    {
-      "name": "pm10",
+      "name": "harmfulMicroParticlesPM_10",
+      "displayName": "Harmful micro particles pm 10",
       "variable": "daymax_cnc_PM10"
     },
     {
-      "name": "no2",
+      "name": "harmfulMicroparticlesPM2_5",
+      "displayName": "Harmful micro particles pm 2.5",
+      "variable": "daymax_cnc_PM2_5"
+    },
+    {
+      "name": "carbonMonoxide",
+      "displayName": "Carbon monoxide",
+      "variable": "daymax_cnc_CO"
+    },
+    {
+      "name": "nitrogenMonoxide",
+      "displayName": "Nitrogen monoxide",
+      "variable": "daymax_cnc_NO"
+    },
+    {
+      "name": "nitrogenDioxide",
+      "displayName": "Nitrogen dioxide",
       "variable": "daymax_cnc_NO2"
+    },
+    {
+      "name": "ozone",
+      "displayName": "Ozone",
+      "variable": "daymax_cnc_O3"
+    },
+    {
+      "name": "sulfurDioxide",
+      "displayName": "Sulfur dioxide",
+      "variable": "daymax_cnc_SO2"
     }
   ],
   "requestParameters": [
     {
-      "name": "sulfurDioxideThreshold",
+      "name": "harmful_micro_particles_PM_10_threshold",
       "parameterType": "threshold",
-      "variable": "so2"
+      "variable": "harmfulMicroParticlesPM_10"
     },
     {
-      "name": "sulfurDioxidePenalty",
+      "name": "harmful_micro_particles_PM_10_penalty",
       "parameterType": "penalty",
-      "variable": "so2",
+      "variable": "harmfulMicroParticlesPM_10",
+      "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
+    },
+    {
+      "name": "harmful_micro_particles_PM_2_threshold",
+      "parameterType": "threshold",
+      "variable": "harmfulMicroParticlesPM_2"
+    },
+    {
+      "name": "harmful_micro_particles_PM_2_penalty",
+      "parameterType": "penalty",
+      "variable": "harmfulMicroParticlesPM_2",
+      "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
+    },
+    {
+      "name": "carbon_monoxide_threshold",
+      "parameterType": "threshold",
+      "variable": "carbonMonoxide"
+    },
+    {
+      "name": "carbon_monoxide_penalty",
+      "parameterType": "penalty",
+      "variable": "carbonMonoxide",
+      "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
+    },
+    {
+      "name": "nitrogen_monoxide_threshold",
+      "parameterType": "threshold",
+      "variable": "nitrogenMonoxide"
+    },
+    {
+      "name": "nitrogen_monoxide_penalty",
+      "parameterType": "penalty",
+      "variable": "nitrogenMonoxide",
+      "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
+    },
+    {
+      "name": "nitrogen_dioxide_threshold",
+      "parameterType": "threshold",
+      "variable": "nitrogenDioxide"
+    },
+    {
+      "name": "nitrogen_dioxide_penalty",
+      "parameterType": "penalty",
+      "variable": "nitrogenDioxide",
+      "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
+    },
+    {
+      "name": "ozone_threshold",
+      "parameterType": "threshold",
+      "variable": "ozone"
+    },
+    {
+      "name": "ozone_penalty",
+      "parameterType": "penalty",
+      "variable": "ozone",
+      "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
+    },
+    {
+      "name": "sulfur_dioxide_threshold",
+      "parameterType": "threshold",
+      "variable": "sulfurDioxide"
+    },
+    {
+      "name": "sulfur_dioxide_penalty",
+      "parameterType": "penalty",
+      "variable": "sulfurDioxide",
       "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
     }
   ]
-}]
+}
