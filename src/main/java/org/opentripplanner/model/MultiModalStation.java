@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class MultiModalStation extends TransitEntity implements StopCollection {
     private static final long serialVersionUID = 1L;
 
-    private final Collection<Station> childStations;
+    private Collection<Station> childStations;
 
     private String name;
 
@@ -96,6 +97,12 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
 
     public Collection<Station> getChildStations() {
         return this.childStations;
+    }
+
+    public void removeChildStationIf(Predicate<Station> filter) {
+        childStations = Collections.unmodifiableCollection(childStations.stream()
+                .filter(Predicate.not(filter))
+                .collect(Collectors.toList()));
     }
 
     @Override

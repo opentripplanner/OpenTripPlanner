@@ -1,8 +1,11 @@
 package org.opentripplanner.standalone;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.ext.interactivelauncher.client.TestClient;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
@@ -16,8 +19,6 @@ import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up
@@ -171,6 +172,10 @@ public class OTPMain {
             router.graphVisualizer = new GraphVisualizer(router);
             router.graphVisualizer.run();
         }
+
+        new Thread(new TestClient(router)).start();
+
+
 
         /* Start web server if requested. */
         // We could start the server first so it can report build/load progress to a load balancer.

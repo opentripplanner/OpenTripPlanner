@@ -167,7 +167,8 @@ Feature | Description | Enabled by default | Sandbox
 `APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
 `OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (witch stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
 `GuaranteedTransfers` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
-`ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
+`RemoveUnusedStops` | Remove all stops if the stop or its parent station is _not_ in use by any pattern before building the graph. This feature is for debugging and testing. Remove all trips manually witch are not relevant for your test case, and let OTP clean up Stops, Stations, Pathways and Transfers. This feature can improve start-up time and reduce the Raptor stop matrix, witch simplify debugging. NOT RECOMMENDED FOR PRODUCTION. | no | yes
+`ActuatorAPI` | Endpoint for actuators (service health status) | no | yes
 `GoogleCloudStorage` | Enable Google Cloud Storage integration | no | yes
 `SandboxAPITransmodelApi` | Enable Entur Transmodel(NeTEx) GraphQL API | no | yes
 `SandboxAPILegacyGraphQLApi` | Enable (GTFS) GraphQL API | no | yes

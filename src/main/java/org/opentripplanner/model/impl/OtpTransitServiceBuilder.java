@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
@@ -29,7 +31,9 @@ import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
@@ -42,6 +46,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferPoint;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -294,6 +299,9 @@ public class OtpTransitServiceBuilder {
         removeStopTimesForNoneExistingTrips();
         fixOrRemovePatternsWhichReferenceNoneExistingTrips();
         removeTransfersForNoneExistingTrips();
+        if(OTPFeature.RemoveUnusedStops.isOn()) {
+            removeStopsUnusedByTripPatterns();
+        }
     }
 
     /** Remove all trips witch reference none existing service ids */
@@ -336,6 +344,124 @@ public class OtpTransitServiceBuilder {
         logRemove("Trip", orgSize, transfers.size(), "Transfer to/from trip does not exist.");
     }
 
+    private void removeStopsUnusedByTripPatterns() {
+        HashSet<Stop> keepStops = new HashSet<>();
+        HashSet<StopCollection> keepStopCollections = new HashSet<>();
+
+        for (TripPattern p : tripPatterns.values()) {
+            keepStops.addAll(p.getStops());
+            for (Stop stop : p.getStops()) {
+                if(stop.getParentStation() != null) {
+                    keepStopCollections.add(stop.getParentStation());
+                }
+            }
+        }
+
+        // Remove Stops
+        int orgSize = stopsById.size();
+        stopsById.removeIf(s -> !keepStops.contains(s) && !keepStopCollections.contains(s.getParentStation()));
+        logRemove("Stop", orgSize, stopsById.size(), "Stop/parent station not in use by any patterns.");
+
+        // Remove Stations
+        orgSize = stationsById.size();
+        stationsById.removeIf(s -> !keepStopCollections.contains(s));
+        logRemove("Station", orgSize, stationsById.size(), "Station not in use by any patterns.");
+
+        // Update/remove Multi-Modal-Stations
+        cleanAndRemoveMultiModalStationsWithReferencesToNoneExistingStations(keepStopCollections);
+        keepStopCollections.addAll(multiModalStationsById.values());
+
+        // Update/remove Group of stations
+        cleanAndRemoveGroupOfStationsWitchReferenceNoneExistingChildren(keepStopCollections);
+
+        // Remove Pathways and pathway nodes
+        removePathwaysAndStationElementsWithMissingReferences();
+
+        // Remove Transfers
+        orgSize = transfers.size();
+        transfers.removeIf(it -> !keepStops.contains(it.getFrom().getStop()) || !keepStops.contains(it.getTo().getStop()));
+        logRemove("Transfer", orgSize, transfers.size(), "Transfer to none existing stop.");
+    }
+
+
+    private void cleanAndRemoveMultiModalStationsWithReferencesToNoneExistingStations(
+            Set<? super Station> keepStations
+    ) {
+        Set<StopCollection> keepMMStations = new HashSet<>();
+
+        for (MultiModalStation mms : multiModalStationsById.values()) {
+            mms.removeChildStationIf(s -> !keepStations.contains(s));
+            if(!mms.getChildStations().isEmpty()) { keepMMStations.add(mms); }
+        }
+
+        int orgSize = multiModalStationsById.size();
+        multiModalStationsById.removeIf(it -> !keepMMStations.contains(it));
+        logRemove("MultiModalStation", orgSize, multiModalStationsById.size(), "MultiModalStation without existing stations.");
+    }
+
+    private void cleanAndRemoveGroupOfStationsWitchReferenceNoneExistingChildren(
+            Set<StopCollection> keepChildren
+    ) {
+        Set<StopCollection> keepGOStations = new HashSet<>();
+
+        // First remove all none existing stations and multi-modal stations
+        for (GroupOfStations gos : groupsOfStationsById.values()) {
+            gos.removeChildStationIf(it -> !(it instanceof GroupOfStations) && !keepChildren.contains(it));
+        }
+
+        // Take care of nested group-of-station(GOS) by removing all GOSs without stops in them
+        for (GroupOfStations gos : groupsOfStationsById.values()) {
+            gos.removeChildStationIf(it -> it.getChildStops().isEmpty());
+            if(!gos.getChildStops().isEmpty()) {
+                keepGOStations.add(gos);
+            }
+        }
+
+        // Finally update the index
+        int orgSize = groupsOfStationsById.size();
+        groupsOfStationsById.removeIf(it -> !keepGOStations.contains(it));
+        logRemove("GroupOfStations", orgSize, groupsOfStationsById.size(), "GroupOfStations without existing stations.");
+    }
+
+    private void removePathwaysAndStationElementsWithMissingReferences() {
+        int orgSizePathways = pathways.size();
+        int orgSizeEntrances = entrancesById.size();
+        int orgSizePathwayNodes = pathwayNodesById.size();
+        int orgSizeBoardingAreas = boardingAreasById.size();
+
+        Set<StationElement> keepStationElement = new HashSet<>(stopsById.values());
+        keepStationElement.addAll(entrancesById.values());
+        keepStationElement.addAll(pathwayNodesById.values());
+        keepStationElement.addAll(boardingAreasById.values());
+
+        boolean changed = true;
+
+        // Iteratively remove Pathway elements until no more elements can be removed
+        while (changed) {
+            changed = pathways.removeIf(p ->
+                    !keepStationElement.contains(p.getFromStop()) ||
+                    !keepStationElement.contains(p.getToStop())
+            );
+
+            // Find all elements used in the pathways
+            keepStationElement.clear();
+            keepStationElement.addAll(pathways.stream()
+                    .flatMap(p -> Stream.of(p.getFromStop(), p.getToStop()))
+                    .collect(Collectors.toList())
+            );
+        }
+
+        // Clean indexes
+        entrancesById.removeIf(e -> !keepStationElement.contains(e));
+        pathwayNodesById.removeIf(e -> !keepStationElement.contains(e));
+        boardingAreasById.removeIf(e -> !keepStationElement.contains(e));
+
+        logRemove("Pathway", orgSizePathways, pathways.size(), "Pathway without existing station element.");
+        logRemove("Entrance", orgSizeEntrances, entrancesById.size(), "Entrance not part of Pathway.");
+        logRemove("PathwayNode", orgSizePathwayNodes, pathwayNodesById.size(), "PathwayNode not part of Pathway.");
+        logRemove("BoardingArea", orgSizeBoardingAreas, boardingAreasById.size(), "BoardingArea not part of Pathway.");
+    }
+
     /** Return {@code true} if the from/to trip reference is none null, but do not exist. */
     private boolean transferTripsDoesNotExist(Transfer t) {
         return transferTripPointDoesNotExist(t.getFrom())
@@ -349,6 +475,9 @@ public class OtpTransitServiceBuilder {
 
     private static void logRemove(String type, int orgSize, int newSize, String reason) {
         if(orgSize == newSize) { return; }
-        LOG.info("{} of {} {}(s) removed. Reason: {}", orgSize - newSize, orgSize, type, reason);
+        LOG.info(
+                "{} of {} {}(s) removed, {} left. Reason: {}",
+                orgSize - newSize, orgSize, type, newSize, reason
+        );
     }
 }
