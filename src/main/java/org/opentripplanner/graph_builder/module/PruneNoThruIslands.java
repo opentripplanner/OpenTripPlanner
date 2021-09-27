@@ -126,6 +126,19 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             LOG.info("{} stops remain isolated", isolated);
         }
 
+        // clean up pruned street vertices
+        int removed = 0;
+        List<Vertex> toRemove = new LinkedList<>();
+        for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
+            if (v.getDegreeOut() + v.getDegreeIn() == 0)
+                toRemove.add(v);
+        }
+        for (Vertex v : toRemove) {
+            graph.remove(v);
+            removed += 1;
+        }
+        LOG.info("Removed {} edgeless street vertices", removed);
+
         LOG.debug("Done pruning nothru islands");
     }
 
