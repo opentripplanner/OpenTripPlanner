@@ -215,10 +215,13 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         int waitTime = pathLeg.waitTimeBeforeNextTransitIncludingSlack();
         if(waitTime < 0) { return; }
 
-        var c = (TransferConstraint)pathLeg.constrainedTransferAfterLeg();
+        var tx = pathLeg.constrainedTransferAfterLeg();
 
-        // If the transfer is guaranteed or stay-seated, then no wait-time cost is added
-        if(c != null && (c.isFacilitated())) { return; }
+        if(tx != null) {
+            var c = (TransferConstraint)tx.getTransferConstraint();
+            // If the transfer is stay-seated or guaranteed, then no wait-time cost is added
+            if (c != null && c.isFacilitated()) { return; }
+        }
 
         int cost = waitTimeCostCalculator.calculateOptimizedWaitCost(waitTime);
         this.waitTimeOptimizedCost += cost;

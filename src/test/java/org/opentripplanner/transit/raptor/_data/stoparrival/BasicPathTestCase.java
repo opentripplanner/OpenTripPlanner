@@ -81,7 +81,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     private static final int TRANSFER_COST_SEC = 120;
     private static final double[] TRANSIT_RELUCTANCE = new double[] { 1.0 };
     public static final int TRANSIT_RELUCTANCE_INDEX = 0;
-    private static final double WAIT_RELUCTANCE = 0.8;
+    public static final double WAIT_RELUCTANCE = 0.8;
 
     /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
     private static final int[] STOP_COSTS = {0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0};
