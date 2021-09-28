@@ -65,7 +65,7 @@ public class TransferConstraintTest implements TransferTestData {
 
   @Test
   public void testToString() {
-    assertEquals("{ NONE }", NO_CONSTRAINS.toString());
+    assertEquals("{no constraints}", NO_CONSTRAINS.toString());
     assertEquals(
             "{priority: PREFERRED, staySeated, guaranteed, maxWaitTime: 1h}",
             EVERYTHING.toString()

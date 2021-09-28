@@ -94,7 +94,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     }
 
     public String toString() {
-        if(noConstraints()) { return "{ NONE }"; }
+        if(noConstraints()) { return "{no constraints}"; }
 
         return ToStringBuilder.of()
                 .addEnum("priority", priority, ALLOWED)

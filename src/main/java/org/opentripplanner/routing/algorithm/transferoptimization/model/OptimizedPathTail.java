@@ -181,9 +181,9 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         return ValueObjectToStringBuilder.of()
                 .addObj(super.toString())
                 .addText(" [")
-                .addCost(generalizedCost()).addText(" ")
-                .addCost(waitTimeOptimizedCost).addText("wtc ")
-                .addCost(transferPriorityCost).addText("pri")
+                .addCost(generalizedCost())
+                .addCost(transferPriorityCost, "pri")
+                .addCost(waitTimeOptimizedCost, "wtc")
                 .addText("]")
                 .toString();
     }
@@ -199,8 +199,8 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     }
 
     /**
-     * Add cost of wait time if the given path leg is a transit leg and it is followed by
-     * another transit leg (with a optional transit leg in between).
+     * Add cost of wait-time, if the given path leg is a transit leg and it is followed by
+     * another transit leg (with a optional transfer leg in between).
      * <p>
      *   Guaranteed and stay-seated transfers have zero wait-time cost.
      * <p>

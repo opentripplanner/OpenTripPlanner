@@ -59,7 +59,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
                 + "~ BUS L21 11:00 11:23 ~ 4 "
                 + "~ BUS L31 11:40 11:52 ~ 5 "
                 + "~ Walk 7m45s "
-                + "[$8019 $153.91wtc $-1pri]";
+                + "[$8019 $-1pri $153.91wtc]";
 
         assertEquals(exp, subject.toString());
     }
@@ -104,7 +104,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
         var expPath = "Walk 3m15s 10:00 10:03:15 $390 ~ A 45s "
                 + "~ BUS L11 10:04 10:35 31m $1998 ~ B 15s "
                 + "~ Walk 2m 10:35:15 10:37:15 $240 ~ C 22m45s "
-                + "~ BUS L21 11:00 11:23 23m $2724ConstrainedTransfer{from: (trip: BUS L21:11:00, stopPos: 1), to: (trip: BUS L31:11:40, stopPos: 0), constraint: {staySeated}} ~ D 17m "
+                + "~ BUS L21 11:00 11:23 23m $2724 ~ D 17m {staySeated} "
                 + "~ BUS L31 11:40 11:52 12m $1737 ~ E 15s "
                 + "~ Walk 7m45s 11:52:15 12:00 $930 "
                 + "[10:00 12:00 2h $8019]";
