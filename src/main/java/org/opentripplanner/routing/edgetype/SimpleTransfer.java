@@ -58,7 +58,7 @@ public class SimpleTransfer extends Edge {
         if (!s0.getOptions().wheelchairAccessible && wheelchairAccessible) {
             return null;
         }
-        // we need to make sure that we when in wheelchair mode we only use the transfer
+        // we need to make sure that, when in wheelchair mode, we only use the transfer
         // generated for the wheelchair
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
