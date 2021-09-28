@@ -35,10 +35,11 @@ public class AccessibilityRoutingTest {
     }
 
     @Test
-    public void accessibilityScoreOnlyForAccessibleRoutes() {
+    public void shouldPopulateAccessibilityScoreOnlyForAccessibleRoutes() {
         GenericLocation start = new GenericLocation(33.74703, -84.39440);
         GenericLocation end = new GenericLocation(33.75029, -84.39188);
 
+        // wheelchair=true is set by default, check method
         Itinerary i = getTripPlan(start, end, r -> r.setMode(TraverseMode.WALK)).itinerary.get(0);
         List<Leg> legs = i.legs;
 
@@ -53,11 +54,10 @@ public class AccessibilityRoutingTest {
         }).itinerary.get(0);
         leg = i.legs.get(0);
         assertNull(leg.accessibilityScore);
-
     }
 
     @Test
-    public void accessibleTrip() {
+    public void canScoreAccessibleTrip() {
         // near Georgia State station
         GenericLocation start = new GenericLocation(33.75054, -84.38409);
         // near Ashby station
@@ -78,7 +78,7 @@ public class AccessibilityRoutingTest {
     }
 
     @Test
-    public void tripWhereStartIsNotAccessible() {
+    public void canScoreTripWhereStartIsNotAccessible() {
         // near Five Points station
         GenericLocation start = new GenericLocation(33.75374, -84.39228);
         // near Ashby station
@@ -113,11 +113,10 @@ public class AccessibilityRoutingTest {
 
         // because we are walking to a station with good accessibility, we get a perfect score again
         assertEquals(1, leg.accessibilityScore);
-
     }
 
     @Test
-    public void tripWhereStartHasUnknownAccessibility() {
+    public void canScoreTripWhereStartHasUnknownAccessibility() {
         // near CNN Center station
         GenericLocation start = new GenericLocation(33.7565, -84.3958);
         // near Ashby station
@@ -158,7 +157,7 @@ public class AccessibilityRoutingTest {
     }
 
     @Test
-    public void badTripScore() {
+    public void canScoreTripWithInaccessibleTransitLeg() {
         // near Georgia State station
         GenericLocation start = new GenericLocation(33.75054, -84.38409);
         // near Ashby station
@@ -180,7 +179,7 @@ public class AccessibilityRoutingTest {
     }
 
     @Test
-    public void stairsPenalty() {
+    public void canApplyStairsPenalty() {
         GenericLocation start = new GenericLocation(33.75630, -84.39527);
         GenericLocation end = new GenericLocation(33.75649, -84.39580);
 
@@ -201,7 +200,7 @@ public class AccessibilityRoutingTest {
     }
 
     @Test
-    public void noWheelchairAccessStreetPenalty() {
+    public void canApplyNoWheelchairAccessStreetPenalty() {
         // since i cannot find a real-life example of an inaccessible street in central Atlanta
         // i manually set Hogue Street Northeast (https://www.openstreetmap.org/way/9254841)
         // to be inaccessible in the OSM data
@@ -228,7 +227,7 @@ public class AccessibilityRoutingTest {
     }
 
     @Test
-    public void accessibleTransfers() {
+    public void canScoreAccessibleTransfers() {
         // Memorial Drive
         GenericLocation start = new GenericLocation(33.74684, -84.37910);
 

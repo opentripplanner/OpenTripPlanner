@@ -153,7 +153,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public int noWheelchairAccessOnElevatorPenalty = 600;
     /**
-     * The cost of traversing a street which we know to be wheelchair-inaccessible.
+     * The cost of traversing a street which we know to be wheelchair-inaccessible as it is
+     * tagged with wheelchair=no (eg. https://www.openstreetmap.org/way/128366294).
      *
      * This is called a reluctance rather than a penalty because we multiply it with the length
      * of the street. This means traversing a 100 meter street (without wheelchair access) is 10

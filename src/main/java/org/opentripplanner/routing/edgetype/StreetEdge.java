@@ -657,7 +657,7 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
-        if(options.wheelchairAccessible && !isWheelchairAccessible()) {
+        if (options.wheelchairAccessible && !isWheelchairAccessible()) {
             weight *= options.noWheelchairAccessOnStreetReluctance;
             // why do we have to increase the time?
             // because when we compute accessible transfers we only look at the time of the travel
@@ -673,7 +673,7 @@ public class StreetEdge extends Edge implements Cloneable {
             // not at the cost. perhaps we should? See EarliestArrivalSearch.java
             // https://github.com/ibi-group/OpenTripPlanner/blob/f2b375364985b8dd83f791950d955e3ec5c9cb34/src/main/java/org/opentripplanner/routing/algorithm/EarliestArrivalSearch.java#L76
             time += options.wheelchairStairsPenalty;
-        } else if(isStairs()) {
+        } else if (isStairs()) {
             weight *= options.stairsReluctance;
         } else {
             // TODO: this is being applied even when biking or driving.

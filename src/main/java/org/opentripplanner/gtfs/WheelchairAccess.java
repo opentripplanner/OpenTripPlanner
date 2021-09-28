@@ -6,7 +6,7 @@ package org.opentripplanner.gtfs;
  * Used to decide if wheelchair users can use a certain stop or trip.
  */
 public enum WheelchairAccess {
-    UNKNOWN,ALLOWED,NOT_ALLOWED;
+    UNKNOWN, ALLOWED, NOT_ALLOWED;
 
     public static WheelchairAccess fromGtfsValue(int v) {
         switch (v) {

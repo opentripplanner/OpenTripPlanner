@@ -420,7 +420,7 @@ public abstract class GraphPathToTripPlanConverter {
         addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
 
         // since this method also computes the accessibility scores it needs to be run after
-        // addPlaces() because for stop information is needed for this computation.
+        // addPlaces() because the stop information is needed for this computation.
         addTripFields(leg, states, requestedLocale);
 
 

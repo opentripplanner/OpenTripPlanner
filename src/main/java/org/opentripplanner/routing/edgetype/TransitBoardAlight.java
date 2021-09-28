@@ -361,7 +361,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     private void addTripWheelchairPenalty(RoutingRequest options, Trip trip, StateEditor s1) {
         if (options.wheelchairAccessible) {
             final WheelchairAccess wa = WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible());
-            if(wa == WheelchairAccess.NOT_ALLOWED) {
+            if (wa == WheelchairAccess.NOT_ALLOWED) {
                 s1.incrementWeight(options.noWheelchairAccessAtTripPenalty);
             }
             else if (wa == WheelchairAccess.UNKNOWN) {
