@@ -69,12 +69,7 @@ public class AccessibilityRoutingTest {
         assertEquals(1, transitLegs.size());
 
         Leg leg = transitLegs.get(0);
-        assertEquals("BLUE", leg.routeShortName);
-
-        assertEquals("GEORGIA STATE STATION", leg.from.name);
-        assertEquals("ASHBY STATION", leg.to.name);
-        // since both the start and end stops and the trip are accessible, we get a perfect score
-        assertEquals(1, leg.accessibilityScore);
+        assertBlueLineFromGeorgiaStateToAshby(leg);
     }
 
     @Test
@@ -106,12 +101,15 @@ public class AccessibilityRoutingTest {
         transitLegs = i.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
 
         leg = transitLegs.get(0);
+        assertBlueLineFromGeorgiaStateToAshby(leg);
+    }
+
+    private void assertBlueLineFromGeorgiaStateToAshby(Leg leg) {
         assertEquals("BLUE", leg.routeShortName);
 
         assertEquals("GEORGIA STATE STATION", leg.from.name);
         assertEquals("ASHBY STATION", leg.to.name);
-
-        // because we are walking to a station with good accessibility, we get a perfect score again
+        // since both the start and end stops and the trip are accessible, we get a perfect score
         assertEquals(1, leg.accessibilityScore);
     }
 
