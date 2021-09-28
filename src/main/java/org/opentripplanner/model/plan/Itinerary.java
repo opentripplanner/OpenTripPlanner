@@ -225,17 +225,20 @@ public class Itinerary {
     }
 
     /**
-     * A itinerary can be tagged with a system notice. System notices should only be added to a
-     * response if explicit asked for in the request.
+     * An itinerary can be marked for removal with a system notice.
      * <p>
-     * For example when tuning or manually testing the itinerary-filter-chain it you can enable the
+     * For example when tuning or manually testing the itinerary-filter-chain it you can enable
      * {@link org.opentripplanner.routing.api.request.ItineraryFilterParameters#debug} and instead
-     * of removing itineraries from the result the itineraries would be tagged by the filters
-     * instead. This enable investigating, why an expected itinerary is missing from the result
-     * set.
+     * of removing itineraries from the result the itineraries will be tagged by the filters
+     * instead. This enables investigating, why an expected itinerary is missing from the result
+     * set. It can be also used by other filters to see the already filtered itineraries.
      */
-    public void addSystemNotice(SystemNotice notice) {
+    public void markAsDeleted(SystemNotice notice) {
         systemNotices.add(notice);
+    }
+
+    public boolean isMarkedAsDeleted() {
+        return !systemNotices.isEmpty();
     }
 
     public void timeShiftToStartAt(Calendar afterTime) {
