@@ -4,6 +4,7 @@ import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProvid
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
 
 import java.util.Collection;
+import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
@@ -251,5 +252,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return searchForward
                 ? new ForwardPathMapper<>(txConstraintsSearch, slackProvider, costCalc, lifeCycle)
                 : new ReversePathMapper<>(txConstraintsSearch, slackProvider, costCalc, lifeCycle);
+    }
+
+    public IntFunction<String> stopIndexTranslatorForDebugging() {
+        return transit.stopIndexTranslatorForDebugging();
     }
 }

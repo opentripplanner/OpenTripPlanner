@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -16,6 +17,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
+import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private static final Logger LOG = LoggerFactory.getLogger(DestinationArrivalPaths.class);
+    private static final Logger LOG_MISS_MATCH = ThrottleLogger.throttle(LOG);
 
     private final ParetoSet<Path<T>> paths;
     private final TransitCalculator<T> transitCalculator;
@@ -43,6 +46,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final SlackProvider slackProvider;
     private final PathMapper<T> pathMapper;
     private final DebugHandler<ArrivalView<?>> debugHandler;
+    private final IntFunction<String> stopNamesForDebugging;
     private boolean reachedCurrentRound = false;
     private int iterationDepartureTime = -1;
 
@@ -53,6 +57,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
             SlackProvider slackProvider,
             PathMapper<T> pathMapper,
             DebugHandlerFactory<T> debugHandlerFactory,
+            IntFunction<String> stopNamesForDebugging,
             WorkerLifeCycle lifeCycle
     ) {
         this.paths = new ParetoSet<>(paretoComparator, debugHandlerFactory.paretoSetDebugPathListener());
@@ -61,6 +66,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         this.slackProvider = slackProvider;
         this.pathMapper = pathMapper;
         this.debugHandler = debugHandlerFactory.debugStopArrival();
+        this.stopNamesForDebugging = stopNamesForDebugging;
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
@@ -142,7 +148,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
     @Override
     public String toString() {
-        return paths.toString();
+        return paths.toString((p) -> p.toString(stopNamesForDebugging));
     }
 
 
@@ -170,11 +176,12 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
      */
     private void assertGeneralizedCostIsCalculatedCorrectByMapper(DestinationArrival<T> destArrival, Path<T> path) {
         if(path.generalizedCost() != destArrival.cost()) {
-            LOG.error(
-                    "Cost mismatch - Mapper: {}, Raptor: {}, path: {}",
+            // TODO - Bug: Cost mismatch stop-arrivals and paths #3623
+            LOG_MISS_MATCH.warn(
+                    "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}",
                     OtpNumberFormat.formatCost(path.generalizedCost()),
                     raptorCostsAsString(destArrival),
-                    path.toStringDetailed(null)
+                    path.toStringDetailed(stopNamesForDebugging)
             );
         }
     }

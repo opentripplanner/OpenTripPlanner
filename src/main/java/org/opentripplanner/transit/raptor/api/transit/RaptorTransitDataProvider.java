@@ -2,6 +2,8 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 
 import java.util.Iterator;
+import java.util.function.IntFunction;
+import javax.validation.constraints.NotNull;
 
 
 /**
@@ -84,4 +86,15 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      * performance.
      */
     RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch();
+
+    /**
+     * Raptor relay on stop indexes for all references to stops for performance reasons, but
+     * when a critical error occurs it would be nice to be able to inject information in the
+     * log event or during debugging to see witch stop it is. This is important to be able to
+     * reproduce the error. This method is used by Raptor to translate the stop index to a
+     * string witch should be short and identify the stop given the related pattern, for example
+     * the stop name would be great.
+     */
+    @NotNull
+    IntFunction<String> stopIndexTranslatorForDebugging();
 }

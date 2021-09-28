@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.val;
@@ -17,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalc
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
@@ -28,7 +30,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 
 @SuppressWarnings("UnusedReturnValue")
-public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule> {
+public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
 
   private static final TransferConstraint GUARANTEED = new TransferConstraint(
           TransferPriority.ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET
@@ -92,6 +94,12 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
         throw new IllegalStateException("More than on transfers found: " + list);
       }
     };
+  }
+
+  @Override
+  public IntFunction<String> stopIndexTranslatorForDebugging() {
+    // Index is translated: 1->'A', 2->'B', 3->'C' ...
+    return this::stopIndexToName;
   }
 
   public TestRoute getRoute(int index) {

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -127,6 +128,14 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
                 toStopPosition
         );
       }
+    };
+  }
+
+  @Override
+  public IntFunction<String> stopIndexTranslatorForDebugging() {
+    return (int stopIndex) -> {
+      var s = transitLayer.getStopByIndex(stopIndex);
+      return s==null ? "null" : s.getName() + "(" + stopIndex + ")";
     };
   }
 

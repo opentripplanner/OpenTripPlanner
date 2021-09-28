@@ -105,6 +105,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
      * @return previous state or throw a NPE if no previousArrival exist.
      */
     final int previousStop() {
+        //noinspection ConstantConditions
         return previous.stop;
     }
 
@@ -130,9 +131,5 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     @Override
     public final int hashCode() {
         throw new IllegalStateException("Avoid using hashCode() and equals() for this class.");
-    }
-
-    private boolean isTransitFollowedByTransit() {
-        return arrivedByTransit() && previous.arrivedByTransit();
     }
 }
