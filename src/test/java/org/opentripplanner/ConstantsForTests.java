@@ -40,7 +40,7 @@ public class ConstantsForTests {
     // - https://www.openstreetmap.org/way/9254841
     // - https://www.openstreetmap.org/way/849819590
     public static final String CENTRAL_ATLANTA_OSM = "/atlanta/central-atlanta-filtered.osm.pbf";
-    // contains the Atlanta Blue and Green lines and a single trip of bus 21
+    // contains the MARTA Blue and Green lines and a single trip of bus 21
     // the Green line and the bus are set to be wheelchair accessible but the Blue line is not
     // only Georgia State and Ashby Station are wheelchair accessible
     public static final String ATLANTA_BLUE_GREEN_LINE = "/atlanta/atlanta-blue-green-line.gtfs.zip";
