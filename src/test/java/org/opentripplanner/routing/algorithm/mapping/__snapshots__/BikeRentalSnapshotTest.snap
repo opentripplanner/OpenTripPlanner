@@ -315,15 +315,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.694539
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7114",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7114"
+            "stop": {
+              "code": "7114",
+              "coordinate": {
+                "latitude": 45.527818,
+                "longitude": -122.694539
+              },
+              "description": "Southbound stop in Portland (Stop ID 7114)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7114"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 15,
             "stopSequence": 16,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -385,15 +402,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.694539
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7114",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7114"
+            "stop": {
+              "code": "7114",
+              "coordinate": {
+                "latitude": 45.527818,
+                "longitude": -122.694539
+              },
+              "description": "Southbound stop in Portland (Stop ID 7114)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7114"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 15,
             "stopSequence": 16,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1175,
           "headsign": "136th Ave",
@@ -422,15 +456,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.677664
             },
             "name": "NW Everett & Broadway",
-            "stopCode": "1606",
-            "stopId": {
-              "feedId": "prt",
-              "id": "1606"
+            "stop": {
+              "code": "1606",
+              "coordinate": {
+                "latitude": 45.525112,
+                "longitude": -122.677664
+              },
+              "description": "Eastbound stop in Portland (Stop ID 1606)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "1606"
+              },
+              "name": "NW Everett & Broadway",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 22,
             "stopSequence": 23,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -495,15 +546,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.677664
             },
             "name": "NW Everett & Broadway",
-            "stopCode": "1606",
-            "stopId": {
-              "feedId": "prt",
-              "id": "1606"
+            "stop": {
+              "code": "1606",
+              "coordinate": {
+                "latitude": 45.525112,
+                "longitude": -122.677664
+              },
+              "description": "Eastbound stop in Portland (Stop ID 1606)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "1606"
+              },
+              "name": "NW Everett & Broadway",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 22,
             "stopSequence": 23,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 285,
           "interlineWithPreviousLeg": false,
@@ -639,15 +707,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.700988
             },
             "name": "W Burnside & SW Osage",
-            "stopCode": "9354",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9354"
+            "stop": {
+              "code": "9354",
+              "coordinate": {
+                "latitude": 45.523773,
+                "longitude": -122.700988
+              },
+              "description": "Eastbound stop in Portland (Stop ID 9354)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9354"
+              },
+              "name": "W Burnside & SW Osage",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 36,
             "stopSequence": 37,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -754,15 +839,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.700988
             },
             "name": "W Burnside & SW Osage",
-            "stopCode": "9354",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9354"
+            "stop": {
+              "code": "9354",
+              "coordinate": {
+                "latitude": 45.523773,
+                "longitude": -122.700988
+              },
+              "description": "Eastbound stop in Portland (Stop ID 9354)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9354"
+              },
+              "name": "W Burnside & SW Osage",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 36,
             "stopSequence": 37,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1133,
           "headsign": "Gresham TC",
@@ -791,15 +893,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.676924
             },
             "name": "W Burnside & SW 6th",
-            "stopCode": "792",
-            "stopId": {
-              "feedId": "prt",
-              "id": "792"
+            "stop": {
+              "code": "792",
+              "coordinate": {
+                "latitude": 45.522961,
+                "longitude": -122.676924
+              },
+              "description": "Eastbound stop in Portland (Stop ID 792)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "792"
+              },
+              "name": "W Burnside & SW 6th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 45,
             "stopSequence": 46,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -864,15 +983,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.676924
             },
             "name": "W Burnside & SW 6th",
-            "stopCode": "792",
-            "stopId": {
-              "feedId": "prt",
-              "id": "792"
+            "stop": {
+              "code": "792",
+              "coordinate": {
+                "latitude": 45.522961,
+                "longitude": -122.676924
+              },
+              "description": "Eastbound stop in Portland (Stop ID 792)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "792"
+              },
+              "name": "W Burnside & SW 6th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 45,
             "stopSequence": 46,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 579,
           "interlineWithPreviousLeg": false,
@@ -1059,15 +1195,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.700988
             },
             "name": "W Burnside & SW Osage",
-            "stopCode": "9354",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9354"
+            "stop": {
+              "code": "9354",
+              "coordinate": {
+                "latitude": 45.523773,
+                "longitude": -122.700988
+              },
+              "description": "Eastbound stop in Portland (Stop ID 9354)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9354"
+              },
+              "name": "W Burnside & SW Osage",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 36,
             "stopSequence": 37,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -1174,15 +1327,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.700988
             },
             "name": "W Burnside & SW Osage",
-            "stopCode": "9354",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9354"
+            "stop": {
+              "code": "9354",
+              "coordinate": {
+                "latitude": 45.523773,
+                "longitude": -122.700988
+              },
+              "description": "Eastbound stop in Portland (Stop ID 9354)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9354"
+              },
+              "name": "W Burnside & SW Osage",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 36,
             "stopSequence": 37,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1201,
           "headsign": "Gresham TC",
@@ -1211,15 +1381,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.674799
             },
             "name": "W Burnside & SW 4th",
-            "stopCode": "772",
-            "stopId": {
-              "feedId": "prt",
-              "id": "772"
+            "stop": {
+              "code": "772",
+              "coordinate": {
+                "latitude": 45.522974,
+                "longitude": -122.674799
+              },
+              "description": "Eastbound stop in Portland (Stop ID 772)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "772"
+              },
+              "name": "W Burnside & SW 4th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 46,
             "stopSequence": 47,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -1284,15 +1471,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.674799
             },
             "name": "W Burnside & SW 4th",
-            "stopCode": "772",
-            "stopId": {
-              "feedId": "prt",
-              "id": "772"
+            "stop": {
+              "code": "772",
+              "coordinate": {
+                "latitude": 45.522974,
+                "longitude": -122.674799
+              },
+              "description": "Eastbound stop in Portland (Stop ID 772)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "772"
+              },
+              "name": "W Burnside & SW 4th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 46,
             "stopSequence": 47,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 472,
           "interlineWithPreviousLeg": false,
@@ -1479,15 +1683,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.701423
             },
             "name": "2400 Block NW Lovejoy",
-            "stopCode": "3589",
-            "stopId": {
-              "feedId": "prt",
-              "id": "3589"
+            "stop": {
+              "code": "3589",
+              "coordinate": {
+                "latitude": 45.529662,
+                "longitude": -122.701423
+              },
+              "description": "Eastbound stop in Portland (Stop ID 3589)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "3589"
+              },
+              "name": "2400 Block NW Lovejoy",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 6,
             "stopSequence": 7,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -1543,15 +1764,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.701423
             },
             "name": "2400 Block NW Lovejoy",
-            "stopCode": "3589",
-            "stopId": {
-              "feedId": "prt",
-              "id": "3589"
+            "stop": {
+              "code": "3589",
+              "coordinate": {
+                "latitude": 45.529662,
+                "longitude": -122.701423
+              },
+              "description": "Eastbound stop in Portland (Stop ID 3589)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "3589"
+              },
+              "name": "2400 Block NW Lovejoy",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 6,
             "stopSequence": 7,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1391,
           "headsign": "Troutdale",
@@ -1580,15 +1818,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.674607
             },
             "name": "NW Everett & 4th",
-            "stopCode": "9546",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9546"
+            "stop": {
+              "code": "9546",
+              "coordinate": {
+                "latitude": 45.525183,
+                "longitude": -122.674607
+              },
+              "description": "Eastbound stop in Portland (Stop ID 9546)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9546"
+              },
+              "name": "NW Everett & 4th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 14,
             "stopSequence": 15,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -1653,15 +1908,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.674607
             },
             "name": "NW Everett & 4th",
-            "stopCode": "9546",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9546"
+            "stop": {
+              "code": "9546",
+              "coordinate": {
+                "latitude": 45.525183,
+                "longitude": -122.674607
+              },
+              "description": "Eastbound stop in Portland (Stop ID 9546)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9546"
+              },
+              "name": "NW Everett & 4th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 14,
             "stopSequence": 15,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 77,
           "interlineWithPreviousLeg": false,
@@ -2038,15 +2310,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.694539
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7114",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7114"
+            "stop": {
+              "code": "7114",
+              "coordinate": {
+                "latitude": 45.527818,
+                "longitude": -122.694539
+              },
+              "description": "Southbound stop in Portland (Stop ID 7114)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7114"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 15,
             "stopSequence": 16,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -2108,15 +2397,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.694539
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7114",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7114"
+            "stop": {
+              "code": "7114",
+              "coordinate": {
+                "latitude": 45.527818,
+                "longitude": -122.694539
+              },
+              "description": "Southbound stop in Portland (Stop ID 7114)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7114"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 15,
             "stopSequence": 16,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1175,
           "headsign": "136th Ave",
@@ -2145,15 +2451,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.677664
             },
             "name": "NW Everett & Broadway",
-            "stopCode": "1606",
-            "stopId": {
-              "feedId": "prt",
-              "id": "1606"
+            "stop": {
+              "code": "1606",
+              "coordinate": {
+                "latitude": 45.525112,
+                "longitude": -122.677664
+              },
+              "description": "Eastbound stop in Portland (Stop ID 1606)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "1606"
+              },
+              "name": "NW Everett & Broadway",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 22,
             "stopSequence": 23,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -2218,15 +2541,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.677664
             },
             "name": "NW Everett & Broadway",
-            "stopCode": "1606",
-            "stopId": {
-              "feedId": "prt",
-              "id": "1606"
+            "stop": {
+              "code": "1606",
+              "coordinate": {
+                "latitude": 45.525112,
+                "longitude": -122.677664
+              },
+              "description": "Eastbound stop in Portland (Stop ID 1606)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "1606"
+              },
+              "name": "NW Everett & Broadway",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 22,
             "stopSequence": 23,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 285,
           "interlineWithPreviousLeg": false,
@@ -2603,15 +2943,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.694539
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7114",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7114"
+            "stop": {
+              "code": "7114",
+              "coordinate": {
+                "latitude": 45.527818,
+                "longitude": -122.694539
+              },
+              "description": "Southbound stop in Portland (Stop ID 7114)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7114"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 50,
             "stopSequence": 51,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -2673,15 +3030,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.694539
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7114",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7114"
+            "stop": {
+              "code": "7114",
+              "coordinate": {
+                "latitude": 45.527818,
+                "longitude": -122.694539
+              },
+              "description": "Southbound stop in Portland (Stop ID 7114)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7114"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 50,
             "stopSequence": 51,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1175,
           "headsign": "136th Ave",
@@ -2710,15 +3084,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.677664
             },
             "name": "NW Everett & Broadway",
-            "stopCode": "1606",
-            "stopId": {
-              "feedId": "prt",
-              "id": "1606"
+            "stop": {
+              "code": "1606",
+              "coordinate": {
+                "latitude": 45.525112,
+                "longitude": -122.677664
+              },
+              "description": "Eastbound stop in Portland (Stop ID 1606)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "1606"
+              },
+              "name": "NW Everett & Broadway",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 57,
             "stopSequence": 58,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -2783,15 +3174,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "longitude": -122.677664
             },
             "name": "NW Everett & Broadway",
-            "stopCode": "1606",
-            "stopId": {
-              "feedId": "prt",
-              "id": "1606"
+            "stop": {
+              "code": "1606",
+              "coordinate": {
+                "latitude": 45.525112,
+                "longitude": -122.677664
+              },
+              "description": "Eastbound stop in Portland (Stop ID 1606)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "1606"
+              },
+              "name": "NW Everett & Broadway",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 57,
             "stopSequence": 58,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 285,
           "interlineWithPreviousLeg": false,
@@ -3908,15 +4316,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.676422
             },
             "name": "NW 6th & Flanders",
-            "stopCode": "9300",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9300"
+            "stop": {
+              "code": "9300",
+              "coordinate": {
+                "latitude": 45.52583,
+                "longitude": -122.676422
+              },
+              "description": "Northbound stop in Portland (Stop ID 9300)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9300"
+              },
+              "name": "NW 6th & Flanders",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 66,
             "stopSequence": 67,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -3989,15 +4414,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.676422
             },
             "name": "NW 6th & Flanders",
-            "stopCode": "9300",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9300"
+            "stop": {
+              "code": "9300",
+              "coordinate": {
+                "latitude": 45.52583,
+                "longitude": -122.676422
+              },
+              "description": "Northbound stop in Portland (Stop ID 9300)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9300"
+              },
+              "name": "NW 6th & Flanders",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 66,
             "stopSequence": 67,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1122,
           "headsign": "Sauvie Is. via St.Johns",
@@ -4026,15 +4468,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.694407
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7113",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7113"
+            "stop": {
+              "code": "7113",
+              "coordinate": {
+                "latitude": 45.527648,
+                "longitude": -122.694407
+              },
+              "description": "Northbound stop in Portland (Stop ID 7113)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7113"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 75,
             "stopSequence": 76,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -4099,15 +4558,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.694407
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7113",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7113"
+            "stop": {
+              "code": "7113",
+              "coordinate": {
+                "latitude": 45.527648,
+                "longitude": -122.694407
+              },
+              "description": "Northbound stop in Portland (Stop ID 7113)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7113"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 75,
             "stopSequence": 76,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 167,
           "interlineWithPreviousLeg": false,
@@ -4507,15 +4983,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.675893
             },
             "name": "W Burnside & NW 5th",
-            "stopCode": "782",
-            "stopId": {
-              "feedId": "prt",
-              "id": "782"
+            "stop": {
+              "code": "782",
+              "coordinate": {
+                "latitude": 45.523169,
+                "longitude": -122.675893
+              },
+              "description": "Westbound stop in Portland (Stop ID 782)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "782"
+              },
+              "name": "W Burnside & NW 5th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 99,
             "stopSequence": 100,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -4588,15 +5081,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.675893
             },
             "name": "W Burnside & NW 5th",
-            "stopCode": "782",
-            "stopId": {
-              "feedId": "prt",
-              "id": "782"
+            "stop": {
+              "code": "782",
+              "coordinate": {
+                "latitude": 45.523169,
+                "longitude": -122.675893
+              },
+              "description": "Westbound stop in Portland (Stop ID 782)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "782"
+              },
+              "name": "W Burnside & NW 5th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 99,
             "stopSequence": 100,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1203,
           "headsign": "Beaverton TC",
@@ -4625,15 +5135,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -4698,15 +5225,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 858,
           "interlineWithPreviousLeg": false,
@@ -4893,15 +5437,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.676462
             },
             "name": "NW Glisan & 6th",
-            "stopCode": "10803",
-            "stopId": {
-              "feedId": "prt",
-              "id": "10803"
+            "stop": {
+              "code": "10803",
+              "coordinate": {
+                "latitude": 45.526655,
+                "longitude": -122.676462
+              },
+              "description": "Westbound stop in Portland (Stop ID 10803)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "10803"
+              },
+              "name": "NW Glisan & 6th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 85,
             "stopSequence": 86,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -4991,15 +5552,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.676462
             },
             "name": "NW Glisan & 6th",
-            "stopCode": "10803",
-            "stopId": {
-              "feedId": "prt",
-              "id": "10803"
+            "stop": {
+              "code": "10803",
+              "coordinate": {
+                "latitude": 45.526655,
+                "longitude": -122.676462
+              },
+              "description": "Westbound stop in Portland (Stop ID 10803)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "10803"
+              },
+              "name": "NW Glisan & 6th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 85,
             "stopSequence": 86,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1077,
           "headsign": "Montgomery Park",
@@ -5028,15 +5606,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 93,
             "stopSequence": 94,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -5101,15 +5696,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 93,
             "stopSequence": 94,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 881,
           "interlineWithPreviousLeg": false,
@@ -5279,15 +5891,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.676422
             },
             "name": "NW 6th & Flanders",
-            "stopCode": "9300",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9300"
+            "stop": {
+              "code": "9300",
+              "coordinate": {
+                "latitude": 45.52583,
+                "longitude": -122.676422
+              },
+              "description": "Northbound stop in Portland (Stop ID 9300)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9300"
+              },
+              "name": "NW 6th & Flanders",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 66,
             "stopSequence": 67,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -5360,15 +5989,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.676422
             },
             "name": "NW 6th & Flanders",
-            "stopCode": "9300",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9300"
+            "stop": {
+              "code": "9300",
+              "coordinate": {
+                "latitude": 45.52583,
+                "longitude": -122.676422
+              },
+              "description": "Northbound stop in Portland (Stop ID 9300)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9300"
+              },
+              "name": "NW 6th & Flanders",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 66,
             "stopSequence": 67,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1122,
           "headsign": "31st & Industrial",
@@ -5397,15 +6043,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.694407
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7113",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7113"
+            "stop": {
+              "code": "7113",
+              "coordinate": {
+                "latitude": 45.527648,
+                "longitude": -122.694407
+              },
+              "description": "Northbound stop in Portland (Stop ID 7113)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7113"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 75,
             "stopSequence": 76,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -5470,15 +6133,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.694407
             },
             "name": "NW 21st & Irving",
-            "stopCode": "7113",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7113"
+            "stop": {
+              "code": "7113",
+              "coordinate": {
+                "latitude": 45.527648,
+                "longitude": -122.694407
+              },
+              "description": "Northbound stop in Portland (Stop ID 7113)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7113"
+              },
+              "name": "NW 21st & Irving",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 75,
             "stopSequence": 76,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 167,
           "interlineWithPreviousLeg": false,
@@ -5878,15 +6558,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.675893
             },
             "name": "W Burnside & NW 5th",
-            "stopCode": "782",
-            "stopId": {
-              "feedId": "prt",
-              "id": "782"
+            "stop": {
+              "code": "782",
+              "coordinate": {
+                "latitude": 45.523169,
+                "longitude": -122.675893
+              },
+              "description": "Westbound stop in Portland (Stop ID 782)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "782"
+              },
+              "name": "W Burnside & NW 5th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 99,
             "stopSequence": 100,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -5959,15 +6656,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.675893
             },
             "name": "W Burnside & NW 5th",
-            "stopCode": "782",
-            "stopId": {
-              "feedId": "prt",
-              "id": "782"
+            "stop": {
+              "code": "782",
+              "coordinate": {
+                "latitude": 45.523169,
+                "longitude": -122.675893
+              },
+              "description": "Westbound stop in Portland (Stop ID 782)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "782"
+              },
+              "name": "W Burnside & NW 5th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 99,
             "stopSequence": 100,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1263,
           "headsign": "Beaverton TC",
@@ -5996,15 +6710,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -6069,15 +6800,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 858,
           "interlineWithPreviousLeg": false,
@@ -6264,15 +7012,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.676462
             },
             "name": "NW Glisan & 6th",
-            "stopCode": "10803",
-            "stopId": {
-              "feedId": "prt",
-              "id": "10803"
+            "stop": {
+              "code": "10803",
+              "coordinate": {
+                "latitude": 45.526655,
+                "longitude": -122.676462
+              },
+              "description": "Westbound stop in Portland (Stop ID 10803)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "10803"
+              },
+              "name": "NW Glisan & 6th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 85,
             "stopSequence": 86,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -6362,15 +7127,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.676462
             },
             "name": "NW Glisan & 6th",
-            "stopCode": "10803",
-            "stopId": {
-              "feedId": "prt",
-              "id": "10803"
+            "stop": {
+              "code": "10803",
+              "coordinate": {
+                "latitude": 45.526655,
+                "longitude": -122.676462
+              },
+              "description": "Westbound stop in Portland (Stop ID 10803)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "10803"
+              },
+              "name": "NW Glisan & 6th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 85,
             "stopSequence": 86,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1077,
           "headsign": "Montgomery Park",
@@ -6399,15 +7181,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 93,
             "stopSequence": 94,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -6472,15 +7271,32 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 93,
             "stopSequence": 94,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 881,
           "interlineWithPreviousLeg": false,
