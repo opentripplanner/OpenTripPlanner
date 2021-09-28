@@ -189,7 +189,7 @@ public class AccessibilityRoutingTest {
         // if we reduce the stair penalty for wheelchairs we get a route that goes up the stairs
         i = getTripPlan(start, end, r -> {
             r.setMode(TraverseMode.WALK);
-            r.wheelchairStairsPenalty = 0;
+            r.wheelchairStairsReluctance = 0;
         }).itinerary.get(0);
 
         leg = i.legs.get(0);

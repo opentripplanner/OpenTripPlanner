@@ -145,9 +145,12 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public int noWheelchairAccessAtTripPenalty = 3 * unknownWheelchairAccessAtTripPenalty;
     /**
-     * The cost of using stairs in a wheelchair.
+     * The reluctance of using stairs in a wheelchair. This value will be multiplied with the
+     * regular cost of traversing the stairs which depends on its length.
+     *
+     * In other words 100 meter long stairs are 10 times worse than a 10 meter one.
      */
-    public int wheelchairStairsPenalty = 600;
+    public int wheelchairStairsReluctance = 20;
     /**
      * The cost of using an elevator which is not wheelchair-accessible.
      */
