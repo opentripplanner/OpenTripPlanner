@@ -124,7 +124,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
 
         // Insert wait-time cost summary info
         var expected = original.toStringDetailed(this::stopIndexToName)
-                .replace("$3250]", "$3250 $423.81wtc]");
+                .replace("$3250]", "$3250 $33pri $423.81wtc]");
 
         assertEquals(
                 expected,
@@ -186,7 +186,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
 
         assertEquals(
                 "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ "
-                        + "BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3010]",
+                        + "BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3010 $66pri]",
                 PathUtils.pathsToString(result)
         );
 
@@ -201,7 +201,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
 
         assertEquals(
                 "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C ~ BUS T2 10:15 10:35 ~ F "
-                        + "~ BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3040 $704.05wtc]",
+                        + "~ BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3040 $66pri $704.05wtc]",
                 PathUtils.pathsToString(result)
         );
     }
@@ -249,7 +249,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         var it = result.iterator().next();
 
         assertEquals(
-                "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:00:20 10:30:20 30m $1810]",
+                "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:00:20 10:30:20 30m $1810 $23pri]",
                 it.toString(this::stopIndexToName)
         );
         // Verify the attached Transfer is exist and is valid

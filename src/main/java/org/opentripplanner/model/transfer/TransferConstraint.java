@@ -8,9 +8,46 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
+/**
+ * This class holds transfer constraint information.
+ * <p>
+ * The class is immutable.
+ */
 public class TransferConstraint implements Serializable, RaptorTransferConstraint {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * STAY_SEATED is not a priority, but we assign a cost to it to be able to compare it with other
+     * transfers with a priority and the {@link #GUARANTIED_TRANSFER_COST}.
+     */
+    private static final int STAY_SEATED_TRANSFER_COST = 10_00;
+
+    /**
+     * GUARANTIED is not a priority, but we assign a cost to it to be able to compare it with other
+     * transfers with a priority. The cost is better than a pure prioritized transfer, but the
+     * priority and GUARANTIED attribute is added together; Hence a (GUARANTIED, RECOMMENDED)
+     * transfer is better than (GUARANTIED, ALLOWED).
+     */
+    private static final int GUARANTIED_TRANSFER_COST = 20_00;
+
+    /**
+     * A Transfer witch is NOT stay-seated or guaranteed is added a cost penalty of 10 points.
+     * This make sure a stay-seated and guaranteed transfers take precedence over the priority
+     * cost.
+     */
+    private static final int NONE_FACILITATED_COST = 30_00;
+
+    /**
+     * A Transfer witch is NOT stay-seated or guaranteed is added a cost penalty of 4 points.
+     */
+    private static final int DEFAULT_COST = NONE_FACILITATED_COST + ALLOWED.cost();
+
+    /**
+     * Starting point for calculating the transfer constraint cost.
+     */
+    public static final int ZERO_COST = 0;
+
 
     /**
      * Regular street transfers should be given this cost.
@@ -36,14 +73,17 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         this.staySeated = staySeated;
         this.guaranteed = guaranteed;
         this.maxWaitTime = maxWaitTime;
+
+        if(!guaranteed && maxWaitTime != MAX_WAIT_TIME_NOT_SET) {
+            throw new IllegalArgumentException("'maxWaitTime' do only apply to guaranteed transfers.");
+        }
     }
 
     /**
-     * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
-     * transfers. This cost is not related in any way to the path generalized-cost.
+     * @see #cost(TransferConstraint)
      */
-    public int priorityCost() {
-        return priority.cost(staySeated, guaranteed);
+    public int cost() {
+        return priority.cost() + facilitatedCost();
     }
 
     public TransferPriority getPriority() {
@@ -105,21 +145,40 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     }
 
     public boolean noConstraints() {
-        boolean prioritySet = priority != ALLOWED;
-        boolean maxWaitTimeSet = maxWaitTime != MAX_WAIT_TIME_NOT_SET;
-        return !(staySeated || guaranteed || prioritySet || maxWaitTimeSet);
+        // Note! The 'maxWaitTime' is only valid with the guaranteed flag set, so we
+        // do not need to check it here
+        return !(staySeated || guaranteed || priority.isConstrained());
     }
 
     /**
      * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
-     * transfers. This cost is not related in any way to the path generalized-cost.
+     * transfers. This cost is not related in any way to the path generalized-cost. It take the
+     * transfer constraint attributes into consideration only.
+     * <p>
+     * When comparing path that ride the same trips this can be used to find the optimal places to
+     * do the transfers. The cost is created to prioritize the following:
+     * <ol>
+     *     <li>{@code stay-seated} - cost: 10 points</li>
+     *     <li>{@code guaranteed} - cost: 20 points</li>
+     *     <li>None facilitated  - cost: 30 points</li>
+     * </ol>
+     * In addition the {@code priority} cost is added, see {@link TransferPriority#cost()}.
      *
      * @param c The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
      *          street generated transfer.
-     * @see TransferPriority#cost(boolean, boolean)
      */
-    public static int priorityCost(@Nullable TransferConstraint c) {
-        return c == null ? TransferPriority.NEUTRAL_PRIORITY_COST : c.priorityCost();
+    public static int cost(@Nullable TransferConstraint c) {
+        return c == null ? DEFAULT_COST : c.cost();
     }
 
+    /**
+     * Return a cost for stay-seated, guaranteed or none-facilitated transfers. This is
+     * used to prioritize stay-seated over guaranteed, and guaranteed over none-facilitated
+     * transfers.
+     */
+    private int facilitatedCost() {
+        if(staySeated) { return STAY_SEATED_TRANSFER_COST; }
+        if(guaranteed) { return GUARANTIED_TRANSFER_COST; }
+        return NONE_FACILITATED_COST;
+    }
 }

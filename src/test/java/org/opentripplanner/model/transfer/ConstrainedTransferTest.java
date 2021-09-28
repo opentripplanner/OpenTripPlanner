@@ -1,13 +1,14 @@
 package org.opentripplanner.model.transfer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 public class ConstrainedTransferTest implements TransferTestData {
 
@@ -25,7 +26,7 @@ public class ConstrainedTransferTest implements TransferTestData {
   private final ConstrainedTransfer TX_NO_CONSTRAINS = new ConstrainedTransfer(STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
   private final ConstrainedTransfer TX_GUARANTIED = new ConstrainedTransfer(TRIP_POINT_11, TRIP_POINT_23, GUARANTIED);
 
-  @Before
+  @BeforeEach
   public void setup() {
     ROUTE_1.setShortName("L1");
     ROUTE_2.setShortName("L2");

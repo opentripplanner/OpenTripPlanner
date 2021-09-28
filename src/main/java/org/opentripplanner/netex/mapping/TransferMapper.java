@@ -13,6 +13,7 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.netex.issues.InterchangeMaxWaitTimeNotGuaranteed;
 import org.opentripplanner.netex.issues.InterchangePointMappingFailed;
 import org.opentripplanner.netex.issues.InterchangeWithoutConstraint;
 import org.opentripplanner.netex.issues.ObjectNotFound;
@@ -67,6 +68,11 @@ public class TransferMapper {
         var guaranteed = isTrue(it.isGuaranteed());
         var priority = mapPriority(it.getPriority());
         var maxWaitTime = DurationMapper.mapDurationToSec(it.getMaximumWaitTime(), MAX_WAIT_TIME_NOT_SET);
+
+        if(!guaranteed && maxWaitTime != MAX_WAIT_TIME_NOT_SET) {
+            issueStore.add(new InterchangeMaxWaitTimeNotGuaranteed(it));
+            maxWaitTime = MAX_WAIT_TIME_NOT_SET;
+        }
 
         var c = new TransferConstraint(priority, staySeated, guaranteed, maxWaitTime);
         var tx = new ConstrainedTransfer(from, to, c);

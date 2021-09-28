@@ -18,17 +18,17 @@ class OptimizedPathTest implements RaptorTestConstants {
         assertEquals(BasicPathTestCase.TOTAL_COST, path.generalizedCost());
         assertEquals(0, path.breakTieCost());
         assertEquals(0, path.waitTimeOptimizedCost());
-        assertEquals(0, path.transferPriorityCost());
+        assertEquals(66_00, path.transferPriorityCost());
 
         // And toString is the same (transfer priority cost added)
         assertEquals(
-                BasicPathTestCase.BASIC_PATH_AS_STRING,
+                BasicPathTestCase.BASIC_PATH_AS_STRING.replace("]", " $66pri]"),
                 path.toString(this::stopIndexToName)
         );
 
         // Verify details
         assertEquals(
-                BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING,
+                BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING.replace("]", " $66pri]"),
                 path.toStringDetailed(this::stopIndexToName)
         );
 

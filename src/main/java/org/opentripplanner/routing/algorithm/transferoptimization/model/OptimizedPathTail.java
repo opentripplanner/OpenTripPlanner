@@ -8,7 +8,6 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathBuilder;
 import org.opentripplanner.transit.raptor.api.path.PathBuilderLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
@@ -32,8 +31,8 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
     @Nullable
     private final TransferWaitTimeCalculator waitTimeCostCalculator;
-    private int transferPriorityCost = 0;
-    private int waitTimeOptimizedCost = 0;
+    private int transferPriorityCost = TransferConstraint.ZERO_COST;
+    private int waitTimeOptimizedCost = TransferWaitTimeCalculator.ZERO_COST;
 
     public OptimizedPathTail(
             RaptorSlackProvider slackProvider,
@@ -57,7 +56,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         // Keep from- and to- times up to date by time-shifting access, transfer and egress legs.
         newLeg.timeShiftThisAndNextLeg(slackProvider);
         addTransferPriorityCost(newLeg);
-        addWaitTimeCost(newLeg);
+        addOptimizedWaitTimeCost(newLeg);
     }
 
     @Override
@@ -124,10 +123,11 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         transit(trip, times, txConstraintsAfter);
     }
 
-    public OptimizedPath<T> build(Path<T> originalPath) {
+    @Override
+    public OptimizedPath<T> build(int iterationDepartureTime) {
         return new OptimizedPath<>(
                 createPathLegs(costCalculator, slackProvider),
-                originalPath.rangeRaptorIterationDepartureTime(),
+                iterationDepartureTime,
                 generalizedCost(),
                 transferPriorityCost,
                 waitTimeOptimizedCost,
@@ -139,11 +139,10 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
      * Return the generalized cost for the current set of paths.
      */
     public int generalizedCost() {
-        return skipCostCalc()
-                ? ZERO_COST
-                : legsAsStream()
-                        .mapToInt(it -> it.generalizedCost(costCalculator, slackProvider))
-                        .sum();
+        if(skipCostCalc()) { return ZERO_COST; }
+        return legsAsStream()
+                .mapToInt(it -> it.generalizedCost(costCalculator, slackProvider))
+                .sum();
     }
 
     /**
@@ -192,9 +191,9 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     /*private methods */
 
     private void addTransferPriorityCost(PathBuilderLeg<T> pathLeg) {
-        var tx = (ConstrainedTransfer) pathLeg.constrainedTransferAfterLeg();
-        this.transferPriorityCost += TransferConstraint.priorityCost(
-                tx == null ? null : tx.getTransferConstraint()
+        boolean transferExist = pathLeg.isTransit() && pathLeg.nextTransitLeg() != null;
+        this.transferPriorityCost += OptimizedPath.priorityCost(
+                transferExist, pathLeg::constrainedTransferAfterLeg
         );
     }
 
@@ -209,7 +208,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
      * impossible to do a proper cost calculation for it. For example, if the FLEX ride is
      * pre-booked, then it might wait for the passenger.
      */
-    private void addWaitTimeCost(PathBuilderLeg<?> pathLeg) {
+    private void addOptimizedWaitTimeCost(PathBuilderLeg<?> pathLeg) {
         if(waitTimeCostCalculator == null) { return; }
 
         int waitTime = pathLeg.waitTimeBeforeNextTransitIncludingSlack();

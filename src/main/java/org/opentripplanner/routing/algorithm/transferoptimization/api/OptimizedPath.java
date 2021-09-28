@@ -1,10 +1,12 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
 import java.util.function.IntFunction;
+import java.util.function.Supplier;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -52,6 +54,22 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
         return transferPriorityCost;
     }
 
+    /**
+     * A utility function for calculating the priority cost for a transfer.
+     * If the {@code transfer exist}, the given supplier is used to obtain the constrained
+     * transfer (can be null) and the cost is calculated. If transfer do not exist the zero
+     * cost value is returned.
+     */
+    public static int priorityCost(boolean transferExist, Supplier<RaptorConstrainedTransfer> txGet) {
+        if(transferExist) {
+            var tx = txGet.get();
+            var c = tx == null ? null : (TransferConstraint) tx.getTransferConstraint();
+            return TransferConstraint.cost(c);
+        }
+        // Any other leg is not associated with a transfer and zero cost is returned
+        return TransferConstraint.ZERO_COST;
+    }
+
     @Override
     public int waitTimeOptimizedCost() {
         return waitTimeOptimizedCost;
@@ -87,9 +105,11 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
     }
 
     private static int priorityCost(PathLeg<?> leg) {
-        var c = leg.isTransitLeg()
-                ? (TransferConstraint) leg.asTransitLeg().getConstrainedTransferAfterLeg()
-                : null;
-        return TransferConstraint.priorityCost(c);
+        // Only calculate priority cost for transit legs witch is followed by at least one
+        // other transit leg.
+        return priorityCost(
+                leg.isTransitLeg() && leg.nextTransitLeg() != null,
+                () -> leg.asTransitLeg().getConstrainedTransferAfterLeg()
+        );
     }
 }

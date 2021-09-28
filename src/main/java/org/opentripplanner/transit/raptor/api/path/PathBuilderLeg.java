@@ -151,8 +151,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     public boolean isEgress() { return leg.isEgress(); }
 
-    public boolean isEgressWithoutRides() { return isEgress() && hasNoRides(); }
-
     private MyAccessLeg asAccessLeg() { return (MyAccessLeg) leg; }
 
     private MyTransferLeg asTransferLeg() { return (MyTransferLeg) leg; }
@@ -187,7 +185,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
 
     @Nullable
-    PathBuilderLeg<T> nextTransitLeg() {  return next(PathBuilderLeg::isTransit); }
+    public PathBuilderLeg<T> nextTransitLeg() {  return next(PathBuilderLeg::isTransit); }
 
     @Nullable
     PathBuilderLeg<T> next(Predicate<PathBuilderLeg<T>> test) {

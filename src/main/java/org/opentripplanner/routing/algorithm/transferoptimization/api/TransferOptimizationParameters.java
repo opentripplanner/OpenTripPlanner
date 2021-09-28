@@ -11,7 +11,7 @@ public interface TransferOptimizationParameters {
 
   /**
    * If enabled, all paths will be optimized with respect to the transfer point to minimise
-   * the {@link org.opentripplanner.model.transfer.TransferConstraint#priorityCost(TransferConstraint)}.
+   * the {@link org.opentripplanner.model.transfer.TransferConstraint#cost(TransferConstraint)}.
    */
   boolean optimizeTransferPriority();
 

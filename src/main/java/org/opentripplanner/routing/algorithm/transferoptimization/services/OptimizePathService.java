@@ -101,8 +101,10 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
             originalPath, transitLegs, possibleTransfers
     );
 
+    final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
+
     return tails.stream()
-            .map(it -> it.build(originalPath))
+            .map(it -> it.build(iterationDepartureTime))
             .collect(Collectors.toSet());
   }
 

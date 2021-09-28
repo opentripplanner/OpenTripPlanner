@@ -78,7 +78,7 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
     public void testTransferPriorityAllowed() {
         testPriority(
                 STOP_D, ALLOWED,
-                "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:00:20 10:18:20 18m $1180]"
+                "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:00:20 10:18:20 18m $1180 $33pri]"
         );
     }
 
@@ -86,7 +86,7 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
     public void testTransferPriorityRecommended() {
         testPriority(
                 STOP_E, RECOMMENDED,
-                "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:00:20 10:24:20 24m $1600]"
+                "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:00:20 10:24:20 24m $1600 $32pri]"
         );
     }
 
@@ -94,7 +94,7 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
     public void testTransferPriorityPreferred() {
         testPriority(
                 STOP_F, PREFERRED,
-                "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:00:20 10:30:20 30m $2020]"
+                "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:00:20 10:30:20 30m $2020 $31pri]"
         );
     }
 
@@ -102,14 +102,14 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
     public void testTransferGuaranteed() {
         testGuaranteed(
                 STOP_G,
-                "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:00:20 10:36:20 36m $2410]"
+                "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:00:20 10:36:20 36m $2410 $23pri]"
         );
     }
     @Test
     public void testTransferStaySeated() {
         testStaySeated(
                 STOP_H,
-                "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:00:20 10:40:20 40m $2710]"
+                "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:00:20 10:40:20 40m $2710 $13pri]"
         );
     }
 
