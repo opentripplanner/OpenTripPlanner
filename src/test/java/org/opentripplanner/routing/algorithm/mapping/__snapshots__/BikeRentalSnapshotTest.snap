@@ -97,6 +97,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -202,6 +204,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -312,6 +316,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -378,6 +384,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -1908,6 +1916,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2013,6 +2023,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2123,6 +2135,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2189,6 +2203,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2561,6 +2577,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2666,6 +2684,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2776,6 +2796,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2842,6 +2864,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3193,6 +3217,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3298,6 +3324,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3408,6 +3436,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3474,6 +3504,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3656,6 +3688,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3761,6 +3795,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -4000,6 +4036,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -4105,6 +4143,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -4592,6 +4632,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -4680,6 +4722,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -4790,6 +4834,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -4856,6 +4902,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -6051,6 +6099,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -6139,6 +6189,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -6249,6 +6301,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -6315,6 +6369,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
+              "vehicleSpacesAvailable": { },
+              "vehicleTypesAvailable": { },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },

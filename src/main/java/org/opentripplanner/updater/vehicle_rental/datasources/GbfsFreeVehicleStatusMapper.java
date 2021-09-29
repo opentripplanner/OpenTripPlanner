@@ -36,8 +36,8 @@ public class GbfsFreeVehicleStatusMapper {
             rentalVehicle.vehicleType = vehicleTypes == null
                     ? RentalVehicleType.getDefaultType(system.systemId)
                     : vehicleTypes.get(vehicle.getVehicleTypeId());
-            rentalVehicle.isReserved = vehicle.getIsReserved();
-            rentalVehicle.isDisabled = vehicle.getIsDisabled();
+            rentalVehicle.isReserved = vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false;
+            rentalVehicle.isDisabled = vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false;
             rentalVehicle.lastReported = vehicle.getLastReported() != null
                     ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported()).atZone(system.timezone.toZoneId())
                     : null;

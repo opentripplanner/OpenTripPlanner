@@ -15,8 +15,8 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     public VehicleRentalSystem system;
     public RentalVehicleType vehicleType;
     public VehicleRentalStationUris rentalUris;
-    public Boolean isReserved;
-    public Boolean isDisabled;
+    public boolean isReserved = false;
+    public boolean isDisabled = false;
     public ZonedDateTime lastReported;
     public Double currentRangeMeters;
     public VehicleRentalStation station;
