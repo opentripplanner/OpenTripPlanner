@@ -43,14 +43,15 @@ public class GbfsStationInformationMapper {
         rentalStation.isValetStation = station.getIsValetStation() != null ? station.getIsValetStation() : false;
         // TODO: Convert geometry
         // rentalStation.stationArea = station.getStationArea();
-        rentalStation.capacity = station.getCapacity() != null ? (int) (double) station.getCapacity() : null;
+        rentalStation.capacity = station.getCapacity() != null ? station.getCapacity().intValue() : null;
+
         rentalStation.vehicleTypeAreaCapacity = station.getVehicleCapacity() != null && vehicleTypes != null
                 ? station.getVehicleCapacity().getAdditionalProperties().entrySet().stream()
-                    .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> (int) (double) e.getValue()))
+                    .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue()))
                 : null;
         rentalStation.vehicleTypeDockCapacity = station.getVehicleTypeCapacity() != null && vehicleTypes != null
                 ? station.getVehicleTypeCapacity().getAdditionalProperties().entrySet().stream()
-                .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> (int) (double) e.getValue()))
+                    .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue()))
                 : null;
 
         rentalStation.isKeepingVehicleRentalAtDestinationAllowed = allowKeepingRentedVehicleAtDestination;
