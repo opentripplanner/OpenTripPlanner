@@ -228,7 +228,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
                     // attempt to alight if we're on board, this is done above the board search
                     // so that we don't alight on first stop boarded
-                    if (pattern.alightingPossibleAt(stopPos)) {
+                    if (calculator.alightingPossibleAt(pattern, stopPos)) {
                         transitWorker.alight(
                                 stopIndex,
                                 stopPos,
@@ -236,7 +236,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                         );
                     }
 
-                    if(pattern.boardingPossibleAt(stopPos)) {
+                    if(calculator.boardingPossibleAt(pattern, stopPos)) {
                         // MC Raptor have many, while RR have one boarding
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
                             RaptorTripScheduleBoardOrAlightEvent<T> result = null;

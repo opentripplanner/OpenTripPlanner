@@ -167,7 +167,13 @@ public class PtSituationElementType {
                     .name("infoLinks")
                     .type(new GraphQLList(infoLinkType))
                     .description("Optional links to more information.")
-                    .dataFetcher(environment -> null)
+                    .dataFetcher(environment -> {
+                        TransitAlert alert = environment.getSource();
+                        if (!alert.getAlertUrlList().isEmpty()) {
+                            return alert.getAlertUrlList();
+                        }
+                        return null;
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("validityPeriod")

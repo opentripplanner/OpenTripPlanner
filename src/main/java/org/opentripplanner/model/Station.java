@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +34,8 @@ public class Station extends TransitEntity implements StopCollection {
 
   private final TimeZone timezone;
 
+  // We serialize this class to json only for snapshot tests, and this creates cyclical structures
+  @JsonBackReference
   private final Set<Stop> childStops = new HashSet<>();
 
   public Station(

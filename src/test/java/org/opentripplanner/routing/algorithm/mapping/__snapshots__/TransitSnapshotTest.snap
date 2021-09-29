@@ -366,15 +366,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.649367
             },
             "name": "NE Sandy & 16th",
-            "stopCode": "5060",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5060"
+            "stop": {
+              "code": "5060",
+              "coordinate": {
+                "latitude": 45.524581,
+                "longitude": -122.649367
+              },
+              "description": "Westbound stop in Portland (Stop ID 5060)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5060"
+              },
+              "name": "NE Sandy & 16th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 92,
             "stopSequence": 93,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -464,15 +481,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.649367
             },
             "name": "NE Sandy & 16th",
-            "stopCode": "5060",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5060"
+            "stop": {
+              "code": "5060",
+              "coordinate": {
+                "latitude": 45.524581,
+                "longitude": -122.649367
+              },
+              "description": "Westbound stop in Portland (Stop ID 5060)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5060"
+              },
+              "name": "NE Sandy & 16th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 92,
             "stopSequence": 93,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1371,
           "headsign": "Beaverton TC",
@@ -501,15 +535,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.694901
             },
             "name": "W Burnside & NW King",
-            "stopCode": "747",
-            "stopId": {
-              "feedId": "prt",
-              "id": "747"
+            "stop": {
+              "code": "747",
+              "coordinate": {
+                "latitude": 45.523312,
+                "longitude": -122.694901
+              },
+              "description": "Westbound stop in Portland (Stop ID 747)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "747"
+              },
+              "name": "W Burnside & NW King",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 107,
             "stopSequence": 108,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -574,15 +625,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.694901
             },
             "name": "W Burnside & NW King",
-            "stopCode": "747",
-            "stopId": {
-              "feedId": "prt",
-              "id": "747"
+            "stop": {
+              "code": "747",
+              "coordinate": {
+                "latitude": 45.523312,
+                "longitude": -122.694901
+              },
+              "description": "Westbound stop in Portland (Stop ID 747)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "747"
+              },
+              "name": "W Burnside & NW King",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 107,
             "stopSequence": 108,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1511,
           "interlineWithPreviousLeg": false,
@@ -752,15 +820,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.649266
             },
             "name": "SE Morrison & 16th",
-            "stopCode": "4019",
-            "stopId": {
-              "feedId": "prt",
-              "id": "4019"
+            "stop": {
+              "code": "4019",
+              "coordinate": {
+                "latitude": 45.517226,
+                "longitude": -122.649266
+              },
+              "description": "Westbound stop in Portland (Stop ID 4019)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "4019"
+              },
+              "name": "SE Morrison & 16th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 50,
             "stopSequence": 51,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -799,15 +884,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.649266
             },
             "name": "SE Morrison & 16th",
-            "stopCode": "4019",
-            "stopId": {
-              "feedId": "prt",
-              "id": "4019"
+            "stop": {
+              "code": "4019",
+              "coordinate": {
+                "latitude": 45.517226,
+                "longitude": -122.649266
+              },
+              "description": "Westbound stop in Portland (Stop ID 4019)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "4019"
+              },
+              "name": "SE Morrison & 16th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 50,
             "stopSequence": 51,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1814,
           "headsign": "Montgomery Park",
@@ -836,15 +938,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 74,
             "stopSequence": 75,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -909,15 +1028,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 74,
             "stopSequence": 75,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 405,
           "interlineWithPreviousLeg": false,
@@ -1070,15 +1206,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.649367
             },
             "name": "NE Sandy & 16th",
-            "stopCode": "5060",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5060"
+            "stop": {
+              "code": "5060",
+              "coordinate": {
+                "latitude": 45.524581,
+                "longitude": -122.649367
+              },
+              "description": "Westbound stop in Portland (Stop ID 5060)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5060"
+              },
+              "name": "NE Sandy & 16th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 92,
             "stopSequence": 93,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -1168,15 +1321,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.649367
             },
             "name": "NE Sandy & 16th",
-            "stopCode": "5060",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5060"
+            "stop": {
+              "code": "5060",
+              "coordinate": {
+                "latitude": 45.524581,
+                "longitude": -122.649367
+              },
+              "description": "Westbound stop in Portland (Stop ID 5060)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5060"
+              },
+              "name": "NE Sandy & 16th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 92,
             "stopSequence": 93,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1385,
           "headsign": "23rd Ave to Tichner",
@@ -1205,15 +1375,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.694901
             },
             "name": "W Burnside & NW King",
-            "stopCode": "747",
-            "stopId": {
-              "feedId": "prt",
-              "id": "747"
+            "stop": {
+              "code": "747",
+              "coordinate": {
+                "latitude": 45.523312,
+                "longitude": -122.694901
+              },
+              "description": "Westbound stop in Portland (Stop ID 747)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "747"
+              },
+              "name": "W Burnside & NW King",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 107,
             "stopSequence": 108,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -1278,15 +1465,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.694901
             },
             "name": "W Burnside & NW King",
-            "stopCode": "747",
-            "stopId": {
-              "feedId": "prt",
-              "id": "747"
+            "stop": {
+              "code": "747",
+              "coordinate": {
+                "latitude": 45.523312,
+                "longitude": -122.694901
+              },
+              "description": "Westbound stop in Portland (Stop ID 747)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "747"
+              },
+              "name": "W Burnside & NW King",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 107,
             "stopSequence": 108,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1511,
           "interlineWithPreviousLeg": false,
@@ -1456,15 +1660,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.649266
             },
             "name": "SE Morrison & 16th",
-            "stopCode": "4019",
-            "stopId": {
-              "feedId": "prt",
-              "id": "4019"
+            "stop": {
+              "code": "4019",
+              "coordinate": {
+                "latitude": 45.517226,
+                "longitude": -122.649266
+              },
+              "description": "Westbound stop in Portland (Stop ID 4019)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "4019"
+              },
+              "name": "SE Morrison & 16th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 50,
             "stopSequence": 51,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -1503,15 +1724,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.649266
             },
             "name": "SE Morrison & 16th",
-            "stopCode": "4019",
-            "stopId": {
-              "feedId": "prt",
-              "id": "4019"
+            "stop": {
+              "code": "4019",
+              "coordinate": {
+                "latitude": 45.517226,
+                "longitude": -122.649266
+              },
+              "description": "Westbound stop in Portland (Stop ID 4019)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "4019"
+              },
+              "name": "SE Morrison & 16th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 50,
             "stopSequence": 51,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1884,
           "headsign": "NW 27th & Thurman",
@@ -1540,15 +1778,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 74,
             "stopSequence": 75,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -1613,15 +1868,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 74,
             "stopSequence": 75,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 405,
           "interlineWithPreviousLeg": false,
@@ -1778,15 +2050,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.65358
             },
             "name": "SE 12th & Morrison",
-            "stopCode": "6588",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6588"
+            "stop": {
+              "code": "6588",
+              "coordinate": {
+                "latitude": 45.517059,
+                "longitude": -122.65358
+              },
+              "description": "Northbound stop in Portland (Stop ID 6588)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6588"
+              },
+              "name": "SE 12th & Morrison",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 31,
             "stopSequence": 32,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -1842,15 +2131,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.65358
             },
             "name": "SE 12th & Morrison",
-            "stopCode": "6588",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6588"
+            "stop": {
+              "code": "6588",
+              "coordinate": {
+                "latitude": 45.517059,
+                "longitude": -122.65358
+              },
+              "description": "Northbound stop in Portland (Stop ID 6588)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6588"
+              },
+              "name": "SE 12th & Morrison",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 31,
             "stopSequence": 32,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1158,
           "headsign": "Rose Qtr TC",
@@ -1879,15 +2185,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.66293
             },
             "name": "NE Multnomah & 3rd",
-            "stopCode": "11492",
-            "stopId": {
-              "feedId": "prt",
-              "id": "11492"
+            "stop": {
+              "code": "11492",
+              "coordinate": {
+                "latitude": 45.531159,
+                "longitude": -122.66293
+              },
+              "description": "Westbound stop in Portland (Stop ID 11492)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "11492"
+              },
+              "name": "NE Multnomah & 3rd",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 41,
             "stopSequence": 42,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -1952,15 +2275,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.66293
             },
             "name": "NE Multnomah & 3rd",
-            "stopCode": "11492",
-            "stopId": {
-              "feedId": "prt",
-              "id": "11492"
+            "stop": {
+              "code": "11492",
+              "coordinate": {
+                "latitude": 45.531159,
+                "longitude": -122.66293
+              },
+              "description": "Westbound stop in Portland (Stop ID 11492)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "11492"
+              },
+              "name": "NE Multnomah & 3rd",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 83,
             "stopSequence": 84,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1543,
           "headsign": "Montgomery Park",
@@ -1989,15 +2329,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.696445
             },
             "name": "NW Northrup & 22nd",
-            "stopCode": "10778",
-            "stopId": {
-              "feedId": "prt",
-              "id": "10778"
+            "stop": {
+              "code": "10778",
+              "coordinate": {
+                "latitude": 45.531308,
+                "longitude": -122.696445
+              },
+              "description": "Westbound stop in Portland (Stop ID 10778)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "10778"
+              },
+              "name": "NW Northrup & 22nd",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 92,
             "stopSequence": 93,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -2062,15 +2419,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.696445
             },
             "name": "NW Northrup & 22nd",
-            "stopCode": "10778",
-            "stopId": {
-              "feedId": "prt",
-              "id": "10778"
+            "stop": {
+              "code": "10778",
+              "coordinate": {
+                "latitude": 45.531308,
+                "longitude": -122.696445
+              },
+              "description": "Westbound stop in Portland (Stop ID 10778)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "10778"
+              },
+              "name": "NW Northrup & 22nd",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 92,
             "stopSequence": 93,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 37,
           "interlineWithPreviousLeg": false,
@@ -2163,13 +2537,30 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "name": "NE 12th & Couch",
             "orig": "NE 12th & Couch",
-            "stopCode": "6577",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6577"
+            "stop": {
+              "code": "6577",
+              "coordinate": {
+                "latitude": 45.52337,
+                "longitude": -122.653725
+              },
+              "description": "Southbound stop in Portland (Stop ID 6577)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6577"
+              },
+              "name": "NE 12th & Couch",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 6717,
           "interlineWithPreviousLeg": false,
@@ -2437,13 +2828,30 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653725
             },
             "name": "NE 12th & Couch",
-            "stopCode": "6577",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6577"
+            "stop": {
+              "code": "6577",
+              "coordinate": {
+                "latitude": 45.52337,
+                "longitude": -122.653725
+              },
+              "description": "Southbound stop in Portland (Stop ID 6577)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6577"
+              },
+              "name": "NE 12th & Couch",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 137,
           "interlineWithPreviousLeg": false,
@@ -2465,15 +2873,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653064
             },
             "name": "NE Sandy & 12th",
-            "stopCode": "5055",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5055"
+            "stop": {
+              "code": "5055",
+              "coordinate": {
+                "latitude": 45.523103,
+                "longitude": -122.653064
+              },
+              "description": "Westbound stop in Portland (Stop ID 5055)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5055"
+              },
+              "name": "NE Sandy & 12th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 94,
             "stopSequence": 95,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -2529,15 +2954,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653064
             },
             "name": "NE Sandy & 12th",
-            "stopCode": "5055",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5055"
+            "stop": {
+              "code": "5055",
+              "coordinate": {
+                "latitude": 45.523103,
+                "longitude": -122.653064
+              },
+              "description": "Westbound stop in Portland (Stop ID 5055)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5055"
+              },
+              "name": "NE Sandy & 12th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 94,
             "stopSequence": 95,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1369,
           "headsign": "Beaverton TC",
@@ -2566,15 +3008,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -2639,15 +3098,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1388,
           "interlineWithPreviousLeg": false,
@@ -2829,13 +3305,30 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653725
             },
             "name": "NE 12th & Couch",
-            "stopCode": "6577",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6577"
+            "stop": {
+              "code": "6577",
+              "coordinate": {
+                "latitude": 45.52337,
+                "longitude": -122.653725
+              },
+              "description": "Southbound stop in Portland (Stop ID 6577)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6577"
+              },
+              "name": "NE 12th & Couch",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 137,
           "interlineWithPreviousLeg": false,
@@ -2857,15 +3350,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653064
             },
             "name": "NE Sandy & 12th",
-            "stopCode": "5055",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5055"
+            "stop": {
+              "code": "5055",
+              "coordinate": {
+                "latitude": 45.523103,
+                "longitude": -122.653064
+              },
+              "description": "Westbound stop in Portland (Stop ID 5055)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5055"
+              },
+              "name": "NE Sandy & 12th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 94,
             "stopSequence": 95,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -2921,15 +3431,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653064
             },
             "name": "NE Sandy & 12th",
-            "stopCode": "5055",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5055"
+            "stop": {
+              "code": "5055",
+              "coordinate": {
+                "latitude": 45.523103,
+                "longitude": -122.653064
+              },
+              "description": "Westbound stop in Portland (Stop ID 5055)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5055"
+              },
+              "name": "NE Sandy & 12th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 94,
             "stopSequence": 95,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1399,
           "headsign": "23rd Ave to Tichner",
@@ -2958,15 +3485,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -3031,15 +3575,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1388,
           "interlineWithPreviousLeg": false,
@@ -3221,13 +3782,30 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653725
             },
             "name": "NE 12th & Couch",
-            "stopCode": "6577",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6577"
+            "stop": {
+              "code": "6577",
+              "coordinate": {
+                "latitude": 45.52337,
+                "longitude": -122.653725
+              },
+              "description": "Southbound stop in Portland (Stop ID 6577)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6577"
+              },
+              "name": "NE 12th & Couch",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 137,
           "interlineWithPreviousLeg": false,
@@ -3249,15 +3827,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653064
             },
             "name": "NE Sandy & 12th",
-            "stopCode": "5055",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5055"
+            "stop": {
+              "code": "5055",
+              "coordinate": {
+                "latitude": 45.523103,
+                "longitude": -122.653064
+              },
+              "description": "Westbound stop in Portland (Stop ID 5055)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5055"
+              },
+              "name": "NE Sandy & 12th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 94,
             "stopSequence": 95,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -3313,15 +3908,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653064
             },
             "name": "NE Sandy & 12th",
-            "stopCode": "5055",
-            "stopId": {
-              "feedId": "prt",
-              "id": "5055"
+            "stop": {
+              "code": "5055",
+              "coordinate": {
+                "latitude": 45.523103,
+                "longitude": -122.653064
+              },
+              "description": "Westbound stop in Portland (Stop ID 5055)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "5055"
+              },
+              "name": "NE Sandy & 12th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 94,
             "stopSequence": 95,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1369,
           "headsign": "Beaverton TC",
@@ -3350,15 +3962,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -3423,15 +4052,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.700681
             },
             "name": "W Burnside & NW 23rd Pl",
-            "stopCode": "9555",
-            "stopId": {
-              "feedId": "prt",
-              "id": "9555"
+            "stop": {
+              "code": "9555",
+              "coordinate": {
+                "latitude": 45.523897,
+                "longitude": -122.700681
+              },
+              "description": "Westbound stop in Portland (Stop ID 9555)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "9555"
+              },
+              "name": "W Burnside & NW 23rd Pl",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 109,
             "stopSequence": 110,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1388,
           "interlineWithPreviousLeg": false,
@@ -3617,13 +4263,30 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653725
             },
             "name": "NE 12th & Couch",
-            "stopCode": "6577",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6577"
+            "stop": {
+              "code": "6577",
+              "coordinate": {
+                "latitude": 45.52337,
+                "longitude": -122.653725
+              },
+              "description": "Southbound stop in Portland (Stop ID 6577)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6577"
+              },
+              "name": "NE 12th & Couch",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 33,
           "interlineWithPreviousLeg": false,
@@ -3645,15 +4308,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653507
             },
             "name": "NE 12th & Sandy",
-            "stopCode": "6592",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6592"
+            "stop": {
+              "code": "6592",
+              "coordinate": {
+                "latitude": 45.52318,
+                "longitude": -122.653507
+              },
+              "description": "Northbound stop in Portland (Stop ID 6592)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6592"
+              },
+              "name": "NE 12th & Sandy",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 34,
             "stopSequence": 35,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -3692,15 +4372,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653507
             },
             "name": "NE 12th & Sandy",
-            "stopCode": "6592",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6592"
+            "stop": {
+              "code": "6592",
+              "coordinate": {
+                "latitude": 45.52318,
+                "longitude": -122.653507
+              },
+              "description": "Northbound stop in Portland (Stop ID 6592)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6592"
+              },
+              "name": "NE 12th & Sandy",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 34,
             "stopSequence": 35,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 972,
           "headsign": "Rose Qtr TC",
@@ -3729,15 +4426,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.66293
             },
             "name": "NE Multnomah & 3rd",
-            "stopCode": "11492",
-            "stopId": {
-              "feedId": "prt",
-              "id": "11492"
+            "stop": {
+              "code": "11492",
+              "coordinate": {
+                "latitude": 45.531159,
+                "longitude": -122.66293
+              },
+              "description": "Westbound stop in Portland (Stop ID 11492)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "11492"
+              },
+              "name": "NE Multnomah & 3rd",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 41,
             "stopSequence": 42,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -3802,15 +4516,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.66293
             },
             "name": "NE Multnomah & 3rd",
-            "stopCode": "11492",
-            "stopId": {
-              "feedId": "prt",
-              "id": "11492"
+            "stop": {
+              "code": "11492",
+              "coordinate": {
+                "latitude": 45.531159,
+                "longitude": -122.66293
+              },
+              "description": "Westbound stop in Portland (Stop ID 11492)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "11492"
+              },
+              "name": "NE Multnomah & 3rd",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 83,
             "stopSequence": 84,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1598,
           "headsign": "Montgomery Park",
@@ -3839,15 +4570,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 93,
             "stopSequence": 94,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -3912,15 +4660,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.698634
             },
             "name": "NW 23rd & Overton",
-            "stopCode": "8981",
-            "stopId": {
-              "feedId": "prt",
-              "id": "8981"
+            "stop": {
+              "code": "8981",
+              "coordinate": {
+                "latitude": 45.532159,
+                "longitude": -122.698634
+              },
+              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "8981"
+              },
+              "name": "NW 23rd & Overton",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 93,
             "stopSequence": 94,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 353,
           "interlineWithPreviousLeg": false,
@@ -4051,13 +4816,30 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.653725
             },
             "name": "NE 12th & Couch",
-            "stopCode": "6577",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6577"
+            "stop": {
+              "code": "6577",
+              "coordinate": {
+                "latitude": 45.52337,
+                "longitude": -122.653725
+              },
+              "description": "Southbound stop in Portland (Stop ID 6577)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6577"
+              },
+              "name": "NE 12th & Couch",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1087,
           "interlineWithPreviousLeg": false,
@@ -4079,15 +4861,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.654067
             },
             "name": "SE Morrison & 12th",
-            "stopCode": "4014",
-            "stopId": {
-              "feedId": "prt",
-              "id": "4014"
+            "stop": {
+              "code": "4014",
+              "coordinate": {
+                "latitude": 45.517299,
+                "longitude": -122.654067
+              },
+              "description": "Westbound stop in Portland (Stop ID 4014)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "4014"
+              },
+              "name": "SE Morrison & 12th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 52,
             "stopSequence": 53,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -4160,15 +4959,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.654067
             },
             "name": "SE Morrison & 12th",
-            "stopCode": "4014",
-            "stopId": {
-              "feedId": "prt",
-              "id": "4014"
+            "stop": {
+              "code": "4014",
+              "coordinate": {
+                "latitude": 45.517299,
+                "longitude": -122.654067
+              },
+              "description": "Westbound stop in Portland (Stop ID 4014)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "4014"
+              },
+              "name": "SE Morrison & 12th",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 52,
             "stopSequence": 53,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 1740,
           "headsign": "NW 27th & Thurman",
@@ -4197,15 +5013,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.698529
             },
             "name": "NW 23rd & Lovejoy",
-            "stopCode": "7163",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7163"
+            "stop": {
+              "code": "7163",
+              "coordinate": {
+                "latitude": 45.529681,
+                "longitude": -122.698529
+              },
+              "description": "Northbound stop in Portland (Stop ID 7163)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7163"
+              },
+              "name": "NW 23rd & Lovejoy",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 73,
             "stopSequence": 74,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -4270,15 +5103,32 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "longitude": -122.698529
             },
             "name": "NW 23rd & Lovejoy",
-            "stopCode": "7163",
-            "stopId": {
-              "feedId": "prt",
-              "id": "7163"
+            "stop": {
+              "code": "7163",
+              "coordinate": {
+                "latitude": 45.529681,
+                "longitude": -122.698529
+              },
+              "description": "Northbound stop in Portland (Stop ID 7163)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "7163"
+              },
+              "name": "NW 23rd & Lovejoy",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
             "stopIndex": 73,
             "stopSequence": 74,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 462,
           "interlineWithPreviousLeg": false,
@@ -4839,13 +5689,30 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "name": "NE 12th & Couch",
             "orig": "NE 12th & Couch",
-            "stopCode": "6577",
-            "stopId": {
-              "feedId": "prt",
-              "id": "6577"
+            "stop": {
+              "code": "6577",
+              "coordinate": {
+                "latitude": 45.52337,
+                "longitude": -122.653725
+              },
+              "description": "Southbound stop in Portland (Stop ID 6577)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "6577"
+              },
+              "name": "NE 12th & Couch",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 6283,
           "interlineWithPreviousLeg": false,
@@ -5092,13 +5959,43 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "name": "Interstate/Rose Quarter MAX Station",
             "orig": "Rose Quarter Transit Center",
-            "stopCode": "11508",
-            "stopId": {
-              "feedId": "prt",
-              "id": "11508"
+            "stop": {
+              "code": "11508",
+              "coordinate": {
+                "latitude": 45.530244,
+                "longitude": -122.667794
+              },
+              "description": "Northbound stop in Portland (Stop ID 11508)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "0"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "11508"
+              },
+              "name": "Interstate/Rose Quarter MAX Station",
+              "parentStation": {
+                "code": "79-tc",
+                "coordinate": {
+                  "latitude": 45.530205,
+                  "longitude": -122.666118
+                },
+                "id": {
+                  "feedId": "prt",
+                  "id": "79-tc"
+                },
+                "name": "Rose Quarter Transit Center",
+                "priority": "ALLOWED"
+              },
+              "partOfStation": true,
+              "wheelchairBoarding": "NO_INFORMATION"
             },
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
+            "vertexType": "TRANSIT"
           },
           "generalizedCost": 4557,
           "interlineWithPreviousLeg": false,
