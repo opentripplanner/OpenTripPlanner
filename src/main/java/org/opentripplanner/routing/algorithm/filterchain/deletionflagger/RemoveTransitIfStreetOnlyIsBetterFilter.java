@@ -14,9 +14,16 @@ import java.util.Optional;
  */
 public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
 
+    public static final String NAME = "transit-vs-street-filter";
+
     @Override
     public String name() {
-        return "transit-vs-street-filter";
+        return NAME;
+    }
+
+    @Override
+    public boolean skipAlreadyFlaggedItineraries() {
+        return false;
     }
 
     @Override

@@ -5,6 +5,17 @@ public enum RoutingErrorCode {
    * The origin and destination is not connected by transit, regardless of search time.
    */
   NO_TRANSIT_CONNECTION,
+
+  /**
+   * The origin and destination is not connected by transit, within the current search window.
+   */
+  NO_TRANSIT_CONNECTION_INSIDE_SEARCH_WINDOW,
+
+  /**
+   * The origin and destination are so close to each other, that walking is always better than transit.
+   */
+  WALKING_BETTER_THAN_TRANSIT,
+
   /**
    * Location was found, but it was located outside the street network.
    */

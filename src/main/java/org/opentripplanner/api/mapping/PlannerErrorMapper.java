@@ -14,6 +14,7 @@ public class PlannerErrorMapper {
 
         switch (domain.code) {
             case NO_TRANSIT_CONNECTION:
+            case NO_TRANSIT_CONNECTION_INSIDE_SEARCH_WINDOW:
                 api.message = Message.PATH_NOT_FOUND;
                 break;
             case OUTSIDE_BOUNDS:
@@ -33,6 +34,12 @@ public class PlannerErrorMapper {
                 break;
             case NO_STOPS_IN_RANGE:
                 api.message = Message.LOCATION_NOT_ACCESSIBLE;
+                break;
+            case WALKING_BETTER_THAN_TRANSIT:
+                api.message = Message.TOO_CLOSE;
+                break;
+            case SYSTEM_ERROR:
+                api.message = Message.SYSTEM_ERROR;
                 break;
             default:
                 throw new IllegalArgumentException();

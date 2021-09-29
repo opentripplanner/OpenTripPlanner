@@ -82,6 +82,7 @@ public class RoutingWorker {
         // Filter itineraries
         var filteredItineraries = filterItineraries(
                 itineraries,
+                routingErrors,
                 filterOnLatestDepartureTime
         );
 
@@ -151,6 +152,7 @@ public class RoutingWorker {
 
     private List<Itinerary> filterItineraries(
             List<Itinerary> itineraries,
+            List<RoutingError> routingErrors,
             Instant filterOnLatestDepartureTime
     ) {
         ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
@@ -159,7 +161,7 @@ public class RoutingWorker {
             emptyDirectModeHandler.removeWalkAllTheWayResults(),
             it -> firstRemovedItinerary = it
         );
-        return filterChain.filter(itineraries);
+        return filterChain.filter(itineraries, routingErrors);
     }
 
     @Nullable
