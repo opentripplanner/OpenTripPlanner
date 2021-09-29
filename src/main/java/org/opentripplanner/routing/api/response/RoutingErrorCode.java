@@ -19,7 +19,6 @@ public enum RoutingErrorCode {
   /**
    * Location was found, but it was located outside the street network.
    */
-  //TODO Currently not in use
   OUTSIDE_BOUNDS,
 
   /**

@@ -1,5 +1,10 @@
 package org.opentripplanner.routing.core;
 
+import org.glassfish.hk2.utilities.general.GeneralUtilities;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
@@ -179,9 +184,13 @@ public class RoutingContext implements Cloneable {
         // the location is not specified, and fromVertices is null, in one end in NearbyStopFinder,
         // depending on search direction
         if (opt.from.isSpecified() && fromDisconnected) {
-            routingErrors.add(
-                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
-            );
+            Coordinate coordinate = opt.from.getCoordinate();
+            GeometryFactory gf = GeometryUtils.getGeometryFactory();
+            RoutingErrorCode code = coordinate != null && graph.getConvexHull().disjoint(gf.createPoint(coordinate))
+                    ? RoutingErrorCode.OUTSIDE_BOUNDS
+                    : RoutingErrorCode.LOCATION_NOT_FOUND;
+
+            routingErrors.add(new RoutingError(code, InputField.FROM_PLACE));
         }
 
         final boolean toDisconnected = toVertices == null ||
@@ -191,9 +200,13 @@ public class RoutingContext implements Cloneable {
         // the location is not specified, and toVertices is null, in one end in NearbyStopFinder,
         // depending on search direction
         if (opt.to.isSpecified() && toDisconnected) {
-            routingErrors.add(
-                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
-            );
+            Coordinate coordinate = opt.to.getCoordinate();
+            GeometryFactory gf = GeometryUtils.getGeometryFactory();
+            RoutingErrorCode code = coordinate != null && graph.getConvexHull().disjoint(gf.createPoint(coordinate))
+                    ? RoutingErrorCode.OUTSIDE_BOUNDS
+                    : RoutingErrorCode.LOCATION_NOT_FOUND;
+
+            routingErrors.add(new RoutingError(code, InputField.TO_PLACE));
         }
 
         if (routingErrors.size() > 0) {
