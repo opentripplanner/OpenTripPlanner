@@ -18,6 +18,7 @@ public class TripType {
       GraphQLObjectType placeType,
       GraphQLObjectType tripPatternType,
       GraphQLObjectType tripMetadataType,
+      GraphQLObjectType routingErrorType,
       GqlUtil gqlUtil
 
   ) {
@@ -57,6 +58,7 @@ public class TripType {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("messageEnums")
             .description("A list of possible error messages as enum")
+            .deprecate("Use routingErrors instead")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
             .dataFetcher(env -> ((PlanResponse) env.getSource()).messages.stream()
                     .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
@@ -65,6 +67,7 @@ public class TripType {
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("messageStrings")
+            .deprecate("Use routingErrors instead")
             .description("A list of possible error messages in cleartext")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
             .dataFetcher(env -> ((PlanResponse) env.getSource()).messages.stream()
@@ -73,8 +76,12 @@ public class TripType {
                     .collect(Collectors.toList())
             )
             .build())
-        // TODO OTP2 - Next version: Wrap errors, include data like witch parameter
-        //           - is causing a problem (like from/to not found).
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name("routingErrors")
+            .description("A list of routing errors, and fields which caused them")
+            .type(new GraphQLNonNull(new GraphQLList(routingErrorType)))
+            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages)
+            .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("debugOutput")
             .description("Information about the timings for the trip generation")
