@@ -32,11 +32,14 @@ public interface VehicleRentalPlace {
     /** How many parking spaces are currently available for dropping off a vehicle at the station, 0 for floating vehicles */
     int getSpacesAvailable();
 
-    /** Can a vehicle currently be dropped off here */
+    /** Does the place allow dropping off vehicles */
     boolean isAllowDropoff();
 
-    /** Can a vehicle be currently rented*/
-    boolean isRenting();
+    /** Can a vehicle be currently rented here */
+    boolean allowPickupNow();
+
+    /** Can a vehicle currently be dropped off here */
+    boolean allowDropoffNow();
 
     /** Is the vehicle to be rented free-floating */
     boolean isFloatingBike();

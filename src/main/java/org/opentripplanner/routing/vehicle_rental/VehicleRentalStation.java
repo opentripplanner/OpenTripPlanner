@@ -97,9 +97,12 @@ public class VehicleRentalStation implements VehicleRentalPlace {
         return isReturning;
     }
 
-    @Override
-    public boolean isRenting() {
-        return isRenting;
+    public boolean allowPickupNow() {
+        return isRenting && vehiclesAvailable > 0;
+    }
+
+    public boolean allowDropoffNow() {
+        return isReturning && spacesAvailable > 0;
     }
 
     @Override
