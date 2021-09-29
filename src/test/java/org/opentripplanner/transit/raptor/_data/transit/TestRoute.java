@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
 
     private final TestTripPattern pattern;
     private final List<TestTripSchedule> schedules = new ArrayList<>();
-    private final TestTransferConstraintSearch transferConstraintsForwardSearch =
-            new TestTransferConstraintSearch();
-    private final TestTransferConstraintSearch transferConstraintsReverseSearch =
-            new TestTransferConstraintSearch();
+    private final TestConstrainedBoardingSearch transferConstraintsForwardSearch =
+            new TestConstrainedBoardingSearch();
+    private final TestConstrainedBoardingSearch transferConstraintsReverseSearch =
+            new TestConstrainedBoardingSearch();
 
 
     private TestRoute(TestTripPattern pattern) {
@@ -53,12 +53,12 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     }
 
     @Override
-    public RaptorTransferConstraintSearch<TestTripSchedule> transferConstraintsForwardSearch() {
+    public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch() {
         return transferConstraintsForwardSearch;
     }
 
     @Override
-    public RaptorTransferConstraintSearch<TestTripSchedule> transferConstraintsReverseSearch() {
+    public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch() {
         return transferConstraintsReverseSearch;
     }
 

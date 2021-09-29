@@ -9,8 +9,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferConstraintSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.ConstrainedBoardingSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TripPatternWithRaptorStopIndexes {
@@ -62,12 +62,12 @@ public class TripPatternWithRaptorStopIndexes {
         return stopIndexes[stopPositionInPattern];
     }
 
-    public RaptorTransferConstraintSearch<TripSchedule> constrainedTransferForwardSearch() {
-        return new TransferConstraintSearch(true, constrainedTransfersForwardSearch);
+    public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> constrainedTransferForwardSearch() {
+        return new ConstrainedBoardingSearch(true, constrainedTransfersForwardSearch);
     }
 
-    public RaptorTransferConstraintSearch<TripSchedule> constrainedTransferReverseSearch() {
-        return new TransferConstraintSearch(false, constrainedTransfersReverseSearch);
+    public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> constrainedTransferReverseSearch() {
+        return new ConstrainedBoardingSearch(false, constrainedTransfersReverseSearch);
     }
 
 

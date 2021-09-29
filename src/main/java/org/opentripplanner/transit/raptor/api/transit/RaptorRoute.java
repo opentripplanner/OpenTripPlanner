@@ -24,11 +24,11 @@ public interface RaptorRoute<T extends RaptorTripSchedule> {
      * Return a service to search for transfer with constraints for the given route transferring
      * FROM the route. This is used by raptor when searching in reverse.
      */
-    RaptorTransferConstraintSearch<T> transferConstraintsForwardSearch();
+    RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsForwardSearch();
 
     /**
      * Return a service to search for transfers with constraints for the given route transferring
      * TO the route. This is used by raptor when searching forward.
      */
-    RaptorTransferConstraintSearch<T> transferConstraintsReverseSearch();
+    RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsReverseSearch();
 }

@@ -6,8 +6,8 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
@@ -19,8 +19,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  * between the current pattern and the source trip stop arrival. The source is the "from"
  * point in a transfer for a forward search, and the "to" point in the reverse search.
  */
-public final class TransferConstraintSearch
-        implements RaptorTransferConstraintSearch<TripSchedule> {
+public final class ConstrainedBoardingSearch
+        implements RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> {
 
     private static final int NOT_FOUND = -999_999_999;
     private static final DirectionHelper FORWARD_HELPER = new ForwardDirectionHelper();
@@ -35,7 +35,7 @@ public final class TransferConstraintSearch
 
     private List<ConstrainedTransfer> currentTransfers;
 
-    public TransferConstraintSearch(
+    public ConstrainedBoardingSearch(
             boolean forwardSearch,
             TIntObjectMap<List<ConstrainedTransfer>> transfers
     ) {

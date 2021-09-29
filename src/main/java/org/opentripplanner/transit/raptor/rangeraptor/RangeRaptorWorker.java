@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraintSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
@@ -279,7 +279,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private boolean boardWithConstrainedTransfer(
             RaptorTimeTable<T> timetable,
-            RaptorTransferConstraintSearch<T> txService,
+            RaptorConstrainedTripScheduleBoardingSearch<T> txService,
             int targetStopIndex,
             int targetStopPos
     ) {
