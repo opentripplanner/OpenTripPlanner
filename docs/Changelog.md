@@ -50,6 +50,7 @@
 - Use a fixed limit(3) for grouping similar itineraries [3599](https://github.com/opentripplanner/OpenTripPlanner/issues/3599)
 - Remove null default values for Transmodel API [#3613](https://github.com/opentripplanner/OpenTripPlanner/pull/3613)
 - Extract GBFS loading logic [#3608](https://github.com/opentripplanner/OpenTripPlanner/pull/3608)
+- Load additional data from GBFS and expose it [#3610](https://github.com/opentripplanner/OpenTripPlanner/pull/3610)
 
 
 ## 2.0.0 (2020-11-27)
