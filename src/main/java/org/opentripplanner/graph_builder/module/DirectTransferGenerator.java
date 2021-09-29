@@ -101,8 +101,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                     // Skip the origin stop, loop transfers are not needed.
                     if (sd.stop == stop) { continue; }
                     distinctTransfers.put(
-                        new TransferKey(ts0.getStop(), sd.stop, sd.edges),
-                        new SimpleTransfer(ts0.getStop(), sd.stop, sd.distance, sd.edges)
+                        new TransferKey(stop, sd.stop, sd.edges),
+                        new SimpleTransfer(stop, sd.stop, sd.distance, sd.edges)
                     );
                 }
                 if (OTPFeature.FlexRouting.isOn()) {
@@ -110,11 +110,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                     // from Stops to FlexStopLocations and between Stops are already covered above.
                     for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, streetRequest,  true)) {
                         // Skip the origin stop, loop transfers are not needed.
-                        if (sd.stop == ts0.getStop()) { continue; }
+                        if (sd.stop == stop) { continue; }
                         if (sd.stop instanceof Stop) { continue; }
                         distinctTransfers.put(
-                            new TransferKey(sd.stop, ts0.getStop(), sd.edges),
-                            new SimpleTransfer(sd.stop, ts0.getStop(), sd.distance, sd.edges)
+                            new TransferKey(sd.stop, stop, sd.edges),
+                            new SimpleTransfer(sd.stop, stop, sd.distance, sd.edges)
                         );
                     }
                 }
