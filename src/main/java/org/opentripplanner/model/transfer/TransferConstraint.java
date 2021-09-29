@@ -58,10 +58,10 @@ public class TransferConstraint implements Serializable {
 
     /**
      * A facilitated transfer is allowed even if there might not be enough time to walk or
-     * if the alight-slack or board-slack is to tight. We ignore slack for facilitated transfers.
+     * if the alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
      * <p>
-     * This is a aggregated field, witch encapsulate an OTP specific rule. A facilitated transfer
-     * is either stay-seated og guaranteed. High priority transfers are not.
+     * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer
+     * is either stay-seated or guaranteed. High priority transfers are not.
      */
     public boolean isFacilitated() {
         return staySeated || guaranteed;

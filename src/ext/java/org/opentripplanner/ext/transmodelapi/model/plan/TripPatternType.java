@@ -148,7 +148,7 @@ public class TripPatternType {
                         .name("waitTimeOptimizedCost")
                         .description(
                                 "A cost calculated to distribute wait-time and avoid very "
-                                + "short transfers. This field is ment for debugging only."
+                                + "short transfers. This field is meant for debugging only."
                         )
                         .type(Scalars.GraphQLInt)
                         .dataFetcher(
@@ -159,7 +159,7 @@ public class TripPatternType {
                         .name("transferPriorityCost")
                         .description(
                                 "A cost calculated to favor transfer with higher priority. This "
-                                        + "field is ment for debugging only."
+                                        + "field is meant for debugging only."
                         )
                         .type(Scalars.GraphQLInt)
                         .dataFetcher(
