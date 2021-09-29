@@ -158,7 +158,6 @@ public class ServiceJourneyType {
                             .name("date")
                             .type(gqlUtil.dateScalar)
                             .description("Date to get estimated calls for. Defaults to today.")
-                            .defaultValue(null)
                             .build())
                     .dataFetcher(environment -> {
                         final Trip trip = trip(environment);

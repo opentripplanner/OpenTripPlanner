@@ -14,7 +14,7 @@ public class ItineraryFiltersMapper {
     return new ItineraryFilterParameters(
         c.asBoolean("debug", dft.debug),
         c.asDouble("groupSimilarityKeepOne", dft.groupSimilarityKeepOne),
-        c.asDouble("groupSimilarityKeepNumOfItineraries", dft.groupSimilarityKeepNumOfItineraries),
+        c.asDouble("groupSimilarityKeepThree", dft.groupSimilarityKeepThree),
         c.asDouble("minSafeTransferTimeFactor", dft.minSafeTransferTimeFactor),
         c.asLinearFunction("transitGeneralizedCostLimit", dft.transitGeneralizedCostLimit),
         c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit),

@@ -3,6 +3,7 @@ package org.opentripplanner.updater.vehicle_rental;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -72,6 +73,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         linker = graph.getLinker();
         // Adding a vehicle rental station service needs a graph writer runnable
         service = graph.getService(VehicleRentalStationService.class, true);
+        // Do any setup if needed
+        source.setup();
     }
 
     @Override
@@ -151,4 +154,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         }
     }
 
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(VehicleRentalUpdater.class)
+                .addObj("source", source)
+                .toString();
+    }
 }

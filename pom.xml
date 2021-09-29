@@ -472,6 +472,12 @@
             <version>0.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.entur.gbfs</groupId>
+            <artifactId>gbfs-java-model</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+
         <!--
             The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
             The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and

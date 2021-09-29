@@ -18,7 +18,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
-import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -235,8 +234,8 @@ public class RaptorPathToItineraryMapper {
         Stop transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = ((TransferWithDuration) pathLeg.transfer()).transfer();
 
-        Place from = mapStopToPlace(transferFromStop);
-        Place to = mapStopToPlace(transferToStop);
+        Place from = new Place(transferFromStop);
+        Place to = new Place(transferToStop);
         return mapNonTransitLeg(pathLeg, transfer, from, to, false);
     }
 
@@ -331,23 +330,10 @@ public class RaptorPathToItineraryMapper {
     }
 
     /**
-     * Maps stops for non-transit (transfer) legs.
-     */
-    private Place mapStopToPlace(Stop stop) {
-        Place place = new Place(stop.getLat(), stop.getLon(), stop.getName());
-        place.stopId = stop.getId();
-        place.stopCode = stop.getCode();
-        place.platformCode = stop.getPlatformCode();
-        place.zoneId = stop.getFirstZoneAsString();
-        place.vertexType = VertexType.TRANSIT;
-        return place;
-    }
-
-    /**
      * Maps stops for transit legs.
      */
     private Place mapStopToPlace(Stop stop, Integer stopIndex, TripTimes tripTimes) {
-        Place place = mapStopToPlace(stop);
+        Place place = new Place(stop);
         place.stopIndex = stopIndex;
         place.stopSequence = tripTimes.getOriginalGtfsStopSequence(stopIndex);
         return place;

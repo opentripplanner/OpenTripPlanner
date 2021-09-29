@@ -46,11 +46,7 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Object> stop() {
-    return environment -> {
-      Place place = getSource(environment).place;
-      return place.vertexType.equals(VertexType.TRANSIT) ?
-          getRoutingService(environment).getStopForId(place.stopId) : null;
-    };
+    return environment -> getSource(environment).place.stop;
   }
 
   @Override

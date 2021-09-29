@@ -47,6 +47,10 @@
 - When importing Netex, allow bicycles on ferries by default [#3596](https://github.com/opentripplanner/OpenTripPlanner/pull/3596)
 - Safely catch some elevation interpolation exceptions [#3412](https://github.com/opentripplanner/OpenTripPlanner/pull/3412)
 - Add basic version-support for importing tariffzones [#3590](https://github.com/opentripplanner/OpenTripPlanner/pull/3590)
+- Use a fixed limit(3) for grouping similar itineraries [3599](https://github.com/opentripplanner/OpenTripPlanner/issues/3599)
+- Remove null default values for Transmodel API [#3613](https://github.com/opentripplanner/OpenTripPlanner/pull/3613)
+- Extract GBFS loading logic [#3608](https://github.com/opentripplanner/OpenTripPlanner/pull/3608)
+- Route not found in some conditions with boarding/alighting restrictions [#3621](https://github.com/opentripplanner/OpenTripPlanner/pull/3621)
 
 
 ## 2.0.0 (2020-11-27)

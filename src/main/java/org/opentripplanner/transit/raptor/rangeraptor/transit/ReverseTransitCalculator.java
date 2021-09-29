@@ -7,6 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripSched
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
@@ -134,6 +135,16 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     @Override
     public RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(RaptorRoute<T> route) {
         return route.transferConstraintsReverseSearch();
+    }
+
+    @Override
+    public boolean alightingPossibleAt(RaptorTripPattern pattern, int stopPos) {
+        return pattern.boardingPossibleAt(stopPos);
+    }
+
+    @Override
+    public boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos) {
+        return pattern.alightingPossibleAt(stopPos);
     }
 
     @Override
