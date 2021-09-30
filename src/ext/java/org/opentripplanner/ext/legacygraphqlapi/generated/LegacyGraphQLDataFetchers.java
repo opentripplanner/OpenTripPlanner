@@ -7,7 +7,7 @@ import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
@@ -493,7 +493,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Object> stop();
 
-        public DataFetcher<VehicleRentalStation> bikeRentalStation();
+        public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
         public DataFetcher<BikePark> bikePark();
 
@@ -616,9 +616,9 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Object> serviceTimeRange();
 
-        public DataFetcher<Iterable<VehicleRentalStation>> bikeRentalStations();
+        public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
 
-        public DataFetcher<VehicleRentalStation> bikeRentalStation();
+        public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
         public DataFetcher<Iterable<BikePark>> bikeParks();
 

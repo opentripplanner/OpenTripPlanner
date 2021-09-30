@@ -475,9 +475,10 @@ public abstract class GraphPathToItineraryMapper {
                 name
         );
 
-        if(vertex instanceof VehicleRentalStationVertex) {
-            place.bikeShareId = ((VehicleRentalStationVertex) vertex).getId();
-            LOG.trace("Added bike share Id {} to place", place.bikeShareId);
+
+        if (vertex instanceof VehicleRentalStationVertex) {
+            place.vehicleRentalStation = ((VehicleRentalStationVertex) vertex).getStation();
+            LOG.trace("Added bike share Id {} to place", place.vehicleRentalStation.getId());
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
             place.vertexType = VertexType.BIKEPARK;

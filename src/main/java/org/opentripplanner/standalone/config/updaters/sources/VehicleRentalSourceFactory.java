@@ -48,7 +48,6 @@ public class VehicleRentalSourceFactory {
         return new GbfsVehicleRentalDataSourceParameters(
             url(),
             language(),
-            routeAsCar(),
             allowKeepingRentedVehicleAtDestination(),
             headers()
         );
@@ -81,10 +80,6 @@ public class VehicleRentalSourceFactory {
 
   private String network() {
     return c.asText("network", null);
-  }
-
-  private boolean routeAsCar() {
-    return c.asBoolean("routeAsCar", false);
   }
 
   private boolean allowKeepingRentedVehicleAtDestination() {

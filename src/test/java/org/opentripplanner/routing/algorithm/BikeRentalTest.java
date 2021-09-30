@@ -15,6 +15,10 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
@@ -138,7 +142,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testNoBikesAvailable() {
-        B1.setVehiclesAvailable(0);
+        ((VehicleRentalStation) B1.getStation()).vehiclesAvailable = 0;
 
         assertPath(
                 S1, E1, true,
@@ -159,7 +163,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testNoSpacesAvailable() {
-        B2.setSpacesAvailable(0);
+        ((VehicleRentalStation) B2.getStation()).spacesAvailable = 0;
 
         assertPath(
                 S1, E1, true,
@@ -180,7 +184,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testIgnoreAvailabilityNoBikesAvailable() {
-        B1.setVehiclesAvailable(0);
+        ((VehicleRentalStation) B1.getStation()).vehiclesAvailable = 0;
 
         assertPath(
                 S1, E1, false,
@@ -193,7 +197,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testIgnoreAvailabilityNoSpacesAvailable() {
-        B2.setSpacesAvailable(0);
+        ((VehicleRentalStation) B2.getStation()).spacesAvailable = 0;
 
         assertPath(
                 S1, E1, false,
@@ -206,7 +210,14 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testFloatingBike() {
-        B1.getStation().isFloatingBike = true;
+        VehicleRentalPlace station = B1.getStation();
+        VehicleRentalVehicle vehicle = new VehicleRentalVehicle();
+        vehicle.latitude = station.getLatitude();
+        vehicle.longitude = station.getLongitude();
+        vehicle.id = station.getId();
+        vehicle.name = station.getName();
+        vehicle.vehicleType = RentalVehicleType.getDefaultType(station.getId().getFeedId());
+        B1.setStation(vehicle);
 
         assertPath(
                 S1, E1,
@@ -235,7 +246,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testBikeRentalFromStationWantToKeepCantKeep() {
-        B1.getStation().isKeepingVehicleRentalAtDestinationAllowed = false;
+        ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = false;
 
         assertPath(
                 S1, E1, 40,
@@ -264,7 +275,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testBikeRentalFromStationWantToKeepCanKeep() {
-        B1.getStation().isKeepingVehicleRentalAtDestinationAllowed = true;
+        ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = true;
 
         assertPath(
                 S1, E1, 40,
@@ -293,7 +304,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void testBikeRentalFromStationWantToKeepCanKeepButCostly() {
-        B1.getStation().isKeepingVehicleRentalAtDestinationAllowed = true;
+        ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = true;
         int keepRentedBicycleAtDestinationCost = 1000;
 
         assertPath(

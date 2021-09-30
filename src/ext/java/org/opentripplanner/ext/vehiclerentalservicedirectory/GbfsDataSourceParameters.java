@@ -7,6 +7,6 @@ import java.util.Map;
 public class GbfsDataSourceParameters extends GbfsVehicleRentalDataSourceParameters {
 
   public GbfsDataSourceParameters(String url, String language, Map<String, String> httpHeaders) {
-    super(url, language, false, false, httpHeaders);
+    super(url, language, false, httpHeaders);
   }
 }
