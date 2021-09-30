@@ -38,8 +38,9 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripForwardSearch(
         ArrivalView<S> arrival
     ) {
-        S trip = arrival.transitPath().trip();
-        int fromStop = arrival.previous().stop();
+        var transitPath = arrival.transitPath();
+        S trip = transitPath.trip();
+        int fromStop = transitPath.boardStop();
         int toStop = arrival.stop();
         int latestArrivalTime = arrival.arrivalTime();
 
@@ -54,9 +55,10 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripReverseSearch(
         ArrivalView<S> arrival
     ) {
-        S trip = arrival.transitPath().trip();
+        var transitPath = arrival.transitPath();
+        S trip = transitPath.trip();
         int fromStop = arrival.stop();
-        int toStop = arrival.previous().stop();
+        int toStop = transitPath.boardStop();
         int earliestBoardTime = arrival.arrivalTime();
 
         return new TripTimesSearch<>(trip, fromStop, toStop).findTripAfter(earliestBoardTime);

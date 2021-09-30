@@ -136,6 +136,7 @@ public class SearchParams {
     public boolean isSearchWindowSet() {
         return searchWindowInSeconds != NOT_SET;
     }
+
     public boolean searchOneIterationOnly() {
         return searchWindowInSeconds == 0;
     }

@@ -109,6 +109,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
       debug.addStops(stopsVisited());
     }
     val logger = new TestDebugLogger(true);
+
     debug
         .stopArrivalListener(logger::stopArrivalLister)
         .patternRideDebugListener(logger::patternRideLister)
@@ -223,5 +224,4 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     }
     return stops;
   }
-
 }
