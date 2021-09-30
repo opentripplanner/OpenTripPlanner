@@ -3,9 +3,7 @@ package org.opentripplanner.model.transfer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
-import static org.opentripplanner.model.transfer.TransferPriority.PREFERRED;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.time.DurationUtils;
@@ -14,12 +12,14 @@ public class TransferConstraintTest implements TransferTestData {
 
   public static final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.duration("1h");
 
-  private final TransferConstraint NO_CONSTRAINS = new TransferConstraint(ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
-  private final TransferConstraint RECOMMENDED = new TransferConstraint(TransferPriority.RECOMMENDED, false, false, MAX_WAIT_TIME_NOT_SET);
-  private final TransferConstraint STAY_SEATED = new TransferConstraint(ALLOWED, true, false, MAX_WAIT_TIME_NOT_SET);
-  private final TransferConstraint GUARANTIED = new TransferConstraint(ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET);
-  private final TransferConstraint MAX_WAIT_TIME = new TransferConstraint(ALLOWED, false, true, MAX_WAIT_TIME_ONE_HOUR);
-  private final TransferConstraint EVERYTHING = new TransferConstraint(PREFERRED, true, true, MAX_WAIT_TIME_ONE_HOUR);
+  private final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
+  private final TransferConstraint RECOMMENDED = TransferConstraint.create().recommended().build();
+  private final TransferConstraint STAY_SEATED = TransferConstraint.create().staySeated().build();
+  private final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
+  private final TransferConstraint MAX_WAIT_TIME = TransferConstraint.create()
+          .guaranteed().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
+  private final TransferConstraint EVERYTHING = TransferConstraint.create()
+          .staySeated().guaranteed().preferred().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
 
   @Test
   public void getPriority() {

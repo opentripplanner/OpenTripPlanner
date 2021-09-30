@@ -3,8 +3,6 @@ package org.opentripplanner.model.transfer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
-import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 public class ConstrainedTransferTest implements TransferTestData {
 
-  private static final TransferConstraint NO_CONSTRAINS = new TransferConstraint(ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
-  private static final TransferConstraint GUARANTIED = new TransferConstraint(ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET);
+  private static final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
+  private static final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
 
   private final ConstrainedTransfer TX_A_TO_B = new ConstrainedTransfer(STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
   private final ConstrainedTransfer TX_A_TO_R22 = new ConstrainedTransfer(STOP_POINT_A, ROUTE_POINT_22, NO_CONSTRAINS);

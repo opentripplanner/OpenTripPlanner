@@ -1,6 +1,9 @@
 package org.opentripplanner.model.transfer;
 
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
+import static org.opentripplanner.model.transfer.TransferPriority.NOT_ALLOWED;
+import static org.opentripplanner.model.transfer.TransferPriority.PREFERRED;
+import static org.opentripplanner.model.transfer.TransferPriority.RECOMMENDED;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -63,19 +66,17 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
     private final int maxWaitTime;
 
-    public TransferConstraint(
-            TransferPriority priority,
-            boolean staySeated,
-            boolean guaranteed,
-            int maxWaitTime
-    ) {
-        this.priority = priority;
-        this.staySeated = staySeated;
-        this.guaranteed = guaranteed;
-        this.maxWaitTime = maxWaitTime;
 
-        if(!guaranteed && maxWaitTime != MAX_WAIT_TIME_NOT_SET) {
-            throw new IllegalArgumentException("'maxWaitTime' do only apply to guaranteed transfers.");
+    private TransferConstraint(Builder builder) {
+        this.priority = builder.priority;
+        this.staySeated = builder.staySeated;
+        this.guaranteed = builder.guaranteed;
+        this.maxWaitTime = builder.maxWaitTime;
+
+        if(isMaxWaitTimeSet() && !guaranteed) {
+            throw new IllegalArgumentException(
+                    "'maxWaitTime' do only apply to guaranteed transfers."
+            );
         }
     }
 
@@ -180,5 +181,64 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         if(staySeated) { return STAY_SEATED_TRANSFER_COST; }
         if(guaranteed) { return GUARANTIED_TRANSFER_COST; }
         return NONE_FACILITATED_COST;
+    }
+
+
+
+    public static Builder create() { return new Builder(); }
+
+    private boolean isMaxWaitTimeSet() {
+        return maxWaitTime != MAX_WAIT_TIME_NOT_SET;
+    }
+
+    public static class Builder {
+        private TransferPriority priority = ALLOWED;
+        private boolean staySeated = false;
+        private boolean guaranteed = false;
+        private int maxWaitTime = MAX_WAIT_TIME_NOT_SET;
+
+        public Builder priority(TransferPriority priority) {
+            this.priority = priority;
+            return this;
+        }
+
+        public Builder notAllowed() {
+            return priority(NOT_ALLOWED);
+        }
+
+        public Builder recommended() {
+            return priority(RECOMMENDED);
+        }
+
+        public Builder preferred() {
+            return priority(PREFERRED);
+        }
+
+        public Builder staySeated(boolean enable) {
+            this.staySeated = enable;
+            return this;
+        }
+
+        public Builder staySeated() {
+            return staySeated(true);
+        }
+
+        public Builder guaranteed(boolean enable) {
+            this.guaranteed = enable;
+            return this;
+        }
+
+        public Builder guaranteed() {
+            return guaranteed(true);
+        }
+
+        public Builder maxWaitTime(int maxWaitTime) {
+            this.maxWaitTime = maxWaitTime;
+            return this;
+        }
+
+        public TransferConstraint build() {
+            return new TransferConstraint(this);
+        }
     }
 }

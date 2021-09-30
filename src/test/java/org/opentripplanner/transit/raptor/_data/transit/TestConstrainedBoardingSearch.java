@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
@@ -17,9 +16,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 public class TestConstrainedBoardingSearch
         implements RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> {
 
-    private static final TransferConstraint GUARANTEED = new TransferConstraint(
-            TransferPriority.ALLOWED, false, true, TransferConstraint.MAX_WAIT_TIME_NOT_SET
-    );
+    private static final TransferConstraint GUARANTEED = TransferConstraint.create().guaranteed().build();
 
 
     /** Index of guaranteed transfers by fromStopPos */

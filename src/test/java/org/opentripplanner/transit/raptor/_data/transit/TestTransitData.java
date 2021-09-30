@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,7 +11,6 @@ import javax.annotation.Nullable;
 import lombok.val;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
@@ -32,9 +29,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
 
-  private static final TransferConstraint GUARANTEED = new TransferConstraint(
-          TransferPriority.ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET
-  );
+  private static final TransferConstraint GUARANTEED = TransferConstraint.create()
+          .guaranteed().build();
 
   private final List<List<RaptorTransfer>> transfersByStop = new ArrayList<>();
   private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
