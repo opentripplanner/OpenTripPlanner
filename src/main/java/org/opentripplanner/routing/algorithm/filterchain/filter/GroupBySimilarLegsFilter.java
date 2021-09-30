@@ -1,6 +1,5 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 
 public class GroupBySimilarLegsFilter extends GroupByFilter<GroupByTripIdAndDistance> {

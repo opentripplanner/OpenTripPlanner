@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filter;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;

@@ -1,10 +1,9 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filter;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 
 import java.util.List;
 

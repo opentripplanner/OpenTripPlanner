@@ -4,7 +4,7 @@ package org.opentripplanner.routing.api.request;
 import java.util.function.DoubleFunction;
 
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
-import org.opentripplanner.routing.algorithm.filterchain.filters.AddMinSafeTransferCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.AddMinSafeTransferCostFilter;
 
 /**
  * Group by Similarity filter parameters

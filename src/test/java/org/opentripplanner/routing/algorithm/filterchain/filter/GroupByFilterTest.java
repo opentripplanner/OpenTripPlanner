@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filter;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 public class GroupByFilterTest implements PlanTestConstants {
