@@ -135,7 +135,7 @@ class TransferGeneratorTest implements RaptorTestConstants {
                 "[["
                         + "TripToTripTransfer{from: [2 10:20:00 BUS L1], to: [2 10:20:00 BUS L2]}"
                         + "], ["
-                        + "TripToTripTransfer{from: [3 10:30:00 BUS L2], to: [4 10:31:00 BUS L3], transfer: Walk 1m ~ 4}"
+                        + "TripToTripTransfer{from: [3 10:30:00 BUS L2], to: [4 10:31:00 BUS L3], transfer: On-Street 1m ~ 4}"
                         + "]]",
                 result.toString()
         );
@@ -161,9 +161,9 @@ class TransferGeneratorTest implements RaptorTestConstants {
         var result = subject.findAllPossibleTransfers(transitLegs);
         assertEquals(
                 "[["
-                        + "TripToTripTransfer{from: [2 10:10:00 BUS L1], to: [5 10:12:00 BUS L2], transfer: Walk 1m ~ 5}, "
+                        + "TripToTripTransfer{from: [2 10:10:00 BUS L1], to: [5 10:12:00 BUS L2], transfer: On-Street 1m ~ 5}, "
                         + "TripToTripTransfer{from: [3 10:20:00 BUS L1], to: [3 10:22:00 BUS L2]}, "
-                        + "TripToTripTransfer{from: [4 10:30:00 BUS L1], to: [6 10:32:00 BUS L2], transfer: Walk 20s ~ 6}"
+                        + "TripToTripTransfer{from: [4 10:30:00 BUS L1], to: [6 10:32:00 BUS L2], transfer: On-Street 20s ~ 6}"
                         + "]]",
                 result.toString()
         );
@@ -200,9 +200,9 @@ class TransferGeneratorTest implements RaptorTestConstants {
         assertEquals(
                 "[["
                         + "TripToTripTransfer{from: [2 10:10:00 BUS L1], to: [2 10:12:00 BUS L2]}, "
-                        + "TripToTripTransfer{from: [3 10:20:00 BUS L1], to: [4 10:22:00 BUS L2], transfer: Walk 30s ~ 4}"
+                        + "TripToTripTransfer{from: [3 10:20:00 BUS L1], to: [4 10:22:00 BUS L2], transfer: On-Street 30s ~ 4}"
                         + "], ["
-                        + "TripToTripTransfer{from: [4 10:22:00 BUS L2], to: [6 10:24:00 BUS L3], transfer: Walk 20s ~ 6}, "
+                        + "TripToTripTransfer{from: [4 10:22:00 BUS L2], to: [6 10:24:00 BUS L3], transfer: On-Street 20s ~ 6}, "
                         + "TripToTripTransfer{from: [5 10:32:00 BUS L2], to: [5 10:34:00 BUS L3]}"
                         + "]]",
                 result.toString()
