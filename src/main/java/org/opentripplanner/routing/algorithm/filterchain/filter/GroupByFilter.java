@@ -10,7 +10,7 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 
 /**
- * This filter group the itineraries using a group-id and filter each group
+ * This filter groups the itineraries using a group-id and filter each group
  * by the given {@code filter}. It ensure that {@code maxNumberOfItinerariesPrGroup} requirement
  * is meat by reducing each group down to the given limit.
  *
