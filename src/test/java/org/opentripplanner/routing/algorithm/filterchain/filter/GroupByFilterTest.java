@@ -1,11 +1,14 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
@@ -15,7 +18,7 @@ public class GroupByFilterTest implements PlanTestConstants {
 
     /**
      * This test group by exact trip ids and test that the reduce function
-     * works properly. It do not merge any groups.
+     * works properly. It does not merge any groups.
      */
     @Test
     public void aSimpleTestGroupByMatchingTripIdsNoMerge() {
@@ -31,16 +34,25 @@ public class GroupByFilterTest implements PlanTestConstants {
         List<Itinerary> all = List.of(i1, i2a, i2b);
 
         // With min Limit = 1, expect the best trips from both groups
-        result = createFilter(1).filter(all);
-        assertEquals(toStr(List.of(i1, i2a)), toStr(result));
+        createFilter(1).filter(all);
+        assertFalse(i1.isMarkedAsDeleted());
+        assertFalse(i2a.isMarkedAsDeleted());
+        assertTrue(i2b.isMarkedAsDeleted());
 
-        // With min Limit = 2, also one from each group
-        result = createFilter(2).filter(all);
-        assertEquals(toStr(List.of(i1, i2a, i2b)), toStr(result));
+        // Remove notice after asserting
+        i2b.systemNotices.remove(0);
+
+        // With min Limit = 2, we get two from each group
+        createFilter(2).filter(all);
+        assertFalse(i1.isMarkedAsDeleted());
+        assertFalse(i2a.isMarkedAsDeleted());
+        assertFalse(i2b.isMarkedAsDeleted());
 
         // With min Limit = 3, we get all 3 itineraries
-        result = createFilter(3).filter(all);
-        assertEquals(toStr(List.of(i1, i2a, i2b)), toStr(result));
+        createFilter(3).filter(all);
+        assertFalse(i1.isMarkedAsDeleted());
+        assertFalse(i2a.isMarkedAsDeleted());
+        assertFalse(i2b.isMarkedAsDeleted());
     }
 
     /**
@@ -49,8 +61,6 @@ public class GroupByFilterTest implements PlanTestConstants {
      */
     @Test
     public void testMerging() {
-        List<Itinerary> result;
-
         // Given these 3 itineraries witch all should be grouped in the same group
         Itinerary i1 = newItinerary(A).bus(1, 1, 11, E).build();
         Itinerary i11 = newItinerary(A).bus(11, 5, 16, E).build();
@@ -66,8 +76,15 @@ public class GroupByFilterTest implements PlanTestConstants {
         List<Itinerary> inputC = List.of(i11, i12, i1);
 
         for (List<Itinerary> input : List.of(inputA, inputB, inputC)) {
-            result = createFilter(1).filter(input);
-            assertEquals(toStr(List.of(i1)), toStr(result));
+            createFilter(1).filter(input);
+
+            assertFalse(i1.isMarkedAsDeleted());
+
+            // Remove notices after asserting
+            assertTrue(i11.isMarkedAsDeleted());
+            i11.systemNotices.remove(0);
+            assertTrue(i12.isMarkedAsDeleted());
+            i12.systemNotices.remove(0);
         }
     }
 

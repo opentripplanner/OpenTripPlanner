@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Filter itineraries and remove all itineraries where all legs is walking.
  */
-public class RemoveWalkOnlyFilter implements ItineraryListFilter {
+public class RemoveWalkOnlyFilter implements ItineraryTagger {
 
     @Override
     public String name() {
@@ -17,14 +17,14 @@ public class RemoveWalkOnlyFilter implements ItineraryListFilter {
     }
 
     @Override
-    public List<Itinerary> filter(List<Itinerary> itineraries) {
-        return itineraries
-            .stream().filter(it -> !it.isWalkingAllTheWay())
-            .collect(Collectors.toList());
+    public boolean filterUntaggedItineraries() {
+        return true;
     }
 
     @Override
-    public boolean removeItineraries() {
-        return true;
+    public void tagItineraries(List<Itinerary> itineraries) {
+        itineraries.stream()
+            .filter(Itinerary::isWalkingAllTheWay)
+            .forEach(it -> it.markAsDeleted(notice()));
     }
 }

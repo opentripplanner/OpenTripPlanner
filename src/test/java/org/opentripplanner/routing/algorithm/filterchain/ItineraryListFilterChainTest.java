@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
-import org.opentripplanner.routing.algorithm.filterchain.filters.ItineraryListFilterChain;
 
 import java.util.List;
 
@@ -23,17 +24,24 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 public class ItineraryListFilterChainTest implements PlanTestConstants {
   private static final int I3_LATE_START_TIME = T11_33;
 
-  // And some itineraries, with some none optimal options
-  // Short walk - 2 minutes - to destination:
-  private final Itinerary i1 = newItinerary(A, T11_06).walk(D2m, E).build();
+  private Itinerary i1;
+  private Itinerary i2;
+  private Itinerary i3;
 
-  // Not optimal, takes longer than walking
-  private final Itinerary i2 = newItinerary(A).bus(21, T11_06, T11_09, E).build();
+  @BeforeEach
+  public void setUpItineraries() {
+    // Add some itineraries, with some none optimal options
+    // Short walk - 2 minutes - to destination:
+    i1 = newItinerary(A, T11_06).walk(D2m, E).build();
 
-  // Not optimal, departure is very late
-  private final Itinerary i3 = newItinerary(A)
-      .bus(20, I3_LATE_START_TIME, I3_LATE_START_TIME + D1m, E)
-      .build();
+    // Not optimal, takes longer than walking
+    i2 = newItinerary(A).bus(21, T11_06, T11_09, E).build();
+
+    // Not optimal, departure is very late
+    i3 = newItinerary(A)
+            .bus(20, I3_LATE_START_TIME, I3_LATE_START_TIME + D1m, E)
+            .build();
+  }
 
 
   @Test
@@ -56,25 +64,37 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertEquals(toStr(List.of(i1)), toStr(chain.filter(List.of(i1, i2, i3))));
   }
 
-  @Test
-  public void testFilterChainWithMaxItinerariesFilterSet() {
-    // Given:
-    ItineraryListFilterChain chain;
-    Itinerary i1 = newItinerary(A).bus(21, T11_05, T11_10, E).build();
-    Itinerary i2 = newItinerary(A).bus(31, T11_07, T11_12, E).build();
-    Itinerary i3 = newItinerary(A).bus(41, T11_09, T11_14, E).build();
+  @Nested
+  class MaxItinerariesBuilderTest {
 
-    // Given a default chain with 'numOfItineraries=2'
-    chain = createBuilder(false, false, 2).build();
-    assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2, i3)));
+    @BeforeEach
+    public void setUpItineraries() {
+      i1 = newItinerary(A).bus(21, T11_05, T11_10, E).build();
+      i2 = newItinerary(A).bus(31, T11_07, T11_12, E).build();
+      i3 = newItinerary(A).bus(41, T11_09, T11_14, E).build();
+    }
 
-    // Given a default chain with 'numOfItineraries=1'
-    chain = createBuilder(false, false, 1).build();
-    assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3)));
+    @Test
+    public void testPostProcessorWithMaxItinerariesFilterSetToTwo() {
+      // Given a default postProcessor with 'numOfItineraries=2'
+      ItineraryListFilterChain chain = createBuilder(false, false, 2).build();
+      assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2, i3)));
+    }
 
-    // Given a chain with 'numOfItineraries=1' and 'arriveBy=true'
-    chain = createBuilder(true, false, 1).build();
-    assertEquals(List.of(i3), chain.filter(List.of(i1, i2, i3)));
+    @Test
+    public void testPostProcessorWithMaxItinerariesFilterSetToOneDepartAt() {
+      // Given a default postProcessor with 'numOfItineraries=1'
+      ItineraryListFilterChain chain = createBuilder(false, false, 1).build();
+      assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3)));
+
+    }
+
+    @Test
+    public void testPostProcessorWithMaxItinerariesFilterSetToOneArriveBy() {
+      // Given a postProcessor with 'numOfItineraries=1' and 'arriveBy=true'
+      ItineraryListFilterChain chain = createBuilder(true, false, 1).build();
+      assertEquals(List.of(i3), chain.filter(List.of(i1, i2, i3)));
+    }
   }
 
   @Test
@@ -93,24 +113,35 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertEquals("latest-departure-time-limit", i3.systemNotices.get(0).tag);
   }
 
-  @Test
-  public void removeTransitWithHigherCostThanBestOnStreetOnly() {
-    var builder= createBuilder(true, false, 20);
-    ItineraryListFilterChain chain;
+  @Nested
+  class RemoveTransitWithHigherCostThanBestOnStreetOnlyTest {
 
-    // given
-    // Walk for 12 minute
-    Itinerary walk = newItinerary(A, T11_06).walk(D12m, E).build();
-    // Not optimal, takes longer than walking
-    Itinerary bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
+    Itinerary walk;
+    Itinerary bus;
+    ItineraryListFilterChainBuilder builder = createBuilder(true, false, 20);
 
-    // Disable filter and allow none optimal bus itinerary pass through
-    chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(false).build();
-    assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
+    @BeforeEach
+    public void setUpItineraries() {
+      // given
+      // Walk for 12 minute
+      walk = newItinerary(A, T11_06).walk(D12m, E).build();
+      // Not optimal, takes longer than walking
+      bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
+    }
 
-    // Enable filter and remove bus itinerary
-    chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(true).build();
-    assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
+    @Test
+    public void removeTransitWithHigherCostThanBestOnStreetOnlyDisabled() {
+      // Disable filter and allow none optimal bus itinerary pass through
+      ItineraryListFilterChain chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(false).build();
+      assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
+    }
+
+    @Test
+    public void removeTransitWithHigherCostThanBestOnStreetOnlyEnabled() {
+      // Enable filter and remove bus itinerary
+      ItineraryListFilterChain chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(true).build();
+      assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
+    }
   }
 
   @Test

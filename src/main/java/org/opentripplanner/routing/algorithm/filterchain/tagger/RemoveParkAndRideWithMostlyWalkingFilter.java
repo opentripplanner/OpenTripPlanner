@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.opentripplanner.routing.core.TraverseMode;
  * <p>
  * This filter is turned off by default (parkAndRideDurationRatio == 0)
  */
-public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryListFilter {
+public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryTagger {
 
     private final double parkAndRideDurationRatio;
 
@@ -28,8 +28,13 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryListFi
     }
 
     @Override
-    public List<Itinerary> filter(List<Itinerary> itineraries) {
-        List<Itinerary> result = new ArrayList<>();
+    public boolean filterUntaggedItineraries() {
+        return true;
+    }
+
+    @Override
+    public void tagItineraries(List<Itinerary> itineraries) {
+        if (itineraries.size() == 1) { return; }
 
         for (Itinerary itinerary : itineraries) {
             var containsTransit =
@@ -42,18 +47,11 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryListFi
                     .sum();
             double totalDuration = itinerary.durationSeconds;
 
-            if (containsTransit
-                    || itineraries.size() == 1
-                    || carDuration == 0
-                    || (carDuration / totalDuration) > parkAndRideDurationRatio) {
-                result.add(itinerary);
+            if (!containsTransit
+                    && carDuration != 0
+                    && (carDuration / totalDuration) <= parkAndRideDurationRatio) {
+                itinerary.markAsDeleted(notice());
             }
         }
-        return result;
-    }
-
-    @Override
-    public boolean removeItineraries() {
-        return true;
     }
 }

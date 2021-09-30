@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * The filter can also report the first itinerary in the list it will remove. The subscriber
  * is optional.
  */
-public class MaxLimitFilter implements ItineraryListFilter {
+public class MaxLimitFilter implements ItineraryTagger {
     private static final Consumer<Itinerary> IGNORE_SUBSCRIBER = (i) -> {};
 
     private final String name;
@@ -38,14 +38,14 @@ public class MaxLimitFilter implements ItineraryListFilter {
     }
 
     @Override
-    public List<Itinerary> filter(final List<Itinerary> itineraries) {
-        if(itineraries.size() <= maxLimit) { return itineraries; }
-        changedSubscriber.accept(itineraries.get(maxLimit));
-        return itineraries.stream().limit(maxLimit).collect(Collectors.toList());
+    public boolean filterUntaggedItineraries() {
+        return true;
     }
 
     @Override
-    public boolean removeItineraries() {
-        return true;
+    public void tagItineraries(List<Itinerary> itineraries) {
+        if(itineraries.size() <= maxLimit) { return; }
+        changedSubscriber.accept(itineraries.get(maxLimit));
+        itineraries.stream().skip(maxLimit).forEach(it -> it.markAsDeleted(notice()));
     }
 }

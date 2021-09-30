@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
  * <p>
  * This filter is turned off by default (bikeRentalDistanceRatio == 0)
  */
-public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryListFilter {
+public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryTagger {
 
     private final double bikeRentalDistanceRatio;
 
@@ -26,9 +26,12 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryListFil
     }
 
     @Override
-    public List<Itinerary> filter(List<Itinerary> itineraries) {
-        List<Itinerary> result = new ArrayList<>();
+    public boolean filterUntaggedItineraries() {
+        return true;
+    }
 
+    @Override
+    public void tagItineraries(List<Itinerary> itineraries) {
         for (Itinerary itinerary : itineraries) {
             var containsTransit =
                     itinerary.legs.stream().anyMatch(l -> l != null && l.mode.isTransit());
@@ -40,17 +43,11 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryListFil
                     .sum();
             double totalDistance = itinerary.distanceMeters();
 
-            if (bikeRentalDistance == 0
-                    || containsTransit
-                    || (bikeRentalDistance / totalDistance) > bikeRentalDistanceRatio) {
-                result.add(itinerary);
+            if (bikeRentalDistance != 0
+                    && !containsTransit
+                    && (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio) {
+                itinerary.markAsDeleted(notice());
             }
         }
-        return result;
-    }
-
-    @Override
-    public boolean removeItineraries() {
-        return true;
     }
 }

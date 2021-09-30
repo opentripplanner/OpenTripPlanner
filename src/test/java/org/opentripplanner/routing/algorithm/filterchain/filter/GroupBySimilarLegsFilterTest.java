@@ -7,8 +7,8 @@ import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGenera
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.plan.Itinerary.toStr;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 /**
@@ -21,7 +21,6 @@ public class GroupBySimilarLegsFilterTest implements PlanTestConstants {
 
   @Test
   public void groupByTheLongestItineraryAndTwoGroups() {
-    List<Itinerary> result;
 
     // Group 1
     Itinerary i1 = newItinerary(A, 6)
@@ -41,8 +40,10 @@ public class GroupBySimilarLegsFilterTest implements PlanTestConstants {
     List<Itinerary> input = List.of(i1, i2, i3);
 
     // With min Limit = 1, expect the best trips from both groups
-    result = new GroupBySimilarLegsFilter(.5, 1, SORT_ON_COST).filter(input);
+    new GroupBySimilarLegsFilter(.5, 1, SORT_ON_COST).filter(input);
 
-    assertEquals(toStr(List.of(i1, i2)), toStr(result));
+    assertFalse(i1.isMarkedAsDeleted());
+    assertFalse(i2.isMarkedAsDeleted());
+    assertTrue(i3.isMarkedAsDeleted());
   }
 }

@@ -1,12 +1,13 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
@@ -16,14 +17,9 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
 
   // Create a filter with f(x) = 600 + 2x
   // Remove itineraries with a cost equivalent of 10 minutes and twice the min itinerary cost.
-  private final ItineraryListFilter subject = new TransitGeneralizedCostFilter(
+  private final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
       RequestFunctions.createLinearFunction(600, 2.0)
   );
-
-  @Test
-  public void name() {
-    assertEquals("transit-cost-filter", subject.name());
-  }
 
   @Test
   public void filter() {
@@ -44,6 +40,13 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     var all = List.of(i1, i2, i3, i4);
 
     // Expect - i4 to be dropped
-    assertEquals(toStr(List.of(i1, i2, i3)), toStr(subject.filter(all)));
+    assertEquals(toStr(List.of(i1, i2, i3)), toStr(process(all, subject)));
+  }
+
+  private List<Itinerary> process(List<Itinerary> itineraries, TransitGeneralizedCostFilter filter) {
+    filter.tagItineraries(itineraries);
+    return itineraries.stream()
+            .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
+            .collect(Collectors.toList());
   }
 }

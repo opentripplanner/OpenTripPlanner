@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,8 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
@@ -39,11 +41,13 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
     var input = List.of(w1, t1, t2, t3);
     var expected = List.of(w1, t1, t2);
 
-    Assertions.assertEquals(Itinerary.toStr(expected), Itinerary.toStr(subject.filter(input)));
+    Assertions.assertEquals(Itinerary.toStr(expected), Itinerary.toStr(process(input, subject)));
   }
 
-  @Test
-  public void removeItineraries() {
-    Assertions.assertTrue(subject.removeItineraries());
+  private List<Itinerary> process(List<Itinerary> itineraries, RemoveBikerentalWithMostlyWalkingFilter filter) {
+    filter.tagItineraries(itineraries);
+    return itineraries.stream()
+            .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
+            .collect(Collectors.toList());
   }
 }

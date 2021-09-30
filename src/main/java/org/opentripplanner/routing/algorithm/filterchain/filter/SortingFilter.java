@@ -24,11 +24,6 @@ public final class SortingFilter implements ItineraryListFilter {
     }
 
     @Override
-    public String name() {
-        return "itinerary-sorter";
-    }
-
-    @Override
     public List<Itinerary> filter(List<Itinerary> itineraries) {
         if (itineraries.size() < 2) {
             return itineraries;
@@ -38,7 +33,4 @@ public final class SortingFilter implements ItineraryListFilter {
             .sorted(comparator())
             .collect(Collectors.toList());
     }
-
-    @Override
-    public boolean removeItineraries() { return false; }
 }

@@ -10,21 +10,14 @@ import java.util.List;
  * instead　make a copy, change it and return the copy. It is allowed to return the list unchanged.
  * <p>
  * A filter should do only one thing! For example do not change the itineraries and delete elements
- * in the same filter. Instead create two filters and insert them after each other in the filter
+ * in the same filter. Instead create two tagger and insert them after each other in the filter
  * chain.
  * <p>
  * This allows decoration of each filter and make it easier to reuse logic. Like the
- * {@link org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter} is reused in
+ * {@link org.opentripplanner.routing.algorithm.filterchain.tagger.MaxLimitFilter} is reused in
  * several places.
  */
 public interface ItineraryListFilter {
-
-    /**
-     * A name used for debugging the filter chain.
-     * <p>
-     * Use '-' so separate words like: {@code sort-on-duration-filter}
-     */
-    String name();
 
     /**
      * Process the given itineraries returning the result.
@@ -39,15 +32,4 @@ public interface ItineraryListFilter {
      * </pre>
      */
     List<Itinerary> filter(List<Itinerary> itineraries);
-
-
-    /**
-     * Return {@code true} if the filter removes itineraries from the input list
-     * in the {@link #filter(List)} method, or {@code false} if no itineraries are
-     * deleted. Filters that sort the list or chane the itineraries should return
-     * {@code false}.
-     * <p>
-     * This is used by the debug functionality, each
-     */
-    boolean removeItineraries();
 }

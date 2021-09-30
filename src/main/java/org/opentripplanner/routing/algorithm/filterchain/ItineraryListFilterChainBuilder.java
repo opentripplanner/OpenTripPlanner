@@ -1,5 +1,21 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
+import org.opentripplanner.routing.algorithm.filterchain.filter.AddMinSafeTransferCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.FilteringFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.GroupBySimilarLegsFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.LatestDepartureTimeFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.NonTransitGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.RemoveBikerentalWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.RemoveParkAndRideWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.RemoveWalkOnlyFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.TransitGeneralizedCostFilter;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,22 +23,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.AddMinSafeTransferCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
-import org.opentripplanner.routing.algorithm.filterchain.filters.ItineraryListFilterChain;
-import org.opentripplanner.routing.algorithm.filterchain.filter.GroupBySimilarLegsFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.NonTransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveBikerentalWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveParkAndRideWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
-import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
 
 
 /**
@@ -194,7 +194,7 @@ public class ItineraryListFilterChainBuilder {
 
     /**
      * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by
-     * and remove-transit-with-higher-cost-than-best-on-street-only filters. This make sure that
+     * and remove-transit-with-higher-cost-than-best-on-street-only tagger. This make sure that
      * poor transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
      */
     public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
@@ -230,42 +230,42 @@ public class ItineraryListFilterChainBuilder {
 
         // Filter transit itineraries on generalized-cost
         if(transitGeneralizedCostLimit != null) {
-            filters.add(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit));
+            filters.add(new FilteringFilter(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit)));
         }
 
         // Filter non-transit itineraries on generalized-cost
         if(nonTransitGeneralizedCostLimit != null) {
-            filters.add(new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit));
+            filters.add(new FilteringFilter(new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit)));
         }
 
-        // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
+        // Apply all absolute tagger AFTER the groupBy tagger. Absolute tagger are tagger that
         // remove elements/ based on the given itinerary properties - not considering other
-        // itineraries. This may remove itineraries in the "groupBy" filters that are considered
+        // itineraries. This may remove itineraries in the "groupBy" tagger that are considered
         // worse than the itineraries removed here. Let take an example, 2 itineraries, A and B, are
         // returned. A have a significant higher cost than B, but share the same long last transit
         // leg. B depart AFTER the latest-departure-time (this may happen if the access is
-        // time-shifted). Then, A will be removed by the "group-by" filters(similar to B, but cost
+        // time-shifted). Then, A will be removed by the "group-by" tagger(similar to B, but cost
         // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
         // what we want, since both itineraries are none optimal.
         {
             if (removeTransitWithHigherCostThanBestOnStreetOnly) {
-                filters.add(new RemoveTransitIfStreetOnlyIsBetterFilter());
+                filters.add(new FilteringFilter(new RemoveTransitIfStreetOnlyIsBetterFilter()));
             }
 
             if(removeWalkAllTheWayResults) {
-                filters.add(new RemoveWalkOnlyFilter());
+                filters.add(new FilteringFilter(new RemoveWalkOnlyFilter()));
             }
 
             if (latestDepartureTimeLimit != null) {
-                filters.add(new LatestDepartureTimeFilter(latestDepartureTimeLimit));
+                filters.add(new FilteringFilter(new LatestDepartureTimeFilter(latestDepartureTimeLimit)));
             }
 
             if (bikeRentalDistanceRatio > 0) {
-                filters.add(new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio));
+                filters.add(new FilteringFilter(new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio)));
             }
 
             if (parkAndRideDurationRatio > 0) {
-                filters.add(new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio));
+                filters.add(new FilteringFilter(new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)));
             }
         }
 
@@ -273,29 +273,19 @@ public class ItineraryListFilterChainBuilder {
         if (maxNumberOfItineraries > 0) {
             filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
             filters.add(
-                new MaxLimitFilter(
-                    "number-of-itineraries-filter",
-                    maxNumberOfItineraries,
-                    maxLimitReachedSubscriber
+                new FilteringFilter(
+                    new MaxLimitFilter(
+                        "number-of-itineraries-filter",
+                        maxNumberOfItineraries,
+                        maxLimitReachedSubscriber
+                    )
                 )
             );
         }
 
         // Do the final itineraries sort
         filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
-        
-        if(debug) {
-            filters = addDebugWrappers(filters);
-        }
 
-        return new ItineraryListFilterChain(filters);
-    }
-
-
-    /* private methods */
-
-    private List<ItineraryListFilter> addDebugWrappers(List<ItineraryListFilter> filters) {
-        final DebugFilterWrapper.Factory factory = new DebugFilterWrapper.Factory();
-        return filters.stream().map(factory::wrap).collect(Collectors.toList());
+        return new ItineraryListFilterChain(filters, debug);
     }
 }

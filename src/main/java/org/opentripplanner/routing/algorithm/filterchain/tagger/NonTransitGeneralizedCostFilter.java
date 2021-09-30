@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * <p>
  * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#nonTransitGeneralizedCostLimit
  */
-public class NonTransitGeneralizedCostFilter implements ItineraryListFilter {
+public class NonTransitGeneralizedCostFilter implements ItineraryTagger {
   private final DoubleFunction<Double> costLimitFunction;
 
   public NonTransitGeneralizedCostFilter(DoubleFunction<Double> costLimitFunction) {
@@ -31,25 +31,24 @@ public class NonTransitGeneralizedCostFilter implements ItineraryListFilter {
   }
 
   @Override
-  public List<Itinerary> filter(List<Itinerary> itineraries) {
+  public boolean filterUntaggedItineraries() {
+    return true;
+  }
+
+  @Override
+  public void tagItineraries(List<Itinerary> itineraries) {
     // ALL itineraries are considered here. Both transit and non-transit
     OptionalDouble minGeneralizedCost = itineraries
         .stream()
         .mapToDouble(it -> it.generalizedCost)
         .min();
 
-    if(minGeneralizedCost.isEmpty()) { return itineraries; }
+    if(minGeneralizedCost.isEmpty()) { return; }
 
     final double maxLimit = costLimitFunction.apply(minGeneralizedCost.getAsDouble());
 
-    // Only non-transit itineraries are filtered out
-    return itineraries.stream().filter(
-      it -> it.hasTransit() || it.generalizedCost <= maxLimit
-    ).collect(Collectors.toList());
-  }
-
-  @Override
-  public boolean removeItineraries() {
-    return true;
+    itineraries.stream()
+        .filter(it -> !it.hasTransit() && it.generalizedCost > maxLimit)
+        .forEach(it -> it.markAsDeleted(notice()));
   }
 }

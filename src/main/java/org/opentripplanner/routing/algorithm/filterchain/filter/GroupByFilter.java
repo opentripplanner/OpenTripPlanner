@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 
@@ -35,7 +35,6 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryListFilter 
         this.maxNumberOfItinerariesPrGroup = maxNumberOfItinerariesPrGroup;
     }
 
-    @Override
     public final String name() {
         return name;
     }
@@ -71,8 +70,8 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryListFilter 
         // Remove leftover of group mergeAndClear operations
         groups.removeIf(g -> g.itineraries.isEmpty());
 
-        final ItineraryListFilter maxLimitFilter = new MaxLimitFilter(name(),
-                maxNumberOfItinerariesPrGroup
+        final ItineraryListFilter maxLimitFilter = new FilteringFilter(
+                new MaxLimitFilter(name(), maxNumberOfItinerariesPrGroup)
         );
 
         List<Itinerary> result = new ArrayList<>();
@@ -83,11 +82,6 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryListFilter 
             result.addAll(groupResult);
         }
         return result;
-    }
-
-    @Override
-    public final boolean removeItineraries() {
-        return true;
     }
 
     private static class Entry<T extends GroupId<T>> {

@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
-import org.opentripplanner.routing.algorithm.filterchain.filters.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 public class RoutingRequestToFilterChainMapper {

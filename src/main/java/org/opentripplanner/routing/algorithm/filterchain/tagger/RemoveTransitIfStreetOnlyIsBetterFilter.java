@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * it exist). If an itinerary is slower than the best all-the-way-on-street itinerary, then the
  * transit itinerary is removed.
  */
-public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryListFilter {
+public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryTagger {
 
     @Override
     public String name() {
@@ -21,26 +21,26 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryListFil
     }
 
     @Override
-    public List<Itinerary> filter(List<Itinerary> itineraries) {
+    public boolean filterUntaggedItineraries() {
+        return true;
+    }
+
+    @Override
+    public void tagItineraries(List<Itinerary> itineraries) {
         // Find the best walk-all-the-way option
         Optional<Itinerary> bestStreetOp = itineraries.stream()
             .filter(Itinerary::isOnStreetAllTheWay)
             .min(Comparator.comparingInt(l -> l.generalizedCost));
 
         if(bestStreetOp.isEmpty()) {
-            return itineraries;
+            return;
         }
 
         final long limit = bestStreetOp.get().generalizedCost;
 
         // Filter away itineraries that have higher cost than the best non-transit option.
-        return itineraries.stream()
-                .filter( it -> it.isOnStreetAllTheWay() || it.generalizedCost < limit)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean removeItineraries() {
-        return true;
+        itineraries.stream()
+            .filter( it -> !it.isOnStreetAllTheWay() && it.generalizedCost >= limit)
+            .forEach(it -> it.markAsDeleted(notice()));
     }
 }

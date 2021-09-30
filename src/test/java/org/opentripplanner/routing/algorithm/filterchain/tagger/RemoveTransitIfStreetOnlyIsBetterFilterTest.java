@@ -1,10 +1,12 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
@@ -19,7 +21,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
         Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
 
         // When:
-        List<Itinerary> result = new RemoveTransitIfStreetOnlyIsBetterFilter().filter(List.of(i1, i2));
+        List<Itinerary> result = process(List.of(i1, i2), new RemoveTransitIfStreetOnlyIsBetterFilter());
 
         // Then:
         assertEquals(toStr(List.of(i1, i2)), toStr(result));
@@ -42,10 +44,16 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
         i2.generalizedCost = 200;
 
         // When:
-        List<Itinerary> result = new RemoveTransitIfStreetOnlyIsBetterFilter()
-            .filter(List.of(i2, bicycle, walk, i1));
+        List<Itinerary> result = process(List.of(i2, bicycle, walk, i1), new RemoveTransitIfStreetOnlyIsBetterFilter());
 
         // Then:
         assertEquals(toStr(List.of(bicycle, walk, i1)), toStr(result));
+    }
+
+    private List<Itinerary> process(List<Itinerary> itineraries, RemoveTransitIfStreetOnlyIsBetterFilter filter) {
+        filter.tagItineraries(itineraries);
+        return itineraries.stream()
+                .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
+                .collect(Collectors.toList());
     }
 }

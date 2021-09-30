@@ -88,11 +88,6 @@ public class AddMinSafeTransferCostFilter implements ItineraryListFilter {
   }
 
   @Override
-  public String name() {
-    return "add-min-safe-transfer-cost-filter";
-  }
-
-  @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     int minSafeTransferTime =  minSafeTransferTime(itineraries);
 
@@ -103,13 +98,8 @@ public class AddMinSafeTransferCostFilter implements ItineraryListFilter {
   }
 
   @Override
-  public boolean removeItineraries() {
-    return false;
-  }
-
-  @Override
   public String toString() {
-    return name() + "{minSafeTransferTimeFactor: " + minSafeTransferTimeFactor + "}";
+    return "add-min-safe-transfer-cost-filter{minSafeTransferTimeFactor: " + minSafeTransferTimeFactor + "}";
   }
 
   /**
