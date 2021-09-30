@@ -3,6 +3,8 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
+import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 
 import java.util.List;
 
@@ -16,7 +18,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
  */
 public class GroupBySimilarLegsFilterTest implements PlanTestConstants {
 
-  public static final SortOnGeneralizedCost SORT_ON_COST = new SortOnGeneralizedCost();
+  public static final SortingFilter SORT_ON_COST = new SortingFilter(new SortOnGeneralizedCost());
 
   @Test
   public void groupByTheLongestItineraryAndTwoGroups() {

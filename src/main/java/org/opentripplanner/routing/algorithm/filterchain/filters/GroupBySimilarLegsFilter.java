@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
+import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 
 public class GroupBySimilarLegsFilter extends GroupByFilter<GroupByTripIdAndDistance> {
@@ -24,7 +25,7 @@ public class GroupBySimilarLegsFilter extends GroupByFilter<GroupByTripIdAndDist
    * @param sortOrder                  Each group is sorted using the {@code sortOrder}, before
    *                                   elements are removed from the tail of the sorted list.
    */
-  public GroupBySimilarLegsFilter(double groupByP, int maxNumOfItinerariesPerGroup, SortFilter sortOrder) {
+  public GroupBySimilarLegsFilter(double groupByP, int maxNumOfItinerariesPerGroup, SortingFilter sortOrder) {
     super(
         name(groupByP, maxNumOfItinerariesPerGroup),
         it -> new GroupByTripIdAndDistance(it, groupByP),

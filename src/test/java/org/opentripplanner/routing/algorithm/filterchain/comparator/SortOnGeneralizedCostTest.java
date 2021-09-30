@@ -1,29 +1,18 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.comparator;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 public class SortOnGeneralizedCostTest implements PlanTestConstants {
-
-    @Test
-    public void sortOnCostWorksWithOneOrEmptyList() {
-        // Expect sort to no fail on an empty list
-        assertEquals(List.of(), new SortOnGeneralizedCost().filter(List.of()));
-
-
-        // Given a list with one itinerary
-        List<Itinerary> list = List.of(newItinerary(A).bus(31, 0, 30, E).build());
-
-        // Then: expect nothing to happen to it
-        assertEquals(toStr(list), toStr(new SortOnGeneralizedCost().filter(list)));
-    }
 
     @Test
     public void sortOnCost() {
@@ -40,7 +29,9 @@ public class SortOnGeneralizedCostTest implements PlanTestConstants {
         rail.generalizedCost = 600 + 1;
 
         // When: sorting
-        result = new SortOnGeneralizedCost().filter(List.of(walk, bus, rail));
+        result = Stream.of(walk, bus, rail)
+                .sorted(new SortOnGeneralizedCost())
+                .collect(Collectors.toList());
 
         // Then: expect rail(1/3 of walk time), bus(2/3 of walk time) and walk
         assertEquals(toStr(List.of(walk, rail, bus)), toStr(result));
@@ -68,7 +59,9 @@ public class SortOnGeneralizedCostTest implements PlanTestConstants {
         bus2.generalizedCost = 300;
 
         // When: sorting
-        result = new SortOnGeneralizedCost().filter(List.of(bus2, walk, bus1));
+        result = Stream.of(bus2, walk, bus1)
+                .sorted(new SortOnGeneralizedCost())
+                .collect(Collectors.toList());
 
         // Then: expect bus to be better than walking
         assertEquals(toStr(List.of(walk, bus1, bus2)), toStr(result));

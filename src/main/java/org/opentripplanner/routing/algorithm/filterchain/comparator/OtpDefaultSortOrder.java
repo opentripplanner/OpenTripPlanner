@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.comparator;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.util.CompositeComparator;
@@ -9,7 +9,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 
 /**
- * This filter will sort the itineraries in OTP default order according to the request {@code
+ * This comparator will sort the itineraries in OTP default order according to the request {@code
  * arriveBy} flag.
  * <p>
  * The SORT ORDER for a "depart-after-search" is:
@@ -32,7 +32,7 @@ import static java.util.Comparator.comparingInt;
  * <p>
  * The filter do only sort the itineraries, no other modifications are done.
  */
-public class OtpDefaultSortOrder extends SortFilter {
+public class OtpDefaultSortOrder extends CompositeComparator<Itinerary> {
 
   /**
    * This comparator will sort all itineraries with STREET ONLY first. So, if there is an itinerary
@@ -52,16 +52,11 @@ public class OtpDefaultSortOrder extends SortFilter {
 
   public OtpDefaultSortOrder(boolean arriveBy) {
     // Put walking first - encourage healthy lifestyle
-    super(new CompositeComparator<>(STREET_ONLY_FIRST,
+    super(STREET_ONLY_FIRST,
         arriveBy ? DEPARTURE_TIME : ARRIVAL_TIME,
         GENERALIZED_COST,
         NUM_OF_TRANSFERS,
         arriveBy ? ARRIVAL_TIME : DEPARTURE_TIME
-    ));
-  }
-
-  @Override
-  public String name() {
-    return "otp-default-sort-order";
+    );
   }
 }

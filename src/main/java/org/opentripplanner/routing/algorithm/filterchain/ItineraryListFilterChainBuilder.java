@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.AddMinSafeTransferCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
 import org.opentripplanner.routing.algorithm.filterchain.filters.ItineraryListFilterChain;
@@ -15,12 +16,12 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.GroupBySimilarL
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.NonTransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveBikerentalWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
 
 
@@ -221,7 +222,7 @@ public class ItineraryListFilterChainBuilder {
                     new GroupBySimilarLegsFilter(
                         it.groupByP,
                         it.maxNumOfItinerariesPerGroup,
-                        new SortOnGeneralizedCost()
+                        new SortingFilter(new SortOnGeneralizedCost())
                     )
                 );
             }
@@ -270,7 +271,7 @@ public class ItineraryListFilterChainBuilder {
 
         // Remove itineraries if max limit is set
         if (maxNumberOfItineraries > 0) {
-            filters.add(new OtpDefaultSortOrder(arriveBy));
+            filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
             filters.add(
                 new MaxLimitFilter(
                     "number-of-itineraries-filter",
@@ -281,7 +282,7 @@ public class ItineraryListFilterChainBuilder {
         }
 
         // Do the final itineraries sort
-        filters.add(new OtpDefaultSortOrder(arriveBy));
+        filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
         
         if(debug) {
             filters = addDebugWrappers(filters);

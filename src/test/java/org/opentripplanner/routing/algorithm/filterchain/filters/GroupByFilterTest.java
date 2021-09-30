@@ -8,6 +8,8 @@ import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 public class GroupByFilterTest implements PlanTestConstants {
@@ -77,7 +79,7 @@ public class GroupByFilterTest implements PlanTestConstants {
     private GroupByFilter<AGroupId> createFilter(int maxNumberOfItinerariesPrGroup) {
         return new GroupByFilter<>(
             "test", i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
-            new OtpDefaultSortOrder(false),
+            new SortingFilter(new OtpDefaultSortOrder(false)),
             maxNumberOfItinerariesPrGroup
         );
     }
