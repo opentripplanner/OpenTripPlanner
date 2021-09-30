@@ -151,7 +151,6 @@ public class AccessibilityRoutingTest {
 
         // because we are walking to a station with bad accessibility we get a lower score
         assertEquals(0.666f, leg.accessibilityScore, DELTA);
-
     }
 
     @Test
@@ -173,7 +172,6 @@ public class AccessibilityRoutingTest {
 
         // because are using a trip that has unknown accessibility, it has a lower score
         assertEquals(0.8333f, leg.accessibilityScore, DELTA);
-
     }
 
     @Test
