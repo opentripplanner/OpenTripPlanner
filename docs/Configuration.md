@@ -780,11 +780,13 @@ seconds needed for the ride and alighting processes in `router-config.json` as f
 ```JSON
 // router-config.json
 {
-  "boardTimes": {
-    "AIRPLANE": 2700
-  },
-  "alightTimes": {
-    "AIRPLANE": 1200
+  "routingDefaults": {
+    "boardSlackForMode": {
+      "AIRPLANE": 2700
+    },
+    "alightSlackForMode": {
+      "AIRPLANE": 1200
+    }
   }
 }
 ```
