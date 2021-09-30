@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TransitMode;
@@ -240,10 +240,10 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     }
 
     private void assertTransfers(
-            Multimap<StopLocation, SimpleTransfer> transfersByStop,
+            Multimap<StopLocation, PathTransfer> transfersByStop,
             TransferDescriptor... transfers
     ) {
-        var matchedTransfers = new HashSet<SimpleTransfer>();
+        var matchedTransfers = new HashSet<PathTransfer>();
         var assertions = Stream.concat(
                 Arrays.stream(transfers).map(td -> td.matcher(transfersByStop, matchedTransfers)),
                 Stream.of(allTransfersMatched(transfersByStop, matchedTransfers))
@@ -253,8 +253,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     }
 
     private Executable allTransfersMatched(
-            Multimap<StopLocation, SimpleTransfer> transfersByStop,
-            Set<SimpleTransfer> matchedTransfers
+            Multimap<StopLocation, PathTransfer> transfersByStop,
+            Set<PathTransfer> matchedTransfers
     ) {
         return () -> {
             var missingTransfers = new HashSet<>(transfersByStop.values());
@@ -307,7 +307,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
             this.to = to.getStop();
         }
 
-        boolean matches(SimpleTransfer transfer) {
+        boolean matches(PathTransfer transfer) {
             if (!Objects.equals(from, transfer.from) || !Objects.equals(to, transfer.to)) {
                 return false;
             }
@@ -338,8 +338,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
         }
 
         private Executable matcher(
-                Multimap<StopLocation, SimpleTransfer> transfersByStop,
-                Set<SimpleTransfer> matchedTransfers
+                Multimap<StopLocation, PathTransfer> transfersByStop,
+                Set<PathTransfer> matchedTransfers
         ) {
             return () -> {
                 var matched = transfersByStop.values()

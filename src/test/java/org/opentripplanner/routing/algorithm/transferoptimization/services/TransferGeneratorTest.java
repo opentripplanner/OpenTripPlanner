@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.api.PathBuilder;
+import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -20,7 +20,7 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.util.time.TimeUtils;
 
-class TransferGeneratorTest implements RaptorTestConstants {
+public class TransferGeneratorTest implements RaptorTestConstants {
 
     // Given a total slack of 30 seconds
     private static final int BOARD_SLACK = 10;
@@ -34,7 +34,7 @@ class TransferGeneratorTest implements RaptorTestConstants {
             TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK
     );
 
-    private final PathBuilder pathBuilder = new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+    private final TestPathBuilder pathBuilder = new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
 
     private final TestTransitData data = new TestTransitData();
 
@@ -76,7 +76,7 @@ class TransferGeneratorTest implements RaptorTestConstants {
         var transitLegs = transitLegsSameRoute(STOP_A, STOP_B, STOP_C);
         var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
         assertEquals(
-                "[[TripToTripTransfer{from: [2 10:10:00 BUS L1], to: [2 10:12:00 BUS L1]}]]",
+                "[[TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:12 BUS L1]}]]",
                 subject.findAllPossibleTransfers(transitLegs).toString()
         );
 
@@ -84,7 +84,7 @@ class TransferGeneratorTest implements RaptorTestConstants {
         transitLegs = transitLegsSameRoute(STOP_B, STOP_C, STOP_D);
         subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
         assertEquals(
-                "[[TripToTripTransfer{from: [3 10:20:00 BUS L1], to: [3 10:22:00 BUS L1]}]]",
+                "[[TripToTripTransfer{from: [3 10:20 BUS L1], to: [3 10:22 BUS L1]}]]",
                 subject.findAllPossibleTransfers(transitLegs).toString()
         );
 
@@ -93,8 +93,8 @@ class TransferGeneratorTest implements RaptorTestConstants {
         transitLegs = transitLegsSameRoute(STOP_A, STOP_C, STOP_D);
         subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
         assertEquals(
-                "[[TripToTripTransfer{from: [2 10:10:00 BUS L1], to: [2 10:12:00 BUS L1]}, "
-                        + "TripToTripTransfer{from: [3 10:20:00 BUS L1], to: [3 10:22:00 BUS L1]}]]",
+                "[[TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:12 BUS L1]}, "
+                        + "TripToTripTransfer{from: [3 10:20 BUS L1], to: [3 10:22 BUS L1]}]]",
                 subject.findAllPossibleTransfers(transitLegs).toString()
         );
     }
@@ -133,9 +133,9 @@ class TransferGeneratorTest implements RaptorTestConstants {
 
         assertEquals(
                 "[["
-                        + "TripToTripTransfer{from: [2 10:20:00 BUS L1], to: [2 10:20:00 BUS L2]}"
+                        + "TripToTripTransfer{from: [2 10:20 BUS L1], to: [2 10:20 BUS L2]}"
                         + "], ["
-                        + "TripToTripTransfer{from: [3 10:30:00 BUS L2], to: [4 10:31:00 BUS L3], transfer: On-Street 1m ~ 4}"
+                        + "TripToTripTransfer{from: [3 10:30 BUS L2], to: [4 10:31 BUS L3], transfer: On-Street 1m ~ 4}"
                         + "]]",
                 result.toString()
         );
@@ -161,9 +161,9 @@ class TransferGeneratorTest implements RaptorTestConstants {
         var result = subject.findAllPossibleTransfers(transitLegs);
         assertEquals(
                 "[["
-                        + "TripToTripTransfer{from: [2 10:10:00 BUS L1], to: [5 10:12:00 BUS L2], transfer: On-Street 1m ~ 5}, "
-                        + "TripToTripTransfer{from: [3 10:20:00 BUS L1], to: [3 10:22:00 BUS L2]}, "
-                        + "TripToTripTransfer{from: [4 10:30:00 BUS L1], to: [6 10:32:00 BUS L2], transfer: On-Street 20s ~ 6}"
+                        + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [5 10:12 BUS L2], transfer: On-Street 1m ~ 5}, "
+                        + "TripToTripTransfer{from: [3 10:20 BUS L1], to: [3 10:22 BUS L2]}, "
+                        + "TripToTripTransfer{from: [4 10:30 BUS L1], to: [6 10:32 BUS L2], transfer: On-Street 20s ~ 6}"
                         + "]]",
                 result.toString()
         );
@@ -199,11 +199,11 @@ class TransferGeneratorTest implements RaptorTestConstants {
 
         assertEquals(
                 "[["
-                        + "TripToTripTransfer{from: [2 10:10:00 BUS L1], to: [2 10:12:00 BUS L2]}, "
-                        + "TripToTripTransfer{from: [3 10:20:00 BUS L1], to: [4 10:22:00 BUS L2], transfer: On-Street 30s ~ 4}"
+                        + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:12 BUS L2]}, "
+                        + "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:22 BUS L2], transfer: On-Street 30s ~ 4}"
                         + "], ["
-                        + "TripToTripTransfer{from: [4 10:22:00 BUS L2], to: [6 10:24:00 BUS L3], transfer: On-Street 20s ~ 6}, "
-                        + "TripToTripTransfer{from: [5 10:32:00 BUS L2], to: [5 10:34:00 BUS L3]}"
+                        + "TripToTripTransfer{from: [4 10:22 BUS L2], to: [6 10:24 BUS L3], transfer: On-Street 20s ~ 6}, "
+                        + "TripToTripTransfer{from: [5 10:32 BUS L2], to: [5 10:34 BUS L3]}"
                         + "]]",
                 result.toString()
         );

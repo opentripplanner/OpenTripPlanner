@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
@@ -42,11 +42,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     private final List<RoutingRequest> transferRequests;
 
     public List<String> provides() {
-        return Arrays.asList("linking");
+        return List.of("linking");
     }
 
     public List<String> getPrerequisites() {
-        return Arrays.asList("street to transit");
+        return List.of("street to transit");
     }
 
     public DirectTransferGenerator (double radiusByDurationInSeconds, List<RoutingRequest> transferRequests) {
@@ -85,12 +85,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         AtomicInteger nLinkedStops = new AtomicInteger();
 
         // This is a synchronizedMultimap so that a parallel stream may be used to insert elements.
-        var transfersByStop = Multimaps.<StopLocation, SimpleTransfer>synchronizedMultimap(HashMultimap.create());
+        var transfersByStop = Multimaps.<StopLocation, PathTransfer>synchronizedMultimap(HashMultimap.create());
 
         stops.stream().parallel().forEach(ts0 -> {
             /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
              * Use map based on the list of edges, so that only distinct transfers are stored. */
-            Map<TransferKey, SimpleTransfer> distinctTransfers = new HashMap<>();
+            Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
             Stop stop = ts0.getStop();
             LOG.debug("Linking stop '{}' {}", stop, ts0);
 
@@ -102,7 +102,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                     if (sd.stop == stop) { continue; }
                     distinctTransfers.put(
                         new TransferKey(stop, sd.stop, sd.edges),
-                        new SimpleTransfer(stop, sd.stop, sd.distance, sd.edges)
+                        new PathTransfer(stop, sd.stop, sd.distance, sd.edges)
                     );
                 }
                 if (OTPFeature.FlexRouting.isOn()) {
@@ -114,7 +114,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                         if (sd.stop instanceof Stop) { continue; }
                         distinctTransfers.put(
                             new TransferKey(sd.stop, stop, sd.edges),
-                            new SimpleTransfer(sd.stop, stop, sd.distance, sd.edges)
+                            new PathTransfer(sd.stop, stop, sd.distance, sd.edges)
                         );
                     }
                 }

@@ -43,6 +43,11 @@ public enum TransferPriority {
   PREFERRED(-2);
 
   /**
+   * Regular street transfers should be given this cost.
+   */
+  public static final int NEUTRAL_PRIORITY_COST = 0;
+
+  /**
    * STAY_SEATED is not a priority, but we assign a cost to it to be able to compare it with other
    * transfers with a priority and the {@link #GUARANTIED_TRANSFER_COST}.
    */

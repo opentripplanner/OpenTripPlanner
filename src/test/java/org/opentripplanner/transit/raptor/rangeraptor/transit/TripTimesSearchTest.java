@@ -14,6 +14,7 @@ import org.opentripplanner.transit.raptor._data.stoparrival.Bus;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 
 public class TripTimesSearchTest implements RaptorTestConstants {
 
@@ -32,7 +33,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
 
     @Test
     public void findTripWithPlentySlack() {
-        BoarAndAlightTime r;
+        BoardAndAlightTime r;
 
         // Search AFTER EDT
         r = findTripForwardSearch(busFwd(STOP_B, STOP_H, C_ALIGHT_LATE));
@@ -49,7 +50,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
 
     @Test
     public void findTripWithoutSlack() {
-        BoarAndAlightTime r;
+        BoardAndAlightTime r;
 
         // Search AFTER EDT
         r = findTripForwardSearch(busFwd(STOP_B, STOP_H, C_ALIGHT_TIME));
@@ -67,7 +68,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
 
     @Test
     public void findTripTimes() {
-        BoarAndAlightTime r;
+        BoardAndAlightTime r;
 
         // Search AFTER EDT
         TestTripSchedule trip = TestTripSchedule
@@ -183,7 +184,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
                 .arrivals( 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)
                 .build();
 
-        BoarAndAlightTime r;
+        BoardAndAlightTime r;
 
         // TEST FORWARD SEARCH
         {

@@ -28,8 +28,6 @@ public interface RaptorTransfer {
      *
      * This methods is called many times, so care needs to be taken that the value is stored, not
      * calculated for each invocation.
-     *
-     * @see RaptorCostConverter#toRaptorCost(double)
      */
     int generalizedCost();
 
@@ -70,11 +68,14 @@ public interface RaptorTransfer {
         return requestedArrivalTime;
     };
 
-    /* ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS */
-    // The methods below should be only overridden when a RaptorTransfer contains information about
-    // public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
-    // include flexible transit service and TNC. They should not be used for regular
-    // access/transfer/egress.
+    /*
+       ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
+
+       The methods below should be only overridden when a RaptorTransfer contains information about
+       public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
+       include flexible transit service and TNC. They should not be used for regular
+       access/transfer/egress.
+    */
 
     /**
      * Some services involving multiple legs are not handled by the RAPTOR algorithm and need to be

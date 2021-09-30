@@ -11,8 +11,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 
@@ -70,7 +70,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     }
 
     private TransitPathLeg<T> createTransitLeg(ArrivalView<T> arrival, PathLeg<T> lastLeg) {
-        BoarAndAlightTime r = TripTimesSearch.findTripForwardSearch(arrival);
+        BoardAndAlightTime r = TripTimesSearch.findTripForwardSearch(arrival);
 
         return new TransitPathLeg<>(
                 arrival.previous().stop(),

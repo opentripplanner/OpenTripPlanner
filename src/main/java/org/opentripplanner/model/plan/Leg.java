@@ -1,6 +1,5 @@
 package org.opentripplanner.model.plan;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +14,7 @@ import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -172,9 +171,9 @@ public class Leg {
 
    public BookingInfo pickupBookingInfo = null;
 
-    public Transfer transferFromPrevLeg = null;
+    public ConstrainedTransfer transferFromPrevLeg = null;
 
-    public Transfer transferToNextLeg = null;
+    public ConstrainedTransfer transferToNextLeg = null;
 
     /**
      * Is this leg walking with a bike?

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 
@@ -41,16 +41,17 @@ public class TransferIndexGenerator {
         for (Trip trip : pattern.getPattern().getTrips()) {
             int nStops = pattern.getPattern().getStops().size();
             for (int stopPos=0; stopPos < nStops; ++stopPos) {
-                var transfers= transferService.listGuaranteedTransfersTo(trip, stopPos);
-                for (Transfer tx : transfers) {
-                    if(tx.isGuaranteed() || tx.isStaySeated()) {
+                var transfers= transferService.listConstrainedTransfersTo(trip, stopPos);
+                for (ConstrainedTransfer tx : transfers) {
+                    var c = tx.getTransferConstraint();
+                    if(c.isFacilitated()) {
                         var fromTrip = tx.getFrom().getTrip();
                         var toTrip = tx.getTo().getTrip();
                         if (fromTrip != null && toTrip != null) {
                             var fromPattern = patternByTrip.get(fromTrip);
                             if (fromPattern != null) {
-                                pattern.addGuaranteedTransfersTo(tx);
-                                fromPattern.addGuaranteedTransferFrom(tx);
+                                pattern.addTransferConstraintsForwardSearch(tx);
+                                fromPattern.addTransferConstraintsReverseSearch(tx);
                             }
                         }
                     }

@@ -1,11 +1,10 @@
-package org.opentripplanner.transit.raptor.api.request;
+package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
 
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-
-import java.util.Objects;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -14,7 +13,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public class McCostParams {
     public static final double DEFAULT_TRANSIT_RELUCTANCE = 1.0;
 
-    static final McCostParams DEFAULTS = new McCostParams();
+    public static final McCostParams DEFAULTS = new McCostParams();
 
     private final int boardCost;
     private final int transferCost;

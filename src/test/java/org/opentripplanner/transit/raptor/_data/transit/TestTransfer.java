@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
 
-import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
 
 import java.util.ArrayList;
 import java.util.Collection;

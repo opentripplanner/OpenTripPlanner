@@ -27,7 +27,6 @@ public interface RaptorTestConstants {
   int T00_10 = hm2time(0, 10);
   int T00_30 = hm2time(0, 30);
   int T01_00 = hm2time(1, 0);
-  int T48_00 = hm2time(48, 0);
 
   // Stop indexes - Note! There is no stop defined for index 0(zero)! You must
   // account for that in the test if you uses a stop index.
@@ -52,4 +51,8 @@ public interface RaptorTestConstants {
   // FLEX
   int ONE_RIDE = 1;
   int TWO_RIDES = 2;
+
+  default String stopIndexToName(int index) {
+    return Character.toString('A' + index - 1);
+  }
 }

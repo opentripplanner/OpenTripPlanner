@@ -20,9 +20,10 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
     ) {
         super(
                 previousState,
+                1,
                 transferPath.stop(),
                 arrivalTime,
-                transferPath.generalizedCost()
+                previousState.cost() + transferPath.generalizedCost()
         );
         this.transfer = transferPath;
     }

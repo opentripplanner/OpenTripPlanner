@@ -2,15 +2,15 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import java.util.Map;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- * This class is used to decorate a {@link TransitPathLeg} with information about guaranteed
- * transfers, and also caches transfer-priority-cost and optimized-wait-time-transfer-cost.
+ * This class is used to decorate a {@link TransitPathLeg} with information about transfers
+ * constraints, and also caches transfer-priority-cost and optimized-wait-time-transfer-cost.
  * <p>
  * The class is only used inside the {@code transferoptimization} package to store temporary
  * path "tails", while building new paths with new transfer points.
@@ -20,13 +20,13 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public class OptimizedPathTail<T extends RaptorTripSchedule> implements TransferOptimized {
 
     private final TransitPathLeg<T> leg;
-    private final Map<PathLeg<T>, Transfer> transfersTo;
+    private final Map<PathLeg<T>, ConstrainedTransfer> transfersTo;
     private final int transferPriorityCost;
     private final int waitTimeOptimizedCost;
 
     public OptimizedPathTail(
             TransitPathLeg<T> leg,
-            Map<PathLeg<T>, Transfer> transfersTo,
+            Map<PathLeg<T>, ConstrainedTransfer> transfersTo,
             int transferPriorityCost,
             int waitTimeOptimizedCost
     ) {
@@ -41,11 +41,11 @@ public class OptimizedPathTail<T extends RaptorTripSchedule> implements Transfer
     }
 
     /**
-     * A map of all guaranteed transfers for all transfers within this tail. The potential
+     * A map of all transfer constraints for all transfers within this tail. The potential
      * set of keys are the transfer legs within this tail, but a key-value pair (k=transfer leg, v=
-     * guaranteed transfer) is only added if the guaranteed transfer exists.
+     * transfer) is only added if the transfer exists.
      */
-    public Map<PathLeg<T>, Transfer> getTransfersTo() {
+    public Map<PathLeg<T>, ConstrainedTransfer> getTransfersTo() {
         return transfersTo;
     }
 
