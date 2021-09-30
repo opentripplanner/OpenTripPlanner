@@ -5,6 +5,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestD
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.api.response.RoutingError;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ public class ItineraryListFilterChain {
         this.debug = debug;
     }
 
-    public List<Itinerary> filter(List<Itinerary> itineraries, List<RoutingError> routingErrors) {
+    public List<Itinerary> filter(List<Itinerary> itineraries, Collection<RoutingError> routingErrors) {
         List<Itinerary> result = itineraries;
         for (ItineraryListFilter filter : filters) {
             result = filter.filter(result);
