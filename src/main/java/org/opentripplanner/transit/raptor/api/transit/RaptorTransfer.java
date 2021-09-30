@@ -134,6 +134,6 @@ public interface RaptorTransfer {
       String duration = DurationUtils.durationToStr(durationInSeconds());
         return hasRides()
             ? String.format("Flex %s %dx ~ %d", duration, numberOfRides(), stop())
-            : String.format("Walk %s ~ %d", duration, stop());
+            : String.format("On-Street %s ~ %d", duration, stop());
     }
 }
