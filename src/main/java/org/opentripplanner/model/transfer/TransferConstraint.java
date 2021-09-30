@@ -1,30 +1,20 @@
-/* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.transfer;
 
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 
-public final class Transfer implements Serializable {
+public class TransferConstraint implements Serializable {
 
-    /**
-     * Regular street transfers should be given this cost.
-     */
-    public static final int NEUTRAL_PRIORITY_COST = 0;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Regular street transfers should be given this cost.
      */
     public static final int MAX_WAIT_TIME_NOT_SET = -1;
 
-    private static final long serialVersionUID = 1L;
-
-    private final TransferPoint from;
-
-    private final TransferPoint to;
 
     private final TransferPriority priority;
 
@@ -34,16 +24,12 @@ public final class Transfer implements Serializable {
 
     private final int maxWaitTime;
 
-    public Transfer(
-            TransferPoint from,
-            TransferPoint to,
+    public TransferConstraint(
             TransferPriority priority,
             boolean staySeated,
             boolean guaranteed,
             int maxWaitTime
     ) {
-        this.from = from;
-        this.to = to;
         this.priority = priority;
         this.staySeated = staySeated;
         this.guaranteed = guaranteed;
@@ -53,21 +39,9 @@ public final class Transfer implements Serializable {
     /**
      * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
      * transfers. This cost is not related in any way to the path generalized-cost.
-     *
-     * @param t The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
-     *          street generated transfer.
-     * @see TransferPriority#cost(boolean, boolean)
      */
-    public static int priorityCost(@Nullable Transfer t) {
-        return t == null ? NEUTRAL_PRIORITY_COST : t.priority.cost(t.staySeated, t.guaranteed);
-    }
-
-    public TransferPoint getFrom() {
-        return from;
-    }
-
-    public TransferPoint getTo() {
-        return to;
+    public int priorityCost() {
+        return priority.cost(staySeated, guaranteed);
     }
 
     public TransferPriority getPriority() {
@@ -82,12 +56,15 @@ public final class Transfer implements Serializable {
         return guaranteed;
     }
 
-    public boolean includeSlack() {
-        return !(guaranteed || staySeated);
-    }
-
-    public boolean matchesStopPos(int fromStopPos, int toStopPos) {
-        return from.getStopPosition() == fromStopPos && to.getStopPosition() == toStopPos;
+    /**
+     * A facilitated transfer is allowed even if there might not be enough time to walk or
+     * if the alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
+     * <p>
+     * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer
+     * is either stay-seated or guaranteed. High priority transfers are not.
+     */
+    public boolean isFacilitated() {
+        return staySeated || guaranteed;
     }
 
     /**
@@ -98,36 +75,25 @@ public final class Transfer implements Serializable {
         return maxWaitTime;
     }
 
-    /**
-     * <a href="https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
-     * Specificity of a transfer
-     * </a>
-     */
-    public int getSpecificityRanking() {
-        return from.getSpecificityRanking() + to.getSpecificityRanking();
-    }
-
     @Override
     public int hashCode() {
-        return Objects.hash(from, to, priority, staySeated, guaranteed);
+        return Objects.hash(priority, staySeated, guaranteed);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
-        if (!(o instanceof Transfer)) { return false; }
-        final Transfer transfer = (Transfer) o;
-        return staySeated == transfer.staySeated
-                && guaranteed == transfer.guaranteed
-                && priority == transfer.priority
-                && Objects.equals(from, transfer.from)
-                && Objects.equals(to, transfer.to);
+        if (!(o instanceof TransferConstraint)) { return false; }
+        final TransferConstraint that = (TransferConstraint) o;
+        return staySeated == that.staySeated
+                && guaranteed == that.guaranteed
+                && priority == that.priority;
     }
 
     public String toString() {
-        return ToStringBuilder.of(Transfer.class)
-                .addObj("from", from)
-                .addObj("to", to)
+        if(noConstraints()) { return "{ NONE }"; }
+
+        return ToStringBuilder.of()
                 .addEnum("priority", priority, ALLOWED)
                 .addDurationSec("maxWaitTime", maxWaitTime, MAX_WAIT_TIME_NOT_SET)
                 .addBoolIfTrue("staySeated", staySeated)

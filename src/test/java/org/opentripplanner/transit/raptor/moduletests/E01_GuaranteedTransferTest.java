@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -33,8 +33,8 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
     private final RaptorService<TestTripSchedule> raptorService =
             new RaptorService<>(RaptorConfig.defaultConfigForTest());
 
-    private static final String EXP_PATH = "Walk 30s ~ 1 ~ BUS R1 0:02 0:05 ~ 2 "
-            + "~ BUS R2 0:05 0:10 ~ 3 ~ Walk 30s [0:01:10 0:10:40 9m30s";
+    private static final String EXP_PATH = "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B "
+            + "~ BUS R2 0:05 0:10 ~ C ~ Walk 30s [0:01:10 0:10:40 9m30s";
     private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
     private static final String EXP_PATH_WITH_COST = EXP_PATH + " $1830]";
 
@@ -43,7 +43,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
      * <p>
      * Access(stop 1) and egress(stop 3) is 30s.
      */
-    @Before
+    @BeforeEach
     public void setup() {
         var r1 = route("R1", STOP_A, STOP_B)
                 .withTimetable(schedule("0:02 0:05"));
@@ -57,7 +57,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
         data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_B);
 
         requestBuilder.searchParams()
-                .guaranteedTransfersEnabled(true)
+                .constrainedTransfersEnabled(true)
                 .addAccessPaths(walk(STOP_A, D30s))
                 .addEgressPaths(walk(STOP_C, D30s))
                 .earliestDepartureTime(T00_00)

@@ -7,7 +7,6 @@
 - Prioritize "direct" routes over transfers in group-filters [#3309](https://github.com/opentripplanner/OpenTripPlanner/issues/3309)
 - The itinerary filter configuration is moved from the `RoutingRequest` into its own JSON node `itineraryFilters`.  
 - Remove poor transit results for short trips, when walking is better [#3331](https://github.com/opentripplanner/OpenTripPlanner/issues/3331)
-- A pathway's `traversal_time` is used when calculating the duration of transfers [#3357](https://github.com/opentripplanner/OpenTripPlanner/issues/3357).
 - GTFS Trips will by default not allow bikes if no explicit value is set [#3359](https://github.com/opentripplanner/OpenTripPlanner/issues/3359).
 - Improve the dynamic search window calculation. The configuration parameters `minTransitTimeCoefficient` and `minWaitTimeCoefficient` replace the old `minTripTimeCoefficient` parameter. [#3366](https://github.com/opentripplanner/OpenTripPlanner/issues/3366)   
 - Allow loops caused by turn restriction in street routes [#3399](https://github.com/opentripplanner/OpenTripPlanner/pull/3399)
@@ -52,6 +51,7 @@
 - Extract GBFS loading logic [#3608](https://github.com/opentripplanner/OpenTripPlanner/pull/3608)
 - Route not found in some conditions with boarding/alighting restrictions [#3621](https://github.com/opentripplanner/OpenTripPlanner/pull/3621)
 - Load additional data from GBFS and expose it [#3610](https://github.com/opentripplanner/OpenTripPlanner/pull/3610)
+- Allow transfers to use customizable request options [#3324](https://github.com/opentripplanner/OpenTripPlanner/issues/3324).
 
 
 ## 2.0.0 (2020-11-27)

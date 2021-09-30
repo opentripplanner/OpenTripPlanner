@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.api.PathUtils;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 
 /**
@@ -22,8 +23,8 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
  * POSSIBLE TRANSFERS
  * Transfers        B-C 1m     C-D 2m       D-E 3m     E-F 4m      F-G 5m
  * Constraint       ALLOWED  RECOMMENDED  PREFERRED  GUARANTIED  STAY_SEATED
- * Trip 1    10:02  B 10:10    C 10:15     D 10:20     E 10:25     F 10:30
- * Trip 2           C 10:13    D 10:18     E 10:24     G 10:30     G 10:36    10:40
+ * Trip 1  A 10:02  B 10:10    C 10:15     D 10:20     E 10:25     F 10:30
+ * Trip 2           C 10:13    D 10:18     E 10:24     G 10:30     G 10:36   H 10:40
  * </pre>
  *
  * Case: There is 5 possible places to transfer in this setup. We want to test that the correct one
@@ -76,7 +77,7 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
     public void testTransferPriorityAllowed() {
         testPriority(
                 STOP_D, ALLOWED,
-                "1 ~ BUS T1 10:02 10:10 ~ 2 ~ Walk 1m ~ 3 ~ BUS T2 10:13 10:18 ~ 4 [10:00:20 10:18:20 18m $1180]"
+                "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:00:20 10:18:20 18m $1180]"
         );
     }
 
@@ -84,7 +85,7 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
     public void testTransferPriorityRecommended() {
         testPriority(
                 STOP_E, RECOMMENDED,
-                "1 ~ BUS T1 10:02 10:15 ~ 3 ~ Walk 2m ~ 4 ~ BUS T2 10:18 10:24 ~ 5 [10:00:20 10:24:20 24m $1600]"
+                "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:00:20 10:24:20 24m $1600]"
         );
     }
 
@@ -92,7 +93,7 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
     public void testTransferPriorityPreferred() {
         testPriority(
                 STOP_F, PREFERRED,
-                "1 ~ BUS T1 10:02 10:20 ~ 4 ~ Walk 3m ~ 5 ~ BUS T2 10:24 10:30 ~ 6 [10:00:20 10:30:20 30m $2020]"
+                "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:00:20 10:30:20 30m $2020]"
         );
     }
 
@@ -100,14 +101,14 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
     public void testTransferGuaranteed() {
         testGuaranteed(
                 STOP_G,
-                "1 ~ BUS T1 10:02 10:25 ~ 5 ~ Walk 4m ~ 6 ~ BUS T2 10:30 10:36 ~ 7 [10:00:20 10:36:20 36m $2440]"
+                "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:00:20 10:36:20 36m $2440]"
         );
     }
     @Test
     public void testTransferStaySeated() {
         testStaySeated(
                 STOP_H,
-                "1 ~ BUS T1 10:02 10:30 ~ 6 ~ Walk 5m ~ 7 ~ BUS T2 10:36 10:40 ~ 8 [10:00:20 10:40:20 40m $2740]"
+                "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:00:20 10:40:20 40m $2740]"
         );
     }
 
@@ -145,22 +146,18 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
         // Find the path with the lowest cost
         var result = subject.findBestTransitPath(original);
 
-        assertEquals(1, result.size(), result.toString());
-
-        var it = result.iterator().next();
-
-        assertEquals(expItinerary, it.toString());
+        assertEquals(expItinerary, PathUtils.pathsToString(result));
 
         // Verify the attached Transfer is exist and is valid
+        var it = result.iterator().next();
         var transfer = it.getTransferTo(it.accessLeg().nextLeg().nextTransitLeg());
 
-        if (expPriority != null) {
-            assertNotNull(transfer);
-        }
+        if (expPriority != null) { assertNotNull(transfer); }
+
         if (transfer != null) {
-            assertEquals(expPriority, transfer.getPriority(), transfer.toString());
-            assertEquals(expStaySeated, transfer.isStaySeated(), transfer.toString());
-            assertEquals(expGuaranteed, transfer.isGuaranteed(), transfer.toString());
+            assertEquals(expPriority, transfer.getTransferConstraint().getPriority(), transfer.toString());
+            assertEquals(expStaySeated, transfer.getTransferConstraint().isStaySeated(), transfer.toString());
+            assertEquals(expGuaranteed, transfer.getTransferConstraint().isGuaranteed(), transfer.toString());
         }
     }
 }

@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.api.transit;
+package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
 /**
  * This {@link FactorStrategy} keep a single value and use it every time

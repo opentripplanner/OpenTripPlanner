@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTransferPriority;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 
 /**
  * This index is temporary to help creating a fixed list of stops (by index), a reverse map

@@ -68,14 +68,14 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public class OptimizePathService<T extends RaptorTripSchedule> {
 
   private final TransferGenerator<T> transferGenerator;
-  private final CostCalculator<T> costCalculator;
+  private final CostCalculator costCalculator;
   private final RaptorSlackProvider slackProvider;
   private final OptimizedPathFactory<T> optimizedPathFactory;
   private final MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain;
 
   public OptimizePathService(
       TransferGenerator<T> transferGenerator,
-      CostCalculator<T> costCalculator,
+      CostCalculator costCalculator,
       RaptorSlackProvider slackProvider,
       ToIntFunction<PathLeg<?>> costCalcForWaitOptimization,
       MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain
@@ -225,7 +225,7 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
 
     return optimizedPathFactory.createPathLeg(
             fromTransitLeg,
-            tx.guaranteedTransfer(),
+            tx.constrainedTransfer(),
             tail.getTransfersTo(),
             toTransitLeg
     );

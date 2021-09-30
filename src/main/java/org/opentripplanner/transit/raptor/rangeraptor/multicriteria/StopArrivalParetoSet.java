@@ -1,18 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
+import java.util.List;
+import java.util.Map;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListenerComposite;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetWithMarker;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * A pareto optimal set of stop arrivals for a given stop.
@@ -45,14 +43,13 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule> extends ParetoSetWithMa
      */
     static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
             Map.Entry<Integer, List<RaptorTransfer>> egressPaths,
-            CostCalculator<T> costCalculator,
             DestinationArrivalPaths<T> destinationArrivals,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
         ParetoSetEventListener<ArrivalView<T>> listener;
         ParetoSetEventListener<ArrivalView<T>> debugListener;
 
-        listener = new CalculateTransferToDestination<>(egressPaths.getValue(), destinationArrivals, costCalculator);
+        listener = new CalculateTransferToDestination<>(egressPaths.getValue(), destinationArrivals);
         debugListener = debugHandlerFactory.paretoSetStopArrivalListener(egressPaths.getKey());
 
         if(debugListener != null) {

@@ -7,9 +7,13 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
@@ -392,9 +396,26 @@ public abstract class GraphRoutingTest {
             return List.of(link(from, to), link(to, from));
         }
 
+        public Agency agency(String name) {
+            return new Agency(new FeedScopedId("Test", name), name, null);
+        }
+
+        public Route route(String id, TransitMode mode, Agency agency) {
+            var route = new Route(new FeedScopedId("Test", id));
+            route.setAgency(agency);
+            route.setMode(mode);
+            return route;
+        }
+
         // Transit
         public void tripPattern(TripPattern tripPattern) {
             graph.tripPatternForId.put(tripPattern.getId(), tripPattern);
+        }
+
+        public StopTime st(TransitStopVertex s1) {
+            var st = new StopTime();
+            st.setStop(s1.getStop());
+            return st;
         }
     }
 }

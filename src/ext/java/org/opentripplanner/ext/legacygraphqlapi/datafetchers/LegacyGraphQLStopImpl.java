@@ -3,6 +3,15 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -20,16 +29,6 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
 
@@ -231,8 +230,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           return getRoutingService(environment)
               .getTransfersByStop(stop)
               .stream()
-              .filter(simpleTransfer -> maxDistance == null || simpleTransfer.getDistanceMeters() < maxDistance)
-              .filter(simpleTransfer -> simpleTransfer.to instanceof Stop)
+              .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
+              .filter(transfer -> transfer.to instanceof Stop)
               .map(transfer -> new NearbyStop(
                   transfer.to,
                   transfer.getDistanceMeters(),

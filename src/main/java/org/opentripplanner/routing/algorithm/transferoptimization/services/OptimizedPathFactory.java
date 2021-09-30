@@ -1,10 +1,12 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
+import static org.opentripplanner.model.transfer.TransferPriority.NEUTRAL_PRIORITY_COST;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
@@ -32,7 +34,6 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
     ) {
         var accessPathLeg = new AccessPathLeg<>(originalPath.accessLeg(), tail.getLeg());
         return new OptimizedPath<>(
-                originalPath,
                 new Path<>(originalPath.rangeRaptorIterationDepartureTime(), accessPathLeg),
                 tail.getTransfersTo(),
                 tail.transferPriorityCost(),
@@ -48,7 +49,7 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
         return new OptimizedPathTail<>(
                 leg,
                 Map.of(),
-                Transfer.NEUTRAL_PRIORITY_COST,
+                NEUTRAL_PRIORITY_COST,
                 costCalcForWaitOptimization.applyAsInt(leg)
         );
     }
@@ -58,8 +59,8 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
      */
     OptimizedPathTail<T> createPathLeg(
             TransitPathLeg<T> leg,
-            @Nullable Transfer tx,
-            Map<PathLeg<T>, Transfer> transfersTo,
+            @Nullable ConstrainedTransfer tx,
+            Map<PathLeg<T>, ConstrainedTransfer> transfersTo,
             TransitPathLeg<T> toTransitLeg
     ) {
         var transfers = createTransfers(toTransitLeg, tx, transfersTo);
@@ -73,10 +74,10 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
 
     /* private methods */
 
-    private static <T extends RaptorTripSchedule> Map<PathLeg<T>, Transfer> createTransfers(
+    private static <T extends RaptorTripSchedule> Map<PathLeg<T>, ConstrainedTransfer> createTransfers(
             TransitPathLeg<T> leg,
-            Transfer tx,
-            Map<PathLeg<T>, Transfer> transfers
+            ConstrainedTransfer tx,
+            Map<PathLeg<T>, ConstrainedTransfer> transfers
     ) {
         if(tx == null) {
             return transfers;
@@ -95,11 +96,11 @@ class OptimizedPathFactory<T extends RaptorTripSchedule> {
      * Return the total transfer priority cost. This is completely separate from the
      * generalized-cost. Return zero if the cost is neutral (no "special" transfers exist).
      *
-     * @see Transfer#priorityCost(Transfer)
+     * @see ConstrainedTransfer#priorityCost(ConstrainedTransfer)
      */
-    private int calculateTxPriorityCost(Map<?, Transfer> transfers) {
+    private int calculateTxPriorityCost(Map<?, ConstrainedTransfer> transfers) {
         if(transfers == null) { return 0; }
 
-        return transfers.values().stream().mapToInt(Transfer::priorityCost).sum();
+        return transfers.values().stream().mapToInt(ConstrainedTransfer::priorityCost).sum();
     }
 }

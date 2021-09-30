@@ -2,7 +2,7 @@ package org.opentripplanner.util.logging;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ class ThrottleLoggerTest {
     private static final Logger THROTTLED_LOG = ThrottleLogger.throttle(LOG);
 
     @Test
-    @Ignore("Run this test manually")
+    @Disabled("Run this test manually")
     void warn() {
         List<Integer> events = new ArrayList<>();
         for (int i = 0; i < 50_000_000; i++) { events.add(i); }
