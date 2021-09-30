@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
 
   // Create a filter with f(x) = 600 + 2x
   // Remove itineraries with a cost equivalent of 10 minutes and twice the min itinerary cost.
-  private final ItineraryFilter subject = new TransitGeneralizedCostFilter(
+  private final ItineraryListFilter subject = new TransitGeneralizedCostFilter(
       RequestFunctions.createLinearFunction(600, 2.0)
   );
 

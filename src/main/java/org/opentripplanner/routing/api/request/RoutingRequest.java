@@ -30,6 +30,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
@@ -111,7 +112,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * limit and should therefore be set high. Results close to the limit are not guaranteed to be
      * optimal. Use filters to limit what is presented to the client.
      *
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
+     * @see ItineraryListFilter
      */
     public double maxDirectStreetDurationSeconds = Duration.ofHours(4).toSeconds();
 
@@ -120,7 +121,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * performance limit and should therefore be set high. Results close to the limit are not
      * guaranteed to be optimal. Use filters to limit what is presented to the client.
      *
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
+     * @see ItineraryListFilter
      */
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 

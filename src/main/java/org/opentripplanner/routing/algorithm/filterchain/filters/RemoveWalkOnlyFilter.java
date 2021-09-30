@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Filter itineraries and remove all itineraries where all legs is walking.
  */
-public class RemoveWalkOnlyFilter implements ItineraryFilter {
+public class RemoveWalkOnlyFilter implements ItineraryListFilter {
 
     @Override
     public String name() {

@@ -2,18 +2,18 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DebugFilterWrapper implements ItineraryFilter {
+public class DebugFilterWrapper implements ItineraryListFilter {
 
-  private final ItineraryFilter delegate;
+  private final ItineraryListFilter delegate;
   private final List<Itinerary> deletedItineraries;
 
-  public DebugFilterWrapper(ItineraryFilter delegate, List<Itinerary> deletedItineraries) {
+  public DebugFilterWrapper(ItineraryListFilter delegate, List<Itinerary> deletedItineraries) {
     this.delegate = delegate;
     this.deletedItineraries = deletedItineraries;
   }
@@ -51,7 +51,7 @@ public class DebugFilterWrapper implements ItineraryFilter {
   public static class Factory {
     private final List<Itinerary> deletedItineraries = new ArrayList<>();
 
-    public ItineraryFilter wrap(ItineraryFilter original) {
+    public ItineraryListFilter wrap(ItineraryListFilter original) {
       if(!original.removeItineraries()) { return original; }
       else { return new DebugFilterWrapper(original, deletedItineraries); }
     }

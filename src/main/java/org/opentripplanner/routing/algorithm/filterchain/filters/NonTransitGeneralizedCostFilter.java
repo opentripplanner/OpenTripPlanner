@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.List;
 import java.util.OptionalDouble;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * <p>
  * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#nonTransitGeneralizedCostLimit
  */
-public class NonTransitGeneralizedCostFilter implements ItineraryFilter {
+public class NonTransitGeneralizedCostFilter implements ItineraryListFilter {
   private final DoubleFunction<Double> costLimitFunction;
 
   public NonTransitGeneralizedCostFilter(DoubleFunction<Double> costLimitFunction) {

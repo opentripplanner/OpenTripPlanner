@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * it exist). If an itinerary is slower than the best all-the-way-on-street itinerary, then the
  * transit itinerary is removed.
  */
-public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryFilter {
+public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryListFilter {
 
     @Override
     public String name() {

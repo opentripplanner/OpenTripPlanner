@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -61,7 +61,7 @@ import java.util.List;
  * Note! Normally the board-/alight-/transfer-slack serve as a lower bound for the
  *       transfer time; Hence also for the min-safe-transfer-time for short journeys.
  */
-public class AddMinSafeTransferCostFilter implements ItineraryFilter {
+public class AddMinSafeTransferCostFilter implements ItineraryListFilter {
 
   /**
    * Min-safe-transfer-time is defined as P=6.67% of total-travel-time, maximum 40 minutes.

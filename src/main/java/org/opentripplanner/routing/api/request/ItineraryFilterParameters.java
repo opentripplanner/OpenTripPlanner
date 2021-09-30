@@ -2,6 +2,8 @@ package org.opentripplanner.routing.api.request;
 
 
 import java.util.function.DoubleFunction;
+
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.AddMinSafeTransferCostFilter;
 
 /**
@@ -17,7 +19,7 @@ public class ItineraryFilterParameters {
   /**
    * Keep ONE itinerary for each group with at least this part of the legs in common.
    * Default value is 0.85 (85%), use a value less than 0.50 to turn off.
-   * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder#addGroupBySimilarity(org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity)
+   * @see ItineraryListFilterChainBuilder#addGroupBySimilarity(org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity)
    */
   public double groupSimilarityKeepOne;
 

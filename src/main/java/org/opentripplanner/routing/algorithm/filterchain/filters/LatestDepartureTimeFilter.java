@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LatestDepartureTimeFilter implements ItineraryFilter {
+public class LatestDepartureTimeFilter implements ItineraryListFilter {
     private final long limitMs;
 
 

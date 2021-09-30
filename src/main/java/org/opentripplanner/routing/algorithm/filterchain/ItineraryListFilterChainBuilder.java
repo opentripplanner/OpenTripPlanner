@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.AddMinSafeTransferCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
-import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.filters.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupBySimilarLegsFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
@@ -27,7 +27,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGenerali
 /**
  * Create a filter chain based on the given config.
  */
-public class ItineraryFilterChainBuilder {
+public class ItineraryListFilterChainBuilder {
     private static final int NOT_SET = -1;
 
     private final boolean arriveBy;
@@ -50,7 +50,7 @@ public class ItineraryFilterChainBuilder {
      * @param arriveBy Used to set the correct sort order. This si the same flag as the
      *        {@link org.opentripplanner.routing.api.request.RoutingRequest#arriveBy}.
      */
-    public ItineraryFilterChainBuilder(boolean arriveBy) {
+    public ItineraryListFilterChainBuilder(boolean arriveBy) {
         this.arriveBy = arriveBy;
     }
 
@@ -60,7 +60,7 @@ public class ItineraryFilterChainBuilder {
      * <p>
      * Use {@code -1} to disable.
      */
-    public ItineraryFilterChainBuilder withMaxNumberOfItineraries(int value) {
+    public ItineraryListFilterChainBuilder withMaxNumberOfItineraries(int value) {
         this.maxNumberOfItineraries = value;
         return this;
     }
@@ -71,7 +71,7 @@ public class ItineraryFilterChainBuilder {
      * <p>
      * Default is off {@code 0.0}.
      */
-    public ItineraryFilterChainBuilder withMinSafeTransferTimeFactor(double minSafeTransferTimeFactor) {
+    public ItineraryListFilterChainBuilder withMinSafeTransferTimeFactor(double minSafeTransferTimeFactor) {
         this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
         return this;
     }
@@ -83,7 +83,7 @@ public class ItineraryFilterChainBuilder {
      *
      * @see GroupBySimilarity for more details.
      */
-    public ItineraryFilterChainBuilder addGroupBySimilarity(GroupBySimilarity groupBySimilarity) {
+    public ItineraryListFilterChainBuilder addGroupBySimilarity(GroupBySimilarity groupBySimilarity) {
         this.groupBySimilarity.add(groupBySimilarity);
         return this;
     }
@@ -98,7 +98,7 @@ public class ItineraryFilterChainBuilder {
      * {@code 5000}, then all transit itineraries with a cost larger than
      * {@code 1800 + 2 * 5000 = 11 800} is dropped.
      */
-    public ItineraryFilterChainBuilder withTransitGeneralizedCostLimit(DoubleFunction<Double> value){
+    public ItineraryListFilterChainBuilder withTransitGeneralizedCostLimit(DoubleFunction<Double> value){
         this.transitGeneralizedCostLimit = value;
         return this;
     }
@@ -116,7 +116,7 @@ public class ItineraryFilterChainBuilder {
      * {@code 5000}, then all non-transit itineraries with a cost larger than
      * {@code 1800 + 2 * 5000 = 11 800} is dropped.
      */
-    public ItineraryFilterChainBuilder withNonTransitGeneralizedCostLimit(DoubleFunction<Double> value){
+    public ItineraryListFilterChainBuilder withNonTransitGeneralizedCostLimit(DoubleFunction<Double> value){
         this.nonTransitGeneralizedCostLimit = value;
         return this;
     }
@@ -126,7 +126,7 @@ public class ItineraryFilterChainBuilder {
      * describes the ratio of the total itinerary that has to consist of bike rental to allow the
      * itinerary.
      */
-    public ItineraryFilterChainBuilder withBikeRentalDistanceRatio(double value){
+    public ItineraryListFilterChainBuilder withBikeRentalDistanceRatio(double value){
         this.bikeRentalDistanceRatio = value;
         return this;
     }
@@ -136,7 +136,7 @@ public class ItineraryFilterChainBuilder {
      * very long walking leg.
      * The value describes the amount of driving vs. walking to allow the itinerary.
      */
-    public ItineraryFilterChainBuilder withParkAndRideDurationRatio(double value){
+    public ItineraryListFilterChainBuilder withParkAndRideDurationRatio(double value){
         this.parkAndRideDurationRatio = value;
         return this;
     }
@@ -153,7 +153,7 @@ public class ItineraryFilterChainBuilder {
      * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
      * exist.
      */
-    public ItineraryFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(boolean value) {
+    public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(boolean value) {
         this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
         return this;
     }
@@ -162,7 +162,7 @@ public class ItineraryFilterChainBuilder {
      * This will NOT delete itineraries, but tag them as deleted using the
      * {@link Itinerary#systemNotices}.
      */
-    public ItineraryFilterChainBuilder withDebugEnabled(boolean value) {
+    public ItineraryListFilterChainBuilder withDebugEnabled(boolean value) {
         this.debug = value;
         return this;
     }
@@ -171,7 +171,7 @@ public class ItineraryFilterChainBuilder {
      * Max departure time. This is a absolute filter on the itinerary departure time from the
      * origin.
      */
-    public ItineraryFilterChainBuilder withLatestDepartureTimeLimit(Instant latestDepartureTimeLimit) {
+    public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(Instant latestDepartureTimeLimit) {
         this.latestDepartureTimeLimit = latestDepartureTimeLimit;
         return this;
     }
@@ -186,7 +186,7 @@ public class ItineraryFilterChainBuilder {
      * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
      *                                  Only the first element removed is passed to the subscriber.
      */
-    public ItineraryFilterChainBuilder withMaxLimitReachedSubscriber(Consumer<Itinerary> maxLimitReachedSubscriber) {
+    public ItineraryListFilterChainBuilder withMaxLimitReachedSubscriber(Consumer<Itinerary> maxLimitReachedSubscriber) {
         this.maxLimitReachedSubscriber = maxLimitReachedSubscriber;
         return this;
     }
@@ -196,13 +196,13 @@ public class ItineraryFilterChainBuilder {
      * and remove-transit-with-higher-cost-than-best-on-street-only filters. This make sure that
      * poor transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
      */
-    public ItineraryFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
+    public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
         this.removeWalkAllTheWayResults = enable;
         return this;
     }
 
-    public ItineraryFilter build() {
-        List<ItineraryFilter> filters = new ArrayList<>();
+    public ItineraryListFilterChain build() {
+        List<ItineraryListFilter> filters = new ArrayList<>();
 
         if(minSafeTransferTimeFactor > 0.01) {
             filters.add(new AddMinSafeTransferCostFilter(minSafeTransferTimeFactor));
@@ -287,13 +287,13 @@ public class ItineraryFilterChainBuilder {
             filters = addDebugWrappers(filters);
         }
 
-        return new FilterChain(filters);
+        return new ItineraryListFilterChain(filters);
     }
 
 
     /* private methods */
 
-    private List<ItineraryFilter> addDebugWrappers(List<ItineraryFilter> filters) {
+    private List<ItineraryListFilter> addDebugWrappers(List<ItineraryListFilter> filters) {
         final DebugFilterWrapper.Factory factory = new DebugFilterWrapper.Factory();
         return filters.stream().map(factory::wrap).collect(Collectors.toList());
     }

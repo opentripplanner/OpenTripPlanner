@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 
@@ -15,17 +15,17 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
  *
  * @see GroupId on how to group itineraries
  */
-public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
+public class GroupByFilter<T extends GroupId<T>> implements ItineraryListFilter {
 
     private final String name;
     private final int maxNumberOfItinerariesPrGroup;
     private final Function<Itinerary, T> groupingBy;
-    private final ItineraryFilter arrangeBy;
+    private final ItineraryListFilter arrangeBy;
 
     public GroupByFilter(
             String name,
             Function<Itinerary, T> groupingBy,
-            ItineraryFilter arrangeBy,
+            ItineraryListFilter arrangeBy,
             int maxNumberOfItinerariesPrGroup
     ) {
         this.name = name;
@@ -70,7 +70,7 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
         // Remove leftover of group mergeAndClear operations
         groups.removeIf(g -> g.itineraries.isEmpty());
 
-        final ItineraryFilter maxLimitFilter = new MaxLimitFilter(name(),
+        final ItineraryListFilter maxLimitFilter = new MaxLimitFilter(name(),
                 maxNumberOfItinerariesPrGroup
         );
 

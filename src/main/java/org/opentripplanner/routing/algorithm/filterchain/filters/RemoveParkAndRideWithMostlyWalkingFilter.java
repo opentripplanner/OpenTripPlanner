@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.core.TraverseMode;
 
 /**
@@ -14,7 +14,7 @@ import org.opentripplanner.routing.core.TraverseMode;
  * <p>
  * This filter is turned off by default (parkAndRideDurationRatio == 0)
  */
-public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryFilter {
+public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryListFilter {
 
     private final double parkAndRideDurationRatio;
 

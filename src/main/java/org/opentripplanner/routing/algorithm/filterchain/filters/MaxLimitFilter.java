@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * The filter can also report the first itinerary in the list it will remove. The subscriber
  * is optional.
  */
-public class MaxLimitFilter implements ItineraryFilter {
+public class MaxLimitFilter implements ItineraryListFilter {
     private static final Consumer<Itinerary> IGNORE_SUBSCRIBER = (i) -> {};
 
     private final String name;

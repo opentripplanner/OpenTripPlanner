@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.filters.ItineraryListFilterChain;
 
 import java.util.List;
 
@@ -16,10 +17,10 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 
 /**
- * This class test the hole filter chain with a few test cases. Each filter should be tested
+ * This class test the whole filter chain with a few test cases. Each filter should be tested
  * with a unit test. This is just a some test on top of the other filter unit-tests.
  */
-public class ItineraryFilterChainTest implements PlanTestConstants {
+public class ItineraryListFilterChainTest implements PlanTestConstants {
   private static final int I3_LATE_START_TIME = T11_33;
 
   // And some itineraries, with some none optimal options
@@ -38,7 +39,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
   @Test
   public void testDefaultFilterChain() {
     // Given a default chain
-    ItineraryFilter chain = createBuilder(false, false, 10).build();
+    ItineraryListFilterChain chain = createBuilder(false, false, 10).build();
 
     assertEquals(toStr(List.of(i1, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
   }
@@ -46,7 +47,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
   @Test
   public void testFilterChainWithLateDepartureFilterSet() {
     // Given a "default" chain
-    ItineraryFilter chain =
+    ItineraryListFilterChain chain =
         createBuilder(false, false, 10)
             // with latest-departure-time-limit set
             .withLatestDepartureTimeLimit(TestItineraryBuilder.newTime(T11_32).toInstant())
@@ -58,7 +59,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
   @Test
   public void testFilterChainWithMaxItinerariesFilterSet() {
     // Given:
-    ItineraryFilter chain;
+    ItineraryListFilterChain chain;
     Itinerary i1 = newItinerary(A).bus(21, T11_05, T11_10, E).build();
     Itinerary i2 = newItinerary(A).bus(31, T11_07, T11_12, E).build();
     Itinerary i3 = newItinerary(A).bus(41, T11_09, T11_14, E).build();
@@ -79,7 +80,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
   @Test
   public void testDebugFilterChain() {
     // Given a filter-chain with debugging enabled
-    ItineraryFilter chain = createBuilder(false, true, 3)
+    ItineraryListFilterChain chain = createBuilder(false, true, 3)
         .withLatestDepartureTimeLimit(newTime(I3_LATE_START_TIME - 1).toInstant())
         .build();
 
@@ -95,7 +96,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
   @Test
   public void removeTransitWithHigherCostThanBestOnStreetOnly() {
     var builder= createBuilder(true, false, 20);
-    ItineraryFilter chain;
+    ItineraryListFilterChain chain;
 
     // given
     // Walk for 12 minute
@@ -114,7 +115,7 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
 
   @Test
   public void removeAllWalkingOnly() {
-    var chain = createBuilder(false, false, 20)
+    ItineraryListFilterChain chain = createBuilder(false, false, 20)
         .withRemoveWalkAllTheWayResults(true)
         .build();
 
@@ -127,8 +128,8 @@ public class ItineraryFilterChainTest implements PlanTestConstants {
 
   /* private methods */
 
-  private ItineraryFilterChainBuilder createBuilder(boolean arriveBy, boolean debug, int numOfItineraries) {
-    return new ItineraryFilterChainBuilder(arriveBy)
+  private ItineraryListFilterChainBuilder createBuilder(boolean arriveBy, boolean debug, int numOfItineraries) {
+    return new ItineraryListFilterChainBuilder(arriveBy)
         .withMaxNumberOfItineraries(numOfItineraries)
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
         .withDebugEnabled(debug);

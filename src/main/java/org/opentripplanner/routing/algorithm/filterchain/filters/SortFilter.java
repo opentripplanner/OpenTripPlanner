@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 
 /**
  * This is an abstract filter to sort itineraries. To create a sub-class, implement the
- * {@link ItineraryFilter#name()} and provide a comparator. You may pass in the comparator
+ * {@link ItineraryListFilter#name()} and provide a comparator. You may pass in the comparator
  * as a constructor argument or override the {@link #comparator()} method.
  */
-public abstract class SortFilter implements ItineraryFilter {
+public abstract class SortFilter implements ItineraryListFilter {
 
     private final Comparator<Itinerary> comparator;
 
