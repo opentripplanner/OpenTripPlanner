@@ -5,44 +5,30 @@ import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 
 /**
  * This filter groups the itineraries using a group-id and filter each group
- * by the given {@code filter}. It ensure that {@code maxNumberOfItinerariesPrGroup} requirement
- * is meat by reducing each group down to the given limit.
+ * by the given {@code filter}.
  *
  * @see GroupId on how to group itineraries
  */
 public class GroupByFilter<T extends GroupId<T>> implements ItineraryListFilter {
 
-    private final String name;
-    private final int maxNumberOfItinerariesPrGroup;
     private final Function<Itinerary, T> groupingBy;
-    private final ItineraryListFilter arrangeBy;
+    private final List<ItineraryListFilter> nestedFilters;
 
     public GroupByFilter(
-            String name,
             Function<Itinerary, T> groupingBy,
-            ItineraryListFilter arrangeBy,
-            int maxNumberOfItinerariesPrGroup
+            List<ItineraryListFilter> nestedFilters
     ) {
-        this.name = name;
         this.groupingBy = groupingBy;
-        this.arrangeBy = arrangeBy;
-        this.maxNumberOfItinerariesPrGroup = maxNumberOfItinerariesPrGroup;
-    }
-
-    public final String name() {
-        return name;
+        this.nestedFilters = nestedFilters;
     }
 
     @Override
     public final List<Itinerary> filter(List<Itinerary> itineraries) {
-        if(itineraries.size() <= maxNumberOfItinerariesPrGroup) { return itineraries; }
-
         List<Entry<T>> groups = new ArrayList<>();
 
         for (Itinerary it : itineraries) {
@@ -70,15 +56,12 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryListFilter 
         // Remove leftover of group mergeAndClear operations
         groups.removeIf(g -> g.itineraries.isEmpty());
 
-        final ItineraryListFilter maxLimitFilter = new FilteringFilter(
-                new MaxLimitFilter(name(), maxNumberOfItinerariesPrGroup)
-        );
-
         List<Itinerary> result = new ArrayList<>();
         for (Entry<T> e : groups) {
             List<Itinerary> groupResult = e.itineraries;
-            groupResult = arrangeBy.filter(groupResult);
-            groupResult = maxLimitFilter.filter(groupResult);
+            for (ItineraryListFilter filter : nestedFilters) {
+                groupResult = filter.filter(groupResult);
+            }
             result.addAll(groupResult);
         }
         return result;

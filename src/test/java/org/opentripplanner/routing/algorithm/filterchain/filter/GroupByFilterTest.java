@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
@@ -13,6 +11,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
+import org.opentripplanner.routing.algorithm.filterchain.tagger.MaxLimitFilter;
 
 public class GroupByFilterTest implements PlanTestConstants {
 
@@ -94,9 +93,11 @@ public class GroupByFilterTest implements PlanTestConstants {
      */
     private GroupByFilter<AGroupId> createFilter(int maxNumberOfItinerariesPrGroup) {
         return new GroupByFilter<>(
-            "test", i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
-            new SortingFilter(new OtpDefaultSortOrder(false)),
-            maxNumberOfItinerariesPrGroup
+            i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
+            List.of(
+                new SortingFilter(new OtpDefaultSortOrder(false)),
+                new FilteringFilter(new MaxLimitFilter("test", maxNumberOfItinerariesPrGroup))
+            )
         );
     }
 

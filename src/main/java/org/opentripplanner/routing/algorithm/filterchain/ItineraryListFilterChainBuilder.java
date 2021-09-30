@@ -5,8 +5,9 @@ import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSo
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filter.AddMinSafeTransferCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.FilteringFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.GroupBySimilarLegsFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 import org.opentripplanner.routing.algorithm.filterchain.tagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.tagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.tagger.NonTransitGeneralizedCostFilter;
@@ -209,24 +210,7 @@ public class ItineraryListFilterChainBuilder {
             filters.add(new AddMinSafeTransferCostFilter(minSafeTransferTimeFactor));
         }
 
-        // Sort list on {@code groupByP} in ascending order to keep as many of the elements in the
-        // groups where the grouping parameter is relaxed as possible.
-        {
-            List<GroupBySimilarity> groupBy = groupBySimilarity
-                .stream()
-                .sorted(Comparator.comparingDouble(o -> o.groupByP))
-                .collect(Collectors.toList());
-
-            for (GroupBySimilarity it : groupBy) {
-                filters.add(
-                    new GroupBySimilarLegsFilter(
-                        it.groupByP,
-                        it.maxNumOfItinerariesPerGroup,
-                        new SortingFilter(new SortOnGeneralizedCost())
-                    )
-                );
-            }
-        }
+        filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
         // Filter transit itineraries on generalized-cost
         if(transitGeneralizedCostLimit != null) {
@@ -287,5 +271,41 @@ public class ItineraryListFilterChainBuilder {
         filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
 
         return new ItineraryListFilterChain(filters, debug);
+    }
+
+    /**
+     * These filters will group the itineraries by the main-legs and reduce the number of
+     * itineraries in each group. The main legs is the legs that together constitute more than a
+     * given　percentage of the total travel distance.
+     * <p>
+     * Each group is filtered using generalized-cost, keeping only the itineraries with the lowest
+     * cost. If there is a tie, the filter look at the number-of-transfers as a tie breaker.
+     * <p>
+     * The filter name is dynamically created: similar-legs-filter-68p-1
+     */
+    private List<ItineraryListFilter> buildGroupByTripIdAndDistanceFilters() {
+        List<GroupBySimilarity> groupBy = groupBySimilarity
+            .stream()
+            .sorted(Comparator.comparingDouble(o -> o.groupByP))
+            .collect(Collectors.toList());
+
+        List<ItineraryListFilter> groupByFilters = new ArrayList<>();
+
+        for (GroupBySimilarity it : groupBy) {
+            String name = "similar-legs-filter-" +
+                    (int)(100d * it.groupByP) + "p-" + it.maxNumOfItinerariesPerGroup + "x";
+
+            groupByFilters.add(
+                new GroupByFilter<>(
+                    itinerary -> new GroupByTripIdAndDistance(itinerary, it.groupByP),
+                    List.of(
+                        new SortingFilter(new SortOnGeneralizedCost()),
+                        new FilteringFilter(new MaxLimitFilter(name, it.maxNumOfItinerariesPerGroup))
+                    )
+                )
+            );
+        }
+
+        return groupByFilters;
     }
 }

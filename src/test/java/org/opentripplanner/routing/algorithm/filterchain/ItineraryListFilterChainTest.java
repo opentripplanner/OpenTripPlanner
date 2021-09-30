@@ -156,6 +156,37 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertEquals(toStr(List.of(bus)), toStr(chain.filter(List.of(walk, bus))));
   }
 
+  @org.junit.Test
+  public void groupByTheLongestItineraryAndTwoGroups() {
+    ItineraryListFilterChain chain = createBuilder(false, false, 20)
+            .addGroupBySimilarity(new GroupBySimilarity(.5, 1))
+            .build();
+
+    // Group 1
+    Itinerary i1 = newItinerary(A, 6)
+            .walk(240, C)
+            .build();
+
+    // Group 2, with 2 itineraries
+    Itinerary i2 = newItinerary(A)
+            .bus(1, 0, 50, B)
+            .bus(11, 52, 100, C)
+            .build();
+    Itinerary i3 = newItinerary(A)
+            .bus(1, 0, 50, B)
+            .bus(12, 55, 102, C)
+            .build();
+
+    List<Itinerary> input = List.of(i1, i2, i3);
+
+    // With min Limit = 1, expect the best trips from both groups
+    chain.filter(input);
+
+    assertFalse(i1.isMarkedAsDeleted());
+    assertFalse(i2.isMarkedAsDeleted());
+    assertTrue(i3.isMarkedAsDeleted());
+  }
+
 
   /* private methods */
 
