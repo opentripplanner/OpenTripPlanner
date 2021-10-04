@@ -50,6 +50,9 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
+    public boolean searchForward() { return true; }
+
+    @Override
     public int plusDuration(final int time, final int delta) {
         return time + delta;
     }

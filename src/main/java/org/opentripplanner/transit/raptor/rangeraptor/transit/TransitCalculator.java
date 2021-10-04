@@ -48,6 +48,12 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     int TIME_NOT_SET = SearchParams.TIME_NOT_SET;
 
     /**
+     * Return {@code true} is searching forward in space and time, {@code false}
+     * if search direction is in reverse.
+     */
+    boolean searchForward();
+
+    /**
      * Add duration to time and return the result. In the case of a normal
      * forward search this will be a plus '+' operation, while in a reverse
      * search (moving back in time) this will be a minus '-' operation: 'time - duration'.

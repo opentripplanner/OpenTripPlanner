@@ -147,6 +147,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     @Override
     final public Collection<Path<T>> route() {
         timerRoute().time(() -> {
+            lifeCycle.notifyRouteSearchStart(calculator.searchForward());
             transitData.setup();
 
             // The main outer loop iterates backward over all minutes in the departure times window.

@@ -162,11 +162,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return debugFactory;
     }
 
-    public DebugLogger debugLogger() {
-        DebugLogger logger = request.debug().logger();
-        return logger != null ? logger : NOOP_DEBUG_LOGGER;
-    }
-
     /** Number of stops in transit graph. */
     public int nStops() {
         return transit.numberOfStops();

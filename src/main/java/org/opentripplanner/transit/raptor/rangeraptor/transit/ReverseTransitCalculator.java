@@ -52,6 +52,9 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
+    public boolean searchForward() { return false; }
+
+    @Override
     public int plusDuration(final int time, final int duration) {
         // It might seems strange to use minus int the add method, but
         // the "positive" direction in this class is backwards in time;
