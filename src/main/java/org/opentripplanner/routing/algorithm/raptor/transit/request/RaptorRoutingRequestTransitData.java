@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
@@ -35,7 +36,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   /**
    * Transfers by stop index
    */
-  private final List<List<RaptorTransfer>> transfers;
+  private final RaptorTransferIndex transfers;
 
   private final ZonedDateTime startOfTime;
 
@@ -74,8 +75,13 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
    * Gets all the transfers starting at a given stop
    */
   @Override
-  public Iterator<RaptorTransfer> getTransfers(int stopIndex) {
-    return transfers.get(stopIndex).iterator();
+  public Iterator<RaptorTransfer> getTransfersFromStop(int stopIndex) {
+    return transfers.getForwardTransfers().get(stopIndex).iterator();
+  }
+
+  @Override
+  public Iterator<? extends RaptorTransfer> getTransfersToStop(int stopIndex) {
+    return transfers.getReversedTransfers().get(stopIndex).iterator();
   }
 
   /**

@@ -134,7 +134,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
   private Collection<? extends TripToTripTransfer<T>> findStandardTransfers(TripStopTime<T> from) {
     final List<TripToTripTransfer<T>> result = new ArrayList<>();
-    Iterator<? extends RaptorTransfer> transfers = stdTransfers.getTransfers(from.stop());
+    Iterator<? extends RaptorTransfer> transfers = stdTransfers.getTransfersFromStop(from.stop());
 
     while (transfers.hasNext()) {
       var it = transfers.next();

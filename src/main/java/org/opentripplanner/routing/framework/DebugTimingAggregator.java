@@ -75,7 +75,7 @@ public class DebugTimingAggregator {
     if(notEnabled) { return; }
     finishedPatternFiltering = System.currentTimeMillis();
     tripPatternFilterTime = finishedPatternFiltering - finishedDirectStreetRouter;
-    log("│┌ Filtering tripPatterns", tripPatternFilterTime);
+    log("│┌ Creating raptor data model", tripPatternFilterTime);
   }
 
   /**

@@ -3,9 +3,14 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.D1m;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_A;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_B;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import org.junit.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
@@ -105,6 +110,15 @@ public class ReverseTransitCalculatorTest {
         assertIntIterator(create().patternStopIterator(2), 1, 0);
     }
 
+    @Test
+    public void getTransfers() {
+        var subject = create();
+        var transitData = new TestTransitData()
+                        .withTransfer(STOP_A, walk(STOP_B, D1m));
+        assertFalse(subject.getTransfers(transitData, STOP_A).hasNext());
+        assertTrue(subject.getTransfers(transitData, STOP_B).hasNext());
+        assertEquals(STOP_A, subject.getTransfers(transitData, STOP_B).next().stop());
+    }
 
     private void assertIntIterator(IntIterator it, int ... values) {
         for (int v : values) {
