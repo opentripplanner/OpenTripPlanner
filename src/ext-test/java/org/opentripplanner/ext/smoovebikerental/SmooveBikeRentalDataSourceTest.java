@@ -15,6 +15,7 @@ class SmooveBikeRentalDataSourceTest {
                 new SmooveBikeRentalDataSourceParameters(
                         "file:src/test/resources/bike/smoove.json",
                         null,
+                        true,
                         Map.of()
                 )
         );
@@ -35,6 +36,8 @@ class SmooveBikeRentalDataSourceTest {
         assertEquals(60.167913, hamn.getLatitude());
         assertEquals(11, hamn.getSpacesAvailable());
         assertEquals(1, hamn.getVehiclesAvailable());
+        assertTrue(hamn.isAllowOverloading());
+        assertTrue(hamn.allowDropoffNow());
 
         VehicleRentalPlace fake = rentalStations.get(1);
         assertEquals("Fake", fake.getName().toString());
@@ -44,6 +47,7 @@ class SmooveBikeRentalDataSourceTest {
         // operative: false overrides available bikes and slots
         assertEquals(0, fake.getSpacesAvailable());
         assertEquals(0, fake.getVehiclesAvailable());
+        assertTrue(fake.allowDropoffNow());
 
         VehicleRentalPlace foo = rentalStations.get(2);
         assertEquals("Foo", foo.getName().toString());
@@ -52,6 +56,32 @@ class SmooveBikeRentalDataSourceTest {
         assertEquals(61.0, foo.getLatitude());
         assertEquals(5, foo.getSpacesAvailable());
         assertEquals(5, foo.getVehiclesAvailable());
+        assertTrue(foo.allowDropoffNow());
         // Ignores mismatch with total_slots
+    }
+
+    @Test
+    void makeStationWithoutOverloading() {
+        SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(
+                new SmooveBikeRentalDataSourceParameters(
+                        "file:src/test/resources/bike/smoove.json",
+                        null,
+                        false,
+                        Map.of()
+                )
+        );
+        assertTrue(source.update());
+        List<VehicleRentalPlace> rentalStations = source.getStations();
+
+        VehicleRentalPlace hamn = rentalStations.get(0);
+        assertEquals(11, hamn.getSpacesAvailable());
+        assertFalse(hamn.isAllowOverloading());
+        // spaces available and overloading is not allowed
+        assertTrue(hamn.allowDropoffNow());
+
+        VehicleRentalPlace fake = rentalStations.get(1);
+        assertEquals(0, fake.getSpacesAvailable());
+        // no spaces and overloading is not allowed
+        assertFalse(fake.allowDropoffNow());
     }
 }

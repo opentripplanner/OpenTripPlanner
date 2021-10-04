@@ -47,6 +47,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     public ZonedDateTime lastReported;
 
     // OTP internal data
+    public boolean allowOverloading = false;
     public boolean isKeepingVehicleRentalAtDestinationAllowed = false;
     public boolean realTimeData = true;
 
@@ -97,12 +98,17 @@ public class VehicleRentalStation implements VehicleRentalPlace {
         return isReturning;
     }
 
+    @Override
+    public boolean isAllowOverloading() {
+        return allowOverloading;
+    }
+
     public boolean allowPickupNow() {
         return isRenting && vehiclesAvailable > 0;
     }
 
     public boolean allowDropoffNow() {
-        return isReturning && spacesAvailable > 0;
+        return isReturning && (spacesAvailable > 0 || allowOverloading);
     }
 
     @Override

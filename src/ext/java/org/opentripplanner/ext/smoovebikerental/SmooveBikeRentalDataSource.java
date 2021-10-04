@@ -11,19 +11,24 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of a VehicleRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
+ *
  * @see VehicleRentalDataSource
  */
-public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSource<SmooveBikeRentalDataSourceParameters> {
+public class SmooveBikeRentalDataSource
+        extends GenericJsonVehicleRentalDataSource<SmooveBikeRentalDataSourceParameters> {
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
     public static final String DEFAULT_NETWORK_NAME = "smoove";
 
+    private final boolean allowOverloading;
+
     private final String networkName;
 
     public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
-        super(config,"result");
+        super(config, "result");
         networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
+        allowOverloading = config.isAllowOverloading();
     }
 
     /**
@@ -65,6 +70,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
             station.vehiclesAvailable = node.path("avl_bikes").asInt();
             station.spacesAvailable = node.path("free_slots").asInt();
         }
+        station.allowOverloading = allowOverloading;
         return station;
     }
 }

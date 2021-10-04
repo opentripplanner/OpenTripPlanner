@@ -71,8 +71,7 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<Boolean> allowOverloading() {
-        // TODO implement this
-        return environment -> false;
+        return environment -> getSource(environment).isAllowOverloading();
     }
 
     @Override

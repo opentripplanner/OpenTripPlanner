@@ -68,6 +68,11 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
         return false;
     }
 
+    @Override
+    public boolean isAllowOverloading() {
+        return false;
+    }
+
     public boolean allowPickupNow() {
         return !isReserved && !isDisabled;
     }

@@ -10,4 +10,19 @@
 TODO
 
 ### Configuration
-TODO
+
+An example updater configuration:
+```
+{
+    "type": "bike-rental",
+    "sourceType": "smoove",
+    "network": "smoove-network-1",
+    "url": "https://helsinki-fi.smoove.pro/api-public/stations",
+    "frequencySec": 10,
+    "allowOverloading": true
+}
+```
+
+`network` (optional) allows defining custom network id
+
+`allowOverloading` (optional) defines if the stations in the network allow overloading (ignoring available spaces)
