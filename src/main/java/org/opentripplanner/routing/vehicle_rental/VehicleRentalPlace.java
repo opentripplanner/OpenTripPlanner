@@ -32,6 +32,9 @@ public interface VehicleRentalPlace {
     /** How many parking spaces are currently available for dropping off a vehicle at the station, 0 for floating vehicles */
     int getSpacesAvailable();
 
+    /** Number of total docking points installed at this station, both available and unavailable.  */
+    int getCapacity();
+
     /** Does the place allow dropping off vehicles */
     boolean isAllowDropoff();
 

@@ -94,6 +94,11 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     }
 
     @Override
+    public int getCapacity() {
+        return capacity;
+    }
+
+    @Override
     public boolean isAllowDropoff() {
         return isReturning;
     }

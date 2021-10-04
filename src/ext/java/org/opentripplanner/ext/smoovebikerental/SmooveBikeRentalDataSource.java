@@ -68,9 +68,11 @@ public class SmooveBikeRentalDataSource
             station.isReturning = false;
             station.vehiclesAvailable = 0;
             station.spacesAvailable = 0;
+            station.capacity = node.path("total_slots").asInt();
         } else {
             station.vehiclesAvailable = node.path("avl_bikes").asInt();
             station.spacesAvailable = node.path("free_slots").asInt();
+            station.capacity = node.path("total_slots").asInt();
         }
         station.allowOverloading = allowOverloading;
         return station;

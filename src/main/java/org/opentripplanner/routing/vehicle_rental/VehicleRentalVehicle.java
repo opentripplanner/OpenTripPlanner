@@ -64,6 +64,11 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     }
 
     @Override
+    public int getCapacity() {
+        return 0;
+    }
+
+    @Override
     public boolean isAllowDropoff() {
         return false;
     }
