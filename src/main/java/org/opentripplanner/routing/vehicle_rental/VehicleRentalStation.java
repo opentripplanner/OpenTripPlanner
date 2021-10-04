@@ -103,6 +103,11 @@ public class VehicleRentalStation implements VehicleRentalPlace {
         return allowOverloading;
     }
 
+    @Override
+    public boolean isAllowPickup() {
+        return isRenting;
+    }
+
     public boolean allowPickupNow() {
         return isRenting && vehiclesAvailable > 0;
     }

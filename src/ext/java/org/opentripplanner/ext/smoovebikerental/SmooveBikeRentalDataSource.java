@@ -64,6 +64,8 @@ public class SmooveBikeRentalDataSource
             return null;
         }
         if (!node.path("operative").asText().equals("true")) {
+            station.isRenting = false;
+            station.isReturning = false;
             station.vehiclesAvailable = 0;
             station.spacesAvailable = 0;
         } else {

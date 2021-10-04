@@ -38,10 +38,12 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
         return environment -> getSource(environment).getSpacesAvailable();
     }
 
-    //TODO:
     @Override
     public DataFetcher<String> state() {
-        return environment -> null;
+        return environment ->
+                getSource(environment).isAllowDropoff() && getSource(environment).isAllowPickup()
+                        ? "Station on"
+                        : "Station off";
     }
 
     @Override
