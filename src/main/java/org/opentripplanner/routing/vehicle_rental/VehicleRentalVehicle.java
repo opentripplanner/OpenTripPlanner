@@ -80,7 +80,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
 
     @Override
     public boolean isAllowPickup() {
-        return false;
+        return !isDisabled;
     }
 
     public boolean allowPickupNow() {
