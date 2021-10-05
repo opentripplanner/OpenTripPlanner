@@ -17,6 +17,7 @@ import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
 import org.rutebanken.netex.model.Quay;
@@ -45,6 +46,8 @@ class StopAndStationMapper {
     private final StationMapper stationMapper;
     private final StopMapper stopMapper;
     private final TariffZoneMapper tariffZoneMapper;
+    private final DataImportIssueStore issueStore;
+
 
     /**
      * Quay ids for all processed stop places
@@ -66,6 +69,7 @@ class StopAndStationMapper {
         this.stopMapper = new StopMapper(idFactory, issueStore);
         this.tariffZoneMapper = tariffZoneMapper;
         this.quayIndex = quayIndex;
+        this.issueStore = issueStore;
     }
 
     /**
@@ -165,11 +169,11 @@ class StopAndStationMapper {
      * We do not support quay references, all quays must be included as part of the
      * given stopPlace.
      */
-    private static List<Quay> listOfQuays(StopPlace stopPlace) {
+    private List<Quay> listOfQuays(StopPlace stopPlace) {
         Quays_RelStructure quays = stopPlace.getQuays();
 
         if(quays == null) {
-            LOG.warn("StopPlace {} has no quays.", stopPlace.getId());
+            issueStore.add(new StopPlaceWithoutQuays(stopPlace.getId()));
             return Collections.emptyList();
         }
 
