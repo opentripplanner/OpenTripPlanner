@@ -496,10 +496,10 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             return isMotorVehicleNoThruTraffic();
         }
 
-	if (traverseMode.isWalking()) {
+        if (traverseMode.isWalking()) {
             return isWalkNoThruTraffic();
         }
-	
+
         return false;
     }
 
@@ -687,21 +687,21 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 	    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
 	}
 
-	public boolean isWalkNoThruTraffic() {
+        public boolean isWalkNoThruTraffic() {
             return BitSetUtils.get(flags, WALK_NOTHRUTRAFFIC);
-	}
+        }
 
-	public void setWalkNoThruTraffic(boolean noThruTraffic) {
-	    flags = BitSetUtils.set(flags, WALK_NOTHRUTRAFFIC, noThruTraffic);
-	}
+        public void setWalkNoThruTraffic(boolean noThruTraffic) {
+            flags = BitSetUtils.set(flags, WALK_NOTHRUTRAFFIC, noThruTraffic);
+        }
 
         public boolean isMotorVehicleNoThruTraffic() {
             return BitSetUtils.get(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC);
-	}
+        }
 
-	public void setMotorVehicleNoThruTraffic(boolean noThruTraffic) {
-	    flags = BitSetUtils.set(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC, noThruTraffic);
-	}
+        public void setMotorVehicleNoThruTraffic(boolean noThruTraffic) {
+            flags = BitSetUtils.set(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC, noThruTraffic);
+        }
 
         public boolean isBicycleNoThruTraffic() {
             return BitSetUtils.get(flags, BICYCLE_NOTHRUTRAFFIC);

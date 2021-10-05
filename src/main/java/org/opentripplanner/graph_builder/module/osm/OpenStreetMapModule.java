@@ -692,7 +692,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
                 street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
                 street.setBicycleNoThruTraffic(bicycleNoThrough);
-		street.setWalkNoThruTraffic(walkNoThrough);
+                street.setWalkNoThruTraffic(walkNoThrough);
             }
 
             if (backStreet != null) {
@@ -707,7 +707,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
                 backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
                 backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
-		backStreet.setWalkNoThruTraffic(walkNoThrough);
+                backStreet.setWalkNoThruTraffic(walkNoThrough);
             }
         }
 

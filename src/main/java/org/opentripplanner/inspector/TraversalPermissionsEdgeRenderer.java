@@ -50,7 +50,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
             if (pse.isBicycleNoThruTraffic()) {
                 attrs.label += " bike NTT";
             }
-	    if (pse.isWalkNoThruTraffic()) {
+            if (pse.isWalkNoThruTraffic()) {
                 attrs.label += " walk NTT";
             }
         } else {
