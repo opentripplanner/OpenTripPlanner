@@ -8,9 +8,6 @@
 .settings
 .sonar
 *~
-*.ipr
-*.iml
-*.iws
 *.swp
 *.DS_Store
 *.snap.debug
@@ -20,7 +17,6 @@ interactive_otp_main.json
 /otp-ui
 
 # Directories
-.idea/
 .run/
 .venv/
 _site/
@@ -36,3 +32,14 @@ target/
 
 # for local dev only
 src/ext/resources/reportapi/report.csv
+
+
+# IntelliJ
+#
+# See also: .idea/.gitignore
+
+*.iml
+*.ipr
+*.iws
+out/
+.idea_modules/
