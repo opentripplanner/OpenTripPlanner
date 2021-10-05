@@ -166,7 +166,7 @@ Feature | Description | Enabled by default | Sandbox
 `APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
 `APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
 `OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (witch stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
-`ParallelRouting` | Enable performing parts of the trip planning in parallel | no | no
+`ParallelRouting` | Enable performing parts of the trip planning in parallel | yes | no
 `TransferConstraints` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
 `ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
 `GoogleCloudStorage` | Enable Google Cloud Storage integration | no | yes
