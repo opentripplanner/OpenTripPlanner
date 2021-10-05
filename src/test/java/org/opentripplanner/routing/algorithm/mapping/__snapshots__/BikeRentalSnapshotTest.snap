@@ -77,6 +77,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -185,6 +186,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -298,6 +300,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -367,6 +370,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -2176,6 +2180,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -2284,6 +2289,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -2397,6 +2403,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -2466,6 +2473,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -2910,6 +2918,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -3018,6 +3027,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -3131,6 +3141,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -3200,6 +3211,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -3623,6 +3635,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -3731,6 +3744,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -3844,6 +3858,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -3913,6 +3928,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -4099,6 +4115,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -4207,6 +4224,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -4450,6 +4468,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -4558,6 +4577,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -5117,6 +5137,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -5208,6 +5229,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -5321,6 +5343,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -5390,6 +5413,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -6795,6 +6819,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -6886,6 +6911,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -6999,6 +7025,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
@@ -7068,6 +7095,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "vehicleRentalStation": {
               "allowDropoff": true,
               "allowOverloading": false,
+              "allowPickup": true,
               "carStation": false,
               "floatingBike": false,
               "id": {
