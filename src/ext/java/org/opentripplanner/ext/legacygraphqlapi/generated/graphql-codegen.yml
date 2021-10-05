@@ -65,7 +65,7 @@ config:
     stopAtDistance: org.opentripplanner.routing.graphfinder.NearbyStop#NearbyStop
     stopAtDistanceConnection: graphql.relay.Connection#Connection<NearbyStop>
     stopAtDistanceEdge: graphql.relay.Edge#Edge<NearbyStop>
-    Stoptime: org.opentripplanner.model.TripTimeShort#TripTimeShort
+    Stoptime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
     TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
