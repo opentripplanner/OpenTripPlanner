@@ -20,7 +20,7 @@ public class SmooveBikeRentalDataSourceParameters extends VehicleRentalDataSourc
         String network,
         boolean allowOverloading,
         @NotNull
-                Map<String, String> httpHeaders
+        Map<String, String> httpHeaders
     ) {
         super(DataSourceType.SMOOVE, url, httpHeaders);
         this.network = network;
