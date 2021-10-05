@@ -10,7 +10,6 @@ Maven embedded, if so you may skip step 3.
 2. Checkout the desired branch `git checkout dev-2.x` 
 3. Run `maven package`- this will download all dependencies, build the project and run tests.
 4. Open the project in your IDE.
-5. Import the _intellij-code-style.xml_ (IntelliJ IDE).
 
 
 ## Working on OTP in an IDE
@@ -19,12 +18,14 @@ Most people writing or modifying OTP code use an Integrated Development Environm
 the most popular IDEs for Java development are [IntelliJ IDEA](https://www.jetbrains.com/idea/), 
 [Eclipse](http://eclipse.org), and [NetBeans](https://netbeans.org). All three of these environments 
 are good for working on OTP. IntelliJ is used by most OTP developers, and the only IDE we support 
-with a code style formatter. You may choose another IDE, but Maven and Git integration is a 
-plus since OTP is under Git version control and build with Maven.
+with a code style formatter. You may choose another IDE, but Maven and Git integration is a plus 
+since OTP is under Git version control and build with Maven.
 
 Many of the Core OTP developers use IntelliJ IDEA. It is an excellent IDE, and in my experience is 
 quicker and more stable than the competition. IntelliJ IDEA is a commercial product, but there is an 
-open source "community edition" that is completely sufficient for working on OTP.
+open source "community edition" that is completely sufficient for working on OTP. When cloning OTP
+the IntelliJ IDEA project settings are also provided in the `.idea/` directory. This include the 
+up to date code style for the project.
 
 Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP GitHub
 repository manually (on the command line or using some other Git interface tool), then import the resulting local OTP

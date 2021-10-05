@@ -8,17 +8,16 @@ few modifications. Here is the original Google style guide:
 https://google.github.io/styleguide/javaguide.html
 
 ### IntellJ Code Style formatter 
-If you use IntelliJ, import the provided [intellij-code-style.xml](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/intellij-code-style.xml). 
-Open the `Preferences` from the menu and select _Editor > Code Style_. Then import the code-style
-xml document. Configure _Scheme_ using  _Import Scheme > IntelliJ IDEA code style XML_.
+If you use IntelliJ, the project code style is included in the `.idea/codeStyles/Project.xml` and
+is import automatically when you open the project in IntelliJ.
 
 Note that the IntelliJ formatter will not always format the code according to the coding standard.
-It struggle to do the line breaks properly. Hence, use it to format new code and to rearrange 
+It struggles to do the line breaks properly. Hence, use it to format new code and to rearrange 
 members, then manually fix any mistakes.
 
 ### Other IDEs
-We do not have support for other IDEs at the moment. If you use another editor and make one please
-feel free to share it.  
+We do not have support for other IDEs now. If you use another editor and make one please feel free
+to share it.  
 
 ### Code Style
 
