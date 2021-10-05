@@ -5,6 +5,7 @@
 
 ## Changelog
 - Move this functonality into a sandbox
+- Add allowOverloading through updater config to the stations and isRenting, isReturning and capacity from the data to stations (October 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3632)
 
 ## Documentation
 TODO

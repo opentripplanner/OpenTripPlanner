@@ -13,6 +13,7 @@
 - Updated to ignore modes which are not valid in OTP2 (June 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3464)
 - Add Leg#walkingBike (June 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3550)
 - Add GBFS bike rental URIs to bike rental stations (June 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3543)
+- Properly implement all bike rental station fields and add allowPickup, allowPickupNow, allowDropoffNow and operative fields (October 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3632)
 
 ## Documentation
 
