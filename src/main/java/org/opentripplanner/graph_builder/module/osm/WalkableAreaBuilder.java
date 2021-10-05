@@ -243,9 +243,9 @@ public class WalkableAreaBuilder {
             }
 
             if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
-                issueStore.add(
-                        new AreaNotEpsilonValid(group.getSomeOSMObject().getId()));
-                continue;
+                issueStore.add(new AreaNotEpsilonValid(group.getSomeOSMObject().getId()));
+                // these errors seem not to harm area visibility processing
+                // so just log an error (most likely OSM mapping error)
             }
 
             edgeList.setOriginalEdges(ring.toJtsPolygon());
