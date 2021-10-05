@@ -12,7 +12,14 @@ public class BookingMethodMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(BookingMethodMapper.class);
 
-  public static BookingMethod map(BookingMethodEnumeration bookingMethodEnumeration) {
+  /**
+   * @param sourceRef The entity with the booking-method, used to include a reference to the
+   *                  entity in the log, in case of a problem with the mapping.
+   */
+  public static BookingMethod map(
+          String sourceRef,
+          BookingMethodEnumeration bookingMethodEnumeration
+  ) {
     if(bookingMethodEnumeration == null) {
       return null;
     }
@@ -30,7 +37,9 @@ public class BookingMethodMapper {
         return BookingMethod.TEXT_MESSAGE;
       default:
         LOG.warn(
-                "Booking method unknown/not supported will be ignored: " + bookingMethodEnumeration
+                "Booking method unknown/not supported will be ignored: {}. Entity: {}",
+                bookingMethodEnumeration,
+                sourceRef
         );
         return null;
     }
