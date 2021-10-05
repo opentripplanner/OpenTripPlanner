@@ -1,6 +1,12 @@
 package org.opentripplanner.netex.mapping;
 
 import com.esotericsoftware.minlog.Log;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.BookingTime;
@@ -14,12 +20,6 @@ import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PurchaseWhenEnumeration;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
-
-import java.time.Duration;
-import java.time.LocalTime;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Maps booking info from NeTEx BookingArrangements, FlexibleServiceProperties, and FlexibleLine
@@ -113,6 +113,7 @@ public class BookingInfoMapper {
     EnumSet<BookingMethod> bookingMethods = bookingMethodEnum
         .stream()
         .map(BookingMethodMapper::map)
+        .filter(Objects::nonNull)
         .collect(Collectors.toCollection(() -> EnumSet.noneOf(BookingMethod.class)));
 
     BookingTime otpEarliestBookingTime = null;
