@@ -88,7 +88,10 @@ public class GbfsFeedLoader {
 
         for (GBFSFeedUpdater<?> updater : feedUpdaters.values()) {
             if (updater.shouldUpdate()) {
-                updater.fetchData();
+                boolean success = updater.fetchData();
+                if (!success) {
+                    return false;
+                }
                 didUpdate = true;
             }
         }
@@ -161,12 +164,12 @@ public class GbfsFeedLoader {
             return data;
         }
 
-        private void fetchData() {
+        private boolean fetchData() {
             T newData = GbfsFeedLoader.fetchFeed(url, httpHeaders, implementingClass);
             if (newData == null) {
                 LOG.error("Invalid data for {}", url);
                 nextUpdate = getCurrentTimeSeconds();
-                return;
+                return false;
             }
             data = newData;
 
@@ -184,6 +187,7 @@ public class GbfsFeedLoader {
                 LOG.error("Invalid lastUpdated or ttl for {}", url);
                 nextUpdate = getCurrentTimeSeconds();
             }
+            return true;
         }
 
         private boolean shouldUpdate() {

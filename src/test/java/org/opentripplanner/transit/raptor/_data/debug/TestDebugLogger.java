@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
@@ -17,7 +18,6 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.BoarAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
 import org.opentripplanner.transit.raptor.util.IntUtils;
@@ -110,7 +110,7 @@ public class TestDebugLogger implements DebugLogger {
                 TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
                 TimeUtils.timeToStrLong(p.egressLeg().toTime()),
                 DurationUtils.durationToStr(p.durationInSeconds()),
-                numFormat.format(p.otpDomainCost()),
+                numFormat.format(RaptorCostConverter.toOtpDomainCost(p.generalizedCost())),
                 details(e.action().toString(), e.reason(), e.element().toString())
             )
         );
@@ -181,9 +181,9 @@ public class TestDebugLogger implements DebugLogger {
     }
 
     private static String path(ArrivalView<?> a) {
-        return path(a, new PathStringBuilder())
+        return path(a, new PathStringBuilder(null))
                 .space().space().append("[ ")
-                .costCentiSec(a.cost())
+                .generalizedCostSentiSec(a.cost())
                 .append(" ]")
                 .toString();
     }
@@ -201,12 +201,12 @@ public class TestDebugLogger implements DebugLogger {
             // forward search
             String tripInfo = a.transitPath().trip().pattern().debugInfo();
             if(a.arrivalTime() > a.previous().arrivalTime()) {
-                BoarAndAlightTime t = TripTimesSearch.findTripForwardSearch(a);
+                var t = TripTimesSearch.findTripForwardSearch(a);
                 buf.transit(tripInfo, t.boardTime(), t.alightTime());
             }
             // reverse search
             else {
-                BoarAndAlightTime t = TripTimesSearch.findTripReverseSearch(a);
+                var t = TripTimesSearch.findTripReverseSearch(a);
                 buf.transit(tripInfo, t.alightTime(), t.boardTime());
             }
         } else if(a.arrivedByTransfer()) {

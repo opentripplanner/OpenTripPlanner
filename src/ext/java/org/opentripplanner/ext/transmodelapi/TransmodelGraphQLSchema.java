@@ -48,6 +48,7 @@ import org.opentripplanner.ext.transmodelapi.model.framework.MultilingualStringT
 import org.opentripplanner.ext.transmodelapi.model.framework.NoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.OperatorType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PointsOnLinkType;
+import org.opentripplanner.ext.transmodelapi.model.framework.RentalVehicleTypeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
 import org.opentripplanner.ext.transmodelapi.model.framework.SystemNoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ValidityPeriodType;
@@ -70,6 +71,7 @@ import org.opentripplanner.ext.transmodelapi.model.stop.PlaceAtDistanceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceInterfaceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.QuayAtDistanceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.QuayType;
+import org.opentripplanner.ext.transmodelapi.model.stop.RentalVehicleType;
 import org.opentripplanner.ext.transmodelapi.model.stop.StopPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.TariffZoneType;
 import org.opentripplanner.ext.transmodelapi.model.timetable.BookingArrangementType;
@@ -84,7 +86,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -140,11 +142,13 @@ public class TransmodelGraphQLSchema {
     GraphQLOutputType authorityType = AuthorityType.create(LineType.REF, PtSituationElementType.REF);
     GraphQLOutputType operatorType = OperatorType.create(LineType.REF, ServiceJourneyType.REF);
     GraphQLOutputType noticeType = NoticeType.create();
+    GraphQLOutputType rentalVehicleTypeType = RentalVehicleTypeType.create();
 
     // Stop
     GraphQLOutputType tariffZoneType = TariffZoneType.createTZ();
     GraphQLInterfaceType placeInterface = PlaceInterfaceType.create();
     GraphQLOutputType bikeRentalStationType = BikeRentalStationType.create(placeInterface);
+    GraphQLOutputType rentalVehicleType = RentalVehicleType.create(rentalVehicleTypeType, placeInterface);
     GraphQLOutputType bikeParkType = BikeParkType.createB(placeInterface);
 //  GraphQLOutputType carParkType = new GraphQLTypeReference("CarPark");
     GraphQLOutputType stopPlaceType = StopPlaceType.create(
@@ -225,6 +229,7 @@ public class TransmodelGraphQLSchema {
             authorityType,
             operatorType,
             bikeRentalStationType,
+            rentalVehicleType,
             quayType,
             estimatedCallType,
             lineType,
@@ -935,7 +940,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
             .dataFetcher(environment -> {
-              Collection<VehicleRentalStation> all = new ArrayList<>(GqlUtil
+              Collection<VehicleRentalPlace> all = new ArrayList<>(GqlUtil
                   .getRoutingService(environment)
                   .getVehicleRentalStationService()
                   .getVehicleRentalStations());
@@ -1136,6 +1141,7 @@ public class TransmodelGraphQLSchema {
         GraphQLOutputType authorityType,
         GraphQLOutputType operatorType,
         GraphQLOutputType bikeRentalStationType,
+        GraphQLOutputType rentalVehicleType,
         GraphQLOutputType quayType,
         GraphQLOutputType estimatedCallType,
         GraphQLOutputType lineType,
@@ -1143,7 +1149,7 @@ public class TransmodelGraphQLSchema {
         GraphQLOutputType ptSituationElementType
     ) {
       GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
-      GraphQLObjectType placeType = PlanPlaceType.create(bikeRentalStationType, quayType);
+      GraphQLObjectType placeType = PlanPlaceType.create(bikeRentalStationType, rentalVehicleType, quayType);
       GraphQLObjectType pathGuidanceType = PathGuidanceType.create();
       GraphQLObjectType legType = LegType.create(
           bookingArrangementType,

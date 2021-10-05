@@ -734,6 +734,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.setStreetSubRequestModes(modeSet);
     }
 
+    public RoutingRequest(RequestModes modes) {
+        this();
+        this.modes = modes;
+    }
+
     /* ACCESSOR/SETTER METHODS */
 
     public boolean transitAllowed() {

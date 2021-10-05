@@ -51,12 +51,12 @@ OTP finds the best transfers in 2 steps:
 
  1. As part of the routing. The routing engine (Raptor) applies generalized-cost and 
     number-of-transfers as criteria during the routing. In addition, Raptor supports overriding 
-    regular transfers with guaranteed transfers. 
+    regular transfers with constrained transfers. 
     1. Goal 1 is achieved by having `number-of-transfers` as a Raptor criterion.
     2. Goal 2 is achieved by giving some stops a lower _visiting-cost_ according to the 
        `StopTransferPriority`.
-    3. Goal 3 and 6 is achieved by allowing guaranteed transfers to override regular transfers. An 
-       optional `RaptorGuaranteedTransferProvider` is injected into Raptor witch Raptor calls to 
+    3. Goal 3 and 6 is achieved by allowing constrained transfers to override regular transfers. An 
+       optional `RaptorTransferConstraintsProvider` is injected into Raptor witch Raptor calls to 
        get guaranteed transfers. This service is also responsible for rejecting a transfer(TODO). 
  2. Optimize transfers: Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the 
     routing search are revised, optimizing the stop at which transfers happen between each pair of
@@ -115,7 +115,7 @@ The `OptimizePathService` finds the best optimized path using the other domain s
 The `TransferGenerator` is responsible for finding all possible transfer options and decorating each 
 transfer with information that the other services will use later to do their job. The additional
 information added to each transfer is:
-- Guaranteed transfer information including priority, guaranteed, stay-seated and so on
+- Constrained transfer information including priority, guaranteed, stay-seated and so on
 - The various cost described in `TransferOptimized`:
   - `transfer-priority-cost`
   - `wait-time-optimized-cost` or `generalized-cost`
@@ -127,7 +127,7 @@ The `TransitPathLegSelector` uses the filter-chain to prune the results already 
 combining them with new transfer-points and a new transit-path-leg. 
 
 The domain `OptimizedPathTail` is used to store the intermediate results. It decorates the `PathLeg`
-from Raptor with `TransferOptimized` costs and keep a list of all relevant guaranteed-transfers.
+from Raptor with `TransferOptimized` costs.
 
 
 ### The Optimize-transfer-cost Function

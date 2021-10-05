@@ -19,14 +19,15 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
         AbstractStopArrival<T> previousState,
         int stopIndex,
         int arrivalTime,
-        int additionalCost,
+        int totalCost,
         T trip
     ) {
         super(
                 previousState,
+                previousState.arrivedByTransit() ? 2 : 1,
                 stopIndex,
                 arrivalTime,
-                additionalCost
+                totalCost
         );
         this.trip = trip;
     }

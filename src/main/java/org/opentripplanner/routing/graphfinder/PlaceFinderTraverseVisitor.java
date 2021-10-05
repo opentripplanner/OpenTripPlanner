@@ -7,7 +7,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -140,13 +140,13 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
-  private void handleBikeRentalStation(VehicleRentalStation station, double distance) {
+  private void handleBikeRentalStation(VehicleRentalPlace station, double distance) {
     if (!includeBikeShares) { return; }
     if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.getStationId())) {
       return;
     }
-    if (seenBicycleRentalStations.contains(station.id)) { return; }
-    seenBicycleRentalStations.add(station.id);
+    if (seenBicycleRentalStations.contains(station.getId())) { return; }
+    seenBicycleRentalStations.add(station.getId());
     placesFound.add(new PlaceAtDistance(station, distance));
   }
 
