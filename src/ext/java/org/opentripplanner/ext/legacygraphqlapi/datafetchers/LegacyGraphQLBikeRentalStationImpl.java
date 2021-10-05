@@ -57,6 +57,21 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     }
 
     @Override
+    public DataFetcher<Boolean> allowDropoffNow() {
+        return environment -> getSource(environment).allowDropoffNow();
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowPickup() {
+        return environment -> getSource(environment).isAllowPickup();
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowPickupNow() {
+        return environment -> getSource(environment).allowPickupNow();
+    }
+
+    @Override
     public DataFetcher<Iterable<String>> networks() {
         return environment -> List.of(getSource(environment).getNetwork());
     }
@@ -79,6 +94,12 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     @Override
     public DataFetcher<Integer> capacity() {
         return environment -> getSource(environment).getCapacity();
+    }
+
+    @Override
+    public DataFetcher<Boolean> operative() {
+        return environment -> getSource(environment).isAllowPickup() && getSource(
+                environment).isAllowDropoff();
     }
 
     @Override

@@ -250,22 +250,23 @@ type BikeRentalStation implements Node & PlaceInterface {
 
     """
     Number of bikes currently available on the rental station.
+    See field `allowPickupNow` to know if is currently possible to pick up a bike.
     """
     bikesAvailable: Int
 
     """
     Number of free spaces currently available on the rental station.
     Note that this value being 0 does not necessarily indicate that bikes cannot be returned
-    to this station, as it might be possible to leave the bike in the vicinity of
-    the rental station,
-    even if the bike racks don't have any spaces available (see field `allowDropoff`).
+    to this station, as for example it might be possible to leave the bike in the vicinity of
+    the rental station, even if the bike racks don't have any spaces available.
+    See field `allowDropoffNow` to know if is currently possible to return a bike.
     """
     spacesAvailable: Int
 
     """
     A description of the current state of this bike rental station, e.g. "Station on"
-  """
-    state: String
+    """
+    state: String @deprecated(reason: "Use operative instead")
 
     """
     If true, values of `bikesAvailable` and `spacesAvailable` are updated from a
@@ -274,8 +275,23 @@ type BikeRentalStation implements Node & PlaceInterface {
     """
     realtime: Boolean
 
-    """If true, bikes can be returned to this station."""
+    """
+    If true, bikes can be returned to this station if the station has spaces available
+    or allows overloading.
+    """
     allowDropoff: Boolean
+
+    """
+    If true, bikes can be picked up from this station if the station has bikes available.
+    """
+    allowPickup: Boolean
+
+    """If true, bikes can be currently returned to this station."""
+    allowDropoffNow: Boolean
+
+    """If true, bikes can be currently picked up from this station."""
+    allowPickupNow: Boolean
+
     networks: [String]
 
     """Longitude of the bike rental station (WGS 84)"""
@@ -292,6 +308,11 @@ type BikeRentalStation implements Node & PlaceInterface {
 
     """Platform-specific URLs to begin renting a bike from this station."""
     rentalUris: BikeRentalStationUris
+
+    """
+    If true, station is on and in service.
+    """
+    operative: Boolean
 }
 
 type BikeRentalStationUris {
