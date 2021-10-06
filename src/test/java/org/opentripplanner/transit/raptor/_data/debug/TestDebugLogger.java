@@ -207,12 +207,12 @@ public class TestDebugLogger implements DebugLogger {
             String tripInfo = a.transitPath().trip().pattern().debugInfo();
 
             if(forwardSearch) {
-                var t = TripTimesSearch.findTripForwardSearch(a);
+                var t = TripTimesSearch.findTripForwardSearchApproximateTime(a);
                 buf.transit(tripInfo, t.boardTime(), t.alightTime());
             }
             // reverse search
             else {
-                var t = TripTimesSearch.findTripReverseSearch(a);
+                var t = TripTimesSearch.findTripReverseSearchApproximateTime(a);
                 buf.transit(tripInfo, t.alightTime(), t.boardTime());
             }
         } else if(a.arrivedByTransfer()) {

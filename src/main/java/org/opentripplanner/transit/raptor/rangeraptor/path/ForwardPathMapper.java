@@ -19,6 +19,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
     private final RaptorSlackProvider slackProvider;
     private final CostCalculator costCalculator;
+    private final BoardAndAlightTimeSearch tripSearch;
 
     private int iterationDepartureTime = -1;
 
@@ -26,11 +27,13 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
             RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
             RaptorSlackProvider slackProvider,
             CostCalculator costCalculator,
-            WorkerLifeCycle lifeCycle
+            WorkerLifeCycle lifeCycle,
+            boolean useApproximateTripTimesSearch
     ) {
         this.transferConstraintsSearch = transferConstraintsSearch;
         this.slackProvider = slackProvider;
         this.costCalculator = costCalculator;
+        this.tripSearch = forwardSearch(useApproximateTripTimesSearch);
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
 
@@ -49,7 +52,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         while (true) {
             if (arrival.arrivedByTransit()) {
-                var times = TripTimesSearch.findTripForwardSearch(arrival);
+                var times = tripSearch.find(arrival);
                 pathBuilder.transit(arrival.transitPath().trip(), times);
             } else if (arrival.arrivedByTransfer()) {
                 pathBuilder.transfer(arrival.transferPath().transfer(), arrival.stop());
@@ -63,5 +66,11 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         }
 
         return pathBuilder.build(iterationDepartureTime);
+    }
+
+    private static BoardAndAlightTimeSearch forwardSearch(boolean useApproximateTimeSearch) {
+        return useApproximateTimeSearch
+                ? TripTimesSearch::findTripForwardSearchApproximateTime
+                : TripTimesSearch::findTripForwardSearch;
     }
 }

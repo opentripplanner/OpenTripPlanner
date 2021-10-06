@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -15,7 +14,6 @@ import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -38,7 +36,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class SearchContext<T extends RaptorTripSchedule> {
-    private static final DebugLogger NOOP_DEBUG_LOGGER = (topic, message) -> { };
     /**
      * The request input used to customize the worker to the clients needs.
      */
@@ -79,10 +76,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
         );
         this.pathMapper = createPathMapper(
                 this.transit.transferConstraintsSearch(),
-                request.slackProvider(),
-                costCalculator,
-                lifeCycle(),
-                request.searchDirection().isForward()
+                this.costCalculator,
+                request,
+                lifeCycle()
         );
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
@@ -198,6 +194,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return searchParams().constrainedTransfersEnabled();
     }
 
+
     /* private methods */
 
     /**
@@ -239,14 +236,25 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
             RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
-            RaptorSlackProvider slackProvider,
-            CostCalculator costCalc,
-            WorkerLifeCycle lifeCycle,
-            boolean searchForward
+            CostCalculator costCalculator,
+            RaptorRequest<S> request,
+            WorkerLifeCycle lifeCycle
     ) {
-        return searchForward
-                ? new ForwardPathMapper<>(txConstraintsSearch, slackProvider, costCalc, lifeCycle)
-                : new ReversePathMapper<>(txConstraintsSearch, slackProvider, costCalc, lifeCycle);
+        return request.searchDirection().isForward()
+                ? new ForwardPathMapper<>(
+                        txConstraintsSearch,
+                        request.slackProvider(),
+                        costCalculator,
+                        lifeCycle,
+                        request.profile().useApproximateTripSearch()
+                )
+                : new ReversePathMapper<>(
+                        txConstraintsSearch,
+                        request.slackProvider(),
+                        costCalculator,
+                        lifeCycle,
+                        request.profile().useApproximateTripSearch()
+                );
     }
 
     public IntFunction<String> stopIndexTranslatorForDebugging() {
