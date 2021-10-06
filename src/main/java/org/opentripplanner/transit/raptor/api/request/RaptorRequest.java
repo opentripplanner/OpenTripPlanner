@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import com.esotericsoftware.minlog.Log;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -8,6 +7,8 @@ import java.util.Set;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -17,6 +18,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class RaptorRequest<T extends RaptorTripSchedule> {
+    private static final Logger LOG = LoggerFactory.getLogger(RaptorRequest.class);
+
     private final SearchParams searchParams;
     private final RaptorProfile profile;
     private final SearchDirection searchDirection;
@@ -169,7 +172,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         searchParams.verify();
         if(!profile.is(RaptorProfile.MULTI_CRITERIA)) {
             if(useDestinationPruning()) {
-                Log.warn("Destination pruning is only supported using McRangeRaptor");
+                LOG.warn("Destination pruning is only supported using McRangeRaptor");
             }
         }
     }
