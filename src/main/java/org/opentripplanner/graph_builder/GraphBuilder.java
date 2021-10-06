@@ -18,7 +18,6 @@ import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
@@ -170,19 +169,14 @@ public class GraphBuilder implements Runnable {
         streetLinkerModule.setAddExtraEdgesToAreas(config.areaVisibility);
         graphBuilder.addModule(streetLinkerModule);
 
+        // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
+        // existence of stops in islands. If an island has a stop, it actually may be a real island and should
+        // not be removed quite as easily
         if ( hasOsm ) {
-            if (OTPFeature.PruneIslands.isOn()) { // original pruning
-                PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
-                pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-                pruneFloatingIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-                graphBuilder.addModule(pruneFloatingIslands);
-            }
-            if (OTPFeature.PruneNoThru.isOn()) { // more advanced island pruning
-                PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
-                pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-                pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-                graphBuilder.addModule(pruneNoThruIslands);
-            }
+            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
+            pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+            pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+            graphBuilder.addModule(pruneNoThruIslands);
         }
 
         // Load elevation data and apply it to the streets.
