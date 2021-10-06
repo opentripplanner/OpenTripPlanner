@@ -105,7 +105,7 @@ public class AddMinSafeTransferCostFilterTest implements PlanTestConstants {
   @Test
   public void testToString() {
     assertEquals(
-        "add-min-safe-transfer-cost-filter{minSafeTransferTimeFactor: 2.0}",
+        "AddMinSafeTransferCostFilter{minSafeTransferTimeFactor: 2.0}",
         subject.toString()
     );
   }

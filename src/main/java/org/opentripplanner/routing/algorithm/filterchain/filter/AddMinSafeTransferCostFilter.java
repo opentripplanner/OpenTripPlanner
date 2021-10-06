@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
@@ -99,7 +100,9 @@ public class AddMinSafeTransferCostFilter implements ItineraryListFilter {
 
   @Override
   public String toString() {
-    return "add-min-safe-transfer-cost-filter{minSafeTransferTimeFactor: " + minSafeTransferTimeFactor + "}";
+    return ToStringBuilder.of(AddMinSafeTransferCostFilter.class)
+            .addNum("minSafeTransferTimeFactor", minSafeTransferTimeFactor)
+            .toString();
   }
 
   /**
