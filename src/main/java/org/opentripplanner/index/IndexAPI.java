@@ -179,7 +179,9 @@ public class IndexAPI {
            @QueryParam("maxLon") Double maxLon,
            @QueryParam("lat")    Double lat,
            @QueryParam("lon")    Double lon,
-           @QueryParam("radius") Double radius) {
+           @QueryParam("radius") Double radius,
+           @QueryParam("includeStopTimes") boolean includeStopTimes,
+           @QueryParam("includeRoutes") boolean includeRoutes) {
 
        /* When no parameters are supplied, return all stops. */
        if (uriInfo.getQueryParameters().isEmpty()) {
@@ -201,7 +203,16 @@ public class IndexAPI {
                     new Coordinate(lon, lat), radius)) {
                double distance = SphericalDistanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
-                   stops.add(new StopShort(stopVertex.getStop(), (int) distance));
+                   // Do the query for the stop times and routes here, and save it to an otherwise null variable
+                   Collection<StopTimesInPattern> stopTimesForStop = null;
+                   Set<Route> routesForStop = null;
+                   if (includeStopTimes) {
+                       stopTimesForStop = index.stopTimesForStop(stopVertex.getStop(), true );
+                   }
+                   if (includeRoutes) {
+                       routesForStop = index.routesForStop(stopVertex.getStop());
+                   }
+                   stops.add(new StopShort(stopVertex.getStop(), (int) distance, stopTimesForStop, routesForStop));
                }
            }
            return Response.status(Status.OK).entity(stops).build();
@@ -215,8 +226,18 @@ public class IndexAPI {
            }
            List<StopShort> stops = Lists.newArrayList();
            Envelope envelope = new Envelope(new Coordinate(minLon, minLat), new Coordinate(maxLon, maxLat));
+
            for (TransitStop stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
-               stops.add(new StopShort(stopVertex.getStop()));
+               // Do the query for the stop times and routes here, and save it to an otherwise null variable
+               Collection<StopTimesInPattern> stopTimesForStop = null;
+               Set<Route> routesForStop = null;
+               if (includeStopTimes) {
+                   stopTimesForStop = index.stopTimesForStop(stopVertex.getStop(), false);
+               }
+               if (includeRoutes) {
+                   routesForStop = index.routesForStop(stopVertex.getStop());
+               }
+               stops.add(new StopShort(stopVertex.getStop(), stopTimesForStop, routesForStop));
            }
            return Response.status(Status.OK).entity(stops).build();           
        }
@@ -227,10 +248,7 @@ public class IndexAPI {
    public Response getRoutesForStop (@PathParam("stopId") String stopId) {
        Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopId));
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-       Set<Route> routes = Sets.newHashSet();
-       for (TripPattern pattern : index.patternsForStop.get(stop)) {
-           routes.add(pattern.route);
-       }
+       Set<Route> routes = index.routesForStop(stop);
        return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
    }
 
