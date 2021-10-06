@@ -38,9 +38,17 @@ public class RoutingRequestToFilterChainMapper {
       }
 
       if (p.groupSimilarityKeepThree >= 0.5) {
-        builder.addGroupBySimilarity(
-            new GroupBySimilarity(p.groupSimilarityKeepThree, KEEP_THREE)
-        );
+        GroupBySimilarity groupBySimilarityKeepThree =
+                new GroupBySimilarity(p.groupSimilarityKeepThree, KEEP_THREE)
+                        .nestedGroupingByAllSameStations();
+
+        if (p.groupedOtherThanSameLegsMaxCostMultiplier >= 1.0) {
+          groupBySimilarityKeepThree.withOtherThanSameLegsMaxGeneralizedCostMultiplier(
+                  p.groupedOtherThanSameLegsMaxCostMultiplier
+          );
+        }
+
+        builder.addGroupBySimilarity(groupBySimilarityKeepThree);
       }
     }
 
