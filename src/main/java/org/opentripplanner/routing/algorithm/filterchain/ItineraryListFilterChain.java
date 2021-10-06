@@ -22,12 +22,11 @@ public class ItineraryListFilterChain {
             result = filter.filter(result);
         }
 
-        if (!debug) {
-            result = result.stream()
-                    .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
-                    .collect(Collectors.toList());
-        }
-
-        return result;
+        if (debug) {
+          return result;
+        }  
+        return result.stream()
+                .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
+                .collect(Collectors.toList());
     }
 }
