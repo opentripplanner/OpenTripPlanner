@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor._data.api;
 
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripAfter;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
@@ -69,7 +69,7 @@ public class TestPathBuilder {
     // We use the startTime as earliest-board-time, this may cause problems for
     // testing routes visiting the same stop more than once. Create a new factory
     // method if this happens.
-    var baTime = findTripAfter(trip, boardStop, alightStop, startTime);
+    var baTime = findTripTimes(trip, boardStop, alightStop, startTime);
     builder.transit(trip, baTime);
     return this;
   }

@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -38,13 +37,9 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripForwardSearch(
         ArrivalView<S> arrival
     ) {
-        var transitPath = arrival.transitPath();
-        S trip = transitPath.trip();
-        int fromStop = transitPath.boardStop();
-        int toStop = arrival.stop();
-        int latestArrivalTime = arrival.arrivalTime();
-
-        return new TripTimesSearch<>(trip, fromStop, toStop).findTripBefore(latestArrivalTime);
+        var transit = arrival.transitPath();
+        var search = new TripTimesSearch<>(transit.trip(), transit.boardStop(), arrival.stop());
+        return search.findTripTimesBefore(arrival.arrivalTime());
     }
 
     /**
@@ -55,38 +50,59 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripReverseSearch(
         ArrivalView<S> arrival
     ) {
-        var transitPath = arrival.transitPath();
-        S trip = transitPath.trip();
-        int fromStop = arrival.stop();
-        int toStop = transitPath.boardStop();
-        int earliestBoardTime = arrival.arrivalTime();
-
-        return new TripTimesSearch<>(trip, fromStop, toStop).findTripAfter(earliestBoardTime);
-    }
-
-    /**
-     * Search for boarding and alighting times matching the given trip, stop pair and
-     * departure-time when searching in REVERSE.
-     */
-    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripAfter(
-            S trip, int fromStop, int toStop, int earliestBoardTime
-    ) {
-        return new TripTimesSearch<>(trip, fromStop, toStop).findTripAfter(earliestBoardTime);
+        var transit = arrival.transitPath();
+        var search = new TripTimesSearch<>(transit.trip(), arrival.stop(), transit.boardStop());
+        return search.findTripTimesAfter(arrival.arrivalTime());
     }
 
     /**
      * Search for board- and alight-times for the trip matching the given stop-arrival
      * when searching FORWARD. Hence, searching in the same direction as the trip travel
      * direction.
+     * <p>
+     * This uses the approximate-time search,
+     * see {@link #findTripTimes(RaptorTripSchedule, int, int, int)}.
      */
-    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripTimes(TransitPathLeg<S> leg) {
-        return new TripTimesSearch<>(leg.trip(), leg.fromStop(), leg.toStop())
-            .findTripBefore(leg.toTime());
+    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripForwardSearchApproximateTime(
+            ArrivalView<S> arrival
+    ) {
+        var t = arrival.transitPath();
+        return findTripTimes(t.trip(), t.boardStop(), arrival.stop(), arrival.arrivalTime());
     }
+
+    /**
+     * Search for board- and alight-times for the trip matching the given stop-arrival
+     * when searching in REVERSE. Hence, searching in the opposite direction of the trip
+     * travel direction.
+     * <p>
+     * This uses the approximate-time search,
+     * see {@link #findTripTimes(RaptorTripSchedule, int, int, int)}.
+     */
+    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripReverseSearchApproximateTime(
+            ArrivalView<S> arrival
+    ) {
+        var t = arrival.transitPath();
+        return findTripTimes(t.trip(), arrival.stop(), t.boardStop(), arrival.arrivalTime());
+    }
+
+    /**
+     * Search for board- and alight-times for the trip matching the given {@code approximateTime}.
+     * This is slower than the more specific methods and not as correct - it is possible to
+     * construct cases with looping patterns where this method may find the wrong trip. But, it is
+     * safe - it will always find a trip if it exists. Can be used in tests, logging and debugging,
+     * but avoid using it in path mapping.
+     */
+    public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripTimes(
+            S trip, int fromStop, int toStop, int approximateTime
+    ) {
+        var search = new TripTimesSearch<>(trip, fromStop, toStop);
+        return search.findTripByApproximateTime(approximateTime);
+    }
+
 
     /* private methods */
 
-    private BoardAndAlightTime findTripAfter(final int earliestDepartureTime) {
+    private BoardAndAlightTime findTripTimesAfter(final int earliestDepartureTime) {
         RaptorTripPattern p = schedule.pattern();
         final int size = p.numberOfStopsInPattern();
 
@@ -118,7 +134,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         return new BoardAndAlightTime(schedule, boardStopPos, i);
     }
 
-    private BoardAndAlightTime findTripBefore(int latestArrivalTime) {
+    private BoardAndAlightTime findTripTimesBefore(int latestArrivalTime) {
         RaptorTripPattern p = schedule.pattern();
         int i = schedule.findArrivalStopPosition(latestArrivalTime, toStop);
 
@@ -146,6 +162,68 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
             );
         }
         return new BoardAndAlightTime(schedule, i, alightStopPos);
+    }
+
+    /**
+     * Find the trip that is closest in time to the given {@code approximateTime}.
+     * <p>
+     * If the approximate time is closer to the next trip, then the total time will be
+     * larger the 4 times the approximate time:
+     * <ul>
+     *   <li>Let the current trip board and alight times be: {@code a & b}</li>
+     *   <li>Let the next trip board and alight times be: {@code c & d}</li>
+     *   <li>Let approximate-time be: {@code T}</li>
+     * </ul>
+     * Then T is closer to [a,b] then [c,d] if:
+     * <pre>
+     *   x - (a+b)/2  < (c+d)/2 + x
+     *   2x < (c+d)/2 + (a+b)/2
+     *   4x <  (a+b+c+d)
+     * </pre>
+     */
+    private BoardAndAlightTime findTripByApproximateTime(int approximateTime) {
+        RaptorTripPattern p = schedule.pattern();
+
+        int fromPos = stopPosAfter(p, 0, fromStop, approximateTime);
+        int toPos = stopPosAfter(p, fromPos+1, toStop, approximateTime);
+        // Step back to find the closest departure stop in case there are more than one
+        fromPos = stopPosBefore(p, toPos-1, fromStop, approximateTime);
+
+        try {
+            while (true) {
+                // Try to find next possible trip [if pattern runs in a loop]
+                int nextFromPos = stopPosAfter(p, fromPos+1, fromStop, approximateTime);
+                int nextToPos = stopPosAfter(p, nextFromPos+1, toStop, approximateTime);
+                nextFromPos = stopPosBefore(p, nextToPos-1, fromStop, approximateTime);
+
+                int totTime = schedule.departure(fromPos) + schedule.arrival(toPos) +
+                        schedule.departure(nextFromPos) + schedule.arrival(nextToPos);
+
+                if(totTime >= 4 * approximateTime) { break; }
+
+                fromPos = nextFromPos;
+                toPos = nextToPos;
+            }
+        } catch (IllegalStateException ignore) { /* No more times/loop exist */ }
+
+        return new BoardAndAlightTime(schedule, fromPos, toPos);
+    }
+
+    private int stopPosAfter(RaptorTripPattern p, int startPos, int stopIndex, int time) {
+        int stopPos = p.findStopPositionAfter(startPos, stopIndex);
+        return stopPosExist(stopPos, stopIndex, time);
+    }
+
+    private int stopPosBefore(RaptorTripPattern p, int startPos, int stopIndex, int time) {
+        int stopPos = p.findStopPositionBefore(startPos, stopIndex);
+        return stopPosExist(stopPos, stopIndex, time);
+    }
+
+    private int stopPosExist(int pos, int stop, int time) {
+        if(pos < 0) {
+            throw notFoundException("No stop matching " + stop, "approximateTime",  time);
+        }
+        return pos;
     }
 
     private IllegalStateException notFoundException(String hint, String lbl, int time) {

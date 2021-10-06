@@ -198,7 +198,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
         return findGuaranteedTransfer(from.trip(), from.stop(), toTrip, toStop);
       }
     };
-  };
+  }
 
 
   /* private methods */
