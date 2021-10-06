@@ -26,14 +26,12 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.util.OTPFeature;
 
@@ -41,11 +39,21 @@ public class TransitRouter {
 
     public static final int NOT_SET = -1;
 
-    public static TransitRouterResult route(
+    private final RoutingRequest request;
+    private final Router router;
+    private final DebugTimingAggregator debugTimingAggregator;
+
+    private TransitRouter(
             RoutingRequest request,
             Router router,
             DebugTimingAggregator debugTimingAggregator
     ) {
+        this.request = request;
+        this.router = router;
+        this.debugTimingAggregator = debugTimingAggregator;
+    }
+
+    private TransitRouterResult route() {
         if (request.modes.transitModes.isEmpty()) {
             return new TransitRouterResult(List.of(), null, NOT_SET);
         }
@@ -61,14 +69,12 @@ public class TransitRouter {
                 : router.graph.getRealtimeTransitLayer();
 
         var requestTransitDataProvider = createRequestTransitDataProvider(
-                request,
-                transitLayer,
-                router.graph
+                transitLayer
         );
 
         debugTimingAggregator.finishedPatternFiltering();
 
-        var accessEgresses = getAccessEgresses(request, router, transitLayer, debugTimingAggregator);
+        var accessEgresses = getAccessEgresses(transitLayer);
 
         debugTimingAggregator.finishedAccessEgress();
 
@@ -140,11 +146,8 @@ public class TransitRouter {
         return new TransitRouterResult(itineraries, filterOnLatestDepartureTime, searchWindowUsedInSeconds);
     }
 
-    private static AccessEgresses getAccessEgresses(
-            RoutingRequest request,
-            Router router,
-            TransitLayer transitLayer,
-            DebugTimingAggregator debugTimingAggregator
+    private AccessEgresses getAccessEgresses(
+            TransitLayer transitLayer
     ) {
         var accessEgressMapper = new AccessEgressMapper(transitLayer.getStopIndex());
         var accessList = new ArrayList<AccessEgress>();
@@ -152,13 +155,13 @@ public class TransitRouter {
 
         var accessCalculator = (Runnable) () -> {
             debugTimingAggregator.startedAccessCalculating();
-            accessList.addAll(getAccessEgresses(request, router, accessEgressMapper, false));
+            accessList.addAll(getAccessEgresses(accessEgressMapper, false));
             debugTimingAggregator.finishedAccessCalculating();
         };
 
         var egressCalculator = (Runnable) () -> {
             debugTimingAggregator.startedEgressCalculating();
-            egressList.addAll(getAccessEgresses(request, router, accessEgressMapper, true));
+            egressList.addAll(getAccessEgresses(accessEgressMapper, true));
             debugTimingAggregator.finishedEgressCalculating();
         };
 
@@ -177,9 +180,7 @@ public class TransitRouter {
         return new AccessEgresses(accessList, egressList);
     }
 
-    private static Collection<AccessEgress> getAccessEgresses(
-            RoutingRequest request,
-            Router router,
+    private Collection<AccessEgress> getAccessEgresses(
             AccessEgressMapper accessEgressMapper,
             boolean isEgress
     ) {
@@ -215,11 +216,11 @@ public class TransitRouter {
         return results;
     }
 
-    private static RaptorRoutingRequestTransitData createRequestTransitDataProvider(
-            RoutingRequest request,
-            TransitLayer transitLayer,
-            Graph graph
+    private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
+            TransitLayer transitLayer
     ) {
+        var graph = router.graph;
+
         try (RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request)) {
             transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
 
@@ -227,17 +228,17 @@ public class TransitRouter {
                     transitLayer,
                     request.getDateTime().toInstant(),
                     request.additionalSearchDaysAfterToday,
-                    createRequestTransitDataProviderFilter(request, graph.index),
+                    createRequestTransitDataProviderFilter(graph.index),
                     transferRoutingRequest
             );
         }
     }
 
-    private static TransitDataProviderFilter createRequestTransitDataProviderFilter(RoutingRequest request, GraphIndex graphIndex) {
+    private TransitDataProviderFilter createRequestTransitDataProviderFilter(GraphIndex graphIndex) {
         return new RoutingRequestTransitDataProviderFilter(request, graphIndex);
     }
 
-    private static void verifyAccessEgress(
+    private void verifyAccessEgress(
             Collection<?> access,
             Collection<?> egress
     ) {
@@ -263,11 +264,19 @@ public class TransitRouter {
      * If no paths or search window is found, we assume there is no transit connection between
      * the origin and destination.
      */
-    private static void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
+    private void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
         int searchWindowUsed = response.requestUsed().searchParams().searchWindowInSeconds();
         if (searchWindowUsed <= 0 && response.paths().isEmpty()) {
             throw new RoutingValidationException(List.of(
                     new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null)));
         }
+    }
+
+    public static TransitRouterResult route(
+            RoutingRequest request,
+            Router router,
+            DebugTimingAggregator debugTimingAggregator
+    ) {
+        return new TransitRouter(request, router, debugTimingAggregator).route();
     }
 }
