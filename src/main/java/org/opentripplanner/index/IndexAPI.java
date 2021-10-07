@@ -170,7 +170,7 @@ public class IndexAPI {
    }
 
     /**
-     * Helper method for below endpoint to add a ShortStop to a collection of stops with optional extra
+     * Helper method for getStopsInRadius endpoint to add a ShortStop to a collection of stops with optional extra
      * fields, should they be requested.
      * @param stops             Collection to add stops into
      * @param stop              Stop to add
@@ -178,7 +178,12 @@ public class IndexAPI {
      * @param includeStopTimes  Whether to add stop times to StopShort
      * @param includeRoutes     Whether to add routes to StopShort
      */
-   private void createStopShort(Collection<StopShort> stops, Stop stop, Integer distance, boolean includeStopTimes, boolean includeRoutes) {
+   private void createStopShort(
+           Collection<StopShort> stops,
+           Stop stop,
+           Integer distance,
+           boolean includeStopTimes,
+           boolean includeRoutes) {
        // Do the query for the stop times and routes here, and save it to an otherwise null variable
        Collection<StopTimesInPattern> stopTimesForStop = null;
        Set<Route> routesForStop = null;
