@@ -4,6 +4,9 @@ import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProvid
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
@@ -85,19 +88,27 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     public Collection<RaptorTransfer> accessPaths() {
-        return request.searchDirection().isForward()
-                ? request.searchParams().accessPaths()
-                : request.searchParams().egressPaths();
+        return accessOrEgressPaths(
+                request.searchDirection().isForward(),
+                profile(),
+                request.searchParams()
+        );
+
     }
 
     public Collection<RaptorTransfer> egressPaths() {
-        return request.searchDirection().isForward()
-                ? request.searchParams().egressPaths()
-                : request.searchParams().accessPaths();
+        return accessOrEgressPaths(
+                request.searchDirection().isInReverse(),
+                profile(),
+                request.searchParams()
+        );
     }
 
     public int[] egressStops() {
-        return egressPaths().stream().mapToInt(RaptorTransfer::stop).toArray();
+        return egressPaths().stream()
+                .mapToInt(RaptorTransfer::stop)
+                .distinct()
+                .toArray();
     }
 
     public SearchParams searchParams() {
@@ -259,5 +270,38 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     public IntFunction<String> stopIndexTranslatorForDebugging() {
         return transit.stopIndexTranslatorForDebugging();
+    }
+
+    /**
+     * The multi-criteria state can handle multiple access/egress paths to a single stop, but the
+     * Standard and BestTime states do not. To get a deterministic behaviour we filter the
+     * paths and return the paths with the shortest duration for none multi-criteria search. If two
+     * paths have the same duration the first one is picked.
+     * <p>
+     * This method is static and package local to enable unit-testing.
+     */
+    static Collection<RaptorTransfer> accessOrEgressPaths(
+            boolean getAccess,
+            RaptorProfile profile,
+            SearchParams searchParams
+    ) {
+        var paths = getAccess
+                ? searchParams.accessPaths()
+                : searchParams.egressPaths();
+
+        if(profile.is(RaptorProfile.MULTI_CRITERIA)) {
+            return paths;
+        }
+
+        // For none MC-search we only want the fastest transfer for each stop,
+        // no duplicates are accepted
+        Map<Integer, RaptorTransfer> bestTimePaths = new HashMap<>();
+        for (RaptorTransfer it : paths) {
+            RaptorTransfer existing = bestTimePaths.get(it.stop());
+            if(existing == null || it.durationInSeconds() < existing.durationInSeconds()) {
+                bestTimePaths.put(it.stop(), it);
+            }
+        }
+        return List.copyOf(bestTimePaths.values());
     }
 }
