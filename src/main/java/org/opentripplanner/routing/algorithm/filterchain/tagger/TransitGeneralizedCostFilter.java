@@ -27,11 +27,6 @@ public class TransitGeneralizedCostFilter implements ItineraryTagger {
   }
 
   @Override
-  public boolean filterUntaggedItineraries() {
-    return true;
-  }
-
-  @Override
   public void tagItineraries(List<Itinerary> itineraries) {
     OptionalDouble minGeneralizedCost = itineraries
         .stream()

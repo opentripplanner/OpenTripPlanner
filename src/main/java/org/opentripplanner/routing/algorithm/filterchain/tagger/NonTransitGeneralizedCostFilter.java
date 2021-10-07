@@ -31,11 +31,6 @@ public class NonTransitGeneralizedCostFilter implements ItineraryTagger {
   }
 
   @Override
-  public boolean filterUntaggedItineraries() {
-    return true;
-  }
-
-  @Override
   public void tagItineraries(List<Itinerary> itineraries) {
     // ALL itineraries are considered here. Both transit and non-transit
     OptionalDouble minGeneralizedCost = itineraries

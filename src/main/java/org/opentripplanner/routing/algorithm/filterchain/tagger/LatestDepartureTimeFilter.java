@@ -19,11 +19,6 @@ public class LatestDepartureTimeFilter implements ItineraryTagger {
     }
 
     @Override
-    public boolean filterUntaggedItineraries() {
-        return true;
-    }
-
-    @Override
     public void tagItineraries(List<Itinerary> itineraries) {
         itineraries
                 .stream()

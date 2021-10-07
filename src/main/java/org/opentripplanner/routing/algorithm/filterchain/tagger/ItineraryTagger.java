@@ -18,16 +18,19 @@ public interface ItineraryTagger {
     String name();
 
     /**
-     * Should itineraries already marked for deletion by previous filters be removed from the list
-     * passed to {@link ItineraryTagger#tagItineraries(List)}.
-     */
-    boolean filterUntaggedItineraries();
-
-    /**
      * Mark all itineraries that should not be visible for the user for deletion using {@link
      * Itinerary#markAsDeleted(SystemNotice)}.
      */
     void tagItineraries(List<Itinerary> itineraries);
+
+    /**
+     * Should itineraries already marked for deletion by previous filters be removed from the list
+     * passed to {@link ItineraryTagger#tagItineraries(List)}. The default value is true, as usually
+     * the already removed itineraries are not needed further in the filter chain.
+     */
+    default boolean processUntaggedItinerariesOnly() {
+        return true;
+    }
 
     /**
      * The notice which is shown to the client when debug is enabled. The default method should be

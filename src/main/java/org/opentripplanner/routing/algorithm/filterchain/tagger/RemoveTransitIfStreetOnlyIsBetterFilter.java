@@ -21,11 +21,6 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryTagger 
     }
 
     @Override
-    public boolean filterUntaggedItineraries() {
-        return true;
-    }
-
-    @Override
     public void tagItineraries(List<Itinerary> itineraries) {
         // Find the best walk-all-the-way option
         Optional<Itinerary> bestStreetOp = itineraries.stream()

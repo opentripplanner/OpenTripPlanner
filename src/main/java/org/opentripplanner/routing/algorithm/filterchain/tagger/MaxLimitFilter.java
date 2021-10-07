@@ -38,11 +38,6 @@ public class MaxLimitFilter implements ItineraryTagger {
     }
 
     @Override
-    public boolean filterUntaggedItineraries() {
-        return true;
-    }
-
-    @Override
     public void tagItineraries(List<Itinerary> itineraries) {
         if(itineraries.size() <= maxLimit) { return; }
         changedSubscriber.accept(itineraries.get(maxLimit));

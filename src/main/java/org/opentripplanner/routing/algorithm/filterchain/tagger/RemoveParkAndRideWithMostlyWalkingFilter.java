@@ -28,11 +28,6 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryTagger
     }
 
     @Override
-    public boolean filterUntaggedItineraries() {
-        return true;
-    }
-
-    @Override
     public void tagItineraries(List<Itinerary> itineraries) {
         if (itineraries.size() == 1) { return; }
 

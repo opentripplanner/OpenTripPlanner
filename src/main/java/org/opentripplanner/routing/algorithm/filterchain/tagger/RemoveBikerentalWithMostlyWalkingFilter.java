@@ -26,11 +26,6 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryTagger 
     }
 
     @Override
-    public boolean filterUntaggedItineraries() {
-        return true;
-    }
-
-    @Override
     public void tagItineraries(List<Itinerary> itineraries) {
         for (Itinerary itinerary : itineraries) {
             var containsTransit =

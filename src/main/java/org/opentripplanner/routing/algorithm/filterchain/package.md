@@ -16,7 +16,9 @@ can appear multiple times.
 FilteringFilter is responsible for tagging itineraries for deletion. It does not remove any
 itineraries directly, but uses `Itinerary#markAsDeleted(SystemNotice)` for this. A FilteringFilter is
 instantiated with a ItineraryTagger, which contains the business logic for selecting the itineraries
-for tagging. You can use `filterUntaggedItineraries()` for selecting if the tagger should
+for tagging. You can use `processUntaggedItinerariesOnly()` for selecting if the filter should pass 
+already filtered itineraries to the tagger. This is useful to disable, in case already removed 
+itineraries are useful in comparing wether other itineraries should be tagged for removal.
 
 ## SortingFilter
 

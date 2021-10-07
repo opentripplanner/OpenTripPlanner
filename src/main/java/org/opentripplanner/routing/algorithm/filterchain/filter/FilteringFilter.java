@@ -28,7 +28,7 @@ public class FilteringFilter implements ItineraryListFilter {
     @Override
     public List<Itinerary> filter(List<Itinerary> itineraries) {
         List<Itinerary> filterInput;
-        if (tagger.filterUntaggedItineraries()) {
+        if (tagger.processUntaggedItinerariesOnly()) {
             filterInput = itineraries.stream()
                     .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
                     .collect(Collectors.toList());
