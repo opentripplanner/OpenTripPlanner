@@ -221,7 +221,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertTrue(chain.filter(List.of(bus), routingErrors).isEmpty());
 
     assertEquals(1, routingErrors.size());
-    assertEquals(RoutingErrorCode.NO_TRANSIT_CONNECTION_INSIDE_SEARCH_WINDOW, routingErrors.get(0).code);
+    assertEquals(RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, routingErrors.get(0).code);
   }
 
   /* private methods */

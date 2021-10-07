@@ -279,7 +279,7 @@ public class EnumTypes {
     public static GraphQLEnumType ROUTING_ERROR_CODE = GraphQLEnumType.newEnum()
         .name("RoutingErrorCode")
         .value("noTransitConnection", RoutingErrorCode.NO_TRANSIT_CONNECTION, "No transit connection was found between the origin and destination withing the operating day or the next day")
-        .value("noTransitConnectionInsideSearchWindow", RoutingErrorCode.NO_TRANSIT_CONNECTION_INSIDE_SEARCH_WINDOW, "Transit connection was found, but it was outside the search window, see metadata for the next search window")
+        .value("noTransitConnectionInSearchWindow", RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, "Transit connection was found, but it was outside the search window, see metadata for the next search window")
         .value("outsideServicePeriod", RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, "The date specified is outside the range of data currently loaded into the system")
         .value("outsideBounds", RoutingErrorCode.OUTSIDE_BOUNDS, "The coordinates are outside the bounds of the data currently loaded into the system")
         .value("locationNotFound", RoutingErrorCode.LOCATION_NOT_FOUND, "The specified location is not close to any streets or transit stops")
@@ -293,7 +293,6 @@ public class EnumTypes {
         .value("dateTime", InputField.DATE_TIME)
         .value("from", InputField.FROM_PLACE)
         .value("to", InputField.TO_PLACE)
-        .value("intermediatePlaces", InputField.INTERMEDIATE_PLACE)
         .build();
 
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {

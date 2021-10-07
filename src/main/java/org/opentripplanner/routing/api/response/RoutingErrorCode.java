@@ -9,7 +9,7 @@ public enum RoutingErrorCode {
   /**
    * The origin and destination is not connected by transit, within the current search window.
    */
-  NO_TRANSIT_CONNECTION_INSIDE_SEARCH_WINDOW,
+  NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
 
   /**
    * The origin and destination are so close to each other, that walking is always better than transit.

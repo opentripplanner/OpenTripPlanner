@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.opentripplanner.routing.api.response.InputField.DATE_TIME;
-import static org.opentripplanner.routing.api.response.RoutingErrorCode.NO_TRANSIT_CONNECTION_INSIDE_SEARCH_WINDOW;
+import static org.opentripplanner.routing.api.response.RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;
 import static org.opentripplanner.routing.api.response.RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT;
 
 public class ItineraryListFilterChain {
@@ -41,7 +41,7 @@ public class ItineraryListFilterChain {
             if (result.stream().allMatch(isOnStreetAllTheWay.or(isWorseThanStreet))) {
                 routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
             } else if (result.stream().allMatch(isOnStreetAllTheWay.or(isOutsideSearchWindow))) {
-                routingErrors.add(new RoutingError(NO_TRANSIT_CONNECTION_INSIDE_SEARCH_WINDOW, DATE_TIME));
+                routingErrors.add(new RoutingError(NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, DATE_TIME));
             }
         }
 
