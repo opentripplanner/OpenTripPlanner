@@ -168,7 +168,40 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
-   
+
+    /**
+     * Helper method for getStopsInRadius endpoint to add a ShortStop to a collection of stops with optional extra
+     * fields, should they be requested.
+     * @param stops             Collection to add stops into
+     * @param stop              Stop to add
+     * @param distance          Optional distance field to add
+     * @param includeStopTimes  Whether to add stop times to StopShort
+     * @param includeRoutes     Whether to add routes to StopShort
+     */
+   private void createStopShort(
+           Collection<StopShort> stops,
+           Stop stop,
+           Integer distance,
+           boolean includeStopTimes,
+           boolean includeRoutes) {
+       // Do the query for the stop times and routes here, and save it to an otherwise null variable
+       Collection<StopTimesInPattern> stopTimesForStop = null;
+       Set<Route> routesForStop = null;
+       if (includeStopTimes) {
+           // Rely on method defaults instead of endpoint defaults -- these are fine
+           stopTimesForStop = index.stopTimesForStop(stop, true);
+       }
+       if (includeRoutes) {
+           routesForStop = index.routesForStop(stop);
+       }
+
+       if (distance != null) {
+           stops.add(new StopShort(stop, distance, stopTimesForStop, routesForStop));
+           return;
+       }
+       stops.add(new StopShort(stop, stopTimesForStop, routesForStop));
+   }
+
    /** Return a list of all stops within a circle around the given coordinate. */
    @GET
    @Path("/stops")
@@ -179,7 +212,9 @@ public class IndexAPI {
            @QueryParam("maxLon") Double maxLon,
            @QueryParam("lat")    Double lat,
            @QueryParam("lon")    Double lon,
-           @QueryParam("radius") Double radius) {
+           @QueryParam("radius") Double radius,
+           @QueryParam("includeStopTimes") boolean includeStopTimes,
+           @QueryParam("includeRoutes") boolean includeRoutes) {
 
        /* When no parameters are supplied, return all stops. */
        if (uriInfo.getQueryParameters().isEmpty()) {
@@ -201,7 +236,7 @@ public class IndexAPI {
                     new Coordinate(lon, lat), radius)) {
                double distance = SphericalDistanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
-                   stops.add(new StopShort(stopVertex.getStop(), (int) distance));
+                   createStopShort(stops, stopVertex.getStop(), (int) distance, includeStopTimes, includeRoutes);
                }
            }
            return Response.status(Status.OK).entity(stops).build();
@@ -215,8 +250,9 @@ public class IndexAPI {
            }
            List<StopShort> stops = Lists.newArrayList();
            Envelope envelope = new Envelope(new Coordinate(minLon, minLat), new Coordinate(maxLon, maxLat));
+
            for (TransitStop stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
-               stops.add(new StopShort(stopVertex.getStop()));
+               createStopShort(stops, stopVertex.getStop(), null, includeStopTimes, includeRoutes);
            }
            return Response.status(Status.OK).entity(stops).build();           
        }
@@ -227,10 +263,7 @@ public class IndexAPI {
    public Response getRoutesForStop (@PathParam("stopId") String stopId) {
        Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopId));
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-       Set<Route> routes = Sets.newHashSet();
-       for (TripPattern pattern : index.patternsForStop.get(stop)) {
-           routes.add(pattern.route);
-       }
+       Set<Route> routes = index.routesForStop(stop);
        return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
    }
 
