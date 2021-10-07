@@ -1,24 +1,26 @@
 # ItineraryListFilterChain
 
 ItineraryListFilterChain is a mechanism for post-processing itinerary results. It contains a list of
-filters, which contain the business logic of each filter. The filters are not only for removing
+Each of which contains different business logic for a different operation. They not only remove 
 itineraries, but can be also used for sorting, decorating or even adding new itineraries. The filter
-chain is also responsible for creating routing errors, if all itineraries are deleted. It is also
-responsible for removing the actual itineraries, if debugging is not turned on.
+chain is also responsible for creating routing errors, if no itineraries remain after filtering. 
+Itineraries are flagged for deletion, but not actually deleted when debugging is turned on. When 
+debugging is off, the chain actually removes those itineraries that were flagged for deletion.
 
 ![Architecture diagram](ItineraryListFilterChain.svg)
 
 There are four types of filters, which can be included in the filter chain. The same type of filter
 can appear multiple times.
 
-## FilteringFilter
+## DeletionFlaggingFilter
 
-FilteringFilter is responsible for tagging itineraries for deletion. It does not remove any
-itineraries directly, but uses `Itinerary#markAsDeleted(SystemNotice)` for this. A FilteringFilter is
-instantiated with a ItineraryTagger, which contains the business logic for selecting the itineraries
-for tagging. You can use `processUntaggedItinerariesOnly()` for selecting if the filter should pass 
-already filtered itineraries to the tagger. This is useful to disable, in case already removed 
-itineraries are useful in comparing wether other itineraries should be tagged for removal.
+DeletionFlaggingFilter is responsible for flagging itineraries for deletion. It does not remove any
+itineraries directly, but uses `Itinerary#flagForDeletion(SystemNotice)` for this. A 
+DeletionFlaggingFilter is instantiated with a ItineraryDeletionFlagger, which contains the business 
+logic for selecting the itineraries for flagging. You can use `skipAlreadyFlaggedItineraries()` for 
+selecting if the filter should skip already flagged itineraries to the flagger. This is useful to 
+disable, in case already removed itineraries are useful in comparing whether other itineraries 
+should be flagged for removal.
 
 ## SortingFilter
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -19,7 +19,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
         Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
 
         // When:
-        List<Itinerary> result = TaggerTestHelper.process(List.of(i1, i2), new RemoveTransitIfStreetOnlyIsBetterFilter());
+        List<Itinerary> result = DeletionFlaggerTestHelper.process(List.of(i1, i2), new RemoveTransitIfStreetOnlyIsBetterFilter());
 
         // Then:
         assertEquals(toStr(List.of(i1, i2)), toStr(result));
@@ -42,7 +42,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
         i2.generalizedCost = 200;
 
         // When:
-        List<Itinerary> result = TaggerTestHelper.process(List.of(i2, bicycle, walk, i1), new RemoveTransitIfStreetOnlyIsBetterFilter());
+        List<Itinerary> result = DeletionFlaggerTestHelper.process(List.of(i2, bicycle, walk, i1), new RemoveTransitIfStreetOnlyIsBetterFilter());
 
         // Then:
         assertEquals(toStr(List.of(bicycle, walk, i1)), toStr(result));

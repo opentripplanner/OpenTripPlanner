@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -20,7 +20,7 @@ public class LatestDepartureTimeFilterTest implements PlanTestConstants {
         Instant time = it.firstLeg().startTime.toInstant();
 
         // When:
-        assertTrue(TaggerTestHelper.process(List.of(it), new LatestDepartureTimeFilter(time.minusSeconds(1))).isEmpty());
-        assertFalse(TaggerTestHelper.process(List.of(it), new LatestDepartureTimeFilter(time)).isEmpty());
+        assertTrue(DeletionFlaggerTestHelper.process(List.of(it), new LatestDepartureTimeFilter(time.minusSeconds(1))).isEmpty());
+        assertFalse(DeletionFlaggerTestHelper.process(List.of(it), new LatestDepartureTimeFilter(time)).isEmpty());
     }
 }

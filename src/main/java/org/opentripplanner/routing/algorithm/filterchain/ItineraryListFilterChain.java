@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -26,7 +25,7 @@ public class ItineraryListFilterChain {
           return result;
         }  
         return result.stream()
-                .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
+                .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
                 .collect(Collectors.toList());
     }
 }

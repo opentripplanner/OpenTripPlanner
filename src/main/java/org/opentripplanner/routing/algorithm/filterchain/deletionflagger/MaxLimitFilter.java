@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
@@ -8,13 +8,13 @@ import java.util.function.Consumer;
 
 
 /**
- * Remove all itineraries after the provided limit. This filter remove the itineraries at the
- * end of the list, so the list should be sorted on the desired key before this filter is applied.
+ * Flag all itineraries after the provided limit. This flags the itineraries at the end of the list
+ * for removal, so the list should be sorted on the desired key before this filter is applied.
  * <p>
- * The filter can also report the first itinerary in the list it will remove. The subscriber
+ * The filter can also report the first itinerary in the list it will flag. The subscriber
  * is optional.
  */
-public class MaxLimitFilter implements ItineraryTagger {
+public class MaxLimitFilter implements ItineraryDeletionFlagger {
     private static final Consumer<Itinerary> IGNORE_SUBSCRIBER = (i) -> {};
 
     private final String name;
@@ -37,7 +37,7 @@ public class MaxLimitFilter implements ItineraryTagger {
     }
 
     @Override
-    public List<Itinerary> getTaggedItineraries(List<Itinerary> itineraries) {
+    public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
         if(itineraries.size() <= maxLimit) { return List.of(); }
         changedSubscriber.accept(itineraries.get(maxLimit));
         return itineraries.stream().skip(maxLimit).collect(Collectors.toList());

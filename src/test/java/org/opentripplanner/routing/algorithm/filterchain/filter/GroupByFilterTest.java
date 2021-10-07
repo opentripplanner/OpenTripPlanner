@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 
 public class GroupByFilterTest implements PlanTestConstants {
 
@@ -34,24 +34,24 @@ public class GroupByFilterTest implements PlanTestConstants {
 
         // With min Limit = 1, expect the best trips from both groups
         createFilter(1).filter(all);
-        assertFalse(i1.isMarkedAsDeleted());
-        assertFalse(i2a.isMarkedAsDeleted());
-        assertTrue(i2b.isMarkedAsDeleted());
+        assertFalse(i1.isFlaggedForDeletion());
+        assertFalse(i2a.isFlaggedForDeletion());
+        assertTrue(i2b.isFlaggedForDeletion());
 
         // Remove notice after asserting
         i2b.systemNotices.remove(0);
 
         // With min Limit = 2, we get two from each group
         createFilter(2).filter(all);
-        assertFalse(i1.isMarkedAsDeleted());
-        assertFalse(i2a.isMarkedAsDeleted());
-        assertFalse(i2b.isMarkedAsDeleted());
+        assertFalse(i1.isFlaggedForDeletion());
+        assertFalse(i2a.isFlaggedForDeletion());
+        assertFalse(i2b.isFlaggedForDeletion());
 
         // With min Limit = 3, we get all 3 itineraries
         createFilter(3).filter(all);
-        assertFalse(i1.isMarkedAsDeleted());
-        assertFalse(i2a.isMarkedAsDeleted());
-        assertFalse(i2b.isMarkedAsDeleted());
+        assertFalse(i1.isFlaggedForDeletion());
+        assertFalse(i2a.isFlaggedForDeletion());
+        assertFalse(i2b.isFlaggedForDeletion());
     }
 
     /**
@@ -77,12 +77,12 @@ public class GroupByFilterTest implements PlanTestConstants {
         for (List<Itinerary> input : List.of(inputA, inputB, inputC)) {
             createFilter(1).filter(input);
 
-            assertFalse(i1.isMarkedAsDeleted());
+            assertFalse(i1.isFlaggedForDeletion());
 
             // Remove notices after asserting
-            assertTrue(i11.isMarkedAsDeleted());
+            assertTrue(i11.isFlaggedForDeletion());
             i11.systemNotices.remove(0);
-            assertTrue(i12.isMarkedAsDeleted());
+            assertTrue(i12.isFlaggedForDeletion());
             i12.systemNotices.remove(0);
         }
     }
@@ -96,7 +96,7 @@ public class GroupByFilterTest implements PlanTestConstants {
             i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
             List.of(
                 new SortingFilter(new OtpDefaultSortOrder(false)),
-                new FilteringFilter(new MaxLimitFilter("test", maxNumberOfItinerariesPrGroup))
+                new DeletionFlaggingFilter(new MaxLimitFilter("test", maxNumberOfItinerariesPrGroup))
             )
         );
     }

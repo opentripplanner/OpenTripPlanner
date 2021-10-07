@@ -1,11 +1,11 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 
 import java.time.Instant;
 
-public class LatestDepartureTimeFilter implements ItineraryTagger {
+public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
     private final long limitMs;
 
 

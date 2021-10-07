@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
@@ -12,7 +12,7 @@ import java.util.Optional;
  * it exist). If an itinerary is slower than the best all-the-way-on-street itinerary, then the
  * transit itinerary is removed.
  */
-public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryTagger {
+public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
 
     @Override
     public String name() {
@@ -20,7 +20,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryTagger 
     }
 
     @Override
-    public List<Itinerary> getTaggedItineraries(List<Itinerary> itineraries) {
+    public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
         // Find the best walk-all-the-way option
         Optional<Itinerary> bestStreetOp = itineraries.stream()
             .filter(Itinerary::isOnStreetAllTheWay)

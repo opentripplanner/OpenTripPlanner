@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
@@ -39,6 +39,9 @@ public class RemoveParkAndRideWithMostlyWalkingTest {
         var input = List.of(w1, t1, t2, t3);
         var expected = List.of(w1, t1, t2);
 
-        Assertions.assertEquals(Itinerary.toStr(expected), Itinerary.toStr(TaggerTestHelper.process(input, subject)));
+        Assertions.assertEquals(
+                Itinerary.toStr(expected),
+                Itinerary.toStr(DeletionFlaggerTestHelper.process(input, subject))
+        );
     }
 }

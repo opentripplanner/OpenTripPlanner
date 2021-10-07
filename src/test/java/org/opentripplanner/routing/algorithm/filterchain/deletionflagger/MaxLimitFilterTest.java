@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -22,21 +22,30 @@ public class MaxLimitFilterTest implements PlanTestConstants {
     public void testNormalFilterMaxLimit3() {
         MaxLimitFilter subject = new MaxLimitFilter("Test", 3);
         List<Itinerary> itineraries = getItineraries();
-        assertEquals(toStr(itineraries), toStr(TaggerTestHelper.process(itineraries, subject)));
+        assertEquals(
+                toStr(itineraries),
+                toStr(DeletionFlaggerTestHelper.process(itineraries, subject))
+        );
     }
 
     @Test
     public void testNormalFilterMaxLimit1() {
         MaxLimitFilter subject = new MaxLimitFilter("Test", 1);
         List<Itinerary> itineraries = getItineraries();
-        assertEquals(toStr(List.of(itineraries.get(0))), toStr(TaggerTestHelper.process(itineraries, subject)));
+        assertEquals(
+                toStr(List.of(itineraries.get(0))),
+                toStr(DeletionFlaggerTestHelper.process(itineraries, subject))
+        );
     }
 
     @Test
     public void testNormalFilterMaxLimit0() {
         MaxLimitFilter subject = new MaxLimitFilter("Test", 0);
         List<Itinerary> itineraries = getItineraries();
-        assertEquals(toStr(List.of()), toStr(TaggerTestHelper.process(itineraries, subject)));
+        assertEquals(
+                toStr(List.of()),
+                toStr(DeletionFlaggerTestHelper.process(itineraries, subject))
+        );
     }
 
     private List<Itinerary> getItineraries() {

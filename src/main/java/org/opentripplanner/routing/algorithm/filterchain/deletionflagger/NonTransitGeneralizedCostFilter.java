@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
@@ -17,7 +17,7 @@ import java.util.function.DoubleFunction;
  * <p>
  * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#nonTransitGeneralizedCostLimit
  */
-public class NonTransitGeneralizedCostFilter implements ItineraryTagger {
+public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
   private final DoubleFunction<Double> costLimitFunction;
 
   public NonTransitGeneralizedCostFilter(DoubleFunction<Double> costLimitFunction) {
@@ -30,7 +30,7 @@ public class NonTransitGeneralizedCostFilter implements ItineraryTagger {
   }
 
   @Override
-  public List<Itinerary> getTaggedItineraries(List<Itinerary> itineraries) {
+  public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
     // ALL itineraries are considered here. Both transit and non-transit
     OptionalDouble minGeneralizedCost = itineraries
         .stream()

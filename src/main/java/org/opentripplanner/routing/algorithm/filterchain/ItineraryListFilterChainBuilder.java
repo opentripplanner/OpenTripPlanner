@@ -4,18 +4,18 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filter.AddMinSafeTransferCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.FilteringFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.LatestDepartureTimeFilter;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.MaxLimitFilter;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.NonTransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.RemoveBikerentalWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.RemoveParkAndRideWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.RemoveWalkOnlyFilter;
-import org.opentripplanner.routing.algorithm.filterchain.tagger.TransitGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -195,7 +195,7 @@ public class ItineraryListFilterChainBuilder {
 
     /**
      * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by
-     * and remove-transit-with-higher-cost-than-best-on-street-only tagger. This make sure that
+     * and remove-transit-with-higher-cost-than-best-on-street-only filter. This make sure that
      * poor transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
      */
     public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
@@ -214,42 +214,42 @@ public class ItineraryListFilterChainBuilder {
 
         // Filter transit itineraries on generalized-cost
         if(transitGeneralizedCostLimit != null) {
-            filters.add(new FilteringFilter(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit)));
+            filters.add(new DeletionFlaggingFilter(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit)));
         }
 
         // Filter non-transit itineraries on generalized-cost
         if(nonTransitGeneralizedCostLimit != null) {
-            filters.add(new FilteringFilter(new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit)));
+            filters.add(new DeletionFlaggingFilter(new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit)));
         }
 
-        // Apply all absolute tagger AFTER the groupBy tagger. Absolute tagger are tagger that
+        // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
         // remove elements/ based on the given itinerary properties - not considering other
-        // itineraries. This may remove itineraries in the "groupBy" tagger that are considered
+        // itineraries. This may remove itineraries in the "groupBy" filters that are considered
         // worse than the itineraries removed here. Let take an example, 2 itineraries, A and B, are
         // returned. A have a significant higher cost than B, but share the same long last transit
         // leg. B depart AFTER the latest-departure-time (this may happen if the access is
-        // time-shifted). Then, A will be removed by the "group-by" tagger(similar to B, but cost
+        // time-shifted). Then, A will be removed by the "group-by" filters(similar to B, but cost
         // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
         // what we want, since both itineraries are none optimal.
         {
             if (removeTransitWithHigherCostThanBestOnStreetOnly) {
-                filters.add(new FilteringFilter(new RemoveTransitIfStreetOnlyIsBetterFilter()));
+                filters.add(new DeletionFlaggingFilter(new RemoveTransitIfStreetOnlyIsBetterFilter()));
             }
 
             if(removeWalkAllTheWayResults) {
-                filters.add(new FilteringFilter(new RemoveWalkOnlyFilter()));
+                filters.add(new DeletionFlaggingFilter(new RemoveWalkOnlyFilter()));
             }
 
             if (latestDepartureTimeLimit != null) {
-                filters.add(new FilteringFilter(new LatestDepartureTimeFilter(latestDepartureTimeLimit)));
+                filters.add(new DeletionFlaggingFilter(new LatestDepartureTimeFilter(latestDepartureTimeLimit)));
             }
 
             if (bikeRentalDistanceRatio > 0) {
-                filters.add(new FilteringFilter(new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio)));
+                filters.add(new DeletionFlaggingFilter(new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio)));
             }
 
             if (parkAndRideDurationRatio > 0) {
-                filters.add(new FilteringFilter(new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)));
+                filters.add(new DeletionFlaggingFilter(new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)));
             }
         }
 
@@ -257,7 +257,7 @@ public class ItineraryListFilterChainBuilder {
         if (maxNumberOfItineraries > 0) {
             filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
             filters.add(
-                new FilteringFilter(
+                new DeletionFlaggingFilter(
                     new MaxLimitFilter(
                         "number-of-itineraries-filter",
                         maxNumberOfItineraries,
@@ -300,7 +300,7 @@ public class ItineraryListFilterChainBuilder {
                     itinerary -> new GroupByTripIdAndDistance(itinerary, it.groupByP),
                     List.of(
                         new SortingFilter(new SortOnGeneralizedCost()),
-                        new FilteringFilter(new MaxLimitFilter(name, it.maxNumOfItinerariesPerGroup))
+                        new DeletionFlaggingFilter(new MaxLimitFilter(name, it.maxNumOfItinerariesPerGroup))
                     )
                 )
             );

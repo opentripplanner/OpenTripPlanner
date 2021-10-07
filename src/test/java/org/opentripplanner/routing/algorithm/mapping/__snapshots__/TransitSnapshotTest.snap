@@ -9,6 +9,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details": { },
         "fare": { }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 7447,
       "legs": [
         {
@@ -279,7 +280,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 4923.150999999999,
       "nonTransitTimeSeconds": 3821,
@@ -331,6 +331,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 4281,
       "legs": [
         {
@@ -735,7 +736,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 1919.4279999999999,
       "nonTransitTimeSeconds": 1490,
@@ -787,6 +787,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2315,
       "legs": [
         {
@@ -1123,7 +1124,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 328.223,
       "nonTransitTimeSeconds": 256,
@@ -1175,6 +1175,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 4295,
       "legs": [
         {
@@ -1579,7 +1580,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 1919.4279999999999,
       "nonTransitTimeSeconds": 1490,
@@ -1631,6 +1631,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2385,
       "legs": [
         {
@@ -1967,7 +1968,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 328.223,
       "nonTransitTimeSeconds": 256,
@@ -2023,6 +2023,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 3375,
       "legs": [
         {
@@ -2503,7 +2504,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 1,
       "nonTransitDistanceMeters": 438.42099999999994,
       "nonTransitTimeSeconds": 348,
@@ -2533,6 +2533,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details": { },
         "fare": { }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 6717,
       "legs": [
         {
@@ -2775,7 +2776,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 4442.913999999999,
       "nonTransitTimeSeconds": 3451,
@@ -2827,6 +2827,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2895,
       "legs": [
         {
@@ -3254,7 +3255,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 1000.8340000000001,
       "nonTransitTimeSeconds": 784,
@@ -3306,6 +3306,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2925,
       "legs": [
         {
@@ -3733,7 +3734,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 1000.8340000000001,
       "nonTransitTimeSeconds": 784,
@@ -3785,6 +3785,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2895,
       "legs": [
         {
@@ -4212,7 +4213,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 1000.8340000000001,
       "nonTransitTimeSeconds": 784,
@@ -4268,6 +4268,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2957,
       "legs": [
         {
@@ -4771,7 +4772,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 1,
       "nonTransitDistanceMeters": 252.199,
       "nonTransitTimeSeconds": 197,
@@ -4823,6 +4823,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 3290,
       "legs": [
         {
@@ -5301,7 +5302,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 1015.832,
       "nonTransitTimeSeconds": 800,
@@ -5331,6 +5331,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details": { },
         "fare": { }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 7384,
       "legs": [
         {
@@ -5669,7 +5670,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 4875.788999999999,
       "nonTransitTimeSeconds": 3804,
@@ -5699,6 +5699,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details": { },
         "fare": { }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 6283,
       "legs": [
         {
@@ -5941,7 +5942,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 4154.147999999998,
       "nonTransitTimeSeconds": 3230,
@@ -5971,6 +5971,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         "details": { },
         "fare": { }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 4557,
       "legs": [
         {
@@ -6311,7 +6312,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 2989.7960000000003,
       "nonTransitTimeSeconds": 2361,

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -40,6 +40,9 @@ public class RemoveWalkOnlyFilterTest {
     var input = List.of(t1, w1, t2, w2, t3, t4);
     var expected = List.of(t1, t2, t3, t4);
 
-    assertEquals(Itinerary.toStr(expected), Itinerary.toStr(TaggerTestHelper.process(input, subject)));
+    assertEquals(
+            Itinerary.toStr(expected),
+            Itinerary.toStr(DeletionFlaggerTestHelper.process(input, subject))
+    );
   }
 }

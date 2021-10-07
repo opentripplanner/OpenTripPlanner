@@ -37,6 +37,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2087,
       "legs": [
         {
@@ -716,7 +717,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 817.8299999999999,
       "nonTransitTimeSeconds": 474,
@@ -768,6 +768,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2577,
       "legs": [
         {
@@ -1206,7 +1207,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 945.235,
       "nonTransitTimeSeconds": 748,
@@ -1258,6 +1258,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2539,
       "legs": [
         {
@@ -1696,7 +1697,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 874.198,
       "nonTransitTimeSeconds": 695,
@@ -1748,6 +1748,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 1805,
       "legs": [
         {
@@ -2084,7 +2085,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 270.084,
       "nonTransitTimeSeconds": 210,
@@ -2136,6 +2136,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2087,
       "legs": [
         {
@@ -2815,7 +2816,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 817.8299999999999,
       "nonTransitTimeSeconds": 474,
@@ -2867,6 +2867,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2087,
       "legs": [
         {
@@ -3546,7 +3547,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 817.8299999999999,
       "nonTransitTimeSeconds": 474,
@@ -3576,6 +3576,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details": { },
         "fare": { }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 915,
       "legs": [
         {
@@ -4019,7 +4020,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 819.078,
       "nonTransitTimeSeconds": 477,
@@ -4049,6 +4049,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details": { },
         "fare": { }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 652,
       "legs": [
         {
@@ -4369,7 +4370,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "walkingLeg": false
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 818.5600000000001,
       "nonTransitTimeSeconds": 338,
@@ -4399,6 +4399,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details": { },
         "fare": { }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 652,
       "legs": [
         {
@@ -4719,7 +4720,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "walkingLeg": false
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 819.078,
       "nonTransitTimeSeconds": 337,
@@ -4777,6 +4777,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 1998,
       "legs": [
         {
@@ -5490,7 +5491,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 796.1389999999999,
       "nonTransitTimeSeconds": 455,
@@ -5542,6 +5542,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2503,
       "legs": [
         {
@@ -5946,7 +5947,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 851.5160000000001,
       "nonTransitTimeSeconds": 673,
@@ -5998,6 +5998,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2351,
       "legs": [
         {
@@ -6402,7 +6403,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 833.505,
       "nonTransitTimeSeconds": 657,
@@ -6454,6 +6454,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 1998,
       "legs": [
         {
@@ -7167,7 +7168,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 796.1389999999999,
       "nonTransitTimeSeconds": 455,
@@ -7219,6 +7219,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2563,
       "legs": [
         {
@@ -7623,7 +7624,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 851.5160000000001,
       "nonTransitTimeSeconds": 673,
@@ -7675,6 +7675,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
+      "flaggedForDeletion": false,
       "generalizedCost": 2351,
       "legs": [
         {
@@ -8079,7 +8080,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "walkingLeg": true
         }
       ],
-      "markedAsDeleted": false,
       "nTransfers": 0,
       "nonTransitDistanceMeters": 833.505,
       "nonTransitTimeSeconds": 657,

@@ -182,9 +182,9 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     // With min Limit = 1, expect the best trips from both groups
     chain.filter(input);
 
-    assertFalse(i1.isMarkedAsDeleted());
-    assertFalse(i2.isMarkedAsDeleted());
-    assertTrue(i3.isMarkedAsDeleted());
+    assertFalse(i1.isFlaggedForDeletion());
+    assertFalse(i2.isFlaggedForDeletion());
+    assertTrue(i3.isFlaggedForDeletion());
   }
 
 

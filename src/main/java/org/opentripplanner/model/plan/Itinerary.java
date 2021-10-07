@@ -225,7 +225,7 @@ public class Itinerary {
     }
 
     /**
-     * An itinerary can be marked for removal with a system notice.
+     * An itinerary can be flagged for removal with a system notice.
      * <p>
      * For example when tuning or manually testing the itinerary-filter-chain it you can enable
      * {@link org.opentripplanner.routing.api.request.ItineraryFilterParameters#debug} and instead
@@ -233,11 +233,11 @@ public class Itinerary {
      * instead. This enables investigating, why an expected itinerary is missing from the result
      * set. It can be also used by other filters to see the already filtered itineraries.
      */
-    public void markAsDeleted(SystemNotice notice) {
+    public void flagForDeletion(SystemNotice notice) {
         systemNotices.add(notice);
     }
 
-    public boolean isMarkedAsDeleted() {
+    public boolean isFlaggedForDeletion() {
         return !systemNotices.isEmpty();
     }
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
@@ -10,7 +10,7 @@ import org.opentripplanner.model.plan.Itinerary;
  * <p>
  * This filter is turned off by default (bikeRentalDistanceRatio == 0)
  */
-public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryTagger {
+public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryDeletionFlagger {
 
     private final double bikeRentalDistanceRatio;
 

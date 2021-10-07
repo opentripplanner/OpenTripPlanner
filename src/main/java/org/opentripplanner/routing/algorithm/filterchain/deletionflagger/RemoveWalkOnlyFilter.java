@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
@@ -6,7 +6,7 @@ import org.opentripplanner.model.plan.Itinerary;
 /**
  * Filter itineraries and remove all itineraries where all legs are walking.
  */
-public class RemoveWalkOnlyFilter implements ItineraryTagger {
+public class RemoveWalkOnlyFilter implements ItineraryDeletionFlagger {
 
     @Override
     public String name() {

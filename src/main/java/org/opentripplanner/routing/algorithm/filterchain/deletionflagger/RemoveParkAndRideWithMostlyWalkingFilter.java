@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -14,7 +14,7 @@ import org.opentripplanner.routing.core.TraverseMode;
  * <p>
  * This filter is turned off by default (parkAndRideDurationRatio == 0)
  */
-public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryTagger {
+public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeletionFlagger {
 
     private final double parkAndRideDurationRatio;
 
@@ -47,7 +47,7 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryTagger
     }
 
     @Override
-    public List<Itinerary> getTaggedItineraries(List<Itinerary> itineraries) {
+    public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
         if (itineraries.size() == 1) { return List.of(); }
 
         return itineraries.stream().filter(predicate()).collect(Collectors.toList());

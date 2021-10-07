@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -38,6 +38,6 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     var all = List.of(i1, i2, i3, i4);
 
     // Expect - i4 to be dropped
-    assertEquals(toStr(List.of(i1, i2, i3)), toStr(TaggerTestHelper.process(all, subject)));
+    assertEquals(toStr(List.of(i1, i2, i3)), toStr(DeletionFlaggerTestHelper.process(all, subject)));
   }
 }

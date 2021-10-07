@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.tagger;
+package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,6 +39,9 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
     var input = List.of(w1, t1, t2, t3);
     var expected = List.of(w1, t1, t2);
 
-    Assertions.assertEquals(Itinerary.toStr(expected), Itinerary.toStr(TaggerTestHelper.process(input, subject)));
+    Assertions.assertEquals(
+            Itinerary.toStr(expected),
+            Itinerary.toStr(DeletionFlaggerTestHelper.process(input, subject))
+    );
   }
 }
