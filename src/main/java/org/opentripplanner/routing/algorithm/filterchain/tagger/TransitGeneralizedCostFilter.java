@@ -1,12 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
+import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.function.DoubleFunction;
-import java.util.stream.Collectors;
 
 /**
  * This filter remove all transit results witch have a generalized-cost higher than
@@ -27,18 +26,19 @@ public class TransitGeneralizedCostFilter implements ItineraryTagger {
   }
 
   @Override
-  public void tagItineraries(List<Itinerary> itineraries) {
+  public List<Itinerary> getTaggedItineraries(List<Itinerary> itineraries) {
     OptionalDouble minGeneralizedCost = itineraries
         .stream()
         .filter(Itinerary::hasTransit)
         .mapToDouble(it -> it.generalizedCost)
         .min();
 
-    if(minGeneralizedCost.isEmpty()) { return; }
+    if(minGeneralizedCost.isEmpty()) { return List.of(); }
 
     final double maxLimit = costLimitFunction.apply(minGeneralizedCost.getAsDouble());
 
-    itineraries.stream().filter(
-            it -> it.hasTransit() && it.generalizedCost > maxLimit
-    ).forEach(it -> it.markAsDeleted(notice()));  }
+    return itineraries.stream()
+      .filter( it -> it.hasTransit() && it.generalizedCost > maxLimit)
+      .collect(Collectors.toList());
+  }
 }

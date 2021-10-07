@@ -7,8 +7,6 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
@@ -41,13 +39,6 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
     var input = List.of(w1, t1, t2, t3);
     var expected = List.of(w1, t1, t2);
 
-    Assertions.assertEquals(Itinerary.toStr(expected), Itinerary.toStr(process(input, subject)));
-  }
-
-  private List<Itinerary> process(List<Itinerary> itineraries, RemoveBikerentalWithMostlyWalkingFilter filter) {
-    filter.tagItineraries(itineraries);
-    return itineraries.stream()
-            .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
-            .collect(Collectors.toList());
+    Assertions.assertEquals(Itinerary.toStr(expected), Itinerary.toStr(TaggerTestHelper.process(input, subject)));
   }
 }

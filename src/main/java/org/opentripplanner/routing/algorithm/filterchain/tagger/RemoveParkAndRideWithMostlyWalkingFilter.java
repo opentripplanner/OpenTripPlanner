@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.core.TraverseMode;
 
 /**
@@ -28,10 +28,8 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryTagger
     }
 
     @Override
-    public void tagItineraries(List<Itinerary> itineraries) {
-        if (itineraries.size() == 1) { return; }
-
-        for (Itinerary itinerary : itineraries) {
+    public Predicate<Itinerary> predicate() {
+        return itinerary -> {
             var containsTransit =
                     itinerary.legs.stream().anyMatch(l -> l != null && l.mode.isTransit());
 
@@ -42,11 +40,16 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryTagger
                     .sum();
             double totalDuration = itinerary.durationSeconds;
 
-            if (!containsTransit
+            return !containsTransit
                     && carDuration != 0
-                    && (carDuration / totalDuration) <= parkAndRideDurationRatio) {
-                itinerary.markAsDeleted(notice());
-            }
-        }
+                    && (carDuration / totalDuration) <= parkAndRideDurationRatio;
+        };
+    }
+
+    @Override
+    public List<Itinerary> getTaggedItineraries(List<Itinerary> itineraries) {
+        if (itineraries.size() == 1) { return List.of(); }
+
+        return itineraries.stream().filter(predicate()).collect(Collectors.toList());
     }
 }

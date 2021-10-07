@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
+import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 
 /**
@@ -38,9 +37,9 @@ public class MaxLimitFilter implements ItineraryTagger {
     }
 
     @Override
-    public void tagItineraries(List<Itinerary> itineraries) {
-        if(itineraries.size() <= maxLimit) { return; }
+    public List<Itinerary> getTaggedItineraries(List<Itinerary> itineraries) {
+        if(itineraries.size() <= maxLimit) { return List.of(); }
         changedSubscriber.accept(itineraries.get(maxLimit));
-        itineraries.stream().skip(maxLimit).forEach(it -> it.markAsDeleted(notice()));
+        return itineraries.stream().skip(maxLimit).collect(Collectors.toList());
     }
 }

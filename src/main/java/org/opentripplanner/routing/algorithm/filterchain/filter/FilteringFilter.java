@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
+import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
@@ -36,7 +37,15 @@ public class FilteringFilter implements ItineraryListFilter {
             filterInput = itineraries;
         }
 
-        tagger.tagItineraries(filterInput);
+        for(Itinerary it : tagger.getTaggedItineraries(filterInput)) {
+            it.markAsDeleted(
+                new SystemNotice(
+                    tagger.name(),
+                    "This itinerary is marked as deleted by the " + tagger.name() + " filter."
+                )
+            );
+        }
+
         return itineraries;
     }
 }

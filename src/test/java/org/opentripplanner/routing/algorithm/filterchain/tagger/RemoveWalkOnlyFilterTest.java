@@ -6,8 +6,6 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -42,13 +40,6 @@ public class RemoveWalkOnlyFilterTest {
     var input = List.of(t1, w1, t2, w2, t3, t4);
     var expected = List.of(t1, t2, t3, t4);
 
-    assertEquals(Itinerary.toStr(expected), Itinerary.toStr(process(input, subject)));
+    assertEquals(Itinerary.toStr(expected), Itinerary.toStr(TaggerTestHelper.process(input, subject)));
   }
-
-  private List<Itinerary> process(List<Itinerary> itineraries, RemoveWalkOnlyFilter filter) {
-      filter.tagItineraries(itineraries);
-      return itineraries.stream()
-              .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
-              .collect(Collectors.toList());
-    }
 }

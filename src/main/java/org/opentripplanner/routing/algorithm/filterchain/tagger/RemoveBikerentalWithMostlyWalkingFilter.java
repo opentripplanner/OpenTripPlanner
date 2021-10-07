@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 /**
  * This is used to filter out bike rental itineraries that contain mostly walking. The value
@@ -26,8 +24,8 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryTagger 
     }
 
     @Override
-    public void tagItineraries(List<Itinerary> itineraries) {
-        for (Itinerary itinerary : itineraries) {
+    public Predicate<Itinerary> predicate() {
+        return itinerary -> {
             var containsTransit =
                     itinerary.legs.stream().anyMatch(l -> l != null && l.mode.isTransit());
 
@@ -38,11 +36,10 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryTagger 
                     .sum();
             double totalDistance = itinerary.distanceMeters();
 
-            if (bikeRentalDistance != 0
+            return bikeRentalDistance != 0
                     && !containsTransit
-                    && (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio) {
-                itinerary.markAsDeleted(notice());
-            }
-        }
+                    && (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio;
+        };
     }
 }
+

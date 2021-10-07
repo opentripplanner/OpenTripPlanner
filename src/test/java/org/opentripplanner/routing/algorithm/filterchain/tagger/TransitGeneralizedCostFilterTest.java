@@ -6,8 +6,6 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
@@ -40,13 +38,6 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     var all = List.of(i1, i2, i3, i4);
 
     // Expect - i4 to be dropped
-    assertEquals(toStr(List.of(i1, i2, i3)), toStr(process(all, subject)));
-  }
-
-  private List<Itinerary> process(List<Itinerary> itineraries, TransitGeneralizedCostFilter filter) {
-    filter.tagItineraries(itineraries);
-    return itineraries.stream()
-            .filter(Predicate.not(Itinerary::isMarkedAsDeleted))
-            .collect(Collectors.toList());
+    assertEquals(toStr(List.of(i1, i2, i3)), toStr(TaggerTestHelper.process(all, subject)));
   }
 }

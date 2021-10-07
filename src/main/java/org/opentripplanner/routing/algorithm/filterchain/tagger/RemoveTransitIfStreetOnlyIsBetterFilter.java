@@ -1,12 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
+import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Filter itineraries based on generalizedCost, compared with a on-street-all-the-way itinerary(if
@@ -21,21 +20,21 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryTagger 
     }
 
     @Override
-    public void tagItineraries(List<Itinerary> itineraries) {
+    public List<Itinerary> getTaggedItineraries(List<Itinerary> itineraries) {
         // Find the best walk-all-the-way option
         Optional<Itinerary> bestStreetOp = itineraries.stream()
             .filter(Itinerary::isOnStreetAllTheWay)
             .min(Comparator.comparingInt(l -> l.generalizedCost));
 
         if(bestStreetOp.isEmpty()) {
-            return;
+            return List.of();
         }
 
         final long limit = bestStreetOp.get().generalizedCost;
 
         // Filter away itineraries that have higher cost than the best non-transit option.
-        itineraries.stream()
+        return itineraries.stream()
             .filter( it -> !it.isOnStreetAllTheWay() && it.generalizedCost >= limit)
-            .forEach(it -> it.markAsDeleted(notice()));
+            .collect(Collectors.toList());
     }
 }

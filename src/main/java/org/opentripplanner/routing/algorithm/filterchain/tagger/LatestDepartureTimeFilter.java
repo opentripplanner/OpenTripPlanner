@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
+import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 
 import java.time.Instant;
-import java.util.List;
 
 public class LatestDepartureTimeFilter implements ItineraryTagger {
     private final long limitMs;
@@ -19,10 +19,7 @@ public class LatestDepartureTimeFilter implements ItineraryTagger {
     }
 
     @Override
-    public void tagItineraries(List<Itinerary> itineraries) {
-        itineraries
-                .stream()
-                .filter(it -> it.startTime().getTimeInMillis() > limitMs)
-                .forEach(it -> it.markAsDeleted(notice()));
+    public Predicate<Itinerary> predicate() {
+        return it -> it.startTime().getTimeInMillis() > limitMs;
     }
 }

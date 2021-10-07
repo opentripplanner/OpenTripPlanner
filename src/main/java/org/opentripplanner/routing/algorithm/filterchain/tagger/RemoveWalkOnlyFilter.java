@@ -1,13 +1,10 @@
 package org.opentripplanner.routing.algorithm.filterchain.tagger;
 
+import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Filter itineraries and remove all itineraries where all legs is walking.
+ * Filter itineraries and remove all itineraries where all legs are walking.
  */
 public class RemoveWalkOnlyFilter implements ItineraryTagger {
 
@@ -17,9 +14,7 @@ public class RemoveWalkOnlyFilter implements ItineraryTagger {
     }
 
     @Override
-    public void tagItineraries(List<Itinerary> itineraries) {
-        itineraries.stream()
-            .filter(Itinerary::isWalkingAllTheWay)
-            .forEach(it -> it.markAsDeleted(notice()));
+    public Predicate<Itinerary> predicate() {
+        return Itinerary::isWalkingAllTheWay;
     }
 }
