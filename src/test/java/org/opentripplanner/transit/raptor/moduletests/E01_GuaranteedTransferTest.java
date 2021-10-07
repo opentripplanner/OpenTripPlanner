@@ -12,6 +12,7 @@ import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
@@ -94,10 +95,11 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
     }
 
     @Test
-    public void standardReverse() {
+    public void standardReverseOneIteration() {
         var request = requestBuilder
                 .searchDirection(SearchDirection.REVERSE)
                 .profile(RaptorProfile.STANDARD)
+                .searchParams().searchOneIterationOnly()
                 .build();
 
         var response = raptorService.route(request, data);
@@ -107,6 +109,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
     @Test
     public void multiCriteria() {
+        requestBuilder.optimizations().add(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
         var request = requestBuilder
                 .profile(RaptorProfile.MULTI_CRITERIA)
                 .build();

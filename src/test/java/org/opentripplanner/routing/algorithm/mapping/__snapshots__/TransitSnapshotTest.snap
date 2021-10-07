@@ -751,7 +751,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
     },
     {
       "arrivedAtDestinationWithRentedVehicle": false,
-      "durationSeconds": 1470,
+      "durationSeconds": 1467,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
       "fare": {
@@ -786,7 +786,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 2315,
+      "generalizedCost": 2349,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -878,8 +878,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 5218.855598775394,
-          "endTime": "2009-11-17T18:35:54.000+00:00",
+          "distanceMeters": 4943.103319311616,
+          "endTime": "2009-11-17T18:35:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -914,13 +914,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "stopSequence": 51,
             "vertexType": "TRANSIT"
           },
-          "generalizedCost": 1814,
+          "generalizedCost": 1760,
           "headsign": "Montgomery Park",
           "interlinedWithPreviousLeg": false,
           "intermediateStops": [ ],
           "legGeometry": {
-            "length": 135,
-            "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB??S?oCDmCDmCBo@@"
+            "length": 129,
+            "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
           },
           "mode": "BUS",
           "onStreetNonTransit": false,
@@ -938,17 +938,17 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "streetNotes": [ ],
           "to": {
             "coordinate": {
-              "latitude": 45.532159,
-              "longitude": -122.698634
+              "latitude": 45.529681,
+              "longitude": -122.698529
             },
-            "name": "NW 23rd & Overton",
+            "name": "NW 23rd & Lovejoy",
             "stop": {
-              "code": "8981",
+              "code": "7163",
               "coordinate": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
+                "latitude": 45.529681,
+                "longitude": -122.698529
               },
-              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "description": "Northbound stop in Portland (Stop ID 7163)",
               "fareZones": [
                 {
                   "id": {
@@ -959,14 +959,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               ],
               "id": {
                 "feedId": "prt",
-                "id": "8981"
+                "id": "7163"
               },
-              "name": "NW 23rd & Overton",
+              "name": "NW 23rd & Lovejoy",
               "partOfStation": false,
               "wheelchairBoarding": "NO_INFORMATION"
             },
-            "stopIndex": 74,
-            "stopSequence": 75,
+            "stopIndex": 73,
+            "stopSequence": 74,
             "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
@@ -1023,22 +1023,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 266.211,
-          "endTime": "2009-11-17T18:39:22.000+00:00",
+          "distanceMeters": 321.94500000000005,
+          "endTime": "2009-11-17T18:39:19.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
-              "latitude": 45.532159,
-              "longitude": -122.698634
+              "latitude": 45.529681,
+              "longitude": -122.698529
             },
-            "name": "NW 23rd & Overton",
+            "name": "NW 23rd & Lovejoy",
             "stop": {
-              "code": "8981",
+              "code": "7163",
               "coordinate": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
+                "latitude": 45.529681,
+                "longitude": -122.698529
               },
-              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "description": "Northbound stop in Portland (Stop ID 7163)",
               "fareZones": [
                 {
                   "id": {
@@ -1049,21 +1049,21 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               ],
               "id": {
                 "feedId": "prt",
-                "id": "8981"
+                "id": "7163"
               },
-              "name": "NW 23rd & Overton",
+              "name": "NW 23rd & Lovejoy",
               "partOfStation": false,
               "wheelchairBoarding": "NO_INFORMATION"
             },
-            "stopIndex": 74,
-            "stopSequence": 75,
+            "stopIndex": 73,
+            "stopSequence": 74,
             "vertexType": "TRANSIT"
           },
-          "generalizedCost": 405,
+          "generalizedCost": 493,
           "interlinedWithPreviousLeg": false,
           "legGeometry": {
-            "length": 13,
-            "points": "}~{tGnq{kV?LVAF?J?L?rBCLA?Q?EAyAEcH?G"
+            "length": 18,
+            "points": "oo{tGxp{kVG@?GCwAAaF?G?i@?SK?C?K?W@{A@M@C@I?_CB?G"
           },
           "mode": "WALK",
           "onStreetNonTransit": true,
@@ -1071,7 +1071,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:35:54.000+00:00",
+          "startTime": "2009-11-17T18:35:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1085,34 +1085,85 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": 3.117146926361324,
+              "absoluteDirection": "EAST",
+              "angle": 1.5519664675850313,
               "area": false,
-              "bogusName": false,
-              "distance": 104.452,
+              "bogusName": true,
+              "distance": 2.418,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "DEPART",
               "startLocation": {
-                "latitude": 45.53215782420268,
-                "longitude": -122.69870264831422
+                "latitude": 45.529726790620664,
+                "longitude": -122.69853023095405
               },
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue",
+              "streetName": "way 158083864 from 0",
               "streetNotes": [ ]
             },
             {
               "absoluteDirection": "EAST",
-              "angle": 1.560623218965512,
+              "angle": 1.5293125423902536,
               "area": false,
               "bogusName": false,
-              "distance": 161.75900000000001,
+              "distance": 142.155,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "CONTINUE",
+              "startLocation": {
+                "latitude": 45.5297272,
+                "longitude": -122.6984992
+              },
+              "stayOn": false,
+              "streetName": "Northwest Lovejoy Street",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "EAST",
+              "angle": 1.5678920159151593,
+              "area": false,
+              "bogusName": true,
+              "distance": 7.657,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "CONTINUE",
+              "startLocation": {
+                "latitude": 45.529758300000005,
+                "longitude": -122.6966749
+              },
+              "stayOn": false,
+              "streetName": "way 158083863 from 2",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "angle": -0.02805287330123452,
+              "area": false,
+              "bogusName": false,
+              "distance": 166.04000000000002,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "LEFT",
               "startLocation": {
-                "latitude": 45.531218800000005,
-                "longitude": -122.69866750000001
+                "latitude": 45.5297585,
+                "longitude": -122.69657660000001
+              },
+              "stayOn": false,
+              "streetName": "Northwest 22nd Avenue",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "EAST",
+              "angle": 1.53914562034506,
+              "area": false,
+              "bogusName": false,
+              "distance": 3.675,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "RIGHT",
+              "startLocation": {
+                "latitude": 45.5312508,
+                "longitude": -122.69663860000001
               },
               "stayOn": false,
               "streetName": "Northwest Northrup Street",
@@ -1124,14 +1175,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         }
       ],
       "nTransfers": 0,
-      "nonTransitDistanceMeters": 328.223,
-      "nonTransitTimeSeconds": 256,
+      "nonTransitDistanceMeters": 383.95700000000005,
+      "nonTransitTimeSeconds": 307,
       "onStreetAllTheWay": false,
       "streetOnly": false,
       "systemNotices": [ ],
       "tooSloped": false,
       "transferPriorityCost": 0,
-      "transitTimeSeconds": 1214,
+      "transitTimeSeconds": 1160,
       "waitTimeOptimizedCost": 0,
       "waitingTimeSeconds": 0,
       "walkOnly": false,
@@ -1595,7 +1646,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
     },
     {
       "arrivedAtDestinationWithRentedVehicle": false,
-      "durationSeconds": 1540,
+      "durationSeconds": 1527,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
       "fare": {
@@ -1630,7 +1681,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 2385,
+      "generalizedCost": 2409,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
@@ -1722,8 +1773,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 5218.855598775394,
-          "endTime": "2009-11-17T18:52:04.000+00:00",
+          "distanceMeters": 4943.103319311616,
+          "endTime": "2009-11-17T18:51:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -1758,13 +1809,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "stopSequence": 51,
             "vertexType": "TRANSIT"
           },
-          "generalizedCost": 1884,
+          "generalizedCost": 1820,
           "headsign": "NW 27th & Thurman",
           "interlinedWithPreviousLeg": false,
           "intermediateStops": [ ],
           "legGeometry": {
-            "length": 135,
-            "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB??S?oCDmCDmCBo@@"
+            "length": 129,
+            "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
           },
           "mode": "BUS",
           "onStreetNonTransit": false,
@@ -1782,17 +1833,17 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "streetNotes": [ ],
           "to": {
             "coordinate": {
-              "latitude": 45.532159,
-              "longitude": -122.698634
+              "latitude": 45.529681,
+              "longitude": -122.698529
             },
-            "name": "NW 23rd & Overton",
+            "name": "NW 23rd & Lovejoy",
             "stop": {
-              "code": "8981",
+              "code": "7163",
               "coordinate": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
+                "latitude": 45.529681,
+                "longitude": -122.698529
               },
-              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "description": "Northbound stop in Portland (Stop ID 7163)",
               "fareZones": [
                 {
                   "id": {
@@ -1803,14 +1854,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               ],
               "id": {
                 "feedId": "prt",
-                "id": "8981"
+                "id": "7163"
               },
-              "name": "NW 23rd & Overton",
+              "name": "NW 23rd & Lovejoy",
               "partOfStation": false,
               "wheelchairBoarding": "NO_INFORMATION"
             },
-            "stopIndex": 74,
-            "stopSequence": 75,
+            "stopIndex": 73,
+            "stopSequence": 74,
             "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
@@ -1867,22 +1918,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 266.211,
-          "endTime": "2009-11-17T18:55:32.000+00:00",
+          "distanceMeters": 321.94500000000005,
+          "endTime": "2009-11-17T18:55:19.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
-              "latitude": 45.532159,
-              "longitude": -122.698634
+              "latitude": 45.529681,
+              "longitude": -122.698529
             },
-            "name": "NW 23rd & Overton",
+            "name": "NW 23rd & Lovejoy",
             "stop": {
-              "code": "8981",
+              "code": "7163",
               "coordinate": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
+                "latitude": 45.529681,
+                "longitude": -122.698529
               },
-              "description": "Northbound stop in Portland (Stop ID 8981)",
+              "description": "Northbound stop in Portland (Stop ID 7163)",
               "fareZones": [
                 {
                   "id": {
@@ -1893,21 +1944,21 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               ],
               "id": {
                 "feedId": "prt",
-                "id": "8981"
+                "id": "7163"
               },
-              "name": "NW 23rd & Overton",
+              "name": "NW 23rd & Lovejoy",
               "partOfStation": false,
               "wheelchairBoarding": "NO_INFORMATION"
             },
-            "stopIndex": 74,
-            "stopSequence": 75,
+            "stopIndex": 73,
+            "stopSequence": 74,
             "vertexType": "TRANSIT"
           },
-          "generalizedCost": 405,
+          "generalizedCost": 493,
           "interlinedWithPreviousLeg": false,
           "legGeometry": {
-            "length": 13,
-            "points": "}~{tGnq{kV?LVAF?J?L?rBCLA?Q?EAyAEcH?G"
+            "length": 18,
+            "points": "oo{tGxp{kVG@?GCwAAaF?G?i@?SK?C?K?W@{A@M@C@I?_CB?G"
           },
           "mode": "WALK",
           "onStreetNonTransit": true,
@@ -1915,7 +1966,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:52:04.000+00:00",
+          "startTime": "2009-11-17T18:51:00.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -1929,34 +1980,85 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": 3.117146926361324,
+              "absoluteDirection": "EAST",
+              "angle": 1.5519664675850313,
               "area": false,
-              "bogusName": false,
-              "distance": 104.452,
+              "bogusName": true,
+              "distance": 2.418,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "DEPART",
               "startLocation": {
-                "latitude": 45.53215782420268,
-                "longitude": -122.69870264831422
+                "latitude": 45.529726790620664,
+                "longitude": -122.69853023095405
               },
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue",
+              "streetName": "way 158083864 from 0",
               "streetNotes": [ ]
             },
             {
               "absoluteDirection": "EAST",
-              "angle": 1.560623218965512,
+              "angle": 1.5293125423902536,
               "area": false,
               "bogusName": false,
-              "distance": 161.75900000000001,
+              "distance": 142.155,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "CONTINUE",
+              "startLocation": {
+                "latitude": 45.5297272,
+                "longitude": -122.6984992
+              },
+              "stayOn": false,
+              "streetName": "Northwest Lovejoy Street",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "EAST",
+              "angle": 1.5678920159151593,
+              "area": false,
+              "bogusName": true,
+              "distance": 7.657,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "CONTINUE",
+              "startLocation": {
+                "latitude": 45.529758300000005,
+                "longitude": -122.6966749
+              },
+              "stayOn": false,
+              "streetName": "way 158083863 from 2",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "angle": -0.02805287330123452,
+              "area": false,
+              "bogusName": false,
+              "distance": 166.04000000000002,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "LEFT",
               "startLocation": {
-                "latitude": 45.531218800000005,
-                "longitude": -122.69866750000001
+                "latitude": 45.5297585,
+                "longitude": -122.69657660000001
+              },
+              "stayOn": false,
+              "streetName": "Northwest 22nd Avenue",
+              "streetNotes": [ ]
+            },
+            {
+              "absoluteDirection": "EAST",
+              "angle": 1.53914562034506,
+              "area": false,
+              "bogusName": false,
+              "distance": 3.675,
+              "edges": [ ],
+              "elevation": [ ],
+              "relativeDirection": "RIGHT",
+              "startLocation": {
+                "latitude": 45.5312508,
+                "longitude": -122.69663860000001
               },
               "stayOn": false,
               "streetName": "Northwest Northrup Street",
@@ -1968,14 +2070,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         }
       ],
       "nTransfers": 0,
-      "nonTransitDistanceMeters": 328.223,
-      "nonTransitTimeSeconds": 256,
+      "nonTransitDistanceMeters": 383.95700000000005,
+      "nonTransitTimeSeconds": 307,
       "onStreetAllTheWay": false,
       "streetOnly": false,
       "systemNotices": [ ],
       "tooSloped": false,
       "transferPriorityCost": 0,
-      "transitTimeSeconds": 1284,
+      "transitTimeSeconds": 1220,
       "waitTimeOptimizedCost": 0,
       "waitingTimeSeconds": 0,
       "walkOnly": false,
@@ -4788,7 +4890,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
     },
     {
       "arrivedAtDestinationWithRentedVehicle": false,
-      "durationSeconds": 1940,
+      "durationSeconds": 1577,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
       "fare": {
@@ -4808,6 +4910,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "routes": [
                 {
                   "feedId": "prt",
+                  "id": "20"
+                },
+                {
+                  "feedId": "prt",
                   "id": "15"
                 }
               ]
@@ -4823,14 +4929,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           }
         }
       },
-      "generalizedCost": 3290,
+      "generalizedCost": 3060,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 718.722,
-          "endTime": "2009-11-17T19:02:00.000+00:00",
+          "distanceMeters": 87.019,
+          "endTime": "2009-11-17T19:00:00.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -4863,11 +4969,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             },
             "vertexType": "TRANSIT"
           },
-          "generalizedCost": 1087,
+          "generalizedCost": 137,
           "interlinedWithPreviousLeg": false,
           "legGeometry": {
-            "length": 24,
-            "points": "ahztGxxrkV@Sb@?`@@T?T@NBRIrA?lC@lC?R?zB@`C?J?J?J@tB?nC?|B?N@?R?|@Q?"
+            "length": 9,
+            "points": "ahztGxxrkV@Sb@?`@@?a@?k@GGKY@A"
           },
           "mode": "WALK",
           "onStreetNonTransit": true,
@@ -4875,21 +4981,21 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "realTime": false,
           "rentedVehicle": false,
           "scheduled": false,
-          "startTime": "2009-11-17T18:52:44.000+00:00",
+          "startTime": "2009-11-17T18:58:47.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
-              "latitude": 45.517299,
-              "longitude": -122.654067
+              "latitude": 45.523103,
+              "longitude": -122.653064
             },
-            "name": "SE Morrison & 12th",
+            "name": "NE Sandy & 12th",
             "stop": {
-              "code": "4014",
+              "code": "5055",
               "coordinate": {
-                "latitude": 45.517299,
-                "longitude": -122.654067
+                "latitude": 45.523103,
+                "longitude": -122.653064
               },
-              "description": "Westbound stop in Portland (Stop ID 4014)",
+              "description": "Westbound stop in Portland (Stop ID 5055)",
               "fareZones": [
                 {
                   "id": {
@@ -4900,14 +5006,14 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               ],
               "id": {
                 "feedId": "prt",
-                "id": "4014"
+                "id": "5055"
               },
-              "name": "SE Morrison & 12th",
+              "name": "NE Sandy & 12th",
               "partOfStation": false,
               "wheelchairBoarding": "NO_INFORMATION"
             },
-            "stopIndex": 52,
-            "stopSequence": 53,
+            "stopIndex": 94,
+            "stopSequence": 95,
             "vertexType": "TRANSIT"
           },
           "transitAlerts": [ ],
@@ -4918,7 +5024,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "angle": -3.1191187064694192,
               "area": false,
               "bogusName": false,
-              "distance": 51.525,
+              "distance": 39.059,
               "edges": [ ],
               "elevation": [ ],
               "relativeDirection": "DEPART",
@@ -4931,37 +5037,20 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetNotes": [ ]
             },
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.0798698707609136,
+              "absoluteDirection": "EAST",
+              "angle": 1.5906288403465376,
               "area": false,
-              "bogusName": false,
-              "distance": 634.751,
+              "bogusName": true,
+              "distance": 47.959999999999994,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "CONTINUE",
+              "relativeDirection": "LEFT",
               "startLocation": {
-                "latitude": 45.5229051,
-                "longitude": -122.6536312
+                "latitude": 45.523017200000005,
+                "longitude": -122.65363380000001
               },
               "stayOn": false,
-              "streetName": "Southeast 12th Avenue",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "WEST",
-              "angle": -1.5753805308488518,
-              "area": false,
-              "bogusName": false,
-              "distance": 32.446,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.5172031,
-                "longitude": -122.6536511
-              },
-              "stayOn": false,
-              "streetName": "Southeast Morrison Street",
+              "streetName": "way 162042138 from 0",
               "streetNotes": [ ]
             }
           ],
@@ -4972,22 +5061,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 4569.033127779713,
-          "endTime": "2009-11-17T19:21:00.000+00:00",
+          "distanceMeters": 3520.3249159419115,
+          "endTime": "2009-11-17T19:12:44.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
-              "latitude": 45.517299,
-              "longitude": -122.654067
+              "latitude": 45.523103,
+              "longitude": -122.653064
             },
-            "name": "SE Morrison & 12th",
+            "name": "NE Sandy & 12th",
             "stop": {
-              "code": "4014",
+              "code": "5055",
               "coordinate": {
-                "latitude": 45.517299,
-                "longitude": -122.654067
+                "latitude": 45.523103,
+                "longitude": -122.653064
               },
-              "description": "Westbound stop in Portland (Stop ID 4014)",
+              "description": "Westbound stop in Portland (Stop ID 5055)",
               "fareZones": [
                 {
                   "id": {
@@ -4998,23 +5087,23 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               ],
               "id": {
                 "feedId": "prt",
-                "id": "4014"
+                "id": "5055"
               },
-              "name": "SE Morrison & 12th",
+              "name": "NE Sandy & 12th",
               "partOfStation": false,
               "wheelchairBoarding": "NO_INFORMATION"
             },
-            "stopIndex": 52,
-            "stopSequence": 53,
+            "stopIndex": 94,
+            "stopSequence": 95,
             "vertexType": "TRANSIT"
           },
-          "generalizedCost": 1740,
-          "headsign": "NW 27th & Thurman",
+          "generalizedCost": 1364,
+          "headsign": "23rd Ave to Tichner",
           "interlinedWithPreviousLeg": false,
           "intermediateStops": [ ],
           "legGeometry": {
-            "length": 120,
-            "points": "oaytG|zrkV?tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
+            "length": 90,
+            "points": "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC"
           },
           "mode": "BUS",
           "onStreetNonTransit": false,
@@ -5028,7 +5117,152 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T19:02:00.000+00:00",
+          "startTime": "2009-11-17T19:00:00.000+00:00",
+          "streetNotes": [ ],
+          "to": {
+            "coordinate": {
+              "latitude": 45.523512,
+              "longitude": -122.698081
+            },
+            "name": "W Burnside & NW 23rd",
+            "stop": {
+              "code": "755",
+              "coordinate": {
+                "latitude": 45.523512,
+                "longitude": -122.698081
+              },
+              "description": "Westbound stop in Portland (Stop ID 755)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "755"
+              },
+              "name": "W Burnside & NW 23rd",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
+            },
+            "stopIndex": 108,
+            "stopSequence": 109,
+            "vertexType": "TRANSIT"
+          },
+          "transitAlerts": [ ],
+          "transitLeg": true,
+          "trip": {
+            "alteration": "PLANNED",
+            "bikesAllowed": "UNKNOWN",
+            "blockId": "2038",
+            "direction": "OUTBOUND",
+            "id": {
+              "feedId": "prt",
+              "id": "200W1230"
+            },
+            "route": {
+              "agency": {
+                "fareUrl": "http://trimet.org/fares/index.htm",
+                "id": {
+                  "feedId": "prt",
+                  "id": "prt"
+                },
+                "lang": "en",
+                "name": "TriMet",
+                "phone": "503-238-7433",
+                "timezone": "America/Los_Angeles",
+                "url": "http://trimet.org"
+              },
+              "bikesAllowed": "UNKNOWN",
+              "id": {
+                "feedId": "prt",
+                "id": "20"
+              },
+              "longName": "Burnside/Stark",
+              "mode": "BUS",
+              "shortName": "20",
+              "sortOrder": -999,
+              "sortOrderSet": false,
+              "type": 3,
+              "url": "http://trimet.org/schedules/r020.htm"
+            },
+            "serviceId": {
+              "feedId": "prt",
+              "id": "W"
+            },
+            "shapeId": {
+              "feedId": "prt",
+              "id": "20.0.6"
+            },
+            "wheelchairAccessible": 0
+          },
+          "walkSteps": [ ],
+          "walkingLeg": false
+        },
+        {
+          "agencyTimeZoneOffset": 0,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distanceMeters": 706.1004833986134,
+          "endTime": "2009-11-17T19:21:00.000+00:00",
+          "flexibleTrip": false,
+          "from": {
+            "coordinate": {
+              "latitude": 45.523512,
+              "longitude": -122.698081
+            },
+            "name": "W Burnside & NW 23rd",
+            "stop": {
+              "code": "755",
+              "coordinate": {
+                "latitude": 45.523512,
+                "longitude": -122.698081
+              },
+              "description": "Westbound stop in Portland (Stop ID 755)",
+              "fareZones": [
+                {
+                  "id": {
+                    "feedId": "prt",
+                    "id": "1"
+                  }
+                }
+              ],
+              "id": {
+                "feedId": "prt",
+                "id": "755"
+              },
+              "name": "W Burnside & NW 23rd",
+              "partOfStation": false,
+              "wheelchairBoarding": "NO_INFORMATION"
+            },
+            "stopIndex": 70,
+            "stopSequence": 71,
+            "vertexType": "TRANSIT"
+          },
+          "generalizedCost": 1096,
+          "headsign": "27th & Thurman",
+          "interlinedWithPreviousLeg": false,
+          "intermediateStops": [ ],
+          "legGeometry": {
+            "length": 16,
+            "points": "khztGbn{kVAPkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
+          },
+          "mode": "BUS",
+          "onStreetNonTransit": false,
+          "pathway": false,
+          "realTime": false,
+          "scheduled": true,
+          "serviceDate": {
+            "day": 17,
+            "minMax": false,
+            "month": 11,
+            "sequenceNumber": 20091117,
+            "year": 2009
+          },
+          "startTime": "2009-11-17T19:17:51.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -5302,17 +5536,17 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "walkingLeg": true
         }
       ],
-      "nTransfers": 0,
-      "nonTransitDistanceMeters": 1015.832,
-      "nonTransitTimeSeconds": 800,
+      "nTransfers": 1,
+      "nonTransitDistanceMeters": 384.129,
+      "nonTransitTimeSeconds": 317,
       "onStreetAllTheWay": false,
       "streetOnly": false,
       "systemNotices": [ ],
       "tooSloped": false,
-      "transferPriorityCost": 0,
-      "transitTimeSeconds": 1140,
-      "waitTimeOptimizedCost": 0,
-      "waitingTimeSeconds": 0,
+      "transferPriorityCost": 33,
+      "transitTimeSeconds": 953,
+      "waitTimeOptimizedCost": 18,
+      "waitingTimeSeconds": 307,
       "walkOnly": false,
       "walkingAllTheWay": false
     }
