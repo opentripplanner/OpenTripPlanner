@@ -14,7 +14,7 @@ can appear multiple times.
 ## FilteringFilter
 
 FilteringFilter is responsible for tagging itineraries for deletion. It does not remove any
-itineraries directly, but uses `Itinerary#markAsDeleted(SystemNotice)` fo this. A FilteringFilter is
+itineraries directly, but uses `Itinerary#markAsDeleted(SystemNotice)` for this. A FilteringFilter is
 instantiated with a ItineraryTagger, which contains the business logic for selecting the itineraries
 for tagging. You can use `filterUntaggedItineraries()` for selecting if the tagger should
 
