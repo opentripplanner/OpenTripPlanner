@@ -50,7 +50,7 @@ public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedu
     int getTime();
 
     /**
-     * Return the transfer constrains for the transfer before this boarding, if it exist.
+     * Return the transfer constrains for the transfer before this boarding, if it exists.
      */
     @Nullable
     RaptorTransferConstraint getTransferConstraint();

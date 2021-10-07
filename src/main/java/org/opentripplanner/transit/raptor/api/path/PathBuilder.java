@@ -18,14 +18,14 @@ import org.opentripplanner.transit.raptor.util.PathStringBuilder;
  * information that was used in decision making inside Raptor, but not kept due to performance
  * reasons. For example information about the transfer like transfer constraints.
  * <p>
- * The path builder enforce the same logic as Raptor and generate information like the
+ * The path builder enforces the same logic as Raptor and generates information like the
  * generalized-cost instead of getting it from the stop-arrivals. This is convenient if a path is
- * created OUTSIDE Raptor, witch is the case in the {@link org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService}.
+ * created OUTSIDE Raptor, which is the case in the {@link org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService}.
  * <p>
- * The path builder comes in two versions. One witch add new legs to the tail of the path
- * allowing us to add legs starting with access leg and ending with the egress leg. The other
- * add legs in the opposite order, from egress to access. Hence the forward and reverse mapper
- * is simplified using the head and tail builder respectively.
+ * The path builder comes in two versions. One which adds new legs to the tail of the path,
+ * allowing us to add legs starting with the access leg and ending with the egress leg. The other
+ * adds legs in the opposite order, from egress to access. Hence the forward and reverse mappers
+ * are simplified using the head and tail builder respectively.
  * See {@link #headPathBuilder(RaptorPathConstrainedTransferSearch, RaptorSlackProvider, CostCalculator)}
  * and {@link #tailPathBuilder(RaptorPathConstrainedTransferSearch, RaptorSlackProvider, CostCalculator)}
  * <p>
@@ -43,7 +43,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   protected final CostCalculator costCalculator;
 
 
-  // Path leg elements as a double linked list, this make it easy to look at
+  // Path leg elements as a double linked list. This makes it easy to look at
   // legs before and after in the logic and easy to fork, building alternative
   // paths with the same path tail.
   private PathBuilderLeg<T> head = null;
@@ -71,8 +71,8 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
    * Create a new path builder to build path starting from the access and add elements
    * in forward order until the last egress leg is added.
    * <p>
-   * This builder insert transferConstraints, time-shift access/transfers/egress and
-   * calculate generalized-cost in the build phase. (Insert new tail)
+   * This builder inserts transferConstraints, time-shifts access/transfers/egress and
+   * calculates generalized-cost in the build phase. (Insert new tail)
    */
   public static <T extends RaptorTripSchedule> PathBuilder<T> headPathBuilder(
           @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
@@ -86,8 +86,8 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
    * Create a new path builder to build path starting from the egress and add elements
    * in reverse order until the access leg is added last. (Insert new head)
    * <p>
-   * This builder insert transferConstraints, time-shift access/transfers/egress and
-   * calculate generalized-cost in the build phase.
+   * This builder inserts transferConstraints, time-shifts access/transfers/egress and
+   * calculates generalized-cost in the build phase.
    */
   public static <T extends RaptorTripSchedule> PathBuilder<T> tailPathBuilder(
           RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,

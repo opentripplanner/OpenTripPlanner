@@ -32,14 +32,14 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     private static final int GUARANTIED_TRANSFER_COST = 20_00;
 
     /**
-     * A Transfer witch is NOT stay-seated or guaranteed is added a cost penalty of 10 points.
-     * This make sure a stay-seated and guaranteed transfers take precedence over the priority
+     * A cost penalty of 10 points is added to a Transfer which is NOT stay-seated or guaranteed.
+     * This makes sure that stay-seated and guaranteed transfers take precedence over the priority
      * cost.
      */
     private static final int NONE_FACILITATED_COST = 30_00;
 
     /**
-     * A Transfer witch is NOT stay-seated or guaranteed is added a cost penalty of 4 points.
+     * A cost penalty of 4 points is added to transfers which are NOT stay-seated or guaranteed.
      */
     private static final int DEFAULT_COST = NONE_FACILITATED_COST + ALLOWED.cost();
 
@@ -151,18 +151,18 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     }
 
     /**
-     * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
-     * transfers. This cost is not related in any way to the path generalized-cost. It take the
-     * transfer constraint attributes into consideration only.
+     * Calculate a cost for prioritizing transfers in a path, to select the best path with respect to
+     * transfers. This cost is not related in any way to the path generalized-cost. It takes only the
+     * transfer constraint attributes in consideration.
      * <p>
-     * When comparing path that ride the same trips this can be used to find the optimal places to
+     * When comparing paths that ride the same trips, this can be used to find the optimal places to
      * do the transfers. The cost is created to prioritize the following:
      * <ol>
      *     <li>{@code stay-seated} - cost: 10 points</li>
      *     <li>{@code guaranteed} - cost: 20 points</li>
      *     <li>None facilitated  - cost: 30 points</li>
      * </ol>
-     * In addition the {@code priority} cost is added, see {@link TransferPriority#cost()}.
+     * In addition, the {@code priority} cost is added. See {@link TransferPriority#cost()}.
      *
      * @param c The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
      *          street generated transfer.
@@ -173,7 +173,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
     /**
      * Return a cost for stay-seated, guaranteed or none-facilitated transfers. This is
-     * used to prioritize stay-seated over guaranteed, and guaranteed over none-facilitated
+     * used to prioritize stay-seated over guaranteed, and guaranteed over non-facilitated
      * transfers.
      */
     private int facilitatedCost() {

@@ -88,11 +88,11 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
     RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch();
 
     /**
-     * Raptor relay on stop indexes for all references to stops for performance reasons, but
-     * when a critical error occurs it would be nice to be able to inject information in the
-     * log event or during debugging to see witch stop it is. This is important to be able to
-     * reproduce the error. This method is used by Raptor to translate the stop index to a
-     * string witch should be short and identify the stop given the related pattern, for example
+     * Raptor relies on stop indexes for all references to stops for performance reasons, but
+     * when a critical error occurs, it is nice to be able to inject information to the
+     * log event or during debugging to see which stop it is. This is important to be able to
+     * reproduce the error. This method is used by Raptor to translate from the stop index to a
+     * string which should be short and identify the stop given the related pattern, for example
      * the stop name would be great.
      */
     @NotNull

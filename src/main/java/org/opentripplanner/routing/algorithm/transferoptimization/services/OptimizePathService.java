@@ -171,14 +171,14 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
     tails = new TransitPathLegSelector<>(minCostFilterChain, tails)
             .next(originalPath.accessLeg().toTime());
 
-    // Insert the assess leg and the following transfer
+    // Insert the access leg and the following transfer
     insertAccess(originalPath, tails);
 
     return tails;
   }
 
   /**
-   * Insert the assess leg and the following transfer.
+   * Insert the access leg and the following transfer.
    * The transfer can only exist if the access has rides (is FLEX).
    */
   private void insertAccess(

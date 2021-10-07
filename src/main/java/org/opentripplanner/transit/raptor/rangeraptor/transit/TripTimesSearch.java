@@ -63,7 +63,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Search for board- and alight-times for the trip matching the given trip, stop pair and
+     * Search for boarding and alighting times matching the given trip, stop pair and
      * departure-time when searching in REVERSE.
      */
     public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripAfter(

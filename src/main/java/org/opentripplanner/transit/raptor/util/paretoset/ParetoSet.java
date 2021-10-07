@@ -194,7 +194,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     }
 
     /**
-     * A special toSting method witch allow the caller to provide a to-string-mapper for the
+     * A special toSting method witch allows the caller to provide a to-string-mapper for the
      * elements in the set.
      */
     public String toString(Function<? super T, String> toStringMapper) {

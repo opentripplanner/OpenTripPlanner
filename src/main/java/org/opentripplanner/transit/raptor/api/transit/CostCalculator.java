@@ -72,8 +72,8 @@ public interface CostCalculator {
 
 
     /**
-     * This method allow the cost calculator to add cost in addition to the generalized-cost of the
-     * given egress it self. For example you might want to add a transfer cost to FLEX egress.
+     * This method allows the cost calculator to add cost in addition to the generalized-cost of the
+     * given egress itself. For example you might want to add a transfer cost to FLEX egress.
      *
      * @return the {@link RaptorTransfer#generalizedCost()} plus any additional board or transfer
      * cost.

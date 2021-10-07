@@ -94,9 +94,9 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
             transfer(tx.getPathTransfer(), tx.to().stop());
         }
 
-        // The transfer may happen before the original board point. If so, the boarding must be
-        // changed so the leg is valid (not traveling in reverse/back in time). Also, setting
-        // the board position to the first stop in the pattern make sure all paths starts at the
+        // The transfer may happen before the original boarding point. If so, the boarding must be
+        // changed so that the leg is valid (not traveling in reverse/back in time). Also, setting
+        // the boarding position to the first stop in the pattern makes sure that all paths start at the
         // same place; hence the generalized-cost can be compared.
         // The board position will be changed when a new head is inserted.
         int boardStopPos = 0;

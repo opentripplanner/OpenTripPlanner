@@ -145,10 +145,10 @@ public final class DefaultCostCalculator implements CostCalculator {
             int boardStop,
             int boardTime
     ) {
-        // Calculate the wait-time before the boarding witch should be accounted for in the cost
-        // calculation. Any slack at the end of the last leg is not part of this, because that is
-        // already accounted for. If the previous leg is an access-leg, then it is already
-        // time-shifted, witch is important for this calculation to be correct.
+        // Calculate the wait-time before the boarding which should be accounted for in the cost
+        // calculation. Any slack at the end of the last leg is not part of this, because it is
+        // already accounted for. If the previous leg is an access leg, then it is already
+        // time-shifted, which is important for this calculation to be correct.
         final int boardWaitTime = boardTime - prevArrivalTime;
 
         int cost = waitFactor * boardWaitTime;
@@ -172,15 +172,15 @@ public final class DefaultCostCalculator implements CostCalculator {
             boolean firstBoarding,
             RaptorTransferConstraint txConstraints
     ) {
-        // This cast could be avoided if we add another generic type to the Raptor component,
-        // but it will be rather messy, just to avoid a single cast.
+        // This cast could be avoided, if we added another generic type to the Raptor component,
+        // but it would be rather messy, just to avoid a single cast.
         var tx = (TransferConstraint) txConstraints;
 
         if(tx.isStaySeated()) {
             final int boardWaitTime = boardTime - prevArrivalTime;
             int transitReluctance = transitFactors.factor(transitReluctanceIndex);
             // For a stay-seated transfer the wait-time is spent on-board and we should use the
-            // transitReluctance not the waitReluctance to find the cost of the time since
+            // transitReluctance, not the waitReluctance, to find the cost of the time since
             // the stop arrival. So we take the time and multiply it with the transit reluctance.
             //
             // Note! if the boarding happens BEFORE the previous stop arrival, we will get a

@@ -191,7 +191,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         );
 
         // Then we do the test with the wait-time cost calculator, which should pick the
-        // option with the lowest wait-time cost. For the first transfer the transfer between
+        // option with the lowest wait-time cost. For the first transfer, the transfer between
         // stop B and C with a 30 sec walk is the one maximising the wait time. The preferred
         // transfer between Trip 2 and 3 is at stop F (same as case 1).
         subject = subject(transfers, TRANS_WAIT_TIME_CALC);

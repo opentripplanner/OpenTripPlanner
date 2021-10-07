@@ -55,7 +55,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
     }
 
     /**
-     * The stop index where the leg start. Also called departure stop index.
+     * The stop index where the leg starts. Also called departure stop index.
      */
     @Override
     public final int fromStop() {
@@ -68,7 +68,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
     }
 
     /**
-     * The stop index where the leg end, also called arrival stop index.
+     * The stop index where the leg ends, also called arrival stop index.
      */
     @Override
     public final int toStop(){

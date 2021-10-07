@@ -123,8 +123,8 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     /**
      * Calculate a cost for riding a trip. It should include the cost from the beginning of the
      * journey all the way until a trip is boarded. Any slack at the end of the last leg is not
-     * part of this, because that is already accounted for. If the previous leg is an access-leg,
-     * then it is already time-shifted, witch is important for this calculation to be correct.
+     * part of this, because that is already accounted for. If the previous leg is an access leg,
+     * then it is already time-shifted, which is important for this calculation to be correct.
      *
      * @param prevArrival The stop-arrival where the trip was boarded.
      */

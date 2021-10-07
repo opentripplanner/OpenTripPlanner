@@ -69,9 +69,9 @@ public enum TransferPriority {
   }
 
   /**
-   * This method return a cost for how good a transfer priority is compared with another transfer
-   * priority. The cost can only be used to compare transfers and should not be mixed with the
-   * generalized-cost. A regular transfer (without any constraints) have the same cost as ALLOWED.
+   * This method returns a cost for how good a transfer priority is compared to other transfer
+   * priorities. The cost can only be used to compare transfers and should not be mixed with the
+   * generalized-cost. A regular transfer (without any constraints) has the same cost as ALLOWED.
    * <p>
    * <ol>
    * <li>{@code PREFERRED} - cost: 1 points.</li>

@@ -32,7 +32,7 @@ class OptimizedPathTest implements RaptorTestConstants {
                 path.toStringDetailed(this::stopIndexToName)
         );
 
-        // Make sure the toString do not throw an exception or return null
+        // Make sure the toString does not throw an exception or return null
         assertNotNull(path.toString());
     }
 
@@ -42,7 +42,7 @@ class OptimizedPathTest implements RaptorTestConstants {
         var orgPath = BasicPathTestCase.basicTripAsPath();
         var accessLeg = orgPath.accessLeg();
 
-        // Define som constants
+        // Define some constants
         final int generalizedCost = 881100;
         final int transferPriorityCost = 120100;
         final int waitTimeOptimizedCost = 130200;

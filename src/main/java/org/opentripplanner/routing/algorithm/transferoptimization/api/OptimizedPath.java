@@ -56,9 +56,8 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
 
     /**
      * A utility function for calculating the priority cost for a transfer.
-     * If the {@code transfer exist}, the given supplier is used to obtain the constrained
-     * transfer (can be null) and the cost is calculated. If transfer do not exist the zero
-     * cost value is returned.
+     * If the {@code transfer exist}, the given supplier is used to get the constrained transfer
+     * (can be null) and the cost is calculated. If a transfer does not exist, zero cost is returned.
      */
     public static int priorityCost(boolean transferExist, Supplier<RaptorConstrainedTransfer> txGet) {
         if(transferExist) {
@@ -66,7 +65,7 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
             var c = tx == null ? null : (TransferConstraint) tx.getTransferConstraint();
             return TransferConstraint.cost(c);
         }
-        // Any other leg is not associated with a transfer and zero cost is returned
+        // Return no zero cost if a transfer do not exist
         return TransferConstraint.ZERO_COST;
     }
 
@@ -105,7 +104,7 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
     }
 
     private static int priorityCost(PathLeg<?> leg) {
-        // Only calculate priority cost for transit legs witch is followed by at least one
+        // Only calculate priority cost for transit legs which are followed by at least one
         // other transit leg.
         return priorityCost(
                 leg.isTransitLeg() && leg.nextTransitLeg() != null,

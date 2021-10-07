@@ -212,7 +212,7 @@ public class Leg {
 
     /**
      * For transit legs, if the rider should stay on the vehicle as it changes route names.
-     * This is the same as a stay-sated transfer.
+     * This is the same as a stay-seated transfer.
      */
     public Boolean isInterlinedWithPreviousLeg() {
         if(transferFromPrevLeg == null) { return false; }
