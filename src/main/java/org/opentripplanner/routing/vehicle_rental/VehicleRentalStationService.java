@@ -17,22 +17,22 @@ import org.opentripplanner.routing.bike_park.BikePark;
 public class VehicleRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 
-    private final Map<FeedScopedId, VehicleRentalStation> vehicleRentalStations = new HashMap<>();
+    private final Map<FeedScopedId, VehicleRentalPlace> vehicleRentalStations = new HashMap<>();
 
     private Set<BikePark> bikeParks = new HashSet<>();
 
-    public Collection<VehicleRentalStation> getVehicleRentalStations() {
+    public Collection<VehicleRentalPlace> getVehicleRentalStations() {
         return vehicleRentalStations.values();
     }
 
-    public VehicleRentalStation getVehicleRentalStation(FeedScopedId id) {
+    public VehicleRentalPlace getVehicleRentalStation(FeedScopedId id) {
         return vehicleRentalStations.get(id);
     }
 
-    public void addVehicleRentalStation(VehicleRentalStation vehicleRentalStation) {
+    public void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation) {
         // Remove old reference first, as adding will be a no-op if already present
-        vehicleRentalStations.remove(vehicleRentalStation.id);
-        vehicleRentalStations.put(vehicleRentalStation.id, vehicleRentalStation);
+        vehicleRentalStations.remove(vehicleRentalStation.getId());
+        vehicleRentalStations.put(vehicleRentalStation.getId(), vehicleRentalStation);
     }
 
     public void removeVehicleRentalStation(FeedScopedId vehicleRentalStationId) {
@@ -58,7 +58,7 @@ public class VehicleRentalStationService implements Serializable {
      * over a set, but we could use a spatial index if the number of vehicle rental stations is high
      * enough for performance to be a concern.
      */
-    public List<VehicleRentalStation> getVehicleRentalStationForEnvelope(
+    public List<VehicleRentalPlace> getVehicleRentalStationForEnvelope(
         double minLon, double minLat, double maxLon, double maxLat
     ) {
         Envelope envelope = new Envelope(
@@ -69,7 +69,7 @@ public class VehicleRentalStationService implements Serializable {
         return vehicleRentalStations
             .values()
             .stream()
-            .filter(b -> envelope.contains(new Coordinate(b.longitude, b.latitude)))
+            .filter(b -> envelope.contains(new Coordinate(b.getLongitude(), b.getLatitude())))
             .collect(Collectors.toList());
     }
 }

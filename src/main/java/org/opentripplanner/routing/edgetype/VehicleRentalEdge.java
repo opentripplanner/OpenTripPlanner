@@ -6,7 +6,9 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
 /**
@@ -30,7 +32,9 @@ public class VehicleRentalEdge extends Edge {
         RoutingRequest options = s0.getOptions();
 
         VehicleRentalStationVertex stationVertex = (VehicleRentalStationVertex) tov;
-        String network = stationVertex.getStation().getNetwork();
+        VehicleRentalPlace station = stationVertex.getStation();
+        TraverseMode vehicleMode = stationVertex.getVehicleMode();
+        String network = station.getNetwork();
 
         boolean pickedUp;
         if (options.arriveBy) {
@@ -38,31 +42,31 @@ public class VehicleRentalEdge extends Edge {
                 case BEFORE_RENTING:
                     return null;
                 case HAVE_RENTED:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && !station.allowDropoffNow()) {
                         return null;
                     }
-                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), network, true);
+                    s1.dropOffRentedVehicleAtStation(vehicleMode, network, true);
                     pickedUp = false;
                     break;
                 case RENTING_FLOATING:
-                    if (stationVertex.getStation().isFloatingBike) {
-                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), network, true);
+                    if (station.isFloatingBike()) {
+                        s1.beginFloatingVehicleRenting(vehicleMode, network, true);
                         pickedUp = true;
                     } else {
                         return null;
                     }
                     break;
                 case RENTING_FROM_STATION:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getVehiclesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && !station.allowPickupNow()) {
                         return null;
                     }
                     // For arriveBy searches mayKeepRentedVehicleAtDestination is only set in State#getInitialStates(),
                     // and so here it is checked if this bicycle could have been kept at the destination
-                    if (s0.mayKeepRentedVehicleAtDestination() && !stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed) {
+                    if (s0.mayKeepRentedVehicleAtDestination() && !station.isKeepingVehicleRentalAtDestinationAllowed()) {
                         return null;
                     }
                     if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {  return null; }
-                    s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), network, false, true);
+                    s1.beginVehicleRentingAtStation(vehicleMode, network, false, true);
                     pickedUp = true;
                     break;
                 default:
@@ -71,18 +75,14 @@ public class VehicleRentalEdge extends Edge {
         } else {
             switch (s0.getVehicleRentalState()) {
                 case BEFORE_RENTING:
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getVehiclesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && !station.allowPickupNow()) {
                         return null;
                     }
-                    if (stationVertex.getStation().isFloatingBike) {
-                        s1.beginFloatingVehicleRenting(stationVertex.getVehicleMode(), network,
-                                false);
+                    if (station.isFloatingBike()) {
+                        s1.beginFloatingVehicleRenting(vehicleMode, network, false);
                     } else {
-                        var mayKeep =
-                                stationVertex.getStation().isKeepingVehicleRentalAtDestinationAllowed
-                                        && options.allowKeepingRentedVehicleAtDestination;
-                        s1.beginVehicleRentingAtStation(stationVertex.getVehicleMode(), network,
-                                mayKeep, false);
+                        boolean mayKeep = options.allowKeepingRentedVehicleAtDestination && station.isKeepingVehicleRentalAtDestinationAllowed();
+                        s1.beginVehicleRentingAtStation(vehicleMode, network, mayKeep, false);
                     }
                     pickedUp = true;
                     break;
@@ -91,10 +91,10 @@ public class VehicleRentalEdge extends Edge {
                 case RENTING_FLOATING:
                 case RENTING_FROM_STATION:
                     if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) { return null; }
-                    if (options.useVehicleRentalAvailabilityInformation && stationVertex.getSpacesAvailable() == 0) {
+                    if (options.useVehicleRentalAvailabilityInformation && !station.allowDropoffNow()) {
                         return null;
                     }
-                    s1.dropOffRentedVehicleAtStation(stationVertex.getVehicleMode(), network, false);
+                    s1.dropOffRentedVehicleAtStation(vehicleMode, network, false);
                     pickedUp = false;
                     break;
                 default:

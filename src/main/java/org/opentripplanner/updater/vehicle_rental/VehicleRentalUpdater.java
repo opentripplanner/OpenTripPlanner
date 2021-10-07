@@ -4,7 +4,7 @@ import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -84,7 +84,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             LOG.debug("No updates");
             return;
         }
-        List<VehicleRentalStation> stations = source.getStations();
+        List<VehicleRentalPlace> stations = source.getStations();
 
         // Create graph writer runnable to apply these stations to the graph
         VehicleRentalGraphWriterRunnable graphWriterRunnable = new VehicleRentalGraphWriterRunnable(stations);
@@ -97,9 +97,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
 
-        private final List<VehicleRentalStation> stations;
+        private final List<VehicleRentalPlace> stations;
 
-        public VehicleRentalGraphWriterRunnable(List<VehicleRentalStation> stations) {
+        public VehicleRentalGraphWriterRunnable(List<VehicleRentalPlace> stations) {
             this.stations = stations;
         }
 
@@ -109,10 +109,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             Set<FeedScopedId> stationSet = new HashSet<>();
 
             /* add any new stations and update vehicle counts for existing stations */
-            for (VehicleRentalStation station : stations) {
+            for (VehicleRentalPlace station : stations) {
                 service.addVehicleRentalStation(station);
-                stationSet.add(station.id);
-                VehicleRentalStationVertex vehicleRentalVertex = verticesByStation.get(station.id);
+                stationSet.add(station.getId());
+                VehicleRentalStationVertex vehicleRentalVertex = verticesByStation.get(station.getId());
                 if (vehicleRentalVertex == null) {
                     vehicleRentalVertex = new VehicleRentalStationVertex(graph, station);
                     DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
@@ -126,14 +126,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                     );
                     if (vehicleRentalVertex.getOutgoing().isEmpty()) {
                         // the toString includes the text "Bike rental station"
-                        LOG.info("VehicleRentalStation {} is unlinked", vehicleRentalVertex);
+                        LOG.info("VehicleRentalPlace {} is unlinked", vehicleRentalVertex);
                     }
                     tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex));
-                    verticesByStation.put(station.id, vehicleRentalVertex);
-                    tempEdgesByStation.put(station.id, tempEdges);
+                    verticesByStation.put(station.getId(), vehicleRentalVertex);
+                    tempEdgesByStation.put(station.getId(), tempEdges);
                 } else {
-                    vehicleRentalVertex.setVehiclesAvailable(station.vehiclesAvailable);
-                    vehicleRentalVertex.setSpacesAvailable(station.spacesAvailable);
+                    vehicleRentalVertex.setStation(station);
                 }
             }
             /* remove existing stations that were not present in the update */

@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
@@ -19,7 +20,6 @@ class GbfsVehicleRentalDataSourceTest {
                 "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
                 "nb",
                 false,
-                false,
                 new HashMap<>()
         ));
 
@@ -27,13 +27,13 @@ class GbfsVehicleRentalDataSourceTest {
 
         assertTrue(dataSource.update());
 
-        List<VehicleRentalStation> stations = dataSource.getStations();
+        List<VehicleRentalPlace> stations = dataSource.getStations();
         assertEquals(6, stations.size());
-        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.name.toString().equals("TORVGATA")));
-        assertTrue(stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.allowDropoff));
-        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isFloatingBike));
-        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation));
-        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed));
+        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.getName().toString().equals("TORVGATA")));
+        assertTrue(stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.isAllowDropoff()));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isFloatingBike()));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation()));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed()));
 
     }
 
@@ -43,7 +43,6 @@ class GbfsVehicleRentalDataSourceTest {
                 "file:src/test/resources/gbfs/helsinki/gbfs.json",
                 "en",
                 false,
-                false,
                 new HashMap<>()
         ));
 
@@ -51,13 +50,14 @@ class GbfsVehicleRentalDataSourceTest {
 
         assertTrue(dataSource.update());
 
-        List<VehicleRentalStation> stations = dataSource.getStations();
+        List<VehicleRentalPlace> stations = dataSource.getStations();
         assertEquals(10, stations.size());
-        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.name.toString().equals("Kasarmitori")));
-        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.allowDropoff));
-        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isFloatingBike));
-        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation));
-        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed));
+        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.getName().toString().equals("Kasarmitori")));
+        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.isAllowDropoff()));
+        assertTrue(stations.stream().anyMatch(vehicleRentalStation -> !vehicleRentalStation.isAllowDropoff()));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isFloatingBike()));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation()));
+        assertTrue(stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed()));
 
     }
 }

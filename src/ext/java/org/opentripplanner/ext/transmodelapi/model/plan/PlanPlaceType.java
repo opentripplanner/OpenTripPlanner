@@ -13,11 +13,14 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
 public class PlanPlaceType {
 
   public static GraphQLObjectType create(
       GraphQLOutputType bikeRentalStationType,
+      GraphQLOutputType rentalVehicleType,
       GraphQLOutputType quayType
   ) {
     return GraphQLObjectType
@@ -78,14 +81,20 @@ public class PlanPlaceType {
             .name("bikeRentalStation")
             .type(bikeRentalStationType)
             .description("The bike rental station related to the place")
-            .dataFetcher(environment -> {
-              return ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
-                  ? GqlUtil
-                  .getRoutingService(environment)
-                  .getVehicleRentalStationService()
-                  .getVehicleRentalStation(((Place) environment.getSource()).bikeShareId)
-                  : null;
-            })
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
+                    && ((Place) environment.getSource()).vehicleRentalStation instanceof VehicleRentalStation
+                ? ((Place) environment.getSource()).vehicleRentalStation
+                : null)
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("rentalVehicle")
+            .type(rentalVehicleType)
+            .description("The rental vehicle related to the place")
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
+                    && ((Place) environment.getSource()).vehicleRentalStation instanceof VehicleRentalVehicle
+                ? ((Place) environment.getSource()).vehicleRentalStation
+                : null)
             .build())
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("bikePark")
