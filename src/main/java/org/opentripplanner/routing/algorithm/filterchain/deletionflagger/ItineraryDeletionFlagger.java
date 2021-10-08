@@ -9,6 +9,12 @@ import java.util.List;
 
 /**
  * ItineraryDeletionFlagger is used to flag itineraries which should not be presented to the user.
+ * <p>
+ * Override one of the default methods in this interface to make a filter:
+ * <ul>
+ *  <li>{@link #predicate()} - If filtering is done based on looking at one itinerary at the time.</li>
+ *  <li>{@link getFlaggedItineraries(List)}}) - If you need more than one itinerary to decide witch to delete.</li>
+ * </ul>
  */
 public interface ItineraryDeletionFlagger {
 
