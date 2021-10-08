@@ -27,7 +27,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  * <p>
  * The expected result is an itinerary with 2 transit legs and a transfer.
  */
-public class C03_ReversedTransfersTest implements RaptorTestConstants {
+public class C03_OnStreetTransfersTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();

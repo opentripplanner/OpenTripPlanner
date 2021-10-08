@@ -1,14 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
@@ -16,8 +11,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
 public class RaptorRequestTransferCache {
 
@@ -44,47 +37,12 @@ public class RaptorRequestTransferCache {
         return new CacheLoader<>() {
             @Override
             public RaptorTransferIndex load(@javax.annotation.Nonnull CacheKey cacheKey) {
-                return createRaptorTransfersForRequest(
+                return RaptorTransferIndex.create(
                         cacheKey.transfersByStopIndex,
                         cacheKey.routingRequest
                 );
             }
         };
-    }
-
-    static RaptorTransferIndex createRaptorTransfersForRequest(
-        List<List<Transfer>> transfersByStopIndex,
-        RoutingRequest routingRequest
-    ) {
-        var forwardTransfers = transfersByStopIndex
-            .stream()
-            .map(t -> (List<RaptorTransfer>) new ArrayList<>(t
-                .stream()
-                .flatMap(s -> s.asRaptorTransfer(routingRequest).stream())
-                .collect(toMap(
-                    RaptorTransfer::stop,
-                    Function.identity(),
-                    (a, b) -> a.generalizedCost() < b.generalizedCost() ? a : b
-                ))
-                .values()))
-            .collect(toList());
-
-        var reversedTransfers = new ArrayList<List<RaptorTransfer>>(forwardTransfers.size());
-
-        for (int i = 0; i < forwardTransfers.size(); i++) {
-            reversedTransfers.add(new ArrayList<>());
-        }
-
-        for (int fromStop = 0; fromStop < forwardTransfers.size(); fromStop++) {
-            final int finalFromStop = fromStop;
-            forwardTransfers.get(fromStop)
-                    .forEach(transfer -> {
-                        reversedTransfers.get(transfer.stop())
-                                .add(new ReversedRaptorTransfer(finalFromStop, transfer));
-                    });
-        }
-
-        return new RaptorTransferIndex(forwardTransfers, reversedTransfers);
     }
 
     private static class CacheKey {

@@ -115,9 +115,14 @@ public class ReverseTransitCalculatorTest {
         var subject = create();
         var transitData = new TestTransitData()
                         .withTransfer(STOP_A, walk(STOP_B, D1m));
+
+        // Expect transfer from stop A to stop B (reversed)
+        var transfersFromStopB = subject.getTransfers(transitData, STOP_B);
+        assertTrue(transfersFromStopB.hasNext());
+        assertEquals(STOP_A, transfersFromStopB.next().stop());
+
+        // No transfer form stop A expected
         assertFalse(subject.getTransfers(transitData, STOP_A).hasNext());
-        assertTrue(subject.getTransfers(transitData, STOP_B).hasNext());
-        assertEquals(STOP_A, subject.getTransfers(transitData, STOP_B).next().stop());
     }
 
     private void assertIntIterator(IntIterator it, int ... values) {

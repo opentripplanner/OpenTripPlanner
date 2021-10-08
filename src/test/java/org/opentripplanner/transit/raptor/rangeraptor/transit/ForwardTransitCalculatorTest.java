@@ -114,8 +114,13 @@ public class ForwardTransitCalculatorTest {
         var subject = create();
         var transitData = new TestTransitData()
                 .withTransfer(STOP_A, walk(STOP_B, D1m));
-        assertTrue(subject.getTransfers(transitData, STOP_A).hasNext());
-        assertEquals(STOP_B, subject.getTransfers(transitData, STOP_A).next().stop());
+
+        // Expect transfer from stop A to stop B
+        var transfersFromStopA = subject.getTransfers(transitData, STOP_A);
+        assertTrue(transfersFromStopA.hasNext());
+        assertEquals(STOP_B, transfersFromStopA.next().stop());
+
+        // No transfer for stop B expected
         assertFalse(subject.getTransfers(transitData, STOP_B).hasNext());
     }
 

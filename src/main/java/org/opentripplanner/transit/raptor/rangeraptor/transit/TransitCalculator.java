@@ -207,5 +207,11 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
      */
     boolean alightingPossibleAt(RaptorTripPattern pattern, int stopPos);
 
+    /**
+     * Returns an iterator over all transfers "from" (or "to" for reverse searches) a stopIndex.
+     *
+     * @see RaptorTransitDataProvider#getTransfersFromStop(int)
+     * @see RaptorTransitDataProvider#getTransfersToStop(int)
+     */
     Iterator<? extends RaptorTransfer> getTransfers(RaptorTransitDataProvider<T> transitDataProvider, int fromStop);
 }

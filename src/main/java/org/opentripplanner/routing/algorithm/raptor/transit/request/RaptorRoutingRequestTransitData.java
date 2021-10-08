@@ -71,9 +71,6 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     );
   }
 
-  /**
-   * Gets all the transfers starting at a given stop
-   */
   @Override
   public Iterator<RaptorTransfer> getTransfersFromStop(int stopIndex) {
     return transfers.getForwardTransfers().get(stopIndex).iterator();
@@ -84,9 +81,6 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     return transfers.getReversedTransfers().get(stopIndex).iterator();
   }
 
-  /**
-   * Gets all the unique trip patterns touching a set of stops
-   */
   @Override
   public Iterator<? extends RaptorRoute<TripSchedule>> routeIterator(IntIterator stops) {
     Set<RaptorRoute<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
