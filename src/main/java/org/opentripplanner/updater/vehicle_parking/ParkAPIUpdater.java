@@ -87,6 +87,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
                 // .openingHours(parseOpeningHours(jsonNode.path("opening_hours")))
                 // .feeHours(parseOpeningHours(jsonNode.path("fee_hours")))
                 .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asText() : null)
+                .imageUrl(jsonNode.has("image_url") ? jsonNode.get("image_url").asText() : null)
                 .note(note)
                 .capacity(capacity)
                 .availability(availability)
