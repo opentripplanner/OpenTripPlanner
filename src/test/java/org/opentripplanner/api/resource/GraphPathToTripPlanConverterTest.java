@@ -530,7 +530,7 @@ public class GraphPathToTripPlanConverterTest {
 
         // Edges for legs 1 and 2
         StreetTransitLink e5 = new StreetTransitLink(
-                v4, v6, false);
+                v4, v6);
         PreBoardEdge e7 = new PreBoardEdge(
                 v6, v8);
         TransitBoardAlight e9 = new TransitBoardAlight(
@@ -564,7 +564,7 @@ public class GraphPathToTripPlanConverterTest {
         PreAlightEdge e35 = new PreAlightEdge(
                 v34, v36);
         StreetTransitLink e37 = new StreetTransitLink(
-                v36, v38, true);
+                v36, v38);
 
         // Edges for legs 5 and 6, where edges 39 and 41 have the same name to trigger stayOn = true
         AreaEdge e39 = new AreaEdge(
