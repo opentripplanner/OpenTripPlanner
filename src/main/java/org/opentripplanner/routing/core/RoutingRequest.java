@@ -160,8 +160,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * tagged with wheelchair=no (eg. https://www.openstreetmap.org/way/128366294).
      *
      * This is called a reluctance rather than a penalty because we multiply it with the length
-     * of the street. This means traversing a 100 meter street (without wheelchair access) is 10
-     * times worse than a 10 meter street.
+     * of the street. This means traversing a 100 meter street (without wheelchair access) 
+     * would now seem like a 1,500 meter long street after applying this reluctance factor.
      */
     public int noWheelchairAccessOnStreetReluctance = 15;
 
