@@ -5,6 +5,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
+import java.awt.Color;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.datastore.CompositeDataSource;
@@ -268,16 +269,18 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
                         label = label_name + currentCount;
                         if (label.equals(issueTypeName)) {
                             out.printf(
-                                    "<button class='pure-button pure-button-disabled button-%s'>%s</button>%n",
+                                    "<button class='pure-button pure-button-disabled button-%s' style='background-color: %s;'>%s</button>%n",
                                     label_name.toLowerCase(),
+                                    IssueColors.rgb(label_name),
                                     label
                             );
                         }
                         else {
                             out.printf(
-                                    "<a class='pure-button button-%s' href=\"%s.html\">%s</a>%n",
+                                    "<a class='pure-button button-%s' href=\"%s.html\" style='background-color: %s;'>%s</a>%n",
                                     label_name.toLowerCase(),
                                     label,
+                                    IssueColors.rgb(label_name),
                                     label
                             );
                         }
