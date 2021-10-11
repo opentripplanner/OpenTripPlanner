@@ -148,7 +148,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * The reluctance of using stairs in a wheelchair. This value will be multiplied with the
      * regular cost of traversing the stairs which depends on its length.
      *
-     * In other words 100 meter long stairs are 10 times worse than a 10 meter one.
+     * In other words, a 100 meter long stairs would now seems like a 2,000 meter long stairs after applying this reluctance factor.
      */
     public int wheelchairStairsReluctance = 20;
     /**
