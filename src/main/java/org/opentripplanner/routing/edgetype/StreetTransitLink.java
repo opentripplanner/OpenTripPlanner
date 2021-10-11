@@ -25,20 +25,16 @@ public class StreetTransitLink extends Edge {
     private static final long serialVersionUID = -3311099256178798981L;
     static final int STL_TRAVERSE_COST = 1;
 
-    private boolean wheelchairAccessible;
-
     private TransitStop transitStop;
 
-    public StreetTransitLink(StreetVertex fromv, TransitStop tov, boolean wheelchairAccessible) {
+    public StreetTransitLink(StreetVertex fromv, TransitStop tov) {
         super(fromv, tov);
         transitStop = tov;
-        this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    public StreetTransitLink(TransitStop fromv, StreetVertex tov, boolean wheelchairAccessible) {
+    public StreetTransitLink(TransitStop fromv, StreetVertex tov) {
         super(fromv, tov);
         transitStop = fromv;
-        this.wheelchairAccessible = wheelchairAccessible;
     }
 
     public String getDirection() {

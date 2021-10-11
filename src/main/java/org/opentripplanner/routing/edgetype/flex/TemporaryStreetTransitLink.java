@@ -9,12 +9,12 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 public class TemporaryStreetTransitLink extends StreetTransitLink implements TemporaryEdge {
 
 
-    public TemporaryStreetTransitLink(StreetVertex fromv, TransitStop tov, boolean wheelchairAccessible) {
-        super(fromv, tov, wheelchairAccessible);
+    public TemporaryStreetTransitLink(StreetVertex fromv, TransitStop tov) {
+        super(fromv, tov);
     }
 
-    public TemporaryStreetTransitLink(TransitStop fromv, StreetVertex tov, boolean wheelchairAccessible) {
-        super(fromv, tov, wheelchairAccessible);
+    public TemporaryStreetTransitLink(TransitStop fromv, StreetVertex tov) {
+        super(fromv, tov);
     }
 
     public State traverse(State s0) {

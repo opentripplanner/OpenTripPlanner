@@ -103,8 +103,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
             // Only use stop codes for linking TODO: find better method to connect stops without stop code
             if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
-                new StreetTransitLink(ts, tsv, wheelchairAccessible);
-                new StreetTransitLink(tsv, ts, wheelchairAccessible);
+                new StreetTransitLink(ts, tsv);
+                new StreetTransitLink(tsv, ts);
                 LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
                 return true;
             }
