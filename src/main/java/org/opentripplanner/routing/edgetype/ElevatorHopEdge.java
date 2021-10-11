@@ -65,11 +65,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
             // https://github.com/ibi-group/OpenTripPlanner/blob/f2b375364985b8dd83f791950d955e3ec5c9cb34/src/main/java/org/opentripplanner/routing/algorithm/EarliestArrivalSearch.java#L76
             s1.incrementWeight(options.noWheelchairAccessOnElevatorPenalty);
             s1.incrementTimeInSeconds(options.noWheelchairAccessOnElevatorPenalty);
-        } else {
-            s1.incrementWeight(options.elevatorHopCost);
         }
 
+        s1.incrementWeight(options.elevatorHopCost);
         s1.incrementTimeInSeconds(options.elevatorHopTime);
+
         return s1.makeState();
     }
 
