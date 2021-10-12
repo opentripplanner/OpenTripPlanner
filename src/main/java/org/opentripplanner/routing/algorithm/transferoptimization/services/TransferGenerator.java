@@ -101,7 +101,6 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     final List<TripToTripTransfer<T>> result = new ArrayList<>();
 
     while (stopPos < fromTrip.pattern().numberOfStopsInPattern()) {
-      // TODO: What about stops with guaranteed transfer but no alighting/boarding
       boolean alightingPossible = fromTrip.pattern().alightingPossibleAt(stopPos);
       if (alightingPossible) {
         var from = TripStopTime.arrival(fromTrip, stopPos);
