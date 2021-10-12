@@ -671,7 +671,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
 
     props.setProperties(
-            "highway=cycleway", StreetTraversalPermission.BICYCLE,
+            "highway=cycleway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
             dedicated_cycleway, dedicated_cycleway
     );
     props.setProperties(
