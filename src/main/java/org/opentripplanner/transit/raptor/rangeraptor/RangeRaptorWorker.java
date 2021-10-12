@@ -292,7 +292,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return false; }
 
-        this.earliestBoardTime = calculator.minusDuration(
+        int earliestBoardTime = calculator.minusDuration(
                 sourceStopArrival.arrivalTime(),
                 slackProvider.alightSlack()
         );
@@ -308,6 +308,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             return false;
         }
 
+        this.earliestBoardTime = earliestBoardTime;
         transitWorker.board(targetStopIndex, earliestBoardTime, result);
 
         return true;

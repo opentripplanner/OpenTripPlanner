@@ -24,7 +24,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * equivalent to the transfers explored during routing (in Raptor).
  * <p>
  * This class also filters away transfers which cannot be used due to time constraints. For example,
- * if a transfer point is before the the earliest possible boarding or after the latest possible
+ * if a transfer point is before the earliest possible boarding or after the latest possible
  * arrival. Transfer constraints should also be respected.
  * <p>
  * This service does NOT combine transfers between various trips to form full paths. There are
@@ -33,6 +33,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class TransferGenerator<T extends RaptorTripSchedule> {
+
+  private static final int SAME_STOP_TRANSFER_TIME = 0;
 
   private final TransferServiceAdaptor<T> transferServiceAdaptor;
   private final RaptorSlackProvider slackProvider;
@@ -89,11 +91,13 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     this.fromTrip = fromTrip;
     this.toTrip = toTrip;
 
-    int firstStopPos = 1 + fromTrip.findDepartureStopPosition(
-        fromTripDeparture.time(),
-        fromTripDeparture.stop()
-    );
+    int firstStopPos = firstPossibleArrivalStopPos(fromTrip, fromTripDeparture);
     return  findAllTransfers(firstStopPos);
+  }
+
+  /** Given the trip and departure, find the first possible stop position to alight. */
+  private int firstPossibleArrivalStopPos(T trip, StopTime departure) {
+    return 1 + trip.findDepartureStopPosition(departure.time(), departure.stop());
   }
 
   private List<TripToTripTransfer<T>> findAllTransfers(int stopPos) {
@@ -116,7 +120,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     final int stop = from.stop();
     var tx = transferServiceAdaptor.findTransfer(from, toTrip, stop);
 
-    final int earliestDepartureTime = earliestDepartureTime(from.time(), tx);
+    final int earliestDepartureTime = earliestDepartureTime(
+            from.time(), SAME_STOP_TRANSFER_TIME, tx
+    );
 
     final int toTripStopPos = toTrip.findDepartureStopPosition(earliestDepartureTime, stop);
 
@@ -164,13 +170,11 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
           int transferDurationInSeconds,
           @Nullable ConstrainedTransfer tx
   ) {
-    return earliestDepartureTime(fromTime, tx) + transferDurationInSeconds;
-  }
-
-  private int earliestDepartureTime(int  fromTime, @Nullable ConstrainedTransfer tx) {
-    return tx==null || tx.includeSlack()
-            ? fromTime + slackProvider.transitSlack(fromTrip.pattern())
-            : fromTime;
+    // Ignore slack and walking-time for guaranteed and stay-seated transfers
+    if(tx != null && tx.getTransferConstraint().isFacilitated()) {
+      return fromTime;
+    }
+    return fromTime + transferDurationInSeconds + slackProvider.transitSlack(fromTrip.pattern());
   }
 
   @Nonnull

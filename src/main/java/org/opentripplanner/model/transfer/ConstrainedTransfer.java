@@ -64,10 +64,6 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
         return constraint;
     }
 
-    public boolean includeSlack() {
-        return !constraint.isFacilitated();
-    }
-
     public boolean noConstraints() {
         return constraint.noConstraints();
     }
