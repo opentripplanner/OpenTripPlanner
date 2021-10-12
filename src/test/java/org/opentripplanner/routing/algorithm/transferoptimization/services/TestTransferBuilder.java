@@ -87,6 +87,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
         int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStopIndex);
 
         return new ConstrainedTransfer(
+                null,
                 new TripTransferPoint(createDummyTrip(fromTrip), fromStopPos),
                 new TripTransferPoint(createDummyTrip(toTrip), toStopPos),
                 constraint.build()

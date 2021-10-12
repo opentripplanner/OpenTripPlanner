@@ -54,6 +54,6 @@ public class TransferServiceTest implements TransferTestData {
 
     ConstrainedTransfer transfer(TransferPoint from, TransferPoint to) {
         var c = TransferConstraint.create().build();
-        return new ConstrainedTransfer(from, to, c);
+        return new ConstrainedTransfer(null, from, to, c);
     }
 }

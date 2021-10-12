@@ -13,16 +13,16 @@ public class ConstrainedTransferTest implements TransferTestData {
   private static final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
   private static final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
 
-  private final ConstrainedTransfer TX_A_TO_B = new ConstrainedTransfer(STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
-  private final ConstrainedTransfer TX_A_TO_R22 = new ConstrainedTransfer(STOP_POINT_A, ROUTE_POINT_22, NO_CONSTRAINS);
-  private final ConstrainedTransfer TX_A_TO_T23 = new ConstrainedTransfer(STOP_POINT_A, TRIP_POINT_23, NO_CONSTRAINS);
-  private final ConstrainedTransfer TX_R11_TO_B = new ConstrainedTransfer(ROUTE_POINT_11, STOP_POINT_B, NO_CONSTRAINS);
-  private final ConstrainedTransfer TX_R11_TO_R22 = new ConstrainedTransfer(ROUTE_POINT_11, ROUTE_POINT_22, NO_CONSTRAINS);
-  private final ConstrainedTransfer TX_T11_TO_R22 = new ConstrainedTransfer(TRIP_POINT_11, ROUTE_POINT_22, NO_CONSTRAINS);
-  private final ConstrainedTransfer TX_T11_TO_T22 = new ConstrainedTransfer(TRIP_POINT_11, TRIP_POINT_23, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_A_TO_B = new ConstrainedTransfer(null, STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_A_TO_R22 = new ConstrainedTransfer(null, STOP_POINT_A, ROUTE_POINT_22, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_A_TO_T23 = new ConstrainedTransfer(null, STOP_POINT_A, TRIP_POINT_23, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_R11_TO_B = new ConstrainedTransfer(null, ROUTE_POINT_11, STOP_POINT_B, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_R11_TO_R22 = new ConstrainedTransfer(null, ROUTE_POINT_11, ROUTE_POINT_22, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_T11_TO_R22 = new ConstrainedTransfer(null, TRIP_POINT_11, ROUTE_POINT_22, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_T11_TO_T22 = new ConstrainedTransfer(null, TRIP_POINT_11, TRIP_POINT_23, NO_CONSTRAINS);
 
-  private final ConstrainedTransfer TX_NO_CONSTRAINS = new ConstrainedTransfer(STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
-  private final ConstrainedTransfer TX_GUARANTIED = new ConstrainedTransfer(TRIP_POINT_11, TRIP_POINT_23, GUARANTIED);
+  private final ConstrainedTransfer TX_NO_CONSTRAINS = new ConstrainedTransfer(null, STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_GUARANTIED = new ConstrainedTransfer(null, TRIP_POINT_11, TRIP_POINT_23, GUARANTIED);
 
   @BeforeEach
   public void setup() {

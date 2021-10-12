@@ -151,6 +151,7 @@ class TransferMapper {
     for (TransferPoint fromPoint : fromPoints) {
       for (TransferPoint toPoint : toPoints) {
         var transfer = new ConstrainedTransfer(
+                null,
                 fromPoint,
                 toPoint,
                 constraint

@@ -3,6 +3,8 @@ package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 
@@ -18,6 +20,8 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
 
     private static final long serialVersionUID = 1L;
 
+    private final FeedScopedId id;
+
     private final TransferPoint from;
 
     private final TransferPoint to;
@@ -25,13 +29,26 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
     private final TransferConstraint constraint;
 
     public ConstrainedTransfer(
+            @Nullable FeedScopedId id,
             TransferPoint from,
             TransferPoint to,
             TransferConstraint constraint
     ) {
+        this.id = id;
         this.from = from;
         this.to = to;
         this.constraint = constraint;
+    }
+
+    /**
+     * In NeTEx an interchange have an id, in GTFS a transfer do not. We include it here to
+     * enable debugging, logging and system integration. Note! OTP do not use this id,
+     * and it is just passed through OTP. There is no service in OTP to look up a transfer by its
+     * id.
+     */
+    @Nullable
+    public FeedScopedId getId() {
+        return id;
     }
 
     public TransferPoint getFrom() {

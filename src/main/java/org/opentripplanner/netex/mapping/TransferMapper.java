@@ -62,7 +62,7 @@ public class TransferMapper {
         if(from==null ||to==null) { return null; }
 
         var c = mapConstraint(it);
-        var tx = new ConstrainedTransfer(from, to, c);
+        var tx = new ConstrainedTransfer(idFactory.createId(it.getId()), from, to, c);
 
         if(tx.noConstraints()) {
             issueStore.add(new InterchangeWithoutConstraint(tx));
