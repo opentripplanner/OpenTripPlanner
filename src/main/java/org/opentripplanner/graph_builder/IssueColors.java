@@ -4,14 +4,21 @@ import java.awt.Color;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** THIS CLASS IS THREAD-SAFE */
 class IssueColors {
+    
+    /** 
+     * We use a concurrent hash map for thread safety. It is not necessary since the report
+     * writer is not writing files in parallel, but it make this class thread-safe in case we
+     * want to speed up the issue report generation.
+     */
     private static final Map<String, Color> ASSIGNED_COLOR = new ConcurrentHashMap<>();
 
     /**
      * List of back-ground-colors, should work with black text on top. The order should give
      * dissent contract for two neighboring pairs.
      */
-    private final static Color[] BG_COLORS = {
+    private static final Color[] BG_COLORS = {
             new Color(0xFFFF80),
             new Color(0xFFD0FF),
             new Color(0x90C8FF),
