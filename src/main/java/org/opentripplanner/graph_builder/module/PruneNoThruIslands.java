@@ -49,7 +49,7 @@ import java.util.Queue;
  */
 public class PruneNoThruIslands implements GraphBuilderModule {
 
-    private static org.slf4j.Logger LOG = LoggerFactory.getLogger(PruneNoThruIslands.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PruneNoThruIslands.class);
 
     /**
      * this field indicate the maximum size for island without stops
