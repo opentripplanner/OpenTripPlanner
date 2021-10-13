@@ -51,7 +51,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         createAffectsStop(stopConditions, stopId.getId())
     );
 
-    long priorityValue = 3;
+    Integer priorityValue = Integer.valueOf(3);
     ptSituation.setPriority(BigInteger.valueOf(priorityValue));
 
     InfoLinkStructure infoLink = new InfoLinkStructure();
