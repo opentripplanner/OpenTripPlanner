@@ -12,7 +12,7 @@ COPY run-otp.sh /opt/run-otp.sh
 
 COPY settings.json /opt/otp/settings.json
 COPY *.osm.pbf /opt/otp/map.osm.pbf
-COPY graphs /opt/otp/graphs
+# COPY graphs /opt/otp/graphs
 
 RUN mkdir /opt/otp/built
 RUN chmod -R 777 /opt
