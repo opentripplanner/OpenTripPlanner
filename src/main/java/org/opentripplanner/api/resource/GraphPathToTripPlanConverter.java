@@ -268,15 +268,19 @@ public abstract class GraphPathToTripPlanConverter {
         return itinerary;
     }
 
+    /**
+     * Iterates over the legs and computes the accessibility scores for transit and walk
+     * legs.
+     */
     private static void addAccessibilityScore(List<Leg> legs, State[][] states) {
         RoutingRequest request = states[0][0].getOptions();
         for (int i = 0; i < legs.size(); i++) {
             Leg currentLeg = legs.get(i);
             if (currentLeg.isTransitLeg()) {
-                System.out.println(currentLeg);
                 Trip trip = states[i][states.length - 1].getBackTrip();
+                Leg nextLeg = legs.get(i + 1);
                 currentLeg.accessibilityScore =
-                        computeAccessibilityScore(trip, currentLeg, states[i][0].getOptions());
+                        computeAccessibilityScore(trip, currentLeg, nextLeg, states[i][0].getOptions());
             }
             else if (currentLeg.mode.equals("WALK") && request.wheelchairAccessible) {
                 currentLeg.accessibilityScore = 0.5f;
@@ -909,19 +913,22 @@ public abstract class GraphPathToTripPlanConverter {
      */
     private static Float computeAccessibilityScore(
             Trip trip,
-            Leg leg,
+            Leg currentLeg,
+            Leg nextLeg,
             RoutingRequest options
     ) {
         if (options.wheelchairAccessible) {
             List<Float> scores = new ArrayList<>();
 
-            if(leg.interlineWithPreviousLeg == null || !leg.interlineWithPreviousLeg) {
-                float fromScore = computeAccessibilityScore(leg.from.wheelchairBoarding);
+            if(currentLeg.interlineWithPreviousLeg == null || !currentLeg.interlineWithPreviousLeg) {
+                float fromScore = computeAccessibilityScore(currentLeg.from.wheelchairBoarding);
                 scores.add(fromScore);
             }
 
-            float toScore = computeAccessibilityScore(leg.to.wheelchairBoarding);
-            scores.add(toScore);
+            if(nextLeg == null || nextLeg.interlineWithPreviousLeg == null || !nextLeg.interlineWithPreviousLeg) {
+                float toScore = computeAccessibilityScore(currentLeg.to.wheelchairBoarding);
+                scores.add(toScore);
+            }
 
             float tripScore = computeAccessibilityScore(
                     WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible()));
