@@ -9,6 +9,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
@@ -23,8 +24,8 @@ import org.opentripplanner.transit.raptor.speed_test.model.Leg;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 
 public class ItineraryMapper {
-    private SpeedTestRequest request;
-    private TransitLayer transitLayer;
+    private final SpeedTestRequest request;
+    private final TransitLayer transitLayer;
 
     /**
      * @param transitLayer - need to be passed in because we do not know if we use the static or real-time version
@@ -70,7 +71,7 @@ public class ItineraryMapper {
         itinerary.walkDistance = 0.0;
         itinerary.transitTime = 0;
         itinerary.waitingTime = 0;
-        itinerary.weight = path.otpDomainCost();
+        itinerary.weight = RaptorCostConverter.toOtpDomainCost(path.generalizedCost());
 
         int numberOfTransits = 0;
 

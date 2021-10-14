@@ -36,7 +36,7 @@ import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -488,7 +488,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<VehicleRentalStation>> bikeRentalStations() {
+  public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations() {
     return environment -> {
       VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
               .getVehicleRentalStationService();
@@ -499,10 +499,10 @@ public class LegacyGraphQLQueryTypeImpl
               environment.getArguments());
 
       if (args.getLegacyGraphQLIds() != null) {
-        ArrayListMultimap<String, VehicleRentalStation> vehicleRentalStations =
+        ArrayListMultimap<String, VehicleRentalPlace> vehicleRentalStations =
                 vehicleRentalStationService.getVehicleRentalStations()
                         .stream()
-                        .collect(Multimaps.toMultimap(VehicleRentalStation::getStationId, station -> station, ArrayListMultimap::create));
+                        .collect(Multimaps.toMultimap(VehicleRentalPlace::getStationId, station -> station, ArrayListMultimap::create));
         return ((List<String>) args.getLegacyGraphQLIds())
                 .stream()
                 .flatMap(id -> vehicleRentalStations.get(id).stream())
@@ -514,7 +514,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<VehicleRentalStation> bikeRentalStation() {
+  public DataFetcher<VehicleRentalPlace> bikeRentalStation() {
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeRentalStationArgs(environment.getArguments());
 

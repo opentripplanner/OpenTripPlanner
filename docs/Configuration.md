@@ -166,7 +166,8 @@ Feature | Description | Enabled by default | Sandbox
 `APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
 `APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
 `OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (witch stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
-`GuaranteedTransfers` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
+`ParallelRouting` | Enable performing parts of the trip planning in parallel | yes | no
+`TransferConstraints` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
 `ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
 `GoogleCloudStorage` | Enable Google Cloud Storage integration | no | yes
 `SandboxAPITransmodelApi` | Enable Entur Transmodel(NeTEx) GraphQL API | no | yes
@@ -211,6 +212,7 @@ config key | description | value type | value default | notes
 `streets` | Include street input files (OSM/PBF) | boolean | true | 
 `storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
 `subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
+`transferRequests` | Routing requests to use for pre-calculating stop-to-stop transfers. | object | `[ { mode: WALK } ]` |
 `transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
 `transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | date or period | &minus;P1Y | _2020&#8209;01&#8209;01, &minus;P1M3D, &minus;P3W_
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
@@ -779,11 +781,13 @@ seconds needed for the ride and alighting processes in `router-config.json` as f
 ```JSON
 // router-config.json
 {
-  "boardTimes": {
-    "AIRPLANE": 2700
-  },
-  "alightTimes": {
-    "AIRPLANE": 1200
+  "routingDefaults": {
+    "boardSlackForMode": {
+      "AIRPLANE": 2700
+    },
+    "alightSlackForMode": {
+      "AIRPLANE": 1200
+    }
   }
 }
 ```
@@ -1029,6 +1033,8 @@ To add a GBFS feed to the router add one entry in the `updater` field of `router
    "frequencySec": 60,
    // The URL of the GBFS feed auto-discovery file
    "url": "http://coast.socialbicycles.com/opendata/gbfs.json",
+   // Optionally specify the language version of the feed to use. If no language is set, the first language in the feed is used. 
+   "language": "en",
    // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
    "allowKeepingRentedBicycleAtDestination": true
 }

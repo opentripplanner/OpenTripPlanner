@@ -31,7 +31,7 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final ParetoSet<Path<T>> paths;
     private final TransitCalculator<T> transitCalculator;
-    private final CostCalculator<T> costCalculator;
+    private final CostCalculator costCalculator;
     private final SlackProvider slackProvider;
     private final PathMapper<T> pathMapper;
     private final DebugHandler<ArrivalView<?>> debugHandler;
@@ -41,7 +41,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     public DestinationArrivalPaths(
             ParetoComparator<Path<T>> paretoComparator,
             TransitCalculator<T> transitCalculator,
-            CostCalculator<T> costCalculator,
+            CostCalculator costCalculator,
             SlackProvider slackProvider,
             PathMapper<T> pathMapper,
             DebugHandlerFactory<T> debugHandlerFactory,

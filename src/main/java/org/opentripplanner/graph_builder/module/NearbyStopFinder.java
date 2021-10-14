@@ -4,6 +4,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.Comparator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -54,9 +55,6 @@ public class NearbyStopFinder {
     private final Graph graph;
     private final double durationLimitInSeconds;
 
-    /* Fields used when finding stops via the street network. */
-    private AStar astar;
-
     private DirectGraphFinder directGraphFinder;
 
     /**
@@ -75,12 +73,11 @@ public class NearbyStopFinder {
         this.graph = graph;
         this.useStreets = useStreets;
         this.durationLimitInSeconds = durationLimitInSeconds;
-        if (useStreets) {
-            astar = new AStar();
+
+        if (!useStreets) {
             // We need to accommodate straight line distance (in meters) but when streets are present we use an
             // earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
             // but we don't have much of a choice here. Use the default walking speed to convert.
-        } else {
             this.directGraphFinder = new DirectGraphFinder(graph);
         }
     }
@@ -189,6 +186,8 @@ public class NearbyStopFinder {
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
+
+        var astar = new AStar();
         astar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(durationLimitInSeconds));
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
@@ -223,9 +222,7 @@ public class NearbyStopFinder {
                 Collection<State> states = locationStates.getValue();
                 // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
                 // the minimum walking distance
-                State min = Collections.min(states,
-                    (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance)
-                );
+                State min = Collections.min(states, Comparator.comparing(State::getWeight));
 
                 // If the best state for this FlexStopLocation is a SplitterVertex, we want to get the
                 // TemporaryStreetLocation instead. This allows us to reach SplitterVertices in both

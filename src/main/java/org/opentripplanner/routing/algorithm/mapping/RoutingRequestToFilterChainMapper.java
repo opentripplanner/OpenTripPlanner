@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 public class RoutingRequestToFilterChainMapper {
@@ -17,13 +17,13 @@ public class RoutingRequestToFilterChainMapper {
   /** Never return more that this limit of itineraries. */
   private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
-  public static ItineraryFilter createFilterChain(
+  public static ItineraryListFilterChain createFilterChain(
       RoutingRequest request,
       Instant filterOnLatestDepartureTime,
       boolean removeWalkAllTheWayResults,
       Consumer<Itinerary> maxLimitReachedSubscriber
   ) {
-    var builder = new ItineraryFilterChainBuilder(request.arriveBy);
+    var builder = new ItineraryListFilterChainBuilder(request.arriveBy);
     var p = request.itineraryFilters;
 
     // Group by similar legs filter

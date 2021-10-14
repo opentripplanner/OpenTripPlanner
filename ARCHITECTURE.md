@@ -66,3 +66,10 @@ compared with an earlier version of the code to make sure the performance is NOT
 #### [Transfer path optimization](src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
 Describes the transfer functionality, the design and the implementation. The logic for finding the best
 transfer is distributed to the Raptor and the [OptimizeTransferService](src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/OptimizeTransferService.java).
+
+#### [Itinerary list filter chain](src/main/java/org/opentripplanner/routing/algorithm/filterchain/package.md)
+Describes the itinerary list filter chain, used to post-process the itineraries returned from the 
+routers in [RoutingWorker](src/main/java/org/opentripplanner/routing/algorithm/RoutingWorker.java), 
+in order to sort and reduce the number of returned itineraries. It can also be used to decorate the 
+returned itineraries, especially if it requires more complex calculations, which would be unfeasible
+to do during the routing process.

@@ -133,11 +133,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
     return environment -> {
       List<StopArrival> intermediateStops = getSource(environment).intermediateStops;
       if (intermediateStops == null) { return null; }
-      RoutingService routingService = getRoutingService(environment);
       return intermediateStops.stream()
-          .map(intermediateStop -> intermediateStop.place)
-          .filter(place -> place.stopId != null)
-          .map(place -> routingService.getStopForId(place.stopId))
+          .map(intermediateStop -> intermediateStop.place.stop)
           .filter(Objects::nonNull)
           .collect(Collectors.toList());
     };

@@ -28,8 +28,7 @@ public class StopTimeTest {
 
   @Test
   public void testToString() {
-    assertEquals("[1 00:10:00]", subject.toString());
-
+    assertEquals("[1 0:10]", subject.toString());
   }
 
   @Test

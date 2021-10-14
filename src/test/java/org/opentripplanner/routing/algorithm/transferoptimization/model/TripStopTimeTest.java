@@ -60,22 +60,22 @@ public class TripStopTimeTest {
 
   @Test
   public void testToString() {
-    assertEquals("[2 10:01:00 BUS L31]", departureStop1.toString());
-    assertEquals("[7 10:20:00 BUS L31]", arrivalStop3.toString());
+    assertEquals("[2 10:01 BUS L31]", departureStop1.toString());
+    assertEquals("[7 10:20 BUS L31]", arrivalStop3.toString());
   }
 
   @Test
   public void createArrival() {
     assertEquals(
-        "[2 10:00:00 BUS L31]",
+        "[2 10:00 BUS L31]",
         TripStopTime.arrival(trip, stopTime(STOP_1, time("10:00"))).toString()
     );
     assertEquals(
-        "[5 10:05:00 BUS L31]",
+        "[5 10:05 BUS L31]",
         TripStopTime.arrival(trip, stopTime(STOP_2, time("10:05"))).toString()
     );
     assertEquals(
-        "[7 10:20:00 BUS L31]",
+        "[7 10:20 BUS L31]",
         TripStopTime.arrival(trip, stopTime(STOP_3, time("10:20"))).toString()
     );
   }
@@ -83,15 +83,15 @@ public class TripStopTimeTest {
   @Test
   public void createDeparture() {
     assertEquals(
-        "[2 10:01:00 BUS L31]",
+        "[2 10:01 BUS L31]",
         TripStopTime.departure(trip, stopTime(STOP_1, time("10:01"))).toString()
     );
     assertEquals(
-        "[5 10:06:00 BUS L31]",
+        "[5 10:06 BUS L31]",
         TripStopTime.departure(trip, stopTime(STOP_2, time("10:06"))).toString()
     );
     assertEquals(
-        "[7 10:21:00 BUS L31]",
+        "[7 10:21 BUS L31]",
         TripStopTime.departure(trip, stopTime(STOP_3, time("10:21"))).toString()
     );
   }

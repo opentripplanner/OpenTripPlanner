@@ -204,7 +204,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   private static Place stop(Place source, int stopIndex) {
     Place p = new Place(source.coordinate.latitude(), source.coordinate.longitude(), source.name);
-    p.stopId = source.stopId;
+    p.stop = source.stop;
     p.stopIndex = stopIndex;
     return p;
   }

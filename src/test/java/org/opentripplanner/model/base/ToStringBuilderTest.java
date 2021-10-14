@@ -1,6 +1,6 @@
 package org.opentripplanner.model.base;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.util.time.TimeUtils;
@@ -68,7 +68,10 @@ public class ToStringBuilderTest {
 
   @Test
   public void addStr() {
-    assertEquals("ToStringBuilderTest{a: 'text'}", subject().addStr("a", "text").toString());
+    assertEquals(
+            "{a: 'text'}",
+            ToStringBuilder.of().addStr("a", "text").toString()
+    );
   }
 
   @Test
