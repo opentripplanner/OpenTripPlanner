@@ -72,6 +72,8 @@ New parameters:
  - `streetRoutingTimeout` Maximum time limit for street route queries. Replace the old `timeout`.
  - `transit` Transit tuning parameters, configure the raptor router. A set of parameters to tune 
              the Raptor transit router. 
+ - `itineraryFilters` Configure itinerary filters that may modify itineraries, sort them, and 
+                      filter away less preferable results.            
  
 These parameters are no longer supported:
 
@@ -133,7 +135,7 @@ The following parameters are missing in OTP2 but will be added:
   - `startingTransitStopId` - duplicative with fromPlace
   - `onlyTransitTrips` - the new feature for specifying access, egress, transit and direct mode
     replace the need for this parameter.
-
+  - `driveOnRight` - this is removed. You can specify the driving direction in your way property set.
 
 Parameters that have changed:
 
@@ -213,6 +215,11 @@ Parameters that have changed:
     - `effectiveEndDate` is added to show the end time of the alert validity. 
 
 
+### ServerInfo
+
+The returned data structure is changed and more info is available.
+
+
 ### AlertPatcher 
 
 The AlertPatcher, which was under the `/patch` path, is removed. In order to update alerts, please 
@@ -229,3 +236,8 @@ The analyst API endpoints have been removed.
 ### Scripting
 
 The scripting API endpoint has been removed.
+
+### Updaters
+
+- Floating bikes have been disabled by default in the GbfsBikeRentalDataSource unless explicitly 
+turned on via OTPFeature.

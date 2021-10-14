@@ -14,7 +14,8 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.PolylineEncoder;
 
@@ -89,14 +90,23 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("operator")
                     .type(operatorType)
-                    .dataFetcher(
-                            environment -> ((trip(environment)).getOperator()))
+                    .dataFetcher(environment -> ((trip(environment)).getOperator()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("directionType")
                     .type(EnumTypes.DIRECTION_TYPE)
-                    .dataFetcher(environment -> directIdStringToInt(((Trip) trip(environment)).getDirectionId()))
+                    .dataFetcher(environment -> trip(environment).getDirection())
                     .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("serviceAlteration")
+                .deprecate(
+                    "The service journey alteration will be moved out of SJ and grouped "
+                    + "together with the SJ and date. In Netex this new type is called "
+                    + "DatedServiceJourney. We will create artificial DSJs for the old SJs."
+                )
+                .type(EnumTypes.SERVICE_ALTERATION)
+                .dataFetcher(environment -> trip(environment).getTripAlteration())
+                .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("wheelchairAccessible")
                     .type(EnumTypes.WHEELCHAIR_BOARDING)
@@ -128,8 +138,12 @@ public class ServiceJourneyType {
                     .description("Returns scheduled passing times only - without realtime-updates, for realtime-data use 'estimatedCalls'")
                     .dataFetcher(env -> {
                         Trip trip = trip(env);
-                        return TripTimeShort.fromTripTimes(
-                            GqlUtil.getRoutingService(env).getPatternForTrip().get(trip).scheduledTimetable,
+                        return TripTimeOnDate.fromTripTimes(
+                            GqlUtil
+                                .getRoutingService(env)
+                                .getPatternForTrip()
+                                .get(trip)
+                                .getScheduledTimetable(),
                             trip
                         );
                     })
@@ -144,7 +158,6 @@ public class ServiceJourneyType {
                             .name("date")
                             .type(gqlUtil.dateScalar)
                             .description("Date to get estimated calls for. Defaults to today.")
-                            .defaultValue(null)
                             .build())
                     .dataFetcher(environment -> {
                         final Trip trip = trip(environment);
@@ -158,17 +171,19 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("pointsOnLink")
                     .type(linkGeometryType)
-                    .description("Detailed path travelled by service journey.")
+                    .description("Detailed path travelled by service journey. Not available for flexible trips.")
                     .dataFetcher(environment -> {
-                      LineString geometry = GqlUtil.getRoutingService(environment).getPatternForTrip()
-                                        .get(trip(environment))
-                                        .getGeometry();
-                                if (geometry == null) {
-                                    return null;
-                                }
-                                return PolylineEncoder.createEncodings(geometry);
-                            }
-                    )
+                        TripPattern tripPattern = GqlUtil
+                            .getRoutingService(environment)
+                            .getPatternForTrip()
+                            .get(trip(environment));
+                        if (tripPattern == null) { return null; }
+
+                        LineString geometry = tripPattern.getGeometry();
+                        if (geometry == null) { return null; }
+
+                        return PolylineEncoder.createEncodings(geometry);
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
@@ -184,7 +199,7 @@ public class ServiceJourneyType {
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment)
                             .getTransitAlertService()
-                            .getTripAlerts(trip(environment).getId())
+                            .getTripAlerts(trip(environment).getId(), null)
                     )
                 .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -208,13 +223,5 @@ public class ServiceJourneyType {
 
   private static Trip trip(DataFetchingEnvironment environment) {
     return environment.getSource();
-  }
-
-  private static int directIdStringToInt(String directionId) {
-    try {
-      return Integer.parseInt(directionId);
-    } catch (NumberFormatException nfe) {
-      return -1;
-    }
   }
 }

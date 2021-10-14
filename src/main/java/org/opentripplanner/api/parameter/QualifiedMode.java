@@ -26,7 +26,12 @@ public class QualifiedMode implements Serializable {
             );
         }
     }
-    
+
+    public QualifiedMode(ApiRequestMode mode, Qualifier... qualifiers) {
+        this.mode = mode;
+        this.qualifiers.addAll(Set.of(qualifiers));
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(mode);

@@ -249,20 +249,16 @@ type BikeRentalStation implements Node & PlaceInterface {
     name: String!
 
     """
-    Number of bikes currently available on the rental station. The total capacity
-    of this bike rental station is the sum of fields `bikesAvailable` and
-    `spacesAvailable`.
+    Number of bikes currently available on the rental station.
     """
     bikesAvailable: Int
 
     """
-    Number of free spaces currently available on the rental station. The total
-    capacity of this bike rental station is the sum of fields `bikesAvailable` and
-    `spacesAvailable`.
-    Note that this value being 0 does not necessarily indicate that bikes cannot
-    be returned to this station, as it might be possible to leave the bike in the
-    vicinity of the rental station, even if the bike racks don't have any spaces
-    available (see field `allowDropoff`).
+    Number of free spaces currently available on the rental station.
+    Note that this value being 0 does not necessarily indicate that bikes cannot be returned
+    to this station, as it might be possible to leave the bike in the vicinity of
+    the rental station,
+    even if the bike racks don't have any spaces available (see field `allowDropoff`).
     """
     spacesAvailable: Int
 
@@ -287,6 +283,37 @@ type BikeRentalStation implements Node & PlaceInterface {
 
     """Latitude of the bike rental station (WGS 84)"""
     lat: Float
+
+    """Nominal capacity (number of racks) of the rental station."""
+    capacity: Int
+
+    """If true, bikes can be returned even if spacesAvailable is zero or bikes > capacity."""
+    allowOverloading: Boolean
+
+    """Platform-specific URLs to begin renting a bike from this station."""
+    rentalUris: BikeRentalStationUris
+}
+
+type BikeRentalStationUris {
+    """
+    A URI that can be passed to an Android app with an {@code android.intent.action.VIEW} Android
+    intent to support Android Deep Links.
+    May be null if a rental URI does not exist.
+    """
+    android: String
+
+    """
+    A URI that can be used on iOS to launch the rental app for this station.
+    May be {@code null} if a rental URI does not exist.
+    """
+    ios: String
+
+    """
+    A URL that can be used by a web browser to show more information about renting a vehicle at
+    this station.
+    May be {@code null} if a rental URL does not exist.
+    """
+    web: String
 }
 
 enum BikesAllowed {
@@ -699,6 +726,19 @@ type Itinerary {
     How much elevation is lost, in total, over the course of the itinerary, in meters.
     """
     elevationLost: Float
+
+    """
+    Does the itinerary end without dropping off the rented bicycle:
+    """
+    arrivedAtDestinationWithRentedBicycle: Boolean
+
+    """
+    A list of system notices. Contains debug information for itineraries.
+    One use-case is to run a routing search with 'debugItineraryFilter: true'.
+    This will then tag itineraries instead of removing them from the result.
+    This make it possible to inspect the itinerary-filter-chain.
+    """
+    systemNotices: [SystemNotice]!
 }
 
 type Leg {
@@ -754,6 +794,9 @@ type Leg {
 
     """Whether this leg is a transit leg or not."""
     transitLeg: Boolean
+
+    "Whether this leg is walking with a bike."
+    walkingBike: Boolean
 
     """Whether this leg is traversed with a rented bike."""
     rentedBike: Boolean
@@ -814,6 +857,10 @@ type Leg {
     and passenger can stay inside the vehicle.
     """
     interlineWithPreviousLeg: Boolean
+
+    dropOffBookingInfo: BookingInfo
+
+    pickupBookingInfo: BookingInfo
 }
 
 """Identifies whether this stop represents a stop or station."""
@@ -845,11 +892,17 @@ enum Mode {
     """CAR"""
     CAR
 
+    """COACH"""
+    COACH
+
     """FERRY"""
     FERRY
 
     """Enables flexible transit for access and egress legs"""
-    FLEXIBLE
+    FLEX
+
+    """Enables flexible transit for access and egress legs"""
+    FLEXIBLE   @deprecated(reason: "Use FLEX instead")
 
     """FUNICULAR"""
     FUNICULAR
@@ -994,6 +1047,32 @@ enum PickupDropoffType {
     COORDINATE_WITH_DRIVER
 }
 
+type ContactInfo {
+    contactPerson: String
+    phoneNumber: String
+    eMail: String
+    faxNumber: String
+    infoUrl: String
+    bookingUrl: String
+    additionalDetails: String
+}
+
+type BookingTime {
+    time: String
+    daysPrior: Int
+}
+
+type BookingInfo {
+    contactInfo: ContactInfo
+    earliestBookingTime: BookingTime
+    latestBookingTime: BookingTime
+    minimumBookingNoticeSeconds: Long
+    maximumBookingNoticeSeconds: Long
+    message: String
+    pickupMessage: String
+    dropOffMessage: String
+}
+
 type Place {
     """
     For transit stops, the name of the stop. For points of interest, the name of the POI.
@@ -1134,7 +1213,7 @@ enum Qualifier {
     ~~HAVE~~
     **Currently not used**
     """
-    HAVE
+    HAVE    @deprecated(reason: "Currently not used")
 
     """
     The vehicle used must be left to a parking area before continuing the journey.
@@ -1149,13 +1228,22 @@ enum Qualifier {
     ~~KEEP~~
     **Currently not used**
     """
-    KEEP
+    KEEP    @deprecated(reason: "Currently not used")
 
     """The user can be picked up by someone else riding a vehicle"""
     PICKUP
 
     """The user can be dropped off by someone else riding a vehicle"""
     DROPOFF
+
+    """The mode is used for the access part of the search."""
+    ACCESS,
+
+    """The mode is used for the egress part of the search."""
+    EGRESS,
+
+    """The mode is used for the direct street search."""
+    DIRECT
 }
 
 type QueryType {
@@ -1442,7 +1530,14 @@ type QueryType {
     serviceTimeRange: serviceTimeRange
 
     """Get all bike rental stations"""
-    bikeRentalStations: [BikeRentalStation]
+    bikeRentalStations(
+        """
+        Return bike rental stations with these ids.
+        **Note:** if an id is invalid (or the bike rental station service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [BikeRentalStation]
 
     """
     Get a single bike rental station based on its ID, i.e. value of field `stationId`
@@ -1543,12 +1638,16 @@ type QueryType {
         transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get
         an itinerary which has (useless) back and forth public transport legs to
         avoid walking too long distances.
+
+        DEPRECATED - Use walkReluctance instead
         """
         maxWalkDistance: Float
 
         """
         The maximum time (in seconds) of pre-transit travel when using
         drive-to-transit (park and ride or kiss and ride). Default value: 1800.
+
+        DEPRECATED - Use walkReluctance or future reluctance parameters for other modes
         """
         maxPreTransitTime: Int
 
@@ -1566,6 +1665,24 @@ type QueryType {
         argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).
         """
         itineraryFiltering: Float
+
+        """
+        A multiplier for how bad biking is, compared to being in transit for equal
+        lengths of time. Default value: 2.0
+        """
+        bikeReluctance: Float
+
+        """
+        A multiplier for how bad walking with a bike is, compared to being in transit for equal
+        lengths of time. Default value: 5.0
+        """
+        bikeWalkingReluctance: Float
+
+        """
+        A multiplier for how bad driving is, compared to being in transit for equal
+        lengths of time. Default value: 3.0
+        """
+        carReluctance: Float
 
         """
         A multiplier for how bad walking is, compared to being in transit for equal
@@ -1696,8 +1813,25 @@ type QueryType {
         """
         modeWeight: InputModeWeight
 
+        """
+        Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but does NOT delete them when this is enabled.
+        """
+        debugItineraryFilter: Boolean
+
         """Is bike rental allowed? Default value: false"""
         allowBikeRental: Boolean
+
+        """
+        Whether arriving at the destination with a rented (station) bicycle is allowed without
+        dropping it off. Default: false.
+        """
+        allowKeepingRentedBicycleAtDestination: Boolean
+
+        """
+        The cost of arriving at the destination with the rented bicycle, to discourage doing so.
+        Default value: 0.
+        """
+        keepingRentedBicycleAtDestinationCost: Int
 
         """
         Invariant: `boardSlack + alightSlack <= transferSlack`. Default value: 0
@@ -2338,6 +2472,21 @@ type Trip implements Node {
 
     """List of alerts which have an effect on this trip"""
     alerts: [Alert]
+}
+
+"""
+A system notice is used to tag elements with system information for debugging
+or other system related purpose. One use-case is to run a routing search with
+'debugItineraryFilter: true'. This will then tag itineraries instead of removing
+them from the result. This make it possible to inspect the itinerary-filter-chain.
+A SystemNotice only has english text,
+because the primary user are technical staff, like testers and developers.
+"""
+type SystemNotice {
+    """Notice's tag"""
+    tag: String
+    """Notice's description"""
+    text: String
 }
 
 enum VertexType {

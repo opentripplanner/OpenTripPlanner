@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.algorithm.astar.strategies.MultiTargetTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;

@@ -1,28 +1,40 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.routing.graph.Edge;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class Transfer {
-    private int toStop;
+    private final int toStop;
 
-    private final int effectiveWalkDistanceMeters;
+    private final int distanceMeters;
 
     private final List<Edge> edges;
 
-    public Transfer(int toStop, int effectiveWalkDistanceMeters, List<Edge> edges) {
+    public Transfer(int toStop, List<Edge> edges) {
         this.toStop = toStop;
-        this.effectiveWalkDistanceMeters = effectiveWalkDistanceMeters;
         this.edges = edges;
+        this.distanceMeters = (int) edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    }
+
+    public Transfer(int toStopIndex, int distanceMeters) {
+        this.toStop = toStopIndex;
+        this.distanceMeters = distanceMeters;
+        this.edges = null;
     }
 
     public List<Coordinate> getCoordinates() {
         List<Coordinate> coordinates = new ArrayList<>();
-        if (edges == null) return coordinates;
+        if (edges == null) { return coordinates; }
         for (Edge edge : edges) {
             if (edge.getGeometry() != null) {
                 coordinates.addAll((Arrays.asList(edge.getGeometry().getCoordinates())));
@@ -33,25 +45,87 @@ public class Transfer {
 
     public int getToStop() { return toStop; }
 
-    /**
-     * The effective distance is defined as the value that divided by the speed will give the
-     * correct duration of the transfer. This takes into account slowdowns/speedups related to
-     * slopes. It can also account for other factors that affect the transfer duration, but all
-     * factors are required to be proportional to the speed. The reason we are doing this is so
-     * that we can calculate all transfer durations in a reasonable amount of time for each
-     * incoming request.
-     */
-    public int getEffectiveWalkDistanceMeters() {
-        return effectiveWalkDistanceMeters;
-    }
-
     public int getDistanceMeters() {
-        return edges != null
-            ? (int) edges.stream().mapToDouble(Edge::getDistanceMeters).sum()
-            : effectiveWalkDistanceMeters;
+        return distanceMeters;
     }
 
     public List<Edge> getEdges() {
         return edges;
+    }
+
+    public Optional<RaptorTransfer> asRaptorTransfer(RoutingRequest routingRequest) {
+        if (edges == null || edges.isEmpty()) {
+            int durationSeconds = (int) Math.ceil(distanceMeters / routingRequest.walkSpeed);
+            return Optional.of(new TransferWithDuration(
+                    this,
+                    durationSeconds,
+                    RaptorCostConverter.toRaptorCost((int) Math.ceil(durationSeconds * routingRequest.walkReluctance))
+            ));
+        }
+
+        StateEditor se = new StateEditor(routingRequest, edges.get(0).getFromVertex());
+        se.setTimeSeconds(0);
+
+        State s = se.makeState();
+        for (Edge e : edges) {
+            s = e.traverse(s);
+            if (s == null) {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(new TransferWithDuration(
+            this,
+            (int) s.getElapsedTimeSeconds(),
+            RaptorCostConverter.toRaptorCost(s.getWeight())
+        ));
+    }
+
+    public static RoutingRequest prepareTransferRoutingRequest(RoutingRequest request) {
+        RoutingRequest transferRoutingRequest = request.getStreetSearchRequest(request.modes.transferMode);
+        transferRoutingRequest.arriveBy = false;
+        transferRoutingRequest.dateTime = 0;
+        transferRoutingRequest.from = null;
+        transferRoutingRequest.to = null;
+
+        // Some of the values are rounded to ease caching in RaptorRequestTransferCache
+        transferRoutingRequest.bikeTriangleSafetyFactor = roundTo(request.bikeTriangleSafetyFactor, 1);
+        transferRoutingRequest.bikeTriangleSlopeFactor = roundTo(request.bikeTriangleSlopeFactor, 1);
+        transferRoutingRequest.bikeTriangleTimeFactor = 1.0 - transferRoutingRequest.bikeTriangleSafetyFactor - transferRoutingRequest.bikeTriangleSlopeFactor;
+        transferRoutingRequest.bikeSwitchCost = roundTo100(request.bikeSwitchCost);
+        transferRoutingRequest.bikeSwitchTime = roundTo100(request.bikeSwitchTime);
+
+        transferRoutingRequest.wheelchairAccessible = request.wheelchairAccessible;
+        transferRoutingRequest.maxWheelchairSlope = request.maxWheelchairSlope;
+
+        transferRoutingRequest.walkSpeed = roundToHalf(request.walkSpeed);
+        transferRoutingRequest.bikeSpeed = roundToHalf(request.bikeSpeed);
+
+        transferRoutingRequest.walkReluctance = roundTo(request.walkReluctance, 1);
+        transferRoutingRequest.stairsReluctance = roundTo(request.stairsReluctance, 1);
+        transferRoutingRequest.turnReluctance = roundTo(request.turnReluctance, 1);
+
+        transferRoutingRequest.elevatorBoardCost = roundTo100(request.elevatorBoardCost);
+        transferRoutingRequest.elevatorBoardTime = roundTo100(request.elevatorBoardTime);
+        transferRoutingRequest.elevatorHopCost = roundTo100(request.elevatorHopCost);
+        transferRoutingRequest.elevatorHopTime = roundTo100(request.elevatorHopTime);
+
+        return transferRoutingRequest;
+    }
+
+    private static double roundToHalf(double input) {
+        return ((int) (input * 2 + 0.5)) / 2.0;
+    }
+
+    private static double roundTo(double input, int decimals) {
+        return Math.round(input * Math.pow(10, decimals)) / Math.pow(10, decimals);
+    }
+
+    private static int roundTo100(int input) {
+        if (input > 0 && input < 100) {
+            return 100;
+        }
+
+        return ((input + 50) / 100) * 100;
     }
 }

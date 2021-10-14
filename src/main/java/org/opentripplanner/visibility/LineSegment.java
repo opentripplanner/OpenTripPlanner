@@ -74,10 +74,12 @@ public class LineSegment {
     VLPoint second() {
         assert (size() > 0);
 
-        if (size() == 2)
+        if (size() == 2) {
             return endpoints[1];
-        else
+        }
+        else {
             return endpoints[0];
+        }
     }
 
     VLPoint midpoint() {
@@ -95,8 +97,9 @@ public class LineSegment {
     boolean is_in_standard_form() {
         assert (size() > 0);
 
-        if (size() < 2)
+        if (size() < 2) {
             return true;
+        }
         return first().compareTo(second()) <= 0;
     }
 
@@ -187,28 +190,38 @@ public class LineSegment {
             return false;
         }
         LineSegment line_segment2 = (LineSegment) o;
-        if (size() != line_segment2.size() || size() == 0 || line_segment2.size() == 0)
+        if (size() != line_segment2.size() || size() == 0 || line_segment2.size() == 0) {
             return false;
-        else
-            return (first().equals(line_segment2.first()) && second()
-                    .equals(line_segment2.second()));
+        }
+        else {
+            return (
+                    first().equals(line_segment2.first()) && second()
+                            .equals(line_segment2.second())
+            );
+        }
     }
 
     boolean equivalent(LineSegment line_segment2, double epsilon) {
-        if (size() != line_segment2.size() || size() == 0 || line_segment2.size() == 0)
+        if (size() != line_segment2.size() || size() == 0 || line_segment2.size() == 0) {
             return false;
-        else
-            return (first().distance(line_segment2.first()) <= epsilon && second().distance(
-                    line_segment2.second()) <= epsilon)
-                    || (first().distance(line_segment2.second()) <= epsilon && second().distance(
-                            line_segment2.first()) <= epsilon);
+        }
+        else {
+            return (
+                    first().distance(line_segment2.first()) <= epsilon
+                            && second().distance(line_segment2.second()) <= epsilon
+            ) || (
+                    first().distance(line_segment2.second()) <= epsilon
+                            && second().distance(line_segment2.first()) <= epsilon
+            );
+        }
     }
 
     double distance(LineSegment line_segment2) {
         assert (size() > 0 && line_segment2.size() > 0);
 
-        if (intersect_proper(line_segment2))
+        if (intersect_proper(line_segment2)) {
             return 0;
+        }
         // But if two line segments intersect improperly, the distance
         // between them is equal to the minimum of the distances between
         // all 4 endpoints and their respective projections onto the line
@@ -216,14 +229,17 @@ public class LineSegment {
         double running_min, distance_temp;
         running_min = first().distance(line_segment2);
         distance_temp = second().distance(line_segment2);
-        if (distance_temp < running_min)
+        if (distance_temp < running_min) {
             running_min = distance_temp;
+        }
         distance_temp = line_segment2.first().distance(this);
-        if (distance_temp < running_min)
+        if (distance_temp < running_min) {
             running_min = distance_temp;
+        }
         distance_temp = line_segment2.second().distance(this);
-        if (distance_temp < running_min)
+        if (distance_temp < running_min) {
             return distance_temp;
+        }
         return running_min;
     }
 
@@ -231,20 +247,24 @@ public class LineSegment {
         assert (size() > 0 && polygon.n() > 0);
 
         double running_min = distance(polygon.get(0));
-        if (polygon.n() > 1)
+        if (polygon.n() > 1) {
             for (int i = 0; i < polygon.n(); i++) {
                 double d = distance(new LineSegment(polygon.get(i), polygon.get(i + 1)));
-                if (running_min > d)
+                if (running_min > d) {
                     running_min = d;
+                }
             }
+        }
         return running_min;
     }
 
     boolean intersect(LineSegment line_segment2, double epsilon) {
-        if (size() == 0 || line_segment2.size() == 0)
+        if (size() == 0 || line_segment2.size() == 0) {
             return false;
-        if (distance(line_segment2) <= epsilon)
+        }
+        if (distance(line_segment2) <= epsilon) {
             return true;
+        }
         return false;
     }
 
@@ -253,8 +273,9 @@ public class LineSegment {
     }
 
     boolean intersect_proper(LineSegment line_segment2, double epsilon) {
-        if (size() == 0 || line_segment2.size() == 0)
+        if (size() == 0 || line_segment2.size() == 0) {
             return false;
+        }
 
         // Declare new vars just for readability.
         VLPoint a = new VLPoint(first());
@@ -266,23 +287,30 @@ public class LineSegment {
         double running_min, distance_temp;
         running_min = a.distance(line_segment2);
         distance_temp = b.distance(line_segment2);
-        if (distance_temp < running_min)
+        if (distance_temp < running_min) {
             running_min = distance_temp;
+        }
         distance_temp = c.distance(this);
-        if (distance_temp < running_min)
+        if (distance_temp < running_min) {
             running_min = distance_temp;
+        }
         distance_temp = d.distance(this);
-        if (distance_temp < running_min)
+        if (distance_temp < running_min) {
             running_min = distance_temp;
+        }
         // If an endpoint is close enough to the other segment, the
         // intersection is not considered proper.
-        if (running_min <= epsilon)
+        if (running_min <= epsilon) {
             return false;
+        }
         // This test is from O'Rourke's "Computational Geometry in C",
         // p.30. Checks left and right turns.
-        if (b.minus(a).cross(c.minus(b)) * b.minus(a).cross(d.minus(b)) < 0
-                && d.minus(c).cross(b.minus(d)) * d.minus(c).cross(a.minus(d)) < 0)
+        if (
+                b.minus(a).cross(c.minus(b)) * b.minus(a).cross(d.minus(b)) < 0
+                && d.minus(c).cross(b.minus(d)) * d.minus(c).cross(a.minus(d)) < 0
+        ) {
             return true;
+        }
         return false;
     }
 
@@ -290,12 +318,14 @@ public class LineSegment {
         // Initially empty.
         LineSegment line_segment_temp = new LineSegment();
 
-        if (size() == 0 || line_segment2.size() == 0)
+        if (size() == 0 || line_segment2.size() == 0) {
             return line_segment_temp;
+        }
 
         // No intersection => return empty segment.
-        if (!intersect(line_segment2, epsilon))
+        if (!intersect(line_segment2, epsilon)) {
             return line_segment_temp;
+        }
         // Declare new vars just for readability.
         VLPoint a = new VLPoint(first());
         VLPoint b = new VLPoint(second());

@@ -71,7 +71,7 @@ public class DatedServiceJourneyMapperTest {
 
     dsjList.add(createDatedServiceJourney("ID-A", OP_DAY_1, SJ_1));
 
-    // ServiceAlteration is ignored, date is added
+    // Date is filtered by ServiceAlteration
     dsjList.add(
         createDatedServiceJourney("ID-C", OP_DAY_3, SJ_1)
             .withServiceAlteration(ServiceAlterationEnumeration.CANCELLATION)
@@ -90,9 +90,8 @@ public class DatedServiceJourneyMapperTest {
     Collection<ServiceDate> result = DatedServiceJourneyMapper.mapToServiceDates(dsjList, opDaysById);
 
     // Then
-    assertEquals(List.of(SD1, SD2, SD3), sort(result));
+    assertEquals(List.of(SD1, SD2), sort(result));
   }
-
 
   private static String listIdsSortedAsStr(List<DatedServiceJourney> list) {
     return list.stream()

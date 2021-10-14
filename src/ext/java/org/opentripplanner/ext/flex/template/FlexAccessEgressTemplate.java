@@ -1,11 +1,15 @@
 package org.opentripplanner.ext.flex.template;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -15,11 +19,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
 
 public abstract class FlexAccessEgressTemplate {
   protected final NearbyStop accessEgress;
@@ -31,6 +30,16 @@ public abstract class FlexAccessEgressTemplate {
   public final ServiceDate serviceDate;
   protected final FlexPathCalculator calculator;
 
+  /**
+   *
+   * @param accessEgress  Path from origin to the point of boarding for this flex trip
+   * @param trip          The FlexTrip used for this Template
+   * @param fromStopIndex Stop sequence index where this FlexTrip is boarded
+   * @param toStopIndex   The stop where this FlexTrip alights
+   * @param transferStop  The stop location where this FlexTrip alights
+   * @param date          The service date of this FlexTrip
+   * @param calculator    Calculates the path and duration of the FlexTrip
+   */
   FlexAccessEgressTemplate(
       NearbyStop accessEgress,
       FlexTrip trip,
@@ -54,6 +63,10 @@ public abstract class FlexAccessEgressTemplate {
     return transferStop;
   }
 
+  public StopLocation getAccessEgressStop() {
+    return accessEgress.stop;
+  }
+
   public FlexTrip getFlexTrip() {
     return trip;
   }
@@ -62,18 +75,18 @@ public abstract class FlexAccessEgressTemplate {
    * Get a list of edges used for transferring to and from the scheduled transit network. The edges
    * should be in the order of traversal of the state in the NearbyStop
    * */
-  abstract protected List<Edge> getTransferEdges(SimpleTransfer simpleTransfer);
+  abstract protected List<Edge> getTransferEdges(PathTransfer transfer);
 
   /**
    * Get the {@Link Stop} where the connection to the scheduled transit network is made.
    */
-  abstract protected Stop getFinalStop(SimpleTransfer simpleTransfer);
+  abstract protected Stop getFinalStop(PathTransfer transfer);
 
   /**
    * Get the transfers to/from stops in the scheduled transit network from the beginning/end of the
    * flex ride for the access/egress.
    */
-  abstract protected Collection<SimpleTransfer> getTransfersFromTransferStop(Graph graph);
+  abstract protected Collection<PathTransfer> getTransfersFromTransferStop(Graph graph);
 
   /**
    * Get the {@Link Vertex} where the flex ride ends/begins for the access/egress.
@@ -107,13 +120,13 @@ public abstract class FlexAccessEgressTemplate {
     else {
       return getTransfersFromTransferStop(graph)
           .stream()
-          .filter(simpleTransfer -> getFinalStop(simpleTransfer) != null)
-          .filter(simpleTransfer -> isRouteable(getFlexVertex(getTransferEdges(simpleTransfer).get(0))))
-          .map(simpleTransfer -> {
-            List<Edge> edges = getTransferEdges(simpleTransfer);
+          .filter(transfer -> getFinalStop(transfer) != null)
+          .filter(transfer -> isRouteable(getFlexVertex(getTransferEdges(transfer).get(0))))
+          .map(transfer -> {
+            List<Edge> edges = getTransferEdges(transfer);
             return getFlexAccessEgress(edges,
                 getFlexVertex(edges.get(0)),
-                getFinalStop(simpleTransfer)
+                getFinalStop(transfer)
             );
           });
     }

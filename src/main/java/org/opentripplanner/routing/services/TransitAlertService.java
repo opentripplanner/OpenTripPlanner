@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.services;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 import java.util.Collection;
@@ -17,13 +18,13 @@ public interface TransitAlertService {
 
     Collection<TransitAlert> getRouteAlerts(FeedScopedId route);
 
-    Collection<TransitAlert> getTripAlerts(FeedScopedId trip);
+    Collection<TransitAlert> getTripAlerts(FeedScopedId trip, ServiceDate serviceDate);
 
     Collection<TransitAlert> getAgencyAlerts(FeedScopedId agency);
 
     Collection<TransitAlert> getStopAndRouteAlerts(FeedScopedId stop, FeedScopedId route);
 
-    Collection<TransitAlert> getStopAndTripAlerts(FeedScopedId stop, FeedScopedId trip);
+    Collection<TransitAlert> getStopAndTripAlerts(FeedScopedId stop, FeedScopedId trip, ServiceDate serviceDate);
 
     Collection<TransitAlert> getTripPatternAlerts(FeedScopedId tripPattern);
 }

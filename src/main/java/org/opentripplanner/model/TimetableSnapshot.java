@@ -42,7 +42,7 @@ public class TimetableSnapshot {
     protected static class SortedTimetableComparator implements Comparator<Timetable> {
         @Override
         public int compare(Timetable t1, Timetable t2) {
-            return t1.serviceDate.compareTo(t2.serviceDate);
+            return t1.getServiceDate().compareTo(t2.getServiceDate());
         }
     }
     
@@ -76,16 +76,14 @@ public class TimetableSnapshot {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
+            if (this == obj) { return true; }
+            if (obj == null) { return false; }
+            if (getClass() != obj.getClass()) {
                 return false;
-            if (getClass() != obj.getClass())
-                return false;
+            }
             TripIdAndServiceDate other = (TripIdAndServiceDate) obj;
-            boolean result = Objects.equals(this.tripId, other.tripId) &&
+            return Objects.equals(this.tripId, other.tripId) &&
                     Objects.equals(this.serviceDate, other.serviceDate);
-            return result;
         }
     }
 
@@ -159,7 +157,7 @@ public class TimetableSnapshot {
             }
         }
 
-        return pattern.scheduledTimetable;
+        return pattern.getScheduledTimetable();
     }
     
     /**
@@ -211,7 +209,7 @@ public class TimetableSnapshot {
                 temp.addAll(sortedTimetables);
                 sortedTimetables = temp;
             }
-            if(old.serviceDate != null)
+            if(old.getServiceDate() != null)
                 sortedTimetables.remove(old);
             sortedTimetables.add(tt);
             timetables.put(pattern, sortedTimetables);
@@ -221,12 +219,12 @@ public class TimetableSnapshot {
         
         // Assume all trips in a pattern are from the same feed, which should be the case.
         // Find trip index
-        int tripIndex = tt.getTripIndex(updatedTripTimes.trip.getId());
+        int tripIndex = tt.getTripIndex(updatedTripTimes.getTrip().getId());
         if (tripIndex == -1) {
             // Trip not found, add it
             tt.addTripTimes(updatedTripTimes);
             // Remember this pattern for the added trip id and service date
-            FeedScopedId tripId = updatedTripTimes.trip.getId();
+            FeedScopedId tripId = updatedTripTimes.getTrip().getId();
             TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
             lastAddedTripPattern.put(tripIdAndServiceDate, pattern);
         } else {
@@ -263,7 +261,7 @@ public class TimetableSnapshot {
         }
         
         TimetableSnapshot ret = new TimetableSnapshot();
-        if (!force && !this.isDirty()) return null;
+        if (!force && !this.isDirty()) { return null; }
         for (Timetable tt : dirtyTimetables) {
             tt.finish(); // summarize, index, etc. the new timetables
         }
@@ -341,7 +339,7 @@ public class TimetableSnapshot {
             SortedSet<Timetable> toKeepTimetables =
                     new TreeSet<Timetable>(new SortedTimetableComparator());
             for(Timetable timetable : sortedTimetables) {
-                if(serviceDate.compareTo(timetable.serviceDate) < 0) {
+                if(serviceDate.compareTo(timetable.getServiceDate()) < 0) {
                     toKeepTimetables.add(timetable);
                 } else {
                     modified = true;
@@ -369,7 +367,7 @@ public class TimetableSnapshot {
     }
 
     public boolean isDirty() {
-        if (readOnly) return false;
+        if (readOnly) { return false; }
         return dirty;
     }
 

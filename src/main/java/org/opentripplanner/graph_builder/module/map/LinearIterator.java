@@ -85,18 +85,22 @@ public class LinearIterator implements Iterable<LinearLocation> {
      * @return <code>true</code> if there are more vertices to scan
      */
     public boolean hasNext() {
-        if (componentIndex >= numLines)
+        if (componentIndex >= numLines) {
             return false;
-        if (componentIndex == numLines - 1 && vertexIndex >= currentLine.getNumPoints() - 1)
+        }
+        if (componentIndex == numLines - 1 && vertexIndex >= currentLine.getNumPoints() - 1) {
             return false;
+        }
         return true;
     }
     
     public boolean isValidIndex() {
-        if (componentIndex >= numLines)
+        if (componentIndex >= numLines) {
             return false;
-        if (componentIndex == numLines - 1 && vertexIndex >= currentLine.getNumPoints())
+        }
+        if (componentIndex == numLines - 1 && vertexIndex >= currentLine.getNumPoints()) {
             return false;
+        }
         return true;
     }
 
@@ -123,11 +127,13 @@ public class LinearIterator implements Iterable<LinearLocation> {
      * @return <code>true</code> if the iterator is at an endpoint
      */
     public boolean isEndOfLine() {
-        if (componentIndex >= numLines)
+        if (componentIndex >= numLines) {
             return false;
+        }
         // LineString currentLine = (LineString) linear.getGeometryN(componentIndex);
-        if (vertexIndex < currentLine.getNumPoints() - 1)
+        if (vertexIndex < currentLine.getNumPoints() - 1) {
             return false;
+        }
         return true;
     }
 
@@ -175,8 +181,9 @@ public class LinearIterator implements Iterable<LinearLocation> {
      * @return a {@link Coordinate} or <code>null</code>
      */
     public Coordinate getSegmentEnd() {
-        if (vertexIndex < getLine().getNumPoints() - 1)
+        if (vertexIndex < getLine().getNumPoints() - 1) {
             return currentLine.getCoordinateN(vertexIndex + 1);
+        }
         return null;
     }
 

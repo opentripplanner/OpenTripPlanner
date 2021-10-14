@@ -1,6 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiPlace;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 
@@ -27,21 +28,28 @@ public class PlaceMapper {
         ApiPlace api = new ApiPlace();
 
         api.name = domain.name;
-        api.stopId = FeedScopedIdMapper.mapToApi(domain.stopId);
-        api.stopCode = domain.stopCode;
-        api.platformCode = domain.platformCode;
+
+        if (domain.stop != null) {
+            api.stopId = FeedScopedIdMapper.mapToApi(domain.stop.getId());
+            api.stopCode = domain.stop.getCode();
+            api.platformCode = domain.stop instanceof Stop ? ((Stop) domain.stop).getPlatformCode() : null;
+            api.zoneId = domain.stop instanceof Stop ? ((Stop) domain.stop).getFirstZoneAsString() : null;
+        }
+
         if(domain.coordinate != null) {
             api.lon = domain.coordinate.longitude();
             api.lat = domain.coordinate.latitude();
         }
+
         api.arrival = arrival;
         api.departure = departure;
         api.orig = domain.orig;
-        api.zoneId = domain.zoneId;
         api.stopIndex = domain.stopIndex;
         api.stopSequence = domain.stopSequence;
         api.vertexType = VertexTypeMapper.mapVertexType(domain.vertexType);
-        api.bikeShareId = domain.bikeShareId;
+        if (domain.vehicleRentalStation != null) {
+            api.bikeShareId = domain.vehicleRentalStation.getStationId();
+        }
 
         return api;
     }

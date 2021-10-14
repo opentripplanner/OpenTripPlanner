@@ -17,4 +17,11 @@ public class FareZone extends TransitEntity {
   public String getName() {
     return name;
   }
+
+  /**
+   * This method compare all field, not just the id like {@link #equals(Object)}.
+   */
+  public boolean sameValueAs(FareZone other) {
+    return getId().equals(other.getId()) && name.equals(other.name);
+  }
 }

@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.interactivelauncher;
 
+import static org.opentripplanner.ext.interactivelauncher.DebugLoggingSupport.configureDebugLogging;
+
 import org.opentripplanner.ext.interactivelauncher.views.MainView;
 import org.opentripplanner.standalone.OTPMain;
 
@@ -16,7 +18,7 @@ import org.opentripplanner.standalone.OTPMain;
  * is started.
  */
 public class InteractiveOtpMain {
-  private Model model = new Model();
+  private Model model;
 
   public static void main(String[] args) {
     new InteractiveOtpMain().run();
@@ -30,7 +32,11 @@ public class InteractiveOtpMain {
 
   private void startOtp() {
     model.save();
-    System.out.println("Start OTP: " + model);
+
+    configureDebugLogging(model.getDebugLogging());
+
+    System.out.println("Start OTP: " + model + "\n");
     OTPMain.main(model.asOtpArgs());
   }
+
 }

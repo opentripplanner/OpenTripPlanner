@@ -66,8 +66,6 @@ otp.modules.multimodal.MultimodalPlannerModule =
         var modeSelector = new otp.widgets.tripoptions.ModeSelector(this.optionsWidget);
         this.optionsWidget.addControl("mode", modeSelector, true);
 
-        modeSelector.addModeControl(new otp.widgets.tripoptions.MaxWalkSelector(this.optionsWidget));
-        modeSelector.addModeControl(new otp.widgets.tripoptions.MaxBikeSelector(this.optionsWidget));
         modeSelector.addModeControl(new otp.widgets.tripoptions.BikeTriangle(this.optionsWidget));
         modeSelector.addModeControl(new otp.widgets.tripoptions.PreferredRoutes(this.optionsWidget));
         modeSelector.addModeControl(new otp.widgets.tripoptions.BannedRoutes(this.optionsWidget));
@@ -78,6 +76,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         }
         modeSelector.addModeControl(new otp.widgets.tripoptions.DebugItineraryFiltersSelector(this.optionsWidget));
         modeSelector.refreshModeControls();
+
+        this.optionsWidget.addSeparator();
+        this.optionsWidget.addControl("additionalParameters", new otp.widgets.tripoptions.AdditionalTripParameters(this.optionsWidget))
 
         this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));

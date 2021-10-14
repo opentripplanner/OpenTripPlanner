@@ -2,7 +2,8 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.TransferLegView;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
+import org.opentripplanner.transit.raptor.api.view.TransferPathView;
 
 /**
  *
@@ -10,13 +11,21 @@ import org.opentripplanner.transit.raptor.api.view.TransferLegView;
  */
 public final class TransferStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
 
-    public TransferStopArrival(AbstractStopArrival<T> previousState, RaptorTransfer transferLeg, int arrivalTime, int additionalCost) {
+    private final RaptorTransfer transfer;
+
+    public TransferStopArrival(
+        AbstractStopArrival<T> previousState,
+        RaptorTransfer transferPath,
+        int arrivalTime
+    ) {
         super(
                 previousState,
-                transferLeg.stop(),
+                1,
+                transferPath.stop(),
                 arrivalTime,
-                additionalCost
+                previousState.cost() + transferPath.generalizedCost()
         );
+        this.transfer = transferPath;
     }
 
     @Override
@@ -25,13 +34,12 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
     }
 
     @Override
-    public TransferLegView transferLeg() {
-        return this::durationInSeconds;
+    public TransferPathView transferPath() {
+        return () -> transfer;
     }
 
-    private int durationInSeconds() {
-        // We do not keep the reference to the TransitLayer transfer(RaptorTransfer),
-        // so we compute the duration.
-        return arrivalTime() - previous().arrivalTime();
+    @Override
+    public TransitArrival<T> mostResentTransitArrival() {
+        return previous().mostResentTransitArrival();
     }
 }

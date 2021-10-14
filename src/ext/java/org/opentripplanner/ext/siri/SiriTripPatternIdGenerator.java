@@ -26,8 +26,7 @@ class SiriTripPatternIdGenerator {
   FeedScopedId generateUniqueTripPatternId(Trip trip) {
     Route route = trip.getRoute();
     FeedScopedId routeId = route.getId();
-    String directionId = trip.getDirectionId();
-    if( directionId == null) { directionId = ""; }
+    String directionId = trip.getGtfsDirectionIdAsString("");
 
     // OBA library uses underscore as separator, we're moving toward colon.
     String id = String.format("%s:%s:%03d:RT", routeId.getId(), directionId, counter.incrementAndGet());

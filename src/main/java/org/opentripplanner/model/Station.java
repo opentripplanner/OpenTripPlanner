@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +15,7 @@ import java.util.TimeZone;
 public class Station extends TransitEntity implements StopCollection {
 
   private static final long serialVersionUID = 1L;
-  public static final TransferPriority DEFAULT_COST_PRIORITY = TransferPriority.ALLOWED;
+  public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 
   private final String name;
 
@@ -23,7 +25,7 @@ public class Station extends TransitEntity implements StopCollection {
 
   private final WgsCoordinate coordinate;
 
-  private final TransferPriority costPriority;
+  private final StopTransferPriority priority;
 
   /**
    * URL to a web page containing information about this particular station
@@ -32,6 +34,8 @@ public class Station extends TransitEntity implements StopCollection {
 
   private final TimeZone timezone;
 
+  // We serialize this class to json only for snapshot tests, and this creates cyclical structures
+  @JsonBackReference
   private final Set<Stop> childStops = new HashSet<>();
 
   public Station(
@@ -42,7 +46,7 @@ public class Station extends TransitEntity implements StopCollection {
       String description,
       String url,
       TimeZone timezone,
-      TransferPriority costPriority
+      StopTransferPriority priority
   ) {
     super(id);
     this.name = name;
@@ -51,7 +55,7 @@ public class Station extends TransitEntity implements StopCollection {
     this.description = description;
     this.url = url;
     this.timezone = timezone;
-    this.costPriority = costPriority == null ? DEFAULT_COST_PRIORITY : costPriority;
+    this.priority = priority == null ? DEFAULT_PRIORITY : priority;
   }
 
   public void addChildStop(Stop stop) {
@@ -91,11 +95,11 @@ public class Station extends TransitEntity implements StopCollection {
    * adding adjusting the cost for all board-/alight- events in the routing search.
    * <p/>
    * To not interfere with request parameters this must be implemented in a neutral way. This mean
-   * that the {@link TransferPriority#ALLOWED} (witch is default) should a nett-effect of
+   * that the {@link StopTransferPriority#ALLOWED} (witch is default) should a nett-effect of
    * adding 0 - zero cost.
    */
-  public TransferPriority getCostPriority() {
-    return costPriority;
+  public StopTransferPriority getPriority() {
+    return priority;
   }
 
   public TimeZone getTimezone() {

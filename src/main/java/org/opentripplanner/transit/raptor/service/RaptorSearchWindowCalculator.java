@@ -17,8 +17,11 @@ public class RaptorSearchWindowCalculator {
     private final int NOT_SET = -9_999_999;
 
 
-    /** Min trip time coefficient */
-    private final double minTripTimeCoefficient;
+    /** The coefficient to multiply with heuristicMinTransitTime */
+    private final double minTransitTimeCoefficient;
+
+    /** The coefficient to multiply with heuristicMinWaitTime */
+    private final double minWaitTimeCoefficient;
 
     /** Min search window in seconds */
     private final int minSearchWinSeconds;
@@ -26,14 +29,16 @@ public class RaptorSearchWindowCalculator {
     private final int maxSearchWinSeconds;
     private final int stepSeconds;
 
-    private int minTravelTime = NOT_SET;
+    private int heuristicMinTransitTime = NOT_SET;
+    private int heuristicMinWaitTime = NOT_SET;
     private int earliestDepartureTime = NOT_SET;
     private int latestArrivalTime = NOT_SET;
     private int searchWindowSeconds = NOT_SET;
     private SearchParams params;
 
     public RaptorSearchWindowCalculator(DynamicSearchWindowCoefficients c) {
-        this.minTripTimeCoefficient = c.minTripTimeCoefficient();
+        this.minTransitTimeCoefficient = c.minTransitTimeCoefficient();
+        this.minWaitTimeCoefficient = c.minWaitTimeCoefficient();
         this.minSearchWinSeconds = c.minWinTimeMinutes() * 60;
         this.maxSearchWinSeconds = c.maxWinTimeMinutes() * 60;
         this.stepSeconds = c.stepMinutes() * 60;
@@ -54,8 +59,9 @@ public class RaptorSearchWindowCalculator {
         return searchWindowSeconds;
     }
 
-    public RaptorSearchWindowCalculator withMinTripTime(int minTravelTime) {
-        this.minTravelTime = minTravelTime;
+    public RaptorSearchWindowCalculator withHeuristics(int minTransitTime, int minWaitTime) {
+        this.heuristicMinTransitTime = minTransitTime;
+        this.heuristicMinWaitTime = minWaitTime;
         return this;
     }
 
@@ -68,7 +74,7 @@ public class RaptorSearchWindowCalculator {
     }
 
     public RaptorSearchWindowCalculator calculate() {
-        if(minTravelTime == NOT_SET) {
+        if(heuristicMinTransitTime == NOT_SET) {
             throw new IllegalArgumentException("The minTravelTime is not set.");
         }
 
@@ -77,7 +83,7 @@ public class RaptorSearchWindowCalculator {
         }
 
         // TravelWindow is the time from the earliest-departure-time to the latest-arrival-time
-        int travelWindow = searchWindowSeconds + roundUpToNearestMinute(minTravelTime);
+        int travelWindow = searchWindowSeconds + roundUpToNearestMinute(heuristicMinTransitTime);
 
         if (!params.isLatestArrivalTimeSet()) {
             latestArrivalTime = earliestDepartureTime + travelWindow;
@@ -109,11 +115,14 @@ public class RaptorSearchWindowCalculator {
         if(params.isEarliestDepartureTimeSet() && params.isLatestArrivalTimeSet()) {
             int travelWindow = params.latestArrivalTime() - params.earliestDepartureTime();
             // There is no upper limit the the search window when both EDT and LAT is set.
-            return roundStep(travelWindow - minTravelTime);
+            return roundStep(travelWindow - heuristicMinTransitTime);
         }
         else {
             // Set the search window using the min-travel-time.
-            int v = roundStep(minSearchWinSeconds + minTripTimeCoefficient * minTravelTime);
+            int v = roundStep(minSearchWinSeconds
+                + minTransitTimeCoefficient * heuristicMinTransitTime
+                + minWaitTimeCoefficient * heuristicMinWaitTime
+            );
 
             // Set an upper bound to the search window
             return Math.min(maxSearchWinSeconds, v);

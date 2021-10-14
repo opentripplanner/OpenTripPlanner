@@ -1,73 +1,18 @@
 package org.opentripplanner.routing.graph;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.ProjectInfo;
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.common.geometry.GraphUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.NoFutureDates;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.SimpleTransfer;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.routing.services.notes.StreetNotesService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.util.ConcurrentPublished;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.util.WorldEnvelope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import gnu.trove.set.hash.TIntHashSet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -89,6 +34,67 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.common.geometry.CompactElevationProfile;
+import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.NoFutureDates;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
+import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
+import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.PathTransfer;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.model.calendar.CalendarService;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
+import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.util.ConcurrentPublished;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.util.WorldEnvelope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
@@ -99,7 +105,12 @@ public class Graph implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final ProjectInfo projectInfo = ProjectInfo.INSTANCE;
+    public static final DrivingDirection DEFAULT_DRIVING_DIRECTION = DrivingDirection.RIGHT_HAND_TRAFFIC;
+
+    public static final IntersectionTraversalCostModel DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL
+        = new SimpleIntersectionTraversalCostModel(DEFAULT_DRIVING_DIRECTION);
+
+    private final OtpProjectInfo projectInfo = projectInfo();
 
     // TODO Remove this field, use Router.routerId ?
     public String routerId;
@@ -122,7 +133,7 @@ public class Graph implements Serializable {
 
     private final Map<Class<?>, Serializable> services = new HashMap<>();
 
-    private final TransferTable transferTable = new TransferTable();
+    private final TransferService transferService = new TransferService();
 
     private GraphBundle bundle;
 
@@ -131,7 +142,7 @@ public class Graph implements Serializable {
 
     private transient CalendarService calendarService;
 
-    public transient StreetVertexIndex streetIndex;
+    private transient StreetVertexIndex streetIndex;
 
     public transient GraphIndex index;
 
@@ -170,6 +181,7 @@ public class Graph implements Serializable {
     /** List of transit modes that are availible in GTFS data used in this graph**/
     private final HashSet<TransitMode> transitModes = new HashSet<>();
 
+    // TODO OTP2: This is only enabled with static bike rental
     public boolean hasBikeSharing = false;
 
     public boolean hasParkRide = false;
@@ -236,11 +248,8 @@ public class Graph implements Serializable {
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
 
     /** Pre-generated transfers between all stops. */
-    public final Multimap<StopLocation, SimpleTransfer> transfersByStop = HashMultimap.create();
+    public final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
-    /** Flex locations are generated by GTFS graph builder, but consumed only after the street graph
-     *  is built
-     */
     public Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
 
     public Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
@@ -261,6 +270,10 @@ public class Graph implements Serializable {
 
     private transient TransitAlertService transitAlertService;
 
+    private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
+
+    private IntersectionTraversalCostModel intersectionTraversalCostModel =
+        DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
 
     /**
      * Hack. I've tried three different ways of generating unique labels.
@@ -274,6 +287,7 @@ public class Graph implements Serializable {
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
+        this.drivingDirection = basedOn.drivingDirection;
     }
 
     // Constructor for deserialization.
@@ -368,6 +382,15 @@ public class Graph implements Serializable {
         return this.vertices.values();
     }
 
+    public <T extends Vertex> List<T> getVerticesOfType(Class<T> cls) {
+        return this
+            .getVertices()
+            .stream()
+            .filter(cls::isInstance)
+            .map(cls::cast)
+            .collect(Collectors.toList());
+    }
+
     /**
      * Return all the edges in the graph. Derived from vertices on demand.
      */
@@ -377,6 +400,15 @@ public class Graph implements Serializable {
             edges.addAll(v.getOutgoing());
         }
         return edges;
+    }
+
+    public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
+        return this
+            .getEdges()
+            .stream()
+            .filter(cls::isInstance)
+            .map(cls::cast)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -429,8 +461,7 @@ public class Graph implements Serializable {
      * Return only the StreetEdges in the graph.
      */
     public Collection<StreetEdge> getStreetEdges() {
-        Collection<Edge> allEdges = this.getEdges();
-        return Lists.newArrayList(Iterables.filter(allEdges, StreetEdge.class));
+        return getEdgesOfType(StreetEdge.class);
     }
 
     public TransitLayer getTransitLayer() {
@@ -493,24 +524,10 @@ public class Graph implements Serializable {
         vertices.remove(vertex.getLabel());
     }
 
-    public void removeVertexAndEdges(Vertex vertex) {
-        if (!containsVertex(vertex)) {
-            throw new IllegalStateException("attempting to remove vertex that is not in graph.");
+    public void removeIfUnconnected(Vertex v) {
+        if (v.getDegreeIn() == 0 && v.getDegreeOut() == 0) {
+            remove(v);
         }
-
-        /*
-         * Note: We have to handle the removal of looping edges (for example RentABikeOn/OffEdge),
-         * we use a set to prevent having multiple times the same edge.
-         */
-        Set<Edge> edges = new HashSet<Edge>(vertex.getDegreeIn() + vertex.getDegreeOut());
-        edges.addAll(vertex.getIncoming());
-        edges.addAll(vertex.getOutgoing());
-
-        for (Edge edge : edges) {
-            removeEdge(edge);
-        }
-
-        this.remove(vertex);
     }
 
     public Envelope getExtent() {
@@ -521,8 +538,8 @@ public class Graph implements Serializable {
         return env;
     }
 
-    public TransferTable getTransferTable() {
-        return transferTable;
+    public TransferService getTransferService() {
+        return transferService;
     }
 
     // Infer the time period covered by the transit feed
@@ -607,7 +624,6 @@ public class Graph implements Serializable {
      * This used to be done in readObject methods upon deserialization, but stand-alone mode now
      * allows passing graphs from graphbuilder to server in memory, without a round trip through
      * serialization. 
-     * TODO: do we really need a factory for different street vertex indexes?
      */
     public void index () {
         LOG.info("Index graph...");
@@ -615,46 +631,13 @@ public class Graph implements Serializable {
         LOG.debug("Rebuilding edge and vertex indices.");
         for (TripPattern tp : tripPatternForId.values()) {
             // Skip frequency-based patterns which have no timetable (null)
-            if (tp != null) tp.scheduledTimetable.finish();
+            if (tp != null) tp.getScheduledTimetable().finish();
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
         LOG.info("Index graph complete.");
     }
     
-    /**
-     * Compares the OTP version number stored in the graph with that of the currently running instance. Logs warnings explaining that mismatched
-     * versions can cause problems.
-     * 
-     * @return false if Maven versions match (even if commit ids do not match), true if Maven version of graph does not match this version of OTP or
-     *         graphs are otherwise obviously incompatible.
-     */
-    boolean graphVersionMismatch() {
-        ProjectInfo v = ProjectInfo.INSTANCE;
-        ProjectInfo gv = this.projectInfo;
-        LOG.info("Graph version: {}", gv);
-        LOG.info("OTP version:   {}", v);
-        if (!v.equals(gv)) {
-            LOG.error("This graph was built with a different version of OTP. Please rebuild it.");
-            return true; // do not allow graph use
-        } else if (!v.commit.equals(gv.commit)) {
-            if (v.qualifier.equals("SNAPSHOT")) {
-                LOG.warn("This graph was built with the same SNAPSHOT version of OTP, but a "
-                        + "different commit. Please rebuild the graph if you experience incorrect "
-                        + "behavior. ");
-                return false; // graph might still work
-            } else {
-                LOG.error("Commit mismatch in non-SNAPSHOT version. This implies a problem with "
-                        + "the build or release process.");
-                return true; // major problem
-            }
-        } else {
-            // no version mismatch, no commit mismatch
-            LOG.info("This graph was built with the currently running version and commit of OTP.");
-            return false;
-        }
-    }
-
     public CalendarService getCalendarService() {
         if (calendarService == null) {
             CalendarServiceData data = this.getService(CalendarServiceData.class);
@@ -664,6 +647,7 @@ public class Graph implements Serializable {
         }
         return this.calendarService;
     }
+
 
     public CalendarServiceData getCalendarDataService() {
         CalendarServiceData calendarServiceData;
@@ -677,6 +661,57 @@ public class Graph implements Serializable {
 
     public void clearCachedCalenderService() {
         this.calendarService = null;
+    }
+
+    public StreetVertexIndex getStreetIndex() {
+        if (this.streetIndex == null) {
+            streetIndex = new StreetVertexIndex(this);
+        }
+        return this.streetIndex;
+    }
+
+    public VertexLinker getLinker() {
+        return getStreetIndex().getVertexLinker();
+    }
+
+    /**
+     * Get or create a serviceId for a given date. This method is used when a new trip is
+     * added from a realtime data update. It make sure the date is in the existing transit service
+     * period.
+     *
+     * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+     *           - this when doing the issue #3030.
+     *
+     * @param serviceDate service date for the added service id
+     *
+     * @return service-id for date if it exist or is created. If the given service date is outside
+     * the service period {@code null} is returned.
+     */
+    @Nullable
+    public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+
+        // Start of day
+        long time = serviceDate.toZonedDateTime(getTimeZone().toZoneId(), 0).toEpochSecond();
+
+        if(time < transitServiceStarts || time >= transitServiceEnds) {
+            return null;
+        }
+
+        // We make an explicit cast here to avoid adding the 'getOrCreateServiceIdForDate(..)'
+        // method to the {@link CalendarService} interface. We do not want to expose it because it
+        // is not thread-safe - and we want to limit the usage. See JavaDoc above as well.
+        FeedScopedId serviceId = ((CalendarServiceImpl)getCalendarService()).getOrCreateServiceIdForDate(serviceDate);
+
+        if (!serviceCodes.containsKey(serviceId)) {
+            // Calculating new unique serviceCode based on size (!)
+            final int serviceCode = serviceCodes.size();
+            serviceCodes.put(serviceId, serviceCode);
+
+            index.getServiceCodesRunningForDate()
+                    .computeIfAbsent(serviceDate, (ignored) -> new TIntHashSet())
+                    .add(serviceCode);
+        }
+        return serviceId;
     }
 
     public int removeEdgelessVertices() {
@@ -822,8 +857,8 @@ public class Graph implements Serializable {
             TDoubleList longitudes = new TDoubleLinkedList();
             Median median = new Median();
 
-            getVertices().stream()
-                .filter(v -> v instanceof TransitStopVertex)
+            getVerticesOfType(TransitStopVertex.class)
+                .stream()
                 .forEach(v -> {
                     latitudes.add(v.getLat());
                     longitudes.add(v.getLon());
@@ -923,14 +958,14 @@ public class Graph implements Serializable {
         BitSet services = new BitSet(calendarService.getServiceIds().size());
         for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
             int n = serviceCodes.get(serviceId);
-            if (n < 0) continue;
+            if (n < 0) { continue; }
             services.set(n);
         }
         return services;
     }
 
-    public BikeRentalStationService getBikerentalStationService() {
-        return getService(BikeRentalStationService.class);
+    public VehicleRentalStationService getVehicleRentalStationService() {
+        return getService(VehicleRentalStationService.class);
     }
 
     public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
@@ -988,7 +1023,57 @@ public class Graph implements Serializable {
         return serviceCodes;
     }
 
-    public Collection<SimpleTransfer> getTransfersByStop(StopLocation stop) {
+    public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
         return transfersByStop.get(stop);
+    }
+
+    public DrivingDirection getDrivingDirection() {
+        return drivingDirection;
+    }
+
+    public void setDrivingDirection(DrivingDirection drivingDirection) {
+        this.drivingDirection = drivingDirection;
+    }
+
+    public IntersectionTraversalCostModel getIntersectionTraversalModel() {
+        return intersectionTraversalCostModel;
+    }
+
+    public void setIntersectionTraversalCostModel(
+        IntersectionTraversalCostModel intersectionTraversalCostModel
+    ) {
+        this.intersectionTraversalCostModel = intersectionTraversalCostModel;
+    }
+
+    /**
+     *  Flex locations are generated by GTFS graph builder, but consumed only after the street graph
+     *  is built
+     */
+    public FlexStopLocation getLocationById(FeedScopedId id) {
+        return locationsById.get(id);
+    }
+
+    /**
+     * Gets all the flex stop locations, including the elements of FlexLocationGroups.
+     */
+    public Set<StopLocation> getAllFlexStopsFlat() {
+        Set<StopLocation> stopLocations = flexTripsById
+            .values()
+            .stream()
+            .flatMap(t -> t.getStops().stream())
+            .collect(Collectors.toSet());
+
+        stopLocations.addAll(
+            stopLocations
+                .stream()
+                .filter(s -> s instanceof FlexLocationGroup)
+                .flatMap(g -> ((FlexLocationGroup) g)
+                    .getLocations()
+                    .stream()
+                    .filter(e -> e instanceof Stop))
+                .collect(Collectors.toList())
+        );
+
+        return stopLocations;
     }
 }

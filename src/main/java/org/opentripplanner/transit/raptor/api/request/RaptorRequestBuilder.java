@@ -1,12 +1,11 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * This is a Request builder to help construct valid requests. Se the
@@ -14,7 +13,6 @@ import java.util.Set;
  * <p/>
  * <ul>
  *     <li>{@link RaptorRequest}
- *     <li>{@link McCostParams}
  *     <li>{@link DebugRequest}
  * </ul>
  *
@@ -28,12 +26,11 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
     // Algorithm
     private RaptorProfile profile;
-    private final McCostParamsBuilder mcCost;
     private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
 
 
     // Debug
-    private final DebugRequestBuilder<T> debug;
+    private final DebugRequestBuilder debug;
 
     public RaptorRequestBuilder() {
         this(RaptorRequest.defaults());
@@ -46,11 +43,10 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
         // Algorithm
         this.profile = defaults.profile();
-        this.mcCost = new McCostParamsBuilder(defaults.multiCriteriaCostFactors());
         this.optimizations.addAll(defaults.optimizations());
 
         // Debug
-        this.debug = new DebugRequestBuilder<>(defaults.debug());
+        this.debug = new DebugRequestBuilder(defaults.debug());
     }
 
     public SearchParamsBuilder<T> searchParams() {
@@ -102,11 +98,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public McCostParamsBuilder mcCostFactors() {
-        return this.mcCost;
-    }
-
-    public DebugRequestBuilder<T> debug() {
+    public DebugRequestBuilder debug() {
         return this.debug;
     }
 

@@ -318,10 +318,12 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public String getAsStr() {
         String retVal = null;
         for (TraverseMode m : getModes()) {
-            if (retVal == null)
+            if (retVal == null) {
                 retVal = "";
-            else
+            }
+            else {
                 retVal += ",";
+            }
             retVal += m;
         }
         return retVal;

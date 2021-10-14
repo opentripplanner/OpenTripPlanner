@@ -304,8 +304,12 @@ otp.widgets.ItinerariesWidget =
 
             //div.append('<div class="otp-itinsAccord-header-segment" style="width: '+widthPx+'px; left: '+leftPx+'px; background: '+this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat;"></div>');
 
+            var routeTitle = _.chain([leg.mode, leg.agencyName, leg.routeShortName, leg.routeLongName])
+                    .filter(function (value) { return !!value; })
+                    .reduce(function (l, r) { return l ? l + " " + r : r; }, "")
+                    .value();
             var showRouteLabel = widthPx > 40 && otp.util.Itin.isTransit(leg.mode) && leg.routeShortName && leg.routeShortName.length <= 6;
-            var segment = $('<div class="otp-itinsAccord-header-segment" />')
+            var segment = $('<div class="otp-itinsAccord-header-segment" title="' + routeTitle + '" />')
             .css({
                 width: widthPx,
                 left: leftPx,
@@ -379,12 +383,12 @@ otp.widgets.ItinerariesWidget =
                 }
             }
             else if(leg.agencyId !== null) {
-                headerHtml += ": "+leg.agencyName+", ";
-                if(leg.route !== leg.routeLongName) {
-                    headerHtml += "("+leg.route+") ";
+                headerHtml += ": " + leg.agencyName + ", ";
+                if (leg.routeShortName) {
+                    headerHtml += leg.routeShortName + " ";
                 }
                 if (leg.routeLongName) {
-                    headerHtml += leg.routeLongName;
+                    headerHtml += leg.routeLongName + " ";
                 }
 
                 if(leg.headsign) {
@@ -445,20 +449,6 @@ otp.widgets.ItinerariesWidget =
             alerts = [ "This itinerary departs on a different day than the one searched for"];
         }
 
-        // check for max walk exceedance
-        var maxWalkExceeded = false;
-        for(var i=0; i<itin.itinData.legs.length; i++) {
-            var leg = itin.itinData.legs[i];
-            if(leg.mode === "WALK" && leg.distance > itin.tripPlan.queryParams.maxWalkDistance) {
-                maxWalkExceeded = false;
-                break;
-            }
-        }
-        if(maxWalkExceeded) {
-            //TRANSLATORS: Shown as alert text before showing itinerary.
-            alerts.push(_tr("Total walk distance for this trip exceeds specified maximum"));
-        }
-
         for(var i = 0; i < alerts.length; i++) {
             itinDiv.append("<div class='otp-itinAlertRow'>"+alerts[i]+"</div>");
         }
@@ -474,6 +464,9 @@ otp.widgets.ItinerariesWidget =
             itinDiv.append("<div class='otp-itinSysNoticeRow'><b>System tags</b>: " + systemTags + "</div>");
         }
         itinDiv.append(itinAccord);
+        if (itin.itinData.arrivedAtDestinationWithRentedBicycle) {
+            itinDiv.append("<div class='otp-itinAlertRow'><b>" + _tr("Arrived at destination with a rented bicycle!") + "</b></div>");
+        }
         //TRANSLATORS: End: Time and date (Shown after path itinerary)
         itinDiv.append("<div class='otp-itinEndRow'><b>" + _tr("End") + "</b>: "+itin.getEndTimeStr()+"</div>");
 

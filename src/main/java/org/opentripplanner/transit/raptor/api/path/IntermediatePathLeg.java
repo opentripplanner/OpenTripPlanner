@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
 import java.util.Objects;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Abstract intermediate leg in a path. It is either a Transit or Transfer leg.
@@ -22,11 +22,19 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
         this.toStop = toStop;
         this.toTime = toTime;
         this.cost = cost;
+        if(fromTime > toTime) {
+            throw new IllegalStateException(
+                    "It is not possible to travel back in time, yet!"
+                            + " From: " + TimeUtils.timeToStrLong(fromTime)
+                            + ", to: " + TimeUtils.timeToStrLong(toTime)
+            );
+        }
     }
 
     /**
      * The stop index where the leg start. Also called departure stop index.
      */
+    @Override
     public final int fromStop() {
         return fromStop;
     }
@@ -39,6 +47,7 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
     /**
      * The stop index where the leg end, also called arrival stop index.
      */
+    @Override
     public final int toStop(){
         return toStop;
     }
@@ -55,8 +64,8 @@ public abstract class IntermediatePathLeg<T extends RaptorTripSchedule> implemen
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         IntermediatePathLeg<?> that = (IntermediatePathLeg<?>) o;
         return fromStop == that.fromStop &&
                 fromTime == that.fromTime &&

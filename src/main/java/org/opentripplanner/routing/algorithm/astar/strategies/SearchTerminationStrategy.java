@@ -8,7 +8,10 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import java.util.Set;
 
 /**
- *
+ * Immediately terminates the search once the condition has been reached. This can be useful for
+ * checking that the required number of targets have been reached, but not for limiting searches
+ * but distance or duration, as it will not continue searching along other paths once the condition
+ * has been met.
  */
 public interface SearchTerminationStrategy {
 
@@ -21,5 +24,5 @@ public interface SearchTerminationStrategy {
      * @return true if the specified search should be terminated
      */
     public boolean shouldSearchTerminate(Set<Vertex> origin, Set<Vertex> target, State current,
-                                         ShortestPathTree spt, RoutingRequest traverseOptions);
+        ShortestPathTree spt, RoutingRequest traverseOptions);
 }

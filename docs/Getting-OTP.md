@@ -4,7 +4,7 @@
 
 OpenTripPlanner is distributed as a single stand-alone runnable JAR file. These JARs are deployed to the Sonatype OSSRH Maven repository, and release versions are synced to the Maven Central repository. Most people will want to go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the directory for the highest version number, and download the file whose name ends with `shaded.jar`.
 
-We use the [Travis continuous integration system](https://travis-ci.com/opentripplanner/OpenTripPlanner) to build OTP every time a change is made. You can find the JARs resulting from those builds in the [OSSRH staging repository](https://oss.sonatype.org/#nexus-search;gav~org.opentripplanner~otp~~~~kw,versionexpand). A folder named `x.y.z-SNAPSHOT` contains JARs for builds leading up to (preceding) the `x.y.z` release. 
+We use the [Github Actions CI system](https://github.com/opentripplanner/OpenTripPlanner/actions) to build OTP every time a change is made. You can find the JARs resulting from those builds in the [Github Packages repositor](https://github.com/opentripplanner/OpenTripPlanner/packages/562174).
 
 ## Building from Source
 

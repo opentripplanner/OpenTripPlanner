@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Map;
 
 /**
  * GTFS-RT alerts updater
@@ -83,10 +84,10 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         try {
-            InputStream data = HttpUtils.getData(
-                    URI.create(url),
-                    "Accept",
-                    "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*");
+            InputStream data = HttpUtils.getData(URI.create(url), Map.of(
+                "Accept",
+                "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+            ));
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }

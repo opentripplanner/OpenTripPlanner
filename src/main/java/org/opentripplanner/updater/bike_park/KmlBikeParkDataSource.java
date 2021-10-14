@@ -1,12 +1,12 @@
 package org.opentripplanner.updater.bike_park;
 
+import static java.util.Locale.ROOT;
+
+import java.util.List;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Load bike park from a KML placemarks. Use name as bike park name and point coordinates. Rely on:
@@ -51,13 +51,14 @@ class KmlBikeParkDataSource implements BikeParkDataSource {
                 return null;
             }
             bikePark.name = attributes.get("name").trim();
-            if (namePrefix != null)
+            if (namePrefix != null) {
                 bikePark.name = namePrefix + bikePark.name;
+            }
             String[] coords = attributes.get("Point").trim().split(",");
             bikePark.x = Double.parseDouble(coords[0]);
             bikePark.y = Double.parseDouble(coords[1]);
             // There is no ID in KML, assume unique names and location.
-            bikePark.id = String.format(Locale.US, "%s[%.3f-%.3f]",
+            bikePark.id = String.format(ROOT, "%s[%.3f-%.3f]",
                     bikePark.name.replace(" ", "_"), bikePark.x, bikePark.y);
             return bikePark;
         });

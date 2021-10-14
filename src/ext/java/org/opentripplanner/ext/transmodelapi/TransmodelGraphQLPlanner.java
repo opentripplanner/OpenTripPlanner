@@ -1,6 +1,20 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+
+import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.DoubleFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
@@ -8,6 +22,7 @@ import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
+import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
@@ -23,22 +38,6 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.DoubleFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 
 public class TransmodelGraphQLPlanner {
 
@@ -64,9 +63,12 @@ public class TransmodelGraphQLPlanner {
 
             response.debugOutput = res.getDebugAggregator().finishedRendering();
         }
+        catch (ParameterException e) {
+            var msg = e.message.get();
+            throw new GraphQLException(msg, e);
+        }
         catch (Exception e) {
-            LOG.warn("System error");
-            LOG.error("Root cause: " + e.getMessage(), e);
+            LOG.error("System error: " + e.getMessage(), e);
             PlannerError error = new PlannerError();
             error.setMsg(Message.SYSTEM_ERROR);
             response.messages.add(error.message);
@@ -91,7 +93,8 @@ public class TransmodelGraphQLPlanner {
         return new GenericLocation(name, stopId, lat, lon);
     }
 
-    private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+    private RoutingRequest createRequest(DataFetchingEnvironment environment)
+    throws ParameterException {
         TransmodelRequestContext context = environment.getContext();
         Router router = context.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
@@ -105,16 +108,15 @@ public class TransmodelGraphQLPlanner {
 
         callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(new Date((long) millisSinceEpoch)), Date::new);
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
+        callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
-        callWith.argument("transitGeneralizedCostLimit", (DoubleFunction<Double> it) -> request.transitGeneralizedCostLimit = it);
-        callWith.argument("maximumWalkDistance", request::setMaxWalkDistance);
+        callWith.argument("transitGeneralizedCostLimit", (DoubleFunction<Double> it) -> request.itineraryFilters.transitGeneralizedCostLimit = it);
 //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
-        callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
 //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
 //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
-        callWith.argument("walkReluctance", request::setWalkReluctance);
+        callWith.argument("walkReluctance", request::setNonTransitReluctance);
         callWith.argument("waitReluctance", request::setWaitReluctance);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
 //        callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
@@ -126,21 +128,27 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
-        BicycleOptimizeType optimize = environment.getArgument("optimize");
+        BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
-        if (optimize == BicycleOptimizeType.TRIANGLE) {
-            try {
-                RoutingRequest.assertTriangleParameters(
-                    request.bikeTriangleSafetyFactor,
-                    request.bikeTriangleTimeFactor,
-                    request.bikeTriangleSlopeFactor
-                );
-                callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
-                callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
-                callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
-            } catch (ParameterException e) {
-                throw new RuntimeException(e);
-            }
+        if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
+
+            // Arguments: [ safety, slope, time ]
+            final double[] args = new double[3];
+
+            callWith.argument("triangleFactors.safety", (Double v) -> args[0] = v);
+            callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
+            callWith.argument("triangleFactors.time", (Double v) -> args[2] = v);
+
+            request.setTriangleNormalized(args[0], args[1], args[2]);
+        }
+
+        if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
+            bicycleOptimizeType = BicycleOptimizeType.QUICK;
+            request.transferCost += 1800;
+        }
+
+        if (bicycleOptimizeType != null) {
+            request.bicycleOptimizeType = bicycleOptimizeType;
         }
 
         callWith.argument("arriveBy", request::setArriveBy);
@@ -168,44 +176,38 @@ public class TransmodelGraphQLPlanner {
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
         //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
         callWith.argument("allowBikeRental", (Boolean v) -> request.bikeRental = v);
-        callWith.argument("debugItineraryFilter", (Boolean v) -> request.debugItineraryFilter = v);
+        callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
 
         callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
 
         //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
         //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
-        if (optimize == BicycleOptimizeType.TRANSFERS) {
-            optimize = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
-
-        if (optimize != null) {
-            request.optimize = optimize;
-        }
-
         if (GqlUtil.hasArgument(environment, "modes")) {
             ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
-            ElementWrapper<ArrayList<TransitMode>> transitModes = new ElementWrapper<>();
+            ElementWrapper<List<TransitMode>> transitModes = new ElementWrapper<>();
             callWith.argument("modes.accessMode", accessMode::set);
             callWith.argument("modes.egressMode", egressMode::set);
             callWith.argument("modes.directMode", directMode::set);
             callWith.argument("modes.transportMode", transitModes::set);
 
             if (transitModes.get() == null) {
-                // Default to all transport modes if transport modes not specified
-                transitModes.set(new ArrayList<>(Arrays.asList(TransitMode.values())));
+                // Default to no transport modes if transport modes not specified
+                transitModes.set(List.of());
             }
 
             request.modes = new RequestModes(
                 accessMode.get(),
+                accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK,
                 egressMode.get(),
                 directMode.get(),
                 new HashSet<>(transitModes.get())
             );
         }
+
+        ItineraryFiltersInputType.mapToRequest(environment, callWith, request.itineraryFilters);
 
         /*
         List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");
@@ -232,31 +234,10 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
         callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
-
-        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
-
-
+        callWith.argument("useBikeRentalAvailabilityInformation", (Boolean v) -> request.useVehicleRentalAvailabilityInformation = v);
         callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
-        //callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
+        callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
         //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
-
-        /*
-        if (!request.modes.isTransit() && request.modes.getCar()) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.kissAndRide) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.rideAndKiss) {
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.parkAndRide) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-        } else if (request.useFlexService) {
-            request.from.vertexId = getLocationOfFirstQuay(request.from.vertexId, ((Router)environment.getContext()).graph.index);
-            request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
-        }
-         */
 
         return request;
     }
@@ -268,22 +249,6 @@ public class TransmodelGraphQLPlanner {
             .collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
         return new HashMap<>(bannedTrips);
     }
-
-    /*
-    private String getLocationOfFirstQuay(String vertexId, GraphIndex graphIndex) {
-        // TODO THIS DOES NOT WORK !!
-        Vertex vertex = graphIndex.stopVertexForStop.get(vertexId);
-        if (vertex instanceof TransitStopVertex) {
-            TransitStopVertex stopVertex = (TransitStopVertex) vertex;
-
-            FeedScopedId stopId = stopVertex.getStop().getId();
-
-            return stopId.getFeedId().concat(":").concat(stopId.getId());
-        } else {
-            return vertexId;
-        }
-    }
-    */
 
     /**
      * Simple wrapper in order to pass a consumer into the CallerWithEnvironment.argument method.

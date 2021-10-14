@@ -17,8 +17,9 @@ import java.util.List;
 public class DlugoszVarLenIntPacker {
 
     public static byte[] pack(int[] arr) {
-        if (arr == null)
+        if (arr == null) {
             return null;
+        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream(arr.length);
         for (int i : arr) {
             if (i >= -64 && i <= 63) {
@@ -62,8 +63,9 @@ public class DlugoszVarLenIntPacker {
     }
 
     public static int[] unpack(byte[] arr) {
-        if (arr == null)
+        if (arr == null) {
             return null;
+        }
         List<Integer> retval = new ArrayList<Integer>(arr.length);
         int i = 0;
         while (i < arr.length) {

@@ -28,7 +28,7 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
       return;
     }
 
-    StreetVertexIndex streetIndex = new StreetVertexIndex(graph);
+    StreetVertexIndex streetIndex = graph.getStreetIndex();
 
     ProgressTracker progress = ProgressTracker.track("Add flex locations to street vertices", 1, graph.locationsById.size());
 

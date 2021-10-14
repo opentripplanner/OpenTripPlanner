@@ -3,17 +3,20 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntIterators;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * A calculator that will take you back in time not forward, this is the
  * basic logic to implement a reveres search.
  */
-final class ReverseTransitCalculator implements TransitCalculator {
+final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements TransitCalculator<T> {
     private final int tripSearchBinarySearchThreshold;
     private final int latestArrivalTime;
     private final int searchWindowInSeconds;
@@ -73,7 +76,7 @@ final class ReverseTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> int stopArrivalTime(
+    public final int stopArrivalTime(
             T onTrip,
             int stopPositionInPattern,
             int alightSlack
@@ -130,14 +133,27 @@ final class ReverseTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            RaptorTimeTable<T> timeTable
-    ) {
+    public RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(RaptorRoute<T> route) {
+        return route.transferConstraintsReverseSearch();
+    }
+
+    @Override
+    public boolean alightingPossibleAt(RaptorTripPattern pattern, int stopPos) {
+        return pattern.boardingPossibleAt(stopPos);
+    }
+
+    @Override
+    public boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos) {
+        return pattern.alightingPossibleAt(stopPos);
+    }
+
+    @Override
+    public final TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
         return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, timeTable);
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
+    public final TripScheduleSearch<T> createExactTripSearch(
             RaptorTimeTable<T> timeTable
     ) {
         return new TripScheduleExactMatchSearch<>(

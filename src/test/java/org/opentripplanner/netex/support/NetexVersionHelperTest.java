@@ -1,19 +1,23 @@
 package org.opentripplanner.netex.support;
 
-import org.junit.Test;
-import org.rutebanken.netex.model.EntityInVersionStructure;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-
+import static java.time.Month.MAY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.netex.support.NetexVersionHelper.comparingVersion;
+import static org.opentripplanner.netex.support.NetexVersionHelper.firstValidDateTime;
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionedElementIn;
 import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import org.junit.Test;
+import org.rutebanken.netex.model.EntityInVersionStructure;
+import org.rutebanken.netex.model.ValidBetween;
 
 public class NetexVersionHelperTest {
 
@@ -52,4 +56,37 @@ public class NetexVersionHelperTest {
         assertTrue(subject.compare(E_VER_2, E_VER_1) > 0);
     }
 
+    @Test
+    public void testFirstRelevantDateTime() {
+        var may1st = LocalDateTime.of(2021, MAY, 1, 14, 0);
+        var may2nd = LocalDateTime.of(2021, MAY, 2, 14, 0);
+        var may3rd = LocalDateTime.of(2021, MAY, 3, 14, 0);
+        var may4th = LocalDateTime.of(2021, MAY, 4, 14, 0);
+
+        var pOpenEnded = new ValidBetween();
+        var pToMay2nd = new ValidBetween().withToDate(may2nd);
+        var pFromMay2nd = new ValidBetween().withFromDate(may2nd);
+        var pFrom2ndTo3rd = new ValidBetween().withFromDate(may2nd).withToDate(may3rd);
+
+        // Open ended periods always yield the input timestamp
+        assertEquals(may1st, firstValidDateTime(List.of(), may1st));
+        assertEquals(may1st, firstValidDateTime(List.of(pOpenEnded), may1st));
+        assertEquals(may3rd, firstValidDateTime(List.of(pOpenEnded), may3rd));
+        assertEquals(may1st, firstValidDateTime(List.of(pFromMay2nd, pOpenEnded), may1st));
+
+        // Pick the best day for a period in the future
+        assertEquals(may2nd, firstValidDateTime(List.of(pFromMay2nd), may1st));
+        assertEquals(may2nd, firstValidDateTime(List.of(pFrom2ndTo3rd), may1st));
+
+        // Get correct date-time for a period ending at may 2nd
+        assertEquals(may1st, firstValidDateTime(List.of(pToMay2nd), may1st));
+        assertEquals(may2nd, firstValidDateTime(List.of(pToMay2nd), may2nd));
+        assertNull(firstValidDateTime(List.of(pToMay2nd), may3rd));
+
+        // Get correct date-time for a fixed period
+        assertEquals(may2nd, firstValidDateTime(List.of(pFrom2ndTo3rd), may1st));
+        assertEquals(may2nd, firstValidDateTime(List.of(pFrom2ndTo3rd), may2nd));
+        assertEquals(may3rd, firstValidDateTime(List.of(pFrom2ndTo3rd), may3rd));
+        assertNull(firstValidDateTime(List.of(pFrom2ndTo3rd), may4th));
+    }
 }

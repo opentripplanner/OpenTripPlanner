@@ -1,12 +1,14 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.common.ProjectInfo;
 import org.opentripplanner.util.OtpAppException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Map.entry;
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * Replaces environment variable placeholders specified on the format ${variable} in a text
@@ -35,18 +37,19 @@ class EnvironmentVariableReplacer {
      */
     private final static Pattern PATTERN = Pattern.compile("\\$\\{([.\\w]+)}");
 
-    private static final Map<String, String> PROJECT_INFO = Map.of(
-        "maven.version" , ProjectInfo.INSTANCE.version,
-        "maven.version.short" , ProjectInfo.INSTANCE.unqualifiedVersion(),
-        "maven.version.major" , Integer.toString(ProjectInfo.INSTANCE.major),
-        "maven.version.minor" , Integer.toString(ProjectInfo.INSTANCE.minor),
-        "maven.version.patch" , Integer.toString(ProjectInfo.INSTANCE.patch),
-        "maven.version.qualifier" , ProjectInfo.INSTANCE.qualifier,
-        "git.branch" , ProjectInfo.INSTANCE.branch,
-        "git.commit" , ProjectInfo.INSTANCE.commit,
-        "git.commit.timestamp" , ProjectInfo.INSTANCE.commitTime
+    private static final Map<String, String> PROJECT_INFO = Map.ofEntries(
+        entry("maven.version" , projectInfo().version.version),
+        entry("maven.version.short" , projectInfo().version.unqualifiedVersion()),
+        entry("maven.version.major" , Integer.toString(projectInfo().version.major)),
+        entry("maven.version.minor" , Integer.toString(projectInfo().version.minor)),
+        entry("maven.version.patch" , Integer.toString(projectInfo().version.patch)),
+        entry("maven.version.qualifier" , projectInfo().version.qualifier),
+        entry("graph.file.header", projectInfo().graphFileHeaderInfo.asString()),
+        entry("otp.serialization.version.id", projectInfo().graphFileHeaderInfo.otpSerializationVersionId()),
+        entry("git.branch" , projectInfo().versionControl.branch),
+        entry("git.commit" , projectInfo().versionControl.commit),
+        entry("git.commit.timestamp" , projectInfo().versionControl.commitTime)
     );
-
 
     /**
      * Search for {@link #PATTERN}s and replace each placeholder with the value of the

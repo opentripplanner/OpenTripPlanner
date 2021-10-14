@@ -29,7 +29,7 @@ public class RouteMapper {
         api.url = domain.getUrl();
         api.color = domain.getColor();
         api.textColor = domain.getTextColor();
-        api.bikesAllowed = domain.getBikesAllowed();
+        api.bikesAllowed = BikeAccessMapper.mapToApi(domain.getBikesAllowed());
         api.sortOrder = domain.isSortOrderSet() ? domain.getSortOrder() : null;
         api.brandingUrl = domain.getBrandingUrl();
 

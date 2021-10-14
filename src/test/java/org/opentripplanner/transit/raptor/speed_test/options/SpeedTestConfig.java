@@ -1,11 +1,9 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -13,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDate;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
@@ -30,6 +28,9 @@ public class SpeedTestConfig {
      */
     public final LocalDate testDate;
 
+    /** The speed test run all its test on an existing pre-build graph. */
+    public final URI graph;
+
     public final int maxWalkDistanceMeters;
     public final double walkSpeedMeterPrSecond;
     public final TransitRoutingConfig transitRoutingParams;
@@ -39,6 +40,7 @@ public class SpeedTestConfig {
         NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
         this.rawNode = node;
         testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
+        graph = adapter.asUri("graph", null);
         maxWalkDistanceMeters = adapter.asInt("maxWalkDistanceMeters", 1000);
         walkSpeedMeterPrSecond = adapter.asDouble("walkSpeedMeterPrSecond", 1.4);
         transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
@@ -59,28 +61,9 @@ public class SpeedTestConfig {
     }
 
     public static SpeedTestConfig config(File dir) {
-        try {
-            File configFile = new File(dir, FILE_NAME);
-
-            if(!configFile.exists()) {
-                LOG.warn(
-                        "SpeedTest config file not found. Default " +
-                        "config is used. Missing file: {}",
-                        configFile.getAbsolutePath()
-                );
-                return new SpeedTestConfig(MissingNode.getInstance());
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-            mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-
-            SpeedTestConfig config = new SpeedTestConfig(mapper.readTree(configFile));
-            LOG.info("SpeedTest config loaded: " + config);
-            return config;
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e.getLocalizedMessage(), e);
-        }
+        var json = new ConfigLoader(dir).loadJsonByFilename(FILE_NAME);
+        SpeedTestConfig config = new SpeedTestConfig(json);
+        LOG.info("SpeedTest config loaded: " + config);
+        return config;
     }
 }

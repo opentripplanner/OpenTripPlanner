@@ -158,6 +158,6 @@ public class TransportModeSlack {
     }
 
     private static Object serializeTransportMode(TraverseMode m) {
-        return MODE.getCoercing().serialize(m);
+        return MODE.serialize(m);
     }
 }

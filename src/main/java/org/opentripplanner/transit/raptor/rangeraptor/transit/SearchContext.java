@@ -1,8 +1,12 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.forwardSlackProvider;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
+
+import java.util.Collection;
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
-import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -23,9 +27,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
-import java.util.Collection;
-import java.util.function.ToIntFunction;
-
 /**
  * The search context is used to hold search scoped instances and to pass these
  * to who ever need them.
@@ -44,8 +45,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
      */
     protected final RaptorTransitDataProvider<T> transit;
 
-    private final TransitCalculator calculator;
-    private final CostCalculator<T> costCalculator;
+    private final TransitCalculator<T> calculator;
+    private final CostCalculator costCalculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final PathMapper<T> pathMapper;
@@ -65,11 +66,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.transit = transit;
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
-        this.costCalculator = createCostCalculator(
-            transit.stopBoarAlightCost(),
-            request.multiCriteriaCostFactors(),
-            lifeCycle()
-        );
+        this.costCalculator = transit.multiCriteriaCostCalculator();
         this.roundTracker = new RoundTracker(
             nRounds(),
             request.searchParams().numberOfAdditionalTransfers(),
@@ -80,20 +77,20 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
 
-    public Collection<RaptorTransfer> accessLegs() {
+    public Collection<RaptorTransfer> accessPaths() {
         return request.searchDirection().isForward()
-                ? request.searchParams().accessLegs()
-                : request.searchParams().egressLegs();
+                ? request.searchParams().accessPaths()
+                : request.searchParams().egressPaths();
     }
 
-    public Collection<RaptorTransfer> egressLegs() {
+    public Collection<RaptorTransfer> egressPaths() {
         return request.searchDirection().isForward()
-                ? request.searchParams().egressLegs()
-                : request.searchParams().accessLegs();
+                ? request.searchParams().egressPaths()
+                : request.searchParams().accessPaths();
     }
 
     public int[] egressStops() {
-        return egressLegs().stream().mapToInt(RaptorTransfer::stop).toArray();
+        return egressPaths().stream().mapToInt(RaptorTransfer::stop).toArray();
     }
 
     public SearchParams searchParams() {
@@ -108,7 +105,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return transit;
     }
 
-    public TransitCalculator calculator() {
+    public TransitCalculator<T> calculator() {
         return calculator;
     }
 
@@ -118,7 +115,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
      * <p>
      * The {@code SlackProvider} is stateful, so this method create a new instance
      * every time it is called, so each consumer could have their own instance and
-     * not get surprised by the life-cycle update.
+     * not get surprised by the life-cycle update. Remember to call the
+     * {@link SlackProvider#setCurrentPattern(RaptorTripPattern)} before retriving
+     * slack values.
      */
     public SlackProvider slackProvider() {
         return createSlackProvider(request, lifeCycle());
@@ -127,7 +126,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     /**
      * The board-slack (duration time in seconds) to add to the stop arrival time,
      * before boarding the given trip pattern. THIS DO NOT INCLUDE THE transfer-slack,
-     * and should only be used to time-shift the access-leg.
+     * and should only be used to time-shift the access-path.
      * <p>
      * Unit: seconds.
      */
@@ -139,7 +138,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return pathMapper;
     }
 
-    public CostCalculator<T> costCalculator() {
+    public CostCalculator costCalculator() {
         return costCalculator;
     }
 
@@ -185,33 +184,42 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return publisher;
     }
 
+    public boolean enableConstrainedTransfers() {
+        if(profile().isOneOf(RaptorProfile.BEST_TIME, RaptorProfile.NO_WAIT_BEST_TIME)) {
+            return false;
+        }
+        return searchParams().constrainedTransfersEnabled();
+    }
+
     /* private methods */
 
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static TransitCalculator createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
+    private static <T extends RaptorTripSchedule> TransitCalculator<T> createCalculator(
+            RaptorRequest<T> r, RaptorTuningParameters t
+    ) {
         SearchParams s = r.searchParams();
         return r.searchDirection().isForward()
-                ? new ForwardTransitCalculator(s, t)
-                : new ReverseTransitCalculator(s, t);
+                ? new ForwardTransitCalculator<>(s, t)
+                : new ReverseTransitCalculator<>(s, t);
     }
 
-    private static <S extends RaptorTripSchedule> DebugRequest<S> debugRequest(
-            RaptorRequest<S> request
+    private static DebugRequest debugRequest(
+            RaptorRequest<?> request
     ) {
         return request.searchDirection().isForward()
                 ? request.debug()
                 : request.mutate().debug().reverseDebugRequest().build();
     }
 
-    private static <S extends RaptorTripSchedule> SlackProvider createSlackProvider(
-            RaptorRequest<S> request,
+    private static SlackProvider createSlackProvider(
+            RaptorRequest<?> request,
             WorkerLifeCycle lifeCycle
     ) {
         return request.searchDirection().isForward()
-                ? new ForwardSlackProvider<>(request.slackProvider(), lifeCycle)
-                : new ReverseSlackProvider<>(request.slackProvider(), lifeCycle);
+                ? forwardSlackProvider(request.slackProvider(), lifeCycle)
+                : reverseSlackProvider(request.slackProvider(), lifeCycle);
     }
 
     private static ToIntFunction<RaptorTripPattern> createBoardSlackProvider(
@@ -227,21 +235,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
             WorkerLifeCycle lifeCycle
     ) {
         return request.searchDirection().isForward()
-                ? new ForwardPathMapper<>(lifeCycle)
-                : new ReversePathMapper<>(lifeCycle);
+                ? new ForwardPathMapper<>(request.slackProvider(), lifeCycle)
+                : new ReversePathMapper<>(request.slackProvider(), lifeCycle);
     }
-
-    private static <S extends RaptorTripSchedule> CostCalculator<S> createCostCalculator(
-        int[] stopVisitCost, McCostParams f, WorkerLifeCycle lifeCycle
-    ) {
-        return new DefaultCostCalculator<>(
-                stopVisitCost,
-                f.boardCost(),
-                f.walkReluctanceFactor(),
-                f.waitReluctanceFactor(),
-                lifeCycle
-        );
-    }
-
-
 }

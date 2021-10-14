@@ -49,8 +49,9 @@ public enum Message {
 
     /** simple checker / getter of the config */
     public Properties getConfig() {
-        if(config == null)
+        if(config == null) {
             config = new Properties(Message.class);
+        }
         return config;
     }
 

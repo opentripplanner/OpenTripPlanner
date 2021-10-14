@@ -12,9 +12,9 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TransitEntranceLink;
+import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -64,8 +64,8 @@ public class StreetUtils {
             State s0 = new State(gv, options);
             for (Edge e : gv.getOutgoing()) {
                 Vertex in = gv;
-                if (!(e instanceof StreetEdge || e instanceof StreetTransitLink ||
-                    e instanceof TransitEntranceLink || e instanceof ElevatorEdge ||
+                if (!(e instanceof StreetEdge || e instanceof StreetTransitStopLink ||
+                    e instanceof StreetTransitEntranceLink || e instanceof ElevatorEdge ||
                     e instanceof FreeEdge)
                 ) {
                     continue;
@@ -176,7 +176,7 @@ public class StreetUtils {
             Collection<Edge> edges = new ArrayList<Edge>(v.getOutgoing());
             edges.addAll(v.getIncoming());
             for (Edge e : edges) {
-                if (e instanceof StreetTransitLink || e instanceof TransitEntranceLink) {
+                if (e instanceof StreetTransitStopLink || e instanceof StreetTransitEntranceLink) {
                     graph.removeEdge(e);
                 }
             }

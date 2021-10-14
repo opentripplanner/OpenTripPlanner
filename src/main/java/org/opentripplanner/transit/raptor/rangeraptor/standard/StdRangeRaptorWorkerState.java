@@ -1,16 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 
+import java.util.Collection;
+import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 
 /**
@@ -27,11 +27,9 @@ import java.util.Iterator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class StdRangeRaptorWorkerState<T
-        extends RaptorTripSchedule>
-        implements StdWorkerState<T>
+public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
+    implements StdWorkerState<T>
 {
-
     /**
      * The best times to reach each stop, whether via a transfer or via transit directly.
      * This is the bare minimum to execute the algorithm.
@@ -53,13 +51,13 @@ public final class StdRangeRaptorWorkerState<T
     /**
      * The calculator is used to calculate transit related times/events like access arrival time.
      */
-    private final TransitCalculator calculator;
+    private final TransitCalculator<T> calculator;
 
     /**
      * create a BestTimes Range Raptor State for given context.
      */
     public StdRangeRaptorWorkerState(
-            TransitCalculator calculator,
+            TransitCalculator<T> calculator,
             BestTimes bestTimes,
             StopArrivalsState<T> stopArrivalsState,
             ArrivedAtDestinationCheck arrivedAtDestinationCheck
@@ -68,19 +66,6 @@ public final class StdRangeRaptorWorkerState<T
         this.bestTimes = bestTimes;
         this.stopArrivalsState = stopArrivalsState;
         this.arrivedAtDestinationCheck = arrivedAtDestinationCheck;
-    }
-
-    @Override
-    public final void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int departureTime) {
-        int durationInSeconds = accessEgressLeg.durationInSeconds();
-        int stop = accessEgressLeg.stop();
-
-        // The time of arrival at the given stop for the current iteration
-        // (or departure time at the last stop if we search backwards).
-        int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
-
-        bestTimes.setAccessStopTime(stop, arrivalTime, accessEgressLeg.stopReachedOnBoard());
-        stopArrivalsState.setAccess(stop, arrivalTime, accessEgressLeg);
     }
 
     @Override
@@ -125,22 +110,49 @@ public final class StdRangeRaptorWorkerState<T
         return stopArrivalsState.bestTimePreviousRound(stop);
     }
 
+    @Override
+    public final void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
+        final int durationInSeconds = accessPath.durationInSeconds();
+        final int stop = accessPath.stop();
+
+        // The time of arrival at the given stop for the current iteration
+        // (or departure time at the last stop if we search backwards).
+        int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
+
+        if (exceedsTimeLimit(arrivalTime)) {
+            return;
+        }
+
+        if (newOverallBestTime(stop, arrivalTime)) {
+            bestTimes.setAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
+            stopArrivalsState.setAccessTime(arrivalTime, accessPath);
+        }
+        else {
+            stopArrivalsState.rejectAccessTime(arrivalTime, accessPath);
+        }
+    }
+
     /**
      * Set the time at a transit stop iff it is optimal. This sets both the bestTime and the transitTime.
      */
     @Override
-    public final void transitToStop(int stop, int alightTime, int boardStop, int boardTime, T trip) {
-        if (exceedsTimeLimit(alightTime)) {
+    public final void transitToStop(int stop, int arrivalTime, int boardStop, int boardTime, T trip) {
+        if (exceedsTimeLimit(arrivalTime)) {
             return;
         }
 
-        if (newTransitBestTime(stop, alightTime)) {
+        if (newTransitBestTime(stop, arrivalTime)) {
             // transitTimes upper bounds bestTimes
-            final boolean newBestOverall = newOverallBestTime(stop, alightTime);
-            stopArrivalsState.setNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime, newBestOverall);
+            final boolean newBestOverall = newOverallBestTime(stop, arrivalTime);
+            stopArrivalsState.setNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime, newBestOverall);
         } else {
-            stopArrivalsState.rejectNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime);
+            stopArrivalsState.rejectNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime);
         }
+    }
+
+    @Override
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        return stopArrivalsState.previousTransit(boardStopIndex);
     }
 
     /**
@@ -159,23 +171,21 @@ public final class StdRangeRaptorWorkerState<T
         return stopArrivalsState.extractPaths();
     }
 
-    private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transferLeg) {
+    private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
         // Use the calculator to make sure the calculation is done correct for a normal
         // forward search and a reverse search.
-        final int arrivalTime = calculator.plusDuration(arrivalTimeTransit, transferLeg.durationInSeconds());
+        final int arrivalTime = calculator.plusDuration(arrivalTimeTransit, transfer.durationInSeconds());
 
         if (exceedsTimeLimit(arrivalTime)) {
             return;
         }
 
-        final int toStop = transferLeg.stop();
+        final int toStop = transfer.stop();
 
-        // transitTimes upper bounds bestTimes so we don't need to update wait time and in-vehicle time here, if we
-        // enter this conditional it has already been updated.
         if (newOverallBestTime(toStop, arrivalTime)) {
-            stopArrivalsState.setNewBestTransferTime(fromStop, arrivalTime, transferLeg);
+            stopArrivalsState.setNewBestTransferTime(fromStop, arrivalTime, transfer);
         } else {
-            stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transferLeg);
+            stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
         }
     }
 

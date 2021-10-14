@@ -1,8 +1,9 @@
 package org.opentripplanner.util.xml;
 
+import static java.util.Locale.ROOT;
+
 import java.util.List;
 import java.util.Map;
-
 import junit.framework.TestCase;
 
 public class TestXmlDataListDownloader extends TestCase {
@@ -32,7 +33,7 @@ public class TestXmlDataListDownloader extends TestCase {
                 .download("file:src/test/resources/xml/test-data.xml", false);
         assertEquals(3, data.size());
         for (DataTest dt : data) {
-            System.out.println(String.format("%s (%.6f,%.6f)", dt.name, dt.lat, dt.lon));
+            System.out.printf(ROOT, "%s (%.6f,%.6f)%n", dt.name, dt.lat, dt.lon);
         }
         DataTest a = data.get(0);
         DataTest c = data.get(2);

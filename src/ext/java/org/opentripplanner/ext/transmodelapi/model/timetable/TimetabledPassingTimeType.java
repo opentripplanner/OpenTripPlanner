@@ -8,10 +8,8 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripTimeShort;
-
-import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
+import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.TripTimeOnDate;
 
 public class TimetabledPassingTimeType {
   private static final String NAME = "TimetabledPassingTime";
@@ -35,8 +33,8 @@ public class TimetabledPassingTimeType {
             .type(quayType)
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment).getStopForId((
-                  (TripTimeShort) environment.getSource()
-              ).stopId);
+                  (TripTimeOnDate) environment.getSource()
+              ).getStopId());
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -44,14 +42,14 @@ public class TimetabledPassingTimeType {
             .name("arrival")
             .type(gqlUtil.timeScalar)
             .description("Scheduled time of arrival at quay")
-            .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).scheduledArrival)
+            .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getScheduledArrival())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("departure")
             .type(gqlUtil.timeScalar)
             .description("Scheduled time of departure from quay")
-            .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).scheduledDeparture)
+            .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getScheduledDeparture())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -59,7 +57,7 @@ public class TimetabledPassingTimeType {
             .type(Scalars.GraphQLBoolean)
             .description(
                 "Whether this is a timing point or not. Boarding and alighting is not allowed at timing points.")
-            .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).timepoint)
+            .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).isTimepoint())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -69,10 +67,8 @@ public class TimetabledPassingTimeType {
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
                   .getPatternForTrip()
-                  .get(GqlUtil.getRoutingService(environment)
-                      .getTripForId()
-                      .get(((TripTimeShort) environment.getSource()).tripId))
-                  .getBoardType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
+                  .get(((TripTimeOnDate) environment.getSource()).getTrip())
+                  .getBoardType(((TripTimeOnDate) environment.getSource()).getStopIndex()) != PickDrop.NONE;
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -83,11 +79,9 @@ public class TimetabledPassingTimeType {
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
                   .getPatternForTrip()
-                  .get(GqlUtil.getRoutingService(environment)
-                      .getTripForId()
-                      .get(((TripTimeShort) environment.getSource()).tripId))
-                  .getAlightType(((TripTimeShort) environment.getSource()).stopIndex)
-                  != PICKDROP_NONE;
+                  .get(((TripTimeOnDate) environment.getSource()).getTrip())
+                  .getAlightType(((TripTimeOnDate) environment.getSource()).getStopIndex())
+                  != PickDrop.NONE;
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -98,37 +92,30 @@ public class TimetabledPassingTimeType {
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
                   .getPatternForTrip()
-                  .get(GqlUtil.getRoutingService(environment)
-                      .getTripForId()
-                      .get(((TripTimeShort) environment.getSource()).tripId))
-                  .getAlightType(((TripTimeShort) environment.getSource()).stopIndex)
-                  == PICKDROP_COORDINATE_WITH_DRIVER;
+                  .get(((TripTimeOnDate) environment.getSource()).getTrip())
+                  .getAlightType(((TripTimeOnDate) environment.getSource()).getStopIndex())
+                  == PickDrop.COORDINATE_WITH_DRIVER;
             })
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("serviceJourney")
             .type(serviceJourneyType)
-            .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment)
-                  .getTripForId()
-                  .get(((TripTimeShort) environment.getSource()).tripId);
-            })
+            .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getTrip())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("destinationDisplay")
             .type(destinationDisplayType)
-            .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).headsign)
+            .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getHeadsign())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("notices")
             .type(new GraphQLNonNull(new GraphQLList(noticeType)))
             .dataFetcher(environment -> {
-              // TODO OTP2 - fix this
-              // TripTimeShort tripTimeShort = environment.getSource();
-              return null; //index.getNoticesByEntity(tripTimeShort.);
+              TripTimeOnDate tripTimeOnDate = environment.getSource();
+              return GqlUtil.getRoutingService(environment).getNoticesByEntity(tripTimeOnDate.getStopTimeKey());
             })
             .build())
         .field(GraphQLFieldDefinition

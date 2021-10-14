@@ -9,8 +9,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlace {
 
@@ -46,31 +45,17 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Object> stop() {
-    return environment -> {
-      Place place = getSource(environment).place;
-      return place.vertexType.equals(VertexType.TRANSIT) ?
-          getRoutingService(environment).getStopForId(place.stopId) : null;
-    };
+    return environment -> getSource(environment).place.stop;
   }
 
   @Override
-  public DataFetcher<BikeRentalStation> bikeRentalStation() {
+  public DataFetcher<VehicleRentalPlace> bikeRentalStation() {
     return environment -> {
       Place place = getSource(environment).place;
 
       if (!place.vertexType.equals(VertexType.BIKESHARE)) { return null; }
 
-      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
-          .getBikerentalStationService();
-
-      if (bikerentalStationService == null) { return null; }
-
-      return bikerentalStationService
-          .getBikeRentalStations()
-          .stream()
-          .filter(bikeRentalStation -> bikeRentalStation.id.equals(place.bikeShareId))
-          .findAny()
-          .orElse(null);
+      return place.vehicleRentalStation;
     };
   }
 

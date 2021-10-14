@@ -92,7 +92,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
                 addIssues(entry.getKey(), issueList);
             }
 
-                //Actual writing to the file is made here since
+            //Actual writing to the file is made here since
             // this is the first place where actual number of files is known (because it depends on
             // the issue count)
             for (HTMLWriter writer : writers) {
@@ -107,6 +107,12 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
             }
 
             LOG.info("Data import issue logs are in {}", reportDirectory.path());
+        }
+        catch (Exception e) {
+            // If the issue report fails due to a remote storage or network problem, then we log
+            // the error an CONTINUE with the graph build process. Preventing OTP from saving the
+            // Graph might have much bigger consequences than just failing to save the issue report.
+            LOG.error("OTP failed to save issue report!", e);
         }
         finally {
             closeReportDirectory();
@@ -262,16 +268,18 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
                         label = label_name + currentCount;
                         if (label.equals(issueTypeName)) {
                             out.printf(
-                                    "<button class='pure-button pure-button-disabled button-%s'>%s</button>%n",
+                                    "<button class='pure-button pure-button-disabled button-%s' style='background-color: %s;'>%s</button>%n",
                                     label_name.toLowerCase(),
+                                    IssueColors.rgb(label_name),
                                     label
                             );
                         }
                         else {
                             out.printf(
-                                    "<a class='pure-button button-%s' href=\"%s.html\">%s</a>%n",
+                                    "<a class='pure-button button-%s' href=\"%s.html\" style='background-color: %s;'>%s</a>%n",
                                     label_name.toLowerCase(),
                                     label,
+                                    IssueColors.rgb(label_name),
                                     label
                             );
                         }

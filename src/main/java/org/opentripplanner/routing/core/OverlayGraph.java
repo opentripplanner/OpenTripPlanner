@@ -102,15 +102,17 @@ public class OverlayGraph implements Serializable {
 
     public List<Edge> getOutgoing(Vertex v) {
         List<Edge> ret = outgoing.get(v);
-        if (ret == null)
+        if (ret == null) {
             ret = Collections.emptyList();
+        }
         return ret;
     }
 
     public List<Edge> getIncoming(Vertex v) {
         List<Edge> ret = incoming.get(v);
-        if (ret == null)
+        if (ret == null) {
             ret = Collections.emptyList();
+        }
         return ret;
     }
 
@@ -167,18 +169,22 @@ public class OverlayGraph implements Serializable {
 
     public int getDegreeIn(Vertex v) {
         List<Edge> l = incoming.get(v);
-        if (l == null)
+        if (l == null) {
             return 0;
-        else
+        }
+        else {
             return l.size();
+        }
     }
 
     public int getDegreeOut(Vertex v) {
         List<Edge> l = outgoing.get(v);
-        if (l == null)
+        if (l == null) {
             return 0;
-        else
+        }
+        else {
             return l.size();
+        }
     }
 
     public boolean containsVertex(Vertex vertex) {
@@ -186,10 +192,12 @@ public class OverlayGraph implements Serializable {
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        for (List<Edge> le : outgoing.values())
+        for (List<Edge> le : outgoing.values()) {
             ((ArrayList<Edge>)le).trimToSize();
-        for (List<Edge> le : incoming.values())
-            ((ArrayList<Edge>)le).trimToSize();
+        }
+        for (List<Edge> le : incoming.values()) {
+            ((ArrayList<Edge>) le).trimToSize();
+        }
         out.defaultWriteObject();
     }
 

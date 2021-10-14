@@ -1,16 +1,15 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Collection;
+import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.QuayWithoutCoordinates;
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.Quay;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 class StopMapper {
 
@@ -30,7 +29,7 @@ class StopMapper {
    * Map Netex Quay to OTP Stop
    */
   @Nullable
-  Stop mapQuayToStop(Quay quay, Station parentStation, List<FareZone> fareZones) {
+  Stop mapQuayToStop(Quay quay, Station parentStation, Collection<FareZone> fareZones) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
     if (coordinate == null) {
@@ -42,11 +41,12 @@ class StopMapper {
         idFactory.createId(quay.getId()),
         parentStation.getName(),
         quay.getPublicCode(),
-        null,
+        quay.getDescription() != null ? quay.getDescription().getValue() : null,
         WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
         null,
         null,
-        null, fareZones,
+        null,
+        fareZones,
         null,
         null,
         null

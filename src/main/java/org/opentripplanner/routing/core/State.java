@@ -1,16 +1,16 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
+import java.util.Objects;
+
+import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -47,10 +47,58 @@ public class State implements Cloneable {
      * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
      * states must be created from a parent and associated with an edge.
      */
-    public static Collection<State> getStates(RoutingRequest request) {
+    public static Collection<State> getInitialStates(RoutingRequest request) {
         Collection<State> states = new ArrayList<>();
         for (Vertex vertex : request.rctx.fromVertices) {
-            states.add(new State(vertex, request.rctx.originBackEdge, request.getSecondsSinceEpoch(), request));
+            /* carPickup searches may end in two distinct states: IN_CAR and WALK_FROM_DROP_OFF/WALK_TO_PICKUP
+               for forward/reverse searches to be symmetric both initial states need to be created. */
+            if (request.carPickup) {
+                states.add(
+                    new State(
+                    vertex,
+                    request.rctx.originBackEdge,
+                    request.getSecondsSinceEpoch(),
+                    request,
+                    true,
+                    false,
+                    false
+                ));
+            }
+
+            /* vehicle rental searches may end in three states (see isFinal()): BEFORE_RENTING/RENTING_FLOATING/HAVE_RENTED
+               for forward/reverse searches to be symmetric an additional RENTING_FLOATING state needs to be created. */
+            if (request.bikeRental && request.arriveBy) {
+                states.add(
+                    new State(
+                        vertex,
+                        request.rctx.originBackEdge,
+                        request.getSecondsSinceEpoch(),
+                        request,
+                        false,
+                        true,
+                        false
+                    ));
+
+                if (request.allowKeepingRentedVehicleAtDestination) {
+                    states.add(
+                            new State(
+                                    vertex,
+                                    request.rctx.originBackEdge,
+                                    request.getSecondsSinceEpoch(),
+                                    request,
+                                    false,
+                                    true,
+                                    true
+                    ));
+                }
+            }
+
+            states.add(new State(
+                vertex,
+                request.rctx.originBackEdge,
+                request.getSecondsSinceEpoch(),
+                request
+            ));
         }
         return states;
     }
@@ -87,14 +135,38 @@ public class State implements Cloneable {
      * a RoutingContext in TransitIndex, tests, etc.
      */
     public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options) {
-        this(vertex, backEdge, timeSeconds, timeSeconds, options);
+        this(vertex, backEdge, timeSeconds, timeSeconds, options, false, false, false);
     }
-    
+
+    /**
+     * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing
+     * a RoutingContext in TransitIndex, tests, etc.
+     */
+    public State(
+        Vertex vertex,
+        Edge backEdge,
+        long timeSeconds,
+        RoutingRequest options,
+        boolean carPickupStateInCar,
+        boolean bikeRentalFloatingState,
+        boolean keptRentedVehicleAtDestination) {
+        this(vertex, backEdge, timeSeconds, timeSeconds, options, carPickupStateInCar, bikeRentalFloatingState, keptRentedVehicleAtDestination);
+    }
+
     /**
      * Create an initial state, forcing vertex, back edge, time and start time to the specified values. Useful for starting
      * a multiple initial state search, for example when propagating profile results to the street network in RoundBasedProfileRouter.
      */
-    public State(Vertex vertex, Edge backEdge, long timeSeconds, long startTime, RoutingRequest options) {
+    public State(
+        Vertex vertex,
+        Edge backEdge,
+        long timeSeconds,
+        long startTime,
+        RoutingRequest options,
+        boolean carPickupStateInCar,
+        boolean vehicleRentalFloatingState,
+        boolean keptRentedVehicleAtDestination
+    ) {
         this.weight = 0;
         this.vertex = vertex;
         this.backEdge = backEdge;
@@ -104,21 +176,44 @@ public class State implements Cloneable {
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
         this.stateData.startTime = startTime;
-        this.stateData.usingRentedBike = false;
+        if (options.bikeRental) {
+            if (options.arriveBy) {
+                if (keptRentedVehicleAtDestination) {
+                    this.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
+                    this.stateData.currentMode = TraverseMode.BICYCLE;
+                    this.stateData.mayKeepRentedVehicleAtDestination = true;
+                } else if (vehicleRentalFloatingState) {
+                    this.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
+                    this.stateData.currentMode = TraverseMode.BICYCLE;
+                } else {
+                    this.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
+                    this.stateData.currentMode = TraverseMode.WALK;
+                }
+            }
+            else {
+                this.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
+            }
+        }
+        if (options.carPickup) {
+            /* For carPickup two initial states are created in getStates(request):
+                 1. WALK / WALK_FROM_DROP_OFF or WALK_TO_PICKUP for cases with an initial walk
+                 2. CAR / IN_CAR where pickup happens directly at the bus stop */
+            if (carPickupStateInCar) {
+                this.stateData.carPickupState = CarPickupState.IN_CAR;
+                this.stateData.currentMode = TraverseMode.CAR;
+            } else {
+                this.stateData.carPickupState = options.arriveBy ? CarPickupState.WALK_FROM_DROP_OFF : CarPickupState.WALK_TO_PICKUP;
+                this.stateData.currentMode = TraverseMode.WALK;
+            }
+        }
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
-        if (options.carPickup) {
-            this.stateData.carPickupState = options.arriveBy
-                ? CarPickupState.WALK_FROM_DROP_OFF
-                : CarPickupState.WALK_TO_PICKUP;
-            this.stateData.nonTransitMode = TraverseMode.WALK;
-        }
         if (options.parkAndRide) {
             this.stateData.carParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
+            this.stateData.currentMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         } else if (options.bikeParkAndRide) {
             this.stateData.bikeParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
+            this.stateData.currentMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         }
         this.walkDistance = 0;
@@ -180,12 +275,41 @@ public class State implements Cloneable {
         return Math.abs(getTimeSeconds() - stateData.startTime);
     }
 
-    public boolean isBikeRenting() {
-        return stateData.usingRentedBike;
+    public boolean isCompatibleVehicleRentalState(State state) {
+        return stateData.vehicleRentalState == state.stateData.vehicleRentalState &&
+                stateData.mayKeepRentedVehicleAtDestination
+                        == state.stateData.mayKeepRentedVehicleAtDestination;
     }
 
-    public boolean hasUsedRentedBike() {
-        return stateData.hasUsedRentedBike;
+    public boolean isBikeRentingFromStation() {
+        return stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION;
+    }
+
+    public boolean isBikeRentingFloating() {
+        return stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING;
+    }
+
+    public boolean isBikeRenting() {
+        return stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
+            || stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING;
+    }
+
+    public boolean bikeRentalIsFinished() {
+        return stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED
+                || stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING
+                || (
+                getOptions().allowKeepingRentedVehicleAtDestination
+                        && stateData.mayKeepRentedVehicleAtDestination
+                        && stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
+        );
+    }
+
+    public boolean bikeRentalNotStarted() {
+        return stateData.vehicleRentalState == VehicleRentalState.BEFORE_RENTING;
+    }
+
+    public VehicleRentalState getVehicleRentalState() {
+        return stateData.vehicleRentalState;
     }
     
     public boolean isCarParked() {
@@ -206,25 +330,16 @@ public class State implements Cloneable {
         boolean bikeRentingOk;
         boolean bikeParkAndRideOk;
         boolean carParkAndRideOk;
-        boolean pickedUpByCar;
         if (stateData.opt.arriveBy) {
-            // Check that we are not renting a bike at the destination
-            // Also check that a bike was rented if bikeRental is specified
-            bikeRentingOk = !isBikeRenting() && (!stateData.opt.bikeRental || hasUsedRentedBike());
+            bikeRentingOk = !stateData.opt.bikeRental || !isBikeRenting();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
-            // Checks that taxi has actually been used
-            pickedUpByCar = getCarPickupState() != CarPickupState.WALK_FROM_DROP_OFF;
         } else {
-            // Check that we are not renting a bike at the destination
-            // Also check that a bike was rented if bikeRental is specified
-            bikeRentingOk = !isBikeRenting() && (!stateData.opt.bikeRental || hasUsedRentedBike());
+            bikeRentingOk = !stateData.opt.bikeRental || (bikeRentalNotStarted() || bikeRentalIsFinished());
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
-            // Checks that taxi has actually been used
-            pickedUpByCar = getCarPickupState() != CarPickupState.WALK_TO_PICKUP;
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && pickedUpByCar;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
     }
 
     public double getWalkDistance() {
@@ -248,10 +363,12 @@ public class State implements Cloneable {
     }
 
     private double getWalkDistanceDelta () {
-        if (backState != null)
+        if (backState != null) {
             return Math.abs(this.walkDistance - backState.walkDistance);
-        else
+        }
+        else {
             return 0.0;
+        }
     }
 
     public double getWeightDelta() {
@@ -314,8 +431,9 @@ public class State implements Cloneable {
      * @return
      */
     public State addToExistingResultChain(State existingResultChain) {
-        if (this.getNextResult() != null)
+        if (this.getNextResult() != null) {
             throw new IllegalStateException("this result already has a next result set");
+        }
         next = existingResultChain;
         return this;
     }
@@ -336,7 +454,7 @@ public class State implements Cloneable {
      *         to a rented bicycle.
      */
     public TraverseMode getNonTransitMode() {
-        return stateData.nonTransitMode;
+        return stateData.currentMode;
     }
     // TODO: There is no documentation about what this means. No one knows precisely.
     // Needs to be replaced with clearly defined fields.
@@ -346,7 +464,7 @@ public class State implements Cloneable {
         // It is distributed symmetrically over all preboard and prealight edges.
         State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone());
         // TODO Check if those two lines are needed:
-        newState.stateData.usingRentedBike = stateData.usingRentedBike;
+        newState.stateData.vehicleRentalState = stateData.vehicleRentalState;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
         newState.stateData.carPickupState = stateData.carPickupState;
@@ -394,7 +512,7 @@ public class State implements Cloneable {
             boolean found = false;
             for (Edge out2 : tov.getOutgoing()) {
                 State outState2 = out2.traverse(outState);
-                if (outState2 != null && !outState2.getBackMode().equals(requestedMode)) {
+                if (outState2 != null && !Objects.equals(outState2.getBackMode(), requestedMode)) {
                     // walking a bike, so, not really an exit
                     continue;
                 }
@@ -412,8 +530,8 @@ public class State implements Cloneable {
         return foundAlternatePaths;
     }
 
-    public Set<String> getBikeRentalNetworks() {
-        return stateData.bikeRentalNetworks;
+    public String getVehicleRentalNetwork() {
+        return stateData.vehicleRentalNetwork;
     }
 
     /**
@@ -423,7 +541,7 @@ public class State implements Cloneable {
      * due to different weights on time-dependent (e.g. transit boarding) edges. If the optimize 
      * parameter is false, the path will be reversed but will have the same duration. This is the 
      * result of combining the functions from GraphPath optimize and reverse.
-     * 
+     *
      * @return a state at the other end (or this end, in the case of a forward search)
      * of a reversed, optimized path
      */
@@ -451,14 +569,37 @@ public class State implements Cloneable {
             editor.setBackMode(orig.getBackMode());
 
             if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
-                editor.doneVehicleRenting();
-            } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
-                editor.beginVehicleRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
+                var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
+                editor.dropOffRentedVehicleAtStation(
+                        stationVertex.getVehicleMode(),
+                        stationVertex.getStation().getNetwork(),
+                        false
+                );
             }
-            if (orig.isCarParked() != orig.getBackState().isCarParked())
+            else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+                var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
+                if (orig.getBackState().isBikeRentingFromStation()) {
+                    editor.beginVehicleRentingAtStation(
+                            stationVertex.getVehicleMode(),
+                            stationVertex.getStation().getNetwork(),
+                            orig.backState.mayKeepRentedVehicleAtDestination(),
+                            false
+                    );
+                }
+                else if (orig.getBackState().isBikeRentingFloating()) {
+                    editor.beginFloatingVehicleRenting(
+                            stationVertex.getVehicleMode(),
+                            stationVertex.getStation().getNetwork(),
+                            false
+                    );
+                }
+            }
+            if (orig.isCarParked() != orig.getBackState().isCarParked()) {
                 editor.setCarParked(!orig.isCarParked());
-            if (orig.isBikeParked() != orig.getBackState().isBikeParked())
+            }
+            if (orig.isBikeParked() != orig.getBackState().isBikeParked()) {
                 editor.setBikeParked(!orig.isBikeParked());
+            }
 
             ret = editor.makeState();
 
@@ -475,8 +616,11 @@ public class State implements Cloneable {
         return reverse();
     }
 
-    boolean hasEnteredNoThruTrafficArea() {
+    public boolean hasEnteredNoThruTrafficArea() {
         return stateData.enteredNoThroughTrafficArea;
     }
 
+    public boolean mayKeepRentedVehicleAtDestination() {
+        return stateData.mayKeepRentedVehicleAtDestination;
+    }
 }

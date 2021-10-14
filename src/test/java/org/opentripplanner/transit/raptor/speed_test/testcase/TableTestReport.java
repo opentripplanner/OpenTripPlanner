@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.routing.util.DiffTool;
 import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,15 +19,14 @@ import static org.opentripplanner.util.TableFormatter.Align.Right;
  */
 public class TableTestReport {
 
-    public static String report(List<Result> results) {
+    public static String report(List<DiffTool.Entry<Result>> results) {
         if (results.isEmpty()) {
             return "NO RESULTS FOUND FOR TEST CASE!";
         }
 
-        Collections.sort(results);
-
         TableFormatter table = newTable();
-        for (Result it : results) {
+
+        for (DiffTool.Entry<Result> it : results) {
             addTo(table, it);
         }
         return table.toString();
@@ -38,24 +37,25 @@ public class TableTestReport {
 
     private static TableFormatter newTable() {
         return new TableFormatter(
-                        List.of(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
-                        List.of("STATUS", "TF", "Duration", "Cost",  "Start", "End", "Modes", "Agencies", "Routes", "Stops", "Legs")
-                );
+            List.of(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
+            List.of("STATUS", "TX", "Duration", "Cost",  "Start", "End", "Modes", "Agencies", "Routes", "Stops", "Legs")
+        );
     }
 
-    private static void addTo(TableFormatter table, Result result) {
+    private static void addTo(TableFormatter table, DiffTool.Entry<Result> e) {
+        Result result = e.element();
         table.addRow(
-                result.status.label,
-                result.transfers,
-                result.durationAsStr(),
-                result.cost,
-                TimeUtils.timeToStrLong(result.startTime),
-                TimeUtils.timeToStrLong(result.endTime),
-                toStr(result.modes),
-                toStr(result.agencies),
-                toStr(result.routes),
-                intsToStr(result.stops),
-                result.details
+            e.status(TestStatus.OK.label, TestStatus.FAILED.label, TestStatus.WARN.label),
+            result.transfers,
+            result.durationAsStr(),
+            result.cost,
+            TimeUtils.timeToStrLong(result.startTime),
+            TimeUtils.timeToStrLong(result.endTime),
+            toStr(result.modes),
+            toStr(result.agencies),
+            toStr(result.routes),
+            intsToStr(result.stops),
+            result.details
         );
     }
 

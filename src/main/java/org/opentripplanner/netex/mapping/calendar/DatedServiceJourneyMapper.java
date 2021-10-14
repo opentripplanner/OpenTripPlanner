@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.opentripplanner.netex.mapping.support.ServiceAlterationFilter.isRunning;
+
 
 /**
  * This class is responsible for indexing and mapping {@link DatedServiceJourney}.
@@ -42,6 +44,12 @@ public class DatedServiceJourneyMapper {
   ) {
     List<ServiceDate> result = new ArrayList<>();
     for (DatedServiceJourney dsj : dsjs) {
+
+      // TODO This currently skips mapping of any trips containing ServiceAlteration CANCELLATION
+      //      or REPLACED. In the future we will want to import these and allow them to be routed
+      //      on if a parameter is set.
+      if (!isRunning(dsj.getServiceAlteration())) { continue; }
+
       OperatingDay opDay = operatingDay(dsj, operatingDayById);
       if(opDay != null) {
         result.add(OperatingDayMapper.map(opDay));

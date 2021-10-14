@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.stoptime;
 
+import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
@@ -45,7 +46,7 @@ public class TripPatternCache {
         // Create TripPattern if it doesn't exist yet
         if (tripPattern == null) {
             // Generate unique code for trip pattern
-            var id = new FeedScopedId(tripPattern.getFeedId(), generateUniqueTripPatternCode(tripPattern));
+            var id = generateUniqueTripPatternCode(trip);
 
             tripPattern = new TripPattern(id, route, stopPattern);
             
@@ -53,7 +54,7 @@ public class TripPatternCache {
             tripPattern.setServiceCodes(graph.getServiceCodes());
             
             // Finish scheduled time table
-            tripPattern.scheduledTimetable.finish();
+            tripPattern.getScheduledTimetable().finish();
 
             TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
 
@@ -74,22 +75,18 @@ public class TripPatternCache {
 
     /**
      * Generate unique trip pattern code for real-time added trip pattern. This function roughly
-     * follows the format of {@link TripPattern#generateUniqueIds(java.util.Collection)}.
-     * 
-     * @param tripPattern trip pattern to generate code for
-     * @return unique trip pattern code
+     * follows the format of the {@link GenerateTripPatternsOperation}.
      */
-    private String generateUniqueTripPatternCode(TripPattern tripPattern) {
-        FeedScopedId routeId = tripPattern.route.getId();
-        String direction = tripPattern.directionId != -1 ? String.valueOf(tripPattern.directionId) : "";
+    private FeedScopedId generateUniqueTripPatternCode(Trip trip) {
+        FeedScopedId routeId = trip.getRoute().getId();
+        String directionId = trip.getGtfsDirectionIdAsString("");
         if (counter == Integer.MAX_VALUE) {
             counter = 0;
         } else {
             counter++;
         }
         // OBA library uses underscore as separator, we're moving toward colon.
-        String code = String.format("%s:%s:%s:rt#%d", routeId.getFeedId(), routeId.getId(), direction, counter);
-        return code;
+        String code = String.format("%s:%s:%s:rt#%d", routeId.getFeedId(), routeId.getId(), directionId, counter);
+        return new FeedScopedId(trip.getId().getFeedId(), code);
     }
-
 }

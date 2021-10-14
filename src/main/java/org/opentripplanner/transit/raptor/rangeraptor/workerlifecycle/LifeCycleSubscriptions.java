@@ -26,59 +26,48 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
 
     @Override
     public void onSetupIteration(IntConsumer setupIterationWithDepartureTime) {
-        assertIsOpen();
-        if(setupIterationWithDepartureTime != null) {
-            this.setupIterationListeners.add(setupIterationWithDepartureTime);
-        }
+        subscribe(setupIterationListeners, setupIterationWithDepartureTime);
     }
 
     @Override
     public void onPrepareForNextRound(IntConsumer prepareForNextRound) {
-        assertIsOpen();
-        if(prepareForNextRound != null) {
-            this.prepareForNextRoundListeners.add(prepareForNextRound);
-        }
+        subscribe(prepareForNextRoundListeners, prepareForNextRound);
     }
 
     @Override
     public void onTransitsForRoundComplete(Runnable transitsForRoundComplete) {
-        assertIsOpen();
-        if(transitsForRoundComplete != null) {
-            this.transitsForRoundCompleteListeners.add(transitsForRoundComplete);
-        }
+        subscribe(transitsForRoundCompleteListeners, transitsForRoundComplete);
     }
 
     @Override
     public void onTransfersForRoundComplete(Runnable transfersForRoundComplete) {
-        assertIsOpen();
-        if(transfersForRoundComplete != null) {
-            this.transfersForRoundCompleteListeners.add(transfersForRoundComplete);
-        }
+        subscribe(transfersForRoundCompleteListeners, transfersForRoundComplete);
     }
 
     @Override
     public void onRoundComplete(Consumer<Boolean> roundCompleteWithDestinationReached) {
-        assertIsOpen();
-        if(roundCompleteWithDestinationReached != null) {
-            this.roundCompleteListeners.add(roundCompleteWithDestinationReached);
-        }
+        subscribe(roundCompleteListeners, roundCompleteWithDestinationReached);
     }
 
     @Override
     public void onIterationComplete(Runnable iterationComplete) {
-        assertIsOpen();
-        if(iterationComplete != null) {
-            this.iterationCompleteListeners.add(iterationComplete);
-        }
+        subscribe(iterationCompleteListeners, iterationComplete);
     }
 
     public void close() {
         this.openForSubscription = false;
     }
 
+    private <T> void subscribe(List<T> subscriptions, T subscriber) {
+        assertIsOpen();
+        if(subscriber != null) {
+            subscriptions.add(subscriber);
+        }
+    }
+
     private void assertIsOpen() {
         if(!openForSubscription) {
-            throw new IllegalStateException("Unable to add subscription, worker already created.");
+            throw new IllegalStateException("Unable to subscribe, publisher already created.");
         }
     }
 }

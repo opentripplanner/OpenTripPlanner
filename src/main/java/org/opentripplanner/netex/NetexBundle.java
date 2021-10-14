@@ -1,5 +1,10 @@
 package org.opentripplanner.netex;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+import javax.xml.bind.JAXBException;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -16,11 +21,6 @@ import org.opentripplanner.standalone.config.NetexConfig;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.JAXBException;
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Loads/reads a NeTEx bundle of a data source(zip file/directory/cloud storage) and maps it into
@@ -53,15 +53,18 @@ public class NetexBundle implements Closeable {
 
     private NetexXmlParser xmlParser;
 
+    private final Set<String> ferryIdsNotAllowedForBicycle;
+
     public NetexBundle(
             String netexFeedId,
             CompositeDataSource source,
-            NetexDataSourceHierarchy hierarchy
-
+            NetexDataSourceHierarchy hierarchy,
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.netexFeedId = netexFeedId;
         this.source = source;
         this.hierarchy = hierarchy;
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     }
 
     /** load the bundle, map it to the OTP transit model and return */
@@ -78,7 +81,13 @@ public class NetexBundle implements Closeable {
 
         // init parser and mapper
         xmlParser = new NetexXmlParser();
-        mapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore);
+        mapper = new NetexMapper(
+                transitBuilder,
+                netexFeedId,
+                deduplicator,
+                issueStore,
+                ferryIdsNotAllowedForBicycle
+        );
 
         // Load data
         loadFileEntries();
@@ -139,7 +148,10 @@ public class NetexBundle implements Closeable {
      * An attempt to map each entry, when read, would lead to missing references, since
      * the order entries are read is not enforced in any way.
      */
-    private void loadFilesThenMapToOtpTransitModel(String fileDescription, Iterable<DataSource> entries) {
+    private void loadFilesThenMapToOtpTransitModel(
+            String fileDescription,
+            Iterable<DataSource> entries
+    ) {
         for (DataSource entry : entries) {
             // Load entry and store it in the index
             loadSingeFileEntry(fileDescription, entry);

@@ -11,6 +11,7 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
+import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceJourney;
 
 import javax.xml.bind.JAXBElement;

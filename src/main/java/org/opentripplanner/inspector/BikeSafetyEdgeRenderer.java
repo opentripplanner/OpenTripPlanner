@@ -7,10 +7,10 @@ import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
@@ -23,7 +23,7 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
 
     private ScalarColorPalette palette = new DefaultScalarColorPalette(1.0, 3.0, 10.0);
 
-    private static final Color BIKE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
+    private static final Color VEHICLE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
 
     public BikeSafetyEdgeRenderer() {
     }
@@ -40,7 +40,7 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
                 attrs.color = Color.LIGHT_GRAY;
                 attrs.label = "no bikes";
             }
-        } else if (e instanceof StreetBikeRentalLink) {
+        } else if (e instanceof StreetVehicleRentalLink) {
             attrs.color = palette.getColor(1.0f);
             attrs.label = "link";
         } else {
@@ -51,8 +51,8 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
 
     @Override
     public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
-        if (v instanceof BikeRentalStationVertex) {
-            attrs.color = BIKE_RENTAL_COLOR_VERTEX;
+        if (v instanceof VehicleRentalStationVertex) {
+            attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
             attrs.label = v.getName();
         } else if (v instanceof IntersectionVertex) {
             attrs.color = Color.DARK_GRAY;

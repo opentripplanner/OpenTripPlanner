@@ -1,18 +1,18 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.Assert.assertEquals;
+
+import java.math.BigInteger;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
-
-import java.math.BigInteger;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 
 
 public class StopTimesMapperTest {
@@ -39,15 +39,19 @@ public class StopTimesMapperTest {
                 MappingSupport.ID_FACTORY,
                 sample.getStopsById(),
                 new EntityById<>(),
+                new EntityById<>(),
                 sample.getDestinationDisplayById(),
                 sample.getQuayIdByStopPointRef(),
+                new HierarchicalMap<>(),
+                new HierarchicalMapById<>(),
                 new HierarchicalMap<>()
         );
 
-        StopTimesMapper.MappedStopTimes result = stopTimesMapper.mapToStopTimes(
+        StopTimesMapperResult result = stopTimesMapper.mapToStopTimes(
                 sample.getJourneyPattern(),
                 TRIP,
-                sample.getTimetabledPassingTimes()
+                sample.getTimetabledPassingTimes(),
+                null
         );
 
         List<StopTime> stopTimes = result.stopTimes;

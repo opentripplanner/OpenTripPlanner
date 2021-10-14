@@ -14,8 +14,9 @@ public class TransitType extends AbstractStopTester {
      */
     @Override
     public boolean fulfillDemands(TransitStopVertex ts, Graph graph) {
-        if (ts.getModes().contains(transitType))
+        if (ts.getModes().contains(transitType)) {
             return true;
+        }
         return false;
     }
 }

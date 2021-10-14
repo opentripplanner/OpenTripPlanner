@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.graph;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 import com.conveyal.kryo.TIntArrayListSerializer;
 import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
@@ -17,19 +19,6 @@ import de.javakaffee.kryoserializers.guava.HashMultimapSerializer;
 import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
-import org.objenesis.strategy.SerializingInstantiatorStrategy;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.kryo.BuildConfigSerializer;
-import org.opentripplanner.kryo.HashBiMapSerializer;
-import org.opentripplanner.kryo.RouterConfigSerializer;
-import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.util.OtpAppException;
-import org.opentripplanner.util.ProgressTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,6 +29,21 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
+import javax.annotation.Nullable;
+import org.objenesis.strategy.SerializingInstantiatorStrategy;
+import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.kryo.BuildConfigSerializer;
+import org.opentripplanner.kryo.HashBiMapSerializer;
+import org.opentripplanner.kryo.RouterConfigSerializer;
+import org.opentripplanner.model.projectinfo.GraphFileHeader;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
+import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.ProgressTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.
@@ -165,10 +169,17 @@ public class SerializedGraphObject implements Serializable {
         kryo.addDefaultSerializer(TPrimitiveHash.class, ExternalizableSerializer.class);
         kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
         kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
+
+        // Add support for the package local java.util.ImmutableCollections, use List.of() to
+        // access. Not supported in the current com.conveyal:kryo-tools:1.3.0.
+        // This provide support for List.of, Set.of and Collectors.toUnmodifiable(Set|List)
+        kryo.register(List.of().getClass(), new JavaSerializer());
+
         // Kryo's default instantiation and deserialization of BitSets leaves them empty.
         // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.
         // BitSet's built-in Java serializer saves the internal bitfields, which is efficient. We use that one.
         kryo.register(BitSet.class, new JavaSerializer());
+
         // BiMap has a constructor that uses its putAll method, which just puts each item in turn.
         // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
         // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
@@ -204,13 +215,16 @@ public class SerializedGraphObject implements Serializable {
         try(inputStream) {
             LOG.info("Reading graph from '{}'", sourceDescription);
             Input input = new Input(inputStream);
+
+            validateGraphSerializationId(
+                input.readBytes(GraphFileHeader.headerLength()),
+                sourceDescription
+            );
+
             Kryo kryo = makeKryo();
             SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
             Graph graph = serObj.graph;
             LOG.debug("Graph read.");
-            if (graph.graphVersionMismatch()) {
-                throw new RuntimeException("Graph version mismatch detected.");
-            }
             serObj.reconstructEdgeLists();
             LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
             return serObj;
@@ -232,6 +246,7 @@ public class SerializedGraphObject implements Serializable {
         outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
         Kryo kryo = makeKryo();
         Output output = new Output(outputStream);
+        output.write(OtpProjectInfo.projectInfo().graphFileHeaderInfo.header());
         kryo.writeClassAndObject(output, this);
         output.close();
         LOG.info("Graph written: {}", graphName);
@@ -251,4 +266,21 @@ public class SerializedGraphObject implements Serializable {
         );
     }
 
+    private static void validateGraphSerializationId(byte[] header, String sourceName) {
+        var expFileHeader = projectInfo().graphFileHeaderInfo;
+        var graphFileHeader = GraphFileHeader.parse(header);
+
+        if(!expFileHeader.equals(graphFileHeader)) {
+            if (!expFileHeader.equals(graphFileHeader)) {
+                throw new OtpAppException(
+                    "The graph file is incompatible with this version of OTP. "
+                        + "The OTP serialization version id '%s' do not match the id "
+                        + "'%s' in '%s' file-header.",
+                    expFileHeader.otpSerializationVersionId(),
+                    graphFileHeader.otpSerializationVersionId(),
+                    sourceName
+                );
+            }
+        }
+    }
 }

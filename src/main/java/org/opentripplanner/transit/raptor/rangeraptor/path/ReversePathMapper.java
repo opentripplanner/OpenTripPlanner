@@ -1,36 +1,40 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearch;
+
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 
 /**
- * Build a path from a destination arrival - this maps between the domain of routing
- * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
+ * Build a path from a destination arrival - this maps between the domain of routing to the domain
+ * of result paths. All values not needed for routing is computed as part of this mapping.
  * <p/>
- * This mapper maps the result of a reverse-search. And is therefor responsible for doing some adjustments
- * to the result. The internal state stores 'latest possible arrivaltimes', so to map back to paths the
- * 'board slack' is removed from the 'latest possible arrivaltime' to get next legs 'boardTime'. Also,
- * the path is reversed again, so the original origin - temporally made destination - is returned to origin
- * again ;-)
+ * This mapper maps the result of a reverse-search. And is therefore responsible for doing some
+ * adjustments to the result. The internal state stores 'latest possible arrival-times', so to map
+ * back to paths the 'board slack' is removed from the 'latest possible arrival-time' to get the
+ * next legs 'boardTime'. Also, the path is reversed again, so the original origin - temporally made
+ * destination - is returned to origin again ;-)
  * <p/>
  * This mapper uses recursion to reverse the results.
  */
 public final class ReversePathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
 
+    private final RaptorSlackProvider slackProvider;
     private int iterationDepartureTime = -1;
 
-    public ReversePathMapper(WorkerLifeCycle lifeCycle) {
+    public ReversePathMapper(RaptorSlackProvider slackProvider, WorkerLifeCycle lifeCycle) {
+        this.slackProvider = slackProvider;
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
 
@@ -46,97 +50,101 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         return new Path<>(
                 iterationDepartureTime,
                 accessLeg,
-                RaptorCostConverter.toOtpDomainCost(destinationArrival.cost())
+                destinationArrival.cost()
         );
     }
 
     AccessPathLeg<T> mapAccessLeg(DestinationArrival<T> destArrival) {
         ArrivalView<T> prevArrival = destArrival.previous();
-        RaptorTransfer access = destArrival.egressLeg().egress();
-        int targetDepartureTime = destArrival.arrivalTime();
-        int targetArrivalTime = destArrival.arrivalTime() + access.durationInSeconds();
+        RaptorTransfer access = destArrival.egressPath().egress();
+        int departureTime = destArrival.arrivalTime();
+
+        // Pass arrival time on to next leg (if access is flex the next leg could be a transfer)
+        int arrivalTime = destArrival.arrivalTime() + access.durationInSeconds();
 
         return new AccessPathLeg<>(
                 access,
-                prevArrival.stop(),
-                targetDepartureTime,
-                targetArrivalTime,
-                domainCost(destArrival),
-                mapToTransit(prevArrival)   // Recursive
+                departureTime,
+                arrivalTime,
+                mapNextLeg(prevArrival, arrivalTime)
         );
+    }
+
+    private PathLeg<T> mapNextLeg(ArrivalView<T> fromStopArrival, int prevStopArrivalTime) {
+        if(fromStopArrival.arrivedByTransit()) {
+            return mapToTransit(fromStopArrival);
+        }
+        else if(fromStopArrival.arrivedByTransfer()) {
+            return mapToTransfer(fromStopArrival, prevStopArrivalTime);
+        }
+        else if(fromStopArrival.arrivedByAccess()) {
+            return mapToEgressLeg(fromStopArrival, prevStopArrivalTime);
+        }
+        throw new IllegalStateException("Unknown path type for: " + fromStopArrival);
     }
 
     private TransitPathLeg<T> mapToTransit(ArrivalView<T> fromStopArrival) {
         // In reverse the previous is in our "toStop"
         ArrivalView<T> toStopArrival = fromStopArrival.previous();
-        T trip = fromStopArrival.transitLeg().trip();
 
         // Map stops and times into a forward search context
         int fromStop = fromStopArrival.stop();
         int toStop = toStopArrival.stop();
 
-        TripTimesSearch.BoarAlightTimes r = TripTimesSearch.findTripReverseSearch(fromStopArrival);
-
-        // Recursive call to map next leg
-        PathLeg<T> next = mapNextLeg(toStopArrival);
+        BoardAndAlightTime r = findTripReverseSearch(fromStopArrival);
+        T trip = fromStopArrival.transitPath().trip();
+        int arrivalTime = r.alightTime() + slackProvider.alightSlack(trip.pattern());
 
         return new TransitPathLeg<>(
-            fromStop,
-            r.boardTime,
-            toStop,
-            r.alightTime,
-            domainCost(fromStopArrival),
-            trip,
-            next
+                fromStop,
+                r.boardTime(),
+                toStop,
+                r.alightTime(),
+                legCost(fromStopArrival),
+                trip,
+                // Recursive call to map next leg
+                mapNextLeg(toStopArrival, arrivalTime)
         );
     }
 
-    private PathLeg<T> mapNextLeg(ArrivalView<T> fromStopArrival) {
-        if(fromStopArrival.arrivedByTransit()) {
-            return mapToTransit(fromStopArrival);
-        }
-        else if(fromStopArrival.arrivedByTransfer()) {
-            return mapToTransfer(fromStopArrival);
-        }
-        else if(fromStopArrival.arrivedByAccessLeg()) {
-            return mapToEgressLeg(fromStopArrival);
-        }
-        throw new IllegalStateException("Unknown leg type for: " + fromStopArrival);
-    }
-
-    private TransferPathLeg<T> mapToTransfer(ArrivalView<T> fromStopArrival) {
+    private TransferPathLeg<T> mapToTransfer(ArrivalView<T> fromStopArrival, int prevStopArrivalTime) {
         ArrivalView<T> toStopArrival = fromStopArrival.previous();
 
-        int targetArrivalTime = fromStopArrival.arrivalTime() + fromStopArrival
-            .transferLeg()
-            .durationInSeconds();
-        return new TransferPathLeg<T>(
+        // time-shift transit to start immediate after previous leg stop-arrival-time
+        // including alight-slack
+        int arrivalTime = prevStopArrivalTime + fromStopArrival.transferPath().durationInSeconds();
+
+        return new TransferPathLeg<>(
                 fromStopArrival.stop(),
-                fromStopArrival.arrivalTime(),
-                toStopArrival.stop(),
-                targetArrivalTime,
-                domainCost(fromStopArrival),
-                mapToTransit(toStopArrival)
+                prevStopArrivalTime,
+                arrivalTime,
+                fromStopArrival.transferPath().transfer(),
+                mapNextLeg(toStopArrival, arrivalTime)
         );
     }
 
-    private EgressPathLeg<T> mapToEgressLeg(ArrivalView<T> accessArrival) {
-        RaptorTransfer egress = accessArrival.accessLeg().access();
-        int targetDepartureTime = accessArrival.arrivalTime();
-        int targetArrivalTime = accessArrival.arrivalTime() + egress.durationInSeconds();
+    private EgressPathLeg<T> mapToEgressLeg(ArrivalView<T> accessArrival, int prevStopArrivalTime) {
+        RaptorTransfer egress = accessArrival.accessPath().access();
+        int targetFromTime = prevStopArrivalTime;
+
+        if(egress.hasRides()) {
+            targetFromTime += slackProvider.transferSlack();
+        }
+
+        targetFromTime = egress.earliestDepartureTime(targetFromTime);
+
+        int targetToTime = targetFromTime + egress.durationInSeconds();
 
         // No need to time-shift the egress leg, this is done when stopArrival is created
         return new EgressPathLeg<>(
-            egress,
-            accessArrival.stop(),
-            targetDepartureTime,
-            targetArrivalTime,
-            RaptorCostConverter.toOtpDomainCost(accessArrival.cost())
+                egress,
+                targetFromTime,
+                targetToTime
         );
     }
 
-    private int domainCost(ArrivalView<T> from) {
+    private static int legCost(ArrivalView<?> from) {
         if(from.cost() == -1) { return -1; }
-        return RaptorCostConverter.toOtpDomainCost(from.cost() - from.previous().cost());
+        return from.cost() - from.previous().cost();
     }
 }

@@ -1,6 +1,10 @@
 package org.opentripplanner.routing.impl;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
@@ -14,11 +18,6 @@ import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
  * the graph until the requested number of them have been found.
@@ -26,10 +25,11 @@ import java.util.stream.Collectors;
  *
  * Its exact behavior will depend on whether the routing request allows transit.
  *
- * When using transit it will incorporate techniques from what we called "long distance" mode, which is designed to
- * provide reasonable response times when routing over large graphs (e.g. the entire Netherlands or New York State).
- * In this case it only uses the street network at the first and last legs of the trip, and all other transfers
- * between transit vehicles will occur via SimpleTransfer edges which are pre-computed by the graph builder.
+ * When using transit it will incorporate techniques from what we called "long distance" mode,
+ * which is designed to provide reasonable response times when routing over large graphs (e.g.
+ * the entire Netherlands or New York State). In this case it only uses the street network at the
+ * first and last legs of the trip, and all other transfers between transit vehicles will occur
+ * via PathTransfer edges which are pre-computed by the graph builder.
  * 
  * More information is available on the OTP wiki at:
  * https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs
@@ -43,8 +43,6 @@ import java.util.stream.Collectors;
 public class GraphPathFinder {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPathFinder.class);
-    private static final double DEFAULT_MAX_WALK = 2000;
-    private static final double CLAMP_MAX_WALK = 15000;
 
     Router router;
 
@@ -88,17 +86,7 @@ public class GraphPathFinder {
             heuristic = new EuclideanRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
-
-        /* maxWalk has a different meaning than it used to. It's the radius around the origin or destination within
-         * which you can walk on the streets. An unlimited value would cause the bidi heuristic to do unbounded street
-         * searches and consider the whole graph walkable.
-         *
-         * After the limited areas of the street network around the origin and destination are explored, the
-         * options.maxWalkDistance will be set to unlimited for similar reasons to maxTransfers above. That happens
-         * in method org.opentripplanner.routing.algorithm.astar.strategies.InterleavedBidirectionalHeuristic.initialize
-         */
-        if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
-        if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
+        
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
 
@@ -112,18 +100,11 @@ public class GraphPathFinder {
             return null;
         }
         // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
-        aStar.getShortestPathTree(options, timeout);
+        // Use the maxDirectStreetDurationSeconds as the limit here, as this class is used for point-to-point routing
+        aStar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(options.maxDirectStreetDurationSeconds));
+        aStar.getShortestPathTree(options, timeout, null);
 
-        List<GraphPath> paths = aStar.getPathsToTarget().stream()
-                .filter(path -> {
-                    double duration = options.useRequestedDateTimeInMaxHours
-                        ? options.arriveBy
-                            ? options.dateTime - path.getStartTime()
-                            : path.getEndTime() - options.dateTime
-                        : path.getDuration();
-                    return duration < options.maxHours * 60 * 60;
-                })
-                .collect(Collectors.toList());
+        List<GraphPath> paths = aStar.getPathsToTarget();
 
         LOG.debug("we have {} paths", paths.size());
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);

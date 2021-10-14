@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
@@ -136,7 +137,7 @@ public class NetexBundleSmokeTest {
     private void assertTripPatterns(Collection<TripPattern> patterns) {
         Map<FeedScopedId, TripPattern> map = patterns.stream().collect(Collectors.toMap(TripPattern::getId, s -> s));
         TripPattern p = map.get(fId("RUT:JourneyPattern:12-1"));
-        assertEquals("Jernbanetorget", p.getDirection());
+        assertEquals("Jernbanetorget", p.getTripHeadsign());
         assertEquals("RB", p.getFeedId());
         assertEquals("[<Stop RB:NSR:Quay:7203>, <Stop RB:NSR:Quay:8027>]", p.getStops().toString());
         assertEquals("[<Trip RB:RUT:ServiceJourney:12-101375-1000>]", p.getTrips().toString());
@@ -155,7 +156,7 @@ public class NetexBundleSmokeTest {
         assertNotNull(t.getServiceId());
         assertEquals("Ruter", t.getOperator().getName());
         assertEquals("Ruter", t.getTripOperator().getName());
-        assertEquals(0, t.getBikesAllowed());
+        assertEquals(BikeAccess.UNKNOWN, t.getBikesAllowed());
         assertEquals(0, t.getWheelchairAccessible());
         assertEquals(4, trips.size());
     }

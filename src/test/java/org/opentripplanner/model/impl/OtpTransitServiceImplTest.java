@@ -1,5 +1,15 @@
 package org.opentripplanner.model.impl;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -15,18 +25,7 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class OtpTransitServiceImplTest {
     private static final String FEED_ID = "Z";
@@ -36,14 +35,11 @@ public class OtpTransitServiceImplTest {
     // The subject is used as read only; hence static is ok
     private static OtpTransitService subject;
 
-    private static Agency agency;
 
     @BeforeClass
     public static void setup() throws IOException {
         GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
         OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
-
-        agency = first(builder.getAgenciesById().values());
 
         // Supplement test data with at least one entity in all collections
         FareRule rule = createFareRule();
@@ -101,10 +97,26 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetAllTransfers() {
-        Collection<Transfer> transfers = subject.getAllTransfers();
+        var result = removeFeedScope(
+                subject.getAllTransfers()
+                        .stream()
+                        .map(Object::toString)
+                        .sorted()
+                        .collect(joining("\n"))
+        );
 
-        assertEquals(9, transfers.size());
-        assertEquals("<Transfer stop=Z:F..Z:E>", first(transfers).toString());
+        // There is 9 transfers, but because of the route to trip we get more
+        // TODO TGR - Support Route to trip expansion
+        assertEquals(
+                //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
+                //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
+                "ConstrainedTransfer{from: (stop: K), to: (stop: L), constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: (stop: K), to: (stop: M), constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: (stop: L), to: (stop: K), constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: (stop: M), to: (stop: K), constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), constraint: {guaranteed}}",
+                result
+        );
     }
 
     @Test
@@ -187,9 +199,16 @@ public class OtpTransitServiceImplTest {
         return rule;
     }
 
+    private static String removeFeedScope(String text) {
+        return text.replace("agency:", "").replace("Z:", "");
+    }
+
+    private static <T> List<T> sort(Collection<? extends T> c) {
+        return c.stream().sorted(comparing(T::toString)).collect(toList());
+    }
+
     private static <T> T first(Collection<? extends T> c) {
-        //noinspection ConstantConditions
-        return c.stream().sorted(comparing(T::toString)).findFirst().get();
+        return c.stream().min(comparing(T::toString)).orElseThrow();
     }
 
     private static String toString(ShapePoint sp) {

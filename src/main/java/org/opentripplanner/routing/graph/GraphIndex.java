@@ -83,7 +83,7 @@ public class GraphIndex {
         }
         for (TripPattern pattern : graph.tripPatternForId.values()) {
             patternsForFeedId.put(pattern.getFeedId(), pattern);
-            patternsForRoute.put(pattern.route, pattern);
+            patternsForRoute.put(pattern.getRoute(), pattern);
             for (Trip trip : pattern.getTrips()) {
                 patternForTrip.put(trip, pattern);
                 tripForId.put(trip.getId(), trip);
@@ -175,7 +175,7 @@ public class GraphIndex {
     public Set<Route> getRoutesForStop(Stop stop) {
         Set<Route> routes = Sets.newHashSet();
         for (TripPattern p : getPatternsForStop(stop)) {
-            routes.add(p.route);
+            routes.add(p.getRoute());
         }
         return routes;
     }

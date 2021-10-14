@@ -6,6 +6,7 @@ import org.opentripplanner.api.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.plan.Leg;
@@ -87,8 +88,13 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
+  public DataFetcher<Boolean> walkingBike() {
+    return environment -> getSource(environment).walkingBike;
+  }
+
+  @Override
   public DataFetcher<Boolean> rentedBike() {
-    return environment -> getSource(environment).rentedBike;
+    return environment -> getSource(environment).rentedVehicle;
   }
 
   @Override
@@ -126,12 +132,9 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<Iterable<Object>> intermediateStops() {
     return environment -> {
       List<StopArrival> intermediateStops = getSource(environment).intermediateStops;
-      if (intermediateStops == null) return null;
-      RoutingService routingService = getRoutingService(environment);
+      if (intermediateStops == null) { return null; }
       return intermediateStops.stream()
-          .map(intermediateStop -> intermediateStop.place)
-          .filter(place -> place.stopId != null)
-          .map(place -> routingService.getStopForId(place.stopId))
+          .map(intermediateStop -> intermediateStop.place.stop)
           .filter(Objects::nonNull)
           .collect(Collectors.toList());
     };
@@ -156,7 +159,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      if (getSource(environment).boardRule == null) return "SCHEDULED";
+      if (getSource(environment).boardRule == null) { return "SCHEDULED"; }
       switch (getSource(environment).boardRule) {
         case "impossible": return "NONE";
         case "mustPhone": return "CALL_AGENCY";
@@ -169,7 +172,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      if (getSource(environment).alightRule == null) return "SCHEDULED";
+      if (getSource(environment).alightRule == null) { return "SCHEDULED"; }
       switch (getSource(environment).alightRule) {
         case "impossible": return "NONE";
         case "mustPhone": return "CALL_AGENCY";
@@ -182,6 +185,16 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<Boolean> interlineWithPreviousLeg() {
     return environment -> getSource(environment).interlineWithPreviousLeg;
+  }
+
+  @Override
+  public DataFetcher<BookingInfo> dropOffBookingInfo() {
+    return environment -> getSource(environment).dropOffBookingInfo;
+  }
+
+  @Override
+  public DataFetcher<BookingInfo> pickupBookingInfo() {
+    return environment -> getSource(environment).pickupBookingInfo;
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import javax.validation.constraints.NotNull;
+
 public final class Trip extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
@@ -19,7 +21,8 @@ public final class Trip extends TransitEntity {
 
     private String routeShortName;
 
-    private String directionId;
+    @NotNull
+    private Direction direction = Direction.UNKNOWN;
 
     private String blockId;
 
@@ -27,15 +30,20 @@ public final class Trip extends TransitEntity {
 
     private int wheelchairAccessible = 0;
 
-    @Deprecated private int tripBikesAllowed = 0;
-
     /**
      * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
      */
-    private int bikesAllowed = 0;
+    private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
 
     /** Custom extension for KCM to specify a fare per-trip */
     private String fareId;
+
+    /**
+     * Default alteration for a trip. // TODO Implement alterations for DSJ
+     *
+     * This is planned, by default (e.g. GTFS and if not set explicit).
+     */
+    private TripAlteration alteration = TripAlteration.PLANNED;
 
     public Trip(FeedScopedId id) {
         super(id);
@@ -49,11 +57,10 @@ public final class Trip extends TransitEntity {
         this.tripShortName = obj.tripShortName;
         this.tripHeadsign = obj.tripHeadsign;
         this.routeShortName = obj.routeShortName;
-        this.directionId = obj.directionId;
+        this.direction = obj.direction;
         this.blockId = obj.blockId;
         this.shapeId = obj.shapeId;
         this.wheelchairAccessible = obj.wheelchairAccessible;
-        this.tripBikesAllowed = obj.tripBikesAllowed;
         this.bikesAllowed = obj.bikesAllowed;
         this.fareId = obj.fareId;
     }
@@ -107,6 +114,18 @@ public final class Trip extends TransitEntity {
     }
 
     /**
+     * Return human friendly short info to identify the trip when mode, from/to stop and
+     * times are known. This method is meant for logging, and should not be exposed in any API.
+     */
+    public String logInfo() {
+        if(hasValue(tripShortName)) { return tripShortName; }
+        if(hasValue(routeShortName)) { return routeShortName; }
+        if(route != null && hasValue(route.getName())) { return route.getName(); }
+        if(hasValue(tripHeadsign)) { return tripHeadsign; }
+        return getId().getId();
+    }
+
+    /**
      * Internal code (non-public identifier) for the journey (e.g. train- or trip number from
      * the planners' tool). This is kept to ensure compatibility with legacy planning systems.
      * In NeTEx this maps to privateCode, there is no GTFS equivalent.
@@ -133,12 +152,24 @@ public final class Trip extends TransitEntity {
         this.routeShortName = routeShortName;
     }
 
-    public String getDirectionId() {
-        return directionId;
+    // TODO Consider moving this to the TripPattern class once we have refactored the transit model
+    /**
+     * The direction for this Trip (and all other Trips in this TripPattern).
+     */
+    @NotNull
+    public Direction getDirection() {
+        return direction;
     }
 
-    public void setDirectionId(String directionId) {
-        this.directionId = directionId;
+    public String getGtfsDirectionIdAsString(String unknownValue) {
+        return direction.equals(Direction.UNKNOWN)
+            ? unknownValue
+            : Integer.toString(direction.gtfsCode);
+    }
+
+    public void setDirection(Direction direction) {
+        // Enforce non-null
+        this.direction = direction != null ? direction : Direction.UNKNOWN;
     }
 
     public String getBlockId() {
@@ -165,27 +196,11 @@ public final class Trip extends TransitEntity {
         return wheelchairAccessible;
     }
 
-    @Deprecated
-    public void setTripBikesAllowed(int tripBikesAllowed) {
-        this.tripBikesAllowed = tripBikesAllowed;
-    }
-
-    @Deprecated
-    public int getTripBikesAllowed() {
-        return tripBikesAllowed;
-    }
-
-    /**
-     * @return 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-     */
-    public int getBikesAllowed() {
+    public BikeAccess getBikesAllowed() {
         return bikesAllowed;
     }
 
-    /**
-     * @param bikesAllowed 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-     */
-    public void setBikesAllowed(int bikesAllowed) {
+    public void setBikesAllowed(BikeAccess bikesAllowed) {
         this.bikesAllowed = bikesAllowed;
     }
 
@@ -199,5 +214,19 @@ public final class Trip extends TransitEntity {
 
     public void setFareId(String fareId) {
         this.fareId = fareId;
+    }
+
+    public TripAlteration getTripAlteration() {
+        return alteration;
+    }
+
+    public void setAlteration(TripAlteration tripAlteration) {
+        if (tripAlteration != null) {
+            this.alteration = tripAlteration;
+        }
+    }
+
+    private boolean hasValue(String text) {
+        return text != null && !text.isBlank();
     }
 }

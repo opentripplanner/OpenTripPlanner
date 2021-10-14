@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.validation;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.netex.issues.ObjecctNotFound;
+import org.opentripplanner.netex.issues.ObjectNotFound;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.OperatingDayRefStructure;
 
@@ -21,7 +21,7 @@ class DSJOperatingDayNotFound extends AbstractHMapValidationRule<String, DatedSe
   public DataImportIssue logMessage(String dsjId, DatedServiceJourney dsj) {
     String ref = getOperatingDayRef(dsj);
 
-    return new ObjecctNotFound(
+    return new ObjectNotFound(
         "DatedServiceJourney",
         dsj.getId(),
         "OperatingDayRef",

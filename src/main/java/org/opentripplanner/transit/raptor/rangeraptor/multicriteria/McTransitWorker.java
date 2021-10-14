@@ -1,14 +1,19 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
+
+import java.util.function.IntConsumer;
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
+import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 
 
@@ -21,103 +26,121 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 public final class McTransitWorker<T extends RaptorTripSchedule> implements RoutingStrategy<T> {
 
     private final McRangeRaptorWorkerState<T> state;
-    private final TransitCalculator calculator;
-    private final CostCalculator<T> costCalculator;
+    private final CostCalculator costCalculator;
     private final SlackProvider slackProvider;
-    private final ParetoSet<PatternRide<T>> patternRides = new ParetoSet<>(PatternRide.paretoComparatorRelativeCost());
+    private final ParetoSet<PatternRide<T>> patternRides;
 
-    private RaptorTripPattern pattern;
-    private TripScheduleSearch<T> tripSearch;
+    private AbstractStopArrival<T> prevArrival;
 
     public McTransitWorker(
         McRangeRaptorWorkerState<T> state,
         SlackProvider slackProvider,
-        TransitCalculator calculator,
-        CostCalculator<T> costCalculator
+        CostCalculator costCalculator,
+        DebugHandlerFactory<T> debugHandlerFactory
     ) {
         this.state = state;
         this.slackProvider = slackProvider;
-        this.calculator = calculator;
         this.costCalculator = costCalculator;
+        this.patternRides = new ParetoSet<>(
+            paretoComparatorRelativeCost(),
+            debugHandlerFactory.paretoSetPatternRideListener()
+        );
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
-        this.pattern = pattern;
-        this.tripSearch = tripSearch;
+    public void setAccessToStop(
+        RaptorTransfer accessPath,
+        int iterationDepartureTime,
+        int timeDependentDepartureTime
+    ) {
+        state.setAccessToStop(accessPath, timeDependentDepartureTime);
+    }
+
+    @Override
+    public void prepareForTransitWith(RaptorTripPattern pattern) {
         this.patternRides.clear();
-        slackProvider.setCurrentPattern(pattern);
+        this.slackProvider.setCurrentPattern(pattern);
     }
 
     @Override
-    public void routeTransitAtStop(int stopPos) {
-        final int stopIndex = pattern.stopIndex(stopPos);
-
-        // Alight at boardStopPos
-        if (pattern.alightingPossibleAt(stopPos)) {
-            for (PatternRide<T> ride : patternRides) {
-                state.transitToStop(
+    public void alight(final int stopIndex, final int stopPos, ToIntFunction<T> stopArrivalTimeOp) {
+        for (PatternRide<T> ride : patternRides) {
+            state.transitToStop(
                     ride,
                     stopIndex,
                     ride.trip.arrival(stopPos),
                     slackProvider.alightSlack()
-                );
-            }
-        }
-
-        // If it is not possible to board the pattern at this stop, then return
-        if(!pattern.boardingPossibleAt(stopPos)) {
-            return;
-        }
-
-        // For each arrival at the current stop
-        for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
-
-            int earliestBoardTime = calculator.plusDuration(
-                prevArrival.arrivalTime(),
-                slackProvider.boardSlack()
             );
-
-            boolean found = tripSearch.search(earliestBoardTime, stopPos);
-
-            if (found) {
-                final T trip = tripSearch.getCandidateTrip();
-                final int boardTime = trip.departure(stopPos);
-
-                // It the previous leg can
-                if(prevArrival.arrivedByAccessLeg()) {
-                    prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
-                }
-
-                // TODO OTP2 - Some access legs can be time-shifted towards the board time and
-                //           - we need to account for this here, not in the calculator as done
-                //           - now. If we don´t do that the alight slack of the first transit
-                //           - is not added to the cost, giving the first transit leg a lower cost
-                //           - than other transit legs.
-                //           - See
-                final int boardWaitTime = boardTime - prevArrival.arrivalTime();
-
-                final int relativeBoardCost = calculateOnTripRelativeCost(
-                    prevArrival,
-                    boardTime,
-                    boardWaitTime,
-                    trip
-                );
-
-                patternRides.add(
-                    new PatternRide<>(
-                        prevArrival,
-                        stopIndex,
-                        stopPos,
-                        boardTime,
-                        boardWaitTime,
-                        relativeBoardCost,
-                        trip,
-                        tripSearch.getCandidateTripIndex()
-                    )
-                );
-            }
         }
+    }
+
+    @Override
+    public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
+        for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
+            this.prevArrival = prevArrival;
+            prevStopArrivalTimeConsumer.accept(prevArrival.arrivalTime());
+        }
+    }
+
+    @Override
+    public void board(
+            final int stopIndex,
+            final int earliestBoardTime,
+            final RaptorTripScheduleBoardOrAlightEvent<T> boarding
+    ) {
+        final T trip = boarding.getTrip();
+        final int boardTime = boarding.getTime();
+
+        if(prevArrival.arrivedByAccess()) {
+            // What if access is FLEX with rides, should not FLEX alightSlack and
+            // transfersSlack be taken into account as well?
+            prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
+        }
+
+        final int boardCost = calculateCostAtBoardTime(prevArrival, boardTime);
+
+        final int relativeBoardCost = boardCost +
+                calculateOnTripRelativeCost(trip.transitReluctanceFactorIndex(), boardTime);
+
+        patternRides.add(
+            new PatternRide<>(
+                prevArrival,
+                stopIndex,
+                boarding.getStopPositionInPattern(),
+                boardTime,
+                boardCost,
+                relativeBoardCost,
+                trip
+            )
+        );
+    }
+
+    @Override
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        return prevArrival.mostResentTransitArrival();
+    }
+
+    /**
+     * Calculate a cost for riding a trip. It should include the cost from the beginning of the
+     * journey all the way until a trip is boarded.
+     *
+     * @param prevArrival The stop-arrival where the trip was boarded.
+     */
+    private int calculateCostAtBoardTime(AbstractStopArrival<T> prevArrival, int boardTime) {
+        // Calculate the wait-time before the boarding.Any slack at the end of the last leg is not
+        // part of this, because that is already accounted for. If the previous leg is an
+        // access-leg, then it is already time-shifted, witch is important for this calculation to
+        // be correct.
+        final int boardWaitTime = boardTime - prevArrival.arrivalTime();
+
+        boolean firstRide = prevArrival.arrivedByAccess() &&
+                !prevArrival.accessPath().access().hasRides();
+
+        return prevArrival.cost() + costCalculator.boardCost(
+                firstRide,
+                boardWaitTime,
+                prevArrival.stop()
+        );
     }
 
     /**
@@ -127,35 +150,8 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
      * to any point in place or time - as long as it can be used to compare to paths that started
      * at the origin in the same iteration, having used the same number-of-rounds to board the same
      * trip.
-     *
-     * @param prevArrival The stop-arrival where the trip was boarded.
-     * @param boardTime the wait-time at the board stop before boarding.
-     * @param boardWaitTime the wait-time at the board stop before boarding.
-     * @param trip boarded trip
      */
-    private int calculateOnTripRelativeCost(
-        AbstractStopArrival<T> prevArrival,
-        int boardTime,
-        int boardWaitTime,
-        T trip
-    ) {
-        return costCalculator.onTripRidingCost(
-            prevArrival,
-            boardWaitTime,
-            boardTime,
-            trip
-        );
-    }
-
-    @Override
-    public void setInitialTimeForIteration(RaptorTransfer it, int iterationDepartureTime) {
-        // Earliest possible departure time from the origin, or latest possible arrival time at the
-        // destination if searching backwards, using this AccessEgress.
-        int departureTime = calculator.departureTime(it, iterationDepartureTime);
-
-        // This access is not available after the iteration departure time
-        if (departureTime == -1) { return; }
-
-        state.setInitialTimeForIteration(it, departureTime);
+    private int calculateOnTripRelativeCost(int transitReluctanceIndex, int boardTime) {
+        return costCalculator.onTripRelativeRidingCost(boardTime, transitReluctanceIndex);
     }
 }

@@ -20,4 +20,4 @@ Removing unneeded data will reduce file sizes, facilitating copying or moving fi
 
 **Osmosis:** `osmosis --rb input.osm.pbf --tf reject-ways building=* --tf reject-ways waterway=* --tf reject-ways landuse=* --tf reject-ways natural=* --used-node --wb filtered.osm.pbf`
 
-**Osmium-Tool:** `osmium tags-filter input.osm.pbf w/highway w/public_transport=platform w/railway=platform w/park_ride=yes r/type=restriction -o filtered.osm.pbf -f pbf,add_metadata=false`
+**Osmium-Tool:** `osmium tags-filter input.osm.pbf w/highway w/public_transport=platform w/railway=platform w/park_ride=yes r/type=restriction r/type=route -o filtered.osm.pbf -f pbf,add_metadata=false`

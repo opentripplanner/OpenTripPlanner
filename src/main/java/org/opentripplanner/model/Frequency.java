@@ -1,10 +1,10 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.util.time.TimeUtils;
+
 import java.io.Serializable;
 import java.util.Objects;
-
-import static org.opentripplanner.util.TimeToStringConverter.toHH_MM_SS;
 
 public final class Frequency implements Serializable {
 
@@ -72,10 +72,12 @@ public final class Frequency implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         Frequency frequency = (Frequency) o;
         return startTime == frequency.startTime && endTime == frequency.endTime
                 && headwaySecs == frequency.headwaySecs && Objects.equals(trip, frequency.trip);
@@ -87,9 +89,9 @@ public final class Frequency implements Serializable {
     }
 
     public String toString() {
-        return "<Frequency trip=" + trip.getId()
-                + " start=" + toHH_MM_SS(startTime)
-                + " end=" + toHH_MM_SS(endTime)
+      return "<Frequency trip=" + trip.getId()
+                + " start=" + TimeUtils.timeToStrLong(startTime)
+                + " end=" + TimeUtils.timeToStrLong(endTime)
                 + ">";
     }
 }

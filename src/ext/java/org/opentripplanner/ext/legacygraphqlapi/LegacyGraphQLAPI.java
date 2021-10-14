@@ -1,7 +1,8 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import graphql.ExecutionResult;
+import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -18,8 +19,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,13 +26,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{routerId}/index/graphql")
+@Path("/routers/{ignoreRouterId}/index/graphql")
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class LegacyGraphQLAPI {
 
@@ -43,17 +40,15 @@ public class LegacyGraphQLAPI {
   private final Router router;
   private final ObjectMapper deserializer = new ObjectMapper();
 
-  public LegacyGraphQLAPI(
-      @Context OTPServer otpServer,
-      @Context Providers providers,
-      @PathParam("routerId") String routerId
-  ) {
-    this.router = otpServer.getRouter();
+  /**
+   * @deprecated The support for multiple routers are removed from OTP2.
+   * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+   */
+  @Deprecated @PathParam("ignoreRouterId")
+  private String ignoreRouterId;
 
-    ContextResolver<ObjectMapper> resolver =
-        providers.getContextResolver(ObjectMapper.class, MediaType.APPLICATION_JSON_TYPE);
-    ObjectMapper mapper = resolver.getContext(ObjectMapper.class);
-    mapper.setDefaultPropertyInclusion(JsonInclude.Include.ALWAYS);
+  public LegacyGraphQLAPI(@Context OTPServer otpServer) {
+    this.router = otpServer.getRouter();
   }
 
   @POST
@@ -142,9 +137,7 @@ public class LegacyGraphQLAPI {
       @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
       @Context HttpHeaders headers
   ) {
-    List<Map<String, Object>> responses = new ArrayList<>();
-    List<Callable<Map>> futures = new ArrayList();
-
+    List<Callable<ExecutionResult>> futures = new ArrayList<>();
     Locale locale = headers.getAcceptableLanguages().size() > 0
         ? headers.getAcceptableLanguages().get(0)
         : router.defaultRoutingRequest.locale;
@@ -183,18 +176,11 @@ public class LegacyGraphQLAPI {
     }
 
     try {
-      List<Future<Map>> results = LegacyGraphQLIndex.threadPool.invokeAll(futures);
-
-      for (int i = 0; i < queries.size(); i++) {
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("id", queries.get(i).get("id"));
-        response.put("payload", results.get(i).get());
-        responses.add(response);
-      }
+      List<Future<ExecutionResult>> results = LegacyGraphQLIndex.threadPool.invokeAll(futures);
+      return Response.status(Response.Status.OK).entity(GraphQLResponseSerializer.serializeBatch(queries, results)).build();
+    } catch (InterruptedException e) {
+      LOG.error("Batch query interrupted", e);
+      throw new RuntimeException(e);
     }
-    catch (CancellationException | ExecutionException | InterruptedException e) {
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    }
-    return Response.status(Response.Status.OK).entity(responses).build();
   }
 }

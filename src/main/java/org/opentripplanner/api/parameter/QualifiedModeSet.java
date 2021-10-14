@@ -9,7 +9,10 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift to "long distance
@@ -36,6 +39,7 @@ public class QualifiedModeSet implements Serializable {
         StreetMode accessMode = null;
         StreetMode egressMode = null;
         StreetMode directMode = null;
+        StreetMode transferMode = null;
         Set<TransitMode> transitModes = new HashSet<>();
 
         // Set transit modes
@@ -70,9 +74,6 @@ public class QualifiedModeSet implements Serializable {
                  case FUNICULAR:
                      transitModes.add(TransitMode.FUNICULAR);
                      break;
-                 case FLEXIBLE:
-                     transitModes.add(TransitMode.FLEXIBLE);
-                     break;
              }
         }
 
@@ -82,53 +83,80 @@ public class QualifiedModeSet implements Serializable {
         //   redesigned to better reflect the mode structure used in RequestModes.
         //   Also, some StreetModes are implied by combination of QualifiedModes and are not covered
         //   in this mapping.
-        for (QualifiedMode qMode : qModes) {
-            switch (qMode.mode) {
+        QualifiedMode requestMode = null;
+
+        List<QualifiedMode> filteredModes = qModes.stream()
+                .filter(m ->
+                        m.mode == ApiRequestMode.WALK ||
+                        m.mode == ApiRequestMode.BICYCLE ||
+                        m.mode == ApiRequestMode.CAR)
+                .collect(Collectors.toList());
+
+        if (filteredModes.size() > 1) {
+            List<QualifiedMode> filteredModesWithoutWalk = filteredModes.stream()
+                    .filter(Predicate.not(m -> m.mode == ApiRequestMode.WALK))
+                    .collect(Collectors.toList());
+            if (filteredModesWithoutWalk.size() > 1) {
+                throw new IllegalStateException("Multiple non-walk modes provided " + filteredModesWithoutWalk);
+            } else if (filteredModesWithoutWalk.isEmpty()) {
+                requestMode = filteredModes.get(0);
+            } else {
+                requestMode = filteredModesWithoutWalk.get(0);
+            }
+        } else if (!filteredModes.isEmpty()) {
+            requestMode = filteredModes.get(0);
+        }
+
+        if(requestMode != null) {
+            switch (requestMode.mode) {
                 case WALK:
                     accessMode = StreetMode.WALK;
+                    transferMode = StreetMode.WALK;
                     egressMode = StreetMode.WALK;
                     directMode = StreetMode.WALK;
                     break;
                 case BICYCLE:
-                    if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                    if (requestMode.qualifiers.contains(Qualifier.RENT)) {
                         accessMode = StreetMode.BIKE_RENTAL;
+                        transferMode = StreetMode.BIKE_RENTAL;
                         egressMode = StreetMode.BIKE_RENTAL;
                         directMode = StreetMode.BIKE_RENTAL;
-                    }
-                    else if (qMode.qualifiers.contains(Qualifier.PARK)) {
+                    } else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
                         accessMode = StreetMode.BIKE_TO_PARK;
+                        transferMode = StreetMode.WALK;
                         egressMode = StreetMode.WALK;
                         directMode = StreetMode.BIKE_TO_PARK;
-                    }
-                    else {
+                    } else {
                         accessMode = StreetMode.BIKE;
+                        transferMode = StreetMode.BIKE;
                         egressMode = StreetMode.BIKE;
                         directMode = StreetMode.BIKE;
                     }
                     break;
                 case CAR:
-                    if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                    if (requestMode.qualifiers.contains(Qualifier.RENT)) {
                         accessMode = StreetMode.CAR_RENTAL;
+                        transferMode = StreetMode.CAR_RENTAL;
                         egressMode = StreetMode.CAR_RENTAL;
                         directMode = StreetMode.CAR_RENTAL;
-                    }
-                    else if (qMode.qualifiers.contains(Qualifier.PARK)) {
+                    } else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
                         accessMode = StreetMode.CAR_TO_PARK;
+                        transferMode = StreetMode.WALK;
                         egressMode = StreetMode.WALK;
                         directMode = StreetMode.CAR_TO_PARK;
-                    }
-                    else if (qMode.qualifiers.contains(Qualifier.PICKUP)) {
+                    } else if (requestMode.qualifiers.contains(Qualifier.PICKUP)) {
                         accessMode = StreetMode.WALK;
+                        transferMode = StreetMode.WALK;
                         egressMode = StreetMode.CAR_PICKUP;
-                        directMode = StreetMode.CAR;
-                    }
-                    else if (qMode.qualifiers.contains(Qualifier.DROPOFF)) {
+                        directMode = StreetMode.CAR_PICKUP;
+                    } else if (requestMode.qualifiers.contains(Qualifier.DROPOFF)) {
                         accessMode = StreetMode.CAR_PICKUP;
+                        transferMode = StreetMode.WALK;
                         egressMode = StreetMode.WALK;
-                        directMode = StreetMode.CAR;
-                    }
-                    else {
+                        directMode = StreetMode.CAR_PICKUP;
+                    } else {
                         accessMode = StreetMode.WALK;
+                        transferMode = StreetMode.WALK;
                         egressMode = StreetMode.WALK;
                         directMode = StreetMode.CAR;
                     }
@@ -136,14 +164,26 @@ public class QualifiedModeSet implements Serializable {
             }
         }
 
-        RequestModes requestModes = new RequestModes(
+        // These modes are set last in order to take precedence over other modes
+        for (QualifiedMode qMode : qModes) {
+            if (qMode.mode.equals(ApiRequestMode.FLEX)) {
+                if (qMode.qualifiers.contains(Qualifier.ACCESS)) {
+                    accessMode = StreetMode.FLEXIBLE;
+                } else if (qMode.qualifiers.contains(Qualifier.EGRESS)) {
+                    egressMode = StreetMode.FLEXIBLE;
+                } else if (qMode.qualifiers.contains(Qualifier.DIRECT)) {
+                    directMode = StreetMode.FLEXIBLE;
+                }
+            }
+        }
+
+        return new RequestModes(
             accessMode,
+            transferMode,
             egressMode,
             directMode,
             transitModes
         );
-
-        return requestModes;
     }
     
     public String toString() {

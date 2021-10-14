@@ -2,7 +2,8 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.TransitLegView;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
+import org.opentripplanner.transit.raptor.api.view.TransitPathView;
 
 /**
  *
@@ -10,7 +11,7 @@ import org.opentripplanner.transit.raptor.api.view.TransitLegView;
  */
 public final class TransitStopArrival<T extends RaptorTripSchedule>
     extends AbstractStopArrival<T>
-    implements TransitLegView<T>
+    implements TransitPathView<T>, TransitArrival<T>
 {
     private final T trip;
 
@@ -18,14 +19,15 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
         AbstractStopArrival<T> previousState,
         int stopIndex,
         int arrivalTime,
-        int additionalCost,
+        int totalCost,
         T trip
     ) {
         super(
                 previousState,
+                previousState.arrivedByTransit() ? 2 : 1,
                 stopIndex,
                 arrivalTime,
-                additionalCost
+                totalCost
         );
         this.trip = trip;
     }
@@ -36,15 +38,22 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
     }
 
     @Override
-    public TransitLegView<T> transitLeg() {
+    public TransitPathView<T> transitPath() {
         return this;
     }
 
+    @Override
     public T trip() {
         return trip;
     }
 
+    @Override
     public int boardStop() {
         return previousStop();
+    }
+
+    @Override
+    public TransitArrival<T> mostResentTransitArrival() {
+        return this;
     }
 }

@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
+import java.time.ZonedDateTime;
+import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -8,18 +10,15 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-
-import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
 
     public static RaptorRequest<TripSchedule> mapRequest(
             RoutingRequest request,
             ZonedDateTime startOfTime,
-            Collection<? extends RaptorTransfer> accessTimes,
-            Collection<? extends RaptorTransfer> egressTimes
+            Collection<? extends RaptorTransfer> accessPaths,
+            Collection<? extends RaptorTransfer> egressPaths
     ) {
         RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
 
@@ -52,16 +51,14 @@ public class RaptorRequestMapper {
         builder
                 .searchParams()
                 .searchWindow(request.searchWindow)
-                .addAccessStops(accessTimes.stream()
-                    .map(t -> (RaptorTransfer) t).collect(Collectors.toList()))
-                .addEgressStops(egressTimes.stream()
-                    .map(t -> (RaptorTransfer) t).collect(Collectors.toList()))
-                .boardSlackInSeconds(request.boardSlack)
-                .timetableEnabled(true);
+                .timetableEnabled(request.timetableView)
+                .constrainedTransfersEnabled(OTPFeature.TransferConstraints.isOn())
+                .addAccessPaths(accessPaths)
+                .addEgressPaths(egressPaths);
 
-        builder.mcCostFactors()
-                .waitReluctanceFactor(request.waitReluctance)
-                .walkReluctanceFactor(request.walkReluctance);
+        if(!request.timetableView && request.arriveBy) {
+            builder.searchParams().preferLateArrival(true);
+        }
 
         return builder.build();
     }

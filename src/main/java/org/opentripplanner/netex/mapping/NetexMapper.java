@@ -2,14 +2,23 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
@@ -28,12 +37,8 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZone;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -49,31 +54,45 @@ import java.util.Map;
  * </p>
  */
 public class NetexMapper {
+    private static final Logger LOG = LoggerFactory.getLogger(NetexMapper.class);
 
-    private final OtpTransitServiceBuilder transitBuilder;
+    private static final int LEVEL_SHARED = 0;
+    private static final int LEVEL_GROUP = 1;
+
     private final FeedScopedIdFactory idFactory;
+    private final OtpTransitServiceBuilder transitBuilder;
     private final Deduplicator deduplicator;
     private final DataImportIssueStore issueStore;
     private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
     private final CalendarServiceBuilder calendarServiceBuilder;
     private final TripCalendarBuilder tripCalendarBuilder;
+    private final Set<String> ferryIdsNotAllowedForBicycle;
+
+    /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
+    private GroupNetexMapper groupMapper;
+
+    private NetexEntityIndexReadOnlyView currentNetexIndex;
+    private int level = LEVEL_SHARED;
 
     /**
-     * This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService,
-     * so we need to temporally cash this here.
+     * This is needed to assign a notice to a stop time. It is not part of the target
+     * OTPTransitService, so we need to temporally cash this here.
      */
     private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
+
 
     public NetexMapper(
             OtpTransitServiceBuilder transitBuilder,
             String feedId,
             Deduplicator deduplicator,
-            DataImportIssueStore issueStore
+            DataImportIssueStore issueStore,
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
         this.idFactory = new FeedScopedIdFactory(feedId);
         this.issueStore = issueStore;
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
         this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
         this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
     }
@@ -85,7 +104,9 @@ public class NetexMapper {
      * during the next call to {@link #mapNetexToOtp(NetexEntityIndexReadOnlyView)} and after.
      */
     public NetexMapper push() {
+        ++level;
         this.tripCalendarBuilder.push();
+        setupGroupMapping();
         return this;
     }
 
@@ -94,7 +115,9 @@ public class NetexMapper {
      * {@link #mapNetexToOtp(NetexEntityIndexReadOnlyView)}.
      */
     public NetexMapper pop() {
+        performGroupMapping();
         this.tripCalendarBuilder.pop();
+        --level;
         return this;
     }
 
@@ -107,7 +130,20 @@ public class NetexMapper {
         // Add Calendar data created during the mapping of dayTypes, dayTypeAssignments,
         // datedServiceJourney and ServiceJourneys
         transitBuilder.getCalendarDates().addAll(
-            calendarServiceBuilder.createServiceCalendar()
+                calendarServiceBuilder.createServiceCalendar()
+        );
+    }
+
+    /**
+     * Any post processing step in the mapping is done in this method for a . The method is called
+     * ONCE after all other mapping is complete. Note! Hierarchical data structures are not
+     * accessible any more.
+     */
+    public void finnishUpGroup() {
+        // Add Calendar data created during the mapping of dayTypes, dayTypeAssignments,
+        // datedServiceJourney and ServiceJourneys
+        transitBuilder.getCalendarDates().addAll(
+                calendarServiceBuilder.createServiceCalendar()
         );
     }
 
@@ -127,52 +163,75 @@ public class NetexMapper {
     public void mapNetexToOtp(NetexEntityIndexReadOnlyView netexIndex) {
         // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency must be mapped
         // before Route - if both entities are defined in the same file.
-        mapAuthorities(netexIndex);
-        mapOperators(netexIndex);
-        mapShapePoints(netexIndex);
-        mapTariffZones(netexIndex);
-        mapStopPlaceAndQuays(netexIndex);
-        mapMultiModalStopPlaces(netexIndex);
-        mapGroupsOfStopPlaces(netexIndex);
-        mapFlexibleStopPlaces(netexIndex);
-        mapDatedServiceJourneys(netexIndex);
-        mapDayTypeAssignments(netexIndex);
+        this.currentNetexIndex = netexIndex;
+        mapAuthorities();
+        mapOperators();
+        mapShapePoints();
+
+        // The tariffZoneMapper is used to map all currently valid zones and to map the correct
+        // referenced zone in StopPlace - which may not be the most currently valid zone.
+        // This is a workaround until versioned entities are supported by OTP
+        var tariffZoneMapper = mapTariffZones();
+        mapStopPlaceAndQuays(tariffZoneMapper);
+        mapMultiModalStopPlaces();
+        mapGroupsOfStopPlaces();
+        mapFlexibleStopPlaces();
+        mapDatedServiceJourneys();
+        mapDayTypeAssignments();
 
         // DayType and DSJ is mapped to a service calendar and a serviceId is generated
-        Map<String, FeedScopedId> serviceIds = createCalendarForServiceJourney(netexIndex);
+        Map<String, FeedScopedId> serviceIds = createCalendarForServiceJourney();
 
-        mapRoute(netexIndex);
-        mapTripPatterns(serviceIds, netexIndex);
-        mapNoticeAssignments(netexIndex);
+        mapRoute();
+        mapTripPatterns(serviceIds);
+        mapNoticeAssignments();
+
+        addEntriesToGroupMapperForPostProcessingLater();
     }
-
 
     /* PRIVATE METHODS */
 
-    private void mapAuthorities(NetexEntityIndexReadOnlyView netexIndex) {
-        AuthorityToAgencyMapper agencyMapper = new AuthorityToAgencyMapper(idFactory, netexIndex.getTimeZone());
-        for (Authority authority : netexIndex.getAuthoritiesById().localValues()) {
+    private void setupGroupMapping() {
+        if(level != LEVEL_GROUP) { return; }
+        this.groupMapper = new GroupNetexMapper(idFactory, issueStore, transitBuilder);
+    }
+
+    /**
+     * Group mappings should be done after all individual processed files and most entities are
+     * mapped. The group mapping should only be used to map entities(relations) that reference
+     * elements in other files within a group(netex namespace);
+     */
+    private void performGroupMapping() {
+        if(level != LEVEL_GROUP) { return; }
+        this.groupMapper.mapGroupEntries();
+        // Throw away group data and make it available for garbage collection
+        this.groupMapper = null;
+    }
+
+    private void mapAuthorities() {
+        AuthorityToAgencyMapper agencyMapper = new AuthorityToAgencyMapper(idFactory, currentNetexIndex.getTimeZone());
+        for (Authority authority : currentNetexIndex.getAuthoritiesById().localValues()) {
             Agency agency = agencyMapper.mapAuthorityToAgency(authority);
             transitBuilder.getAgenciesById().add(agency);
         }
     }
 
-    private void mapOperators(NetexEntityIndexReadOnlyView netexIndex) {
+    private void mapOperators() {
         OperatorToAgencyMapper mapper = new OperatorToAgencyMapper(idFactory);
-        for (org.rutebanken.netex.model.Operator operator : netexIndex.getOperatorsById().localValues()) {
+        for (org.rutebanken.netex.model.Operator operator : currentNetexIndex.getOperatorsById().localValues()) {
             transitBuilder.getOperatorsById().add(mapper.mapOperator(operator));
         }
     }
 
-    private void mapShapePoints(NetexEntityIndexReadOnlyView netexIndex) {
+    private void mapShapePoints() {
         ServiceLinkMapper serviceLinkMapper = new ServiceLinkMapper(idFactory, issueStore);
-        for (JourneyPattern journeyPattern : netexIndex.getJourneyPatternsById().localValues()) {
+        for (JourneyPattern journeyPattern : currentNetexIndex.getJourneyPatternsById().localValues()) {
 
             Collection<ShapePoint> shapePoints = serviceLinkMapper.getShapePointsByJourneyPattern(
                 journeyPattern,
-                netexIndex.getServiceLinkById(),
-                netexIndex.getQuayIdByStopPointRef(),
-                netexIndex.getQuayById());
+                currentNetexIndex.getServiceLinkById(),
+                currentNetexIndex.getQuayIdByStopPointRef(),
+                currentNetexIndex.getQuayById());
 
             for (ShapePoint shapePoint : shapePoints) {
                 transitBuilder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
@@ -180,32 +239,36 @@ public class NetexMapper {
         }
     }
 
-    private void mapTariffZones(NetexEntityIndexReadOnlyView netexIndex) {
-        TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(idFactory);
-        for (TariffZone tariffZone : netexIndex.getTariffZonesById().localValues()) {
-            transitBuilder.getFareZonesById().add(tariffZoneMapper.mapTariffZone(tariffZone));
-        }
-    }
-
-    private void mapStopPlaceAndQuays(NetexEntityIndexReadOnlyView netexIndex) {
-        for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
-            Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
-            StopAndStationMapper stopMapper = new StopAndStationMapper(
+    private TariffZoneMapper mapTariffZones() {
+        TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(
+                getStartOfPeriod(),
                 idFactory,
-                netexIndex.getQuayById(),
-                transitBuilder.getFareZonesById(),
-                issueStore
-            );
-            stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
-            transitBuilder.getStops().addAll(stopMapper.resultStops);
-            transitBuilder.getStations().addAll(stopMapper.resultStations);
-            stationsByMultiModalStationRfs.putAll(stopMapper.resultStationByMultiModalStationRfs);
-        }
+                currentNetexIndex.getTariffZonesById()
+        );
+        transitBuilder.getFareZonesById().addAll(tariffZoneMapper.listAllCurrentFareZones());
+        return tariffZoneMapper;
     }
 
-    private void mapMultiModalStopPlaces(NetexEntityIndexReadOnlyView netexIndex) {
+    private void mapStopPlaceAndQuays(TariffZoneMapper tariffZoneMapper) {
+        StopAndStationMapper stopMapper = new StopAndStationMapper(
+                idFactory,
+                currentNetexIndex.getQuayById(),
+                tariffZoneMapper,
+                issueStore
+        );
+        for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
+            Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex.getStopPlaceById().lookup(stopPlaceId);
+            stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
+        }
+        transitBuilder.getStops().addAll(stopMapper.resultStops);
+        transitBuilder.getStations().addAll(stopMapper.resultStations);
+        stationsByMultiModalStationRfs.putAll(stopMapper.resultStationByMultiModalStationRfs);
+
+    }
+
+    private void mapMultiModalStopPlaces() {
         MultiModalStationMapper mapper = new MultiModalStationMapper(idFactory);
-        for (StopPlace multiModalStopPlace : netexIndex.getMultiModalStopPlaceById().localValues()) {
+        for (StopPlace multiModalStopPlace : currentNetexIndex.getMultiModalStopPlaceById().localValues()) {
             transitBuilder.getMultiModalStationsById().add(
                 mapper.map(
                     multiModalStopPlace,
@@ -215,118 +278,149 @@ public class NetexMapper {
         }
     }
 
-    private void mapGroupsOfStopPlaces(NetexEntityIndexReadOnlyView netexIndex) {
+    private void mapGroupsOfStopPlaces() {
         GroupOfStationsMapper groupOfStationsMapper = new GroupOfStationsMapper(
                 idFactory,
                 transitBuilder.getMultiModalStationsById(),
                 transitBuilder.getStations()
         );
-        for (GroupOfStopPlaces groupOfStopPlaces : netexIndex.getGroupOfStopPlacesById().localValues()) {
+        for (GroupOfStopPlaces groupOfStopPlaces : currentNetexIndex.getGroupOfStopPlacesById().localValues()) {
             transitBuilder.getGroupsOfStationsById().add(groupOfStationsMapper.map(groupOfStopPlaces));
         }
     }
 
-    private void mapFlexibleStopPlaces(NetexEntityIndexReadOnlyView netexIndex) {
-        FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(idFactory);
+    private void mapFlexibleStopPlaces() {
+        FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(idFactory, transitBuilder.getStops().values());
 
-        for (FlexibleStopPlace flexibleStopPlace : netexIndex.getFlexibleStopPlacesById().localValues()) {
-            FlexStopLocation stopLocation = flexStopLocationMapper.map(flexibleStopPlace);
-            if (stopLocation != null) {
-                transitBuilder.getLocations().add(stopLocation);
+        for (FlexibleStopPlace flexibleStopPlace : currentNetexIndex.getFlexibleStopPlacesById().localValues()) {
+            StopLocation stopLocation = flexStopLocationMapper.map(flexibleStopPlace);
+            if (stopLocation instanceof FlexStopLocation) {
+                transitBuilder.getLocations().add((FlexStopLocation) stopLocation);
+            } else if (stopLocation instanceof FlexLocationGroup) {
+                transitBuilder.getLocationGroups().add((FlexLocationGroup) stopLocation);
             }
         }
     }
 
-    private void mapDatedServiceJourneys(NetexEntityIndexReadOnlyView netexIndex) {
+    private void mapDatedServiceJourneys() {
         tripCalendarBuilder.addDatedServiceJourneys(
-            netexIndex.getOperatingDayById(),
+            currentNetexIndex.getOperatingDayById(),
             DatedServiceJourneyMapper.indexDSJBySJId(
-                netexIndex.getDatedServiceJourneys()
+                currentNetexIndex.getDatedServiceJourneys()
             )
         );
     }
 
-    private void mapDayTypeAssignments(NetexEntityIndexReadOnlyView netexIndex) {
+    private void mapDayTypeAssignments() {
         tripCalendarBuilder.addDayTypeAssignments(
-            netexIndex.getDayTypeById(),
-            netexIndex.getDayTypeAssignmentByDayTypeId(),
-            netexIndex.getOperatingDayById(),
-            netexIndex.getOperatingPeriodById()
+            currentNetexIndex.getDayTypeById(),
+            currentNetexIndex.getDayTypeAssignmentByDayTypeId(),
+            currentNetexIndex.getOperatingDayById(),
+            currentNetexIndex.getOperatingPeriodById()
         );
     }
 
-    private Map<String, FeedScopedId> createCalendarForServiceJourney(NetexEntityIndexReadOnlyView netexIndex) {
+    private Map<String, FeedScopedId> createCalendarForServiceJourney() {
         return tripCalendarBuilder.createTripCalendar(
-            netexIndex.getServiceJourneyById().localValues()
+            currentNetexIndex.getServiceJourneyById().localValues()
         );
     }
 
-    private void mapRoute(NetexEntityIndexReadOnlyView netexIndex) {
+    private void mapRoute() {
         RouteMapper routeMapper = new RouteMapper(
                 idFactory,
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
-                netexIndex,
-                netexIndex.getTimeZone()
+                currentNetexIndex,
+                currentNetexIndex.getTimeZone(),
+                ferryIdsNotAllowedForBicycle
         );
-        for (Line line : netexIndex.getLineById().localValues()) {
+        for (Line line : currentNetexIndex.getLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
             transitBuilder.getRoutes().add(route);
         }
-        for (FlexibleLine line : netexIndex.getFlexibleLineById().localValues()) {
+        for (FlexibleLine line : currentNetexIndex.getFlexibleLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
             transitBuilder.getRoutes().add(route);
         }
     }
 
-    private void mapTripPatterns(
-        Map<String, FeedScopedId> serviceIds,
-        NetexEntityIndexReadOnlyView netexIndex
-    ) {
+    private void mapTripPatterns(Map<String, FeedScopedId> serviceIds) {
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
                 idFactory,
                 transitBuilder.getOperatorsById(),
                 transitBuilder.getStops(),
                 transitBuilder.getLocations(),
+                transitBuilder.getLocationGroups(),
                 transitBuilder.getRoutes(),
                 transitBuilder.getShapePoints().keySet(),
-                netexIndex.getRouteById(),
-                netexIndex.getJourneyPatternsById(),
-                netexIndex.getQuayIdByStopPointRef(),
-                netexIndex.getFlexibleStopPlaceByStopPointRef(),
-                netexIndex.getDestinationDisplayById(),
-                netexIndex.getServiceJourneyById(),
+                currentNetexIndex.getRouteById(),
+                currentNetexIndex.getJourneyPatternsById(),
+                currentNetexIndex.getQuayIdByStopPointRef(),
+                currentNetexIndex.getFlexibleStopPlaceByStopPointRef(),
+                currentNetexIndex.getDestinationDisplayById(),
+                currentNetexIndex.getServiceJourneyById(),
+                currentNetexIndex.getFlexibleLineById(),
                 serviceIds,
                 deduplicator
         );
 
-        for (JourneyPattern journeyPattern : netexIndex.getJourneyPatternsById().localValues()) {
-            TripPatternMapper.Result result = tripPatternMapper.mapTripPattern(journeyPattern);
+        for (JourneyPattern journeyPattern : currentNetexIndex.getJourneyPatternsById().localValues()) {
+            TripPatternMapperResult result = tripPatternMapper.mapTripPattern(journeyPattern);
 
             for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes.entrySet()) {
                 transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
                 transitBuilder.getTripsById().add(it.getKey());
             }
             for (TripPattern it : result.tripPatterns) {
-                transitBuilder.getTripPatterns().put(it.stopPattern, it);
+                transitBuilder.getTripPatterns().put(it.getStopPattern(), it);
             }
             stopTimesByNetexId.putAll(result.stopTimeByNetexId);
+            groupMapper.scheduledStopPointsIndex.putAll(result.scheduledStopPointsIndex);
         }
     }
 
-    private void mapNoticeAssignments(NetexEntityIndexReadOnlyView netexIndex) {
+    private void mapNoticeAssignments() {
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
                 idFactory,
-                netexIndex.getServiceJourneyById().localValues(),
-                netexIndex.getNoticeById(),
+                currentNetexIndex.getServiceJourneyById().localValues(),
+                currentNetexIndex.getNoticeById(),
                 transitBuilder.getRoutes(),
                 transitBuilder.getTripsById(),
                 stopTimesByNetexId
         );
-        for (NoticeAssignment noticeAssignment : netexIndex.getNoticeAssignmentById().localValues()) {
+        for (NoticeAssignment noticeAssignment : currentNetexIndex.getNoticeAssignmentById().localValues()) {
             Multimap<TransitEntity, Notice> noticesByElementId;
             noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
             transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
         }
+    }
+
+    private void addEntriesToGroupMapperForPostProcessingLater() {
+        if(level != 0) {
+            groupMapper.addInterchange(
+                    currentNetexIndex.getServiceJourneyInterchangeById().localValues());
+        }
+    }
+
+    /**
+     * The start of period is used to find the valid entities based on the current time.
+     * This should probably be configurable in the future, or even better incorporate the version
+     * number into the entity id, so we can operate with more than one version of an entity in OTPs
+     * internal model.
+     */
+    private LocalDateTime getStartOfPeriod() {
+        String timeZone = currentNetexIndex.getTimeZone();
+        if(timeZone == null) {
+            LocalDateTime time = LocalDateTime.now(ZoneId.of("UTC"));
+            LOG.warn(
+                    "No timezone set for the current NeTEx input data file. The import " +
+                    "start-of-period is set to " + time + " UTC, used to check entity validity " +
+                    "periods."
+            );
+            return time;
+
+        }
+        return LocalDateTime.now(ZoneId.of(timeZone));
     }
 }

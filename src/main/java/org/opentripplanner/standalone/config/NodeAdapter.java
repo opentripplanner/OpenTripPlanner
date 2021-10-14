@@ -1,12 +1,6 @@
 package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.api.request.RequestFunctions;
-import org.opentripplanner.util.OtpAppException;
-import org.slf4j.Logger;
-
-import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
@@ -25,6 +19,14 @@ import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.util.OtpAppException;
+import org.slf4j.Logger;
 
 
 /**
@@ -166,6 +168,16 @@ public class NodeAdapter {
 
     public String asText(String paramName, String defaultValue) {
         return param(paramName).asText(defaultValue);
+    }
+
+    public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
+        if(!exist(paramName)) return defaultValue;
+        return arrayAsList(paramName, JsonNode::asText).stream().collect(Collectors.toSet());
+    }
+
+    public RequestModes asRequestModes(String paramName, RequestModes defaultValue) {
+        var node = param(paramName);
+        return node == null || node.asText().isBlank() ? defaultValue : new QualifiedModeSet(node.asText()).getRequestModes();
     }
 
     /**
@@ -322,6 +334,11 @@ public class NodeAdapter {
         return uris;
     }
 
+    public URI asUri(String paramName) {
+        assertRequiredFieldExist(paramName);
+        return asUri(paramName, null);
+    }
+
     public URI asUri(String paramName, String defaultValue) {
         return uriFromString(paramName, asText(paramName, defaultValue));
     }
@@ -460,4 +477,18 @@ public class NodeAdapter {
         return result;
     }
 
+    public <T> Map<String, T> asMap(String paramName, BiFunction<NodeAdapter, String, T> mapper) {
+        NodeAdapter node = path(paramName);
+
+        if(node.isEmpty()) { return Map.of(); }
+
+        Map<String, T> result = new HashMap<>();
+
+        Iterator<String> names = node.json.fieldNames();
+        while (names.hasNext()) {
+            String key = names.next();
+            result.put(key, mapper.apply(node, key));
+        }
+        return result;
+    }
 }

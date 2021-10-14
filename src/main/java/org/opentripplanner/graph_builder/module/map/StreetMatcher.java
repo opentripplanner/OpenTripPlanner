@@ -61,8 +61,9 @@ public class StreetMatcher {
         
         routeGeometry = removeDuplicatePoints(routeGeometry);
 
-        if (routeGeometry == null) 
+        if (routeGeometry == null) {
             return null;
+        }
         
         routeGeometry = DouglasPeuckerSimplifier.simplify(routeGeometry, 0.00001);
 

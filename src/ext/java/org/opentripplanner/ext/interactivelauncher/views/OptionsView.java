@@ -1,19 +1,27 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import org.opentripplanner.ext.interactivelauncher.Model;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.swing.Box;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import org.opentripplanner.ext.interactivelauncher.Model;
 
 class OptionsView {
   private final Box panel = Box.createVerticalBox();
   private final JCheckBox buildStreetGraphChk = new JCheckBox("Street graph", false);
   private final JCheckBox buildTransitGraphChk = new JCheckBox("Transit graph", false);
+  private final List<JCheckBox> debugLoggingChks = new ArrayList<>();
   private final JCheckBox saveGraphChk = new JCheckBox("Save graph", true);
   private final JCheckBox startOptServerChk = new JCheckBox("Serve graph", true);
 
@@ -32,8 +40,10 @@ class OptionsView {
     addSectionSpace(panel);
     addComp(saveGraphChk, panel);
     addComp(startOptServerChk, panel);
-    addSectionDoubleSpace(panel);
 
+    addDebugCheckBoxes(model);
+
+    addSectionDoubleSpace(panel);
     initValues(model);
   }
 
@@ -60,10 +70,26 @@ class OptionsView {
     model.setBuildTransit(buildTransit());
     model.setSaveGraph(saveGraph());
     model.setServeGraph(startOptServer());
+    for (JCheckBox it : debugLoggingChks) {
+      model.getDebugLogging().put(it.getText(), it.isSelected());
+    }
   }
 
   void initState() {
     onBuildGraphChkChanged(null);
+  }
+
+  private void addDebugCheckBoxes(Model model) {
+    addSectionSpace(panel);
+    addComp(new JLabel("Debug logging"), panel);
+    addSectionSpace(panel);
+    var entries = model.getDebugLogging();
+    List<String> keys = entries.keySet().stream().sorted().collect(Collectors.toList());
+    for (String name : keys) {
+      JCheckBox dbox =  new JCheckBox(name, entries.get(name));
+      debugLoggingChks.add(dbox);
+      addComp(dbox, panel);
+    }
   }
 
   private boolean buildStreet() {

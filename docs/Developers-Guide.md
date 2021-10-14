@@ -81,6 +81,17 @@ GitHub will automatically update issues when commits are merged in: if your comm
 If you simply mention ` #123 ` in your message, your message will be appended to the issue but it will remain open.
 Many other expressions exist to close issues via commit messages. See [the GitHub help page on this topic](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
+### Unit tests using real OSM data
+
+Sometimes it is useful to build a graph from actual OSM or GTFS data. Since building these graphs
+in a test can be quite slow they will be accepted in pull requests only if they conform to certain
+standards:
+
+1. Use the smallest possible regional extract - the OSM file should not contain more than a few hundred ways.
+   Use `osmium-extract` to cut down a larger OSM file into a tiny subset of it.
+   
+2. Strip out any unneeded information by using the `osmium filter-tags` as describe in [Preparing OSM](Preparing-OSM.md)
+
 
 ### Code Comments
 
@@ -92,6 +103,15 @@ comments that not only explain *what* you did but also *why you did it* while pr
 context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
 `@param` annotations with no description.
 
+### Itinerary and API Snapshot Tests
+
+To test the itinerary generation, and the API there are snapshot test which save the result of the
+requests as `*.snap` JSON-like files. These are stored in git so that it is possible to compare to
+the expected result when running the tests.
+
+If the snapshots need to be recreated than running `mvn clean -Pclean-test-snapshots` will remove
+the existing `*.snap` files so that the next time the tests are run the snapshots will be recreated.
+The updated files may be committed after checking that the changes in the files are expected.
 
 ### Documentation
 
@@ -113,6 +133,14 @@ In short:
 $ pip install mkdocs
 $ mkdocs serve
 ```
+
+The OTP REST API documentation is available online in the format of:
+
+http://dev.opentripplanner.org/apidoc/x.x.x/index.html
+
+For example, for v2.0.0:
+
+http://dev.opentripplanner.org/apidoc/2.0.0/index.html
 
 
 ### Debug layers

@@ -9,12 +9,11 @@ public class FlexAccessEgressAdapter extends AccessEgress {
   private final FlexAccessEgress flexAccessEgress;
 
   public FlexAccessEgressAdapter(
-      FlexAccessEgress flexAccessEgress, StopIndexForRaptor stopIndex
+          FlexAccessEgress flexAccessEgress, boolean isEgress, StopIndexForRaptor stopIndex
   ) {
     super(
         stopIndex.indexByStop.get(flexAccessEgress.stop),
-        flexAccessEgress.preFlexTime + flexAccessEgress.flexTime + flexAccessEgress.postFlexTime,
-        flexAccessEgress.lastState
+        isEgress ? flexAccessEgress.lastState.reverse() : flexAccessEgress.lastState
     );
 
     this.flexAccessEgress = flexAccessEgress;
@@ -31,12 +30,18 @@ public class FlexAccessEgressAdapter extends AccessEgress {
   }
 
   @Override
-  public int numberOfLegs() {
-    return flexAccessEgress.directToStop ? 2 : 3;
+  public int numberOfRides() {
+    // We only support one flex leg at the moment
+    return 1;
   }
 
   @Override
   public boolean stopReachedOnBoard() {
     return flexAccessEgress.directToStop;
+  }
+
+  @Override
+  public String toString() {
+    return asString();
   }
 }

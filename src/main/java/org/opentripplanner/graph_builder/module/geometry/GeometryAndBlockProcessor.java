@@ -172,7 +172,7 @@ public class GeometryAndBlockProcessor {
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
         for (TripPattern tableTripPattern : tripPatterns) {
-            tableTripPattern.scheduledTimetable.finish();
+            tableTripPattern.getScheduledTimetable().finish();
         }
 
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
@@ -192,10 +192,10 @@ public class GeometryAndBlockProcessor {
 
         LOG.info("Finding interlining trips based on block IDs.");
         for (TripPattern pattern : tripPatterns) {
-            Timetable timetable = pattern.scheduledTimetable;
+            Timetable timetable = pattern.getScheduledTimetable();
             /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
-            for (TripTimes tripTimes : timetable.tripTimes) {
-                Trip trip = tripTimes.trip;
+            for (TripTimes tripTimes : timetable.getTripTimes()) {
+                Trip trip = tripTimes.getTrip();
                 if (!Strings.isNullOrEmpty(trip.getBlockId())) {
                     tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);
                     // For space efficiency, only record times that are part of a block.
@@ -219,7 +219,7 @@ public class GeometryAndBlockProcessor {
                     if (prev.getDepartureTime(prev.getNumStops() - 1) > curr.getArrivalTime(0)) {
                         LOG.error(
                                 "Trip times within block {} are not increasing on service {} after trip {}.",
-                                block.blockId, block.serviceId, prev.trip.getId());
+                                block.blockId, block.serviceId, prev.getTrip().getId());
                         continue SERVICE_BLOCK;
                     }
                     TripPattern prevPattern = patternForTripTimes.get(prev);
@@ -240,7 +240,7 @@ public class GeometryAndBlockProcessor {
                         // Only skip this particular interline edge; there may be other valid ones in the block.
                     } else {
                         interlines.put(new P2<>(prevPattern, currPattern),
-                                new P2<>(prev.trip, curr.trip));
+                                new P2<>(prev.getTrip(), curr.getTrip()));
                     }
                 }
                 prev = curr;
@@ -478,8 +478,9 @@ public class GeometryAndBlockProcessor {
 
         ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
         LineString geometry = geometriesByShapeSegmentKey.get(key);
-        if (geometry != null)
+        if (geometry != null) {
             return geometry;
+        }
 
         double[] distances = getDistanceForShapeId(shapeId);
 
@@ -613,8 +614,9 @@ public class GeometryAndBlockProcessor {
 
         LineString geometry = geometriesByShapeId.get(shapeId);
 
-        if (geometry != null)
+        if (geometry != null) {
             return geometry;
+        }
 
         List<ShapePoint> points = getUniqueShapePointsForShapeId(shapeId);
         if (points.size() < 2) {
@@ -655,12 +657,15 @@ public class GeometryAndBlockProcessor {
 
     private LinearLocation getSegmentFraction(double[] distances, double distance) {
         int index = Arrays.binarySearch(distances, distance);
-        if (index < 0)
+        if (index < 0) {
             index = -(index + 1);
-        if (index == 0)
+        }
+        if (index == 0) {
             return new LinearLocation(0, 0.0);
-        if (index == distances.length)
+        }
+        if (index == distances.length) {
             return new LinearLocation(distances.length, 0.0);
+        }
 
         double prevDistance = distances[index - 1];
         if (prevDistance == distances[index]) {

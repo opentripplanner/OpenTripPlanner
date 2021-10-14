@@ -9,33 +9,37 @@ The design goals are:
 - Load and validate the configuration early, before loading the graph or creating any 
   components/modules. This ensures fast feedback and early termination of the server if the
   configuration is not valid.
-- Ignore unknown parameters, just print a warning message in the log. This will make the process 
-  of upgrading and downgrading OTP easier, and less prune to service failure. Try to make reasonable
+- Ignore unknown parameters, just print a warning message in the log. This will make the process of
+  upgrading and downgrading OTP easier and less prune to service failure. Try to make reasonable
   default values instead of making a parameter required.
-- Encapsulate config parsing, so parsing and error handling is consistent - and stay consistent 
-  over time(maintenance).
+- Encapsulate config parsing, so parsing and error handling is consistent - and stay consistent over
+  time(maintenance).
 - Configuration should be injected into OTP components/modules in using inversion-of-control. Each
-  module should define the needed config as an interface(or simple Java class). This ensures  
-  type-safty and provide a consistent way to document needed configuration for each module. NB! The
-  `BuildConfig` is not doing correct, 
- 
+  module should define the needed config as an interface(or simple Java class). This ensures
+  type-safety and provides a consistent way to document needed configuration for each module.
+- For Sandbox modules the configuration loading should be put in the
+  `org.opentripplanner.standalone.config.sandbox` package. This keeps all the configuration loading
+  in one place, avoiding fragmentation and makes it easier to get an overview. The parameters
+  (interface or POJO) injected into the Sandbox module itself, should be declared in the Sandbox
+  module.
+
 
 ## Implementation
 
 For historic reasons the configuration loader uses jackson and parses the config into a JSON node 
 tree. Java objects are mapped explicit by wrapping each `JsonNode` in a `NodeAdapter`. The 
-`NodeAdapter` decorate the `JsonNode` to provide type-safe getters for rich basic types, like 
+`NodeAdapter` decorates the `JsonNode` to provide type-safe getters for rich basic types like 
 `Enum`, `List`(type-safe), `Map`(type-safe), `LocalDateTime`, `URI` and so on. It also helps with 
 validation and providing a list of unused parameters. 
 
 
 ### Config Injection
 
-Each module in OTP witch need configuration should declare what it needs and document each parameter
-with using JavaDoc. It can be done using a interface or a simple plain-old-java-object(POJO):
+Each OTP module in need for configuration should declare needs and document each parameter
+using JavaDoc. It can be done using an interface or a simple plain-old-java-object(POJO):
 
 ```
-/** <Sumary doc goes here> */
+/** <Summary doc goes here> */
 interface <ModuleNnnnParameters> {
 
    /** 
@@ -49,7 +53,7 @@ interface <ModuleNnnnParameters> {
 
 or 
 
-/** <Sumary doc goes here> */
+/** <Summary doc goes here> */
 public class <ModuleNnnnParameters> {
     <fields>
 
@@ -64,7 +68,7 @@ public class <ModuleNnnnParameters> {
 ```
 
 In the `org.opentripplanner.standalone.config` package there will be a class called 
-`ModuleNnnnConfig` that either extend the interface above or instantiate the POJO. The
+`ModuleNnnnConfig` that either extends the interface above or instantiates the POJO. The
 config class should map from JSON using the `NodeAdapter` into itself(extending the interface)
 or into the POJO.
 
