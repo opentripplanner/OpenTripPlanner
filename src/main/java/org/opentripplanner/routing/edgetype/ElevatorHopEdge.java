@@ -15,7 +15,7 @@ import java.util.Locale;
  * @author mattwigway
  *
  */
-public class ElevatorHopEdge extends Edge implements ElevatorEdge {
+public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
@@ -95,5 +95,10 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     @Override
     public String getName(Locale locale) {
         return this.getName();
+    }
+
+    @Override
+    public boolean isWheelchairAccessible() {
+        return wheelchairAccessible;
     }
 }

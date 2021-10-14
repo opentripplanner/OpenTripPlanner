@@ -5,8 +5,10 @@ import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.WheelchairEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +84,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             }
 
             // we build two transfers: one which is wheelchair accessible and one which isn't
-            nTransfersTotal += createTransfers(graph, nearbyStopFinder, true, ts0, pathwayDestinations);
-            nTransfersTotal += createTransfers(graph, nearbyStopFinder, false, ts0, pathwayDestinations);
+            nTransfersTotal += createTransfers(graph, nearbyStopFinder, ts0, pathwayDestinations);
         }
         LOG.info("Done connecting stops to one another. Created a total of {} transfers from {} stops.", nTransfersTotal, nLinkableStops);
         graph.hasDirectTransfers = true;
@@ -91,24 +92,34 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     /**
      * Create a set of transfers from the input TransitStop to all possible stops nearby. What is considered
-     * "nearby" is defined by the paramters radiusMeters.
+     * "nearby" is defined by radiusMeters.
      *
      * These transfers are also added to the graph.
      */
     private int createTransfers(
             Graph graph,
             NearbyStopFinder nearbyStopFinder,
-            boolean wheelchairAccessible,
             TransitStop ts0,
             Set<TransitStop> pathwayDestinations
     ) {
         /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
         int numTransfersCreated = 0;
-        for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, wheelchairAccessible)) {
+        for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, false)) {
+            boolean isWheelchairAccessible = sd.edges.stream()
+                    .filter(e -> e instanceof WheelchairEdge)
+                    .map(edge -> (WheelchairEdge) edge)
+                    .anyMatch(WheelchairEdge::isWheelchairAccessible);
             /* Skip the origin stop, loop transfers are not needed. */
             if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
-            new SimpleTransfer(ts0, sd.tstop, sd.dist, wheelchairAccessible, sd.geom, sd.edges);
+            new SimpleTransfer(ts0, sd.tstop, sd.dist, isWheelchairAccessible, sd.geom, sd.edges);
             numTransfersCreated++;
+
+            if(!isWheelchairAccessible) {
+                List<NearbyStopFinder.StopAtDistance> stops =
+                        nearbyStopFinder.findNearbyStopsViaStreets(ts0, sd.tstop.departVertex, true);
+                new SimpleTransfer(ts0, sd.tstop, sd.dist, isWheelchairAccessible, sd.geom, sd.edges);
+                numTransfersCreated++;
+            }
         }
         LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(),
                 numTransfersCreated

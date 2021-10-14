@@ -126,17 +126,20 @@ public class NearbyStopFinder {
         return useStreets ? findNearbyStopsViaStreets(vertex, wheelchairAccessible) : findNearbyStopsEuclidean(vertex);
     }
 
+    public List<StopAtDistance> findNearbyStopsViaStreets(Vertex originVertex, boolean wheelchairAccessible) {
+       return findNearbyStopsViaStreets(originVertex, null, wheelchairAccessible);
+    }
 
     /**
      * Return all stops within a certain radius of the given vertex, using network distance along streets.
      * If the origin vertex is a TransitStop, the result will include it.
      */
-    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex, boolean wheelchairAccessible) {
-
+    public List<StopAtDistance> findNearbyStopsViaStreets(Vertex originVertex, Vertex destinationVertex, boolean wheelchairAccessible) {
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
         routingRequest.wheelchairAccessible = wheelchairAccessible;
-        routingRequest.setRoutingContext(graph, originVertex, null);
+        // setting null as the destination vertex will lead to a radius search where all nearby stops are returned.
+        routingRequest.setRoutingContext(graph, originVertex, destinationVertex);
         ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();

@@ -48,7 +48,7 @@ import java.util.Set;
  * @author novalis
  * 
  */
-public class StreetEdge extends Edge implements Cloneable {
+public class StreetEdge extends Edge implements Cloneable, WheelchairEdge {
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
     private static final long serialVersionUID = 2L;
