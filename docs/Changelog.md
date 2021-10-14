@@ -53,6 +53,7 @@
 - Load additional data from GBFS and expose it [#3610](https://github.com/opentripplanner/OpenTripPlanner/pull/3610)
 - Allow transfers to use customizable request options [#3324](https://github.com/opentripplanner/OpenTripPlanner/issues/3324)
 - Fix NPE in NeTEx Booking Method mapping #3633 [#3633](https://github.com/opentripplanner/OpenTripPlanner/issues/3633)
+- Check boarding and alighting permissions in TransferGenerator [#3641](https://github.com/opentripplanner/OpenTripPlanner/pull/3641)
 - Refactor itinerary list filter chain [#3626](https://github.com/opentripplanner/OpenTripPlanner/pull/3626)
 - Stoptimes should return tripId on the REST API. [#3589](https://github.com/opentripplanner/OpenTripPlanner/issues/3589)
 
