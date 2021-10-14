@@ -113,13 +113,7 @@ public class GtfsModule implements GraphBuilderModule {
         // because the time zone from the first agency is cached
         graph.clearTimeZone();
 
-        CalendarServiceData calendarServiceData;
-        if (graph.hasService(CalendarServiceData.class)) {
-            graph.clearCachedCalenderService();
-            calendarServiceData = graph.getService(CalendarServiceData.class);
-        } else {
-            calendarServiceData = new CalendarServiceData();
-        }
+        CalendarServiceData calendarServiceData = graph.getCalendarDataService();
 
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
@@ -166,6 +160,7 @@ public class GtfsModule implements GraphBuilderModule {
             gtfsBundles.forEach(GtfsBundle::close);
         }
 
+        graph.clearCachedCalenderService();
         // We need to save the calendar service data so we can use it later
         graph.putService(
                 org.opentripplanner.model.calendar.CalendarServiceData.class,
