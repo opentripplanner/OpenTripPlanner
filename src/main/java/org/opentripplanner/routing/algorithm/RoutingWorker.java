@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.FilterTransitWhenDirectModeIsEmpty;
@@ -153,7 +153,7 @@ public class RoutingWorker {
             List<Itinerary> itineraries,
             Instant filterOnLatestDepartureTime
     ) {
-        ItineraryFilter filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
+        ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
             request,
             filterOnLatestDepartureTime,
             emptyDirectModeHandler.removeWalkAllTheWayResults(),
