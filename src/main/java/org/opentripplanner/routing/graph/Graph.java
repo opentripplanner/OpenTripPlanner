@@ -664,6 +664,10 @@ public class Graph implements Serializable {
         }
         return this.calendarService;
     }
+    
+    public void clearCachedCalenderService() {
+        this.calendarService = null;
+    }
 
     public int removeEdgelessVertices() {
         int removed = 0;

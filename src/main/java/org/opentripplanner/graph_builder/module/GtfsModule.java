@@ -113,7 +113,13 @@ public class GtfsModule implements GraphBuilderModule {
         // because the time zone from the first agency is cached
         graph.clearTimeZone();
 
-        CalendarServiceData calendarServiceData = new CalendarServiceData();
+        CalendarServiceData calendarServiceData;
+        if (graph.hasService(CalendarServiceData.class)) {
+            graph.clearCachedCalenderService();
+            calendarServiceData = graph.getService(CalendarServiceData.class);
+        } else {
+            calendarServiceData = new CalendarServiceData();
+        }
 
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {

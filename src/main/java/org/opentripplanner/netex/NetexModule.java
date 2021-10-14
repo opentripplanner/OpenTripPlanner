@@ -67,7 +67,13 @@ public class NetexModule implements GraphBuilderModule {
     ) {
 
         graph.clearTimeZone();
-        CalendarServiceData calendarServiceData = new CalendarServiceData();
+        CalendarServiceData calendarServiceData;
+        if (graph.hasService(CalendarServiceData.class)) {
+            graph.clearCachedCalenderService();
+            calendarServiceData = graph.getService(CalendarServiceData.class);
+        } else {
+            calendarServiceData = new CalendarServiceData();
+        }
 
         try {
             for (NetexBundle netexBundle : netexBundles) {
