@@ -202,11 +202,6 @@ public abstract class GraphPathToTripPlanConverter {
         if (itinerary.walkDistance > request.maxWalkDistance) {
             itinerary.walkLimitExceeded = true;
         }
-        itinerary.legs.forEach(leg -> {
-            if(leg.mode.equals("WALK") && request.wheelchairAccessible) {
-                leg.accessibilityScore = 0.5f;
-            }
-        });
         // Return itinerary
         return itinerary;
     }
@@ -253,6 +248,8 @@ public abstract class GraphPathToTripPlanConverter {
 
         fixupLegs(itinerary.legs, legsStates);
 
+        addAccessibilityScore(itinerary.legs, legsStates);
+
         itinerary.duration = lastState.getElapsedTimeSeconds();
         itinerary.startTime = makeCalendar(states[0]);
         itinerary.endTime = makeCalendar(lastState);
@@ -269,6 +266,22 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         return itinerary;
+    }
+
+    private static void addAccessibilityScore(List<Leg> legs, State[][] states) {
+        RoutingRequest request = states[0][0].getOptions();
+        for (int i = 0; i < legs.size(); i++) {
+            Leg currentLeg = legs.get(i);
+            if (currentLeg.isTransitLeg()) {
+                System.out.println(currentLeg);
+                Trip trip = states[i][states.length - 1].getBackTrip();
+                currentLeg.accessibilityScore =
+                        computeAccessibilityScore(trip, currentLeg, states[i][0].getOptions());
+            }
+            else if (currentLeg.mode.equals("WALK") && request.wheelchairAccessible) {
+                currentLeg.accessibilityScore = 0.5f;
+            }
+        }
     }
 
     private static Calendar makeCalendar(State state) {
@@ -417,12 +430,9 @@ public abstract class GraphPathToTripPlanConverter {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
-
-        // since this method also computes the accessibility scores it needs to be run after
-        // addPlaces() because the stop information is needed for this computation.
         addTripFields(leg, states, requestedLocale);
 
+        addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
@@ -858,7 +868,6 @@ public abstract class GraphPathToTripPlanConverter {
             leg.flexDrtDropOffMessage = trip.getDrtDropOffMessage();
             leg.flexFlagStopPickupMessage = trip.getContinuousPickupMessage();
             leg.flexFlagStopDropOffMessage = trip.getContinuousDropOffMessage();
-            leg.accessibilityScore = computeAccessibilityScore(trip, leg, states[states.length - 1].getOptions());
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
