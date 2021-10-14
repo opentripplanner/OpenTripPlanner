@@ -9,6 +9,7 @@ import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.model.ContactInfo;
 
 public class BookingArrangementType {
@@ -67,13 +68,19 @@ public class BookingArrangementType {
             .name("latestBookingTime")
             .description("Latest time the service can be booked. ISO 8601 timestamp")
             .type(gqlUtil.localTimeScalar)
-            .dataFetcher(environment -> ((bookingInfo(environment)).getLatestBookingTime().getTime()))
+            .dataFetcher(environment -> {
+              final BookingTime latestBookingTime = (bookingInfo(environment)).getLatestBookingTime();
+              return latestBookingTime == null ? null : latestBookingTime.getTime();
+            })
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("latestBookingDay")
             .description("How many days prior to the travel the service needs to be booked")
             .type(Scalars.GraphQLInt)
-            .dataFetcher(environment -> ((bookingInfo(environment)).getLatestBookingTime().getDaysPrior()))
+                .dataFetcher(environment -> {
+                  final BookingTime latestBookingTime = (bookingInfo(environment)).getLatestBookingTime();
+                  return latestBookingTime == null ? null : latestBookingTime.getDaysPrior();
+                })
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("minimumBookingPeriod")
