@@ -904,12 +904,24 @@ public abstract class GraphPathToTripPlanConverter {
             RoutingRequest options
     ) {
         if (options.wheelchairAccessible) {
-            float fromScore = computeAccessibilityScore(leg.from.wheelchairBoarding);
+            List<Float> scores = new ArrayList<>();
+
+            if(leg.interlineWithPreviousLeg == null || !leg.interlineWithPreviousLeg) {
+                float fromScore = computeAccessibilityScore(leg.from.wheelchairBoarding);
+                scores.add(fromScore);
+            }
+
             float toScore = computeAccessibilityScore(leg.to.wheelchairBoarding);
+            scores.add(toScore);
+
             float tripScore = computeAccessibilityScore(
                     WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible()));
+            scores.add(tripScore);
 
-            return (fromScore + toScore + tripScore) / 3;
+            // sadly there doesn't seem to be a mapToFloat, so we have to convert
+            double sum = scores.stream().mapToDouble(Float::doubleValue).sum();
+
+            return (float) sum / scores.size();
         }
         else {
             return null;
