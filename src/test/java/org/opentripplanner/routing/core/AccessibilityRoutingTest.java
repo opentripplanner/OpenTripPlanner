@@ -179,7 +179,10 @@ public class AccessibilityRoutingTest {
         GenericLocation start = new GenericLocation(33.75630, -84.39527);
         GenericLocation end = new GenericLocation(33.75649, -84.39580);
 
-        Itinerary i = getTripPlan(start, end, r -> r.setMode(TraverseMode.WALK)).itinerary.get(0);
+        Itinerary i = getTripPlan(start, end, r -> {
+            r.wheelchairStairsReluctance = 50;
+            r.setMode(TraverseMode.WALK);
+        }).itinerary.get(0);
         Leg leg = i.legs.get(0);
         assertEquals("WALK", leg.mode);
         assertThatPolylinesAreEqual("y_`mEnmbbObA}@U]{@wAIMEOMHwBz@^p@Zn@Zx@Ld@DJLd@?@", leg.legGeometry.getPoints());
