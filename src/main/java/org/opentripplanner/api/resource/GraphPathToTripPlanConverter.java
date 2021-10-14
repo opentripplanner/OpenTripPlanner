@@ -277,7 +277,8 @@ public abstract class GraphPathToTripPlanConverter {
         for (int i = 0; i < legs.size(); i++) {
             Leg currentLeg = legs.get(i);
             if (currentLeg.isTransitLeg()) {
-                Trip trip = states[i][states.length - 1].getBackTrip();
+                State[] legStates = states[i];
+                Trip trip = legStates[legStates.length - 1].getBackTrip();
                 Leg nextLeg = legs.get(i + 1);
                 currentLeg.accessibilityScore =
                         computeAccessibilityScore(trip, currentLeg, nextLeg, states[i][0].getOptions());
