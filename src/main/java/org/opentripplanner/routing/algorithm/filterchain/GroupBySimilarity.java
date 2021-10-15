@@ -31,7 +31,7 @@ import org.opentripplanner.model.base.ToStringBuilder;
  * Normally, we want some variation, so a good value to use for this parameter is the combined
  * cost of board- and alight-cost including indirect cost from board- and alight-slack.
  *
- * @see ItineraryFilterChainBuilder#addGroupBySimilarity(GroupBySimilarity)
+ * @see ItineraryListFilterChainBuilder#addGroupBySimilarity(GroupBySimilarity)
  */
 public class GroupBySimilarity {
 
