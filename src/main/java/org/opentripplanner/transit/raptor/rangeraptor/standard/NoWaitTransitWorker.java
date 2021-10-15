@@ -43,12 +43,12 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final int onTripIndex() {
+    public int onTripIndex() {
         return onTripIndex;
     }
 
     @Override
-    public final void prepareForTransitWith(RaptorTripPattern pattern) {
+    public void prepareForTransitWith(RaptorTripPattern pattern) {
         this.onTripIndex = NOT_SET;
         this.onTripBoardTime = NOT_SET;
         this.onTripBoardStop = NOT_SET;
@@ -57,7 +57,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final void alight(int stopIndex, int stopPos, ToIntFunction<T> getStopArrivalTime) {
+    public void alight(int stopIndex, int stopPos, ToIntFunction<T> getStopArrivalTime) {
         // attempt to alight if we're on board
         if (onTripIndex != NOT_SET) {
             // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
@@ -73,14 +73,14 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
+    public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
         if (state.isStopReachedInPreviousRound(stopIndex)) {
             prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
         }
     }
 
     @Override
-    public final void board(
+    public void board(
             final int stopIndex,
             final int earliestBoardTime,
             final RaptorTripScheduleBoardOrAlightEvent<T> result
@@ -95,7 +95,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final TransitArrival<T> previousTransit(int boardStopIndex) {
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
         return state.previousTransit(boardStopIndex);
     }
 }
