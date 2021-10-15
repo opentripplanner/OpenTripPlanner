@@ -139,7 +139,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
     public static final int TRIP_DURATION = EGRESS_END - ACCESS_START;
 
-    private static final RaptorTransfer ACCESS = walk(STOP_B, ACCESS_DURATION, ACCESS_COST);
+    private static final RaptorTransfer ACCESS = walk(STOP_A, ACCESS_DURATION, ACCESS_COST);
     private static final RaptorTransfer EGRESS = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
 
     public static final String LINE_11 = "L11";

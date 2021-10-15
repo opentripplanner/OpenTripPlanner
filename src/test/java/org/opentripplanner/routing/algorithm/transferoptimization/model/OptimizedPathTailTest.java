@@ -37,7 +37,8 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
             BasicPathTestCase.SLACK_PROVIDER,
             BasicPathTestCase.COST_CALCULATOR,
-            waitTimeCalc
+            waitTimeCalc,
+            this::stopIndexToName
     );
 
 
@@ -53,11 +54,11 @@ class OptimizedPathTailTest implements RaptorTestConstants {
         subject.addTransitAndTransferLeg(t1, tx12);
         subject.access(orgPath.accessLeg().access());
 
-        var exp = "Walk 3m15s ~ 2 "
-                + "~ BUS L11 10:04 10:35 ~ 2 "
-                + "~ Walk 2m ~ 3 "
-                + "~ BUS L21 11:00 11:23 ~ 4 "
-                + "~ BUS L31 11:40 11:52 ~ 5 "
+        var exp = "Walk 3m15s ~ A "
+                + "~ BUS L11 10:04 10:35 ~ B "
+                + "~ Walk 2m ~ C "
+                + "~ BUS L21 11:00 11:23 ~ D "
+                + "~ BUS L31 11:40 11:52 ~ E "
                 + "~ Walk 7m45s "
                 + "[$8019 $46pri $153.91wtc]";
 

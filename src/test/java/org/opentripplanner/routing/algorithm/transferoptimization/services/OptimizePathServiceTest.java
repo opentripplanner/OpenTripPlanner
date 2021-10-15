@@ -274,7 +274,8 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
                 TransferOptimizedFilterFactory.filter(
                         true,
                         waitTimeCalculator != null
-                )
+                ),
+                (new RaptorTestConstants(){})::stopIndexToName
         );
     }
 
