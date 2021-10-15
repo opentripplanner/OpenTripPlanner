@@ -8,13 +8,19 @@ import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
 public class PlanPlaceType {
 
   public static GraphQLObjectType create(
       GraphQLOutputType bikeRentalStationType,
+      GraphQLOutputType rentalVehicleType,
       GraphQLOutputType quayType
   ) {
     return GraphQLObjectType
@@ -57,19 +63,17 @@ public class PlanPlaceType {
             .name("quay")
             .description("The quay related to the place.")
             .type(quayType)
-            .dataFetcher(environment -> ((Place) environment.getSource()).stopId != null
-                ? GqlUtil.getRoutingService(environment)
-                .getStopForId(((Place) environment.getSource()).stopId) : null)
+            .dataFetcher(environment -> ((Place) environment.getSource()).stop instanceof Stop
+                ? ((Stop) ((Place) environment.getSource()).stop)
+                : null)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("flexibleArea")
             .description("The flexible area related to the place.")
             .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
-            .dataFetcher(environment -> ((Place) environment.getSource()).stopId != null
-                ? GqlUtil.getRoutingService(environment)
-                .getLocationById(((Place) environment.getSource()).stopId)
-                .getGeometry().getCoordinates()
+            .dataFetcher(environment -> ((Place) environment.getSource()).stop instanceof FlexStopLocation
+                ? ((FlexStopLocation) ((Place) environment.getSource()).stop).getGeometry().getCoordinates()
                 : null)
             .build())
         .field(GraphQLFieldDefinition
@@ -77,14 +81,20 @@ public class PlanPlaceType {
             .name("bikeRentalStation")
             .type(bikeRentalStationType)
             .description("The bike rental station related to the place")
-            .dataFetcher(environment -> {
-              return ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
-                  ? GqlUtil
-                  .getRoutingService(environment)
-                  .getVehicleRentalStationService()
-                  .getVehicleRentalStation(((Place) environment.getSource()).bikeShareId)
-                  : null;
-            })
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
+                    && ((Place) environment.getSource()).vehicleRentalStation instanceof VehicleRentalStation
+                ? ((Place) environment.getSource()).vehicleRentalStation
+                : null)
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("rentalVehicle")
+            .type(rentalVehicleType)
+            .description("The rental vehicle related to the place")
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
+                    && ((Place) environment.getSource()).vehicleRentalStation instanceof VehicleRentalVehicle
+                ? ((Place) environment.getSource()).vehicleRentalStation
+                : null)
             .build())
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("bikePark")

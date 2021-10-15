@@ -26,12 +26,41 @@ public class TestTripPattern implements RaptorTripPattern {
   }
 
   public static TestTripPattern pattern(String name, int ... stopIndexes) {
-    return new TestTripPattern(name, stopIndexes, null);
+    return new TestTripPattern(name, stopIndexes, new int[stopIndexes.length]);
   }
 
   /** Create a pattern with name 'R1' and given stop indexes */
   public static TestTripPattern pattern(int ... stopIndexes) {
     return new TestTripPattern("R1", stopIndexes, new int[stopIndexes.length]);
+  }
+
+  /**
+   * Codes:
+   *   B : Board
+   *   A : Alight
+   *   W : Wheelchair
+   *   * : Board, Alight, Wheelchair
+   *
+   * Example:   B BA * AW
+   */
+  public void restrictions(String codes) {
+    String[] split = codes.split(" ");
+    for (int i = 0; i < split.length; i++) {
+      String restriction = split[i];
+      restrictions[i] = 0;
+      if (restriction.contains("*")) {
+        continue;
+      }
+      if (!restriction.contains("B")) {
+        restrictions[i] |= BOARDING_MASK;
+      }
+      if (!restriction.contains("A")) {
+        restrictions[i] |= ALIGHTING_MASK;
+      }
+      if (!restriction.contains("W")) {
+        restrictions[i] |= WHEELCHAIR_MASK;
+      }
+    }
   }
 
   @Override public int stopIndex(int stopPositionInPattern) {

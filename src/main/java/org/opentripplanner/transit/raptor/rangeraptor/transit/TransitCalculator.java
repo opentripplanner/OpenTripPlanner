@@ -5,10 +5,11 @@ import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -157,11 +158,11 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
 
     /**
-     * Return a guaranteed transfer provider for the given pattern. When searching forward the
+     * Return a transfer provider for the given pattern. When searching forward the
      * given {@code target} is the TO pattern/stop, while when searching in reverse the given
      * target is the FROM pattern/stop.
      */
-    RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route);
+    RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(RaptorRoute<T> route);
 
     /**
      * Return a calculator for test purpose. The following parameters are fixed:
@@ -190,4 +191,17 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
                         60
                 );
     }
+
+    /**
+     * Return {@code true} if it is allowed/possible to board at a particular stop index, on a
+     * normal search. For a backwards search, it checks for alighting instead. This should include
+     * checks like: Does the pattern allow boarding at the given stop? Is this accessible to
+     * wheelchairs (if requested).
+     */
+    boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos);
+
+    /**
+     * Same as {@link #boardingPossibleAt(RaptorTripPattern, int)}, but for switched alighting/boarding.
+     */
+    boolean alightingPossibleAt(RaptorTripPattern pattern, int stopPos);
 }

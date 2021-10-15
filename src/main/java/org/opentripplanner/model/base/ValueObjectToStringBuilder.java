@@ -26,7 +26,7 @@ public class ValueObjectToStringBuilder {
     private static final String FIELD_SEPARATOR = " ";
 
     private final StringBuilder sb = new StringBuilder();
-    private final NumberFormat numFormat = new NumberFormat();
+    private final OtpNumberFormat numFormat = new OtpNumberFormat();
 
     boolean skipSep = true;
     boolean skipNull = false;
@@ -134,7 +134,7 @@ public class ValueObjectToStringBuilder {
      * Add time in seconds since midnight. Format:  HH:mm:ss. Ignore if not set.
      */
     public  ValueObjectToStringBuilder addServiceTime(int secondsPastMidnight, int notSet) {
-        return addIt(TimeUtils.timeToStrLong(secondsPastMidnight, notSet));
+        return addIt(TimeUtils.timeToStrCompact(secondsPastMidnight, notSet));
     }
 
     /**
@@ -144,6 +144,13 @@ public class ValueObjectToStringBuilder {
      */
     public ValueObjectToStringBuilder addDuration(Integer durationSeconds) {
         return addIt(durationSeconds, DurationUtils::durationToStr);
+    }
+
+    /**
+     * Add  a cost in the format $N.NN or $N (id decimals are zero)
+     */
+    public ValueObjectToStringBuilder addCost(Integer cost) {
+        return addIt(cost, OtpNumberFormat::formatCost);
     }
 
     @Override

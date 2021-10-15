@@ -1,19 +1,19 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.util.time.DurationUtils;
@@ -41,11 +41,12 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
+    private static final int ZERO = 0;
     public static final double WAIT_RELUCTANCE = 0.8;
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
     // The COST_CALCULATOR is not under test, so we use it to calculate correct cost values.
-    public static final DefaultCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+    public static final DefaultCostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, null, null
     );
 
@@ -77,8 +78,10 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
     // Wait at least 1m45s (45s BOARD_SLACK and 60s TRANSFER_SLACK)
     public static final int L1_TRANSIT_DURATION = L1_END - L1_START;
-    public static final int L1_COST_EX_WAIT = COST_CALCULATOR.transitArrivalCost(
-            false, STOP_B, 0, L1_TRANSIT_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_C
+    public static final int L1_COST_EX_WAIT =
+            COST_CALCULATOR.transitArrivalCost(
+                    COST_CALCULATOR.boardCost(false, ZERO, STOP_B),
+                    ZERO, L1_TRANSIT_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_C
     );
     // Transfers (C ~ Walk 2m ~ D) (Used in Case B only)
     public static final int TX2_START = time("10:20:15");
@@ -157,7 +160,6 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     }
 
     public static String flexCaseBWithOpeningHoursForwardSearchAsText() {
-
         return flexCaseBWithOpeningHours(L1_COST_INC_WAIT_W_OPENING_HOURS_B);
     }
 
@@ -220,8 +222,8 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     private static String flexCaseAText() {
         //assertEquals(TOT_COST_A, accessCost + 996 + egressCost);
         return String.format(
-                "Flex 5m15s 1x 10:01 10:06:15 %s ~ 1 1m45s ~ "
-                        + "BUS A 10:08 10:20 12m $996.00 ~ 4 1m15s ~ "
+                "Flex 5m15s 1x 10:01 10:06:15 %s ~ A 1m45s ~ "
+                        + "BUS A 10:08 10:20 12m $996 ~ D 1m15s ~ "
                         + "Flex 6m 1x 10:21:15 10:27:15 %s "
                         + "[10:01 10:27:15 26m15s %s]",
                 RaptorCostConverter.toString(ACCESS_COST),
@@ -233,8 +235,8 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     private static String flexCaseAWithOpeningHours(int busCost) {
         //assertEquals(TOT_COST_W_OPENING_HOURS_A, accessCost + busCost + egressCost);
         return String.format(
-                "Flex 5m15s 1x 9:50 9:55:15 %s ~ 1 12m45s ~ "
-                        + "BUS A 10:08 10:20 12m %s ~ 4 10m ~ "
+                "Flex 5m15s 1x 9:50 9:55:15 %s ~ A 12m45s ~ "
+                        + "BUS A 10:08 10:20 12m %s ~ D 10m ~ "
                         + "Flex 6m 1x 10:30 10:36 %s "
                         + "[9:50 10:36 46m %s]",
                 RaptorCostConverter.toString(ACCESS_COST),
@@ -246,10 +248,10 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
     private static String flexCaseBText() {
         return String.format(
-                "Flex 5m15s 1x 10:00 10:05:15 %s ~ 1 0s ~ "
-                        + "Walk 1m 10:05:15 10:06:15 $120.00 ~ 2 1m45s ~ "
-                        + "BUS B 10:08 10:20 12m $996.00 ~ 3 15s ~ "
-                        + "Walk 2m 10:20:15 10:22:15 $240.00 ~ 4 1m ~ "
+                "Flex 5m15s 1x 10:00 10:05:15 %s ~ A 0s ~ "
+                        + "Walk 1m 10:05:15 10:06:15 $120 ~ B 1m45s ~ "
+                        + "BUS B 10:08 10:20 12m $996 ~ C 15s ~ "
+                        + "Walk 2m 10:20:15 10:22:15 $240 ~ D 1m ~ "
                         + "Flex 6m 1x 10:23:15 10:29:15 %s"
                         + " [10:00 10:29:15 29m15s %s]",
                 RaptorCostConverter.toString(ACCESS_COST),
@@ -261,10 +263,10 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     private static String flexCaseBWithOpeningHours(int busCost) {
         //assertEquals(TOT_COST_W_OPENING_HOURS_B, accessCost + 12000 + busCost + 24000 + egressCost);
         return String.format(
-                "Flex 5m15s 1x 9:50 9:55:15 %s ~ 1 0s ~ "
-                        + "Walk 1m 9:55:15 9:56:15 $120.00 ~ 2 11m45s ~ "
-                        + "BUS B 10:08 10:20 12m %s ~ 3 15s ~ "
-                        + "Walk 2m 10:20:15 10:22:15 $240.00 ~ 4 7m45s ~ "
+                "Flex 5m15s 1x 9:50 9:55:15 %s ~ A 0s ~ "
+                        + "Walk 1m 9:55:15 9:56:15 $120 ~ B 11m45s ~ "
+                        + "BUS B 10:08 10:20 12m %s ~ C 15s ~ "
+                        + "Walk 2m 10:20:15 10:22:15 $240 ~ D 7m45s ~ "
                         + "Flex 6m 1x 10:30 10:36 %s"
                         + " [9:50 10:36 46m %s]",
                 RaptorCostConverter.toString(ACCESS_COST),

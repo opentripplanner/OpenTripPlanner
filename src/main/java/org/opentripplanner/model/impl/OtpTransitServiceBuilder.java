@@ -40,7 +40,7 @@ import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +99,7 @@ public class OtpTransitServiceBuilder {
 
     private final EntityById<FareZone> fareZonesById = new EntityById<>();
 
-    private final List<Transfer> transfers = new ArrayList<>();
+    private final List<ConstrainedTransfer> transfers = new ArrayList<>();
 
     private final EntityById<Trip> tripsById = new EntityById<>();
 
@@ -206,7 +206,7 @@ public class OtpTransitServiceBuilder {
 
     public EntityById<FareZone> getFareZonesById() { return fareZonesById; }
 
-    public List<Transfer> getTransfers() {
+    public List<ConstrainedTransfer> getTransfers() {
         return transfers;
     }
 
@@ -337,7 +337,7 @@ public class OtpTransitServiceBuilder {
     }
 
     /** Return {@code true} if the from/to trip reference is none null, but do not exist. */
-    private boolean transferTripsDoesNotExist(Transfer t) {
+    private boolean transferTripsDoesNotExist(ConstrainedTransfer t) {
         return transferTripPointDoesNotExist(t.getFrom())
             || transferTripPointDoesNotExist(t.getTo());
     }

@@ -445,24 +445,22 @@ public abstract class GraphPathToItineraryMapper {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
-        Stop firstStop = firstVertex instanceof TransitStopVertex ?
-                ((TransitStopVertex) firstVertex).getStop(): null;
-        Stop lastStop = lastVertex instanceof TransitStopVertex ?
-                ((TransitStopVertex) lastVertex).getStop(): null;
-
-        leg.from = makePlace(firstVertex, firstStop, requestedLocale);
-        leg.to = makePlace(lastVertex, lastStop, requestedLocale);
+        leg.from = makePlace(firstVertex, requestedLocale);
+        leg.to = makePlace(lastVertex, requestedLocale);
     }
 
     /**
      * Make a {@link Place} to add to a {@link Leg}.
      *
      * @param vertex The {@link Vertex} at the {@link State}.
-     * @param stop The {@link Stop} associated with the {@link Vertex}.
      * @param requestedLocale The locale to use for all text attributes.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(Vertex vertex, Stop stop, Locale requestedLocale) {
+    private static Place makePlace(Vertex vertex, Locale requestedLocale) {
+        if (vertex instanceof TransitStopVertex) {
+            return new Place(((TransitStopVertex) vertex).getStop());
+        }
+
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
@@ -477,15 +475,10 @@ public abstract class GraphPathToItineraryMapper {
                 name
         );
 
-        if (vertex instanceof TransitStopVertex) {
-            place.stopId = stop.getId();
-            place.stopCode = stop.getCode();
-            place.platformCode = stop.getPlatformCode();
-            place.zoneId = stop.getFirstZoneAsString();
-            place.vertexType = VertexType.TRANSIT;
-        } else if(vertex instanceof VehicleRentalStationVertex) {
-            place.bikeShareId = ((VehicleRentalStationVertex) vertex).getId();
-            LOG.trace("Added bike share Id {} to place", place.bikeShareId);
+
+        if (vertex instanceof VehicleRentalStationVertex) {
+            place.vehicleRentalStation = ((VehicleRentalStationVertex) vertex).getStation();
+            LOG.trace("Added bike share Id {} to place", place.vehicleRentalStation.getId());
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
             place.vertexType = VertexType.BIKEPARK;

@@ -13,7 +13,7 @@ public class VehicleRentalStationInfo {
     public Double lat, lon;
     
     public VehicleRentalStationInfo(VehicleRentalStationVertex vertex) {
-        id = vertex.getId().getId();
+        id = vertex.getStation().getStationId();
         name = vertex.getName();
         lat = vertex.getLat();
         lon = vertex.getLon();

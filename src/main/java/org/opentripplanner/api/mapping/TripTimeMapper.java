@@ -35,6 +35,7 @@ public class TripTimeMapper {
         api.realtimeState      = ApiRealTimeState.RealTimeState(domain.getRealtimeState());
         api.blockId            = domain.getBlockId();
         api.headsign           = domain.getHeadsign();
+        api.tripId             = FeedScopedIdMapper.mapToApi(domain.getTrip().getId());
 
         return api;
     }

@@ -7,8 +7,8 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.util.time.DurationUtils.duration;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 
 public class TransferWaitTimeCalculatorTest {
   private static final double WAIT_RELUCTANCE = 0.5;

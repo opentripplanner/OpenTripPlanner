@@ -3,10 +3,11 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
@@ -132,14 +133,22 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route) {
-        return route.getGuaranteedTransfersFrom();
+    public RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(RaptorRoute<T> route) {
+        return route.transferConstraintsReverseSearch();
     }
 
     @Override
-    public final TripScheduleSearch<T> createTripSearch(
-            RaptorTimeTable<T> timeTable
-    ) {
+    public boolean alightingPossibleAt(RaptorTripPattern pattern, int stopPos) {
+        return pattern.boardingPossibleAt(stopPos);
+    }
+
+    @Override
+    public boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos) {
+        return pattern.alightingPossibleAt(stopPos);
+    }
+
+    @Override
+    public final TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
         return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, timeTable);
     }
 

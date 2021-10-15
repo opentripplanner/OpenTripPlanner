@@ -7,13 +7,11 @@ import java.util.Collection;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
-import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -48,7 +46,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     protected final RaptorTransitDataProvider<T> transit;
 
     private final TransitCalculator<T> calculator;
-    private final CostCalculator<T> costCalculator;
+    private final CostCalculator costCalculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final PathMapper<T> pathMapper;
@@ -68,10 +66,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.transit = transit;
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
-        this.costCalculator = createCostCalculator(
-            transit.stopBoarAlightCost(),
-            request.multiCriteriaCostFactors()
-        );
+        this.costCalculator = transit.multiCriteriaCostCalculator();
         this.roundTracker = new RoundTracker(
             nRounds(),
             request.searchParams().numberOfAdditionalTransfers(),
@@ -143,7 +138,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return pathMapper;
     }
 
-    public CostCalculator<T> costCalculator() {
+    public CostCalculator costCalculator() {
         return costCalculator;
     }
 
@@ -189,11 +184,11 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return publisher;
     }
 
-    public boolean enableGuaranteedTransfers() {
+    public boolean enableConstrainedTransfers() {
         if(profile().isOneOf(RaptorProfile.BEST_TIME, RaptorProfile.NO_WAIT_BEST_TIME)) {
             return false;
         }
-        return searchParams().guaranteedTransfersEnabled();
+        return searchParams().constrainedTransfersEnabled();
     }
 
     /* private methods */
@@ -242,15 +237,5 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return request.searchDirection().isForward()
                 ? new ForwardPathMapper<>(request.slackProvider(), lifeCycle)
                 : new ReversePathMapper<>(request.slackProvider(), lifeCycle);
-    }
-
-    private CostCalculator<T> createCostCalculator(int[] stopVisitCost, McCostParams f) {
-        return new DefaultCostCalculator<T>(
-                f.boardCost(),
-                f.transferCost(),
-                f.waitReluctanceFactor(),
-                stopVisitCost,
-                f.transitReluctanceFactors()
-        );
     }
 }

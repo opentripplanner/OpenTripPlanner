@@ -1,7 +1,20 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.DoubleFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
@@ -25,20 +38,6 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.Duration;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.DoubleFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 
 public class TransmodelGraphQLPlanner {
 
@@ -69,8 +68,7 @@ public class TransmodelGraphQLPlanner {
             throw new GraphQLException(msg, e);
         }
         catch (Exception e) {
-            LOG.warn("System error");
-            LOG.error("Root cause: " + e.getMessage(), e);
+            LOG.error("System error: " + e.getMessage(), e);
             PlannerError error = new PlannerError();
             error.setMsg(Message.SYSTEM_ERROR);
             response.messages.add(error.message);
