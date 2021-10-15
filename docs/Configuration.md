@@ -692,9 +692,14 @@ The order of transfer priority is:
 5. ALLOWED
 6. NOT_ALLOWED
 
-If two paths have the same priority level, then we break the tie by looking at waiting time. The goal is to maximize the wait time, avoiding situations where very little time is available to make the transfer. This is balanced with the generalized cost. The cost is adjusted with a new cost for the wait-time. The new wait-time cost follows an inverse logarithmic cost function (see the design doc). 
+If two paths have the same priority level, then we break the tie by looking at waiting time. The
+goal is to maximize the wait time, avoiding situations where there is little time available to make
+the transfer. This is balanced with the generalized-cost. The cost is adjusted with a new cost for
+the wait-time. The new wait-time cost follows an inverse logarithmic cost function (see the design
+doc).
 
-The defaults should work fine, but if you have results with "back-travel" try increasing the two parameters `minSafeWaitTimeFactor` and `inverseWaitReluctance`.
+The defaults should work fine, but if you have results with "back-travel" try increasing
+the `minSafeWaitTimeFactor`.
 
 ```JSON
 // router-config.json
@@ -702,8 +707,7 @@ The defaults should work fine, but if you have results with "back-travel" try in
   "routingDefaults": {
     "transferOptimization": {
       "optimizeTransferWaitTime": true,
-      "minSafeWaitTimeFactor": 5.0,
-      "inverseWaitReluctance": 1.0
+      "minSafeWaitTimeFactor": 5.0
     }
   }
 }

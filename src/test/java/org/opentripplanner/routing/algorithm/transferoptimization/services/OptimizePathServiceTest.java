@@ -45,7 +45,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
     );
 
     private static final TransferWaitTimeCalculator TRANS_WAIT_TIME_CALC =
-            new TransferWaitTimeCalculator(WAIT_RELUCTANCE, WAIT_RELUCTANCE, 2.0);
+            new TransferWaitTimeCalculator(2.0);
 
     static TestPathBuilder pathBuilder() {
         return new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);

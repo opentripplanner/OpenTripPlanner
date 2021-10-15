@@ -134,11 +134,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   }
 
   private TransferWaitTimeCalculator createTransferWaitTimeCalculator() {
-    return new TransferWaitTimeCalculator(
-            config.waitReluctanceRouting(),
-            config.inverseWaitReluctance(),
-            config.minSafeWaitTimeFactor()
-    );
+    return new TransferWaitTimeCalculator(config.minSafeWaitTimeFactor());
   }
 
   private MinCostFilterChain<OptimizedPathTail<T>> createTransferOptimizedFilter(
