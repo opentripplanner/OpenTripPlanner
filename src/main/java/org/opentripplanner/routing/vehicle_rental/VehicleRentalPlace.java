@@ -33,7 +33,7 @@ public interface VehicleRentalPlace {
     int getSpacesAvailable();
 
     /** Number of total docking points installed at this station, both available and unavailable.  */
-    int getCapacity();
+    Integer getCapacity();
 
     /** Does the place allow dropping off vehicles */
     boolean isAllowDropoff();

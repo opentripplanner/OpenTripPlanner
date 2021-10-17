@@ -94,7 +94,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     }
 
     @Override
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 
