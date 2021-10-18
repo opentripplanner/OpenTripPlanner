@@ -6,6 +6,9 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
@@ -469,7 +472,11 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<String> name();
 
+        public DataFetcher<VehicleRentalVehicle> rentalVehicle();
+
         public DataFetcher<Object> stop();
+
+        public DataFetcher<VehicleRentalStation> vehicleRentalStation();
 
         public DataFetcher<String> vertexType();
     }
@@ -551,6 +558,10 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<RoutingResponse> plan();
 
+        public DataFetcher<VehicleRentalVehicle> rentalVehicle();
+
+        public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles();
+
         public DataFetcher<Route> route();
 
         public DataFetcher<Iterable<Route>> routes();
@@ -575,7 +586,35 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Iterable<Trip>> trips();
 
+        public DataFetcher<VehicleRentalStation> vehicleRentalStation();
+
+        public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
+
         public DataFetcher<Object> viewer();
+    }
+
+    /**
+     * Rental vehicle represents a vehicle that belongs to a rental network.
+     */
+    public interface LegacyGraphQLRentalVehicle {
+
+        public DataFetcher<Boolean> allowPickupNow();
+
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+
+        public DataFetcher<Double> lat();
+
+        public DataFetcher<Double> lon();
+
+        public DataFetcher<String> name();
+
+        public DataFetcher<String> network();
+
+        public DataFetcher<Boolean> operative();
+
+        public DataFetcher<VehicleRentalStationUris> rentalUris();
+
+        public DataFetcher<String> vehicleId();
     }
 
     /**
@@ -818,6 +857,55 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<String> tripShortName();
 
         public DataFetcher<Object> wheelchairAccessible();
+    }
+
+    /**
+     * Vehicle rental station represents a location where users can rent bicycles etc. for a fee.
+     */
+    public interface LegacyGraphQLVehicleRentalStation {
+
+        public DataFetcher<Boolean> allowDropoff();
+
+        public DataFetcher<Boolean> allowDropoffNow();
+
+        public DataFetcher<Boolean> allowOverloading();
+
+        public DataFetcher<Boolean> allowPickup();
+
+        public DataFetcher<Boolean> allowPickupNow();
+
+        public DataFetcher<Integer> capacity();
+
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+
+        public DataFetcher<Double> lat();
+
+        public DataFetcher<Double> lon();
+
+        public DataFetcher<String> name();
+
+        public DataFetcher<String> network();
+
+        public DataFetcher<Boolean> operative();
+
+        public DataFetcher<Boolean> realtime();
+
+        public DataFetcher<VehicleRentalStationUris> rentalUris();
+
+        public DataFetcher<Integer> spacesAvailable();
+
+        public DataFetcher<String> stationId();
+
+        public DataFetcher<Integer> vehiclesAvailable();
+    }
+
+    public interface LegacyGraphQLVehicleRentalUris {
+
+        public DataFetcher<String> android();
+
+        public DataFetcher<String> ios();
+
+        public DataFetcher<String> web();
     }
 
     public interface LegacyGraphQLDebugOutput {

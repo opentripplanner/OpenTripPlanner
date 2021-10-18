@@ -32,6 +32,9 @@ config:
     BikePark: org.opentripplanner.routing.bike_park.BikePark#BikePark
     BikeRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace#VehicleRentalPlace
     BikeRentalStationUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
+    VehicleRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalStation#VehicleRentalStation
+    RentalVehicle: org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle#VehicleRentalVehicle
+    VehicleRentalUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
     BikesAllowed: String
     BookingInfo: org.opentripplanner.model.BookingInfo
     BookingTime: org.opentripplanner.model.BookingTime

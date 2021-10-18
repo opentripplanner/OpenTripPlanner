@@ -315,6 +315,120 @@ type BikeRentalStation implements Node & PlaceInterface {
     operative: Boolean
 }
 
+"""
+Vehicle rental station represents a location where users can rent bicycles etc. for a fee.
+"""
+type VehicleRentalStation implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the vehicle in the format of network:id"""
+    stationId: String
+
+    """Name of the vehicle rental station"""
+    name: String!
+
+    """
+    Number of vehicles currently available on the rental station.
+    See field `allowPickupNow` to know if is currently possible to pick up a vehicle.
+    """
+    vehiclesAvailable: Int
+
+    """
+    Number of free spaces currently available on the rental station.
+    Note that this value being 0 does not necessarily indicate that vehicles cannot be returned
+    to this station, as for example it might be possible to leave the vehicle in the vicinity of
+    the rental station, even if the vehicle racks don't have any spaces available.
+    See field `allowDropoffNow` to know if is currently possible to return a vehicle.
+    """
+    spacesAvailable: Int
+
+    """
+    If true, values of `vehiclesAvailable` and `spacesAvailable` are updated from a
+    real-time source. If false, values of `vehiclesAvailable` and `spacesAvailable`
+    are always the total capacity divided by two.
+    """
+    realtime: Boolean
+
+    """
+    If true, vehicles can be returned to this station if the station has spaces available
+    or allows overloading.
+    """
+    allowDropoff: Boolean
+
+    """
+    If true, vehicles can be picked up from this station if the station has vehicles available.
+    """
+    allowPickup: Boolean
+
+    """If true, vehicles can be currently returned to this station."""
+    allowDropoffNow: Boolean
+
+    """If true, vehicles can be currently picked up from this station."""
+    allowPickupNow: Boolean
+
+    """ID of the rental network."""
+    network: String
+
+    """Longitude of the vehicle rental station (WGS 84)"""
+    lon: Float
+
+    """Latitude of the vehicle rental station (WGS 84)"""
+    lat: Float
+
+    """Nominal capacity (number of racks) of the rental station."""
+    capacity: Int
+
+    """If true, vehicles can be returned even if spacesAvailable is zero or vehicles > capacity."""
+    allowOverloading: Boolean
+
+    """Platform-specific URLs to begin renting a vehicle from this station."""
+    rentalUris: VehicleRentalUris
+
+    """
+    If true, station is on and in service.
+    """
+    operative: Boolean
+}
+
+"""
+Rental vehicle represents a vehicle that belongs to a rental network.
+"""
+type RentalVehicle implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the vehicle in the format of network:id"""
+    vehicleId: String
+
+    """Name of the vehicle"""
+    name: String!
+
+    """If true, vehicle is currently available for renting."""
+    allowPickupNow: Boolean
+
+    """ID of the rental network."""
+    network: String
+
+    """Longitude of the vehicle (WGS 84)"""
+    lon: Float
+
+    """Latitude of the vehicle (WGS 84)"""
+    lat: Float
+
+    """Platform-specific URLs to begin the vehicle."""
+    rentalUris: VehicleRentalUris
+
+    """
+    If true, vehicle is not disabled.
+    """
+    operative: Boolean
+}
+
 type BikeRentalStationUris {
     """
     A URI that can be passed to an Android app with an {@code android.intent.action.VIEW} Android
@@ -332,6 +446,27 @@ type BikeRentalStationUris {
     """
     A URL that can be used by a web browser to show more information about renting a vehicle at
     this station.
+    May be {@code null} if a rental URL does not exist.
+    """
+    web: String
+}
+
+type VehicleRentalUris {
+    """
+    A URI that can be passed to an Android app with an {@code android.intent.action.VIEW} Android
+    intent to support Android Deep Links.
+    May be null if a rental URI does not exist.
+    """
+    android: String
+
+    """
+    A URI that can be used on iOS to launch the rental app for this rental network.
+    May be {@code null} if a rental URI does not exist.
+    """
+    ios: String
+
+    """
+    A URL that can be used by a web browser to show more information about renting a vehicle.
     May be {@code null} if a rental URL does not exist.
     """
     web: String
@@ -600,7 +735,7 @@ input InputFilters {
     """Routes to include by GTFS id."""
     routes: [String]
 
-    """Bike rentals to include by id."""
+    """Bike rentals to include by id (without network identifier)."""
     bikeRentalStations: [String]
 
     """Bike parks to include by id."""
@@ -1126,7 +1261,13 @@ type Place {
     stop: Stop
 
     """The bike rental station related to the place"""
-    bikeRentalStation: BikeRentalStation
+    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+
+    """The vehicle rental station related to the place"""
+    vehicleRentalStation: VehicleRentalStation
+
+    """The rental vehicle related to the place"""
+    rentalVehicle: RentalVehicle
 
     """The bike parking related to the place"""
     bikePark: BikePark
@@ -1558,12 +1699,42 @@ type QueryType {
         the returned list will contain `null` values.
         """
         ids: [String]
-    ): [BikeRentalStation]
+    ): [BikeRentalStation] @deprecated(reason: "Use rentalVehicles or vehicleRentalStations instead")
 
     """
     Get a single bike rental station based on its ID, i.e. value of field `stationId`
     """
-    bikeRentalStation(id: String!): BikeRentalStation
+    bikeRentalStation(id: String!): BikeRentalStation @deprecated(reason: "Use rentalVehicle or vehicleRentalStation instead")
+
+    """Get all rental vehicles"""
+    rentalVehicles(
+        """
+        Return rental vehicles with these ids, i.e. value of field `vehicleId`.
+        **Note:** if an id is invalid (or the rental service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [RentalVehicle]
+
+    """
+    Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`
+    """
+    rentalVehicle(id: String!): RentalVehicle
+
+    """Get all vehicle rental stations"""
+    vehicleRentalStations(
+        """
+        Return vehicle rental stations with these ids, i.e. value of field `stationId`.
+        **Note:** if an id is invalid (or the rental service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [VehicleRentalStation]
+
+    """
+    Get a single vehicle rental station based on its ID, i.e. value of field `stationId`
+    """
+    vehicleRentalStation(id: String!): VehicleRentalStation
 
     """Get all bike parks"""
     bikeParks: [BikePark]
