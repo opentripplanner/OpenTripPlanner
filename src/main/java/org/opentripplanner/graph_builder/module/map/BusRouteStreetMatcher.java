@@ -58,7 +58,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
 
         for (Route route : allRoutes) {
             for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
-                if (pattern.getMode() == TransitMode.BUS) {
+                if (pattern.getMode().isBus()) {
                     /* we can only match geometry to streets on bus routes */
                     log.debug("Matching {}", pattern);
                     //If there are no shapes in GTFS pattern geometry is generated
