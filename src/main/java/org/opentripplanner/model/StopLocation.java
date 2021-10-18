@@ -3,6 +3,8 @@ package org.opentripplanner.model;
 import java.util.Collection;
 import java.util.List;
 
+import org.locationtech.jts.geom.GeometryCollection;
+
 /**
  * A StopLocation describes a place where a vehicle can be boarded or alighted, which is not
  * necessarily a marked stop, but can be of other shapes, such as a service area for flexible
@@ -47,5 +49,15 @@ public interface StopLocation {
    * the centroid of an area or line.
    */
   WgsCoordinate getCoordinate();
+
+  /**
+   * The geometry of the stop.
+   *
+   * For fixed-schedule stops this will return the same data as
+   * getCoordinate().
+   *
+   * For flex stops this will return the geometries of the stop or group of stops.
+   */
+  GeometryCollection getGeometries();
 
 }

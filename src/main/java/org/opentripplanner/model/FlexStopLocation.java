@@ -1,7 +1,9 @@
 package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the
@@ -52,6 +54,11 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   public WgsCoordinate getCoordinate() {
     Point centroid = geometry.getCentroid();
     return new WgsCoordinate(centroid.getY(), centroid.getX());
+  }
+
+  @Override
+  public GeometryCollection getGeometries() {
+    return GeometryUtils.makeCollection(geometry);
   }
 
   @Override

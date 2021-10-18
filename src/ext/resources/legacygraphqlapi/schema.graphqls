@@ -837,6 +837,13 @@ type Geometry {
     points: Polyline
 }
 
+scalar GeoJson
+
+type StopGeometries {
+    geoJson: GeoJson,
+    geometries: [Geometry]
+}
+
 input InputBanned {
     """A comma-separated list of banned route ids"""
     routes: String
@@ -2475,6 +2482,14 @@ type Stop implements Node & PlaceInterface {
 
     """Longitude of the stop (WGS 84)"""
     lon: Float
+
+    """
+    GeoJSON representation of this stop's geometry. This is interesting for flex stops which can be
+    a polygon or a group stops either with points with polygons.
+
+    Regular fixed-schedule stops return a single point.
+    """
+    geoJson: GeoJson
 
     """Stop code which is visible at the stop"""
     code: String

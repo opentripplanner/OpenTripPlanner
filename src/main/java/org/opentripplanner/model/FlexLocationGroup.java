@@ -51,6 +51,11 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     return null;
   }
 
+  @Override
+  public GeometryCollection getGeometries() {
+    return geometry;
+  }
+
   /**
    * Adds a new location to the location group.
    * This should ONLY be used during the graph build process.

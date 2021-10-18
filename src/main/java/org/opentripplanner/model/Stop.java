@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
@@ -125,5 +127,10 @@ public final class Stop extends StationElement implements StopLocation {
 
   public Collection<FareZone> getFareZones() {
     return Collections.unmodifiableCollection(fareZones);
+  }
+
+  @Override
+  public GeometryCollection getGeometries() {
+    return GeometryUtils.makeCollection(getCoordinate());
   }
 }
