@@ -44,7 +44,7 @@ class AreaVisibilityAdjuster {
 
     // Do not connect to area boundary unless vertex is inside area
     if (originalEdges == null || !originalEdges.contains(splitPoint)) {
-	return;
+        return;
     }
 
     for (AreaEdge areaEdge : area.getEdges()) {
@@ -57,7 +57,7 @@ class AreaVisibilityAdjuster {
       if (vertex instanceof StreetVertex && !vertex.equals(splitterVertex)) {
         LineString line = GEOMETRY_FACTORY.createLineString(
             new Coordinate[] {
-	      splitCoord,
+              splitCoord,
               vertex.getCoordinate()
         });
         double length = SphericalDistanceLibrary.distance(
@@ -68,22 +68,22 @@ class AreaVisibilityAdjuster {
         NamedArea okArea = null;
         Geometry polygon;
 
-	// Create connection if the line is completely inside a single area.
-	// This can be tested simply by verifying that intersection with the area
-	// does not remove any part of the connecting line
+        // Create connection if the line is completely inside a single area.
+        // This can be tested simply by verifying that intersection with the area
+        // does not remove any part of the connecting line
         for (NamedArea a : area.getAreas()) {
             polygon = a.getPolygon();
             Geometry intersection = line.intersection(polygon);
             if (intersection instanceof LineString) {
                 LineString line2 = (LineString)intersection;
-		// make sure that intersection is still a single line segment
+                // make sure that intersection is still a single line segment
                 if (line2.getNumPoints() != 2) {
                     continue;
                 }
                 Coordinate p1 = line2.getCoordinateN(0);
                 Coordinate p2 = line2.getCoordinateN(1);
                 double length2 = SphericalDistanceLibrary.distance(p1, p2);
-		// length remains the same if no part of the line falls outside the area
+                // length remains the same if no part of the line falls outside the area
                 if (length - length2 < 0.0000001) {
                     okArea = a;
                     break;
