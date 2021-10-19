@@ -35,16 +35,16 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
     if (o instanceof VehicleRentalVehicle) { return schema.getObjectType("RentalVehicle"); }
     if (o instanceof VehicleRentalStation) {
       SelectionSet set = environment.getField().getFields().get(0).getSelectionSet();
-      boolean queryHasVehicleRentalStationFragment = set != null && set.getSelections()
+      boolean queryHasBikeRentalStationFragment = set != null && set.getSelections()
               .stream()
               .filter(selection -> selection instanceof InlineFragment)
               .map(InlineFragment.class::cast)
               .anyMatch(fragment -> fragment.getTypeCondition()
                       .getName()
-                      .equals("VehicleRentalStation"));
-      return queryHasVehicleRentalStationFragment
-              ? schema.getObjectType("VehicleRentalStation")
-              : schema.getObjectType("BikeRentalStation");
+                      .equals("BikeRentalStation"));
+      return queryHasBikeRentalStationFragment
+              ? schema.getObjectType("BikeRentalStation")
+              : schema.getObjectType("VehicleRentalStation");
     }
     // if (o instanceof CarPark) { return schema.getObjectType("CarPark"); }
     // if (o instanceof Cluster) { return schema.getObjectType("Cluster"); }
