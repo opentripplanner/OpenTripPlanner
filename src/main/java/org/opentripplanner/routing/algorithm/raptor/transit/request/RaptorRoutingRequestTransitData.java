@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
@@ -83,7 +83,8 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   @Override
   public Iterator<? extends RaptorRoute<TripSchedule>> routeIterator(IntIterator stops) {
-    Set<RaptorRoute<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
+    // A LinkedHashSet is used so that the iteration order is deterministic.
+    Set<TripPatternForDates> activeTripPatternsForGivenStops = new LinkedHashSet<>();
     while (stops.hasNext()) {
       activeTripPatternsForGivenStops.addAll(activeTripPatternsPerStop.get(stops.next()));
     }
