@@ -86,13 +86,13 @@ public class LegacyGraphQLQueryTypeImpl
               .orElse(null);
         case "BikeRentalStation":
           return vehicleRentalStationService == null ? null :
-              vehicleRentalStationService.getVehicleRentalStation(FeedScopedId.parseId(id));
+              vehicleRentalStationService.getVehicleRentalPlace(FeedScopedId.parseId(id));
         case "VehicleRentalStation":
           return vehicleRentalStationService == null ? null :
               vehicleRentalStationService.getVehicleRentalStation(FeedScopedId.parseId(id));
         case "RentalVehicle":
           return vehicleRentalStationService == null ? null :
-              vehicleRentalStationService.getVehicleRentalStation(FeedScopedId.parseId(id));
+              vehicleRentalStationService.getVehicleRentalVehicle(FeedScopedId.parseId(id));
         case "CarPark":
           return null; //TODO
         case "Cluster":
@@ -508,7 +508,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       if (args.getLegacyGraphQLIds() != null) {
         ArrayListMultimap<String, VehicleRentalPlace> vehicleRentalStations =
-                vehicleRentalStationService.getVehicleRentalStations()
+                vehicleRentalStationService.getVehicleRentalPlaces()
                         .stream()
                         .collect(Multimaps.toMultimap(VehicleRentalPlace::getStationId, station -> station, ArrayListMultimap::create));
         return ((List<String>) args.getLegacyGraphQLIds())
@@ -517,7 +517,7 @@ public class LegacyGraphQLQueryTypeImpl
                 .collect(Collectors.toList());
       }
 
-      return vehicleRentalStationService.getVehicleRentalStations();
+      return vehicleRentalStationService.getVehicleRentalPlaces();
     };
   }
 
@@ -532,7 +532,7 @@ public class LegacyGraphQLQueryTypeImpl
       if (vehicleRentalStationService == null) { return null; }
 
       return vehicleRentalStationService
-              .getVehicleRentalStations()
+              .getVehicleRentalPlaces()
               .stream()
               .filter(vehicleRentalStation -> vehicleRentalStation.getStationId().equals(args.getLegacyGraphQLId()))
               .findAny()
@@ -557,8 +557,6 @@ public class LegacyGraphQLQueryTypeImpl
         ArrayListMultimap<String, VehicleRentalStation> vehicleRentalStations =
                 vehicleRentalStationService.getVehicleRentalStations()
                         .stream()
-                        .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalStation)
-                        .map(VehicleRentalStation.class::cast)
                         .collect(Multimaps.toMultimap(station -> station.getId().toString(),
                                 station -> station, ArrayListMultimap::create
                         ));
@@ -568,11 +566,7 @@ public class LegacyGraphQLQueryTypeImpl
                 .collect(Collectors.toList());
       }
 
-      return vehicleRentalStationService.getVehicleRentalStations()
-              .stream()
-              .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalStation)
-              .map(VehicleRentalStation.class::cast)
-              .collect(Collectors.toList());
+      return vehicleRentalStationService.getVehicleRentalStations();
     };
   }
 
@@ -592,9 +586,9 @@ public class LegacyGraphQLQueryTypeImpl
       return vehicleRentalStationService
               .getVehicleRentalStations()
               .stream()
-              .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalStation
-                      && vehicleRentalPlace.getId().toString().equals(args.getLegacyGraphQLId()))
-              .map(VehicleRentalStation.class::cast)
+              .filter(vehicleRentalStation -> vehicleRentalStation.getId()
+                      .toString()
+                      .equals(args.getLegacyGraphQLId()))
               .findAny()
               .orElse(null);
     };
@@ -615,10 +609,8 @@ public class LegacyGraphQLQueryTypeImpl
 
       if (args.getLegacyGraphQLIds() != null) {
         ArrayListMultimap<String, VehicleRentalVehicle> vehicleRentalVehicles =
-                vehicleRentalStationService.getVehicleRentalStations()
+                vehicleRentalStationService.getVehicleRentalVehicles()
                         .stream()
-                        .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalVehicle)
-                        .map(VehicleRentalVehicle.class::cast)
                         .collect(Multimaps.toMultimap(vehicle -> vehicle.getId().toString(),
                                 vehicle -> vehicle, ArrayListMultimap::create
                         ));
@@ -628,11 +620,7 @@ public class LegacyGraphQLQueryTypeImpl
                 .collect(Collectors.toList());
       }
 
-      return vehicleRentalStationService.getVehicleRentalStations()
-              .stream()
-              .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalVehicle)
-              .map(VehicleRentalVehicle.class::cast)
-              .collect(Collectors.toList());
+      return vehicleRentalStationService.getVehicleRentalVehicles();
     };
   }
 
@@ -650,11 +638,11 @@ public class LegacyGraphQLQueryTypeImpl
       }
 
       return vehicleRentalStationService
-              .getVehicleRentalStations()
+              .getVehicleRentalVehicles()
               .stream()
-              .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalVehicle
-                      && vehicleRentalPlace.getId().toString().equals(args.getLegacyGraphQLId()))
-              .map(VehicleRentalVehicle.class::cast)
+              .filter(vehicleRentalVehicle -> vehicleRentalVehicle.getId()
+                      .toString()
+                      .equals(args.getLegacyGraphQLId()))
               .findAny()
               .orElse(null);
     };
