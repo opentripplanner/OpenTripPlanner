@@ -47,6 +47,9 @@ public class FlexTripEdge extends Edge {
 
   @Override
   public State traverse(State s0) {
+    if(this.flexPath == null) {
+      return null; // not routable
+    }
     StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.BUS);
     // TODO: decide good value

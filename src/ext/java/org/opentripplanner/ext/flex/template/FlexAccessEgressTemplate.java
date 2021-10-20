@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex.template;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexServiceDate;
@@ -104,40 +105,47 @@ public abstract class FlexAccessEgressTemplate {
   abstract protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
   /**
-   * Checks whether the routing is possible
+   * This method is very much the hot code path in the flex access/egress search so any optimization
+   * here will lead to noticeable speedups.
    */
-  abstract protected boolean isRouteable(Vertex flexVertex);
-
   public Stream<FlexAccessEgress> createFlexAccessEgressStream(Graph graph) {
     if (transferStop instanceof Stop) {
       TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
-      if (isRouteable(flexVertex)) {
-        return Stream.of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop));
-      }
-      return Stream.empty();
+      return Stream.of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop))
+              .filter(Objects::nonNull);
     }
     // transferStop is Location Area/Line
     else {
       return getTransfersFromTransferStop(graph)
-          .stream()
-          .filter(transfer -> getFinalStop(transfer) != null)
-          .filter(transfer -> isRouteable(getFlexVertex(getTransferEdges(transfer).get(0))))
-          .map(transfer -> {
-            List<Edge> edges = getTransferEdges(transfer);
-            return getFlexAccessEgress(edges,
-                getFlexVertex(edges.get(0)),
-                getFinalStop(transfer)
-            );
-          });
+              .stream()
+              .filter(transfer -> getFinalStop(transfer) != null)
+              .map(transfer -> {
+                List<Edge> edges = getTransferEdges(transfer);
+                return getFlexAccessEgress(
+                        edges,
+                        getFlexVertex(edges.get(0)),
+                        getFinalStop(transfer)
+                );
+              })
+              .filter(Objects::nonNull);
     }
   }
 
   protected FlexAccessEgress getFlexAccessEgress(List<Edge> transferEdges, Vertex flexVertex, Stop stop) {
     FlexTripEdge flexEdge = getFlexEdge(flexVertex, transferStop);
 
+    // this code is a little repetitive but needed as a performance improvement. previously
+    // the flex path was checked before this method was called. this meant that every path
+    // was traversed twice leading to a noticeable slowdown.
     State state = flexEdge.traverse(accessEgress.state);
+    if (state == null) {
+      return null;
+    }
     for (Edge e : transferEdges) {
       state = e.traverse(state);
+      if (state == null) {
+        return null;
+      }
     }
 
     int[] times = getFlexTimes(flexEdge, state);
