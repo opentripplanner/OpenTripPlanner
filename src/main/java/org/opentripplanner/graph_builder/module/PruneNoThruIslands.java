@@ -94,7 +94,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         LOG.info("Pruning islands and areas isolated by nothru edges in street network");
 
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
-                pruningThresholdIslandWithStops, null,
+                pruningThresholdIslandWithStops,
                 issueStore, TraverseMode.BICYCLE
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
@@ -102,7 +102,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 issueStore, TraverseMode.WALK
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
-                pruningThresholdIslandWithStops, null,
+                pruningThresholdIslandWithStops,
                 issueStore, TraverseMode.CAR
         );
         // reconnect stops that got disconnected
@@ -187,7 +187,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         LOG.info("Islands with {} noThruTraffic edges: {}", traverseMode, count);
 
         /* collect unreachable edges to a map */
-        processIslands(graph, islands, isolated, null, true,
+        processIslands(graph, islands, isolated, true,
                 maxIslandSize, islandWithStopMaxSize, issueStore, traverseMode
         );
 
