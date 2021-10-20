@@ -66,13 +66,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
      */
     private int pruningThresholdIslandWithStops;
 
-    /**
-     * The name for output file for this process. The file will store information about the islands
-     * that were found and whether they were pruned. If the value is an empty string or null there
-     * will be no output file.
-     */
-    private String islandLogFile = null;
-
     private final StreetLinkerModule streetLinkerModule;
 
     public PruneNoThruIslands(StreetLinkerModule streetLinkerModule) {
@@ -105,7 +98,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 issueStore, TraverseMode.BICYCLE
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
-                pruningThresholdIslandWithStops, islandLogFile,
+                pruningThresholdIslandWithStops,
                 issueStore, TraverseMode.WALK
         );
         pruneNoThruIslands(graph, pruningThresholdIslandWithoutStops,
@@ -139,8 +132,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             removed += 1;
         }
         LOG.info("Removed {} edgeless street vertices", removed);
-
-        LOG.debug("Done pruning nothru islands");
     }
 
     @Override
@@ -167,22 +158,10 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
     private static void pruneNoThruIslands(
             Graph graph, int maxIslandSize,
-            int islandWithStopMaxSize, String islandLogName, DataImportIssueStore issueStore,
+            int islandWithStopMaxSize, DataImportIssueStore issueStore,
             TraverseMode traverseMode
     ) {
         LOG.debug("nothru pruning");
-        PrintWriter islandLog = null;
-        if (islandLogName != null && !islandLogName.isEmpty()) {
-            try {
-                islandLog = new PrintWriter(new File(islandLogName));
-            }
-            catch (Exception e) {
-                LOG.error("Failed to write islands log file", e);
-            }
-        }
-        if (islandLog != null) {
-            islandLog.printf("%s\t%s\t%s\t%s\n", "id", "streets", "stops", "changed", "node");
-        }
         Map<Vertex, Subgraph> subgraphs = new HashMap<Vertex, Subgraph>();
         Map<Vertex, Subgraph> extgraphs = new HashMap<Vertex, Subgraph>();
         Map<Vertex, ArrayList<Vertex>> neighborsForVertex =
@@ -227,21 +206,16 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         LOG.info("Total {} sub graphs found", islands.size());
 
         /* remove all tiny subgraphs and large subgraphs without stops */
-        count = processIslands(graph, islands, isolated, islandLog, false,
+        count = processIslands(graph, islands, isolated, false,
                 maxIslandSize, islandWithStopMaxSize, issueStore, traverseMode
         );
         LOG.info("Modified {} islands", count);
-
-        if (islandLog != null) {
-            islandLog.close();
-        }
     }
 
     private static int processIslands(
             Graph graph,
             ArrayList<Subgraph> islands,
             Map<Edge, Boolean> isolated,
-            PrintWriter log,
             boolean markIsolated,
             int maxIslandSize,
             int islandWithStopMaxSize,
@@ -278,9 +252,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                     changed = true;
                     count++;
                 }
-            }
-            if (log != null) {
-                writeNodesInSubGraph(island, log, changed);
             }
         }
         if (markIsolated) {
@@ -507,19 +478,4 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         }
         return subgraph;
     }
-
-    private static void writeNodesInSubGraph(
-            Subgraph subgraph,
-            PrintWriter islandLog,
-            boolean changed
-    ) {
-
-        String label = subgraph.getRepresentativeVertex().getLabel();
-
-        islandLog.printf(
-            "%d\t%d\t%d\t%b\t%s\n", islandCounter, subgraph.streetSize(), subgraph.stopSize(), changed, label
-        );
-        islandCounter++;
-    }
-
 }
