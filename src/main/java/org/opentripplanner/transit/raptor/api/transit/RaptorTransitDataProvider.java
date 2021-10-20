@@ -51,13 +51,21 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      * </pre>
      * @return a map of distances from the given input stop to all other stops.
      */
-    Iterator<? extends RaptorTransfer> getTransfers(int fromStop);
+    Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop);
+
+    /**
+     * This method is responsible for providing all transfers to a given stop from all
+     * possible stops around that stop.
+     * See {@link #getTransfersFromStop(int)} for detail on how to implement this.
+     * @return a map of distances to the given input stop from all other stops.
+     */
+    Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop);
 
     /**
      * Return a set of all patterns visiting the given set of stops.
      * <p/>
      * The implementation may implement a lightweight {@link RaptorTripPattern} representation.
-     * See {@link #getTransfers(int)} for detail on how to implement this.
+     * See {@link #getTransfersFromStop(int)} for detail on how to implement this.
      *
      * @param stops set of stops for find all patterns for.
      */

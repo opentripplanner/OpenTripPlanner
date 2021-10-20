@@ -59,7 +59,7 @@ public class TransferMapper {
     public ConstrainedTransfer mapToTransfer(ServiceJourneyInterchange it) {
         var id = it.getId();
         var from = mapPoint("from", id, it.getFromJourneyRef(), it.getFromPointRef());
-        var to = mapPoint("to", id, it.getToJourneyRef(), it.getFromPointRef());
+        var to = mapPoint("to", id, it.getToJourneyRef(), it.getToPointRef());
 
         if(from==null ||to==null) { return null; }
 

@@ -51,8 +51,8 @@ public class RoutingService {
 
     // TODO We should probably not have the Router as a parameter here
     public RoutingResponse route(RoutingRequest request, Router router) {
-        RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
-        return worker.route(router);
+        RoutingWorker worker = new RoutingWorker(request, router);
+        return worker.route();
     }
 
     /**
