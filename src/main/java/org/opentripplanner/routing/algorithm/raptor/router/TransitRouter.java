@@ -80,7 +80,10 @@ public class TransitRouter {
 
         var accessEgresses = getAccessEgresses(transitLayer);
 
-        debugTimingAggregator.finishedAccessEgress();
+        debugTimingAggregator.finishedAccessEgress(
+                accessEgresses.getAccesses().size(),
+                accessEgresses.getEgresses().size()
+        );
 
         var itineraries = new ArrayList<Itinerary>();
 
