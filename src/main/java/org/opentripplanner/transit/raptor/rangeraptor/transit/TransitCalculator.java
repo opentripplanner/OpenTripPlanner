@@ -3,12 +3,14 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
+import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -210,4 +212,12 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
      * Same as {@link #boardingPossibleAt(RaptorTripPattern, int)}, but for switched alighting/boarding.
      */
     boolean alightingPossibleAt(RaptorTripPattern pattern, int stopPos);
+
+    /**
+     * Returns an iterator over all transfers "from" (or "to" for reverse searches) a stopIndex.
+     *
+     * @see RaptorTransitDataProvider#getTransfersFromStop(int)
+     * @see RaptorTransitDataProvider#getTransfersToStop(int)
+     */
+    Iterator<? extends RaptorTransfer> getTransfers(RaptorTransitDataProvider<T> transitDataProvider, int fromStop);
 }

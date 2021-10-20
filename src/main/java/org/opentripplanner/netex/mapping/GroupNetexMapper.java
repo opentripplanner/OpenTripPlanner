@@ -22,7 +22,7 @@ class GroupNetexMapper {
     private final List<ServiceJourneyInterchange> interchanges = new ArrayList<>();
 
     /**
-     * A map from trip/serviceJourney id to a ordered list of scheduled stop point ids.
+     * A map from trip/serviceJourney id to an ordered list of scheduled stop point ids.
      */
     final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
 

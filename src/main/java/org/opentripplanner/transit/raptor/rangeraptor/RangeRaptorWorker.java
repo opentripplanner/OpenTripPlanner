@@ -322,7 +322,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 final int fromStop = it.next();
                 // no need to consider loop transfers, since we don't mark patterns here any more
                 // loop transfers are already included by virtue of those stops having been reached
-                state.transferToStops(fromStop, transitData.getTransfers(fromStop));
+                state.transferToStops(fromStop, calculator.getTransfers(transitData, fromStop));
             }
 
             lifeCycle.transfersForRoundComplete();
