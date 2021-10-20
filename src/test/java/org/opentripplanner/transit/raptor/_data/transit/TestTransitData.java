@@ -22,6 +22,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule> {
@@ -30,15 +31,21 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
           TransferPriority.ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET
   );
 
-  private final List<List<RaptorTransfer>> transfersByStop = new ArrayList<>();
+  private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
+  private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();
   private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<ConstrainedTransfer> guaranteedTransfers = new ArrayList<>();
   private final McCostParamsBuilder costParamsBuilder = new McCostParamsBuilder();
 
   @Override
-  public Iterator<? extends RaptorTransfer> getTransfers(int fromStop) {
-    return transfersByStop.get(fromStop).iterator();
+  public Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop) {
+    return transfersFromStop.get(fromStop).iterator();
+  }
+
+  @Override
+  public Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop) {
+    return transfersToStop.get(toStop).iterator();
   }
 
   @Override
@@ -101,8 +108,9 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   public TestTransitData withTransfer(int fromStop, TestTransfer transfer) {
-    expandNumOfStops(fromStop);
-    transfersByStop.get(fromStop).add(transfer);
+    expandNumOfStops(Math.max(fromStop, transfer.stop()));
+    transfersFromStop.get(fromStop).add(transfer);
+    transfersToStop.get(transfer.stop()).add(new ReversedRaptorTransfer(fromStop, transfer));
     return this;
   }
 
@@ -175,7 +183,8 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
 
   private void expandNumOfStops(int stopIndex) {
     for (int i=numberOfStops(); i<=stopIndex; ++i) {
-      transfersByStop.add(new ArrayList<>());
+      transfersFromStop.add(new ArrayList<>());
+      transfersToStop.add(new ArrayList<>());
       routesByStop.add(new HashSet<>());
     }
   }
