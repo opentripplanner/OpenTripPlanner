@@ -108,8 +108,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         // reconnect stops that got disconnected
         if (streetLinkerModule != null) {
             LOG.info("Reconnecting stops");
-            long count = streetLinkerModule.linkTransitStops(graph);
-            LOG.info("Tried to reconnect {} stops", count);
+            streetLinkerModule.linkTransitStops(graph);
             int isolated = 0;
             for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
                 if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {

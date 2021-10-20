@@ -65,8 +65,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
 
-  public long linkTransitStops(Graph graph) {
-    long count = 0;
+  public void linkTransitStops(Graph graph) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
     LOG.info(progress.startMessage());
@@ -100,12 +99,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
               new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
           )
       );
-      count++;
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
-    return count;
   }
 
   public void linkTransitEntrances(Graph graph) {
