@@ -228,7 +228,8 @@ public class TransitRouter {
                     graph.getTransferService(),
                     transitLayer,
                     request.getDateTime().toInstant(),
-                    request.additionalSearchDaysAfterToday,
+                    request.arriveBy ? request.additionalSearchDaysBeforeToday : 0,
+                    request.arriveBy ? 0 : request.additionalSearchDaysAfterToday,
                     createRequestTransitDataProviderFilter(graph.index),
                     transferRoutingRequest
             );
