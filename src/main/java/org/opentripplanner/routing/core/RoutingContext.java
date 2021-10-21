@@ -1,12 +1,11 @@
 package org.opentripplanner.routing.core;
 
-import org.glassfish.hk2.utilities.general.GeneralUtilities;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -173,40 +172,20 @@ public class RoutingContext implements Cloneable {
     public void checkIfVerticesFound() {
         List<RoutingError> routingErrors = new ArrayList<>();
 
-        Predicate<Vertex> isNotTransit = Predicate.not(TransitStopVertex.class::isInstance);
-        Predicate<Vertex> hasNoIncoming = v -> v.getIncoming().isEmpty();
-        Predicate<Vertex> hasNoOutgoing = v -> v.getOutgoing().isEmpty();
-
-        final boolean fromDisconnected = fromVertices == null ||
-                fromVertices.stream().allMatch(isNotTransit.and(opt.arriveBy ? hasNoIncoming : hasNoOutgoing));
-
-        // check that vertices where found and linked if from-location was specified
-        // the location is not specified, and fromVertices is null, in one end in NearbyStopFinder,
-        // depending on search direction
-        if (opt.from.isSpecified() && fromDisconnected) {
-            Coordinate coordinate = opt.from.getCoordinate();
-            GeometryFactory gf = GeometryUtils.getGeometryFactory();
-            RoutingErrorCode code = coordinate != null && graph.getConvexHull().disjoint(gf.createPoint(coordinate))
-                    ? RoutingErrorCode.OUTSIDE_BOUNDS
-                    : RoutingErrorCode.LOCATION_NOT_FOUND;
-
-            routingErrors.add(new RoutingError(code, InputField.FROM_PLACE));
+        // check that vertices where found if from-location was specified
+        if (opt.from.isSpecified() && isDisconnected(fromVertices, true)) {
+            routingErrors.add(new RoutingError(
+                getRoutingErrorCodeForDisconnected(opt.from),
+                InputField.FROM_PLACE
+            ));
         }
 
-        final boolean toDisconnected = toVertices == null ||
-                toVertices.stream().allMatch(isNotTransit.and(opt.arriveBy ? hasNoOutgoing : hasNoIncoming));
-
-        // check that vertices where found and linked if to-location was specified
-        // the location is not specified, and toVertices is null, in one end in NearbyStopFinder,
-        // depending on search direction
-        if (opt.to.isSpecified() && toDisconnected) {
-            Coordinate coordinate = opt.to.getCoordinate();
-            GeometryFactory gf = GeometryUtils.getGeometryFactory();
-            RoutingErrorCode code = coordinate != null && graph.getConvexHull().disjoint(gf.createPoint(coordinate))
-                    ? RoutingErrorCode.OUTSIDE_BOUNDS
-                    : RoutingErrorCode.LOCATION_NOT_FOUND;
-
-            routingErrors.add(new RoutingError(code, InputField.TO_PLACE));
+        // check that vertices where found if to-location was specified
+        if (opt.to.isSpecified() && isDisconnected(toVertices, false)) {
+            routingErrors.add(new RoutingError(
+                getRoutingErrorCodeForDisconnected(opt.to),
+                InputField.TO_PLACE
+            ));
         }
 
         if (routingErrors.size() > 0) {
@@ -221,5 +200,33 @@ public class RoutingContext implements Cloneable {
      */
     public void destroy() {
         this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
+    }
+
+
+    /* PRIVATE METHODS */
+
+    private boolean isDisconnected(Set<Vertex> vertices, boolean isFrom) {
+        // Not connected if linking was not attempted, and vertices were not specified in the request.
+        if (vertices == null) { return true; }
+
+        Predicate<Vertex> isNotTransit = Predicate.not(TransitStopVertex.class::isInstance);
+        Predicate<Vertex> hasNoIncoming = v -> v.getIncoming().isEmpty();
+        Predicate<Vertex> hasNoOutgoing = v -> v.getOutgoing().isEmpty();
+
+        // Not connected if linking did not create incoming/outgoing edges depending on the
+        // direction and the end.
+        Predicate<Vertex> isNotConnected = isFrom ^ opt.arriveBy
+                ? hasNoOutgoing
+                : hasNoIncoming;
+
+        return vertices.stream().allMatch(isNotTransit.and(isNotConnected));
+    }
+
+    private RoutingErrorCode getRoutingErrorCodeForDisconnected(GenericLocation location) {
+        Coordinate coordinate = location.getCoordinate();
+        GeometryFactory gf = GeometryUtils.getGeometryFactory();
+        return coordinate != null && graph.getConvexHull().disjoint(gf.createPoint(coordinate))
+                ? RoutingErrorCode.OUTSIDE_BOUNDS
+                : RoutingErrorCode.LOCATION_NOT_FOUND;
     }
 }
