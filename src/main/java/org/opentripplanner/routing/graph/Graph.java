@@ -648,6 +648,21 @@ public class Graph implements Serializable {
         return this.calendarService;
     }
 
+
+    public CalendarServiceData getCalendarDataService() {
+        CalendarServiceData calendarServiceData;
+        if (this.hasService(CalendarServiceData.class)) {
+            calendarServiceData = this.getService(CalendarServiceData.class);
+        } else {
+            calendarServiceData = new CalendarServiceData();
+        }
+        return calendarServiceData;
+    }
+
+    public void clearCachedCalenderService() {
+        this.calendarService = null;
+    }
+
     public StreetVertexIndex getStreetIndex() {
         if (this.streetIndex == null) {
             streetIndex = new StreetVertexIndex(this);
