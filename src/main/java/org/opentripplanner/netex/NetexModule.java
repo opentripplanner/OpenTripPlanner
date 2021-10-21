@@ -67,8 +67,7 @@ public class NetexModule implements GraphBuilderModule {
     ) {
 
         graph.clearTimeZone();
-        CalendarServiceData calendarServiceData = new CalendarServiceData();
-
+        CalendarServiceData calendarServiceData = graph.getCalendarDataService();
         try {
             for (NetexBundle netexBundle : netexBundles) {
                 netexBundle.checkInputs();
@@ -111,6 +110,7 @@ public class NetexModule implements GraphBuilderModule {
             throw new RuntimeException(e);
         }
 
+        graph.clearCachedCalenderService();
         graph.putService(CalendarServiceData.class, calendarServiceData);
         graph.updateTransitFeedValidity(calendarServiceData, issueStore);
 
