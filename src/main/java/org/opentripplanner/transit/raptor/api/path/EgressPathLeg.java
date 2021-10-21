@@ -14,11 +14,13 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     private final RaptorTransfer egress;
     private final int fromTime;
     private final int toTime;
+    private final int generalizedCost;
 
-    public EgressPathLeg(RaptorTransfer egress, int fromTime, int toTime) {
+    public EgressPathLeg(RaptorTransfer egress, int fromTime, int toTime, int generalizedCost) {
         this.egress = egress;
         this.fromTime = fromTime;
         this.toTime = toTime;
+        this.generalizedCost = generalizedCost;
     }
 
     /**
@@ -41,7 +43,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public int generalizedCost() {
-        return egress.generalizedCost();
+        return generalizedCost;
     }
 
     public RaptorTransfer egress() {

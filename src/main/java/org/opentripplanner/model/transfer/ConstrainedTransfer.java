@@ -4,7 +4,9 @@ package org.opentripplanner.model.transfer;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 
 
 /**
@@ -14,9 +16,11 @@ import org.opentripplanner.model.base.ToStringBuilder;
  * transfer from a transfer-point to another point. A transfer point is a combination of stop and
  * route/trip.
  */
-public final class ConstrainedTransfer implements Serializable {
+public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private final FeedScopedId id;
 
     private final TransferPoint from;
 
@@ -25,25 +29,26 @@ public final class ConstrainedTransfer implements Serializable {
     private final TransferConstraint constraint;
 
     public ConstrainedTransfer(
+            @Nullable FeedScopedId id,
             TransferPoint from,
             TransferPoint to,
             TransferConstraint constraint
     ) {
+        this.id = id;
         this.from = from;
         this.to = to;
         this.constraint = constraint;
     }
 
     /**
-     * Calculate a cost for prioritizing transfers in a path to select the best path with respect to
-     * transfers. This cost is not related in any way to the path generalized-cost.
-     *
-     * @param t The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
-     *          street generated transfer.
-     * @see TransferPriority#cost(boolean, boolean)
+     * In NeTEx an interchange have an id, in GTFS a transfer do not. We include it here to
+     * enable debugging, logging and system integration. Note! OTP do not use this id,
+     * and it is just passed through OTP. There is no service in OTP to look up a transfer by its
+     * id.
      */
-    public static int priorityCost(@Nullable ConstrainedTransfer t) {
-        return t==null ? TransferPriority.NEUTRAL_PRIORITY_COST : t.constraint.priorityCost();
+    @Nullable
+    public FeedScopedId getId() {
+        return id;
     }
 
     public TransferPoint getFrom() {
@@ -54,12 +59,9 @@ public final class ConstrainedTransfer implements Serializable {
         return to;
     }
 
+    @Override
     public TransferConstraint getTransferConstraint() {
         return constraint;
-    }
-
-    public boolean includeSlack() {
-        return !constraint.isFacilitated();
     }
 
     public boolean noConstraints() {

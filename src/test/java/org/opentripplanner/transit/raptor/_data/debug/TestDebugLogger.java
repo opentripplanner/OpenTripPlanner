@@ -39,6 +39,7 @@ public class TestDebugLogger implements DebugLogger {
     private final boolean enableDebugLogging;
     private final NumberFormat numFormat = NumberFormat.getInstance(Locale.FRANCE);
 
+    private boolean forwardSearch = true;
     private int lastIterationTime = NOT_SET;
     private int lastRound = NOT_SET;
     private boolean pathHeader = true;
@@ -122,6 +123,11 @@ public class TestDebugLogger implements DebugLogger {
     }
 
     @Override
+    public void setSearchDirection(boolean forward) {
+        this.forwardSearch = forward;
+    }
+
+    @Override
     public void debug(DebugTopic topic, String message) {
         if(enableDebugLogging) {
             // We log to info - since debugging is controlled by the application
@@ -180,7 +186,7 @@ public class TestDebugLogger implements DebugLogger {
         return concat(optReason,  action + ", element: " + element);
     }
 
-    private static String path(ArrivalView<?> a) {
+    private String path(ArrivalView<?> a) {
         return path(a, new PathStringBuilder(null))
                 .space().space().append("[ ")
                 .generalizedCostSentiSec(a.cost())
@@ -188,7 +194,7 @@ public class TestDebugLogger implements DebugLogger {
                 .toString();
     }
 
-    private static PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
+    private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {
         if (a.arrivedByAccess()) {
             return buf.accessEgress(a.accessPath().access()).sep().stop(a.stop());
         }
@@ -198,15 +204,15 @@ public class TestDebugLogger implements DebugLogger {
         buf.sep();
 
         if (a.arrivedByTransit()) {
-            // forward search
             String tripInfo = a.transitPath().trip().pattern().debugInfo();
-            if(a.arrivalTime() > a.previous().arrivalTime()) {
-                var t = TripTimesSearch.findTripForwardSearch(a);
+
+            if(forwardSearch) {
+                var t = TripTimesSearch.findTripForwardSearchApproximateTime(a);
                 buf.transit(tripInfo, t.boardTime(), t.alightTime());
             }
             // reverse search
             else {
-                var t = TripTimesSearch.findTripReverseSearch(a);
+                var t = TripTimesSearch.findTripReverseSearchApproximateTime(a);
                 buf.transit(tripInfo, t.alightTime(), t.boardTime());
             }
         } else if(a.arrivedByTransfer()) {

@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.debug;
 
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -8,8 +10,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
-
-import javax.annotation.Nullable;
 
 
 /**
@@ -27,6 +27,7 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
   private final DebugHandler<ArrivalView<?>> stopHandler;
   private final DebugHandler<Path<?>> pathHandler;
   private final DebugHandler<PatternRide<?>> patternRideHandler;
+  private final DebugLogger logger;
 
   public DebugHandlerFactory(DebugRequest request, WorkerLifeCycle lifeCycle) {
     this.stopHandler = isDebug(request.stopArrivalListener())
@@ -40,6 +41,9 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
     this.patternRideHandler = isDebug(request.patternRideDebugListener())
         ? new DebugHandlerPatternRideAdapter(request, lifeCycle)
         : null;
+
+    this.logger = request.logger();
+    lifeCycle.onRouteSearch(logger::setSearchDirection);
   }
 
   /* Stop Arrival */
@@ -78,6 +82,10 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
   public ParetoSetDebugHandlerAdapter<Path<?>> paretoSetDebugPathListener() {
     return pathHandler == null ? null : new ParetoSetDebugHandlerAdapter<>(pathHandler);
   }
+
+  /* logger */
+
+  public DebugLogger debugLogger() { return logger;}
 
 
   /* private methods */

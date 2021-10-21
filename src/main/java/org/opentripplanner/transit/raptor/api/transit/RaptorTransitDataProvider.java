@@ -2,6 +2,8 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 
 import java.util.Iterator;
+import java.util.function.IntFunction;
+import javax.validation.constraints.NotNull;
 
 
 /**
@@ -81,4 +83,26 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      * Create/provide the cost criteria calculator.
      */
     CostCalculator multiCriteriaCostCalculator();
+
+
+    /**
+     * Implement this method to provide a service to search for {@link RaptorTransferConstraint}.
+     * This is not used during the routing, but after a path is found to attach constraint
+     * information to the path.
+     * <p>
+     * The search should have good performance, but it is not a critical part of the overall
+     * performance.
+     */
+    RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch();
+
+    /**
+     * Raptor relies on stop indexes for all references to stops for performance reasons, but
+     * when a critical error occurs, it is nice to be able to inject information to the
+     * log event or during debugging to see which stop it is. This is important to be able to
+     * reproduce the error. This method is used by Raptor to translate from the stop index to a
+     * string which should be short and identify the stop given the related pattern, for example
+     * the stop name would be great.
+     */
+    @NotNull
+    IntFunction<String> stopIndexTranslatorForDebugging();
 }

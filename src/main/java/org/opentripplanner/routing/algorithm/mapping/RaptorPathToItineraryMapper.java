@@ -18,6 +18,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -95,7 +96,7 @@ public class RaptorPathToItineraryMapper {
             // Map transit leg
             if (pathLeg.isTransitLeg()) {
                 transitLeg = mapTransitLeg(
-                        request, optimizedPath, transitLeg, pathLeg.asTransitLeg(), firstLeg
+                        request, transitLeg, pathLeg.asTransitLeg(), firstLeg
                 );
                 firstLeg = false;
                 legs.add(transitLeg);
@@ -147,7 +148,6 @@ public class RaptorPathToItineraryMapper {
 
     private Leg mapTransitLeg(
             RoutingRequest request,
-            OptimizedPath<TripSchedule> optPath,
             Leg prevTransitLeg,
             TransitPathLeg<TripSchedule> pathLeg,
             boolean firstLeg
@@ -198,13 +198,8 @@ public class RaptorPathToItineraryMapper {
         leg.dropOffBookingInfo = tripTimes.getDropOffBookingInfo(boardStopIndexInPattern);
         leg.pickupBookingInfo = tripTimes.getPickupBookingInfo(boardStopIndexInPattern);
 
-        if(optPath != null) {
-            var transfer = optPath.getTransferTo(pathLeg);
-            if(transfer != null) {
-                leg.transferFromPrevLeg = transfer;
-                prevTransitLeg.transferToNextLeg = transfer;
-            }
-        }
+        leg.transferToNextLeg = (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg();
+        leg.transferFromPrevLeg = prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg;
 
         // TODO OTP2 - alightRule and boardRule needs mapping
         //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary

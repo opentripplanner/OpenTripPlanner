@@ -70,8 +70,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
                 context.nStops(),
                 context.egressPaths(),
                 createDestinationArrivalPaths(),
-                context.debugFactory(),
-                context.debugLogger()
+                context.debugFactory()
         );
     }
 

@@ -41,7 +41,7 @@ public class TransfersReport {
 
     String export() {
         buf.addHeader(
-                "Operator", "FromTripId", "FromTrip", "FromStop",
+                "Id", "Operator", "FromTripId", "FromTrip", "FromStop",
                 "ToTripId", "ToTrip", "ToStop", "ArrivalTime", "DepartureTime", "TransferTime",
                 "Walk", "Priority", "MaxWaitTime", "StaySeated", "Guaranteed"
         );
@@ -59,6 +59,7 @@ public class TransfersReport {
                     ? "" : durationToStr(to.time - from.time);
             var c = t.getTransferConstraint();
 
+            buf.addText(t.getId() == null ? "" : t.getId().getId());
             buf.addText(t.getFrom().getTrip().getOperator().getId().getId());
             buf.addText(from.tripId);
             buf.addText(from.trip);

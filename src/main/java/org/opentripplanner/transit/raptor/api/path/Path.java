@@ -7,6 +7,7 @@ import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -202,8 +203,10 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             boolean detailed,
             @Nullable IntFunction<String> stopNameTranslator,
             @Nullable Consumer<PathStringBuilder> appendToSummary
-    ) {
+            ) {
+        RaptorTransferConstraint constraintPrevLeg = null;
         var buf = new PathStringBuilder(stopNameTranslator);
+
         if(accessLeg != null) {
             int prevToTime = 0;
             for (PathLeg<T> leg : accessLeg.iterator()) {
@@ -213,10 +216,18 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                 }
                 else {
                     buf.sep().stop(leg.fromStop());
+
                     if(detailed) {
                         buf.duration(leg.fromTime() - prevToTime);
+                        // Add Transfer constraints info from the previous transit lag
+                        if(constraintPrevLeg != null) {
+                            buf.space().append(constraintPrevLeg.toString());
+                            constraintPrevLeg = null;
+                        }
                     }
+
                     buf.sep();
+
                     if (leg.isTransitLeg()) {
                         TransitPathLeg<T> transitLeg = leg.asTransitLeg();
                         buf.transit(
@@ -227,6 +238,10 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                         if (detailed) {
                             buf.duration(leg.duration());
                             buf.generalizedCostSentiSec(leg.generalizedCost());
+                        }
+                        if(transitLeg.getConstrainedTransferAfterLeg() != null) {
+                            constraintPrevLeg = transitLeg.getConstrainedTransferAfterLeg()
+                                    .getTransferConstraint();
                         }
                     }
                     else if (leg.isTransferLeg()) {
@@ -312,7 +327,6 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private static <S extends RaptorTripSchedule> int countNumberOfTransfers(
         AccessPathLeg<S> accessLeg, EgressPathLeg<S> egressPathLeg
     ) {
-
         return accessLeg.access().numberOfRides()
             // Skip first transit
             + (int)accessLeg.nextLeg().nextLeg().stream().filter(PathLeg::isTransitLeg).count()

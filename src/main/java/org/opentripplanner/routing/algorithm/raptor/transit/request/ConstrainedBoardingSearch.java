@@ -82,7 +82,9 @@ public final class ConstrainedBoardingSearch
         var trip = timetable.getTripSchedule(tripIndex);
         int departureTime = translator.time(trip, targetStopPos);
 
-        return new ConstrainedTransferBoarding(tripIndex, trip, targetStopPos, departureTime);
+        return new ConstrainedTransferBoarding<>(
+                tx.getTransferConstraint(), tripIndex, trip, targetStopPos, departureTime
+        );
     }
 
     private ConstrainedTransfer findMatchingTargetPoint(
