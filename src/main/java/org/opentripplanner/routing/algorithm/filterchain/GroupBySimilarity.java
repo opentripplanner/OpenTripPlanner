@@ -52,27 +52,50 @@ public class GroupBySimilarity {
    * or stops of all the legs in the itinerary, so that only one itinerary that has the same
    * combination of stations/stops is shown.
    */
-  public boolean nestedGroupingByAllSameStations = false;
+  public final boolean nestedGroupingByAllSameStations;
 
   /**
    * Remove all itineraries whose cost for the non-grouped legs is at least this much higher
    * compared to the lowest cost in the group.
    */
-  public double maxOtherLegsMultiplier = 0.0;
+  public final double maxCostOtherLegsFactor;
 
-  public GroupBySimilarity(double groupByP, int maxNumOfItinerariesPerGroup) {
+  /**
+   * Get a GroupBySimilarity configured to return one itinerary per group.
+   */
+  public static GroupBySimilarity createWithOneItineraryPerGroup(double groupByP) {
+    return new GroupBySimilarity(groupByP, 1, false, 0.0);
+  }
+
+  /**
+   * Get a GroupBySimilarity configured to return more than one itinerary per group.
+   * Additional filtering is configured with nestedGroupingByAllSameStations and maxCostOtherLegsFactor
+   * parameters,
+   */
+  public static GroupBySimilarity createWithMoreThanOneItineraryPerGroup(
+          double groupByP,
+          int maxNumOfItinerariesPerGroup,
+          boolean nestedGroupingByAllSameStations,
+          double maxCostOtherLegsFactor
+  ) {
+    return new GroupBySimilarity(
+        groupByP,
+        maxNumOfItinerariesPerGroup,
+        nestedGroupingByAllSameStations,
+        maxCostOtherLegsFactor
+    );
+  }
+
+  private GroupBySimilarity(
+          double groupByP,
+          int maxNumOfItinerariesPerGroup,
+          boolean nestedGroupingByAllSameStations,
+          double maxCostOtherLegsFactor
+  ) {
     this.groupByP = groupByP;
     this.maxNumOfItinerariesPerGroup = maxNumOfItinerariesPerGroup;
-  }
-
-  public GroupBySimilarity nestedGroupingByAllSameStations() {
-    nestedGroupingByAllSameStations = true;
-    return this;
-  }
-
-  public GroupBySimilarity withOtherThanSameLegsMaxGeneralizedCostMultiplier(double multiplier) {
-    maxOtherLegsMultiplier = multiplier;
-    return this;
+    this.nestedGroupingByAllSameStations = nestedGroupingByAllSameStations;
+    this.maxCostOtherLegsFactor = maxCostOtherLegsFactor;
   }
 
   @Override
@@ -81,7 +104,7 @@ public class GroupBySimilarity {
         .addNum("groupByP", groupByP)
         .addNum("maxNumOfItinerariesPerGroup", maxNumOfItinerariesPerGroup)
         .addBoolIfTrue("nestedGroupingByAllSameStations", nestedGroupingByAllSameStations)
-        .addNum("maxOtherLegsMultiplier", maxOtherLegsMultiplier)
+        .addNum("maxCostOtherLegsFactor", maxCostOtherLegsFactor)
         .toString();
   }
 }

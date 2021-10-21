@@ -21,10 +21,10 @@ public class OtherThanSameLegsMaxGeneralizedCostFilter implements ItineraryDelet
     /**
      * How much higher cost do we allow for the non-shared legs before we filter out the itinerary.
      */
-    private final double maxOtherLegsMultiplier;
+    private final double maxCostOtherLegsFactor;
 
-    public OtherThanSameLegsMaxGeneralizedCostFilter(double maxOtherLegsMultiplier) {
-        this.maxOtherLegsMultiplier = maxOtherLegsMultiplier;
+    public OtherThanSameLegsMaxGeneralizedCostFilter(double maxCostOtherLegsFactor) {
+        this.maxCostOtherLegsFactor = maxCostOtherLegsFactor;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class OtherThanSameLegsMaxGeneralizedCostFilter implements ItineraryDelet
 
         // Calculate the maximum limit allowed for itinerary cost
         double maxLimit =
-                ((minimumCost.getAsInt() - commonCost.getAsInt()) * maxOtherLegsMultiplier)
+                ((minimumCost.getAsInt() - commonCost.getAsInt()) * maxCostOtherLegsFactor)
                         + commonCost.getAsInt();
 
         return itineraries.stream()

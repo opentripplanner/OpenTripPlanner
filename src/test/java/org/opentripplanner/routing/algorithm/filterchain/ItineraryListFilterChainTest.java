@@ -159,7 +159,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   @org.junit.Test
   public void groupByTheLongestItineraryAndTwoGroups() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
-            .addGroupBySimilarity(new GroupBySimilarity(.5, 1))
+            .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
             .build();
 
     // Group 1
