@@ -29,10 +29,16 @@ public class WayPropertySetSourceTest {
 
     @Test
     public void isBicycleNoThroughTrafficExplicitlyDisallowed() {
-        OSMWithTags o = new OSMWithTags();
         WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
         assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(way("bicycle", "destination")));
         assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(way("access", "destination")));
+    }
+
+    @Test
+    public void isWalkNoThroughTrafficExplicitlyDisallowed() {
+        WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+        assertTrue(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(way("foot", "destination")));
+        assertTrue(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(way("access", "destination")));
     }
 
     public  OSMWithTags way(String key, String value) {
