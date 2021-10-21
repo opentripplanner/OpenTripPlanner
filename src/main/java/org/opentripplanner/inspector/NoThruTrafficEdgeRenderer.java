@@ -14,36 +14,43 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
 
-    private static final Color THRU_TRAFFIC_COLOR = Color.LIGHT_GRAY;
-
-    private static final Color NO_THRU_TRAFFIC_COLOR = Color.RED;
-
-    private static final Color NO_BICYCLE_THRU_TRAFFIC_COLOR = Color.BLUE;
-
-    private static final Color NO_CAR_THRU_TRAFFIC_COLOR = Color.ORANGE;
-
     public NoThruTrafficEdgeRenderer() {
     }
+
+    private static final Color [] colors = {
+        new Color(200, 200, 200), // no limitations = light gray
+        new Color(200, 200, 0),   // no walk thru traffic = yellow
+        new Color(0, 200, 200),   // no bike thru = cyan
+        new Color(0, 200, 0),     // no walk & bike thru = green
+        new Color(0, 0, 200),     // no car thru = blue
+        new Color(200, 100, 0),   // no car & walk thru = orange
+        new Color(200, 0, 200),   // no car & bike thru = purple
+        new Color(200, 0, 0)      // no for all = red
+    };
 
     @Override
     public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
         if (e instanceof StreetEdge) {
             StreetEdge pse = (StreetEdge) e;
-            if (pse.isBicycleNoThruTraffic() && pse.isMotorVehicleNoThruTraffic()) {
-                attrs.color = NO_THRU_TRAFFIC_COLOR;
-                attrs.label = "no thru traffic";
+            int colorIndex = 0;
+
+            attrs.label = "";
+
+            if (pse.isWalkNoThruTraffic()) {
+                attrs.label = " walk ";
+                colorIndex += 1;
             }
-            else if (pse.isBicycleNoThruTraffic()) {
-                attrs.color = NO_BICYCLE_THRU_TRAFFIC_COLOR;
-                attrs.label = "no bicycle thru traffic";
+            if (pse.isBicycleNoThruTraffic()) {
+                attrs.label += " bike";
+                colorIndex += 2;
             }
-            else if (pse.isMotorVehicleNoThruTraffic()) {
-                attrs.color = NO_CAR_THRU_TRAFFIC_COLOR;
-                attrs.label = "no car thru traffic";
+            if (pse.isMotorVehicleNoThruTraffic()) {
+                attrs.label += " car";
+                colorIndex += 4;
             }
-            else {
-                attrs.color = THRU_TRAFFIC_COLOR;
-                attrs.label = "";
+            attrs.color = colors[colorIndex];
+            if (!attrs.label.equals("")) {
+                attrs.label = "No" + attrs.label + " thru traffic";
             }
         }
         else {
