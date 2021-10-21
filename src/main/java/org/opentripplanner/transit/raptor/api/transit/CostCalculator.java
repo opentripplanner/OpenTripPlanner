@@ -18,16 +18,16 @@ public interface CostCalculator {
      * same trip - so any cost that is constant for a given trip can be dropped, but it will make
      * debugging easier if the cost can be compared with the "stop-arrival-cost". The cost must
      * incorporate the fact that 2 boarding may happen at 2 different stops.
-     *
-     * @param firstRide {@code true} if this is the first boarding in the path including
-     *                  any FLEX/ACCESS rides.
-     * @param waitTime  The time waiting before boarding at the board stop
      */
-    int boardCost(
-            boolean firstRide,
-            int waitTime,
-            int boardStop
+    int boardingCost(
+            boolean firstBoarding,
+            int prevArrivalTime,
+            int boardStop,
+            int boardTime,
+            RaptorTripSchedule trip,
+            RaptorTransferConstraint transferConstraints
     );
+
 
     /**
      * Calculate cost of boarding a trip. This should be the cost of the waiting time,
@@ -70,4 +70,13 @@ public interface CostCalculator {
      */
     int calculateMinCost(int minTravelTime, int minNumTransfers);
 
+
+    /**
+     * This method allows the cost calculator to add cost in addition to the generalized-cost of the
+     * given egress itself. For example you might want to add a transfer cost to FLEX egress.
+     *
+     * @return the {@link RaptorTransfer#generalizedCost()} plus any additional board or transfer
+     * cost.
+     */
+    int costEgress(RaptorTransfer egress);
 }

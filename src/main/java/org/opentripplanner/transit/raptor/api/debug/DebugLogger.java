@@ -17,6 +17,17 @@ public interface DebugLogger {
         return false;
     }
 
+
+    /**
+     * Prepare the debug logger for searching direction FORWARD or REVERSE. This method is optional
+     * to implement, the default do nothing.
+     * <p>
+     * The method is called once before each search begin.
+     */
+    default void setSearchDirection(boolean forward) {
+        // do nothing
+    }
+
     /**
      * Implement this method to provide logging.
      */

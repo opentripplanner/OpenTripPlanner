@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 /**
  * This interface enable the transit layer to override the normal trip search in Raptor. Each {@link
- * RaptorRoute} may provide an instance of this interface to so Raptor can ask for a bord-/alight-
+ * RaptorRoute} may provide an instance of this interface so Raptor can ask for a bord-/alight-
  * event with the route as the target.
  * <p>
  * When searching forward the <em>target</em> is the "to" end of the transfer, and the
@@ -26,10 +26,12 @@ public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTri
     /**
      * Get the board-/alight-event for the current pattern at the target stop position coming from
      * the source stop and trip with the given source arrival board-/alight time (exclude slack).
+     * <p>
+     * @return {@code null} if no target trip is found
      */
     @Nullable
     RaptorTripScheduleBoardOrAlightEvent<T> find(
-            RaptorTimeTable<T> timetable,
+            RaptorTimeTable<T> targetTimetable,
             T sourceTrip,
             int sourceStopIndex,
             int sourceArrivalTime

@@ -1,25 +1,25 @@
 package org.opentripplanner.model.transfer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
-import static org.opentripplanner.model.transfer.TransferPriority.PREFERRED;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.time.DurationUtils;
 
 public class TransferConstraintTest implements TransferTestData {
 
   public static final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.duration("1h");
 
-  private final TransferConstraint NO_CONSTRAINS = new TransferConstraint(ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
-  private final TransferConstraint RECOMMENDED = new TransferConstraint(TransferPriority.RECOMMENDED, false, false, MAX_WAIT_TIME_NOT_SET);
-  private final TransferConstraint STAY_SEATED = new TransferConstraint(ALLOWED, true, false, MAX_WAIT_TIME_NOT_SET);
-  private final TransferConstraint GUARANTIED = new TransferConstraint(ALLOWED, false, true, MAX_WAIT_TIME_NOT_SET);
-  private final TransferConstraint MAX_WAIT_TIME = new TransferConstraint(ALLOWED, false, false, MAX_WAIT_TIME_ONE_HOUR);
-  private final TransferConstraint EVERYTHING = new TransferConstraint(PREFERRED, true, true, MAX_WAIT_TIME_ONE_HOUR);
+  private final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
+  private final TransferConstraint RECOMMENDED = TransferConstraint.create().recommended().build();
+  private final TransferConstraint STAY_SEATED = TransferConstraint.create().staySeated().build();
+  private final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
+  private final TransferConstraint MAX_WAIT_TIME = TransferConstraint.create()
+          .guaranteed().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
+  private final TransferConstraint EVERYTHING = TransferConstraint.create()
+          .staySeated().guaranteed().preferred().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
 
   @Test
   public void getPriority() {
@@ -40,17 +40,24 @@ public class TransferConstraintTest implements TransferTestData {
   }
 
   @Test
+  public void isFacilitated() {
+    assertTrue(GUARANTIED.isFacilitated());
+    assertTrue(STAY_SEATED.isFacilitated());
+    assertFalse(NO_CONSTRAINS.isFacilitated());
+  }
+
+  @Test
   public void getMaxWaitTime() {
     assertEquals(MAX_WAIT_TIME_ONE_HOUR, MAX_WAIT_TIME.getMaxWaitTime());
   }
 
   @Test
-  public void priorityCost() {
-    assertEquals(0, NO_CONSTRAINS.priorityCost());
-    assertEquals(-1, RECOMMENDED.priorityCost());
-    assertEquals(-10, GUARANTIED.priorityCost());
-    assertEquals(-100, STAY_SEATED.priorityCost());
-    assertEquals(-112, EVERYTHING.priorityCost());
+  public void cost() {
+    assertEquals(33_00, NO_CONSTRAINS.cost());
+    assertEquals(32_00, RECOMMENDED.cost());
+    assertEquals(23_00, GUARANTIED.cost());
+    assertEquals(13_00, STAY_SEATED.cost());
+    assertEquals(11_00, EVERYTHING.cost());
   }
 
   @Test
@@ -65,10 +72,17 @@ public class TransferConstraintTest implements TransferTestData {
 
   @Test
   public void testToString() {
-    assertEquals("{ NONE }", NO_CONSTRAINS.toString());
+    assertEquals("{no constraints}", NO_CONSTRAINS.toString());
     assertEquals(
-            "{priority: PREFERRED, maxWaitTime: 1h, staySeated, guaranteed}",
+            "{priority: PREFERRED, staySeated, guaranteed, maxWaitTime: 1h}",
             EVERYTHING.toString()
     );
+  }
+
+  @Test
+  public void staticPriorityCost() {
+    assertEquals(NO_CONSTRAINS.cost(), TransferConstraint.cost(null));
+    assertEquals(NO_CONSTRAINS.cost(), TransferConstraint.cost(NO_CONSTRAINS));
+    assertEquals(GUARANTIED.cost(), TransferConstraint.cost(GUARANTIED));
   }
 }

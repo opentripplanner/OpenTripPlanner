@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
 import java.util.function.IntFunction;
-import java.util.function.ToIntFunction;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
@@ -14,7 +13,6 @@ import org.opentripplanner.routing.algorithm.transferoptimization.services.Optim
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
@@ -65,10 +63,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   }
 
   private OptimizeTransferService<T> createOptimizeTransferService() {
-    var pathTransferGenerator = createTransferGenerator(
-            config.optimizeTransferPriority()
-    );
-    var costCalculator = transitDataProvider.multiCriteriaCostCalculator();
+    var pathTransferGenerator = createTransferGenerator(config.optimizeTransferPriority());
     var filter = createTransferOptimizedFilter(
             config.optimizeTransferPriority(), config.optimizeTransferWaitTime()
     );
@@ -79,8 +74,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       var transfersPermutationService = createOptimizePathService(
               pathTransferGenerator,
               filter,
-              transferWaitTimeCalculator::cost,
-              costCalculator
+              transferWaitTimeCalculator,
+              transitDataProvider.multiCriteriaCostCalculator()
       );
 
       return new OptimizeTransferService<>(
@@ -93,8 +88,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       var transfersPermutationService = createOptimizePathService(
               pathTransferGenerator,
               filter,
-              PathLeg::generalizedCostTotal,
-              costCalculator
+              null,
+              transitDataProvider.multiCriteriaCostCalculator()
       );
       return new OptimizeTransferService<>(transfersPermutationService);
     }
@@ -103,14 +98,14 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private OptimizePathService<T> createOptimizePathService(
           TransferGenerator<T> transferGenerator,
           MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
-          ToIntFunction<PathLeg<?>> costCalcForWaitOptimization,
+          TransferWaitTimeCalculator transferWaitTimeCalculator,
           CostCalculator costCalculator
   ) {
     return new OptimizePathService<>(
             transferGenerator,
             costCalculator,
             raptorRequest.slackProvider(),
-            costCalcForWaitOptimization,
+            transferWaitTimeCalculator,
             transferPointFilter
     );
   }

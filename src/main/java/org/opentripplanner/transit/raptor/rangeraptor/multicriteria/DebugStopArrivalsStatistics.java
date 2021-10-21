@@ -27,7 +27,7 @@ class DebugStopArrivalsStatistics {
         long numOfStops = 0;
         int max = 0;
 
-        for (StopArrivalParetoSet stop : stops) {
+        for (StopArrivalParetoSet<?> stop : stops) {
             if(stop != null) {
                 ++numOfStops;
                 total += stop.size();
@@ -70,7 +70,7 @@ class DebugStopArrivalsStatistics {
             return toStr(number/1_000_000.0) + "\"";
         }
         if(number > 1_000) {
-            return toStr(number/1_000.0) + "\'";
+            return toStr(number/1_000.0) + "'";
         }
         return Long.toString(number);
     }
