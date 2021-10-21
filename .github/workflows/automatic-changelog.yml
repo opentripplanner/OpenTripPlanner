@@ -1,0 +1,32 @@
+name: Automatic changelog entry
+on:
+  pull_request:
+    branches:
+      - dev-2.x
+    types: [closed]
+
+jobs:
+  changelog-entry:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        if: github.event.pull_request.merged
+        uses: actions/checkout@v2
+
+      - name: Generate changelog entry from PR information
+        if: github.event.pull_request.merged
+        run: |
+          git config user.name "OTP Changelog Bot"
+          git config user.email "<>"
+
+          # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
+          awk '/AUTOMATIC_CHANGELOG_PLACEHOLDER/ {
+            print "- ${{ github.event.pull_request.title }} [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+          } { print }' docs/Changelog.md > docs/Changelog.generated.md
+
+          mv docs/Changelog.generated.md docs/Changelog.md
+
+          git add docs/Changelog.md
+          git commit -m "Add changelog entry for #${{ github.event.pull_request.number }} [ci skip]"
+          git push origin dev-2.x
