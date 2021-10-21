@@ -310,7 +310,7 @@ public class ItineraryListFilterChainBuilder {
                 ));
             }
 
-            if (it.maxOtherLegsMultiplier > 1) {
+            if (it.maxOtherLegsMultiplier > 1.0) {
                 nested.add(new DeletionFlaggingFilter(new OtherThanSameLegsMaxGeneralizedCostFilter(
                     it.maxOtherLegsMultiplier
                 )));
