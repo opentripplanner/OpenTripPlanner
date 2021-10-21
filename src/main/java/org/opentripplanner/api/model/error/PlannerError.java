@@ -11,7 +11,7 @@ public class PlannerError {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlannerError.class);
 
-    public final int    id;
+    public final int id;
     public final String msg;
     public final Message message;
     public List<String> missing = null;

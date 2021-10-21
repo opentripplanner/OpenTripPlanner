@@ -13,8 +13,8 @@ public class RoutingError {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) { return true; }
+    if (o == null || getClass() != o.getClass()) { return false; }
     RoutingError that = (RoutingError) o;
     return code == that.code && inputField == that.inputField;
   }
