@@ -64,6 +64,7 @@
 - Stop linking to area/platform edges obeys area boundaries and traverse modes [#3201](https://github.com/opentripplanner/OpenTripPlanner/issues/3201)
 - Add service day mapping to REST API [#3659](https://github.com/opentripplanner/OpenTripPlanner/pull/3659)
 - Cost on transfer in Raptor [#3629](https://github.com/opentripplanner/OpenTripPlanner/pull/3629)
+- Use correct slack in transfer optimizer [#3668](https://github.com/opentripplanner/OpenTripPlanner/pull/3668)
 
 
 ## 2.0.0 (2020-11-27)

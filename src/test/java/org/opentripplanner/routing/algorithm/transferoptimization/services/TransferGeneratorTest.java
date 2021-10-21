@@ -10,6 +10,7 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
@@ -20,6 +21,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class TransferGeneratorTest implements RaptorTestConstants {
@@ -170,6 +172,39 @@ public class TransferGeneratorTest implements RaptorTestConstants {
                 result.toString()
         );
     }
+
+    @Test
+    void findTransferForDifferentRoutesWithCustomBoardingSlack() {
+        TestRoute l1 = route("L1", STOP_A, STOP_B)
+                .withTimetable(schedule("10:00 10:10"));
+        TestRoute l2 = route("L2", STOP_B, STOP_C)
+                .withTimetable(schedule("10:20 10:30"));
+
+        // S
+        data.withRoutes(l1, l2);
+
+        // The only possible place to transfer between A and D is stop C (no extra transfers):
+        var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_C);
+
+        RaptorSlackProvider slackProvider = new RaptorSlackProvider() {
+            @Override public int transferSlack() { return 0; }
+            @Override public int boardSlack(RaptorTripPattern pattern) {
+                return ((TestTripPattern) pattern).getName().equals("L1") ? 20 * 60 : 0;
+            }
+            @Override public int alightSlack(RaptorTripPattern pattern) { return 0; }
+        };
+
+        var subject = new TransferGenerator<>(TS_ADAPTOR, slackProvider, data);
+
+        var result = subject.findAllPossibleTransfers(transitLegs);
+        assertEquals(
+                "[["
+                        + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}"
+                        + "]]",
+                result.toString()
+        );
+    }
+
 
     @Test
     void findTransferWithAlightingForbiddenAtSameStop() {
