@@ -183,7 +183,7 @@ public class DebugTimingAggregator {
     }
 
     if (finishedPatternFiltering > 0) {
-      log("│┌ Filtering tripPatterns", tripPatternFilterTime);
+      log("│┌ Creating raptor data model", tripPatternFilterTime);
       log("│├ Access routing", accessTime);
       log("│├ Egress routing", egressTime);
       log("││ Access/Egress routing", accessEgressTime);

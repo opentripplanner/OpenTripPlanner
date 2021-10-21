@@ -101,11 +101,14 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     final List<TripToTripTransfer<T>> result = new ArrayList<>();
 
     while (stopPos < fromTrip.pattern().numberOfStopsInPattern()) {
-      var from = TripStopTime.arrival(fromTrip, stopPos);
+      boolean alightingPossible = fromTrip.pattern().alightingPossibleAt(stopPos);
+      if (alightingPossible) {
+        var from = TripStopTime.arrival(fromTrip, stopPos);
 
-      // First add high priority transfers
-      result.addAll(transferFromSameStop(from));
-      result.addAll(findStandardTransfers(from));
+        // First add high priority transfers
+        result.addAll(transferFromSameStop(from));
+        result.addAll(findStandardTransfers(from));
+      }
 
       ++stopPos;
     }
@@ -122,6 +125,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
     if(toTripStopPos < 0) { return List.of(); }
 
+    boolean boardingPossible = toTrip.pattern().boardingPossibleAt(toTripStopPos);
+
+    if (!boardingPossible) { return List.of(); }
+
     return List.of(
             new TripToTripTransfer<>(
                     from,
@@ -134,7 +141,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
   private Collection<? extends TripToTripTransfer<T>> findStandardTransfers(TripStopTime<T> from) {
     final List<TripToTripTransfer<T>> result = new ArrayList<>();
-    Iterator<? extends RaptorTransfer> transfers = stdTransfers.getTransfers(from.stop());
+    Iterator<? extends RaptorTransfer> transfers = stdTransfers.getTransfersFromStop(from.stop());
 
     while (transfers.hasNext()) {
       var it = transfers.next();
@@ -149,10 +156,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
       var to = TripStopTime.departure(toTrip, toTripStopPos);
 
-      boolean alightingPossible = from.trip().pattern().alightingPossibleAt(from.stopPosition());
       boolean boardingPossible = to.trip().pattern().boardingPossibleAt(to.stopPosition());
 
-      if (boardingPossible && alightingPossible) {
+      if (boardingPossible) {
         result.add(new TripToTripTransfer<>(from, to, it, tx));
       }
     }
