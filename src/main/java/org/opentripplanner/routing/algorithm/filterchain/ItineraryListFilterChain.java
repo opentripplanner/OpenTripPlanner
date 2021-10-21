@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
@@ -16,14 +18,17 @@ import static org.opentripplanner.routing.api.response.RoutingErrorCode.WALKING_
 
 public class ItineraryListFilterChain {
     private final List<ItineraryListFilter> filters;
+
     private final boolean debug;
+
+    private final List<RoutingError> routingErrors = new ArrayList<>();
 
     public ItineraryListFilterChain(List<ItineraryListFilter> filters, boolean debug) {
         this.filters = filters;
         this.debug = debug;
     }
 
-    public List<Itinerary> filter(List<Itinerary> itineraries, Collection<RoutingError> routingErrors) {
+    public List<Itinerary> filter(List<Itinerary> itineraries) {
         List<Itinerary> result = itineraries;
         for (ItineraryListFilter filter : filters) {
             result = filter.filter(result);
@@ -51,5 +56,9 @@ public class ItineraryListFilterChain {
         return result.stream()
                 .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
                 .collect(Collectors.toList());
+    }
+
+    public List<RoutingError> getRoutingErrors() {
+        return routingErrors;
     }
 }

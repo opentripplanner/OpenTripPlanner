@@ -53,7 +53,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     // Given a default chain
     ItineraryListFilterChain chain = createBuilder(false, false, 10).build();
 
-    assertEquals(toStr(List.of(i1, i3)), toStr(chain.filter(List.of(i1, i2, i3), List.of())));
+    assertEquals(toStr(List.of(i1, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
   }
 
   @Test
@@ -65,7 +65,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
             .withLatestDepartureTimeLimit(TestItineraryBuilder.newTime(T11_32).toInstant())
             .build();
 
-    assertEquals(toStr(List.of(i1)), toStr(chain.filter(List.of(i1, i2, i3), List.of())));
+    assertEquals(toStr(List.of(i1)), toStr(chain.filter(List.of(i1, i2, i3))));
   }
 
   @Nested
@@ -82,14 +82,14 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     public void testPostProcessorWithMaxItinerariesFilterSetToTwo() {
       // Given a default postProcessor with 'numOfItineraries=2'
       ItineraryListFilterChain chain = createBuilder(false, false, 2).build();
-      assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2, i3), List.of()));
+      assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2, i3)));
     }
 
     @Test
     public void testPostProcessorWithMaxItinerariesFilterSetToOneDepartAt() {
       // Given a default postProcessor with 'numOfItineraries=1'
       ItineraryListFilterChain chain = createBuilder(false, false, 1).build();
-      assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3), List.of()));
+      assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3)));
 
     }
 
@@ -97,7 +97,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     public void testPostProcessorWithMaxItinerariesFilterSetToOneArriveBy() {
       // Given a postProcessor with 'numOfItineraries=1' and 'arriveBy=true'
       ItineraryListFilterChain chain = createBuilder(true, false, 1).build();
-      assertEquals(List.of(i3), chain.filter(List.of(i1, i2, i3), List.of()));
+      assertEquals(List.of(i3), chain.filter(List.of(i1, i2, i3)));
     }
   }
 
@@ -109,7 +109,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
         .build();
 
     // Walk first, then transit sorted on arrival-time
-    assertEquals(toStr(List.of(i1, i2, i3)), toStr(chain.filter(List.of(i1, i2, i3), List.of())));
+    assertEquals(toStr(List.of(i1, i2, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
     assertTrue(i1.systemNotices.isEmpty());
     assertFalse(i2.systemNotices.isEmpty());
     assertFalse(i3.systemNotices.isEmpty());
@@ -137,14 +137,14 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     public void removeTransitWithHigherCostThanBestOnStreetOnlyDisabled() {
       // Disable filter and allow none optimal bus itinerary pass through
       ItineraryListFilterChain chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(false).build();
-      assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus), List.of())));
+      assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
     }
 
     @Test
     public void removeTransitWithHigherCostThanBestOnStreetOnlyEnabled() {
       // Enable filter and remove bus itinerary
       ItineraryListFilterChain chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(true).build();
-      assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus), List.of())));
+      assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
     }
   }
 
@@ -157,7 +157,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     Itinerary walk = newItinerary(A, T11_06).walk(D10m, E).build();
     Itinerary bus = newItinerary(A).bus(21, T11_06, T11_12, E).build();
 
-    assertEquals(toStr(List.of(bus)), toStr(chain.filter(List.of(walk, bus), List.of())));
+    assertEquals(toStr(List.of(bus)), toStr(chain.filter(List.of(walk, bus))));
   }
 
   @org.junit.Test
@@ -184,7 +184,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     List<Itinerary> input = List.of(i1, i2, i3);
 
     // With min Limit = 1, expect the best trips from both groups
-    chain.filter(input, List.of());
+    chain.filter(input);
 
     assertFalse(i1.isFlaggedForDeletion());
     assertFalse(i2.isFlaggedForDeletion());
@@ -200,10 +200,9 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     Itinerary walk = newItinerary(A, T11_06).walk(D10m, E).build();
     Itinerary bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
 
-    List<RoutingError> routingErrors = new ArrayList<>();
+    assertTrue(chain.filter(List.of(walk, bus)).isEmpty());
 
-    assertTrue(chain.filter(List.of(walk, bus), routingErrors).isEmpty());
-
+    final List<RoutingError> routingErrors = chain.getRoutingErrors();
     assertEquals(1, routingErrors.size());
     assertEquals(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, routingErrors.get(0).code);
   }
@@ -216,10 +215,9 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
 
     Itinerary bus = newItinerary(A).bus(21, T11_06, T11_23, E).build();
 
-    List<RoutingError> routingErrors = new ArrayList<>();
+    assertTrue(chain.filter(List.of(bus)).isEmpty());
 
-    assertTrue(chain.filter(List.of(bus), routingErrors).isEmpty());
-
+    final List<RoutingError> routingErrors = chain.getRoutingErrors();
     assertEquals(1, routingErrors.size());
     assertEquals(RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, routingErrors.get(0).code);
   }

@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
@@ -83,11 +82,16 @@ public class RoutingWorker {
         debugTimingAggregator.finishedRouting();
 
         // Filter itineraries
-        var filteredItineraries = filterItineraries(
-                itineraries,
-                routingErrors,
-                filterOnLatestDepartureTime
+        ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
+            request,
+            filterOnLatestDepartureTime,
+            emptyDirectModeHandler.removeWalkAllTheWayResults(),
+            it -> firstRemovedItinerary = it
         );
+
+        List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
+
+        routingErrors.addAll(filterChain.getRoutingErrors());
 
         LOG.debug("Return TripPlan with {} filtered itineraries out of {} total.", filteredItineraries.size(), itineraries.size());
 
@@ -151,20 +155,6 @@ public class RoutingWorker {
         } finally {
             debugTimingAggregator.finishedTransitRouter();
         }
-    }
-
-    private List<Itinerary> filterItineraries(
-            List<Itinerary> itineraries,
-            Collection<RoutingError> routingErrors,
-            Instant filterOnLatestDepartureTime
-    ) {
-        ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
-            request,
-            filterOnLatestDepartureTime,
-            emptyDirectModeHandler.removeWalkAllTheWayResults(),
-            it -> firstRemovedItinerary = it
-        );
-        return filterChain.filter(itineraries, routingErrors);
     }
 
     @Nullable
