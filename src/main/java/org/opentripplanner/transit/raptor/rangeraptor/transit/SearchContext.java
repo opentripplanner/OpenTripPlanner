@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
@@ -17,6 +16,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -80,6 +80,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.pathMapper = createPathMapper(
                 this.transit.transferConstraintsSearch(),
                 this.costCalculator,
+                transit.stopNameResolver(),
                 request,
                 lifeCycle()
         );
@@ -245,6 +246,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
             RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
             CostCalculator costCalculator,
+            RaptorStopNameResolver stopNameResolver,
             RaptorRequest<S> request,
             WorkerLifeCycle lifeCycle
     ) {
@@ -253,6 +255,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
                         txConstraintsSearch,
                         request.slackProvider(),
                         costCalculator,
+                        stopNameResolver,
                         lifeCycle,
                         request.profile().useApproximateTripSearch()
                 )
@@ -260,13 +263,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
                         txConstraintsSearch,
                         request.slackProvider(),
                         costCalculator,
+                        stopNameResolver,
                         lifeCycle,
                         request.profile().useApproximateTripSearch()
                 );
     }
 
-    public IntFunction<String> stopIndexTranslatorForDebugging() {
-        return transit.stopIndexTranslatorForDebugging();
+    public RaptorStopNameResolver stopNameResolver() {
+        return transit.stopNameResolver();
     }
 
     /**

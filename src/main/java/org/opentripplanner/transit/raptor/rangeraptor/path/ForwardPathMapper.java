@@ -5,6 +5,7 @@ import org.opentripplanner.transit.raptor.api.path.PathBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
@@ -20,6 +21,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     private final RaptorSlackProvider slackProvider;
     private final CostCalculator costCalculator;
     private final BoardAndAlightTimeSearch tripSearch;
+    private final RaptorStopNameResolver stopNameResolver;
 
     private int iterationDepartureTime = -1;
 
@@ -27,12 +29,14 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
             RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
             RaptorSlackProvider slackProvider,
             CostCalculator costCalculator,
+            RaptorStopNameResolver stopNameResolver,
             WorkerLifeCycle lifeCycle,
             boolean useApproximateTripTimesSearch
     ) {
         this.transferConstraintsSearch = transferConstraintsSearch;
         this.slackProvider = slackProvider;
         this.costCalculator = costCalculator;
+        this.stopNameResolver = stopNameResolver;
         this.tripSearch = forwardSearch(useApproximateTripTimesSearch);
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
@@ -44,7 +48,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     @Override
     public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
         var pathBuilder = PathBuilder.headPathBuilder(
-                transferConstraintsSearch, slackProvider, costCalculator
+                transferConstraintsSearch, slackProvider, costCalculator, stopNameResolver
         );
 
         pathBuilder.egress(destinationArrival.egressPath().egress());

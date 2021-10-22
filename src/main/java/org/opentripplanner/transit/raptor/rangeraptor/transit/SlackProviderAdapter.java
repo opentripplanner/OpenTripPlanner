@@ -75,12 +75,12 @@ public final class SlackProviderAdapter implements SlackProvider {
     }
 
     @Override
-    public final int boardSlack() {
+    public int boardSlack() {
         return boardSlack;
     }
 
     @Override
-    public final int alightSlack() {
+    public int alightSlack() {
         return alightSlack;
     }
 

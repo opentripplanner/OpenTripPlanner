@@ -46,7 +46,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
                 ctx.slackProvider(),
                 ctx.pathMapper(),
                 ctx.debugFactory(),
-                ctx.stopIndexTranslatorForDebugging(),
+                ctx.stopNameResolver(),
                 ctx.lifeCycle()
         );
     }
