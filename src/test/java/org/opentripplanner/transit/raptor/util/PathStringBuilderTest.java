@@ -2,18 +2,18 @@ package org.opentripplanner.transit.raptor.util;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.function.IntFunction;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
 public class PathStringBuilderTest {
-    private static final IntFunction<String> NAME_TRANSLATOR = Integer::toString;
+    private static final RaptorStopNameResolver STOP_NAME_RESOLVER = RaptorStopNameResolver.nullSafe(null);
     private static final String MODE = "BUS";
     private static final int T_10_46_05 = time(10, 46, 5);
     private static final int T_10_55 = time(10, 55, 0);
     private static final int D_5_12 = time(0, 5, 12);
 
-    private final PathStringBuilder subject = new PathStringBuilder(NAME_TRANSLATOR);
+    private final PathStringBuilder subject = new PathStringBuilder(STOP_NAME_RESOLVER);
 
     @Test
     public void walkSomeMinutesAndSeconds() {
@@ -25,7 +25,7 @@ public class PathStringBuilderTest {
     }
     @Test
     public void walkWithDurationPadded() {
-        assertEquals("Walk   17s", new PathStringBuilder(NAME_TRANSLATOR, true).walk(17).toString());
+        assertEquals("Walk   17s", new PathStringBuilder(STOP_NAME_RESOLVER, true).walk(17).toString());
     }
 
     @Test

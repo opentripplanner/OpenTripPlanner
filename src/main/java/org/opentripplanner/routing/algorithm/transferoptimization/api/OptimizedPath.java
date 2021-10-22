@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
-import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -80,13 +80,13 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
     }
 
     @Override
-    public String toStringDetailed(IntFunction<String> stopNameTranslator) {
-        return buildString(true, stopNameTranslator, this::appendSummary);
+    public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
+        return buildString(true, stopNameResolver, this::appendSummary);
     }
 
     @Override
-    public String toString(IntFunction<String> stopNameTranslator) {
-        return buildString(false, stopNameTranslator, this::appendSummary);
+    public String toString(RaptorStopNameResolver stopNameResolver) {
+        return buildString(false, stopNameResolver, this::appendSummary);
     }
 
     @Override

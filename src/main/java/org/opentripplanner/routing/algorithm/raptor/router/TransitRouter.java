@@ -101,6 +101,7 @@ public class TransitRouter {
         if(OTPFeature.OptimizeTransfers.isOn()) {
             paths = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
                     transitLayer::getStopByIndex,
+                    requestTransitDataProvider.stopNameResolver(),
                     router.graph.getTransferService(),
                     requestTransitDataProvider,
                     raptorRequest,

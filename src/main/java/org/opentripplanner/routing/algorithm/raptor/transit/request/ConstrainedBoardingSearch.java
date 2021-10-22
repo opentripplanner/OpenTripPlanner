@@ -44,7 +44,7 @@ public final class ConstrainedBoardingSearch
     }
 
     @Override
-    public final boolean transferExist(int targetStopPos) {
+    public boolean transferExist(int targetStopPos) {
         if(transfers == null) { return false; }
 
         // Get all guaranteed transfers for the target pattern at the target stop position
@@ -53,7 +53,7 @@ public final class ConstrainedBoardingSearch
     }
 
     @Override
-    public final RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
+    public RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
             RaptorTimeTable<TripSchedule> timetable,
             TripSchedule sourceTripSchedule,
             int sourceStopIndex,

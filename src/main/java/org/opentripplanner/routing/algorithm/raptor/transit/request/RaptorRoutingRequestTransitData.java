@@ -21,6 +21,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.util.OTPFeature;
@@ -148,7 +149,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public IntFunction<String> stopIndexTranslatorForDebugging() {
+  public RaptorStopNameResolver stopNameResolver() {
     return (int stopIndex) -> {
       var s = transitLayer.getStopByIndex(stopIndex);
       return s==null ? "null" : s.getName() + "(" + stopIndex + ")";

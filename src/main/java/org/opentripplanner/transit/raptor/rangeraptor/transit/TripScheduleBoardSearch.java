@@ -48,22 +48,22 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
     /* TripScheduleBoardOrAlightEvent implementation using fly-weight pattern */
 
     @Override
-    public final T getTrip() {
+    public T getTrip() {
         return candidateTrip;
     }
 
     @Override
-    public final int getTripIndex() {
+    public int getTripIndex() {
         return candidateTripIndex;
     }
 
     @Override
-    public final int getTime() {
+    public int getTime() {
         return candidateTrip.departure(stopPositionInPattern);
     }
 
     @Override
-    public final int getStopPositionInPattern() {
+    public int getStopPositionInPattern() {
         return stopPositionInPattern;
     }
 
@@ -85,7 +85,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
      *                              Use {@code -1} (negative value) for an unbounded search.
      */
     @Override
-    public final RaptorTripScheduleBoardOrAlightEvent<T> search(
+    public RaptorTripScheduleBoardOrAlightEvent<T> search(
             int earliestTime,
             int stopPositionInPattern,
             int tripIndexUpperBound

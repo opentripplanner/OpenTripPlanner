@@ -16,6 +16,7 @@ import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 
@@ -70,6 +71,8 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
   private final CostCalculator costCalculator;
   private final RaptorSlackProvider slackProvider;
   private final MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain;
+  private final RaptorStopNameResolver stopNameTranslator;
+
 
   @Nullable
   private final TransferWaitTimeCalculator waitTimeCostCalculator;
@@ -79,13 +82,15 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
       CostCalculator costCalculator,
       RaptorSlackProvider slackProvider,
       @Nullable TransferWaitTimeCalculator waitTimeCostCalculator,
-      MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain
+      MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain,
+      RaptorStopNameResolver stopNameTranslator
   ) {
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
     this.waitTimeCostCalculator = waitTimeCostCalculator;
     this.transferGenerator = transferGenerator;
     this.minCostFilterChain = minCostFilterChain;
+    this.stopNameTranslator = stopNameTranslator;
   }
 
   public Set<OptimizedPath<T>> findBestTransitPath(Path<T> originalPath) {
@@ -115,7 +120,12 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
   ) {
     // Create a set of tails with the last transit leg in it (one element)
     Set<OptimizedPathTail<T>> tails = Set.of(
-        new OptimizedPathTail<T>(slackProvider, costCalculator, waitTimeCostCalculator)
+        new OptimizedPathTail<T>(
+                slackProvider,
+                costCalculator,
+                waitTimeCostCalculator,
+                stopNameTranslator
+        )
               .addTransitTail(last(originalTransitLegs))
     );
 

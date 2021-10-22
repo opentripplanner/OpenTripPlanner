@@ -3,10 +3,10 @@ package org.opentripplanner.transit.raptor.api.path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
@@ -182,11 +182,11 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                 .map(PathLeg::asTransitLeg);
     }
 
-    public String toStringDetailed(IntFunction<String> stopNameTranslator) {
-        return buildString(true, stopNameTranslator, null);
+    public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
+        return buildString(true, stopNameResolver, null);
     }
 
-    public String toString(IntFunction<String> stopNameTranslator) {
+    public String toString(RaptorStopNameResolver stopNameTranslator) {
         return buildString(false, stopNameTranslator, null);
     }
 
@@ -195,17 +195,17 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
         return buildString(false, null, null);
     }
 
-    protected String toString(boolean detailed, IntFunction<String> stopNameTranslator) {
-        return buildString(detailed, stopNameTranslator, null);
+    protected String toString(boolean detailed, RaptorStopNameResolver stopNameResolver) {
+        return buildString(detailed, stopNameResolver, null);
     }
 
     protected String buildString(
             boolean detailed,
-            @Nullable IntFunction<String> stopNameTranslator,
+            @Nullable RaptorStopNameResolver stopNameResolver,
             @Nullable Consumer<PathStringBuilder> appendToSummary
             ) {
         RaptorTransferConstraint constraintPrevLeg = null;
-        var buf = new PathStringBuilder(stopNameTranslator);
+        var buf = new PathStringBuilder(stopNameResolver);
 
         if(accessLeg != null) {
             int prevToTime = 0;

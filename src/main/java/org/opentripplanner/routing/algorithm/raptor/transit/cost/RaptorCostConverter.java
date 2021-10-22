@@ -43,6 +43,13 @@ public final class RaptorCostConverter {
   }
 
   /**
+   * Convert OTP domain model cost to Raptor internal cost.
+   */
+  public static int toRaptorCost(int domainCost) {
+    return domainCost * PRECISION;
+  }
+
+  /**
    * Convert an array of OTP domain values(doubles) into Raptor internal values {@code int}s.
    */
   public static int[] toRaptorCosts(double[] domainValues) {

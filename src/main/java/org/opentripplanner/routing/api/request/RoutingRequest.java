@@ -277,7 +277,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
 
     /** Configure the transfer optimization */
-    public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest(this);
+    public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest();
 
     /**
      * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add
@@ -1411,7 +1411,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      *
      * If you encounter a case of this, you can adjust this code to take this into account.
      *
-     * @see RoutingRequest.MAX_CLOSENESS_METERS
+     * @see RoutingRequest#MAX_CLOSENESS_METERS
      * @see DominanceFunction#betterOrEqualAndComparable(State, State)
      */
     public boolean isCloseToStartOrEnd(Vertex vertex) {

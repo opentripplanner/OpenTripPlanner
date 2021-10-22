@@ -145,7 +145,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * @return a unique set of paths
      */
     @Override
-    final public Collection<Path<T>> route() {
+    public Collection<Path<T>> route() {
         timerRoute().time(() -> {
             lifeCycle.notifyRouteSearchStart(calculator.searchForward());
             transitData.setup();

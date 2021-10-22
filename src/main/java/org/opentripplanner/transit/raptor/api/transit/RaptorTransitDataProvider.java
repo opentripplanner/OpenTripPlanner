@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 
 import java.util.Iterator;
-import java.util.function.IntFunction;
 import javax.validation.constraints.NotNull;
 
 
@@ -104,7 +103,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      * the stop name would be great.
      */
     @NotNull
-    IntFunction<String> stopIndexTranslatorForDebugging();
+    RaptorStopNameResolver stopNameResolver();
 
     /**
      * Returns the beginning of valid transit data, in seconds since midnight of the day of the
