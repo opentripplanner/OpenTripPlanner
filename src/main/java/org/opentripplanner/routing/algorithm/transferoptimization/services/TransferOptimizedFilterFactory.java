@@ -29,7 +29,7 @@ public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule> {
             filters.add(OptimizedPathTail::waitTimeOptimizedCost);
         }
         else {
-            filters.add(it -> it.getLeg().generalizedCostTotal());
+            filters.add(OptimizedPathTail::generalizedCost);
         }
 
         filters.add(OptimizedPathTail::breakTieCost);

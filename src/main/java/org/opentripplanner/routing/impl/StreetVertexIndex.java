@@ -101,6 +101,7 @@ public class StreetVertexIndex {
 
       temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
       temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
+      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     }
@@ -117,6 +118,7 @@ public class StreetVertexIndex {
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
       temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
       temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
+      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     }
   }

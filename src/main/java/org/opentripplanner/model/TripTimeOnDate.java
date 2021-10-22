@@ -165,4 +165,12 @@ public class TripTimeOnDate {
     public StopTimeKey getStopTimeKey() {
         return new StopTimeKey(tripTimes.getTrip().getId(), stopIndex);
     }
+
+    public BookingInfo getPickupBookingInfo() {
+        return tripTimes.getPickupBookingInfo(stopIndex);
+    }
+
+    public BookingInfo getDropOffBookingInfo() {
+        return tripTimes.getDropOffBookingInfo(stopIndex);
+    }
 }

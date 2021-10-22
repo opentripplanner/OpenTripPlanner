@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -39,14 +38,13 @@ public final class Stops<T extends RaptorTripSchedule> {
             int nStops,
             Collection<RaptorTransfer> egressPath,
             DestinationArrivalPaths<T> paths,
-            DebugHandlerFactory<T> debugHandlerFactory,
-            DebugLogger debugLogger
+            DebugHandlerFactory<T> debugHandlerFactory
     ) {
         //noinspection unchecked
         this.stops = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
         this.touchedStops = new BitSet(nStops);
         this.debugHandlerFactory = debugHandlerFactory;
-        this.debugStats = new DebugStopArrivalsStatistics(debugLogger);
+        this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
         Collection<Map.Entry<Integer, List<RaptorTransfer>>> groupedEgressPaths = egressPath
             .stream()

@@ -164,6 +164,11 @@ public class ValueObjectToStringBuilderTest {
         assertEquals("$0.01", subject().addCost(1).toString());
         assertEquals("$1", subject().addCost(100).toString());
         assertEquals("$100.01", subject().addCost(10001).toString());
+
+        assertEquals("null", subject().addCost(null, "pip").toString());
+        assertEquals("", subject().skipNull().addCost(null, "pip").toString());
+        assertEquals("$-0.01pip", subject().addCost(-1, "pip").toString());
+        assertEquals("$1pip", subject().addCost(100, "pip").toString());
     }
 
 }
