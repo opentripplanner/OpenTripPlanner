@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.interactivelauncher.Model;
 
 import javax.swing.*;
@@ -60,7 +61,9 @@ class DataSourcesView {
 
     ButtonGroup selectDataSourceRadioGroup = new ButtonGroup();
 
-    for (String name : values) {
+    List<String> valuesSorted = values.stream().sorted().collect(Collectors.toList());
+
+    for (String name : valuesSorted) {
       boolean selected = selectedValue.equals(name);
       JRadioButton radioBtn = newRadioBtn(selectDataSourceRadioGroup, name, selected);
       radioBtn.addActionListener(this::onDataSourceChange);
