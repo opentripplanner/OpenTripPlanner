@@ -89,7 +89,7 @@ public final class DefaultCostCalculator implements CostCalculator {
     }
 
     @Override
-    public final int onTripRelativeRidingCost(
+    public int onTripRelativeRidingCost(
             int boardTime,
             int transitFactorIndex
     ) {
@@ -101,7 +101,7 @@ public final class DefaultCostCalculator implements CostCalculator {
     }
 
     @Override
-    public final int transitArrivalCost(
+    public int transitArrivalCost(
         int boardCost,
         int alightSlack,
         int transitTime,
@@ -120,12 +120,12 @@ public final class DefaultCostCalculator implements CostCalculator {
     }
 
     @Override
-    public final int waitCost(int waitTimeInSeconds) {
+    public int waitCost(int waitTimeInSeconds) {
         return waitFactor * waitTimeInSeconds;
     }
 
     @Override
-    public final int calculateMinCost(int minTravelTime, int minNumTransfers) {
+    public int calculateMinCost(int minTravelTime, int minNumTransfers) {
         return  boardCostOnly
             + boardAndTransferCost * minNumTransfers
             + transitFactors.minFactor() * minTravelTime;

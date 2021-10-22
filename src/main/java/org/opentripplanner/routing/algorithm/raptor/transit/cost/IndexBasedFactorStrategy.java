@@ -22,12 +22,12 @@ final class IndexBasedFactorStrategy implements FactorStrategy {
     }
 
     @Override
-    public final int factor(int index) {
+    public int factor(int index) {
         return factors[index];
     }
 
     @Override
-    public final int minFactor() {
+    public int minFactor() {
         return minFactor;
     }
 

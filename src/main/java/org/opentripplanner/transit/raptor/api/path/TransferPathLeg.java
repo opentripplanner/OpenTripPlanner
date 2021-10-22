@@ -37,32 +37,32 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
         this.next = next;
     }
 
-    public final RaptorTransfer transfer() {
+    public RaptorTransfer transfer() {
         return transfer;
     }
 
     @Override
-    public final boolean isTransferLeg() {
+    public boolean isTransferLeg() {
         return true;
     }
 
     @Override
-    public final int fromStop() {
+    public int fromStop() {
         return fromStop;
     }
 
     @Override
-    public final int fromTime() {
+    public int fromTime() {
         return fromTime;
     }
 
     @Override
-    public final int toStop(){
+    public int toStop(){
         return toStop;
     }
 
     @Override
-    public final int toTime(){
+    public int toTime(){
         return toTime;
     }
 
@@ -72,7 +72,7 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
     }
 
     @Override
-    public final PathLeg<T> nextLeg() {
+    public PathLeg<T> nextLeg() {
         return next;
     }
 
