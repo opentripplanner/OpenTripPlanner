@@ -20,7 +20,7 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
 
-public class OptimizePathServiceTest implements RaptorTestConstants {
+public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     /**
      * The exact start time to walk to stop A to catch Trip_1 with 40s board slack
@@ -45,7 +45,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
     );
 
     private static final TransferWaitTimeCalculator TRANS_WAIT_TIME_CALC =
-            new TransferWaitTimeCalculator(2.0);
+            new TransferWaitTimeCalculator(1.0, 2.0);
 
     static TestPathBuilder pathBuilder() {
         return new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
@@ -124,7 +124,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
 
         // Insert wait-time cost summary info
         var expected = original.toStringDetailed(this::stopIndexToName)
-                .replace("$3250]", "$3250 $33pri $423.81wtc]");
+                .replace("$3250]", "$3250 $33pri $333.81wtc]");
 
         assertEquals(
                 expected,
@@ -201,7 +201,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
 
         assertEquals(
                 "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C ~ BUS T2 10:15 10:35 ~ F "
-                        + "~ BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3040 $66pri $704.05wtc]",
+                        + "~ BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3040 $66pri $314.05wtc]",
                 PathUtils.pathsToString(result)
         );
     }
@@ -262,11 +262,11 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
 
     /* private methods */
 
-    static OptimizePathService<TestTripSchedule> subject(
+    static OptimizePathDomainService<TestTripSchedule> subject(
             TransferGenerator<TestTripSchedule> generator,
             @Nullable TransferWaitTimeCalculator waitTimeCalculator
     ) {
-        return new OptimizePathService<>(
+        return new OptimizePathDomainService<>(
                 generator,
                 COST_CALCULATOR,
                 SLACK_PROVIDER,

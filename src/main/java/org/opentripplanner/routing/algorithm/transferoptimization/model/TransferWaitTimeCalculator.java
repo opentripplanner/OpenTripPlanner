@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 
-import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
 
 /**
  * This calculator uses the {@code minSafeTransferTime}(t0) and an inverse log function to calculate
@@ -13,11 +13,11 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConve
  * <p>
  * First let look at an example. The transfer times(t) are in minutes:
  * <pre>
- *     Leg 1        Origin ---- A ----------- B
- *     Transfer 1               | t=1         | t=3
- *     Leg 2                    C ---- D ---- E ---- F
- *     Transfer 2                      | t=7         | t=4
- *     Leg 3                           G ----------- H ---- Destination(Z)
+ *     Leg 1        Origin --- A --------- B
+ *     Transfer 1               \ t=1       \ t=3
+ *     Leg 2                     C --- D --- E --- F
+ *     Transfer 2                       \ t=7       \ t=4
+ *     Leg 3                             G --------- H --- Destination(Z)
  * </pre>
  * In this example there is 3 valid paths with the following transfers:
  * <ol>
@@ -117,7 +117,19 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConve
 public class TransferWaitTimeCalculator {
   public static final int ZERO_COST = 0;
 
+  /**
+   * The cost is approximately minus 30 hours. This should be enough to beat the back-travel cost
+   * for any normal transfer (also negative).
+   * <p>
+   * Unit: cost-seconds
+   */
+  private static final int STAY_SEATED_COST = -100_000;
+
+  /** ~ -15 hours, @see #STAY_SEATED_COST */
+  private static final int GUARANTEED_COST = -50_000;
+
   private final double n;
+  private final double backTravelWaitTimeFactor;
   private int t0 = -1;
   private double a = Double.NaN;
 
@@ -128,8 +140,15 @@ public class TransferWaitTimeCalculator {
    *   f(0) = N * minSafeTransferTime
    * </pre>
    * <p>
+   *
+   * @param backTravelWaitTimeFactor This factor is used to calculate a cost, with should balance
+   *                                 the wait time against extra transit time and less walking.
    */
-  public TransferWaitTimeCalculator(double minSafeWaitTimeFactor) {
+  public TransferWaitTimeCalculator(
+      double backTravelWaitTimeFactor,
+      double minSafeWaitTimeFactor
+  ) {
+    this.backTravelWaitTimeFactor = backTravelWaitTimeFactor;
     this.n = minSafeWaitTimeFactor;
   }
 
@@ -141,10 +160,61 @@ public class TransferWaitTimeCalculator {
     this.a = (Math.E - 1.0) / minSafeTransferTime;
   }
 
+
+  double avoidShortWaitTimeCost(int waitTime) {
+    return n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime));
+  }
+
+  double avoidBackTravelCost(int waitTime) {
+    return -(waitTime * backTravelWaitTimeFactor);
+  }
+
+  /**
+   * The optimized transfer normally do not need to account for transfer constraints, but we want
+   * a guaranteed or stay-seated transfer to "win" over a normal transfer - independent of what
+   * the wait-times of the facilitated transfer are. We also need to account for the case where we
+   * have to choose between facilitated transfers.
+   * <p>
+   * Here is an example with to possible paths: {@code A-B-D-E-H-J} and {@code A-C-F-G-I-J}, the
+   * {@code \} is a normal transfer and the {@code \\} is a guaranteed transfer. The path
+   * {@code A-B-D-G-I-J} is also possible, but can be dropped early, because it does not contain
+   * any guaranteed transfers.
+   * <pre>
+   *  A --- B ---------- C
+   *         \           \\
+   *          D --- E --- F --- G
+   *                \\           \
+   *                 H ---------- I --- J
+   * </pre>
+   * So,
+   * <ol>
+   *     <li>when arriving a stop D we want E-H to dominate G-I</li>
+   *     <li>when comparing the paths we want to eliminate the restricted transfers</li>
+   * </ol>
+   * To achieve this we give a restricted transfer a big negative cost - bigger than any possible
+   * optimized-wait-time cost (to achieve point 1 above), and we use a constant cost (to achieve
+   * point 2).
+   * <p>
+   * We give stay-seated an advantage over guaranteed by using a smaller cost as well.
+   */
+  int calculateStaySeatedTransferCost() {
+    return toRaptorCost(STAY_SEATED_COST);
+  }
+
+  /**
+   * @see #calculateStaySeatedTransferCost()
+   */
+  int calculateGuaranteedTransferCost() {
+    return toRaptorCost(GUARANTEED_COST);
+  }
+
   int calculateOptimizedWaitCost(int waitTime) {
     if(waitTime < 0 ) { return ZERO_COST; }
     assertMinSafeTransferTimeSet();
-    return RaptorCostConverter.toRaptorCost(n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime)));
+
+    return toRaptorCost(
+        avoidShortWaitTimeCost(waitTime) + avoidBackTravelCost(waitTime)
+    );
   }
 
   private void assertMinSafeTransferTimeSet() {

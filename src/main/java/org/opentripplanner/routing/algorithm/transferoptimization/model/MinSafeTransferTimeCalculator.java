@@ -18,7 +18,8 @@ import org.opentripplanner.util.time.DurationUtils;
  * <p>
  * Example:
  * <pre>
- *   upper limit: 40 minutes
+ *   Lower limit is:  2 minutes
+ *   Upper limit is: 40 minutes
  *   minSafeTransferTimeFactor: f = 6.67
  *
  *   Itineraries returned from search:
@@ -64,6 +65,12 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
    */
   private static final int MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND = DurationUtils.duration("40m");
 
+  /**
+   * This is an lower bound for min-safe-transfer-time. Journeys that
+   * last for less than 30 minutes will use 2 minutes as a {@code minSafeTransferTime}.
+   */
+  private static final int MIN_SAFE_TRANSFER_TIME_LIMIT_LOWER_BOUND = DurationUtils.duration("2m");
+
 
   public MinSafeTransferTimeCalculator(RaptorSlackProvider slackProvider) {
     this.slackProvider = slackProvider;
@@ -92,6 +99,17 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
     if(list.isEmpty()) { return MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND; }
     int minTransitTime = list.stream().mapToInt(transitTimeSeconds).min().getAsInt();
     int minSafeTransitTime = (int) Math.round(minTransitTime * P / 100.0);
-    return Math.min(MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND, minSafeTransitTime);
+    return bound(
+            minSafeTransitTime,
+            MIN_SAFE_TRANSFER_TIME_LIMIT_LOWER_BOUND,
+            MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND
+    );
+  }
+
+  /** Make sure value is within lower and upper bound. */
+  @SuppressWarnings("SameParameterValue")
+  static int bound(int value, final int lowerLimit, final int upperLimit) {
+    value = Math.max(value, lowerLimit);
+    return Math.min(value, upperLimit);
   }
 }
