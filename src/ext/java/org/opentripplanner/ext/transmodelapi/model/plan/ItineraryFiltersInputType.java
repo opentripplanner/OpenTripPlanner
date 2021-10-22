@@ -17,6 +17,7 @@ public class ItineraryFiltersInputType {
   private static final String TRANSIT_GENERALIZED_COST_LIMIT = "transitGeneralizedCostLimit";
   private static final String GROUP_SIMILARITY_KEEP_ONE = "groupSimilarityKeepOne";
   private static final String GROUP_SIMILARITY_KEEP_THREE = "groupSimilarityKeepThree";
+  private static final String GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER = "groupedOtherThanSameLegsMaxCostMultiplier";
   private static final String GROUP_SIMILARITY_KEEP_N_ITINERARIES = "groupSimilarityKeepNumOfItineraries";
 
   public static GraphQLInputObjectType create(GqlUtil gqlUtil, ItineraryFilterParameters dft) {
@@ -67,6 +68,17 @@ public class ItineraryFiltersInputType {
                 .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
                 .defaultValue(dft.groupSimilarityKeepThree)
                 .build())
+        .field(GraphQLInputObjectField
+            .newInputObjectField()
+            .type(Scalars.GraphQLFloat)
+            .name(GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER)
+            .description(
+                "Of the itineraries grouped to maximum of three itineraries, how much worse can the "
+                + "non-grouped legs be compared to the lowest cost. 2.0 means that they can be "
+                + "double the cost, and any itineraries having a higher cost will be filtered. "
+                + "Default value is 2.0, use a value lower than 1.0 to turn off")
+            .defaultValue(dft.groupedOtherThanSameLegsMaxCostMultiplier)
+            .build())
         .build();
   }
 
@@ -84,6 +96,7 @@ public class ItineraryFiltersInputType {
     setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, (Double v) -> target.groupSimilarityKeepThree = v);
 
     setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) -> target.groupSimilarityKeepThree = v);
+    setField(callWith, GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER, (Double v) -> target.groupedOtherThanSameLegsMaxCostMultiplier = v);
     setField(callWith, MIN_SAFE_TRANSFER_TIME_FACTOR, (Double v) -> target.minSafeTransferTimeFactor = v);
     setField(callWith, TRANSIT_GENERALIZED_COST_LIMIT, (DoubleFunction<Double> v) -> target.transitGeneralizedCostLimit = v);
   }
