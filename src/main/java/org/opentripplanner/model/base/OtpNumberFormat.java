@@ -51,4 +51,9 @@ public class OtpNumberFormat {
     if(cost % 100 == 0) { return "$" + cost/100; }
     return String.format(Locale.ROOT, "$%.2f",  cost / 100.0);
   }
+
+  /** Used to format integer cost types with a given unit. */
+  public static String formatCost(int cost, String unit) {
+    return formatCost(cost) + unit;
+  }
 }

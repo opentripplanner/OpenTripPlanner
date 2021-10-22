@@ -1,21 +1,27 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
-class ConstrainedTransferBoarding implements RaptorTripScheduleBoardOrAlightEvent<TripSchedule> {
 
+public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
+        implements RaptorTripScheduleBoardOrAlightEvent<T> {
+
+    private final TransferConstraint constraint;
     private final int tripIndex;
-    private final TripSchedule trip;
+    private final T trip;
     private final int stopPositionInPattern;
     private final int time;
 
     ConstrainedTransferBoarding(
+            TransferConstraint constraint,
             int tripIndex,
-            TripSchedule trip,
+            T trip,
             int stopPositionInPattern,
             int time
     ) {
+        this.constraint = constraint;
         this.tripIndex = tripIndex;
         this.trip = trip;
         this.stopPositionInPattern = stopPositionInPattern;
@@ -26,11 +32,16 @@ class ConstrainedTransferBoarding implements RaptorTripScheduleBoardOrAlightEven
     public int getTripIndex() { return tripIndex; }
 
     @Override
-    public TripSchedule getTrip() { return trip; }
+    public T getTrip() { return trip; }
 
     @Override
     public int getStopPositionInPattern() { return stopPositionInPattern; }
 
     @Override
     public int getTime() { return time; }
+
+    @Override
+    public TransferConstraint getTransferConstraint() {
+        return constraint;
+    }
 }

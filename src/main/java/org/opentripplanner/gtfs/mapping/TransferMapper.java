@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +8,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
@@ -119,17 +118,13 @@ class TransferMapper {
     Trip toTrip = tripMapper.map(rhs.getToTrip());
     Route fromRoute = routeMapper.map(rhs.getFromRoute());
     Route toRoute = routeMapper.map(rhs.getToRoute());
-
-    boolean guaranteed = rhs.getTransferType() == GUARANTEED;
-    boolean staySeated = sameBlockId(fromTrip, toTrip);
-
-    TransferPriority transferPriority = mapTypeToPriority(rhs.getTransferType());
+    TransferConstraint constraint = mapConstraint(rhs, fromTrip, toTrip);
 
     // TODO TGR - Create a transfer for this se issue #3369
     int transferTime = rhs.getMinTransferTime();
 
     // If this transfer do not give any advantages in the routing, then drop it
-    if(!guaranteed && !staySeated && transferPriority == TransferPriority.ALLOWED) {
+    if(constraint.noConstraints()) {
       if(transferTime > 0) {
         LOG.info("Transfer skipped, issue #3369: " + rhs);
       }
@@ -155,13 +150,8 @@ class TransferMapper {
 
     for (TransferPoint fromPoint : fromPoints) {
       for (TransferPoint toPoint : toPoints) {
-        var constraint = new TransferConstraint(
-                transferPriority,
-                staySeated,
-                guaranteed,
-                MAX_WAIT_TIME_NOT_SET
-        );
         var transfer = new ConstrainedTransfer(
+                null,
                 fromPoint,
                 toPoint,
                 constraint
@@ -170,6 +160,16 @@ class TransferMapper {
       }
     }
     return result;
+  }
+
+  private TransferConstraint mapConstraint(Transfer rhs, Trip fromTrip, Trip toTrip) {
+    var builder = TransferConstraint.create();
+
+    builder.guaranteed(rhs.getTransferType() == GUARANTEED);
+    builder.staySeated(sameBlockId(fromTrip, toTrip));
+    builder.priority(mapTypeToPriority(rhs.getTransferType()));
+
+    return builder.build();
   }
 
   private Collection<TransferPoint> mapTransferPoints(

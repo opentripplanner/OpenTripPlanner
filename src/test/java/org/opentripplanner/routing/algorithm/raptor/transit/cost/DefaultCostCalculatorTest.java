@@ -25,12 +25,15 @@ public class DefaultCostCalculatorTest {
     );
 
     @Test
-    public void boardCost() {
-        assertEquals(500, subject.boardCost(true, 0, STOP_A), "Board stop cost");
-        assertEquals(525, subject.boardCost(true, 0, STOP_B), "Board stop cost");
-        assertEquals(550, subject.boardCost(true, 1, STOP_A), "Board stop and wait cost");
-        assertEquals(700, subject.boardCost(false, 0, STOP_A), "Board stop cost");
-        assertEquals(750, subject.boardCost(false, 1, STOP_A), "Board stop and wait cost");
+    public void boardCostRegularTransfer() {
+        int time0 = 10;
+        int oneSec = time0 + 1;
+
+        assertEquals(500, subject.boardingCostRegularTransfer(true, time0, STOP_A, time0));
+        assertEquals(525, subject.boardingCostRegularTransfer(true, time0, STOP_B, time0));
+        assertEquals(550, subject.boardingCostRegularTransfer(true, time0, STOP_A, oneSec));
+        assertEquals(700, subject.boardingCostRegularTransfer(false, time0, STOP_A, time0));
+        assertEquals(750, subject.boardingCostRegularTransfer(false, time0, STOP_A, oneSec));
     }
 
     @Test

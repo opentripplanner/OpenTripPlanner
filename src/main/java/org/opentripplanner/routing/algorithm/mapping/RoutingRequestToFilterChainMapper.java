@@ -4,26 +4,24 @@ import java.time.Instant;
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 public class RoutingRequestToFilterChainMapper {
-  private static final int KEEP_ONE = 1;
-
   /** Filter itineraries down to this limit, but not below. */
   private static final int KEEP_THREE = 3;
 
   /** Never return more that this limit of itineraries. */
   private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
-  public static ItineraryFilter createFilterChain(
+  public static ItineraryListFilterChain createFilterChain(
       RoutingRequest request,
       Instant filterOnLatestDepartureTime,
       boolean removeWalkAllTheWayResults,
       Consumer<Itinerary> maxLimitReachedSubscriber
   ) {
-    var builder = new ItineraryFilterChainBuilder(request.arriveBy);
+    var builder = new ItineraryListFilterChainBuilder(request.arriveBy);
     var p = request.itineraryFilters;
 
     // Group by similar legs filter
@@ -33,13 +31,18 @@ public class RoutingRequestToFilterChainMapper {
 
       if (p.groupSimilarityKeepOne >= 0.5) {
         builder.addGroupBySimilarity(
-            new GroupBySimilarity(p.groupSimilarityKeepOne, KEEP_ONE)
+            GroupBySimilarity.createWithOneItineraryPerGroup(p.groupSimilarityKeepOne)
         );
       }
 
       if (p.groupSimilarityKeepThree >= 0.5) {
         builder.addGroupBySimilarity(
-            new GroupBySimilarity(p.groupSimilarityKeepThree, KEEP_THREE)
+          GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(
+              p.groupSimilarityKeepThree,
+              KEEP_THREE,
+              true,
+              p.groupedOtherThanSameLegsMaxCostMultiplier
+          )
         );
       }
     }

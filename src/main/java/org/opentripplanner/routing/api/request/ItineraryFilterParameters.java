@@ -2,7 +2,9 @@ package org.opentripplanner.routing.api.request;
 
 
 import java.util.function.DoubleFunction;
-import org.opentripplanner.routing.algorithm.filterchain.filters.AddMinSafeTransferCostFilter;
+
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.filter.AddMinSafeTransferCostFilter;
 
 /**
  * Group by Similarity filter parameters
@@ -17,7 +19,7 @@ public class ItineraryFilterParameters {
   /**
    * Keep ONE itinerary for each group with at least this part of the legs in common.
    * Default value is 0.85 (85%), use a value less than 0.50 to turn off.
-   * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder#addGroupBySimilarity(org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity)
+   * @see ItineraryListFilterChainBuilder#addGroupBySimilarity(org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity)
    */
   public double groupSimilarityKeepOne;
 
@@ -27,6 +29,13 @@ public class ItineraryFilterParameters {
    */
   public double groupSimilarityKeepThree;
 
+  /**
+   * Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped
+   * legs be compared to the lowest cost. 2.0 means that they can be double the cost, and any
+   * itineraries having a higher cost will be filtered. Default value is 2.0, use a value lower than
+   * 1.0 to turn off
+   */
+  public double groupedOtherThanSameLegsMaxCostMultiplier;
 
   /**
    * If set greater than zero(0.0), an addition to the itinerary generalized-cost for "unsafe
@@ -95,6 +104,7 @@ public class ItineraryFilterParameters {
     this.debug = false;
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepThree = 0.68;
+    this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
     this.minSafeTransferTimeFactor = 0.0;
     this.bikeRentalDistanceRatio = 0.0;
     this.parkAndRideDurationRatio = 0.0;
@@ -112,6 +122,7 @@ public class ItineraryFilterParameters {
       boolean debug,
       double groupSimilarityKeepOne,
       double groupSimilarityKeepThree,
+      double groupedOtherThanSameLegsMaxCostMultiplier,
       double minSafeTransferTimeFactor,
       DoubleFunction<Double> transitGeneralizedCostLimit,
       DoubleFunction<Double> nonTransitGeneralizedCostLimit,
@@ -121,6 +132,7 @@ public class ItineraryFilterParameters {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
     this.groupSimilarityKeepThree = groupSimilarityKeepThree;
+    this.groupedOtherThanSameLegsMaxCostMultiplier = groupedOtherThanSameLegsMaxCostMultiplier;
     this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
     this.transitGeneralizedCostLimit = transitGeneralizedCostLimit;
     this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;

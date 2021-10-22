@@ -116,7 +116,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     /**
      * Set the time at a transit stop iff it is optimal.
      */
-    final void transitToStop(
+    void transitToStop(
         final PatternRide<T> ride,
         final int alightStop,
         final int alightTime,

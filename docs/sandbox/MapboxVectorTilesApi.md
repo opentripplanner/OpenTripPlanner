@@ -10,6 +10,7 @@
 - 2020-07-09: Initial version of Mapbox vector tiles API
 - 2021-05-12: Make expansion factor configurable
 - 2021-09-07: Rename `BikeRental` to `VehicleRental`
+- 2021-10-13: Correctly serialize the vehicle rental name [#3648](https://github.com/opentripplanner/OpenTripPlanner/pull/3648)
 
 ## Documentation
 
