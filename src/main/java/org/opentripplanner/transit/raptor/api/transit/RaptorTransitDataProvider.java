@@ -106,14 +106,16 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
     RaptorStopNameResolver stopNameResolver();
 
     /**
-     * Returns the beginning of valid transit data, in seconds since midnight of the day of the
-     * search. All trips running even partially after this time are included.
+     * Returns the beginning of valid transit data. All trips running even partially after this time are included.
+     * <p>
+     * Unit: seconds since midnight of the day of the search.
      */
     int getValidTransitDataStartTime();
 
     /**
-     * Returns the end time of valid transit data, in seconds since midnight of the day of the
-     * search. All trips running even partially before this time are included.
+     * Returns the end time of valid transit data. All trips running even partially before this time are included.
+     * <p>
+     * Unit: seconds since midnight of the day of the search
      */
     int getValidTransitDataEndTime();
 }
