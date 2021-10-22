@@ -25,8 +25,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConve
  *   <li>Alt 2: A-C and F-H with 1 + 4 = 5 minutes total</li>
  *   <li>Alt 3: B-E and F-H with 3 + 4 = 7 minutes total</li>
  * </ol>
- * The best alternative here is Alt 3, witch is the best compromise between maximizing the travel
- * time and avoiding the short transfer time(1 minute) at A-C, witch is only 1 minute.
+ * The best alternative here is Alt 3, which is the best compromise between maximizing the travel
+ * time and avoiding the short transfer time(1 minute) at A-C, which is only 1 minute.
  *
  * <pre>
  *   t0 : MinSafeTransferTime
