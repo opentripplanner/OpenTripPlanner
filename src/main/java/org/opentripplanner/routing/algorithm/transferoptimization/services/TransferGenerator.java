@@ -180,7 +180,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     if(tx != null && tx.getTransferConstraint().isFacilitated()) {
       return fromTime;
     }
-    return fromTime + transferDurationInSeconds + slackProvider.transitSlack(fromTrip.pattern());
+    return fromTime
+            + transferDurationInSeconds
+            + slackProvider.alightSlack(fromTrip.pattern())
+            + slackProvider.boardSlack(toTrip.pattern());
   }
 
   @Nonnull

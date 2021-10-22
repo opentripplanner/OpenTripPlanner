@@ -65,6 +65,7 @@
 - Add service day mapping to REST API [#3659](https://github.com/opentripplanner/OpenTripPlanner/pull/3659)
 - Cost on transfer in Raptor [#3629](https://github.com/opentripplanner/OpenTripPlanner/pull/3629)
 - Add two new filters for use within grouping filter [#3638](https://github.com/opentripplanner/OpenTripPlanner/pull/3638)
+- Use correct slack in transfer optimizer [#3668](https://github.com/opentripplanner/OpenTripPlanner/pull/3668)
 
 
 ## 2.0.0 (2020-11-27)
