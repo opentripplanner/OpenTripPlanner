@@ -32,7 +32,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
     }
 
     @Override
-    public final int tripSortIndex() {
+    public int tripSortIndex() {
         return sortIndex;
     }
 

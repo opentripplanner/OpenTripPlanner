@@ -43,7 +43,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     private final int T10_40 = TimeUtils.time("10:40");
 
     private final OptimizedPathTail<TestTripSchedule> pathTail = new OptimizedPathTail<>(
-            SLACK_PROVIDER, COST_CALCULATOR, null
+            SLACK_PROVIDER, COST_CALCULATOR, null, this::stopIndexToName
     );
 
     private final TestTripSchedule TRIP = TestTripSchedule.schedule()
@@ -111,10 +111,6 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
         var times = BoardAndAlightTime.create(TRIP, STOP_A, T10_00, egressStop, toTime);
         int cost = 100 * (T10_40 - T10_00);
         return new TransitPathLeg<>(TRIP, times, null, cost, egress);
-    }
-
-    private static  <T> T first(Collection<T> c) {
-        return c.stream().findFirst().orElseThrow();
     }
 
     private static  <T> String firstRide(Collection<T> c) {

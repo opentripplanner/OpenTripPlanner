@@ -72,8 +72,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
    */
   public TestItineraryBuilder walk(int duration, Place to) {
     if(lastEndTime == NOT_SET) { throw new IllegalStateException("Start time unknown!"); }
-    cost += cost(WALK_RELUCTANCE_FACTOR, duration);
-    streetLeg(WALK, lastEndTime, lastEndTime + duration, to);
+    int legCost = cost(WALK_RELUCTANCE_FACTOR, duration);
+    streetLeg(WALK, lastEndTime, lastEndTime + duration, to, legCost);
     return this;
   }
 
@@ -81,14 +81,14 @@ public class TestItineraryBuilder implements PlanTestConstants {
    * Add a bicycle leg to the itinerary.
    */
   public TestItineraryBuilder bicycle(int startTime, int endTime, Place to) {
-    cost += cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
-    streetLeg(BICYCLE, startTime, endTime, to);
+    int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
+    streetLeg(BICYCLE, startTime, endTime, to, legCost);
     return this;
   }
 
   public TestItineraryBuilder drive(int startTime, int endTime, Place to) {
-    cost += cost(CAR_RELUCTANCE_FACTOR, endTime - startTime);
-    streetLeg(CAR, startTime, endTime, to);
+    int legCost = cost(CAR_RELUCTANCE_FACTOR, endTime - startTime);
+    streetLeg(CAR, startTime, endTime, to, legCost);
     return this;
   }
 
@@ -96,8 +96,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
    * Add a rented bicycle leg to the itinerary.
    */
   public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
-    cost += cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
-    streetLeg(BICYCLE, startTime, endTime, to);
+    int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
+    streetLeg(BICYCLE, startTime, endTime, to, legCost);
     this.legs.get(0).rentedVehicle = true;
     return this;
   }
@@ -143,24 +143,27 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private TestItineraryBuilder transit(Route route, int tripId, int start, int end, Place to) {
     if(lastPlace == null) { throw new IllegalStateException("Trip from place is unknown!"); }
     int waitTime = start - lastEndTime(start);
-    cost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
-    cost += cost(1.0f, end - start) + BOARD_COST;
-    Leg leg = leg(new Leg(trip(tripId, route)), start, end, to);
+    int legCost = 0;
+    legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
+    legCost += cost(1.0f, end - start) + BOARD_COST;
+    Leg leg = leg(new Leg(trip(tripId, route)), start, end, to, legCost);
     leg.serviceDate = SERVICE_DATE;
     return this;
   }
 
-  private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to) {
-    return leg(new Leg(mode), startTime, endTime, to);
+  private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
+    return leg(new Leg(mode), startTime, endTime, to, legCost);
   }
 
-  private Leg leg(Leg leg, int startTime, int endTime, Place to) {
+  private Leg leg(Leg leg, int startTime, int endTime, Place to, int legCost) {
     leg.from = stop(lastPlace, TRIP_FROM_STOP_INDEX);
     leg.startTime = GregorianCalendar.from(newTime(startTime));
     leg.to = stop(to, TRIP_TO_STOP_INDEX);
     leg.endTime = GregorianCalendar.from(newTime(endTime));
     leg.distanceMeters = speed(leg.mode) * (endTime - startTime);
+    leg.generalizedCost = legCost;
     legs.add(leg);
+    cost += legCost;
 
     // Setup for adding another leg
     lastEndTime = endTime;

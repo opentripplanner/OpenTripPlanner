@@ -9,8 +9,6 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChai
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 public class RoutingRequestToFilterChainMapper {
-  private static final int KEEP_ONE = 1;
-
   /** Filter itineraries down to this limit, but not below. */
   private static final int KEEP_THREE = 3;
 
@@ -33,13 +31,18 @@ public class RoutingRequestToFilterChainMapper {
 
       if (p.groupSimilarityKeepOne >= 0.5) {
         builder.addGroupBySimilarity(
-            new GroupBySimilarity(p.groupSimilarityKeepOne, KEEP_ONE)
+            GroupBySimilarity.createWithOneItineraryPerGroup(p.groupSimilarityKeepOne)
         );
       }
 
       if (p.groupSimilarityKeepThree >= 0.5) {
         builder.addGroupBySimilarity(
-            new GroupBySimilarity(p.groupSimilarityKeepThree, KEEP_THREE)
+          GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(
+              p.groupSimilarityKeepThree,
+              KEEP_THREE,
+              true,
+              p.groupedOtherThanSameLegsMaxCostMultiplier
+          )
         );
       }
     }

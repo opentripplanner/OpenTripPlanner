@@ -43,7 +43,12 @@ public class PathMapperTest implements RaptorTestConstants {
         // Given:
         var destArrival = basicTripByForwardSearch();
         var mapper = new ForwardPathMapper<TestTripSchedule>(
-                null, SLACK_PROVIDER, COST_CALCULATOR, lifeCycle(), false
+                null,
+                SLACK_PROVIDER,
+                COST_CALCULATOR,
+                this::stopIndexToName,
+                lifeCycle(),
+                false
         );
 
         //When:
@@ -58,7 +63,12 @@ public class PathMapperTest implements RaptorTestConstants {
         // Given:
         var destArrival = basicTripByReverseSearch();
         var mapper = new ReversePathMapper<TestTripSchedule>(
-                null, SLACK_PROVIDER, COST_CALCULATOR, lifeCycle(), false
+                null,
+                SLACK_PROVIDER,
+                COST_CALCULATOR,
+                this::stopIndexToName,
+                lifeCycle(),
+                false
         );
 
         //When:
@@ -141,7 +151,12 @@ public class PathMapperTest implements RaptorTestConstants {
     ) {
         // Given:
         var mapper = new ForwardPathMapper<TestTripSchedule>(
-                null, FLEX_SLACK_PROVIDER, FLEX_COST_CALCULATOR, lifeCycle(), false
+                null,
+                FLEX_SLACK_PROVIDER,
+                FLEX_COST_CALCULATOR,
+                this::stopIndexToName,
+                lifeCycle(),
+                false
         );
         // When:
         Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
@@ -155,7 +170,12 @@ public class PathMapperTest implements RaptorTestConstants {
     ) {
         // Given:
         var mapper = new ReversePathMapper<TestTripSchedule>(
-                null, FLEX_SLACK_PROVIDER, FLEX_COST_CALCULATOR, lifeCycle(), false
+                null,
+                FLEX_SLACK_PROVIDER,
+                FLEX_COST_CALCULATOR,
+                this::stopIndexToName,
+                lifeCycle(),
+                false
         );
         // When:
         Path<TestTripSchedule> path = mapper.mapToPath(destArrival);

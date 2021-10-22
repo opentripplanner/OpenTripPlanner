@@ -15,6 +15,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.services.Trans
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -23,6 +24,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedule> {
   private final IntFunction<Stop> stopLookup;
+  private final RaptorStopNameResolver stopNameResolver;
   private final TransferService transferService;
   private final RaptorTransitDataProvider<T> transitDataProvider;
   private final RaptorRequest<T> raptorRequest;
@@ -31,12 +33,14 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
 
   public TransferOptimizationServiceConfigurator(
       IntFunction<Stop> stopLookup,
+      RaptorStopNameResolver stopNameResolver,
       TransferService transferService,
       RaptorTransitDataProvider<T> transitDataProvider,
       RaptorRequest<T> raptorRequest,
       TransferOptimizationParameters config
   ) {
     this.stopLookup = stopLookup;
+    this.stopNameResolver = stopNameResolver;
     this.transferService = transferService;
     this.transitDataProvider = transitDataProvider;
     this.raptorRequest = raptorRequest;
@@ -48,6 +52,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
    */
   public static <T extends RaptorTripSchedule> OptimizeTransferService<T> createOptimizeTransferService(
       IntFunction<Stop> stopLookup,
+      RaptorStopNameResolver stopNameResolver,
       TransferService transferService,
       RaptorTransitDataProvider<T> transitDataProvider,
       RaptorRequest<T> raptorRequest,
@@ -55,6 +60,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   ) {
     return new TransferOptimizationServiceConfigurator<T>(
         stopLookup,
+        stopNameResolver,
         transferService,
         transitDataProvider,
         raptorRequest,
@@ -106,7 +112,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
             costCalculator,
             raptorRequest.slackProvider(),
             transferWaitTimeCalculator,
-            transferPointFilter
+            transferPointFilter,
+            stopNameResolver
     );
   }
 
@@ -127,11 +134,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   }
 
   private TransferWaitTimeCalculator createTransferWaitTimeCalculator() {
-    return new TransferWaitTimeCalculator(
-            config.waitReluctanceRouting(),
-            config.inverseWaitReluctance(),
-            config.minSafeWaitTimeFactor()
-    );
+    return new TransferWaitTimeCalculator(config.minSafeWaitTimeFactor());
   }
 
   private MinCostFilterChain<OptimizedPathTail<T>> createTransferOptimizedFilter(
