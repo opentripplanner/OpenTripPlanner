@@ -63,6 +63,10 @@ public class TestTripPattern implements RaptorTripPattern {
     }
   }
 
+  public String getName() {
+    return name;
+  }
+
   @Override public int stopIndex(int stopPositionInPattern) {
     return stopIndexes[stopPositionInPattern];
   }
