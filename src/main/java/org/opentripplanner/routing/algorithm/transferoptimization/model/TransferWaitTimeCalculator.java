@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
 
 /**
  * This calculator uses the {@code minSafeTransferTime}(t0) and an inverse log function to calculate
@@ -26,8 +25,8 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
  *   <li>Alt 2: A-C and F-H with 1 + 4 = 5 minutes total</li>
  *   <li>Alt 3: B-E and F-H with 3 + 4 = 7 minutes total</li>
  * </ol>
- * The best alternative here is Alt 3, with is the best compromise between maximizing the travel
- * time and avoiding the very short transfer time(1 minute) at A-C, witch is only 1 minute.
+ * The best alternative here is Alt 3, which is the best compromise between maximizing the travel
+ * time and avoiding the short transfer time(1 minute) at A-C, which is only 1 minute.
  *
  * <pre>
  *   t0 : MinSafeTransferTime
@@ -84,13 +83,13 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
  * +---------+----------++----------+------------++----------+------------+
  * |    t    |   cost   ||    t     |    cost    ||    t     |    cost    |
  * +---------+----------++----------+------------++----------+------------+
- * |   0.0   |   2.0    ||    0     |     240    ||    0     |    1200    |
- * |   0.1   |   1.56   ||   12s    |     188    ||    1m    |     938    |
- * |   0.2   |   1.38   ||   24s    |     166    ||    2m    |     829    |
- * |   0.5   |   1.15   ||    1m    |     138    ||    5m    |     690    |
- * |   1.0   |   1.0    ||    2m    |     120    ||   10m    |     600    |
- * |   2.0   |   0.88   ||   10m    |     105    ||   50m    |     526    |
- * |  10.0   |   0.75   ||   10m    |      90    ||   50m    |     451    |
+ * |   0.0   |   2.0    ||    0     |   $ 240    ||    0     |  $ 1200    |
+ * |   0.1   |   1.56   ||   12s    |   $ 188    ||    1m    |   $ 938    |
+ * |   0.2   |   1.38   ||   24s    |   $ 166    ||    2m    |   $ 829    |
+ * |   0.5   |   1.15   ||    1m    |   $ 138    ||    5m    |   $ 690    |
+ * |   1.0   |   1.0    ||    2m    |   $ 120    ||   10m    |   $ 600    |
+ * |   2.0   |   0.88   ||   10m    |   $ 105    ||   50m    |   $ 526    |
+ * |  10.0   |   0.75   ||   10m    |    $ 90    ||   50m    |   $ 451    |
  * +---------+----------++----------+------------++----------+------------+
  *
  * </pre>
@@ -110,14 +109,15 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
  *     Any 1/logN would be suitable, but log with base 10 is chosen (Supported in Java).
  *   </li>
  *   <li>
- *     We use this only to adjust the transfers within a single journey, not to compare
- *     two journeys with each other.
+ *     We use this only to adjust the transfers within a single itinerary, not to compare
+ *     two itineraries with each other.
  *   </li>
  * </ol>
  */
 public class TransferWaitTimeCalculator {
+  public static final int ZERO_COST = 0;
+
   private final double n;
-  private final double waitFactorCombined;
   private int t0 = -1;
   private double a = Double.NaN;
 
@@ -128,17 +128,8 @@ public class TransferWaitTimeCalculator {
    *   f(0) = N * minSafeTransferTime
    * </pre>
    * <p>
-   *
-   * @param waitReluctanceRouting The wait-reluctance used in the transit search.
-   * @param inverseWaitReluctance This factor is used to calculate a cost, with should balance the
-   *                              wait time against extra transit time and less walking.
    */
-  public TransferWaitTimeCalculator(
-      double waitReluctanceRouting,
-      double inverseWaitReluctance,
-      double minSafeWaitTimeFactor
-  ) {
-    this.waitFactorCombined = waitReluctanceRouting + inverseWaitReluctance;
+  public TransferWaitTimeCalculator(double minSafeWaitTimeFactor) {
     this.n = minSafeWaitTimeFactor;
   }
 
@@ -150,50 +141,8 @@ public class TransferWaitTimeCalculator {
     this.a = (Math.E - 1.0) / minSafeTransferTime;
   }
 
-  public int cost(PathLeg<?> leg) {
-    int waitCost = 0;
-
-    PathLeg<?> prev = leg;
-    PathLeg<?> curr = prev.nextLeg();
-    int totalWaitTime = 0;
-
-    while (!curr.isEgressLeg()) {
-      // Wait time including slack
-      int waitTime = curr.fromTime() - prev.toTime();
-
-      if (curr.isTransferLeg()) {
-        prev = curr;
-        curr = curr.nextLeg();
-        waitTime += curr.fromTime() - prev.toTime();
-      }
-      totalWaitTime += waitTime;
-
-      // Do not add any cost for the wait-time after a regular walk/bike access leg.
-      // The leg can be time-shifted so wait time is compressible and not considered.
-      //
-      // Also, we ignore the fact that a flex leg might have rides, because we are not considering
-      // transfers between flex and regular transit here. That would require more knowledge about
-      // the flex ride.
-      if(!prev.isAccessLeg() || prev.asAccessLeg().access().hasRides()) {
-        waitCost += calculateOptimizedWaitCost(waitTime);
-      }
-
-      prev = curr;
-      curr = curr.nextLeg();
-    }
-
-    // Add slack before egress
-    totalWaitTime += curr.fromTime() - prev.toTime();
-
-    int linearWaitCostDiff = RaptorCostConverter.toRaptorCost(
-            waitFactorCombined * totalWaitTime
-    );
-    // We use the path's generalized cost as a starting point, and subtract the cost of waiting.
-    // We want to maximize the waiting, but balance it toward walking and time spent on-board.
-    return leg.generalizedCostTotal() - linearWaitCostDiff + waitCost;
-  }
-
   int calculateOptimizedWaitCost(int waitTime) {
+    if(waitTime < 0 ) { return ZERO_COST; }
     assertMinSafeTransferTimeSet();
     return RaptorCostConverter.toRaptorCost(n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime)));
   }

@@ -3,10 +3,11 @@ package org.opentripplanner.transit.raptor.api.path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -181,11 +182,11 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                 .map(PathLeg::asTransitLeg);
     }
 
-    public String toStringDetailed(IntFunction<String> stopNameTranslator) {
-        return buildString(true, stopNameTranslator, null);
+    public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
+        return buildString(true, stopNameResolver, null);
     }
 
-    public String toString(IntFunction<String> stopNameTranslator) {
+    public String toString(RaptorStopNameResolver stopNameTranslator) {
         return buildString(false, stopNameTranslator, null);
     }
 
@@ -194,16 +195,18 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
         return buildString(false, null, null);
     }
 
-    protected String toString(boolean detailed, IntFunction<String> stopNameTranslator) {
-        return buildString(detailed, stopNameTranslator, null);
+    protected String toString(boolean detailed, RaptorStopNameResolver stopNameResolver) {
+        return buildString(detailed, stopNameResolver, null);
     }
 
     protected String buildString(
             boolean detailed,
-            @Nullable IntFunction<String> stopNameTranslator,
+            @Nullable RaptorStopNameResolver stopNameResolver,
             @Nullable Consumer<PathStringBuilder> appendToSummary
-    ) {
-        var buf = new PathStringBuilder(stopNameTranslator);
+            ) {
+        RaptorTransferConstraint constraintPrevLeg = null;
+        var buf = new PathStringBuilder(stopNameResolver);
+
         if(accessLeg != null) {
             int prevToTime = 0;
             for (PathLeg<T> leg : accessLeg.iterator()) {
@@ -213,10 +216,18 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                 }
                 else {
                     buf.sep().stop(leg.fromStop());
+
                     if(detailed) {
                         buf.duration(leg.fromTime() - prevToTime);
+                        // Add Transfer constraints info from the previous transit lag
+                        if(constraintPrevLeg != null) {
+                            buf.space().append(constraintPrevLeg.toString());
+                            constraintPrevLeg = null;
+                        }
                     }
+
                     buf.sep();
+
                     if (leg.isTransitLeg()) {
                         TransitPathLeg<T> transitLeg = leg.asTransitLeg();
                         buf.transit(
@@ -227,6 +238,10 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                         if (detailed) {
                             buf.duration(leg.duration());
                             buf.generalizedCostSentiSec(leg.generalizedCost());
+                        }
+                        if(transitLeg.getConstrainedTransferAfterLeg() != null) {
+                            constraintPrevLeg = transitLeg.getConstrainedTransferAfterLeg()
+                                    .getTransferConstraint();
                         }
                     }
                     else if (leg.isTransferLeg()) {
@@ -312,7 +327,6 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private static <S extends RaptorTripSchedule> int countNumberOfTransfers(
         AccessPathLeg<S> accessLeg, EgressPathLeg<S> egressPathLeg
     ) {
-
         return accessLeg.access().numberOfRides()
             // Skip first transit
             + (int)accessLeg.nextLeg().nextLeg().stream().filter(PathLeg::isTransitLeg).count()

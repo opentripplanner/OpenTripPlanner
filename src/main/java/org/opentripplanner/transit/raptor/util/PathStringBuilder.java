@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.util;
 
 import java.util.Calendar;
-import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -14,28 +14,26 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class PathStringBuilder {
-    private final IntFunction<String> stopNameTranslator;
+    private final RaptorStopNameResolver stopNameResolver;
     private final StringBuilder buf = new StringBuilder();
     private final boolean padDuration;
     private boolean elementAdded = false;
     private boolean sepAdded = false;
 
-    public PathStringBuilder(@Nullable IntFunction<String> stopNameTranslator) {
-        this(stopNameTranslator, false);
+    public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver) {
+        this(stopNameResolver, false);
     }
 
     /**
-     * @param stopNameTranslator Used to translate stopIndexes to stopNames, if {@code null} the
+     * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the
      *                           index is used in the result string.
      * @param padDuration        This can be set to {@code true} for padding the duration output.
      *                           This would be used in cases were several similar paths are listed.
      *                           If the legs are similar, the path elements is more likely to be
      *                           aligned.
      */
-    public PathStringBuilder(@Nullable IntFunction<String> stopNameTranslator, boolean padDuration) {
-        this.stopNameTranslator = stopNameTranslator == null
-                ? Integer::toString
-                : stopNameTranslator;
+    public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver, boolean padDuration) {
+        this.stopNameResolver = RaptorStopNameResolver.nullSafe(stopNameResolver);
         this.padDuration = padDuration;
     }
 
@@ -49,7 +47,7 @@ public class PathStringBuilder {
      * set in the constructor. If not translater is set the stopIndex is used.
      */
     public PathStringBuilder stop(int stopIndex) {
-        return stop(stopNameTranslator.apply(stopIndex));
+        return stop(stopNameResolver.apply(stopIndex));
     }
 
     public PathStringBuilder stop(String stop) {

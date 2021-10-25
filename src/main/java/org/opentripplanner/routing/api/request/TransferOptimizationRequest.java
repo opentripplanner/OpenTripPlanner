@@ -4,14 +4,8 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 import org.opentripplanner.util.OTPFeature;
 
 public class TransferOptimizationRequest implements TransferOptimizationParameters {
-  private final RoutingRequest parent;
   public boolean optimizeTransferWaitTime = true;
   public double minSafeWaitTimeFactor = 5.0;
-  public double inverseWaitReluctance = 1.0;
-
-  public TransferOptimizationRequest(RoutingRequest parent) {
-    this.parent = parent;
-  }
 
   @Override
   public boolean optimizeTransferPriority() {
@@ -21,16 +15,6 @@ public class TransferOptimizationRequest implements TransferOptimizationParamete
   @Override
   public boolean optimizeTransferWaitTime() {
     return optimizeTransferWaitTime;
-  }
-
-  @Override
-  public double waitReluctanceRouting() {
-    return parent.waitReluctance;
-  }
-
-  @Override
-  public double inverseWaitReluctance() {
-    return inverseWaitReluctance;
   }
 
   @Override

@@ -135,6 +135,10 @@ public class VertexLinker {
     }
   }
 
+  public void removePermanentEdgeFromIndex(Edge edge) {
+    removeEdgeFromIndex(edge, Scope.PERMANENT);
+  }
+
   /**
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).

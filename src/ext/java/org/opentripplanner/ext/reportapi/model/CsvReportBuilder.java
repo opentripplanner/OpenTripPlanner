@@ -25,19 +25,16 @@ class CsvReportBuilder {
     void addEnum(Enum<?> enumValue) {
         buf.append(enumValue);
         sep();
-
     }
 
     void addDuration(int duration, int notSet) {
         buf.append(DurationUtils.durationToStr(duration, notSet));
         sep();
-
     }
 
     void addTime(int time, int notSet) {
         buf.append(TimeUtils.timeToStrLong(time, notSet));
         sep();
-
     }
 
     /** Add the column headers including new line. */

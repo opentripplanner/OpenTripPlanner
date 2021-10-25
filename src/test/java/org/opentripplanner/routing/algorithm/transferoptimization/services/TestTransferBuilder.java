@@ -20,10 +20,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     private final int fromStopIndex;
     private final T toTrip;
     private final int toStopIndex;
-    private boolean staySeated = false;
-    private boolean guaranteed = false;
-    private TransferPriority priority = TransferPriority.ALLOWED;
-    private int maxWaitTime = TransferConstraint.MAX_WAIT_TIME_NOT_SET;
+    private final TransferConstraint.Builder constraint = TransferConstraint.create();
 
     private TestTransferBuilder(
             T fromTrip,
@@ -63,22 +60,22 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     }
 
     public TestTransferBuilder<T> staySeated() {
-        this.staySeated = true;
+        this.constraint.staySeated();
         return this;
     }
 
     public TestTransferBuilder<T> guaranteed() {
-        this.guaranteed = true;
+        this.constraint.guaranteed();
         return this;
     }
 
     public TestTransferBuilder<T> maxWaitTime(int maxWaitTime) {
-        this.maxWaitTime = maxWaitTime;
+        this.constraint.maxWaitTime(maxWaitTime);
         return this;
     }
 
     public TestTransferBuilder<T> priority(TransferPriority priority) {
-        this.priority = priority;
+        this.constraint.priority(priority);
         return this;
     }
 
@@ -90,9 +87,10 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
         int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStopIndex);
 
         return new ConstrainedTransfer(
+                null,
                 new TripTransferPoint(createDummyTrip(fromTrip), fromStopPos),
                 new TripTransferPoint(createDummyTrip(toTrip), toStopPos),
-                new TransferConstraint(priority, staySeated, guaranteed, maxWaitTime)
+                constraint.build()
         );
     }
 

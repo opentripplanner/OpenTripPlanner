@@ -69,6 +69,7 @@ public interface PlanTestConstants {
   Place E = place("E", 9.0, 10.0);
   Place F = place("F", 9.0, 10.5);
   Place G = place("G", 9.5, 11.0);
+  Place H = place("H", 10.0, 11.5);
 
   private static Place place(String name, double lat, double lon) {
     Place p = new Place(lat, lon, name);

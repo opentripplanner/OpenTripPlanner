@@ -1,13 +1,12 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.api.model.ApiLeg;
-import org.opentripplanner.model.plan.Leg;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import org.opentripplanner.api.model.ApiAlert;
+import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.model.plan.Leg;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;
@@ -88,7 +87,7 @@ public class LegMapper {
             api.route = "";
         }
 
-        api.interlineWithPreviousLeg = domain.interlineWithPreviousLeg;
+        api.interlineWithPreviousLeg = domain.isInterlinedWithPreviousLeg();
         api.headsign = domain.headsign;
         api.serviceDate = ServiceDateMapper.mapToApi(domain.serviceDate);
         api.routeBrandingUrl = domain.routeBrandingUrl;

@@ -169,6 +169,7 @@ public class LineType {
                 .name("bookingArrangements")
                 .description("Booking arrangements for flexible line.")
                 .type(bookingArrangementType)
+                .deprecate("BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
                 .dataFetcher(environment -> null)
                 .build())
             .build();

@@ -224,9 +224,10 @@ public class EstimatedCallType {
                     .build())
              .field(GraphQLFieldDefinition.newFieldDefinition()
                      .name("bookingArrangements")
-                     .description("Booking arrangements for flexible service. NOT IMPLEMENTED")
-                     .dataFetcher(environment ->  null)
+                     .description("Booking arrangements for this EstimatedCall.")
                      .type(bookingArrangementType)
+                     .dataFetcher(environment ->
+                             environment.<TripTimeOnDate>getSource().getPickupBookingInfo())
                      .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("flexible")

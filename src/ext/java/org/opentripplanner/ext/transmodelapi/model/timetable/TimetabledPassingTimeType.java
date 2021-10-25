@@ -121,9 +121,10 @@ public class TimetabledPassingTimeType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("bookingArrangements")
-            .description("Booking arrangements for flexible service. NOT IMPLEMENTED")
-            .dataFetcher(environment -> null)
+            .description("Booking arrangements for this passing time.")
             .type(bookingArrangementType)
+            .dataFetcher(environment ->
+                    environment.<TripTimeOnDate>getSource().getPickupBookingInfo())
             .build())
         .build();
   }

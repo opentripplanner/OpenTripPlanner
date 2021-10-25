@@ -153,6 +153,13 @@ public class ValueObjectToStringBuilder {
         return addIt(cost, OtpNumberFormat::formatCost);
     }
 
+    /**
+     * Add a cost in the format $N.NNu or $Nu, where 'N' is the number and 'u' is the unit.
+     */
+    public ValueObjectToStringBuilder addCost(Integer cost, String unit) {
+        return addIt(cost, it -> OtpNumberFormat.formatCost(it, unit));
+    }
+
     @Override
     public String toString() {
         return sb.toString();

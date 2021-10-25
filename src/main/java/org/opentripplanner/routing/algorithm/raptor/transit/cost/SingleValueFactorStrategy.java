@@ -19,12 +19,12 @@ final class SingleValueFactorStrategy implements FactorStrategy {
     }
 
     @Override
-    public final int factor(int index) {
+    public int factor(int index) {
         return factor;
     }
 
     @Override
-    public final int minFactor() {
+    public int minFactor() {
         return factor;
     }
 }
