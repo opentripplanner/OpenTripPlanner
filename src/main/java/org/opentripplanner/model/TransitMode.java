@@ -16,12 +16,12 @@ public enum TransitMode {
   TROLLEYBUS,
   MONORAIL;
 
-  static final EnumSet<TransitMode> BUS_TYPE_MODES = EnumSet.of(
-          TransitMode.BUS, TransitMode.TROLLEYBUS
+  private static final EnumSet<TransitMode> ON_STREET_MODES = EnumSet.of(
+          COACH, BUS, TROLLEYBUS
   );
 
 
-  public boolean isBus() {
-    return BUS_TYPE_MODES.contains(this);
+  public boolean onStreet() {
+    return ON_STREET_MODES.contains(this);
   }
 }

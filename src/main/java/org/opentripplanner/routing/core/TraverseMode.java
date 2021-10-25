@@ -14,18 +14,10 @@ public enum TraverseMode {
         AIRPLANE, BUS, CABLE_CAR, FERRY, FUNICULAR, GONDOLA, RAIL, SUBWAY, TRAM, TRANSIT, TROLLEYBUS, MONORAIL
     );
 
-    static final EnumSet<TraverseMode> BUS_TYPE_MODES = EnumSet.of(
-            TraverseMode.BUS, TraverseMode.TROLLEYBUS
-    );
-
     private static final EnumSet<TraverseMode> STREET_MODES = EnumSet.of(WALK, BICYCLE, CAR);
 
     public boolean isTransit() {
         return TRANSIT_MODES.contains(this);
-    }
-
-    public boolean isBus() {
-        return BUS_TYPE_MODES.contains(this);
     }
 
     public boolean isOnStreetNonTransit() {
