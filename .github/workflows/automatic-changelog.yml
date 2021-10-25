@@ -18,7 +18,7 @@ jobs:
         if: github.event.pull_request.merged
         run: |
           git config user.name "OTP Changelog Bot"
-          git config user.email "<>"
+          git config user.email "changelog-bot@opentripplanner.org"
 
           # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
           awk '/AUTOMATIC_CHANGELOG_PLACEHOLDER/ {
