@@ -60,6 +60,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
@@ -330,14 +331,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
                 I18NString creativeName = nameParkAndRideEntity(isCarParkAndRide, node);
 
-                var entrance = VehicleParking.VehicleParkingEntrance.builder()
+                VehicleParkingEntranceCreator entrance = (builder) -> builder
                         .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, String.format("%s/%s/entrance", node.getClass().getSimpleName(), node.getId())))
                         .name(creativeName)
                         .x(node.lon)
                         .y(node.lat)
                         .walkAccessible(true)
-                        .carAccessible(isCarParkAndRide)
-                        .build();
+                        .carAccessible(isCarParkAndRide);
 
                 var vehicleParking = createVehicleParkingObjectFromOsmEntity(
                         isCarParkAndRide, node.lon, node.lat, node, creativeName, List.of(entrance)
@@ -345,8 +345,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
                 vehicleParkingService.addVehicleParking(vehicleParking);
 
-                VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(graph, entrance);
-                new VehicleParkingEdge(parkVertex, vehicleParking);
+                VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(graph, vehicleParking.getEntrances().get(0));
+                new VehicleParkingEdge(parkVertex);
             }
 
             LOG.info("Created {} {} P+R nodes.", n, isCarParkAndRide ? "car" : "bike");
@@ -499,7 +499,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
             }
 
-            List<VehicleParking.VehicleParkingEntrance> entrances = createParkingEntrancesFromAccessVertices(accessVertices, creativeName.toString(), entity);
+            List<VehicleParking.VehicleParkingEntranceCreator> entrances = createParkingEntrancesFromAccessVertices(accessVertices, creativeName.toString(), entity);
 
             var vehicleParking = createVehicleParkingObjectFromOsmEntity(
                     isCarParkAndRide,
@@ -524,7 +524,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 double lat,
                 OSMWithTags entity,
                 I18NString creativeName,
-                List<VehicleParking.VehicleParkingEntrance> entrances
+                List<VehicleParking.VehicleParkingEntranceCreator> entrances
         ) {
             OptionalInt bicycleCapacity, carCapacity, wheelchairAccessibleCapacity;
             if (isCarParkAndRide) {
@@ -605,33 +605,25 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             return accessVertices;
         }
 
-        private List<VehicleParking.VehicleParkingEntrance> createParkingEntrancesFromAccessVertices(
+        private List<VehicleParking.VehicleParkingEntranceCreator> createParkingEntrancesFromAccessVertices(
                 Set<OsmVertex> accessVertices,
                 String vehicleParkingName,
                 OSMWithTags entity
         ) {
-            List<VehicleParking.VehicleParkingEntrance> entrances = new ArrayList<>();
+            List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
 
             for (var accessVertex : accessVertices) {
-                var entranceName = accessVertex.getName();
-                if (entranceName == null) {
-                    entranceName = String.format("#%d", entrances.size() + 1);
-                }
+                var vertexName = accessVertex.getName();
+                var entranceName = vertexName == null ? String.format("#%d", entrances.size() + 1) : vertexName;
 
-                entrances.add(VehicleParking.VehicleParkingEntrance.builder()
-                        .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID,
-                                String.format("%s/%d/%d", entity.getClass().getSimpleName(),
-                                        entity.getId(), accessVertex.nodeId
-                                )
-                        ))
-                        .name(new NonLocalizedString(
-                                String.format("%s (%s)", vehicleParkingName, entranceName)))
-                        .x(accessVertex.getX())
-                        .y(accessVertex.getY())
-                        .vertex(accessVertex)
-                        .walkAccessible(accessVertex.isConnectedToWalkingEdge())
-                        .carAccessible(accessVertex.isConnectedToDriveableEdge())
-                        .build());
+                entrances.add((builder) -> builder
+                    .entranceId(new FeedScopedId(VEHICLE_PARKING_OSM_FEED_ID, String.format("%s/%d/%d", entity.getClass().getSimpleName(), entity.getId(), accessVertex.nodeId)))
+                    .name(new NonLocalizedString(String.format("%s (%s)", vehicleParkingName, entranceName)))
+                    .x(accessVertex.getX())
+                    .y(accessVertex.getY())
+                    .vertex(accessVertex)
+                    .walkAccessible(accessVertex.isConnectedToWalkingEdge())
+                    .carAccessible(accessVertex.isConnectedToDriveableEdge()));
             }
 
             return entrances;

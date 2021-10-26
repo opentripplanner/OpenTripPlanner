@@ -112,7 +112,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
 
                     var disposableEdgeCollectionsForVertex = linkVehicleParkingVertexToStreets(vehicleParkingVertices);
 
-                    VehicleParkingHelper.linkVehicleParkingEntrances(vehicleParkingVertices, updatedVehicleParking);
+                    VehicleParkingHelper.linkVehicleParkingEntrances(vehicleParkingVertices);
                     verticesByPark.put(updatedVehicleParking, vehicleParkingVertices);
                     tempEdgesByPark.put(updatedVehicleParking, disposableEdgeCollectionsForVertex);
                 } else {

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,11 +40,12 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void entranceWithVertexLinkingTest() {
-    var entrance = VehicleParking.VehicleParkingEntrance.builder()
-        .entranceId(new FeedScopedId("TEST", "1"))
-        .vertex(A)
-        .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, entrance);
+    var parking = VehicleParking.builder()
+            .entrance(builder -> builder
+                    .entranceId(new FeedScopedId("TEST", "1"))
+                    .vertex(A))
+            .build();
+    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
     StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
     streetLinkerModule.buildGraph(graph, new HashMap<>(), new DataImportIssueStore(false));
@@ -59,14 +59,15 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void entranceWithoutVertexLinkingTest() {
-    var entrance = VehicleParking.VehicleParkingEntrance.builder()
-        .entranceId(new FeedScopedId("TEST", "1"))
-        .x(0.0001)
-        .y(0)
-        .carAccessible(true)
-        .walkAccessible(true)
-        .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, entrance);
+    var parking = VehicleParking.builder()
+            .entrance(builder -> builder
+                    .entranceId(new FeedScopedId("TEST", "1"))
+                    .x(0.0001)
+                    .y(0)
+                    .carAccessible(true)
+                    .walkAccessible(true))
+            .build();
+    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
     StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
     streetLinkerModule.buildGraph(graph, new HashMap<>(), new DataImportIssueStore(false));
@@ -85,14 +86,15 @@ public class VehicleParkingLinkingTest {
 
     street(A, C, StreetTraversalPermission.NONE);
 
-    var entrance = VehicleParking.VehicleParkingEntrance.builder()
-        .entranceId(new FeedScopedId("TEST", "1"))
-        .x(0.0001)
-        .y(0)
-        .carAccessible(true)
-        .walkAccessible(true)
-        .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, entrance);
+    var parking = VehicleParking.builder()
+            .entrance(builder -> builder
+                    .entranceId(new FeedScopedId("TEST", "1"))
+                    .x(0.0001)
+                    .y(0)
+                    .carAccessible(true)
+                    .walkAccessible(true))
+            .build();
+    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
     StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
     streetLinkerModule.buildGraph(graph, new HashMap<>(), new DataImportIssueStore(false));
@@ -115,22 +117,17 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void removeEntranceWithNonExistingVertexTest() {
-    var entrance1 = VehicleParking.VehicleParkingEntrance.builder()
-        .entranceId(new FeedScopedId("TEST", "Entrance-1"))
-        .vertex(A)
-        .walkAccessible(true)
-        .build();
-
-    var entrance2 = VehicleParking.VehicleParkingEntrance.builder()
-        .entranceId(new FeedScopedId("TEST", "Entrance-2"))
-        .vertex(B)
-        .walkAccessible(true)
-        .build();
-
     var vehicleParking = VehicleParking.builder()
         .id(new FeedScopedId("TEST", "VP"))
-        .entrances(List.of(entrance1, entrance2))
         .bicyclePlaces(true)
+        .entrance(builder -> builder
+                .entranceId(new FeedScopedId("TEST", "Entrance-1"))
+                .vertex(A)
+                .walkAccessible(true))
+        .entrance(builder -> builder
+                .entranceId(new FeedScopedId("TEST", "Entrance-2"))
+                .vertex(B)
+                .walkAccessible(true))
         .build();
 
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
@@ -150,16 +147,14 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void removeVehicleParkingWithOneEntranceAndNonExistingVertexTest() {
-    var entrance1 = VehicleParking.VehicleParkingEntrance.builder()
-        .entranceId(new FeedScopedId("TEST", "Entrance-1"))
-        .vertex(A)
-        .walkAccessible(true)
-        .build();
 
     var vehicleParking = VehicleParking.builder()
         .id(new FeedScopedId("TEST", "VP"))
-        .entrances(List.of(entrance1))
         .bicyclePlaces(true)
+        .entrance(builder -> builder
+                .entranceId(new FeedScopedId("TEST", "Entrance-1"))
+                .vertex(A)
+                .walkAccessible(true))
         .build();
 
     var vehicleParkingService = graph.getService(VehicleParkingService.class, true);

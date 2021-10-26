@@ -349,33 +349,30 @@ public abstract class GraphRoutingTest {
             return List.of(link(from, to), link(to, from));
         }
 
-        public void vehicleParking(String id, double x, double y, boolean bicyclePlaces, boolean carPlaces, List<VehicleParkingEntranceVertex> entranceVertices) {
+        public void vehicleParking(String id, double x, double y, boolean bicyclePlaces, boolean carPlaces, List<VehicleParking.VehicleParkingEntranceCreator> entrances) {
             var vehicleParking = VehicleParking.builder()
                 .id(new FeedScopedId(TEST_FEED_ID, id))
                 .x(x)
                 .y(y)
                 .bicyclePlaces(bicyclePlaces)
                 .carPlaces(carPlaces)
-                .entrances(entranceVertices.stream().map(VehicleParkingEntranceVertex::getParkingEntrance).collect(Collectors.toList()))
+                .entrances(entrances)
                 .build();
 
-            VehicleParkingHelper.linkVehicleParkingEntrances(entranceVertices, vehicleParking);
+            var vertices = VehicleParkingHelper.createVehicleParkingVertices(graph, vehicleParking);
+            VehicleParkingHelper.linkVehicleParkingEntrances(vertices);
+            vertices.forEach(v -> biLink(v.getParkingEntrance().getVertex(), v));
         }
 
-        public VehicleParkingEntranceVertex vehicleParkingEntrance(StreetVertex streetVertex, String id, boolean carAccessible, boolean walkAccessible) {
-            var entrance = VehicleParking.VehicleParkingEntrance.builder()
+        public VehicleParking.VehicleParkingEntranceCreator vehicleParkingEntrance(StreetVertex streetVertex, String id, boolean carAccessible, boolean walkAccessible) {
+            return builder -> builder
                 .entranceId(new FeedScopedId(TEST_FEED_ID, id))
                 .name(new NonLocalizedString(id))
                 .x(streetVertex.getX())
                 .y(streetVertex.getY())
                 .vertex(streetVertex)
                 .carAccessible(carAccessible)
-                .walkAccessible(walkAccessible)
-                .build();
-
-            var vehicleParkingVertex = new VehicleParkingEntranceVertex(graph, entrance);
-            biLink(streetVertex, vehicleParkingVertex);
-            return vehicleParkingVertex;
+                .walkAccessible(walkAccessible);
         }
 
         public StreetVehicleParkingLink link(StreetVertex from, VehicleParkingEntranceVertex to) {

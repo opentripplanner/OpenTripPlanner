@@ -22,13 +22,13 @@ public class VehicleParkingEdge extends Edge {
     @Getter
     private final VehicleParking vehicleParking;
 
-    public VehicleParkingEdge(VehicleParkingEntranceVertex vehicleParkingEntranceVertex, VehicleParking vehicleParking) {
-        this(vehicleParkingEntranceVertex, vehicleParkingEntranceVertex, vehicleParking);
+    public VehicleParkingEdge(VehicleParkingEntranceVertex vehicleParkingEntranceVertex) {
+        this(vehicleParkingEntranceVertex, vehicleParkingEntranceVertex);
     }
 
-    public VehicleParkingEdge(VehicleParkingEntranceVertex fromVehicleParkingEntranceVertex, VehicleParkingEntranceVertex toVehicleParkingEntranceVertex, VehicleParking vehicleParking) {
+    public VehicleParkingEdge(VehicleParkingEntranceVertex fromVehicleParkingEntranceVertex, VehicleParkingEntranceVertex toVehicleParkingEntranceVertex) {
         super(fromVehicleParkingEntranceVertex, toVehicleParkingEntranceVertex);
-        this.vehicleParking = vehicleParking;
+        this.vehicleParking = fromVehicleParkingEntranceVertex.getVehicleParking();
     }
 
     @Override

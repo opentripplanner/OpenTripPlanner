@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntrance;
 
 /**
  * A vertex for a bike park.
@@ -18,9 +19,16 @@ public class VehicleParkingEntranceVertex extends Vertex {
     @Getter
     private final VehicleParking.VehicleParkingEntrance parkingEntrance;
 
-    public VehicleParkingEntranceVertex(Graph g, VehicleParking.VehicleParkingEntrance parkingEntrance) {
+    public VehicleParkingEntranceVertex(
+            Graph g,
+            VehicleParkingEntrance parkingEntrance
+    ) {
         super(g, "Vehicle parking " + parkingEntrance.getEntranceId(), parkingEntrance.getX(), parkingEntrance.getY(), parkingEntrance.getName());
         this.parkingEntrance = parkingEntrance;
+    }
+
+    public VehicleParking getVehicleParking() {
+        return parkingEntrance.getVehicleParking();
     }
 
     public boolean isCarAccessible() {

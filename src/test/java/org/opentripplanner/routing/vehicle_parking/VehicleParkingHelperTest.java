@@ -1,17 +1,17 @@
 package org.opentripplanner.routing.vehicle_parking;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.util.NonLocalizedString;
-
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VehicleParkingHelperTest {
 
@@ -42,18 +42,18 @@ class VehicleParkingHelperTest {
     Graph graph = new Graph();
     var vehicleParking = VehicleParking
         .builder()
+        .entrances(
+                IntStream.rangeClosed(1, 3)
+                        .<VehicleParkingEntranceCreator>mapToObj(id -> builder -> builder
+                                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+                                .name(new NonLocalizedString("Entrance " + id))
+                                .x(id)
+                                .y(id)
+                                .carAccessible(id == 1 || id == 3)
+                                .walkAccessible(id == 2 || id == 3))
+                .collect(Collectors.toList())
+        )
         .wheelchairAccessibleCarPlaces(true)
-        .entrances(IntStream.rangeClosed(1, 3)
-            .mapToObj(id -> VehicleParking.VehicleParkingEntrance
-                .builder()
-                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                .name(new NonLocalizedString("Entrance " + id))
-                .x(id)
-                .y(id)
-                .carAccessible(id == 1 || id == 3)
-                .walkAccessible(id == 2 || id == 3)
-                .build())
-            .collect(Collectors.toList()))
         .build();
 
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
@@ -66,16 +66,16 @@ class VehicleParkingHelperTest {
     return VehicleParking
         .builder()
         .bicyclePlaces(true)
-        .entrances(IntStream.rangeClosed(1, entranceNumber)
-            .mapToObj(id -> VehicleParking.VehicleParkingEntrance
-                .builder()
-                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                .name(new NonLocalizedString("Entrance " + id))
-                .x(id)
-                .y(id)
-                .walkAccessible(true)
-                .build())
-            .collect(Collectors.toList()))
+        .entrances(
+                IntStream.rangeClosed(1, entranceNumber)
+                        .<VehicleParkingEntranceCreator>mapToObj(id -> builder -> builder
+                                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+                                .name(new NonLocalizedString("Entrance " + id))
+                                .x(id)
+                                .y(id)
+                                .walkAccessible(true))
+                        .collect(Collectors.toList())
+        )
         .build();
   }
 

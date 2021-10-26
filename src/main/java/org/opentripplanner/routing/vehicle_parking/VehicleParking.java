@@ -21,7 +21,7 @@ import org.opentripplanner.util.I18NString;
  * All fields are immutable except for the availability, capacity which may be updated by updaters.
  * If any other properties change a new VehicleParking instance should be created.
  */
-@Builder
+@Builder(buildMethodName = "buildInternal")
 @Getter
 @EqualsAndHashCode
 public class VehicleParking implements Serializable {
@@ -73,7 +73,8 @@ public class VehicleParking implements Serializable {
   @EqualsAndHashCode.Exclude
   private VehiclePlaces availability;
 
-  private final List<VehicleParkingEntrance> entrances;
+  @Builder.Default
+  private final List<VehicleParkingEntrance> entrances = new ArrayList<>();
 
   public String toString() {
     return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
@@ -128,42 +129,75 @@ public class VehicleParking implements Serializable {
     this.capacity = vehiclePlaces;
   }
 
-  @Data
+  private void addEntrance(VehicleParkingEntranceCreator creator) {
+    var entrance = creator.updateValues(VehicleParkingEntrance.builder()
+            .vehicleParking(this))
+            .build();
+
+    entrances.add(entrance);
+  }
+
+  @Getter
   @Builder
   @EqualsAndHashCode
   public static class VehicleParkingEntrance implements Serializable {
-    private FeedScopedId entranceId;
-    private double x, y;
-    private I18NString name;
+
+    @EqualsAndHashCode.Exclude
+    private final VehicleParking vehicleParking;
+
+    private final FeedScopedId entranceId;
+
+    private final double x, y;
+
+    private final I18NString name;
+
     // Used to explicitly specify the intersection to link to instead of using (x, y)
     @EqualsAndHashCode.Exclude
     private transient StreetVertex vertex;
+
     // If this entrance should be linked to car accessible streets
-    private boolean carAccessible;
+    private final boolean carAccessible;
+
     // If this entrance should be linked to walk/bike accessible streets
-    private boolean walkAccessible;
+    private final boolean walkAccessible;
 
     void clearVertex() {
       vertex = null;
     }
   }
 
-  /*
-   * These methods are overwritten so that the saved list always an array list and also so that
-   * there is a default value.
-   */
-  public static class VehicleParkingBuilder {
-    private List<VehicleParkingEntrance> entrances = new ArrayList<>();
-    private List<String> tags = new ArrayList<>();
+  @FunctionalInterface
+  public interface VehicleParkingEntranceCreator {
+    VehicleParkingEntrance.VehicleParkingEntranceBuilder updateValues(VehicleParkingEntrance.VehicleParkingEntranceBuilder builder);
+  }
 
-    public VehicleParkingBuilder entrances(Collection<VehicleParkingEntrance> entrances) {
-      this.entrances = new ArrayList<>(entrances);
-      return this;
-    }
+  /*
+   * These methods are overwritten so that the saved list is always an array list for serialization.
+   */
+  @SuppressWarnings("unused")
+  public static class VehicleParkingBuilder {
+    private List<String> tags = new ArrayList<>();
+    private final List<VehicleParkingEntranceCreator> entranceCreators = new ArrayList<>();
 
     public VehicleParkingBuilder tags(Collection<String> tags) {
       this.tags = new ArrayList<>(tags);
       return this;
+    }
+
+    public VehicleParkingBuilder entrances(Collection<VehicleParkingEntranceCreator> creators) {
+        this.entranceCreators.addAll(creators);
+        return this;
+    }
+
+    public VehicleParkingBuilder entrance(VehicleParkingEntranceCreator creator) {
+        this.entranceCreators.add(creator);
+        return this;
+    }
+
+    public VehicleParking build() {
+        VehicleParking vehicleParking = this.buildInternal();
+        this.entranceCreators.forEach(vehicleParking::addEntrance);
+        return vehicleParking;
     }
   }
 }

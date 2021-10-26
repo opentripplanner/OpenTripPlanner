@@ -14,7 +14,7 @@ public class VehicleParkingHelper {
 
   public static void linkVehicleParkingToGraph(Graph graph, VehicleParking vehicleParking) {
     var vehicleParkingVertices =VehicleParkingHelper.createVehicleParkingVertices(graph, vehicleParking);
-    VehicleParkingHelper.linkVehicleParkingEntrances(vehicleParkingVertices, vehicleParking);
+    VehicleParkingHelper.linkVehicleParkingEntrances(vehicleParkingVertices);
   }
 
   public static List<VehicleParkingEntranceVertex> createVehicleParkingVertices(Graph graph, VehicleParking vehicleParking) {
@@ -25,31 +25,30 @@ public class VehicleParkingHelper {
         .collect(Collectors.toList());
   }
 
-  public static void linkVehicleParkingEntrances(List<VehicleParkingEntranceVertex> vehicleParkingVertices, VehicleParking vehicleParking) {
+  public static void linkVehicleParkingEntrances(List<VehicleParkingEntranceVertex> vehicleParkingVertices) {
     for (int i = 0; i < vehicleParkingVertices.size(); i++) {
       var currentVertex = vehicleParkingVertices.get(i);
-      if (isUsableForParking(vehicleParking, currentVertex, currentVertex)) {
-        new VehicleParkingEdge(currentVertex, vehicleParking);
+      if (isUsableForParking(currentVertex, currentVertex)) {
+        new VehicleParkingEdge(currentVertex);
       }
       for (int j = i + 1; j < vehicleParkingVertices.size(); j++) {
         var nextVertex = vehicleParkingVertices.get(j);
-        if (isUsableForParking(vehicleParking, currentVertex, nextVertex)) {
-          new VehicleParkingEdge(currentVertex, nextVertex, vehicleParking);
-          new VehicleParkingEdge(nextVertex, currentVertex, vehicleParking);
+        if (isUsableForParking(currentVertex, nextVertex)) {
+          new VehicleParkingEdge(currentVertex, nextVertex);
+          new VehicleParkingEdge(nextVertex, currentVertex);
         }
       }
     }
   }
 
   private static boolean isUsableForParking(
-      VehicleParking vehicleParking,
       VehicleParkingEntranceVertex from,
       VehicleParkingEntranceVertex to
   ) {
-    var usableForBikeParking = vehicleParking.hasBicyclePlaces() &&
+    var usableForBikeParking = from.getVehicleParking().hasBicyclePlaces() &&
         from.isWalkAccessible() && to.isWalkAccessible();
 
-    var usableForCarParking = vehicleParking.hasAnyCarPlaces() &&
+    var usableForCarParking = from.getVehicleParking().hasAnyCarPlaces() &&
         (
             (from.isCarAccessible() && to.isWalkAccessible())
                 || (from.isWalkAccessible() && to.isCarAccessible())

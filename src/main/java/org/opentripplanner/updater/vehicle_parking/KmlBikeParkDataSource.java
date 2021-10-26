@@ -69,19 +69,16 @@ class KmlBikeParkDataSource implements VehicleParkingDataSource {
             var localizedName = new NonLocalizedString(name);
 
             return VehicleParking.builder()
-                .name(localizedName)
-                .x(x)
-                .y(y)
-                .id(new FeedScopedId(feedId, id))
-                .entrances(List.of(
-                    VehicleParking.VehicleParkingEntrance.builder()
-                        .entranceId(new FeedScopedId(feedId, id))
-                        .name(localizedName)
-                        .x(x)
-                        .y(y)
-                        .build()
-                ))
-                .build();
+                    .name(localizedName)
+                    .x(x)
+                    .y(y)
+                    .id(new FeedScopedId(feedId, id))
+                    .entrance((builder) -> builder
+                            .entranceId(new FeedScopedId(feedId, id))
+                            .name(localizedName)
+                            .x(x)
+                            .y(y))
+                    .build();
         });
     }
 
