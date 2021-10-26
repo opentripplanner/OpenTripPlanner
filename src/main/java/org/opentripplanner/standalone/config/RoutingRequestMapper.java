@@ -24,8 +24,10 @@ public class RoutingRequestMapper {
         // mapping or duplicate exist.
         request.alightSlack = c.asInt("alightSlack", dft.alightSlack);
         request.alightSlackForMode = c.asEnumMap("alightSlackForMode", TransitMode.class, NodeAdapter::asInt);
+        request.allowedVehicleRentalNetworks = c.asStringSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
         request.bikeRental = c.asBoolean("allowBikeRental", dft.bikeRental);
         request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
+        request.bannedVehicleRentalNetworks = c.asStringSet("bannedVehicleRentalNetworks", dft.bannedVehicleRentalNetworks);
         request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
         request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
         request.bikeParkCost = c.asInt("bikeParkCost", dft.bikeParkCost);

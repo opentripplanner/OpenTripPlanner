@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -491,5 +492,22 @@ public class NodeAdapter {
             result.put(key, mapper.apply(node, key));
         }
         return result;
+    }
+
+    public Set<String> asStringSet(
+            String paramName,
+            Set<String> defaultValue
+    ) {
+        if (!exist(paramName)) { return Set.of(); }
+
+        JsonNode param = param(paramName);
+        if (param.isArray()) {
+            Set<String> result = new HashSet<>(param.size());
+            for (JsonNode it : param) {
+                result.add(it.asText());
+            }
+            return result;
+        }
+        return defaultValue;
     }
 }

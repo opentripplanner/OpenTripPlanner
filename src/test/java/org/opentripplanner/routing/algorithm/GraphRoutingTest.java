@@ -307,6 +307,7 @@ public abstract class GraphRoutingTest {
         ) {
             var vehicleRentalStation = new VehicleRentalStation();
             vehicleRentalStation.id = new FeedScopedId(network, id);
+            vehicleRentalStation.name = new NonLocalizedString(id);
             vehicleRentalStation.longitude = longitude;
             vehicleRentalStation.latitude = latitude;
             vehicleRentalStation.vehiclesAvailable = 2;

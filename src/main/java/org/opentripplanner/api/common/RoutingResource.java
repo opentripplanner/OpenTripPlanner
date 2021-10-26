@@ -1,5 +1,6 @@
 package org.opentripplanner.api.common;
 
+import java.util.Set;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -361,6 +362,14 @@ public abstract class RoutingResource {
 
     @QueryParam("keepingRentedBicycleAtDestinationCost")
     protected Double keepingRentedBicycleAtDestinationCost;
+
+    /** The vehicle rental networks which may be used. If empty all networks may be used. */
+    @QueryParam("allowedVehicleRentalNetworks")
+    protected Set<String> allowedVehicleRentalNetworks;
+
+    /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+    @QueryParam("bannedVehicleRentalNetworks")
+    protected Set<String> bannedVehicleRentalNetworks;
 
     /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
@@ -738,6 +747,12 @@ public abstract class RoutingResource {
 
         if (keepingRentedBicycleAtDestinationCost != null)
             request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+
+        if (allowedVehicleRentalNetworks != null)
+            request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+
+        if (bannedVehicleRentalNetworks != null)
+            request.allowedVehicleRentalNetworks = bannedVehicleRentalNetworks;
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
