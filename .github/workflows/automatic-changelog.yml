@@ -20,13 +20,18 @@ jobs:
           git config user.name "OTP Changelog Bot"
           git config user.email "changelog-bot@opentripplanner.org"
 
-          # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
-          awk '/AUTOMATIC_CHANGELOG_PLACEHOLDER/ {
-            print "- ${{ github.event.pull_request.title }} [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
-          } { print }' docs/Changelog.md > docs/Changelog.generated.md
+          # if the title starts with "refactor" we don't generate an entry
+          if  [[ "${{ github.event.pull_request.title }}" == refactor* ]]; then
+            echo "Skipping changelog entry generation"
+          else
+            # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
+            awk '/AUTOMATIC_CHANGELOG_PLACEHOLDER/ {
+              print "- ${{ github.event.pull_request.title }} [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+            } { print }' docs/Changelog.md > docs/Changelog.generated.md
 
-          mv docs/Changelog.generated.md docs/Changelog.md
+            mv docs/Changelog.generated.md docs/Changelog.md
 
-          git add docs/Changelog.md
-          git commit -m "Add changelog entry for #${{ github.event.pull_request.number }} [ci skip]"
-          git push origin dev-2.x
+            git add docs/Changelog.md
+            git commit -m "Add changelog entry for #${{ github.event.pull_request.number }} [ci skip]"
+            git push origin dev-2.x
+          fi
