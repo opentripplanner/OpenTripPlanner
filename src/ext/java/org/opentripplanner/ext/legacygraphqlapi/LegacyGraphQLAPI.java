@@ -52,7 +52,6 @@ public class LegacyGraphQLAPI {
   }
 
   @POST
-  @Path("/")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGraphQL(
       HashMap<String, Object> queryParameters,
@@ -107,7 +106,6 @@ public class LegacyGraphQLAPI {
   }
 
   @POST
-  @Path("/")
   @Consumes("application/graphql")
   public Response getGraphQL(
       String query,
