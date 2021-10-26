@@ -14,11 +14,15 @@ import java.util.Optional;
  */
 public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
 
-    public static final String NAME = "transit-vs-street-filter";
+    /**
+     *  Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
+     *  to know which filters removed
+     */
+    public static final String TAG = "transit-vs-street-filter";
 
     @Override
     public String name() {
-        return NAME;
+        return TAG;
     }
 
     @Override

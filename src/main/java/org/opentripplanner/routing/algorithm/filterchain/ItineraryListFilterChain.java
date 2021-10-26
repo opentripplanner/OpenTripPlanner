@@ -1,13 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.api.response.RoutingError;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -40,9 +38,9 @@ public class ItineraryListFilterChain {
         if (!itineraries.isEmpty() && allDeleted) {
             Predicate<Itinerary> isOnStreetAllTheWay = Itinerary::isOnStreetAllTheWay;
             Predicate<Itinerary> isWorseThanStreet = it -> it.systemNotices.stream().anyMatch(
-                notice -> notice.tag.equals(RemoveTransitIfStreetOnlyIsBetterFilter.NAME));
+                notice -> notice.tag.equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
             Predicate<Itinerary> isOutsideSearchWindow = it -> it.systemNotices.stream().anyMatch(
-                notice -> notice.tag.equals(LatestDepartureTimeFilter.NAME));
+                notice -> notice.tag.equals(LatestDepartureTimeFilter.TAG));
             if (result.stream().allMatch(isOnStreetAllTheWay.or(isWorseThanStreet))) {
                 routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
             } else if (result.stream().allMatch(isOnStreetAllTheWay.or(isOutsideSearchWindow))) {

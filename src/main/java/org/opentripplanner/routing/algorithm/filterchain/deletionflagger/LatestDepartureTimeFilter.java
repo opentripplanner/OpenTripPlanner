@@ -6,7 +6,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import java.time.Instant;
 
 public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
-    public static final String NAME = "latest-departure-time-limit";
+    public static final String TAG = "latest-departure-time-limit";
 
     private final long limitMs;
 
@@ -16,7 +16,7 @@ public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
 
     @Override
     public String name() {
-        return NAME;
+        return TAG;
     }
 
     @Override
