@@ -12,6 +12,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -64,6 +65,7 @@ public class TransmodelGraphQLPlanner {
         }
         catch (Exception e) {
             LOG.error("System error: " + e.getMessage(), e);
+            response.plan = TripPlanMapper.mapTripPlan(request, List.of());
             response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
         }
         return response;
