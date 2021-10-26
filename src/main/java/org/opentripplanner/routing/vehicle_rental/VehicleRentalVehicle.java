@@ -5,6 +5,9 @@ import org.opentripplanner.util.I18NString;
 
 import java.time.ZonedDateTime;
 
+/**
+ * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
+ */
 public class VehicleRentalVehicle implements VehicleRentalPlace {
 
     public FeedScopedId id;

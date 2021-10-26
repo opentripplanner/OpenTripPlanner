@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
+ */
 public class VehicleRentalStation implements VehicleRentalPlace {
 
     // GBFS  Static information
