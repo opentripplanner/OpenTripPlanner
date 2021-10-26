@@ -28,7 +28,7 @@ public class RoutingErrorType {
                         .name("description")
                         .description("A textual description of why the search failed. The clients are expected to have their own translations based on the code, for user visible error messages.")
                         .type(new GraphQLNonNull(Scalars.GraphQLString))
-                        .dataFetcher(env -> PlannerErrorMapper.mapMessage(env.getSource()).message.get(env.getLocale()))
+                        .dataFetcher(env -> PlannerErrorMapper.mapMessage(env.getSource()).message.get())
                         .build())
                 .build();
     }
