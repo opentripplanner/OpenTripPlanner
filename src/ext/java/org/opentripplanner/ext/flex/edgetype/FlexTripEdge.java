@@ -72,7 +72,7 @@ public class FlexTripEdge extends Edge {
 
   @Override
   public LineString getGeometry() {
-    return flexPath.geometry;
+    return flexPath.getGeometry();
   }
 
   @Override
