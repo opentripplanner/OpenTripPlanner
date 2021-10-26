@@ -33,10 +33,10 @@ public class ActuatorAPI {
             "{\n"
             + "  \"_links\" : {\n"
             + "    \"self\" : {\n"
-            + "      \"href\" : \"/actuator\", \n"
+            + "      \"href\" : \"/actuators\", \n"
             + "    },\n"
             + "    \"health\" : {\n"
-            + "      \"href\" : \"/actuator/health\"\n"
+            + "      \"href\" : \"/actuators/health\"\n"
             + "    } "
             + "\n}" )
             .type("application/json").build();
