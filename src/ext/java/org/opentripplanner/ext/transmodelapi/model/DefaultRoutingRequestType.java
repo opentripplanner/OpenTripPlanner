@@ -323,6 +323,7 @@ public class DefaultRoutingRequestType {
                         .name("allowBikeRental")
                         .description("")
                         .type(Scalars.GraphQLBoolean)
+                        .deprecate("Rental is specified by modes")
                         .dataFetcher(env -> request.vehicleRental)
                         .build())
                 .field(GraphQLFieldDefinition
