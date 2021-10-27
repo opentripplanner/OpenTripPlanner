@@ -68,6 +68,7 @@
 - Use correct slack in transfer optimizer [#3668](https://github.com/opentripplanner/OpenTripPlanner/pull/3668)
 - ${TITLE} [#${NUMBER}](${URL})
 - ${TITLE} [#${NUMBER}](${URL})
+- ${TITLE} [#${NUMBER}](${URL})
 <!-- AUTOMATIC_CHANGELOG_PLACEHOLDER  -  DO NOT REMOVE -->
 
 
