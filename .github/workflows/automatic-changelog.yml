@@ -30,10 +30,10 @@ jobs:
             echo "Skipping changelog entry generation"
           else
             # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
-            LINE="- ${TITLE} [#${NUMBER}](${URL})"
+            ITEM="${TITLE} [#${NUMBER}](${URL})"
             TEMP_FILE=docs/Changelog.generated.md
             FILE=docs/Changelog.md
-            awk '/CHANGELOG_PLACEHOLDER/{print $LINE}1' $FILE > $TEMP_FILE
+            awk '/CHANGELOG_PLACEHOLDER/{print "- $ITEM"}1' $FILE > $TEMP_FILE
             mv $TEMP_FILE $FILE
             git add $FILE
             git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
