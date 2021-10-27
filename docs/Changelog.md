@@ -66,6 +66,7 @@
 - Cost on transfer in Raptor [#3629](https://github.com/opentripplanner/OpenTripPlanner/pull/3629)
 - Add two new filters for use within grouping filter [#3638](https://github.com/opentripplanner/OpenTripPlanner/pull/3638)
 - Use correct slack in transfer optimizer [#3668](https://github.com/opentripplanner/OpenTripPlanner/pull/3668)
+- $ITEM
 <!-- CHANGELOG_PLACEHOLDER - DO NOT REMOVE -->
 
 
