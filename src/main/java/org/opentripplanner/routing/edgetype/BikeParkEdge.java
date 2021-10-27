@@ -72,7 +72,7 @@ public class BikeParkEdge extends Edge {
          * it.
          */
         if (s0.getNonTransitMode() != TraverseMode.BICYCLE || !options.streetSubRequestModes.getWalk()
-                || s0.isBikeRenting() || s0.isBikeParked()) {
+                || s0.isRentingVehicle() || s0.isBikeParked()) {
             return null;
         }
         BikeParkVertex bikeParkVertex = (BikeParkVertex) tov;

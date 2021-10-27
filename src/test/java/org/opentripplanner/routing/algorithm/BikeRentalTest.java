@@ -430,10 +430,10 @@ public class BikeRentalTest extends GraphRoutingTest {
     ) {
         var options = new RoutingRequest();
         options.arriveBy = arriveBy;
-        options.bikeRentalPickupTime = 42;
-        options.bikeRentalPickupCost = 62;
-        options.bikeRentalDropoffCost = 33;
-        options.bikeRentalDropoffTime = 15;
+        options.vehicleRentalPickupTime = 42;
+        options.vehicleRentalPickupCost = 62;
+        options.vehicleRentalDropoffCost = 33;
+        options.vehicleRentalDropoffTime = 15;
         options.useVehicleRentalAvailabilityInformation = useAvailabilityInformation;
         options.allowKeepingRentedVehicleAtDestination = keepRentedBicycleCost > 0;
         options.keepingRentedVehicleAtDestinationCost = keepRentedBicycleCost;

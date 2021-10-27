@@ -67,7 +67,7 @@ public class State implements Cloneable {
 
             /* vehicle rental searches may end in three states (see isFinal()): BEFORE_RENTING/RENTING_FLOATING/HAVE_RENTED
                for forward/reverse searches to be symmetric an additional RENTING_FLOATING state needs to be created. */
-            if (request.bikeRental && request.arriveBy) {
+            if (request.vehicleRental && request.arriveBy) {
                 states.add(
                     new State(
                         vertex,
@@ -176,7 +176,7 @@ public class State implements Cloneable {
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
         this.stateData.startTime = startTime;
-        if (options.bikeRental) {
+        if (options.vehicleRental) {
             if (options.arriveBy) {
                 if (keptRentedVehicleAtDestination) {
                     this.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
@@ -248,7 +248,7 @@ public class State implements Cloneable {
 
     public String toString() {
         return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] "
-                + (isBikeRenting() ? "BIKE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
+                + (isRentingVehicle() ? "VEHICLE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
                 + vertex + ">";
     }
     
@@ -257,7 +257,7 @@ public class State implements Cloneable {
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
                 " d=" + this.getWalkDistance() + 
-                " br=" + this.isBikeRenting() +
+                " br=" + this.isRentingVehicle() +
                 " pr=" + this.isCarParked() + ">";
     }
 
@@ -281,20 +281,20 @@ public class State implements Cloneable {
                         == state.stateData.mayKeepRentedVehicleAtDestination;
     }
 
-    public boolean isBikeRentingFromStation() {
+    public boolean isRentingVehicleFromStation() {
         return stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION;
     }
 
-    public boolean isBikeRentingFloating() {
+    public boolean isRentingFloatingVehicle() {
         return stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING;
     }
 
-    public boolean isBikeRenting() {
+    public boolean isRentingVehicle() {
         return stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
             || stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING;
     }
 
-    public boolean bikeRentalIsFinished() {
+    public boolean vehicleRentalIsFinished() {
         return stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED
                 || stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING
                 || (
@@ -304,7 +304,7 @@ public class State implements Cloneable {
         );
     }
 
-    public boolean bikeRentalNotStarted() {
+    public boolean vehicleRentalNotStarted() {
         return stateData.vehicleRentalState == VehicleRentalState.BEFORE_RENTING;
     }
 
@@ -327,19 +327,19 @@ public class State implements Cloneable {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
         boolean parkAndRide = stateData.opt.parkAndRide;
         boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
-        boolean bikeRentingOk;
+        boolean vehicleRentingOk;
         boolean bikeParkAndRideOk;
         boolean carParkAndRideOk;
         if (stateData.opt.arriveBy) {
-            bikeRentingOk = !stateData.opt.bikeRental || !isBikeRenting();
+            vehicleRentingOk = !stateData.opt.vehicleRental || !isRentingVehicle();
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
         } else {
-            bikeRentingOk = !stateData.opt.bikeRental || (bikeRentalNotStarted() || bikeRentalIsFinished());
+            vehicleRentingOk = !stateData.opt.vehicleRental || (vehicleRentalNotStarted() || vehicleRentalIsFinished());
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return vehicleRentingOk && bikeParkAndRideOk && carParkAndRideOk;
     }
 
     public double getWalkDistance() {
@@ -568,7 +568,7 @@ public class State implements Cloneable {
             // propagate the modes through to the reversed edge
             editor.setBackMode(orig.getBackMode());
 
-            if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
+            if (orig.isRentingVehicle() && !orig.getBackState().isRentingVehicle()) {
                 var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
                 editor.dropOffRentedVehicleAtStation(
                         stationVertex.getVehicleMode(),
@@ -576,9 +576,9 @@ public class State implements Cloneable {
                         false
                 );
             }
-            else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+            else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
                 var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
-                if (orig.getBackState().isBikeRentingFromStation()) {
+                if (orig.getBackState().isRentingVehicleFromStation()) {
                     editor.beginVehicleRentingAtStation(
                             stationVertex.getVehicleMode(),
                             stationVertex.getStation().getNetwork(),
@@ -586,7 +586,7 @@ public class State implements Cloneable {
                             false
                     );
                 }
-                else if (orig.getBackState().isBikeRentingFloating()) {
+                else if (orig.getBackState().isRentingFloatingVehicle()) {
                     editor.beginFloatingVehicleRenting(
                             stationVertex.getVehicleMode(),
                             stationVertex.getStation().getNetwork(),

@@ -698,7 +698,7 @@ public class LegacyGraphQLQueryTypeImpl
         // request.allowedBikeRentalNetworks = new HashSet<>(allowedBikeRentalNetworks);
       }
 
-      if (request.bikeRental && !hasArgument(environment, "bikeSpeed")) {
+      if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
         //slower bike speed for bike sharing, based on empirical evidence from DC.
         request.bikeSpeed = 4.3;
       }

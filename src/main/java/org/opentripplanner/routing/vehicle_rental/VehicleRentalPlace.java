@@ -42,7 +42,7 @@ public interface VehicleRentalPlace {
     boolean allowDropoffNow();
 
     /** Is the vehicle to be rented free-floating */
-    boolean isFloatingBike();
+    boolean isFloatingVehicle();
 
     /** Should the search be continued with CAR mode after renting a vehicle */
     boolean isCarStation();

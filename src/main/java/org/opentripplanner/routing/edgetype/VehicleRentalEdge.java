@@ -26,7 +26,7 @@ public class VehicleRentalEdge extends Edge {
     }
 
     public State traverse(State s0) {
-        if (!s0.getOptions().bikeRental) { return null; }
+        if (!s0.getOptions().vehicleRental) { return null; }
 
         StateEditor s1 = s0.edit(this);
         RoutingRequest options = s0.getOptions();
@@ -49,7 +49,7 @@ public class VehicleRentalEdge extends Edge {
                     pickedUp = false;
                     break;
                 case RENTING_FLOATING:
-                    if (station.isFloatingBike()) {
+                    if (station.isFloatingVehicle()) {
                         s1.beginFloatingVehicleRenting(vehicleMode, network, true);
                         pickedUp = true;
                     } else {
@@ -78,7 +78,7 @@ public class VehicleRentalEdge extends Edge {
                     if (options.useVehicleRentalAvailabilityInformation && !station.allowPickupNow()) {
                         return null;
                     }
-                    if (station.isFloatingBike()) {
+                    if (station.isFloatingVehicle()) {
                         s1.beginFloatingVehicleRenting(vehicleMode, network, false);
                     } else {
                         boolean mayKeep = options.allowKeepingRentedVehicleAtDestination && station.isKeepingVehicleRentalAtDestinationAllowed();
@@ -102,8 +102,8 @@ public class VehicleRentalEdge extends Edge {
             }
         }
 
-        s1.incrementWeight(pickedUp ? options.bikeRentalPickupCost : options.bikeRentalDropoffCost);
-        s1.incrementTimeInSeconds(pickedUp ? options.bikeRentalPickupTime : options.bikeRentalDropoffTime);
+        s1.incrementWeight(pickedUp ? options.vehicleRentalPickupCost : options.vehicleRentalDropoffCost);
+        s1.incrementTimeInSeconds(pickedUp ? options.vehicleRentalPickupTime : options.vehicleRentalDropoffTime);
         s1.setBackMode(null);
         return s1.makeState();
     }

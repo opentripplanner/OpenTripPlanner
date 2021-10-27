@@ -106,7 +106,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     }
 
     @Override
-    public boolean isFloatingBike() {
+    public boolean isFloatingVehicle() {
         return false;
     }
 

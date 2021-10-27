@@ -123,7 +123,7 @@ public abstract class GraphPathToItineraryMapper {
         calculateElevations(itinerary, edges);
 
         itinerary.generalizedCost = (int) lastState.weight;
-        itinerary.arrivedAtDestinationWithRentedVehicle = lastState.isBikeRentingFromStation();
+        itinerary.arrivedAtDestinationWithRentedVehicle = lastState.isRentingVehicleFromStation();
 
         return itinerary;
     }
@@ -288,7 +288,7 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.walkingBike = states[states.length - 1].isBackWalkingBike();
 
-        leg.rentedVehicle = states[0].isBikeRenting();
+        leg.rentedVehicle = states[0].isRentingVehicle();
 
         if (leg.rentedVehicle) {
             String vehicleRentalNetwork = states[0].getVehicleRentalNetwork();
@@ -788,11 +788,11 @@ public abstract class GraphPathToItineraryMapper {
 
     private static boolean isRentalPickUp(State state) {
         return state.getBackEdge() instanceof VehicleRentalEdge && (state.getBackState() == null || !state.getBackState()
-                .isBikeRenting());
+                .isRentingVehicle());
     }
 
     private static boolean isRentalDropOff(State state) {
-        return state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isBikeRenting();
+        return state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isRentingVehicle();
     }
 
     private static boolean isLink(Edge edge) {

@@ -6,8 +6,6 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
@@ -357,7 +355,7 @@ public class StateEditor {
     }
 
     public boolean isRentingBike() {
-        return child.isBikeRenting();
+        return child.isRentingVehicle();
     }
 
     public double getWalkDistance() {

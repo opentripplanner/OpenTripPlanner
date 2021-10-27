@@ -334,19 +334,19 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /** Cost of getting on and off your own bike */
     public int bikeSwitchCost;
 
-    /** Time to rent a bike */
-    public int bikeRentalPickupTime = 60;
+    /** Time to rent a vehicle */
+    public int vehicleRentalPickupTime = 60;
 
     /**
-     * Cost of renting a bike. The cost is a bit more than actual time to model the associated cost and trouble.
+     * Cost of renting a vehicle. The cost is a bit more than actual time to model the associated cost and trouble.
      */
-    public int bikeRentalPickupCost = 120;
+    public int vehicleRentalPickupCost = 120;
 
-    /** Time to drop-off a rented bike */
-    public int bikeRentalDropoffTime = 30;
+    /** Time to drop-off a rented vehicle */
+    public int vehicleRentalDropoffTime = 30;
 
-    /** Cost of dropping-off a rented bike */
-    public int bikeRentalDropoffCost = 30;
+    /** Cost of dropping-off a rented vehicle */
+    public int vehicleRentalDropoffCost = 30;
 
     /** Time to park a bike */
     public int bikeParkTime = 60;
@@ -646,7 +646,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
       Additional flags affecting mode transitions.
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
     */
-    public boolean bikeRental = false;
+    public boolean vehicleRental = false;
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean carPickup = false;
@@ -1011,7 +1011,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
                     break;
                 case BIKE_RENTAL:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
-                    streetRequest.bikeRental = true;
+                    streetRequest.vehicleRental = true;
                     break;
                 case CAR:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
