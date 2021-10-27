@@ -37,6 +37,7 @@ public class RouterConfig implements Serializable {
     private final TransitRoutingConfig transitConfig;
     private final UpdatersParameters updatersParameters;
     private final VectorTileConfig vectorTileLayers;
+    private final FlexConfig flexConfig;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
@@ -51,6 +52,7 @@ public class RouterConfig implements Serializable {
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
         this.updatersParameters = new UpdatersConfig(adapter);
         this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
+        this.flexConfig = new FlexConfig(adapter.path("flex"));
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
@@ -105,6 +107,8 @@ public class RouterConfig implements Serializable {
     public UpdatersParameters updaterConfig() { return updatersParameters; }
 
     public VectorTileConfig vectorTileLayers() { return vectorTileLayers; }
+
+    public FlexConfig flexConfig() { return flexConfig; }
 
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.

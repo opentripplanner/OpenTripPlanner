@@ -13,6 +13,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.opentripplanner.standalone.config.FlexConfig;
 
 /**
  * This class represents the different variations of what is considered flexible transit, and its
@@ -29,11 +30,11 @@ public abstract class FlexTrip extends TransitEntity {
   }
 
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexConfig config
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexConfig config
   );
 
   public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex, int flexTime);
