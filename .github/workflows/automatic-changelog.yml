@@ -41,5 +41,5 @@ jobs:
 
             git add docs/Changelog.md
             git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
-            git push HEAD:changelog-test
+            git push https://github.com/opentripplanner/OpenTripPlanner.git HEAD:changelog-test
           fi
