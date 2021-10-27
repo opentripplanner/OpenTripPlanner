@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
@@ -35,6 +36,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -308,6 +310,9 @@ public abstract class GraphRoutingTest {
             vehicleRentalStation.latitude = latitude;
             vehicleRentalStation.vehiclesAvailable = 2;
             vehicleRentalStation.spacesAvailable = 2;
+            final RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(network);
+            vehicleRentalStation.vehicleTypesAvailable = Map.of(vehicleType, 2);
+            vehicleRentalStation.vehicleSpacesAvailable = Map.of(vehicleType, 2);
             vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
             return vehicleRentalStation;
         }

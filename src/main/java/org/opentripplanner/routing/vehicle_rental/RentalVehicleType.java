@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.vehicle_rental;
 
+import java.io.Serializable;
+import java.util.EnumMap;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -10,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @see <a href="https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS Specification</a>
  */
-public class RentalVehicleType {
+public class RentalVehicleType implements Serializable, Comparable<RentalVehicleType> {
 
     // This is a ConcurrentHashMap in order to be thread safe, as it is used from different updater threads.
     static final Map<String, RentalVehicleType> defaultVehicleForSystem = new ConcurrentHashMap<>();
@@ -37,6 +39,27 @@ public class RentalVehicleType {
                 PropulsionType.HUMAN,
                 null
         )));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        RentalVehicleType that = (RentalVehicleType) o;
+
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public int compareTo(RentalVehicleType rentalVehicleType) {
+        return id.compareTo(rentalVehicleType.id);
     }
 
     public enum FormFactor {

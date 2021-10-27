@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -39,6 +40,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -273,6 +275,10 @@ public class ConstantsForTests {
                 station.latitude = Double.parseDouble(reader.get("lat"));
                 station.longitude = Double.parseDouble(reader.get("lon"));
                 station.name = new NonLocalizedString(reader.get("osm_id"));
+                RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(reader.get("network"));
+                Map<RentalVehicleType, Integer> availability = Map.of(vehicleType, 2);
+                station.vehicleTypesAvailable = availability;
+                station.vehicleSpacesAvailable = availability;
                 station.realTimeData = false;
                 station.isKeepingVehicleRentalAtDestinationAllowed = true;
 
