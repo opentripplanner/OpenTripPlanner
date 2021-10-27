@@ -35,9 +35,9 @@ jobs:
 
             mv docs/Changelog.generated.md docs/Changelog.md
 
-            git config --local user.email "$CI_EMAIL"
-            git config --local user.name "$CI_USER"
+            git config --local user.email "$EMAIL"
+            git config --local user.name "$USER"
             git add docs/Changelog.md
             git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
-            git push "https://$CI_USER:$CI_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:changelog-test
+            git push "https://${USER}:${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY.git" HEAD:changelog-test
           fi
