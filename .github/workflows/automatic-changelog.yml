@@ -17,9 +17,7 @@ jobs:
       - name: Generate changelog entry from PR information
         if: github.event.pull_request.merged
         env:
-          USER: ${{ secrets.YOUR_GITHUB_USER }}
-          EMAIL: ${{ secrets.YOUR_GITHUB_EMAIL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ADMIN_TOKEN }}
           TITLE: ${{ github.event.pull_request.title }}
           NUMBER: ${{ github.event.pull_request.number }}
           URL: ${{ github.event.pull_request.html_url }}
