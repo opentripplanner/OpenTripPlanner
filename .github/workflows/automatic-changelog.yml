@@ -1,0 +1,39 @@
+name: Automatic changelog entry
+on:
+  pull_request:
+    branches:
+      - changelog-test
+    types: [closed]
+
+jobs:
+  changelog-entry:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        if: github.event.pull_request.merged
+        uses: actions/checkout@v2
+
+      - name: Generate changelog entry from PR information
+        if: github.event.pull_request.merged
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TITLE: ${{ github.event.pull_request.title }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          # if the title starts with "refactor" we don't generate an entry
+          if  [[ "$TITLE" == CL_SKIP* ]]; then
+            echo "Skipping changelog entry generation"
+          else
+            # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
+            awk '/AUTOMATIC_CHANGELOG_PLACEHOLDER/ {
+              print "- ${TITLE} [#${NUMBER}](${URL})"
+            } { print }' docs/Changelog.md > docs/Changelog.generated.md
+
+            mv docs/Changelog.generated.md docs/Changelog.md
+
+            git add docs/Changelog.md
+            git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
+            git push origin dev-2.x
+          fi
