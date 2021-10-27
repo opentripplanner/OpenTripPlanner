@@ -67,6 +67,7 @@
 - Add two new filters for use within grouping filter [#3638](https://github.com/opentripplanner/OpenTripPlanner/pull/3638)
 - Use correct slack in transfer optimizer [#3668](https://github.com/opentripplanner/OpenTripPlanner/pull/3668)
 - Add support for routes of type trolley bus and monorail. [#3657](https://github.com/opentripplanner/OpenTripPlanner/issues/3657)
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
 ## 2.0.0 (2020-11-27)

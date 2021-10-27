@@ -34,6 +34,3 @@ Have you followed the [suggested code style](https://github.com/opentripplanner/
 - Have you added documentation in code covering design and rationale behind the code?
 - Were all non-trivial public classes and methods documented with Javadoc?
 - Were any new configuration options added? If so were the tables in the [configuration documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md) updated?
-
-### Changelog
-Was a bullet point added to the [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Changelog.md) with description and link to the linked issue?
