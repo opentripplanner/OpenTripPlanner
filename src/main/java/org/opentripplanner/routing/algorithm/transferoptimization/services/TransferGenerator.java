@@ -181,8 +181,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       return fromTime;
     }
     return fromTime
-            + transferDurationInSeconds
             + slackProvider.alightSlack(fromTrip.pattern())
+            + transferDurationInSeconds
+            + slackProvider.transferSlack()
             + slackProvider.boardSlack(toTrip.pattern());
   }
 
