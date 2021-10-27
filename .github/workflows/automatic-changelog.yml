@@ -13,11 +13,17 @@ jobs:
       - name: Checkout
         if: github.event.pull_request.merged
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ADMIN_TOKEN }}
+          
+      - name: Configure Git User
+        run: |
+          git config --global user.name 'OTP Changelog Bot'
+          git config --global user.email 'changelog-bot@opentripplanner.org    
  
       - name: Generate changelog entry from PR information
         if: github.event.pull_request.merged
         env:
-          GITHUB_TOKEN: ${{ secrets.ADMIN_TOKEN }}
           TITLE: ${{ github.event.pull_request.title }}
           NUMBER: ${{ github.event.pull_request.number }}
           URL: ${{ github.event.pull_request.html_url }}
@@ -33,9 +39,7 @@ jobs:
 
             mv docs/Changelog.generated.md docs/Changelog.md
 
-            git config --local user.name "OTP Changelog Bot"
-            git config --local user.email "changelog-bot@opentripplanner.org"
             git add docs/Changelog.md
             git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
-            git push "https://${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY.git" HEAD:changelog-test
+            git push HEAD:changelog-test
           fi
