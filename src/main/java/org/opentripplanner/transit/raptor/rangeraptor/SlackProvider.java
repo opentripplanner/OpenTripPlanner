@@ -19,7 +19,11 @@ public interface SlackProvider {
 
     /**
      * Set the trip pattern to use when finding the {@code boardSlack} and {@code alightSlack}.
-     */
+     *
+     * @deprecated The {@link #boardSlack()} and {@link #alightSlack()} methods are only called
+     *             once pr pattern, so simplify this by adding the pattern to those methods.
+      */
+    @Deprecated
     void setCurrentPattern(RaptorTripPattern pattern);
 
     /**

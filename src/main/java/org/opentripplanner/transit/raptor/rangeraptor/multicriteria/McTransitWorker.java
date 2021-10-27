@@ -63,13 +63,13 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     @Override
-    public void alight(final int stopIndex, final int stopPos, ToIntFunction<T> stopArrivalTimeOp) {
+    public void alight(final int stopIndex, final int stopPos, int alightSlack) {
         for (PatternRide<T> ride : patternRides) {
             state.transitToStop(
                     ride,
                     stopIndex,
                     ride.trip.arrival(stopPos),
-                    slackProvider.alightSlack()
+                    alightSlack
             );
         }
     }
