@@ -67,6 +67,7 @@
 - Add two new filters for use within grouping filter [#3638](https://github.com/opentripplanner/OpenTripPlanner/pull/3638)
 - Use correct slack in transfer optimizer [#3668](https://github.com/opentripplanner/OpenTripPlanner/pull/3668)
 <!-- CHANGELOG_PLACEHOLDER - DO NOT REMOVE -->
+<!-- CHANGELOG_PLACEHOLDER - DO NOT REMOVE -->
 
 
 ## 2.0.0 (2020-11-27)
