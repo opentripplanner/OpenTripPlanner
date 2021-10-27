@@ -35,5 +35,5 @@ jobs:
 
             git add docs/Changelog.md
             git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
-            git push origin dev-2.x
+            git push origin changelog-test
           fi
