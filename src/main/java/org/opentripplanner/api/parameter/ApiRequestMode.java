@@ -3,7 +3,7 @@ package org.opentripplanner.api.parameter;
 import org.opentripplanner.model.TransitMode;
 
 public enum ApiRequestMode {
-    WALK, BICYCLE, CAR,
+    WALK, BICYCLE, SCOOTER, CAR,
     TRAM, SUBWAY, RAIL, BUS, COACH, FERRY,
     CABLE_CAR, GONDOLA, FUNICULAR,
     TRANSIT, AIRPLANE, FLEX;

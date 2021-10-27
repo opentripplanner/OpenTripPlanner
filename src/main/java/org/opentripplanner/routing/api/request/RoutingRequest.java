@@ -47,6 +47,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
@@ -651,6 +652,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public boolean parkAndRide  = false;
     public boolean carPickup = false;
 
+    public Set<FormFactor> allowedRentalFormFactors = new HashSet<>();
+
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
@@ -1012,6 +1015,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
                 case BIKE_RENTAL:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
                     streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.BICYCLE);
+                    break;
+                case SCOOTER_RENTAL:
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
+                    streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.SCOOTER);
                     break;
                 case CAR:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
@@ -1026,6 +1035,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
                     break;
                 case CAR_RENTAL:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
+                    streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.CAR);
             }
         }
 
@@ -1061,6 +1072,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             clone.unpreferredRoutes = unpreferredRoutes.clone();
 
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
+
+            clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 
             return clone;
         } catch (CloneNotSupportedException e) {

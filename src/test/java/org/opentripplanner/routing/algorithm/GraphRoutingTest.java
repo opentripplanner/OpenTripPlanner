@@ -322,7 +322,7 @@ public abstract class GraphRoutingTest {
                     graph,
                     vehicleRentalStationEntity(id, latitude, longitude, network)
             );
-            new VehicleRentalEdge(vertex);
+            new VehicleRentalEdge(vertex, RentalVehicleType.getDefaultType(network).formFactor);
             return vertex;
         }
 

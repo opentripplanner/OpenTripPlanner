@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,7 +218,7 @@ public class StateEditor {
     }
 
     public void beginFloatingVehicleRenting(
-            TraverseMode vehicleMode,
+            FormFactor formFactor,
             String network,
             boolean reverse
     ) {
@@ -226,15 +227,17 @@ public class StateEditor {
             child.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
             child.stateData.currentMode = TraverseMode.WALK;
             child.stateData.vehicleRentalNetwork = null;
+            child.stateData.rentalVehicleFormFactor = null;
         } else {
             child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
-            child.stateData.currentMode = vehicleMode;
+            child.stateData.currentMode = formFactor.traverseMode;
             child.stateData.vehicleRentalNetwork = network;
+            child.stateData.rentalVehicleFormFactor = formFactor;
         }
     }
 
     public void beginVehicleRentingAtStation(
-            TraverseMode vehicleMode,
+            FormFactor formFactor,
             String network,
             boolean mayKeep,
             boolean reverse
@@ -245,17 +248,19 @@ public class StateEditor {
             child.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
             child.stateData.currentMode = TraverseMode.WALK;
             child.stateData.vehicleRentalNetwork = null;
+            child.stateData.rentalVehicleFormFactor = null;
             child.stateData.backWalkingBike = false;
         } else {
             child.stateData.mayKeepRentedVehicleAtDestination = mayKeep;
             child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
-            child.stateData.currentMode = vehicleMode;
+            child.stateData.currentMode = formFactor.traverseMode;
             child.stateData.vehicleRentalNetwork = network;
+            child.stateData.rentalVehicleFormFactor = formFactor;
         }
     }
 
     public void dropOffRentedVehicleAtStation(
-            TraverseMode vehicleMode,
+            FormFactor formFactor,
             String network,
             boolean reverse
     ) {
@@ -263,13 +268,15 @@ public class StateEditor {
         if (reverse) {
             child.stateData.mayKeepRentedVehicleAtDestination = false;
             child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
-            child.stateData.currentMode = vehicleMode;
+            child.stateData.currentMode = formFactor.traverseMode;
             child.stateData.vehicleRentalNetwork = network;
+            child.stateData.rentalVehicleFormFactor = formFactor;
         } else {
             child.stateData.mayKeepRentedVehicleAtDestination = false;
             child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
             child.stateData.currentMode = TraverseMode.WALK;
             child.stateData.vehicleRentalNetwork = null;
+            child.stateData.rentalVehicleFormFactor = null;
             child.stateData.backWalkingBike = false;
         }
     }

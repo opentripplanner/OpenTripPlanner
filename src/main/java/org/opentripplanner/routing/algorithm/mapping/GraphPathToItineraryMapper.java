@@ -42,6 +42,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -401,6 +403,16 @@ public abstract class GraphPathToItineraryMapper {
      */
     private static TraverseMode resolveMode(State[] states) {
         TraverseMode returnMode = TraverseMode.WALK;
+
+        if (states[0].isRentingVehicle()) {
+            switch (states[0].stateData.rentalVehicleFormFactor) {
+                case BICYCLE:
+                case OTHER: return TraverseMode.BICYCLE;
+                case SCOOTER:
+                case MOPED: return TraverseMode.SCOOTER;
+                case CAR: return TraverseMode.CAR;
+            }
+        }
 
         for (State state : states) {
             TraverseMode mode = state.getBackMode();

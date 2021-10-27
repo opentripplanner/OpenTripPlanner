@@ -1,9 +1,12 @@
 package org.opentripplanner.updater.vehicle_rental;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -128,7 +131,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                         // the toString includes the text "Bike rental station"
                         LOG.info("VehicleRentalPlace {} is unlinked", vehicleRentalVertex);
                     }
-                    tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex));
+                    Set<FormFactor> formFactors = Stream.concat(
+                        station.getAvailablePickupFormFactors(false).stream(),
+                        station.getAvailableDropoffFormFactors(false).stream()
+                    ).collect(Collectors.toSet());
+                    for (FormFactor formFactor : formFactors) {
+                        tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex, formFactor));
+                    }
                     verticesByStation.put(station.getId(), vehicleRentalVertex);
                     tempEdgesByStation.put(station.getId(), tempEdges);
                 } else {

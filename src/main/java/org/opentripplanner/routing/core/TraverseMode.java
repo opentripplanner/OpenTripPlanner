@@ -5,7 +5,7 @@ import org.opentripplanner.model.TransitMode;
 import java.util.EnumSet;
 
 public enum TraverseMode {
-    WALK, BICYCLE, CAR,
+    WALK, BICYCLE, SCOOTER, CAR,
     TRAM, SUBWAY, RAIL, BUS, FERRY,
     CABLE_CAR, GONDOLA, FUNICULAR,
     TRANSIT, AIRPLANE;
@@ -14,7 +14,7 @@ public enum TraverseMode {
         AIRPLANE, BUS, CABLE_CAR, FERRY, FUNICULAR, GONDOLA, RAIL, SUBWAY, TRAM, TRANSIT
     );
 
-    private static final EnumSet<TraverseMode> STREET_MODES = EnumSet.of(WALK, BICYCLE, CAR);
+    private static final EnumSet<TraverseMode> STREET_MODES = EnumSet.of(WALK, BICYCLE, SCOOTER, CAR);
 
     public boolean isTransit() {
         return TRANSIT_MODES.contains(this);

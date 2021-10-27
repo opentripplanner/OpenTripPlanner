@@ -106,6 +106,10 @@ public class EnumTypes {
         .value("bike_rental", StreetMode.BIKE_RENTAL, "Walk to a bike rental point, "
             + "bike to a bike rental drop-off point, and walk the rest of the way. This can include "
             + "bike rental at fixed locations or free-floating services.")
+        .value("scooter_rental", StreetMode.SCOOTER_RENTAL, "Walk to a scooter "
+                + "rental point, ride a scooter to a scooter rental drop-off point, and walk the "
+                + "rest of the way. This can include scooter rental at fixed locations or "
+                + "free-floating services.")
         .value("car", StreetMode.CAR, "Car only. Direct mode only.")
         .value("car_park", StreetMode.CAR_TO_PARK, "Start in the car, drive to a "
             + "parking area, and walk the rest of the way. Direct mode and access mode only.")
@@ -133,6 +137,7 @@ public class EnumTypes {
             .value("transit", TraverseMode.TRANSIT, "Any for of public transportation")
             .value("foot", TraverseMode.WALK)
             .value("car", TraverseMode.CAR)
+            .value("scooter", TraverseMode.SCOOTER)
             // TODO OTP2 - Car park no added
             // .value("car_park", TraverseMode.CAR_PARK, "Combine with foot and transit for park and ride.")
             // .value("car_dropoff", TraverseMode.CAR_DROPOFF, "Combine with foot and transit for kiss and ride.")

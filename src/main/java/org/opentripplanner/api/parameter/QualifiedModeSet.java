@@ -89,6 +89,7 @@ public class QualifiedModeSet implements Serializable {
                 .filter(m ->
                         m.mode == ApiRequestMode.WALK ||
                         m.mode == ApiRequestMode.BICYCLE ||
+                        m.mode == ApiRequestMode.SCOOTER ||
                         m.mode == ApiRequestMode.CAR)
                 .collect(Collectors.toList());
 
@@ -131,6 +132,17 @@ public class QualifiedModeSet implements Serializable {
                         transferMode = StreetMode.BIKE;
                         egressMode = StreetMode.BIKE;
                         directMode = StreetMode.BIKE;
+                    }
+                    break;
+                case SCOOTER:
+                    if (requestMode.qualifiers.contains(Qualifier.RENT)) {
+                        accessMode = StreetMode.SCOOTER_RENTAL;
+                        transferMode = StreetMode.SCOOTER_RENTAL;
+                        egressMode = StreetMode.SCOOTER_RENTAL;
+                        directMode = StreetMode.SCOOTER_RENTAL;
+                    } else {
+                        // Only supported as rental mode
+                        throw new IllegalArgumentException();
                     }
                     break;
                 case CAR:

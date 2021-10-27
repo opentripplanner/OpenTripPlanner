@@ -8,6 +8,7 @@ import java.util.Objects;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
@@ -571,7 +572,7 @@ public class State implements Cloneable {
             if (orig.isRentingVehicle() && !orig.getBackState().isRentingVehicle()) {
                 var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
                 editor.dropOffRentedVehicleAtStation(
-                        stationVertex.getVehicleMode(),
+                        ((VehicleRentalEdge) edge).formFactor,
                         stationVertex.getStation().getNetwork(),
                         false
                 );
@@ -580,7 +581,7 @@ public class State implements Cloneable {
                 var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
                 if (orig.getBackState().isRentingVehicleFromStation()) {
                     editor.beginVehicleRentingAtStation(
-                            stationVertex.getVehicleMode(),
+                            ((VehicleRentalEdge) edge).formFactor,
                             stationVertex.getStation().getNetwork(),
                             orig.backState.mayKeepRentedVehicleAtDestination(),
                             false
@@ -588,7 +589,7 @@ public class State implements Cloneable {
                 }
                 else if (orig.getBackState().isRentingFloatingVehicle()) {
                     editor.beginFloatingVehicleRenting(
-                            stationVertex.getVehicleMode(),
+                            ((VehicleRentalEdge) edge).formFactor,
                             stationVertex.getStation().getNetwork(),
                             false
                     );
