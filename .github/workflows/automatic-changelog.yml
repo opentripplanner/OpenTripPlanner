@@ -15,12 +15,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.ADMIN_TOKEN }}
-          
+
       - name: Configure Git User
         run: |
           git config --global user.name 'OTP Changelog Bot'
-          git config --global user.email 'changelog-bot@opentripplanner.org'   
- 
+          git config --global user.email 'changelog-bot@opentripplanner.org'
+
       - name: Generate changelog entry from PR information
         if: github.event.pull_request.merged
         env:
@@ -28,8 +28,9 @@ jobs:
           NUMBER: ${{ github.event.pull_request.number }}
           URL: ${{ github.event.pull_request.html_url }}
         run: |
-          # if the title starts with "refactor" we don't generate an entry
-          if  [[ "${TITLE}" == CL_SKIP* ]]; then
+          # if the title contains "changelog skip" we don't generate an entry
+          TITLE_LOWER_CASE=`echo "${TITLE}" | awk '{print tolower($0)}'`
+          if  [[ "${TITLE_LOWER_CASE}" =~ "changelog skip" ]]; then
             echo "Skipping changelog entry generation"
           else
             # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
@@ -41,5 +42,5 @@ jobs:
 
             git add docs/Changelog.md
             git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
-            git push https://github.com/opentripplanner/OpenTripPlanner.git HEAD:changelog-test
+            git push HEAD:changelog-test
           fi
