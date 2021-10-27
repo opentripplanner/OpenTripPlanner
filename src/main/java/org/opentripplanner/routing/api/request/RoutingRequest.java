@@ -508,7 +508,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * <p>
      * Unit is seconds. Default value is not-set(empty map).
      */
-    public Map<TraverseMode, Integer> boardSlackForMode = new HashMap<>();
+    public Map<TransitMode, Integer> boardSlackForMode = new HashMap<>();
 
     /**
      * The number of seconds to add after alighting a transit leg. It is recommended to use the
@@ -528,7 +528,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * <p>
      * Unit is seconds. Default value is not-set(empty map).
      */
-    public Map<TraverseMode, Integer> alightSlackForMode = new HashMap<>();
+    public Map<TransitMode, Integer> alightSlackForMode = new HashMap<>();
 
     /**
      * Ideally maxTransfers should be set in the router config, not here. Instead the client should

@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import java.util.Map;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TripPatternForDates;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-
-import java.util.Map;
 
 
 /**
@@ -36,9 +35,9 @@ public final class SlackProvider implements RaptorSlackProvider {
     public SlackProvider(
             int transferSlack,
             int defaultBoardSlack,
-            Map<TraverseMode, Integer> modeBoardSlack,
+            Map<TransitMode, Integer> modeBoardSlack,
             int defaultAlightSlack,
-            Map<TraverseMode, Integer> modeAlightSlack
+            Map<TransitMode, Integer> modeAlightSlack
     ) {
         this.transferSlack = transferSlack;
         this.boardSlack = slackByMode(modeBoardSlack, defaultBoardSlack);
@@ -70,9 +69,9 @@ public final class SlackProvider implements RaptorSlackProvider {
         return ((TripPatternForDates)pattern).getTripPattern().getTransitMode().ordinal();
     }
 
-    private static int[] slackByMode(Map<TraverseMode, Integer> modeSlack, int defaultSlack) {
-        int[] result = new int[TraverseMode.values().length];
-        for (TraverseMode mode : TraverseMode.values()) {
+    private static int[] slackByMode(Map<TransitMode, Integer> modeSlack, int defaultSlack) {
+        int[] result = new int[TransitMode.values().length];
+        for (TransitMode mode : TransitMode.values()) {
             result[mode.ordinal()] = modeSlack.getOrDefault(mode, defaultSlack) ;
         }
         return result;
