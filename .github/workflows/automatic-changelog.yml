@@ -19,7 +19,7 @@ jobs:
       - name: Configure Git User
         run: |
           git config --global user.name 'OTP Changelog Bot'
-          git config --global user.email 'changelog-bot@opentripplanner.org    
+          git config --global user.email 'changelog-bot@opentripplanner.org'   
  
       - name: Generate changelog entry from PR information
         if: github.event.pull_request.merged
@@ -29,7 +29,7 @@ jobs:
           URL: ${{ github.event.pull_request.html_url }}
         run: |
           # if the title starts with "refactor" we don't generate an entry
-          if  [[ "$TITLE" == CL_SKIP* ]]; then
+          if  [[ "${TITLE}" == CL_SKIP* ]]; then
             echo "Skipping changelog entry generation"
           else
             # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
