@@ -13,10 +13,6 @@ public class FlexPath {
   private final Supplier<LineString> geometrySupplier;
   private LineString geometry;
 
-  public FlexPath(int distanceMeters, int durationSeconds, FlexPath path) {
-    this(distanceMeters, durationSeconds, path::getGeometry);
-  }
-
   /**
    *
    * @param geometrySupplier Computing a linestring from a GraphPath is a surprisingly expensive

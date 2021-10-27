@@ -47,7 +47,6 @@
 
   <!-- Raptor request debug logging - Turn on/off: debug/info -->
   <logger name="org.opentripplanner.transit.raptor.RaptorService" level="info"/>
-  <logger name="org.opentripplanner.routing.framework.DebugTimingAggregator" level="info"/>
 
   <!-- THIRD PARTY LOGGERS -->
 
