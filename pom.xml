@@ -12,7 +12,6 @@
 
     <licenses>
         <license>
-            <!--Comment -->
             <name>GNU Lesser General Public License</name>
             <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
         </license>
