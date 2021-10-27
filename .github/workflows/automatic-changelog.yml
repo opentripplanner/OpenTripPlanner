@@ -23,13 +23,9 @@ jobs:
 
       - name: Generate changelog entry from PR information
         if: github.event.pull_request.merged
-        env:
-          TITLE: ${{ github.event.pull_request.title }}
-          NUMBER: ${{ github.event.pull_request.number }}
-          URL: ${{ github.event.pull_request.html_url }}
         run: |
           # if the title contains "changelog skip" we don't generate an entry
-          TITLE_LOWER_CASE=`echo "${TITLE}" | awk '{print tolower($0)}'`
+          TITLE_LOWER_CASE=`echo $TITLE | awk '{print tolower($0)}'`
           if  [[ "${TITLE_LOWER_CASE}" =~ "changelog skip" ]]; then
             echo "Skipping changelog entry generation"
           else
@@ -42,5 +38,9 @@ jobs:
 
             git add docs/Changelog.md
             git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
-            git push https://github.com/opentripplanner/OpenTripPlanner.git HEAD:changelog-test
+            git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:changelog-test
           fi
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          URL: ${{ github.event.pull_request.html_url }}
