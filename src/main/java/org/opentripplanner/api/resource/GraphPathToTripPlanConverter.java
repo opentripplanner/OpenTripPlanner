@@ -915,6 +915,12 @@ public abstract class GraphPathToTripPlanConverter {
     /**
      * Computes how easy a leg is to use for a wheelchair user on a scale from 0 to 1 where
      * 0 is bad and 1 is good.
+     *
+     * The score is computed as follows: each the trip and the board and alight stops count
+     * 1/3 of the score.
+     *
+     * If there are interlined transfers then the alight/board stop pairs are not taken into account
+     * as the passengers don't leave the vehicle.
      */
     private static Float computeAccessibilityScore(
             Trip trip,
