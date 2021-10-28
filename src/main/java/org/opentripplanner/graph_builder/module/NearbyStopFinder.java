@@ -11,6 +11,7 @@ import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.profile.StopAtDistance;
 import org.opentripplanner.routing.algorithm.EarliestArrivalSearch;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -135,13 +136,7 @@ public class NearbyStopFinder {
      * If the origin vertex is a TransitStop, the result will include it.
      */
     public List<StopAtDistance> findNearbyStopsViaStreets(Vertex originVertex, Vertex destinationVertex, boolean wheelchairAccessible) {
-        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-        routingRequest.clampInitialWait = (0L);
-        routingRequest.wheelchairAccessible = wheelchairAccessible;
-        // setting null as the destination vertex will lead to a radius search where all nearby stops are returned.
-        routingRequest.setRoutingContext(graph, originVertex, destinationVertex);
-        ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
-
+        ShortestPathTree spt = calculateWalkTree(originVertex, destinationVertex, wheelchairAccessible);
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         if (spt != null) {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
@@ -157,9 +152,28 @@ public class NearbyStopFinder {
         if (originVertex instanceof TransitStop) {
             stopsFound.add(new StopAtDistance((TransitStop)originVertex, 0));
         }
-        routingRequest.cleanup();
         return stopsFound;
 
+    }
+
+    public ShortestPathTree calculateWalkTree(Vertex origin, Vertex destination, boolean wheelchairAccessible) {
+        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
+        routingRequest.clampInitialWait = (0L);
+        routingRequest.wheelchairAccessible = wheelchairAccessible;
+        // setting null as the destination vertex will lead to a radius search where all nearby stops are returned.
+        routingRequest.setRoutingContext(graph, origin, destination);
+        ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
+        routingRequest.cleanup();
+        return spt;
+    }
+
+    public StopAtDistance calculateStopAtDistance(Vertex origin, Vertex destination, boolean wheelchairAccessible) {
+        ShortestPathTree spt = calculateWalkTree(origin, destination, wheelchairAccessible);
+        State state = spt.getState(destination);
+        if(state == null) {
+            return null;
+        }
+        return stopAtDistanceForState(state);
     }
 
     /**

@@ -1,7 +1,13 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Iterables;
+import java.util.Optional;
+import java.util.stream.Stream;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
+import org.opentripplanner.graph_builder.module.NearbyStopFinder.StopAtDistance;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -9,6 +15,7 @@ import org.opentripplanner.routing.edgetype.WheelchairEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,20 +112,28 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
         int numTransfersCreated = 0;
         for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, false)) {
-            boolean isWheelchairAccessible = sd.edges.stream()
-                    .filter(e -> e instanceof WheelchairEdge)
-                    .map(edge -> (WheelchairEdge) edge)
-                    .anyMatch(WheelchairEdge::isWheelchairAccessible);
             /* Skip the origin stop, loop transfers are not needed. */
             if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
-            new SimpleTransfer(ts0, sd.tstop, sd.dist, isWheelchairAccessible, sd.geom, sd.edges);
+
+            // we check all the edges in the transfer path if there are wheelchair-inaccessible ones
+            boolean isWheelchairAccessible = Optional.ofNullable(sd.edges)
+                    .map(List::stream)
+                    .orElse(Stream.empty())
+                    .filter(e -> e instanceof WheelchairEdge)
+                    .map(edge -> (WheelchairEdge) edge)
+                    .allMatch(WheelchairEdge::isWheelchairAccessible);
+
+            new SimpleTransfer(ts0, sd.tstop, sd.dist, false, sd.geom, sd.edges);
             numTransfersCreated++;
 
+            // if there is an edge that isn't accessible we generate a second transfer which is
             if(!isWheelchairAccessible) {
-                List<NearbyStopFinder.StopAtDistance> stops =
-                        nearbyStopFinder.findNearbyStopsViaStreets(ts0, sd.tstop.departVertex, true);
-                new SimpleTransfer(ts0, sd.tstop, sd.dist, isWheelchairAccessible, sd.geom, sd.edges);
-                numTransfersCreated++;
+                StopAtDistance stop =
+                        nearbyStopFinder.calculateStopAtDistance(ts0, sd.tstop, true);
+                if(stop != null) {
+                    new SimpleTransfer(ts0, stop.tstop, stop.dist, true, stop.geom, stop.edges);
+                    numTransfersCreated++;
+                }
             }
         }
         LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(),
