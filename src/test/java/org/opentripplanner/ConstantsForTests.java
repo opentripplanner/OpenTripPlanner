@@ -3,7 +3,6 @@ package org.opentripplanner;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.HashMap;
 
 import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -139,7 +138,7 @@ public class ConstantsForTests {
             StreetLinkerModule slm = new StreetLinkerModule();
             slm.buildGraph(g, new GraphBuilderModuleSummary(slm));
 
-            DirectTransferGenerator dtg = new DirectTransferGenerator(2000);
+            DirectTransferGenerator dtg = new DirectTransferGenerator(2000, true);
             dtg.buildGraph(g, new GraphBuilderModuleSummary(dtg));
 
             g.index(true);

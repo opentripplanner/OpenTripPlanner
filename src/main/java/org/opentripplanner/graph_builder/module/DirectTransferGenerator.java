@@ -1,11 +1,12 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Iterables;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder.StopAtDistance;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -14,16 +15,9 @@ import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.WheelchairEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit network among themselves. This is necessary for
@@ -39,6 +33,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     private static Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
 
     final double radiusMeters;
+    final boolean wheelchairTransfers;
 
     public List<String> provides() {
         return Arrays.asList("linking");
@@ -48,8 +43,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         return Arrays.asList("street to transit");
     }
 
-    public DirectTransferGenerator (double radiusMeters) {
+    public DirectTransferGenerator(double radiusMeters, boolean wheelchairTransfers) {
         this.radiusMeters = radiusMeters;
+        this.wheelchairTransfers = wheelchairTransfers;
     }
 
     @Override
@@ -115,14 +111,20 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             /* Skip the origin stop, loop transfers are not needed. */
             if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
 
-            // we check all the edges in the transfer path if there are wheelchair-inaccessible ones
-            boolean isWheelchairAccessible = Optional.ofNullable(sd.edges)
-                    .map(List::stream)
-                    .orElse(Stream.empty())
-                    .filter(e -> e instanceof WheelchairEdge)
-                    .map(edge -> (WheelchairEdge) edge)
-                    .allMatch(WheelchairEdge::isWheelchairAccessible);
+            boolean isWheelchairAccessible;
 
+            if (wheelchairTransfers) {
+                // we check all the edges in the transfer path if there are wheelchair-inaccessible ones
+                isWheelchairAccessible = Optional.ofNullable(sd.edges)
+                        .map(List::stream)
+                        .orElse(Stream.empty())
+                        .filter(e -> e instanceof WheelchairEdge)
+                        .map(edge -> (WheelchairEdge) edge)
+                        .allMatch(WheelchairEdge::isWheelchairAccessible);
+
+            } else {
+                isWheelchairAccessible = true;
+            }
             new SimpleTransfer(ts0, sd.tstop, sd.dist, isWheelchairAccessible, sd.geom, sd.edges);
             numTransfersCreated++;
 
