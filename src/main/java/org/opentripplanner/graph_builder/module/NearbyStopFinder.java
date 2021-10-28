@@ -127,16 +127,12 @@ public class NearbyStopFinder {
         return useStreets ? findNearbyStopsViaStreets(vertex, wheelchairAccessible) : findNearbyStopsEuclidean(vertex);
     }
 
-    public List<StopAtDistance> findNearbyStopsViaStreets(Vertex originVertex, boolean wheelchairAccessible) {
-       return findNearbyStopsViaStreets(originVertex, null, wheelchairAccessible);
-    }
-
     /**
      * Return all stops within a certain radius of the given vertex, using network distance along streets.
      * If the origin vertex is a TransitStop, the result will include it.
      */
-    public List<StopAtDistance> findNearbyStopsViaStreets(Vertex originVertex, Vertex destinationVertex, boolean wheelchairAccessible) {
-        ShortestPathTree spt = calculateWalkTree(originVertex, destinationVertex, wheelchairAccessible);
+    public List<StopAtDistance> findNearbyStopsViaStreets(Vertex originVertex, boolean wheelchairAccessible) {
+        ShortestPathTree spt = calculateWalkTree(originVertex, null, wheelchairAccessible);
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         if (spt != null) {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
@@ -156,7 +152,15 @@ public class NearbyStopFinder {
 
     }
 
-    public ShortestPathTree calculateWalkTree(Vertex origin, Vertex destination, boolean wheelchairAccessible) {
+    /**
+     * Given an origin and destination calculate a shortest path tree.
+     *
+     * Can also be used to do a radius search to return all stops nearby.
+     *
+     * @param destination where the destination of the search should be. setting this to null will
+     *                    lead to radius search where all stops in the vicinity are returned.
+     */
+    private ShortestPathTree calculateWalkTree(Vertex origin, Vertex destination, boolean wheelchairAccessible) {
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = (0L);
         routingRequest.wheelchairAccessible = wheelchairAccessible;
@@ -167,6 +171,11 @@ public class NearbyStopFinder {
         return spt;
     }
 
+    /**
+     * If you already know what the transfer stop is - for example when re-computing a transfer
+     * to be wheelchair-accessible - use this method to calculate the path from the origin stop
+     * to the transfer stop vertex.
+     */
     public StopAtDistance calculateStopAtDistance(Vertex origin, Vertex destination, boolean wheelchairAccessible) {
         ShortestPathTree spt = calculateWalkTree(origin, destination, wheelchairAccessible);
         State state = spt.getState(destination);

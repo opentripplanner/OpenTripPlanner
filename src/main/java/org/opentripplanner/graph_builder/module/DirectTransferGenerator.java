@@ -123,7 +123,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                     .map(edge -> (WheelchairEdge) edge)
                     .allMatch(WheelchairEdge::isWheelchairAccessible);
 
-            new SimpleTransfer(ts0, sd.tstop, sd.dist, false, sd.geom, sd.edges);
+            new SimpleTransfer(ts0, sd.tstop, sd.dist, isWheelchairAccessible, sd.geom, sd.edges);
             numTransfersCreated++;
 
             // if there is an edge that isn't accessible we generate a second transfer which is
