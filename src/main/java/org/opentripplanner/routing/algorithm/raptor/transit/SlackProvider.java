@@ -59,12 +59,12 @@ public final class SlackProvider implements RaptorSlackProvider {
 
     @Override
     public int boardSlack(RaptorTripPattern pattern) {
-        return boardSlack.getOrDefault(index(pattern), defaultBoardSlack);
+        return boardSlack.getOrDefault(modeForPattern(pattern), defaultBoardSlack);
     }
 
     @Override
     public int alightSlack(RaptorTripPattern pattern) {
-        return alightSlack.getOrDefault(index(pattern), defaultAlightSlack);
+        return alightSlack.getOrDefault(modeForPattern(pattern), defaultAlightSlack);
     }
 
     @Override
@@ -76,9 +76,9 @@ public final class SlackProvider implements RaptorSlackProvider {
     /* private methods */
 
     /**
-     * Return the trip-pattern ordinal as an index.
+     * Return the mode for the trip pattern.
      */
-    private static TransitMode index(RaptorTripPattern pattern) {
+    private static TransitMode modeForPattern(RaptorTripPattern pattern) {
         return ((TripPatternForDates)pattern).getTripPattern().getTransitMode();
     }
 }
