@@ -28,15 +28,16 @@ public class ActuatorAPI {
      * List the actuator endpoints available
      */
     @GET
+    @Path("")
     public Response actuator() {
         return Response.status(Response.Status.OK).entity(
             "{\n"
             + "  \"_links\" : {\n"
             + "    \"self\" : {\n"
-            + "      \"href\" : \"/actuators\", \n"
+            + "      \"href\" : \"/actuator\", \n"
             + "    },\n"
             + "    \"health\" : {\n"
-            + "      \"href\" : \"/actuators/health\"\n"
+            + "      \"href\" : \"/actuator/health\"\n"
             + "    } "
             + "\n}" )
             .type("application/json").build();
