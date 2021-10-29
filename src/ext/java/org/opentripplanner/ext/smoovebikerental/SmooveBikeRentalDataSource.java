@@ -1,7 +1,9 @@
 package org.opentripplanner.ext.smoovebikerental;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.GenericJsonVehicleRentalDataSource;
@@ -20,10 +22,12 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
     public static final String DEFAULT_NETWORK_NAME = "smoove";
 
     private final String networkName;
+    private final RentalVehicleType vehicleType;
 
     public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
         super(config,"result");
         networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
+        vehicleType = RentalVehicleType.getDefaultType(networkName);
     }
 
     /**
@@ -65,6 +69,8 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
             station.vehiclesAvailable = node.path("avl_bikes").asInt();
             station.spacesAvailable = node.path("free_slots").asInt();
         }
+        station.vehicleTypesAvailable = Map.of(vehicleType, station.spacesAvailable);
+        station.vehicleSpacesAvailable = Map.of(vehicleType, station.spacesAvailable);
         return station;
     }
 }
