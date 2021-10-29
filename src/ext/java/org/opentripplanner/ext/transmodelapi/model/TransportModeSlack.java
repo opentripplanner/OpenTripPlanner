@@ -16,7 +16,7 @@ import graphql.schema.GraphQLOutputType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -137,8 +137,8 @@ public class TransportModeSlack {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<TransitMode, Integer> mapToDomain(Object value) {
-        Map<TransitMode, Integer> result = new HashMap<>();
+    public static EnumMap<TransitMode, Integer> mapToDomain(Object value) {
+        var result = new EnumMap<TransitMode, Integer>(TransitMode.class);
         if(value instanceof List) {
             List<Map<String, Object>> list = (List<Map<String, Object>>) value;
             for (Map<String, Object> map : list) {
