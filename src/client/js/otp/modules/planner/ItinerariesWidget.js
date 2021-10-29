@@ -331,6 +331,7 @@ otp.widgets.ItinerariesWidget =
     getModeColor : function(mode) {
         if(mode === "WALK") return '#bbb';
         if(mode === "BICYCLE") return '#44f';
+        if(mode === "SCOOTER") return '#88f';
         if(mode === "SUBWAY") return '#f00';
         if(mode === "RAIL") return '#b00';
         if(mode === "BUS") return '#0f0';
