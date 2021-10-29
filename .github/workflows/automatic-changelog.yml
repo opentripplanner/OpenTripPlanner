@@ -1,6 +1,6 @@
 name: Automatic changelog entry
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - dev-2.x
     types: [closed]
@@ -11,18 +11,19 @@ jobs:
     steps:
 
       - name: Checkout
-        if: github.event.pull_request.merged
+        if: github.event.pull_request_target.merged
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.ADMIN_TOKEN }}
 
       - name: Configure Git User
+        if: github.event.pull_request_target.merged
         run: |
           git config --global user.name 'OTP Changelog Bot'
           git config --global user.email 'changelog-bot@opentripplanner.org'
 
       - name: Generate changelog entry from PR information
-        if: github.event.pull_request.merged
+        if: github.event.pull_request_target.merged
         run: |
           # if the title contains "changelog skip" we don't generate an entry
           TITLE_LOWER_CASE=`echo $TITLE | awk '{print tolower($0)}'`
