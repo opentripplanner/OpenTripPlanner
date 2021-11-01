@@ -2,10 +2,20 @@ package org.opentripplanner.api.mapping;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiAlert;
+import org.opentripplanner.api.model.ApiBookingInfo;
+import org.opentripplanner.api.model.ApiBookingMethod;
+import org.opentripplanner.api.model.ApiBookingTime;
+import org.opentripplanner.api.model.ApiContactInfo;
 import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingMethod;
+import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.model.plan.Leg;
 
 public class LegMapper {
@@ -100,10 +110,88 @@ public class LegMapper {
         );
         api.boardRule = domain.boardRule;
         api.alightRule = domain.alightRule;
+
+        api.pickupBookingInfo = toApi(domain.pickupBookingInfo);
+        api.dropOffBookingInfo = toApi(domain.dropOffBookingInfo);
+
         api.rentedBike = domain.rentedVehicle;
         api.walkingBike = domain.walkingBike;
 
         return api;
+    }
+
+    private ApiBookingInfo toApi(BookingInfo info) {
+        if (info != null) {
+
+            return new ApiBookingInfo(
+                    toApi(info.getContactInfo()),
+                    toApi(info.bookingMethods()),
+                    toApi(info.getEarliestBookingTime()),
+                    toApi(info.getLatestBookingTime()),
+                    info.getMinimumBookingNotice(),
+                    info.getMaximumBookingNotice(),
+                    info.getMessage(),
+                    info.getPickupMessage(),
+                    info.getDropOffMessage()
+            );
+        }
+        else {
+            return null;
+        }
+    }
+
+    private ApiContactInfo toApi(ContactInfo info) {
+        if (info != null) {
+            return new ApiContactInfo(
+                    info.getContactPerson(),
+                    info.getPhoneNumber(),
+                    info.geteMail(),
+                    info.getFaxNumber(),
+                    info.getInfoUrl(),
+                    info.getBookingUrl(),
+                    info.getAdditionalDetails()
+            );
+        }
+        else {
+            return null;
+        }
+    }
+
+    private EnumSet<ApiBookingMethod> toApi(EnumSet<BookingMethod> m) {
+           if(m !=null) {
+
+        return m.stream()
+                .map(this::toApi)
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(ApiBookingMethod.class)));
+        } else {
+            return null;
+        }
+    }
+
+    private ApiBookingTime toApi(BookingTime time) {
+        if(time != null) {
+            return new ApiBookingTime(time.getTime().toSecondOfDay(), time.getDaysPrior());
+        } else {
+            return null;
+        }
+    }
+
+    private ApiBookingMethod toApi(BookingMethod m) {
+        switch (m) {
+            case CALL_DRIVER:
+                return ApiBookingMethod.CALL_DRIVER;
+            case CALL_OFFICE:
+                return ApiBookingMethod.CALL_OFFICE;
+            case ONLINE:
+                return ApiBookingMethod.ONLINE;
+            case PHONE_AT_STOP:
+                return ApiBookingMethod.PHONE_AT_STOP;
+            case TEXT_MESSAGE:
+                return ApiBookingMethod.TEXT_MESSAGE;
+            default:
+                return null;
+        }
+
     }
 
     private static List<ApiAlert> concatenateAlerts(List<ApiAlert> a, List<ApiAlert> b) {
