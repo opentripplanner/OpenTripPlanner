@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import java.util.EnumMap;
+import java.util.Map;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TripPatternForDates;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-
-import java.util.Map;
 
 
 /**
@@ -17,15 +17,25 @@ import java.util.Map;
  */
 public final class SlackProvider implements RaptorSlackProvider {
     /**
+     * Default boardSlack if an explicit value is not set for the mode.
+     */
+    private final int defaultBoardSlack;
+
+    /**
      * Keep a list of board-slack values for each mode.
      */
-    private final int[] boardSlack;
+    private final EnumMap<TransitMode, Integer> boardSlack;
+
+    /**
+     * Default alightSlack if an explicit value is not set for the mode.
+     */
+    private final int defaultAlightSlack;
 
     /**
      * Keep a list of alight-slack values for each mode.
      *
      */
-    private final int[] alightSlack;
+    private final EnumMap<TransitMode, Integer> alightSlack;
 
     /**
      * A constant value is used for alight slack.
@@ -36,23 +46,25 @@ public final class SlackProvider implements RaptorSlackProvider {
     public SlackProvider(
             int transferSlack,
             int defaultBoardSlack,
-            Map<TraverseMode, Integer> modeBoardSlack,
+            EnumMap<TransitMode, Integer> modeBoardSlack,
             int defaultAlightSlack,
-            Map<TraverseMode, Integer> modeAlightSlack
+            EnumMap<TransitMode, Integer> modeAlightSlack
     ) {
         this.transferSlack = transferSlack;
-        this.boardSlack = slackByMode(modeBoardSlack, defaultBoardSlack);
-        this.alightSlack = slackByMode(modeAlightSlack, defaultAlightSlack);
+        this.defaultBoardSlack = defaultBoardSlack;
+        this.boardSlack = modeBoardSlack;
+        this.defaultAlightSlack = defaultAlightSlack;
+        this.alightSlack = modeAlightSlack;
     }
 
     @Override
     public int boardSlack(RaptorTripPattern pattern) {
-        return boardSlack[index(pattern)];
+        return boardSlack.getOrDefault(modeForPattern(pattern), defaultBoardSlack);
     }
 
     @Override
     public int alightSlack(RaptorTripPattern pattern) {
-        return alightSlack[index(pattern)];
+        return alightSlack.getOrDefault(modeForPattern(pattern), defaultAlightSlack);
     }
 
     @Override
@@ -64,17 +76,9 @@ public final class SlackProvider implements RaptorSlackProvider {
     /* private methods */
 
     /**
-     * Return the trip-pattern ordinal as an index.
+     * Return the mode for the trip pattern.
      */
-    private static int index(RaptorTripPattern pattern) {
-        return ((TripPatternForDates)pattern).getTripPattern().getTransitMode().ordinal();
-    }
-
-    private static int[] slackByMode(Map<TraverseMode, Integer> modeSlack, int defaultSlack) {
-        int[] result = new int[TraverseMode.values().length];
-        for (TraverseMode mode : TraverseMode.values()) {
-            result[mode.ordinal()] = modeSlack.getOrDefault(mode, defaultSlack) ;
-        }
-        return result;
+    private static TransitMode modeForPattern(RaptorTripPattern pattern) {
+        return ((TripPatternForDates)pattern).getTripPattern().getTransitMode();
     }
 }
