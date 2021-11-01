@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 import static org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 import java.util.function.IntConsumer;
-import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -59,7 +58,6 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     @Override
     public void prepareForTransitWith(RaptorTripPattern pattern) {
         this.patternRides.clear();
-        this.slackProvider.setCurrentPattern(pattern);
     }
 
     @Override
@@ -83,6 +81,11 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     @Override
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        return prevArrival.mostResentTransitArrival();
+    }
+
+    @Override
     public void board(
             final int stopIndex,
             final int earliestBoardTime,
@@ -92,9 +95,10 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         final int boardTime = boarding.getTime();
 
         if(prevArrival.arrivedByAccess()) {
-            // What if access is FLEX with rides, should not FLEX alightSlack and
-            // transfersSlack be taken into account as well?
-            prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
+            // TODO: What if access is FLEX with rides, should not FLEX transfersSlack be taken
+            //       into account as well?
+            int latestArrivalTime = boardTime - slackProvider.boardSlack(trip.pattern());
+            prevArrival = prevArrival.timeShiftNewArrivalTime(latestArrivalTime);
         }
 
         final int boardCost = calculateCostAtBoardTime(prevArrival, boarding);
@@ -115,10 +119,6 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         );
     }
 
-    @Override
-    public TransitArrival<T> previousTransit(int boardStopIndex) {
-        return prevArrival.mostResentTransitArrival();
-    }
 
     /**
      * Calculate a cost for riding a trip. It should include the cost from the beginning of the

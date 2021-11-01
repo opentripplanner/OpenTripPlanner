@@ -217,9 +217,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 var txService = enableTransferConstraints
                         ? calculator.transferConstraintsSearch(route) : null;
 
-                slackProvider.setCurrentPattern(pattern);
-                int alightSlack = slackProvider.alightSlack();
-                int boardSlack = slackProvider.boardSlack();
+                int alightSlack = slackProvider.alightSlack(pattern);
+                int boardSlack = slackProvider.boardSlack(pattern);
 
                 transitWorker.prepareForTransitWith(pattern);
 
@@ -292,10 +291,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return false; }
 
-        slackProvider.setCurrentPattern(sourceStopArrival.trip().pattern());
+        int prevStopArrivalTime = sourceStopArrival.arrivalTime();
+
         int earliestBoardTime = calculator.minusDuration(
-                sourceStopArrival.arrivalTime(),
-                slackProvider.alightSlack()
+                prevStopArrivalTime,
+                slackProvider.alightSlack(sourceStopArrival.trip().pattern())
         );
 
         var result = txService.find(
