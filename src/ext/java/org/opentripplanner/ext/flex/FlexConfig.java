@@ -1,4 +1,6 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.ext.flex;
+
+import org.opentripplanner.standalone.config.NodeAdapter;
 
 public class FlexConfig {
   public static final int DEFAULT_MAX_TRANSFER_METERS = 1000;

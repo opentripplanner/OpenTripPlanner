@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.standalone.config.FlexConfig;
+import org.opentripplanner.ext.flex.FlexConfig;
 
 import static org.opentripplanner.model.PickDrop.NONE;
 

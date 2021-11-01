@@ -8,7 +8,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.standalone.config.FlexConfig;
+import org.opentripplanner.ext.flex.FlexConfig;
 
 public class FlexAccessEgressRouter {
 

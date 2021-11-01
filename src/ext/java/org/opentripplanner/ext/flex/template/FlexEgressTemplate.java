@@ -15,7 +15,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.FlexConfig;
+import org.opentripplanner.ext.flex.FlexConfig;
 
 public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   public FlexEgressTemplate(
