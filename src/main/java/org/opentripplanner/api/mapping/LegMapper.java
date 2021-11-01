@@ -5,10 +5,10 @@ import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiBookingInfo;
-import org.opentripplanner.api.model.ApiBookingMethod;
 import org.opentripplanner.api.model.ApiBookingTime;
 import org.opentripplanner.api.model.ApiContactInfo;
 import org.opentripplanner.api.model.ApiLeg;
@@ -157,41 +157,24 @@ public class LegMapper {
         }
     }
 
-    private EnumSet<ApiBookingMethod> toApi(EnumSet<BookingMethod> m) {
-           if(m !=null) {
-
-        return m.stream()
-                .map(this::toApi)
-                .collect(Collectors.toCollection(() -> EnumSet.noneOf(ApiBookingMethod.class)));
-        } else {
+    private Set<String> toApi(EnumSet<BookingMethod> m) {
+        if (m != null) {
+            return m.stream()
+                    .map(Enum::toString)
+                    .collect(Collectors.toSet());
+        }
+        else {
             return null;
         }
     }
 
     private ApiBookingTime toApi(BookingTime time) {
-        if(time != null) {
+        if (time != null) {
             return new ApiBookingTime(time.getTime().toSecondOfDay(), time.getDaysPrior());
-        } else {
+        }
+        else {
             return null;
         }
-    }
-
-    private ApiBookingMethod toApi(BookingMethod m) {
-        switch (m) {
-            case CALL_DRIVER:
-                return ApiBookingMethod.CALL_DRIVER;
-            case CALL_OFFICE:
-                return ApiBookingMethod.CALL_OFFICE;
-            case ONLINE:
-                return ApiBookingMethod.ONLINE;
-            case PHONE_AT_STOP:
-                return ApiBookingMethod.PHONE_AT_STOP;
-            case TEXT_MESSAGE:
-                return ApiBookingMethod.TEXT_MESSAGE;
-            default:
-                return null;
-        }
-
     }
 
     private static List<ApiAlert> concatenateAlerts(List<ApiAlert> a, List<ApiAlert> b) {
