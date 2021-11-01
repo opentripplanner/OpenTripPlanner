@@ -1,17 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import java.util.function.IntSupplier;
+import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
-import java.util.function.IntSupplier;
-import java.util.function.ToIntFunction;
-
 /**
  * This class is an adapter for the internal {@link SlackProvider} witch wrap the
  * api {@link RaptorSlackProvider}. The Adapter is needed to swap board/alight
- * in the reverse search. It also incorporate the transfer slack into the bordSlack,
+ * in the reverse search. It also incorporates the transfer slack into the bordSlack,
  * so the algorithm have one thing less to account for.
  * <p>
  * Uses the adapter design pattern.
