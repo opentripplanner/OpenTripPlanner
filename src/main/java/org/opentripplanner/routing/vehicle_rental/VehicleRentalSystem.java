@@ -1,44 +1,43 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import java.net.URI;
-import java.net.URL;
-import java.time.LocalDate;
-import java.util.Locale;
 import java.util.TimeZone;
 
+/**
+ * Based on https://github.com/NABSA/gbfs/blob/master/gbfs.md#system_informationjson
+ */
 public class VehicleRentalSystem {
     public final String systemId;
-    public final Locale language;
+    public final String language;
     public final String name;
     public final String shortName;
     public final String operator;
-    public final URL url;
-    public final URL purchaseUrl;
-    public final LocalDate startDate;
+    public final String url;
+    public final String purchaseUrl;
+    public final String startDate;
     public final String phoneNumber;
     public final String email;
     public final String feedContactEmail;
     public final TimeZone timezone;
     public final String licenseUrl;
-    public final AppInformation androidApp;
-    public final AppInformation iosApp;
+    public final VehicleRentalSystemAppInformation androidApp;
+    public final VehicleRentalSystemAppInformation iosApp;
 
     public VehicleRentalSystem(
             String systemId,
-            Locale language,
+            String language,
             String name,
             String shortName,
             String operator,
-            URL url,
-            URL purchaseUrl,
-            LocalDate startDate,
+            String url,
+            String purchaseUrl,
+            String startDate,
             String phoneNumber,
             String email,
             String feedContactEmail,
             TimeZone timezone,
             String licenseUrl,
-            AppInformation androidApp,
-            AppInformation iosApp
+            VehicleRentalSystemAppInformation androidApp,
+            VehicleRentalSystemAppInformation iosApp
     ) {
         this.systemId = systemId;
         this.language = language;
@@ -57,13 +56,4 @@ public class VehicleRentalSystem {
         this.iosApp = iosApp;
     }
 
-    public static class AppInformation {
-        public final URI storeUri;
-        public final URI discoveryUri;
-
-        public AppInformation(URI storeUri, URI discoveryUri) {
-            this.storeUri = storeUri;
-            this.discoveryUri = discoveryUri;
-        }
-    }
 }
