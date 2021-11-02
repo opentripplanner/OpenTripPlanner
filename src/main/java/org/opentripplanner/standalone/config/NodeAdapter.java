@@ -224,7 +224,7 @@ public class NodeAdapter {
      *               The second argument to the function is the enum NAME(String).
      * @return a map of listed enum values as keys with value, or an empty map if not set.
      */
-    public <T, E extends Enum<E>> EnumMap<E, T> asEnumMap(
+    public <T, E extends Enum<E>> Map<E, T> asEnumMap(
             String paramName,
             Class<E> enumClass,
             BiFunction<NodeAdapter, String, T> mapper
