@@ -194,6 +194,16 @@ The OTP code style is described on a separate [style guide page](Codestyle.md).
 The OpenTripPlanner project uses the [Travis CI continuous integration system](https://travis-ci.org/opentripplanner/OpenTripPlanner). Any time a change
 is pushed to the main OpenTripPlanner repository on GitHub, this server will compile and test the new code, providing feedback on the stability of the build.
 
+
+### Changelog workflow
+
+The [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Changelog.md)
+is generated from the pull-request _title_ using the
+[changelog workflow](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/automatic-changelog.yml).
+The workflow run after the PR is merged, and it changes, commits and pushes the _changelog.md_. A
+secret _personal access token_ is used to bypass the "Require PR with 2 approvals" rule.
+
+
 ## Release Process
 
 This section serves as a checklist for the person performing releases. Note that much of this mimics 
