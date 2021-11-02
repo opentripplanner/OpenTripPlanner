@@ -124,6 +124,9 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         this.setBack(back);
         this.setGeometry(geometry);
         this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
+        if (this.length_mm == 0) {
+            LOG.warn("StreetEdge {} from {} to {} has length of 0. This is usually an error.", name, v1, v2);
+        }
         this.bicycleSafetyFactor = 1.0f;
         this.name = name;
         this.setPermission(permission);
@@ -165,6 +168,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
     }
 
+    public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, I18NString name,
+            StreetTraversalPermission permission, boolean back
+    ) {
+        this(v1, v2, geometry, name, SphericalDistanceLibrary.length(geometry), permission, back);
+    }
 
     /**
      * Checks permissions of the street edge if specified modes are allowed to travel.
@@ -755,34 +763,17 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         return graph.getTurnRestrictions(this);
     }
 
-    /** calculate the length of this street segement from its geometry */
-    protected void calculateLengthFromGeometry () {
-        double accumulatedMeters = 0;
-
-        LineString geom = getGeometry();
-
-        for (int i = 1; i < geom.getNumPoints(); i++) {
-            accumulatedMeters += SphericalDistanceLibrary.distance(geom.getCoordinateN(i - 1), geom.getCoordinateN(i));
-        }
-
-        length_mm = (int) (accumulatedMeters * 1000);
-    }
-
     /** Split this street edge and return the resulting street edges. After splitting, the original
      * edge will be removed from the graph. */
     public P2<StreetEdge> splitDestructively(SplitterVertex v, Graph graph) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
-        StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
-        StreetEdge e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, 0, permission, this.isBack());
+        StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, permission, this.isBack());
+        StreetEdge e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, permission, this.isBack());
 
         // copy the wayId to the split edges, so we can trace them back to their parent if need be
         e1.wayId = this.wayId;
         e2.wayId = this.wayId;
-
-        // figure the lengths, ensuring that they sum to the length of this edge
-        e1.calculateLengthFromGeometry();
-        e2.calculateLengthFromGeometry();
 
         // we have this code implemented in both directions, because splits are fudged half a millimeter
         // when the length of this is odd. We want to make sure the lengths of the split streets end up
