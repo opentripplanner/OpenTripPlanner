@@ -100,7 +100,6 @@ public class ActuatorAPI {
      * List the actuator endpoints available
      */
     @GET
-    @Path("")
     public Response actuator(@Context UriInfo uriInfo) {
         return Response.status(Response.Status.OK).entity(String.format(
             "{\n"

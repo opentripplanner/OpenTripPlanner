@@ -55,6 +55,7 @@ public class VehicleRentalSourceFactory {
         return new SmooveBikeRentalDataSourceParameters(
             url(),
             network(),
+            allowOverloading(),
             headers()
         );
       default:
@@ -84,5 +85,9 @@ public class VehicleRentalSourceFactory {
 
   private boolean allowKeepingRentedVehicleAtDestination() {
     return c.asBoolean("allowKeepingRentedBicycleAtDestination", false);
+  }
+
+  private boolean allowOverloading() {
+    return c.asBoolean("allowOverloading", false);
   }
 }

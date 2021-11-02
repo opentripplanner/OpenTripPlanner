@@ -77,13 +77,14 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     int duration(int timeA, int timeB);
 
     /**
-     * For a normal search return the trip arrival time at stop position including alightSlack.
-     * For a reverse search return the next trips departure time at stop position with the boardSlack added.
+     * For a forward search return the trip arrival time at stop position including alightSlack.
+     * For a reverse search return the next trips departure time at stop position with the
+     * boardSlack added.
      *
-     * @param onTrip the current boarded trip
+     * @param trip the current boarded trip
      * @param stopPositionInPattern the stop position/index
      */
-    int stopArrivalTime(T onTrip, int stopPositionInPattern, int slack);
+    int stopArrivalTime(T trip, int stopPositionInPattern, int slack);
 
     /**
      * Stop the search when the time exceeds the latest-acceptable-arrival-time.

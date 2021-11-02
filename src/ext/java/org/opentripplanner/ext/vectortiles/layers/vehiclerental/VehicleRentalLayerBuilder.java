@@ -39,7 +39,7 @@ public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> 
   protected List<Geometry> getGeometries(Envelope query) {
     VehicleRentalStationService service = graph.getVehicleRentalStationService();
     if (service == null) {return List.of();}
-    return service.getVehicleRentalStations()
+    return service.getVehicleRentalPlaces()
         .stream()
         .map(vehicleRentalStation -> {
           Coordinate coordinate = new Coordinate(vehicleRentalStation.getLongitude(), vehicleRentalStation.getLatitude());

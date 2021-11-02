@@ -40,7 +40,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Alight the current trip at the given stop with the arrival times.
      */
-    void alight(final int stopIndex, final int stopPos, ToIntFunction<T> getStopArrivalTime);
+    void alight(final int stopIndex, final int stopPos, final int alightSlack);
 
     /**
      * Board trip for each stopArrival (Std have only one "best" arrival, while Mc may have many).
