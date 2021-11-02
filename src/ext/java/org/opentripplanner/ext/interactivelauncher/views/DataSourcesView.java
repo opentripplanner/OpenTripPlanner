@@ -15,13 +15,10 @@ import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSec
 class DataSourcesView {
   private final Box panel = Box.createVerticalBox();
   private final Box dataSourceSelectionPanel = Box.createVerticalBox();
-  private final List<JRadioButton> sourceOptions = new ArrayList<>();
   private final Model model;
-  private final Runnable dataSourceChangeLitener;
 
-  public DataSourcesView(Model model, Runnable dataSourceChangeLitener) {
+  public DataSourcesView(Model model) {
     this.model = model;
-    this.dataSourceChangeLitener = dataSourceChangeLitener;
 
     setupDataSources();
 
@@ -29,15 +26,10 @@ class DataSourcesView {
     addSectionSpace(panel);
     addComp(dataSourceSelectionPanel, panel);
     addSectionDoubleSpace(panel);
-
   }
 
   public Box panel() {
     return panel;
-  }
-
-  public void updateModel(Model model) {
-    model.setDataSource(getSelectedDataSource());
   }
 
   private void setupDataSources() {
@@ -67,7 +59,6 @@ class DataSourcesView {
       boolean selected = selectedValue.equals(name);
       JRadioButton radioBtn = newRadioBtn(selectDataSourceRadioGroup, name, selected);
       radioBtn.addActionListener(this::onDataSourceChange);
-      sourceOptions.add(radioBtn);
       addComp(radioBtn, dataSourceSelectionPanel);
     }
   }
@@ -81,16 +72,6 @@ class DataSourcesView {
 
   public void onDataSourceChange(ActionEvent e) {
     model.setDataSource(e.getActionCommand());
-    dataSourceChangeLitener.run();
-  }
-
-  private String getSelectedDataSource() {
-    for (JRadioButton btn : sourceOptions) {
-      if(btn.isSelected()) {
-        return btn.getText();
-      }
-    }
-    throw new IllegalStateException("No datasource selected - programming error!");
   }
 
   private static JRadioButton newRadioBtn(ButtonGroup group, String name, boolean selected) {

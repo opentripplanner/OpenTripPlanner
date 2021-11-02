@@ -5,12 +5,9 @@ import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSec
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
@@ -19,13 +16,19 @@ import org.opentripplanner.ext.interactivelauncher.Model;
 
 class OptionsView {
   private final Box panel = Box.createVerticalBox();
-  private final JCheckBox buildStreetGraphChk = new JCheckBox("Street graph", false);
-  private final JCheckBox buildTransitGraphChk = new JCheckBox("Transit graph", false);
-  private final List<JCheckBox> debugLoggingChks = new ArrayList<>();
-  private final JCheckBox saveGraphChk = new JCheckBox("Save graph", true);
-  private final JCheckBox startOptServerChk = new JCheckBox("Serve graph", true);
+  private final JCheckBox buildStreetGraphChk;
+  private final JCheckBox buildTransitGraphChk;
+  private final JCheckBox saveGraphChk;
+  private final JCheckBox startOptServerChk;
+  private final Model model;
 
   OptionsView(Model model) {
+    this.model = model;
+    this.buildStreetGraphChk = new JCheckBox("Street graph", model.isBuildStreet());
+    this.buildTransitGraphChk = new JCheckBox("Transit graph", model.isBuildTransit());
+    this.saveGraphChk = new JCheckBox("Save graph", model.isSaveGraph());
+    this.startOptServerChk = new JCheckBox("Serve graph", model.isServeGraph());
+
     addComp(new JLabel("Build graph"), panel);
     addSectionSpace(panel);
     addComp(buildStreetGraphChk, panel);
@@ -42,37 +45,12 @@ class OptionsView {
     addComp(startOptServerChk, panel);
 
     addDebugCheckBoxes(model);
-
     addSectionDoubleSpace(panel);
-    initValues(model);
+    bindCheckBoxesToModel();
   }
 
   Box panel() {
     return panel;
-  }
-
-  void addActionListener(ActionListener l) {
-    buildStreetGraphChk.addActionListener(l);
-    buildTransitGraphChk.addActionListener(l);
-    saveGraphChk.addActionListener(l);
-    startOptServerChk.addActionListener(l);
-  }
-
-  private void initValues(Model model) {
-    buildStreetGraphChk.setSelected(model.isBuildStreet());
-    buildTransitGraphChk.setSelected(model.isBuildTransit());
-    saveGraphChk.setSelected(model.isSaveGraph());
-    startOptServerChk.setSelected(model.isServeGraph());
-  }
-
-  public void updateModel(Model model) {
-    model.setBuildStreet(buildStreet());
-    model.setBuildTransit(buildTransit());
-    model.setSaveGraph(saveGraph());
-    model.setServeGraph(startOptServer());
-    for (JCheckBox it : debugLoggingChks) {
-      model.getDebugLogging().put(it.getText(), it.isSelected());
-    }
   }
 
   void initState() {
@@ -86,10 +64,21 @@ class OptionsView {
     var entries = model.getDebugLogging();
     List<String> keys = entries.keySet().stream().sorted().collect(Collectors.toList());
     for (String name : keys) {
-      JCheckBox dbox =  new JCheckBox(name, entries.get(name));
-      debugLoggingChks.add(dbox);
-      addComp(dbox, panel);
+      JCheckBox box =  new JCheckBox(name, entries.get(name));
+      box.addActionListener(l -> model.getDebugLogging().put(name, box.isSelected()));
+      addComp(box, panel);
     }
+  }
+
+  private void bindCheckBoxesToModel() {
+    bind(buildStreetGraphChk, model::setBuildStreet);
+    bind(buildTransitGraphChk, model::setBuildTransit);
+    bind(saveGraphChk, model::setSaveGraph);
+    bind(startOptServerChk, model::setServeGraph);
+  }
+
+  void bind(JCheckBox box, Consumer<Boolean> modelUpdate) {
+    box.addActionListener(l -> modelUpdate.accept(box.isSelected() && box.isEnabled()));
   }
 
   private boolean buildStreet() {
@@ -98,14 +87,6 @@ class OptionsView {
 
   private boolean buildTransit() {
     return buildTransitGraphChk.isSelected();
-  }
-
-  private boolean saveGraph() {
-    return saveGraphChk.isSelected();
-  }
-
-  private boolean startOptServer() {
-    return startOptServerChk.isSelected();
   }
 
   private void onBuildGraphChkChanged(ActionEvent e) {
