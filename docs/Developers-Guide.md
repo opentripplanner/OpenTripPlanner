@@ -198,10 +198,11 @@ is pushed to the main OpenTripPlanner repository on GitHub, this server will com
 ### Changelog workflow
 
 The [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Changelog.md)
-is generated from the pull-request _title_ using the
+is generated from the pull-request(PR) _title_ using the
 [changelog workflow](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/automatic-changelog.yml).
 The workflow runs after the PR is merged, and it changes, commits and pushes the _Changelog.md_. A
-secret _personal access token_ is used to bypass the "Require PR with 2 approvals" rule.
+secret _personal access token_ is used to bypass the "Require PR with 2 approvals" rule. To exclude
+a PR from the changelog add `[changelog skip]` in the PR title.
 
 
 ## Release Process
