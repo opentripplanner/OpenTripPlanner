@@ -793,11 +793,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         }
 
         // TODO: better handle this temporary fix to handle bad edge distance calculation
-        if (e1.length_mm < 0) {
+        if (e1.length_mm <= 0) {
             LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.wayId, v.getLat(), v.getLon(), e1.length_mm);
             e1.length_mm = 1;
         }
-        if (e2.length_mm < 0) {
+        if (e2.length_mm <= 0) {
             LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.wayId, v.getLat(), v.getLon(), e2.length_mm);
             e2.length_mm = 1;
         }
