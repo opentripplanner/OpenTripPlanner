@@ -9,18 +9,20 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 
 import java.util.List;
 
-public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBikeRentalStation {
+public class LegacyGraphQLVehicleRentalStationImpl
+        implements LegacyGraphQLDataFetchers.LegacyGraphQLVehicleRentalStation {
+
     @Override
     public DataFetcher<Relay.ResolvedGlobalId> id() {
         return environment -> new Relay.ResolvedGlobalId(
-                "BikeRentalStation",
+                "VehicleRentalStation",
                 getSource(environment).getId().toString()
         );
     }
 
     @Override
     public DataFetcher<String> stationId() {
-        return environment -> getSource(environment).getStationId();
+        return environment -> getSource(environment).getId().toString();
     }
 
     @Override
@@ -29,21 +31,13 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     }
 
     @Override
-    public DataFetcher<Integer> bikesAvailable() {
+    public DataFetcher<Integer> vehiclesAvailable() {
         return environment -> getSource(environment).getVehiclesAvailable();
     }
 
     @Override
     public DataFetcher<Integer> spacesAvailable() {
         return environment -> getSource(environment).getSpacesAvailable();
-    }
-
-    @Override
-    public DataFetcher<String> state() {
-        return environment ->
-                getSource(environment).isAllowDropoff() && getSource(environment).isAllowPickup()
-                        ? "Station on"
-                        : "Station off";
     }
 
     @Override
@@ -72,8 +66,8 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     }
 
     @Override
-    public DataFetcher<Iterable<String>> networks() {
-        return environment -> List.of(getSource(environment).getNetwork());
+    public DataFetcher<String> network() {
+        return environment -> getSource(environment).getNetwork();
     }
 
     @Override

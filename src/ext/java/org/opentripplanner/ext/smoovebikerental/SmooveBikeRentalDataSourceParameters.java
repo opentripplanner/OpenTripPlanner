@@ -8,16 +8,23 @@ import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 public class SmooveBikeRentalDataSourceParameters extends VehicleRentalDataSourceParameters {
+
     private final String network;
+    /**
+     * Does the stations in the network allow overloading (ignoring available spaces)
+     */
+    private final boolean allowOverloading;
 
     public SmooveBikeRentalDataSourceParameters(
         String url,
         String network,
+        boolean allowOverloading,
         @NotNull
         Map<String, String> httpHeaders
     ) {
         super(DataSourceType.SMOOVE, url, httpHeaders);
         this.network = network;
+        this.allowOverloading = allowOverloading;
     }
 
     /**
@@ -28,5 +35,9 @@ public class SmooveBikeRentalDataSourceParameters extends VehicleRentalDataSourc
     @Nullable
     public String getNetwork(String defaultValue) {
         return network == null || network.isEmpty() ? defaultValue : network;
+    }
+
+    public boolean isAllowOverloading() {
+        return allowOverloading;
     }
 }
