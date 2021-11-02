@@ -57,7 +57,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
     if (graph.hasStreets) {
       linkTransitStops(graph);
       linkTransitEntrances(graph);
-      linkBikeParks(graph);
+      if (!graph.hasLinkedBikeParks) {
+        linkBikeParks(graph);
+        graph.hasLinkedBikeParks = true;
+      }
     }
 
     // Calculates convex hull of a graph which is shown in routerInfo API point
