@@ -15,6 +15,7 @@
 - Fix correct type for BookingArrangementType#latestBookingDay
 - Fix NPE in BookingArrangementType data fetchers [#3649](https://github.com/opentripplanner/OpenTripPlanner/pull/3649)
 - Add BookingInfo to TimetabledPassingTime and EstimatedCall [#3666](https://github.com/opentripplanner/OpenTripPlanner/pull/3666)
+- Use correct capitalization for GraphQL fields [#3707](https://github.com/opentripplanner/OpenTripPlanner/pull/3707)
 
 ## Documentation
 
