@@ -44,7 +44,7 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     private static final int MODE_TROLLEYBUS = 8192;
 
-    private static final int MODE_MONORAIL = 2 * 8192;
+    private static final int MODE_MONORAIL = 16384;
 
     private static final int MODE_TRANSIT = MODE_TRAM | MODE_RAIL | MODE_SUBWAY | MODE_FUNICULAR
             | MODE_GONDOLA | MODE_CABLE_CAR | MODE_BUS | MODE_FERRY | MODE_AIRPLANE | MODE_TROLLEYBUS | MODE_MONORAIL;
