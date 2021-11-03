@@ -118,8 +118,8 @@ public class ScheduledDeviatedTrip extends FlexTrip {
                 stop,
                 date,
                 scheduledCalculator,
-                config)
-        );
+                config
+        ));
       }
     }
 
