@@ -26,16 +26,17 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     var medium_high_traffic = 2.06;
     var medium_traffic = 1.5;
     var medium_low_traffic = 1.46;
-    var low_traffic = 0.97;
-    var very_low_traffic = 0.92;
+    var low_traffic = 1.1;
+    var very_low_traffic = 0.96;
 
-    var cycle_lane_medium_traffic = 0.87;
-    var cycle_lane_low_traffic = 0.77;
+    var cycle_lane_medium_traffic = 0.76;
+    var cycle_lane_low_traffic = 0.66;
 
-    var dedicated_footway = 0.9;
-    var footway_crossing = 1.2;
-    var mixed_cycleway = 0.8;
-    var dedicated_cycleway = 0.7;
+    var dedicated_footway = 0.85;
+    var sidewalk = 1.15;
+    var footway_crossing = 1.4;
+    var mixed_cycleway = 0.67;
+    var dedicated_cycleway = 0.62;
     var dual_lane_or_oneway_cycleway = 0.6;
 
     props.setProperties("highway=motorway", StreetTraversalPermission.CAR);
@@ -63,16 +64,19 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "highway=trunk;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic
     );
+    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
             "highway=trunk_link;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic
     );
-    // Don't recommend walking in trunk road tunnels (although actually legal unless explicitly forbidden)
+    // Discourage cycling trunk road tunnels
     props.setProperties(
-            "highway=trunk;tunnel=yes", StreetTraversalPermission.CAR
+            "highway=trunk;tunnel=yes", StreetTraversalPermission.CAR,
+            very_high_traffic, very_high_traffic
     );
     props.setProperties(
-            "highway=trunk_link;tunnel=yes", StreetTraversalPermission.CAR
+            "highway=trunk_link;tunnel=yes", StreetTraversalPermission.CAR,
+            very_high_traffic, very_high_traffic
     );
     props.setProperties(
             "highway=trunk;maxspeed=90", StreetTraversalPermission.ALL,
@@ -115,6 +119,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "highway=primary_link", StreetTraversalPermission.ALL,
             high_traffic, high_traffic
     );
+    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
             "highway=primary;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic
@@ -157,11 +162,11 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
     props.setProperties(
             "highway=primary;maxspeed=30", StreetTraversalPermission.ALL,
-            very_low_traffic, very_low_traffic
+            low_traffic, low_traffic
     );
     props.setProperties(
             "highway=primary_link;maxspeed=30", StreetTraversalPermission.ALL,
-            very_low_traffic, very_low_traffic
+            low_traffic, low_traffic
     );
 
     props.setProperties(
@@ -172,6 +177,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "highway=secondary_link", StreetTraversalPermission.ALL,
             medium_high_traffic, medium_high_traffic
     );
+    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
             "highway=secondary;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic
@@ -206,21 +212,22 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
     props.setProperties(
             "highway=secondary;maxspeed=30", StreetTraversalPermission.ALL,
-            very_low_traffic, very_low_traffic
+            low_traffic, low_traffic
     );
     props.setProperties(
             "highway=secondary_link;maxspeed=30", StreetTraversalPermission.ALL,
-            very_low_traffic, very_low_traffic
+            low_traffic, low_traffic
     );
 
     props.setProperties(
             "highway=tertiary", StreetTraversalPermission.ALL,
-            low_traffic, low_traffic
+            medium_low_traffic, medium_low_traffic
     );
     props.setProperties(
             "highway=tertiary_link", StreetTraversalPermission.ALL,
-            low_traffic, low_traffic
+            medium_low_traffic, medium_low_traffic
     );
+    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
             "highway=tertiary;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic
@@ -246,18 +253,27 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             medium_high_traffic, medium_high_traffic
     );
     props.setProperties(
+            "highway=tertiary;maxspeed=40", StreetTraversalPermission.ALL,
+            low_traffic, low_traffic
+    );
+    props.setProperties(
+            "highway=tertiary_link;maxspeed=40", StreetTraversalPermission.ALL,
+            low_traffic, low_traffic
+    );
+    props.setProperties(
             "highway=tertiary;maxspeed=30", StreetTraversalPermission.ALL,
-            very_low_traffic, very_low_traffic
+            low_traffic, low_traffic
     );
     props.setProperties(
             "highway=tertiary_link;maxspeed=30", StreetTraversalPermission.ALL,
-            very_low_traffic, very_low_traffic
+            low_traffic, low_traffic
     );
 
     props.setProperties(
             "highway=unclassified", StreetTraversalPermission.ALL,
             low_traffic, low_traffic
     );
+    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
             "highway=unclassified;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             medium_traffic, medium_traffic
@@ -314,6 +330,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "highway=service", StreetTraversalPermission.ALL,
             low_traffic, low_traffic
     );
+    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
             "highway=service;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             medium_traffic, medium_traffic
@@ -321,19 +338,19 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     // These access tags indicates low traffic
     props.setProperties(
             "highway=service;motor_vehicle=no", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-            low_traffic, low_traffic
+            very_low_traffic, very_low_traffic
     );
     props.setProperties(
             "highway=service;motor_vehicle=private", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-            low_traffic, low_traffic
+            very_low_traffic, very_low_traffic
     );
     props.setProperties(
             "highway=service;motor_vehicle=permit", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-            low_traffic, low_traffic
+            very_low_traffic, very_low_traffic
     );
     props.setProperties(
             "highway=service;motor_vehicle=destination", StreetTraversalPermission.ALL,
-            low_traffic, low_traffic
+            very_low_traffic, very_low_traffic
     );
     // Cycling around reversing cars on a parking lot feels unsafe
     props.setProperties(
@@ -571,14 +588,9 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             1.2, 1.2
     );
     props.setProperties(
-            "highway=pedestrian;bicycle=designated",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-            dedicated_cycleway, dedicated_cycleway
-    );
-    props.setProperties(
             "highway=residential;cyclestreet=yes;motor_vehicle=*",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-            dedicated_cycleway, dedicated_cycleway
+            very_low_traffic, very_low_traffic
     );
 
     props.setProperties(
@@ -590,13 +602,13 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties(
             "highway=footway;motor_vehicle=destination",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-            low_traffic, low_traffic
+            very_low_traffic, very_low_traffic
     );
 
     props.setProperties(
             "highway=footway;footway=sidewalk",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-            dedicated_footway, dedicated_footway
+            sidewalk, sidewalk
     );
     props.setProperties(
             "highway=footway;footway=crossing",
@@ -612,11 +624,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "highway=cycleway;footway=crossing",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
             footway_crossing, footway_crossing
-    );
-    props.setProperties(
-            "highway=cycleway;cycleway=sidewalk",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-            dedicated_footway, dedicated_footway
     );
     props.setProperties(
             "highway=cycleway;cycleway=crossing",
@@ -668,6 +675,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
             dedicated_cycleway, dedicated_cycleway
     );
+    // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
     props.setProperties(
             "highway=cycleway;foot=designated;segregated=*;motor_vehicle=destination",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
