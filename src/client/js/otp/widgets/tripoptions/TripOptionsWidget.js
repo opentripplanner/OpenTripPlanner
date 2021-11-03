@@ -445,7 +445,9 @@ otp.widgets.tripoptions.WheelChairSelector =
     },
 
     restorePlan : function(data) {
-        $("#"+this.id+"-wheelchair-input").prop("checked", data.queryParams.wheelchair === 'true');
+        var checked = data.queryParams.wheelchair === true || data.queryParams.wheelchair === 'true';
+        this.tripWidget.module.wheelchair = checked;
+        $("#"+this.id+"-wheelchair-input").prop("checked", checked);
     },
 
     isApplicableForMode : function(mode) {
@@ -483,7 +485,9 @@ otp.widgets.tripoptions.DebugItineraryFiltersSelector = otp.Class(
             });
         },
         restorePlan: function (data) {
-            $("#" + this.id + "-debug-filters-input").prop("checked", data.queryParams.debugItineraryFilter === 'true');
+            var checked = data.queryParams.debugItineraryFilter === true || data.queryParams.debugItineraryFilter === 'true';
+            this.tripWidget.module.debugItineraryFilter = checked;
+            $("#" + this.id + "-debug-filters-input").prop("checked", checked);
         },
         isApplicableForMode : function(mode) { return true; }
     }
@@ -1088,7 +1092,9 @@ otp.widgets.tripoptions.AdditionalTripParameters =
             if (data.queryParams.additionalParameters) {
                 var str = '';
                 var keys = data.queryParams.additionalParameters.split(',');
-                var params = {};
+                var params = {
+                  additionalParameters: data.queryParams.additionalParameters
+                };
 
                 _.each(keys, function (key) {
                     str += key + '=' + data.queryParams[key] + '\n';
