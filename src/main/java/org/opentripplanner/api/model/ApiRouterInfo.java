@@ -50,6 +50,7 @@ public class ApiRouterInfo {
     public List<TravelOption> travelOptions;
 
 
+    /** TODO: Do not pass in the graph here, do this in a mapper instead. */
     public ApiRouterInfo(String routerId, Graph graph) {
         VehicleRentalStationService vehicleRentalService = graph.getService(
                 VehicleRentalStationService.class, false
