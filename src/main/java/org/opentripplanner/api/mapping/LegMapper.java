@@ -111,8 +111,8 @@ public class LegMapper {
         api.boardRule = domain.boardRule;
         api.alightRule = domain.alightRule;
 
-        api.pickupBookingInfo = toApi(domain.pickupBookingInfo);
-        api.dropOffBookingInfo = toApi(domain.dropOffBookingInfo);
+        api.pickupBookingInfo = toApi(domain.pickupBookingInfo, true);
+        api.dropOffBookingInfo = toApi(domain.dropOffBookingInfo, false);
 
         api.rentedBike = domain.rentedVehicle;
         api.walkingBike = domain.walkingBike;
@@ -120,7 +120,7 @@ public class LegMapper {
         return api;
     }
 
-    private static ApiBookingInfo toApi(BookingInfo info) {
+    private static ApiBookingInfo toApi(BookingInfo info, boolean isPickup) {
         if (info == null) {return null;}
 
         return new ApiBookingInfo(
@@ -131,8 +131,9 @@ public class LegMapper {
                 info.getMinimumBookingNotice(),
                 info.getMaximumBookingNotice(),
                 info.getMessage(),
-                info.getPickupMessage(),
-                info.getDropOffMessage()
+                // we only want to show the pick up message for pickups versa
+                isPickup ? info.getPickupMessage() : null,
+                !isPickup ? info.getDropOffMessage() : null
         );
     }
 
