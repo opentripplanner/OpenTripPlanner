@@ -5,13 +5,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +13,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.datastore.CompositeDataSource;
+import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class generates a nice HTML graph import data issue report.
@@ -29,14 +28,14 @@ import java.util.Map;
  */
 public class DataImportIssuesToHTML implements GraphBuilderModule {
 
-    private static Logger LOG = LoggerFactory.getLogger(DataImportIssuesToHTML.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataImportIssuesToHTML.class);
 
     //Path to output folder
-    private CompositeDataSource reportDirectory;
+    private final CompositeDataSource reportDirectory;
 
     //If there are more then this number of issues the report are split into multiple files
     //This is because browsers aren't made for giant HTML files which can be made with 500k lines
-    private int maxNumberOfIssuesPerFile;
+    private final int maxNumberOfIssuesPerFile;
 
 
     //This counts all occurrences of HTML issue type
@@ -49,7 +48,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
 
     //Key is classname, value is issue message
     //Multimap because there are multiple issues for each classname
-    private Multimap<String, String> issues = ArrayListMultimap.create();
+    private final Multimap<String, String> issues = ArrayListMultimap.create();
   
     DataImportIssuesToHTML(CompositeDataSource reportDirectory, int maxNumberOfIssuesPerFile) {
         this.reportDirectory = reportDirectory;
@@ -72,7 +71,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
             //Groups issues in multimap according to issue type
             for (DataImportIssue it : issueStore.getIssues()) {
                 //writer.println("<p>" + it.getHTMLMessage() + "</p>");
-                // writer.println("<small>" + it.getClass().getSimpleName()+"</small>");
+                // writer.println("<small>" + it.getTypeName()+"</small>");
                 addIssue(it);
 
             }
@@ -179,17 +178,15 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
      * and values are list of issue with that class
      */
     private void addIssue(DataImportIssue issue) {
-        String issueTypeName = issue.getClass().getSimpleName();
-        issues.put(issueTypeName, issue.getHTMLMessage());
-
+        issues.put(issue.getType(), issue.getHTMLMessage());
     }
 
     class HTMLWriter {
-        private DataSource target;
+        private final DataSource target;
 
-        private Multimap<String, String> writerIssues;
+        private final Multimap<String, String> writerIssues;
 
-        private String issueTypeName;
+        private final String issueTypeName;
 
         HTMLWriter(String key, Collection<String> issues) {
             LOG.debug("Making file: {}", key);
