@@ -230,15 +230,11 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             very_high_traffic, very_high_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;maxspeed=80", StreetTraversalPermission.ALL,
-            medium_high_traffic, medium_high_traffic
-    );
-    props.setProperties(
             "highway=tertiary;maxspeed=80", StreetTraversalPermission.ALL,
             medium_high_traffic, medium_high_traffic
     );
     props.setProperties(
-            "highway=tertiary;maxspeed=70", StreetTraversalPermission.ALL,
+            "highway=tertiary_link;maxspeed=80", StreetTraversalPermission.ALL,
             medium_high_traffic, medium_high_traffic
     );
     props.setProperties(
@@ -246,7 +242,11 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             medium_high_traffic, medium_high_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;maxspeed=30", StreetTraversalPermission.ALL,
+            "highway=tertiary_link;maxspeed=70", StreetTraversalPermission.ALL,
+            medium_high_traffic, medium_high_traffic
+    );
+    props.setProperties(
+            "highway=tertiary;maxspeed=30", StreetTraversalPermission.ALL,
             very_low_traffic, very_low_traffic
     );
     props.setProperties(
@@ -420,7 +420,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             cycle_lane_low_traffic, cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=secondary;cycleway=lane;maxspeed=40", StreetTraversalPermission.ALL,
+            "highway=secondary_link;cycleway=lane;maxspeed=40", StreetTraversalPermission.ALL,
             cycle_lane_low_traffic, cycle_lane_low_traffic
     );
     props.setProperties(
@@ -428,7 +428,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             cycle_lane_low_traffic, cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=secondary;cycleway=lane;maxspeed=30", StreetTraversalPermission.ALL,
+            "highway=secondary_link;cycleway=lane;maxspeed=30", StreetTraversalPermission.ALL,
             cycle_lane_low_traffic, cycle_lane_low_traffic
     );
     props.setProperties(
