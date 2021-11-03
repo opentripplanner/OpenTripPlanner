@@ -41,8 +41,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         /* no bicycle tags */
 
         /* NONE */
-        props.setProperties("highway=raceway", StreetTraversalPermission.NONE);
-        props.setProperties("highway=construction", StreetTraversalPermission.NONE);
         props.setProperties("mtb:scale=3", StreetTraversalPermission.NONE);
         props.setProperties("mtb:scale=4", StreetTraversalPermission.NONE);
         props.setProperties("mtb:scale=5", StreetTraversalPermission.NONE);

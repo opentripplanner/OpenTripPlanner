@@ -26,6 +26,8 @@ public class OSMFilter {
      * But not conveyers, proposed highways/roads or those still under construction, and raceways
      * (as well as ways where all access is specifically forbidden to the public).
      * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dproposed
+     *
+     * A whitelist for highway tags is an alternative to a blacklist.
      */
     static boolean isWayRoutable(OSMWithTags way) {
         if (!isOsmEntityRoutable(way)) {
@@ -35,12 +37,19 @@ public class OSMFilter {
         String highway = way.getTag("highway");
         if (highway != null) {
             if(
-                    highway.equals("conveyer") ||
                     highway.equals("proposed") ||
+                    highway.equals("planned") ||
                     highway.equals("construction") ||
                     highway.equals("razed") ||
                     highway.equals("raceway") ||
-                    highway.equals("unbuilt")
+                    highway.equals("abandoned") ||
+                    highway.equals("historic") ||
+                    highway.equals("no") ||
+                    highway.equals("emergency_bay") ||
+                    highway.equals("rest_area") ||
+                    highway.equals("services") ||
+                    highway.equals("bus_guideway") ||
+                    highway.equals("escape")
             ) {
                 return false;
             }
