@@ -701,12 +701,11 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=*;smoothness=very_horrible", StreetTraversalPermission.NONE);
     props.setProperties("highway=*;smoothness=impassable", StreetTraversalPermission.NONE);
 
-    props.setProperties("highway=*;tracktype=grade1", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
-    props.setProperties("highway=*;tracktype=grade2", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
-    props.setProperties("highway=*;tracktype=grade3", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
-    props.setProperties("highway=*;tracktype=grade3", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.5, 1.5);
-    props.setProperties("highway=*;tracktype=grade4", StreetTraversalPermission.PEDESTRIAN);
-    props.setProperties("highway=*;tracktype=grade5", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=track;tracktype=grade1", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
+    props.setProperties("highway=track;tracktype=grade2", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
+    props.setProperties("highway=track;tracktype=grade3", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.5, 1.5);
+    props.setProperties("highway=track;tracktype=grade4", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=track;tracktype=grade5", StreetTraversalPermission.PEDESTRIAN);
 
     props.setProperties("highway=path;trail_visibility=bad", StreetTraversalPermission.NONE);
     props.setProperties("highway=path;trail_visibility=no", StreetTraversalPermission.NONE);
