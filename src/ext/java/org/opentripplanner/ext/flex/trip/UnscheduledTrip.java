@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.ext.flex.FlexConfig;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 import static org.opentripplanner.model.PickDrop.NONE;
 
@@ -67,7 +67,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexConfig config
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters config
   ) {
     int fromIndex = getFromIndex(access);
 
@@ -85,7 +85,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexConfig config
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters config
   ) {
     int toIndex = getToIndex(egress);
 

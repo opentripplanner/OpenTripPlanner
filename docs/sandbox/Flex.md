@@ -27,14 +27,22 @@ configuration, add the following to `router-config.json`.
 ```
 {
   "flex": {
-    "maxTransferMeters": 300
+    "maxTransferDurationSeconds": 300
   }
 }
 ```
 
 *Config parameters*
 
-- `maxTransferMeters`: how far should you a passenger be able to walk after getting out of a flex
-                       vehicle and transferring to another one. 
-                       This was mainly introduced to improve performance - a lower value means that 
-                       the routing is faster.
+### `maxTransferDurationSeconds`
+
+Default: 300
+
+How long should a passenger be allowed to walk after getting out of a flex vehicle and transferring 
+to a flex or transit one. 
+
+This was mainly introduced to improve performance which is also the reason for not using the existing 
+value with the same name: fixed schedule transfers are computed during the graph build but flex 
+ones are calculated at request time and are more sensitive to slowdown.
+
+A lower value means that the routing is faster.

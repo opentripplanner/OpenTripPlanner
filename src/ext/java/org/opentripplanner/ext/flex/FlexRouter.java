@@ -33,7 +33,7 @@ public class FlexRouter {
 
   /* Transit data */
   private final Graph graph;
-  private final FlexConfig config;
+  private final FlexParameters config;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -53,7 +53,7 @@ public class FlexRouter {
 
   public FlexRouter(
       Graph graph,
-      FlexConfig config,
+      FlexParameters config,
       Instant searchInstant,
       boolean arriveBy,
       int additionalPastSearchDays,

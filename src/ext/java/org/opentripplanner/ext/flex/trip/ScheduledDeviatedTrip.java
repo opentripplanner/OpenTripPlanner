@@ -24,7 +24,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.ext.flex.FlexConfig;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 /**
  * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop
@@ -66,7 +66,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexConfig config
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters config
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
@@ -97,7 +97,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexConfig config
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters config
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 

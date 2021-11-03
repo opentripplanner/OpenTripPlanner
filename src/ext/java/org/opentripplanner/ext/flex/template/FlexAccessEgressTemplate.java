@@ -20,7 +20,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.ext.flex.FlexConfig;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 public abstract class FlexAccessEgressTemplate {
   protected final NearbyStop accessEgress;
@@ -31,7 +31,7 @@ public abstract class FlexAccessEgressTemplate {
   protected final int secondsFromStartOfTime;
   public final ServiceDate serviceDate;
   protected final FlexPathCalculator calculator;
-  private final FlexConfig config;
+  private final FlexParameters config;
 
   /**
    *
@@ -51,7 +51,7 @@ public abstract class FlexAccessEgressTemplate {
       StopLocation transferStop,
       FlexServiceDate date,
       FlexPathCalculator calculator,
-      FlexConfig config
+      FlexParameters config
   ) {
     this.accessEgress = accessEgress;
     this.trip = trip;
