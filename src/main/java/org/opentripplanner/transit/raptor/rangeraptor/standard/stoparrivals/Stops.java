@@ -134,6 +134,9 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         if(state.arrivedByTransfer()) {
             stopIndex = state.transferFromStop();
             state = stops[prevRound][stopIndex];
+            if(!state.arrivedByTransit()) {
+                return null;
+            }
         }
         return TransitArrival.create(state.trip(), stopIndex, state.transitTime());
     }

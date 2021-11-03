@@ -46,6 +46,9 @@ final class Transfer<T extends RaptorTripSchedule>
 
     @Override
     public ArrivalView<T> previous() {
+        if (!arrival.arrivedByTransit()) {
+            return cursor.stop(round(), arrival.transferFromStop());
+        }
         return cursor.transit(round(), arrival.transferFromStop());
     }
 
