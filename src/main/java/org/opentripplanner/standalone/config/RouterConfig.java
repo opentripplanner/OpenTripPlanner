@@ -110,7 +110,9 @@ public class RouterConfig implements Serializable {
 
     public VectorTileConfig vectorTileLayers() { return vectorTileLayers; }
 
-    public FlexConfig flexConfig() { return flexConfig; }
+    public FlexParameters flexParameters(RoutingRequest request) { 
+        return flexConfig.toFlexParameters(request);
+    }
 
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
