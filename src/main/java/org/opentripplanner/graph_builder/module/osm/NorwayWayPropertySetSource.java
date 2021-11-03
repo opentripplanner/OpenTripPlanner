@@ -40,23 +40,13 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     props.setProperties("highway=motorway", StreetTraversalPermission.CAR);
     props.setProperties("highway=motorway_link", StreetTraversalPermission.CAR);
-    // Patch missing vehicle=no check
-    props.setProperties("highway=motorway_link;vehicle=no", StreetTraversalPermission.NONE);
-    props.setProperties("highway=motorway_link=yes;vehicle=no", StreetTraversalPermission.NONE);
 
     // Do not walk on "Motortrafikkvei" ("motorvei klasse b")
     props.setProperties("highway=trunk;motorroad=yes", StreetTraversalPermission.CAR);
     props.setProperties("highway=trunk_link;motorroad=yes", StreetTraversalPermission.CAR);
-    // Patch missing vehicle=no check
-    props.setProperties("highway=trunk;motorroad=yes;vehicle=no", StreetTraversalPermission.NONE);
-    props.setProperties("highway=trunk_link;motorroad=yes;vehicle=no", StreetTraversalPermission.NONE);
 
     props.setProperties("highway=primary;motorroad=yes", StreetTraversalPermission.CAR);
     props.setProperties("highway=primary_link;motorroad=yes", StreetTraversalPermission.CAR);
-    // Patch missing vehicle=no check
-    props.setProperties("highway=primary_link;motorroad=yes;vehicle=no", StreetTraversalPermission.NONE);
-    props.setProperties("highway=primary_link;motorroad=yes;vehicle=no", StreetTraversalPermission.NONE);
-
 
     /* "highway=trunk" roads ("Riksveier") are often single carriageway, and not only legal for bicycles,
     but assumed to be  much safer than the  default profile (Except when the speedlimt exceeds 90). */
@@ -75,15 +65,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
     props.setProperties(
             "highway=trunk_link;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
-    );
-    // Patch missing vehicle=no check
-    props.setProperties(
-            "highway=trunk;vehicle=no", StreetTraversalPermission.PEDESTRIAN,
-            very_high_traffic, very_high_traffic
-    );
-    props.setProperties(
-            "highway=trunk_link;vehicle=no", StreetTraversalPermission.PEDESTRIAN,
             very_high_traffic, very_high_traffic
     );
     // Don't recommend walking in trunk road tunnels (although actually legal unless explicitly forbidden)
@@ -142,15 +123,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "highway=primary_link;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic)
     ;
-    // Patch missing vehicle=no check
-    props.setProperties(
-            "highway=primary;vehicle=no", StreetTraversalPermission.PEDESTRIAN,
-            very_high_traffic, very_high_traffic
-    );
-    props.setProperties(
-            "highway=primary_link;vehicle=no", StreetTraversalPermission.PEDESTRIAN,
-            very_high_traffic, very_high_traffic
-    );
     props.setProperties(
             "highway=primary;maxspeed=90", StreetTraversalPermission.ALL,
             very_high_traffic, very_high_traffic
@@ -208,15 +180,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "highway=secondary_link;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic
     );
-    // Patch missing vehicle=no check
-    props.setProperties(
-            "highway=secondary;vehicle=no", StreetTraversalPermission.PEDESTRIAN,
-            very_high_traffic, very_high_traffic
-    );
-    props.setProperties(
-            "highway=secondary_link;vehicle=no", StreetTraversalPermission.PEDESTRIAN,
-            very_high_traffic, very_high_traffic
-    );
     props.setProperties(
             "highway=secondary;maxspeed=60", StreetTraversalPermission.ALL,
             medium_traffic, medium_traffic
@@ -264,15 +227,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
     props.setProperties(
             "highway=tertiary_link;foot=no", StreetTraversalPermission.BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
-    );
-    // Patch missing vehicle=no check
-    props.setProperties(
-            "highway=tertiary;vehicle=no", StreetTraversalPermission.PEDESTRIAN,
-            very_high_traffic, very_high_traffic
-    );
-    props.setProperties(
-            "highway=tertiary_link;vehicle=no", StreetTraversalPermission.PEDESTRIAN,
             very_high_traffic, very_high_traffic
     );
     props.setProperties(

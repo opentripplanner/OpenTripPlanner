@@ -242,6 +242,17 @@ public class OSMWithTags {
         return doesTagAllowAccess("motor_vehicle");
     }
 
+    /**
+     * Returns true if all land vehicles (including bicycles) are explicitly denied access.
+     */
+    public boolean isVehicleExplicitlyDenied() { return isTagDeniedAccess("vehicle"); }
+
+    /**
+     * Returns true if all land vehicles (including bicycles) are explicitly allowed.
+     */
+    public boolean isVehicleExplicitlyAllowed() {
+        return doesTagAllowAccess("vehicle");
+    }
 
     /**
      * Returns true if bikes are explicitly denied access.
