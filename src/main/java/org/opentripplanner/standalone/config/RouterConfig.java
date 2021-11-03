@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
@@ -108,7 +109,7 @@ public class RouterConfig implements Serializable {
 
     public UpdatersParameters updaterConfig() { return updatersParameters; }
 
-    public VectorTileConfig vectorTileLayers() { return vectorTileLayers; }
+    public VectorTilesResource.LayersParameters vectorTileLayers() { return vectorTileLayers; }
 
     public FlexParameters flexParameters(RoutingRequest request) { 
         return flexConfig.toFlexParameters(request);
