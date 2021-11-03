@@ -5,6 +5,9 @@ import org.opentripplanner.util.I18NString;
 
 import java.time.ZonedDateTime;
 
+/**
+ * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
+ */
 public class VehicleRentalVehicle implements VehicleRentalPlace {
 
     public FeedScopedId id;
@@ -64,8 +67,23 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     }
 
     @Override
+    public Integer getCapacity() {
+        return 0;
+    }
+
+    @Override
     public boolean isAllowDropoff() {
         return false;
+    }
+
+    @Override
+    public boolean isAllowOverloading() {
+        return false;
+    }
+
+    @Override
+    public boolean isAllowPickup() {
+        return !isDisabled;
     }
 
     public boolean allowPickupNow() {

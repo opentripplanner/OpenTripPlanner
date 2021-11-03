@@ -79,11 +79,11 @@ public class TransferMapper {
             ScheduledStopPointRefStructure pointRef
     ) {
         var sjId = sjRef.getRef();
-        var fromTrip = findTrip(label + "Journey", interchangeId, sjId);
-        int fromStopPos = findStopPosition(interchangeId, label + "Point", sjId, pointRef);
-        return (fromTrip==null || fromStopPos<0)
+        var trip = findTrip(label + "Journey", interchangeId, sjId);
+        int stopPos = findStopPosition(interchangeId, label + "Point", sjId, pointRef);
+        return (trip==null || stopPos<0)
                 ? null
-                : new TripTransferPoint(fromTrip, fromStopPos);
+                : new TripTransferPoint(trip, stopPos);
     }
 
     @Nullable

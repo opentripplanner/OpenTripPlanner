@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -101,9 +102,9 @@ public class TestUnconnectedAreas {
       * Additionally, the node of the ring is duplicated to test this corner case.
       */
      @Test
-     public void testRoadPassingOverDuplicatedNode () {
-    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr_dupl.osm.pbf", 1, 2);
-    	 
+     public void testRoadPassingOverDuplicatedNode () throws URISyntaxException {
+         List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr_dupl.osm.pbf", 1, 2);
+
     	 // depending on what order everything comes out of the spatial index, we will inject one of
     	 // the duplicated nodes into the way. When we get to the other ringsegments, we will just inject
     	 // the node that has already been injected into the way. So either of these cases are valid.

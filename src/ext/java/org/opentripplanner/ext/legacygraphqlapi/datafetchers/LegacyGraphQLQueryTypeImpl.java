@@ -49,7 +49,9 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -85,7 +87,13 @@ public class LegacyGraphQLQueryTypeImpl
               .orElse(null);
         case "BikeRentalStation":
           return vehicleRentalStationService == null ? null :
+              vehicleRentalStationService.getVehicleRentalPlace(FeedScopedId.parseId(id));
+        case "VehicleRentalStation":
+          return vehicleRentalStationService == null ? null :
               vehicleRentalStationService.getVehicleRentalStation(FeedScopedId.parseId(id));
+        case "RentalVehicle":
+          return vehicleRentalStationService == null ? null :
+              vehicleRentalStationService.getVehicleRentalVehicle(FeedScopedId.parseId(id));
         case "CarPark":
           var carParkId = FeedScopedId.parseId(id);
           return vehicleParkingService == null ? null : vehicleParkingService
@@ -513,7 +521,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       if (args.getLegacyGraphQLIds() != null) {
         ArrayListMultimap<String, VehicleRentalPlace> vehicleRentalStations =
-                vehicleRentalStationService.getVehicleRentalStations()
+                vehicleRentalStationService.getVehicleRentalPlaces()
                         .stream()
                         .collect(Multimaps.toMultimap(VehicleRentalPlace::getStationId, station -> station, ArrayListMultimap::create));
         return ((List<String>) args.getLegacyGraphQLIds())
@@ -522,7 +530,7 @@ public class LegacyGraphQLQueryTypeImpl
                 .collect(Collectors.toList());
       }
 
-      return vehicleRentalStationService.getVehicleRentalStations();
+      return vehicleRentalStationService.getVehicleRentalPlaces();
     };
   }
 
@@ -537,9 +545,116 @@ public class LegacyGraphQLQueryTypeImpl
       if (vehicleRentalStationService == null) { return null; }
 
       return vehicleRentalStationService
-              .getVehicleRentalStations()
+              .getVehicleRentalPlaces()
               .stream()
               .filter(vehicleRentalStation -> vehicleRentalStation.getStationId().equals(args.getLegacyGraphQLId()))
+              .findAny()
+              .orElse(null);
+    };
+  }
+
+  public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations() {
+    return environment -> {
+      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+              .getVehicleRentalStationService();
+
+      if (vehicleRentalStationService == null) {
+        return null;
+      }
+
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeVehicleRentalStationsArgs(
+              environment.getArguments());
+
+      if (args.getLegacyGraphQLIds() != null) {
+        ArrayListMultimap<String, VehicleRentalStation> vehicleRentalStations =
+                vehicleRentalStationService.getVehicleRentalStations()
+                        .stream()
+                        .collect(Multimaps.toMultimap(station -> station.getId().toString(),
+                                station -> station, ArrayListMultimap::create
+                        ));
+        return ((List<String>) args.getLegacyGraphQLIds())
+                .stream()
+                .flatMap(id -> vehicleRentalStations.get(id).stream())
+                .collect(Collectors.toList());
+      }
+
+      return vehicleRentalStationService.getVehicleRentalStations();
+    };
+  }
+
+  @Override
+  public DataFetcher<VehicleRentalStation> vehicleRentalStation() {
+    return environment -> {
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeVehicleRentalStationArgs(
+              environment.getArguments());
+
+      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+              .getVehicleRentalStationService();
+
+      if (vehicleRentalStationService == null) {
+        return null;
+      }
+
+      return vehicleRentalStationService
+              .getVehicleRentalStations()
+              .stream()
+              .filter(vehicleRentalStation -> vehicleRentalStation.getId()
+                      .toString()
+                      .equals(args.getLegacyGraphQLId()))
+              .findAny()
+              .orElse(null);
+    };
+  }
+
+  @Override
+  public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles() {
+    return environment -> {
+      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+              .getVehicleRentalStationService();
+
+      if (vehicleRentalStationService == null) {
+        return null;
+      }
+
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeRentalVehiclesArgs(
+              environment.getArguments());
+
+      if (args.getLegacyGraphQLIds() != null) {
+        ArrayListMultimap<String, VehicleRentalVehicle> vehicleRentalVehicles =
+                vehicleRentalStationService.getVehicleRentalVehicles()
+                        .stream()
+                        .collect(Multimaps.toMultimap(vehicle -> vehicle.getId().toString(),
+                                vehicle -> vehicle, ArrayListMultimap::create
+                        ));
+        return ((List<String>) args.getLegacyGraphQLIds())
+                .stream()
+                .flatMap(id -> vehicleRentalVehicles.get(id).stream())
+                .collect(Collectors.toList());
+      }
+
+      return vehicleRentalStationService.getVehicleRentalVehicles();
+    };
+  }
+
+  @Override
+  public DataFetcher<VehicleRentalVehicle> rentalVehicle() {
+    return environment -> {
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeRentalVehicleArgs(
+              environment.getArguments());
+
+      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+              .getVehicleRentalStationService();
+
+      if (vehicleRentalStationService == null) {
+        return null;
+      }
+
+      return vehicleRentalStationService
+              .getVehicleRentalVehicles()
+              .stream()
+              .filter(vehicleRentalVehicle -> vehicleRentalVehicle.getId()
+                      .toString()
+                      .equals(args.getLegacyGraphQLId()))
               .findAny()
               .orElse(null);
     };

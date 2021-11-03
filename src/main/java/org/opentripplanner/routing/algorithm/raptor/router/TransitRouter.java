@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
@@ -34,8 +35,11 @@ import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.util.OTPFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransitRouter {
+    private static final Logger LOG = LoggerFactory.getLogger(TransitRouter.class);
 
     public static final int NOT_SET = -1;
 
@@ -167,10 +171,20 @@ public class TransitRouter {
         };
 
         if (OTPFeature.ParallelRouting.isOn()) {
-            CompletableFuture.allOf(
-                    CompletableFuture.runAsync(accessCalculator),
-                    CompletableFuture.runAsync(egressCalculator)
-            ).join();
+            try {
+                CompletableFuture.allOf(
+                        CompletableFuture.runAsync(accessCalculator),
+                        CompletableFuture.runAsync(egressCalculator)
+                ).join();
+            } catch (CompletionException e) {
+                if (e.getCause() instanceof RoutingValidationException) {
+                    throw (RoutingValidationException) e.getCause();
+                } else if (e.getCause() instanceof RuntimeException) {
+                    LOG.warn("Unknown exception from access/egress calculation", e.getCause());
+                    throw (RuntimeException) e.getCause();
+                }
+                throw e;
+            }
         } else {
             accessCalculator.run();
             egressCalculator.run();

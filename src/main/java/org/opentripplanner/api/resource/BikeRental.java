@@ -53,7 +53,7 @@ public class BikeRental {
         } else {
             envelope = new Envelope(-180,180,-90,90); 
         }
-        Collection<VehicleRentalPlace> stations = vehicleRentalService.getVehicleRentalStations();
+        Collection<VehicleRentalPlace> stations = vehicleRentalService.getVehicleRentalPlaces();
         List<ApiVehicleRentalStation> out = new ArrayList<>();
         for (VehicleRentalPlace station : stations) {
             if (envelope.contains(station.getLongitude(), station.getLatitude())) {

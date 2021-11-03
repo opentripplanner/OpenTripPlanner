@@ -81,7 +81,7 @@ public class ApiRouterInfo {
         }
 
         //at least 2 bike sharing stations are needed for useful bike sharing
-        return service.getVehicleRentalStations().size() > 1;
+        return service.getVehicleRentalPlaces().size() > 1;
     }
 
     public boolean mapHasBikePark(VehicleParkingService service) {

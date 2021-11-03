@@ -32,6 +32,9 @@ config:
     BikePark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     BikeRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace#VehicleRentalPlace
     BikeRentalStationUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
+    VehicleRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalStation#VehicleRentalStation
+    RentalVehicle: org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle#VehicleRentalVehicle
+    VehicleRentalUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
     BikesAllowed: String
     BookingInfo: org.opentripplanner.model.BookingInfo
     BookingTime: org.opentripplanner.model.BookingTime
@@ -65,7 +68,7 @@ config:
     stopAtDistance: org.opentripplanner.routing.graphfinder.NearbyStop#NearbyStop
     stopAtDistanceConnection: graphql.relay.Connection#Connection<NearbyStop>
     stopAtDistanceEdge: graphql.relay.Edge#Edge<NearbyStop>
-    Stoptime: org.opentripplanner.model.TripTimeShort#TripTimeShort
+    Stoptime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
     TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
