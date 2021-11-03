@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiPlace;
-import org.opentripplanner.api.model.ApiVehicleParkingWithEntrance;
 import org.opentripplanner.api.model.ApiVehicleParkingSpaces;
+import org.opentripplanner.api.model.ApiVehicleParkingWithEntrance;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
@@ -16,17 +17,23 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 
 public class PlaceMapper {
 
-    public static List<ApiPlace> mapStopArrivals(Collection<StopArrival> domain) {
-        if(domain == null) { return null; }
+    private final Locale locale;
 
-        return domain.stream().map(PlaceMapper::mapStopArrival).collect(Collectors.toList());
+    public PlaceMapper(Locale locale) {
+        this.locale = locale;
     }
 
-    public static ApiPlace mapStopArrival(StopArrival domain) {
+    public List<ApiPlace> mapStopArrivals(Collection<StopArrival> domain) {
+        if(domain == null) { return null; }
+
+        return domain.stream().map(this::mapStopArrival).collect(Collectors.toList());
+    }
+
+    public ApiPlace mapStopArrival(StopArrival domain) {
         return mapPlace(domain.place, domain.arrival, domain.departure);
     }
 
-    public static ApiPlace mapPlace(Place domain, Calendar arrival, Calendar departure) {
+    public ApiPlace mapPlace(Place domain, Calendar arrival, Calendar departure) {
         if(domain == null) { return null; }
 
         ApiPlace api = new ApiPlace();
@@ -54,22 +61,25 @@ public class PlaceMapper {
         if (domain.vehicleRentalPlace != null) {
             api.bikeShareId = domain.vehicleRentalPlace.getStationId();
         }
+        if (domain.vehicleParkingWithEntrance != null) {
+            api.vehicleParking = mapVehicleParking(domain.vehicleParkingWithEntrance);
+        }
 
         return api;
     }
 
-    private static ApiVehicleParkingWithEntrance mapVehicleParking(VehicleParkingWithEntrance vehicleParkingWithEntrance) {
+    private ApiVehicleParkingWithEntrance mapVehicleParking(VehicleParkingWithEntrance vehicleParkingWithEntrance) {
         var vp = vehicleParkingWithEntrance.getVehicleParking();
         var e = vehicleParkingWithEntrance.getEntrance();
 
         return ApiVehicleParkingWithEntrance.builder()
                 .id(FeedScopedIdMapper.mapToApi(vp.getId()))
-                .name(vp.getName().toString())
+                .name(I18NStringMapper.mapToApi(vp.getName(), locale))
                 .entranceId(FeedScopedIdMapper.mapToApi(e.getEntranceId()))
-                .entranceName(vp.getName().toString())
+                .entranceName(I18NStringMapper.mapToApi(e.getName(), locale))
+                .note(I18NStringMapper.mapToApi(vp.getNote(), locale))
                 .detailsUrl(vp.getDetailsUrl())
                 .imageUrl(vp.getImageUrl())
-                .note(vp.getNote() != null ? vp.getNote().toString() : null)
                 .tags(new ArrayList<>(vp.getTags()))
                 .hasBicyclePlaces(vp.hasBicyclePlaces())
                 .hasAnyCarPlaces(vp.hasAnyCarPlaces())
