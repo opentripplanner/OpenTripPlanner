@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.ApiVehicleParkingWithEntrance;
-import org.opentripplanner.api.model.ApiVehicleParkingWithEntrance.ApiVehicleParkingSpaces;
+import org.opentripplanner.api.model.ApiVehicleParkingSpaces;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VehicleParkingWithEntrance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 public class PlaceMapper {
 
@@ -75,7 +74,7 @@ public class PlaceMapper {
                 .hasBicyclePlaces(vp.hasBicyclePlaces())
                 .hasAnyCarPlaces(vp.hasAnyCarPlaces())
                 .hasCarPlaces(vp.hasCarPlaces())
-                .hasDisabledCarPlaces(vp.hasWheelchairAccessibledCarPlaces())
+                .hasWheelchairAccessibleCarPlaces(vp.hasWheelchairAccessibleCarPlaces())
                 .availability(mapVehicleParkingSpaces(vp.getAvailability()))
                 .capacity(mapVehicleParkingSpaces(vp.getCapacity()))
                 .build();
@@ -89,7 +88,7 @@ public class PlaceMapper {
         return ApiVehicleParkingSpaces.builder()
                 .bicycleSpaces(parkingSpaces.getBicycleSpaces())
                 .carSpaces(parkingSpaces.getCarSpaces())
-                .disabledCarSpaces(parkingSpaces.getWheelchairAccessibleCarSpaces())
+                .wheelchairAccessibleCarSpaces(parkingSpaces.getWheelchairAccessibleCarSpaces())
                 .build();
     }
 }

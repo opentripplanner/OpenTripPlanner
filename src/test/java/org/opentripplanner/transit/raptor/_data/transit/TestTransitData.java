@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import lombok.val;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
@@ -115,7 +114,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     if(debug.stops().isEmpty()) {
       debug.addStops(stopsVisited());
     }
-    val logger = new TestDebugLogger(true);
+    var logger = new TestDebugLogger(true);
 
     debug
         .stopArrivalListener(logger::stopArrivalLister)

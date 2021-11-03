@@ -5,10 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
@@ -18,9 +15,6 @@ import org.opentripplanner.util.I18NString;
  * All fields are immutable except for the availability, capacity which may be updated by updaters.
  * If any other properties change a new VehicleParking instance should be created.
  */
-@Builder(buildMethodName = "buildInternal")
-@Getter
-@EqualsAndHashCode
 public class VehicleParking implements Serializable {
 
   /**
@@ -62,25 +56,21 @@ public class VehicleParking implements Serializable {
   /**
    * The state of this vehicle parking. Only ones in an OPERATIONAL state may be used for Park and Ride.
    */
-  @Builder.Default
-  private final VehicleParkingState state = VehicleParkingState.OPERATIONAL;
+  private final VehicleParkingState state;
 
   /**
    * Does this vehicle parking have spaces (capacity) for bicycles.
    */
-  @Getter(AccessLevel.NONE)
   private final boolean bicyclePlaces;
 
   /**
    * Does this vehicle parking have spaces (capacity) for cars.
    */
-  @Getter(AccessLevel.NONE)
   private final boolean carPlaces;
 
   /**
-   * Does this vehicle parking have disabled (wheelchair accessible) car spaces (capacity).
+   * Does this vehicle parking have wheelchair accessible (disabled) car spaces (capacity).
    */
-  @Getter(AccessLevel.NONE)
   private final boolean wheelchairAccessibleCarPlaces;
 
   /**
@@ -91,25 +81,103 @@ public class VehicleParking implements Serializable {
   /**
    * The currently available spaces at this vehicle parking.
    */
-  @EqualsAndHashCode.Exclude
   private VehicleParkingSpaces availability;
 
-  @Builder.Default
   private final List<VehicleParkingEntrance> entrances = new ArrayList<>();
+
+  VehicleParking(
+          FeedScopedId id,
+          I18NString name,
+          double x,
+          double y,
+          String detailsUrl,
+          String imageUrl,
+          List<String> tags,
+          I18NString note,
+          VehicleParkingState state,
+          boolean bicyclePlaces,
+          boolean carPlaces,
+          boolean wheelchairAccessibleCarPlaces,
+          VehicleParkingSpaces capacity,
+          VehicleParkingSpaces availability
+  ) {
+    this.id = id;
+    this.name = name;
+    this.x = x;
+    this.y = y;
+    this.detailsUrl = detailsUrl;
+    this.imageUrl = imageUrl;
+    this.tags = tags;
+    this.note = note;
+    this.state = state;
+    this.bicyclePlaces = bicyclePlaces;
+    this.carPlaces = carPlaces;
+    this.wheelchairAccessibleCarPlaces = wheelchairAccessibleCarPlaces;
+    this.capacity = capacity;
+    this.availability = availability;
+  }
+
+  public FeedScopedId getId() {
+    return id;
+  }
+
+  public I18NString getName() {
+    return name;
+  }
+
+  public double getX() {
+    return x;
+  }
+
+  public double getY() {
+    return y;
+  }
+
+  public String getDetailsUrl() {
+    return detailsUrl;
+  }
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
+  public List<String> getTags() {
+    return tags;
+  }
+
+  public I18NString getNote() {
+    return note;
+  }
+
+  public VehicleParkingState getState() {
+    return state;
+  }
+
+  public VehicleParkingSpaces getCapacity() {
+    return capacity;
+  }
+
+  public VehicleParkingSpaces getAvailability() {
+    return availability;
+  }
+
+  public List<VehicleParkingEntrance> getEntrances() {
+    return entrances;
+  }
 
   public boolean hasBicyclePlaces() {
     return bicyclePlaces;
   }
 
   public boolean hasAnyCarPlaces() {
-    return hasCarPlaces() || hasWheelchairAccessibledCarPlaces();
+    return hasCarPlaces() || hasWheelchairAccessibleCarPlaces();
   }
 
   public boolean hasCarPlaces() {
     return carPlaces;
   }
 
-  public boolean hasWheelchairAccessibledCarPlaces() {
+  public boolean hasWheelchairAccessibleCarPlaces() {
     return wheelchairAccessibleCarPlaces;
   }
 
@@ -133,18 +201,64 @@ public class VehicleParking implements Serializable {
     return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {return true;}
+    if (o == null || getClass() != o.getClass()) {return false;}
+    final VehicleParking that = (VehicleParking) o;
+    return Double.compare(that.x, x) == 0
+            && Double.compare(that.y, y) == 0
+            && bicyclePlaces == that.bicyclePlaces
+            && carPlaces == that.carPlaces
+            && wheelchairAccessibleCarPlaces == that.wheelchairAccessibleCarPlaces
+            && state == that.state
+            && Objects.equals(id, that.id)
+            && Objects.equals(name, that.name)
+            && Objects.equals(detailsUrl, that.detailsUrl)
+            && Objects.equals(imageUrl, that.imageUrl)
+            && Objects.equals(tags, that.tags)
+            && Objects.equals(note, that.note)
+            && Objects.equals(capacity, that.capacity)
+            && Objects.equals(entrances, that.entrances);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+            id, name, x, y, detailsUrl, imageUrl, tags, note, state, bicyclePlaces,
+            carPlaces, wheelchairAccessibleCarPlaces, capacity, entrances
+    );
+  }
+
+  public static VehicleParkingBuilder builder() {
+    return new VehicleParkingBuilder();
+  }
+
   @FunctionalInterface
   public interface VehicleParkingEntranceCreator {
     VehicleParkingEntrance.VehicleParkingEntranceBuilder updateValues(VehicleParkingEntrance.VehicleParkingEntranceBuilder builder);
   }
 
-  /*
-   * These methods are overwritten so that the saved list is always an array list for serialization.
-   */
   @SuppressWarnings("unused")
   public static class VehicleParkingBuilder {
     private List<String> tags = new ArrayList<>();
     private final List<VehicleParkingEntranceCreator> entranceCreators = new ArrayList<>();
+    private FeedScopedId id;
+    private I18NString name;
+    private double x;
+    private double y;
+    private String detailsUrl;
+    private String imageUrl;
+    private I18NString note;
+    private VehicleParkingState state$value;
+    private boolean state$set;
+    private boolean bicyclePlaces;
+    private boolean carPlaces;
+    private boolean wheelchairAccessibleCarPlaces;
+    private VehicleParkingSpaces capacity;
+    private VehicleParkingSpaces availability;
+
+    VehicleParkingBuilder() {}
 
     public VehicleParkingBuilder tags(Collection<String> tags) {
       this.tags = new ArrayList<>(tags);
@@ -161,10 +275,84 @@ public class VehicleParking implements Serializable {
         return this;
     }
 
+    public VehicleParkingBuilder id(FeedScopedId id) {
+      this.id = id;
+      return this;
+    }
+
+    public VehicleParkingBuilder name(I18NString name) {
+      this.name = name;
+      return this;
+    }
+
+    public VehicleParkingBuilder x(double x) {
+      this.x = x;
+      return this;
+    }
+
+    public VehicleParkingBuilder y(double y) {
+      this.y = y;
+      return this;
+    }
+
+    public VehicleParkingBuilder detailsUrl(String detailsUrl) {
+      this.detailsUrl = detailsUrl;
+      return this;
+    }
+
+    public VehicleParkingBuilder imageUrl(String imageUrl) {
+      this.imageUrl = imageUrl;
+      return this;
+    }
+
+    public VehicleParkingBuilder note(I18NString note) {
+      this.note = note;
+      return this;
+    }
+
+    public VehicleParkingBuilder state(VehicleParkingState state) {
+      this.state$value = state;
+      this.state$set = true;
+      return this;
+    }
+
+    public VehicleParkingBuilder bicyclePlaces(boolean bicyclePlaces) {
+      this.bicyclePlaces = bicyclePlaces;
+      return this;
+    }
+
+    public VehicleParkingBuilder carPlaces(boolean carPlaces) {
+      this.carPlaces = carPlaces;
+      return this;
+    }
+
+    public VehicleParkingBuilder wheelchairAccessibleCarPlaces(boolean wheelchairAccessibleCarPlaces) {
+      this.wheelchairAccessibleCarPlaces = wheelchairAccessibleCarPlaces;
+      return this;
+    }
+
+    public VehicleParkingBuilder capacity(VehicleParkingSpaces capacity) {
+      this.capacity = capacity;
+      return this;
+    }
+
+    public VehicleParkingBuilder availability(VehicleParkingSpaces availability) {
+      this.availability = availability;
+      return this;
+    }
+
     public VehicleParking build() {
-        VehicleParking vehicleParking = this.buildInternal();
-        this.entranceCreators.forEach(vehicleParking::addEntrance);
-        return vehicleParking;
+      VehicleParkingState state$value = this.state$value;
+      if (!this.state$set) {
+        state$value = VehicleParkingState.OPERATIONAL;
+      }
+
+      var vehicleParking = new VehicleParking(
+              id, name, x, y, detailsUrl, imageUrl, tags, note, state$value,
+              bicyclePlaces, carPlaces, wheelchairAccessibleCarPlaces, capacity, availability
+      );
+      this.entranceCreators.forEach(vehicleParking::addEntrance);
+      return vehicleParking;
     }
   }
 }

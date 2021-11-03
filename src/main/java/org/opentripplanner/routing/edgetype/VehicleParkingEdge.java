@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
-import lombok.Getter;
+import java.util.Locale;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -9,9 +10,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 
-import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
-
 /**
  * Parking a vehicle edge.
  */
@@ -19,7 +17,6 @@ public class VehicleParkingEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    @Getter
     private final VehicleParking vehicleParking;
 
     public VehicleParkingEdge(VehicleParkingEntranceVertex vehicleParkingEntranceVertex) {
@@ -29,6 +26,10 @@ public class VehicleParkingEdge extends Edge {
     public VehicleParkingEdge(VehicleParkingEntranceVertex fromVehicleParkingEntranceVertex, VehicleParkingEntranceVertex toVehicleParkingEntranceVertex) {
         super(fromVehicleParkingEntranceVertex, toVehicleParkingEntranceVertex);
         this.vehicleParking = fromVehicleParkingEntranceVertex.getVehicleParking();
+    }
+
+    public VehicleParking getVehicleParking() {
+        return vehicleParking;
     }
 
     @Override
@@ -115,7 +116,7 @@ public class VehicleParkingEdge extends Edge {
             case BICYCLE:
                 return vehicleParking.hasBicyclePlaces();
             case CAR:
-                return wheelchairAccessible ? vehicleParking.hasWheelchairAccessibledCarPlaces() : vehicleParking.hasCarPlaces();
+                return wheelchairAccessible ? vehicleParking.hasWheelchairAccessibleCarPlaces() : vehicleParking.hasCarPlaces();
             default:
                 return false;
         }

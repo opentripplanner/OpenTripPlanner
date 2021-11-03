@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.vertextype;
 
-import lombok.Getter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -16,7 +15,6 @@ public class VehicleParkingEntranceVertex extends Vertex {
 
     private static final long serialVersionUID = 1L;
 
-    @Getter
     private final VehicleParkingEntrance parkingEntrance;
 
     public VehicleParkingEntranceVertex(
@@ -25,6 +23,10 @@ public class VehicleParkingEntranceVertex extends Vertex {
     ) {
         super(g, "Vehicle parking " + parkingEntrance.getEntranceId(), parkingEntrance.getX(), parkingEntrance.getY(), parkingEntrance.getName());
         this.parkingEntrance = parkingEntrance;
+    }
+
+    public VehicleParkingEntrance getParkingEntrance() {
+        return parkingEntrance;
     }
 
     public VehicleParking getVehicleParking() {

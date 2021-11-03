@@ -85,7 +85,7 @@ public class LegacyGraphQLVehicleParkingImpl implements LegacyGraphQLDataFetcher
 
     @Override
     public DataFetcher<Boolean> wheelchairAccessibleCarPlaces() {
-        return environment -> getSource(environment).hasWheelchairAccessibledCarPlaces();
+        return environment -> getSource(environment).hasWheelchairAccessibleCarPlaces();
     }
 
     @Override

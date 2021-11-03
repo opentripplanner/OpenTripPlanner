@@ -3,9 +3,8 @@ package org.opentripplanner.util;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
-import lombok.EqualsAndHashCode;
+import java.util.Objects;
 
-@EqualsAndHashCode
 public class LocalizedStringFormat implements I18NString, Serializable {
 
     private final String format;
@@ -24,5 +23,20 @@ public class LocalizedStringFormat implements I18NString, Serializable {
     @Override
     public String toString(Locale locale) {
         return String.format(format, Arrays.stream(values).map(i -> i.toString(locale)).toArray(Object[]::new));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
+        final LocalizedStringFormat that = (LocalizedStringFormat) o;
+        return format.equals(that.format) && Arrays.equals(values, that.values);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(format);
+        result = 31 * result + Arrays.hashCode(values);
+        return result;
     }
 }
