@@ -120,61 +120,63 @@ public class LegMapper {
         return api;
     }
 
-    private ApiBookingInfo toApi(BookingInfo info) {
-        if (info != null) {
+    private static ApiBookingInfo toApi(BookingInfo info) {
+        if (info == null) {return null;}
 
-            return new ApiBookingInfo(
-                    toApi(info.getContactInfo()),
-                    toApi(info.bookingMethods()),
-                    toApi(info.getEarliestBookingTime()),
-                    toApi(info.getLatestBookingTime()),
-                    info.getMinimumBookingNotice(),
-                    info.getMaximumBookingNotice(),
-                    info.getMessage(),
-                    info.getPickupMessage(),
-                    info.getDropOffMessage()
-            );
-        }
-        else {
-            return null;
-        }
+        return new ApiBookingInfo(
+                toApi(info.getContactInfo()),
+                toApi(info.bookingMethods()),
+                toApi(info.getEarliestBookingTime()),
+                toApi(info.getLatestBookingTime()),
+                info.getMinimumBookingNotice(),
+                info.getMaximumBookingNotice(),
+                info.getMessage(),
+                info.getPickupMessage(),
+                info.getDropOffMessage()
+        );
     }
 
-    private ApiContactInfo toApi(ContactInfo info) {
-        if (info != null) {
-            return new ApiContactInfo(
-                    info.getContactPerson(),
-                    info.getPhoneNumber(),
-                    info.geteMail(),
-                    info.getFaxNumber(),
-                    info.getInfoUrl(),
-                    info.getBookingUrl(),
-                    info.getAdditionalDetails()
-            );
-        }
-        else {
-            return null;
-        }
+    private static ApiContactInfo toApi(ContactInfo info) {
+        if (info == null) {return null;}
+        return new ApiContactInfo(
+                info.getContactPerson(),
+                info.getPhoneNumber(),
+                info.geteMail(),
+                info.getFaxNumber(),
+                info.getInfoUrl(),
+                info.getBookingUrl(),
+                info.getAdditionalDetails()
+        );
     }
 
-    private Set<String> toApi(EnumSet<BookingMethod> m) {
-        if (m != null) {
-            return m.stream()
-                    .map(Enum::toString)
-                    .collect(Collectors.toSet());
-        }
-        else {
-            return null;
-        }
+    private static Set<String> toApi(EnumSet<BookingMethod> m) {
+        if (m == null) {return null;}
+        return m.stream()
+                .map(LegMapper::toApi)
+                .collect(Collectors.toSet());
     }
 
-    private ApiBookingTime toApi(BookingTime time) {
-        if (time != null) {
-            return new ApiBookingTime(time.getTime().toSecondOfDay(), time.getDaysPrior());
+    private static String toApi(BookingMethod m) {
+        switch (m) {
+            case CALL_DRIVER:
+                return "CALL_DRIVER";
+            case CALL_OFFICE:
+                return "CALL_OFFICE";
+            case ONLINE:
+                return "ONLINE";
+            case PHONE_AT_STOP:
+                return "PHONE_AT_STOP";
+            case TEXT_MESSAGE:
+                return "TEXT_MESSAGE";
+            default:
+                return null;
         }
-        else {
-            return null;
-        }
+
+    }
+
+    private static ApiBookingTime toApi(BookingTime time) {
+        if (time == null) {return null;}
+        return new ApiBookingTime(time.getTime().toSecondOfDay(), time.getDaysPrior());
     }
 
     private static List<ApiAlert> concatenateAlerts(List<ApiAlert> a, List<ApiAlert> b) {
