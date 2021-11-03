@@ -39,7 +39,7 @@ public class DirectFlexRouter {
 
       FlexRouter flexRouter = new FlexRouter(
               router.graph,
-              router.routerConfig. flexParameters(request),
+              router.routerConfig.flexParameters(request),
               directRequest.getDateTime().toInstant(),
               directRequest.arriveBy,
               directRequest.additionalSearchDaysBeforeToday,
