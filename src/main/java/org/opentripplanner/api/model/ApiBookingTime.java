@@ -8,8 +8,17 @@ import java.time.LocalTime;
  * of the trip.
  */
 public class ApiBookingTime implements Serializable {
+
+  /**
+   * The latest time at which the trip must be booked.
+   *
+   * Unit: seconds since midnight
+   */
   public final int time;
 
+  /**
+   * How many days in advance this trip must be booked.
+   */
   public final int daysPrior;
 
   public ApiBookingTime(int time, int daysPrior) {

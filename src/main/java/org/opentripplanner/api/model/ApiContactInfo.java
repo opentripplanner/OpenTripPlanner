@@ -2,20 +2,44 @@ package org.opentripplanner.api.model;
 
 import java.io.Serializable;
 
+/**
+ * How to contact the agency to book a trip or requests information.
+ */
 public class ApiContactInfo implements Serializable {
 
+  /**
+   * The person's name responsible to administer the trip.
+   */
   public final String contactPerson;
 
+  /**
+   * Phone number to book the trip or request information.
+   */
   public final String phoneNumber;
 
-  public final String eMail;
+/**
+ * Email address to book the trip or request information.
+ */
+ public final String eMail;
 
+/**
+ * Fax number to book the trip or request information. Very important.
+ */
   public final String faxNumber;
 
+  /**
+   * URL to a website about general information about the service.
+   */
   public final String infoUrl;
 
+  /**
+   * URL to a website to book the service.
+   */
   public final String bookingUrl;
 
+  /**
+   * Any other comment that does not fit anywhere else.
+   */
   public final String additionalDetails;
 
   public ApiContactInfo(

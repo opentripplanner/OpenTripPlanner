@@ -11,8 +11,14 @@ import java.util.Set;
  */
 public class ApiBookingInfo implements Serializable {
 
+  /**
+   * How to contact the agency to book a trip or requests information.
+   */
   public final ApiContactInfo contactInfo;
 
+  /**
+   * What booking methods are available at this stop time.
+   */
   public final Set<String> bookingMethods;
 
   /**
@@ -35,10 +41,21 @@ public class ApiBookingInfo implements Serializable {
    */
   public final Integer maximumBookingNoticeSeconds;
 
+  /**
+   * Message to riders utilizing service at a stop_time when booking on-demand pickup and drop off.
+   * Meant to provide minimal information to be transmitted within a user interface about the action
+   * a rider must take in order to utilize the service.
+   */
   public final String message;
 
+  /**
+   * Functions in the same way as message but used when riders have on-demand pickup only.
+   */
   public final String pickupMessage;
 
+  /**
+   * Functions in the same way as message but used when riders have on-demand drop off only.
+   */
   public final String dropOffMessage;
 
   public ApiBookingInfo(
