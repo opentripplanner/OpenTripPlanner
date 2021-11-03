@@ -242,26 +242,6 @@ public class ConstantsForTests {
         }
     }
 
-    public static Graph buildGraph(String path) {
-        Graph graph = new Graph();
-        GtfsContext context;
-        try {
-            context = contextBuilder(path).build();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        AddTransitModelEntitiesToGraph.addToGraph(context, graph);
-
-        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-        factory.run(graph);
-        graph.putService(
-                CalendarServiceData.class, context.getCalendarServiceData()
-        );
-        return graph;
-    }
-
-
     private static void addPortlandVehicleRentals(Graph graph) {
         try {
             VertexLinker linker = graph.getLinker();
