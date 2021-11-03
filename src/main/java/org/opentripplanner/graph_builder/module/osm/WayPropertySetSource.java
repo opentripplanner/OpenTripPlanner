@@ -53,25 +53,35 @@ public interface WayPropertySetSource {
 
 	IntersectionTraversalCostModel getIntersectionTraversalCostModel();
 
+	default boolean doesTagValueDisallowThroughTraffic(String tagValue) {
+		return "destination".equals(tagValue) || "private".equals(tagValue)
+				|| "customers".equals(tagValue) || "delivery".equals(tagValue);
+	}
+
+	default boolean isGeneralNoThroughTraffic(OSMWithTags way) {
+		String access = way.getTag("access");
+		return doesTagValueDisallowThroughTraffic(access);
+	}
+
+	default boolean isVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+		String vehicle = way.getTag("vehicle");
+		return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(vehicle);
+	}
+
 	/**
 	 * Returns true if through traffic for motor vehicles is not allowed.
 	 */
 	default boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
 		String motorVehicle = way.getTag("motor_vehicle");
-		return isGeneralNoThroughTraffic(way) || "destination".equals(motorVehicle);
-	}
-
-	default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
-		String bicycle = way.getTag("bicycle");
-		return isGeneralNoThroughTraffic(way) || "destination".equals(bicycle);
+		return isVehicleThroughTrafficExplicitlyDisallowed(way) || doesTagValueDisallowThroughTraffic(motorVehicle);
 	}
 
 	/**
 	 * Returns true if through traffic for bicycle is not allowed.
 	 */
-	default boolean isGeneralNoThroughTraffic(OSMWithTags way) {
-		String access = way.getTag("access");
-		return "destination".equals(access) || "private".equals(access)
-				|| "customers".equals(access) || "delivery".equals(access);
+	default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+		String bicycle = way.getTag("bicycle");
+		return isVehicleThroughTrafficExplicitlyDisallowed(way) || doesTagValueDisallowThroughTraffic(bicycle);
 	}
+
 }
