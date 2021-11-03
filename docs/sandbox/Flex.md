@@ -17,7 +17,9 @@
 - Improve performance of flex access/egress routing [#3661](https://github.com/opentripplanner/OpenTripPlanner/pull/3661)
 
 ## Documentation
-To enable this turn on `FlexRouting` as a feature in `otp-config.json`. The GTFS feeds should conform to the [GTFS-Flex v2.1 draft](https://docs.google.com/document/d/1PyYK6JVzz52XEx3FXqAJmoVefHFqZTHS4Mpn20dTuKE/)
+To enable this turn on `FlexRouting` as a feature in `otp-config.json`. 
+
+The GTFS feeds should conform to the [GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master/spec/reference.md)
 
 ## Configuration
 
