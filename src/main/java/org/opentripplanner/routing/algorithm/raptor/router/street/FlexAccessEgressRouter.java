@@ -16,7 +16,7 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
       RoutingRequest request,
-      FlexParameters config,
+      FlexParameters params,
       boolean isEgress
   ) {
 
@@ -34,7 +34,7 @@ public class FlexAccessEgressRouter {
 
     FlexRouter flexRouter = new FlexRouter(
         request.rctx.graph,
-        config,
+        params,
         request.getDateTime().toInstant(),
         request.arriveBy,
         request.additionalSearchDaysBeforeToday,

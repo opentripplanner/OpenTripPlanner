@@ -29,11 +29,11 @@ public abstract class FlexTrip extends TransitEntity {
   }
 
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters config
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters config
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   );
 
   public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex, int flexTime);

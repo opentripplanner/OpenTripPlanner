@@ -27,9 +27,9 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   public FlexAccessTemplate(
       NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
       StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator,
-      FlexParameters config
+      FlexParameters flexParams
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, config);
+    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, flexParams);
   }
 
   public Itinerary createDirectItinerary(

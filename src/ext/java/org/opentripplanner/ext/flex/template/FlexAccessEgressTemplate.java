@@ -31,7 +31,7 @@ public abstract class FlexAccessEgressTemplate {
   protected final int secondsFromStartOfTime;
   public final ServiceDate serviceDate;
   protected final FlexPathCalculator calculator;
-  private final FlexParameters config;
+  private final FlexParameters flexParams;
 
   /**
    *
@@ -51,7 +51,7 @@ public abstract class FlexAccessEgressTemplate {
       StopLocation transferStop,
       FlexServiceDate date,
       FlexPathCalculator calculator,
-      FlexParameters config
+      FlexParameters flexParams
   ) {
     this.accessEgress = accessEgress;
     this.trip = trip;
@@ -61,7 +61,7 @@ public abstract class FlexAccessEgressTemplate {
     this.secondsFromStartOfTime = date.secondsFromStartOfTime;
     this.serviceDate = date.serviceDate;
     this.calculator = calculator;
-    this.config = config;
+    this.flexParams = flexParams;
   }
 
   public StopLocation getTransferStop() {
@@ -122,7 +122,7 @@ public abstract class FlexAccessEgressTemplate {
     else {
       return getTransfersFromTransferStop(graph)
               .stream()
-              .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= config.maxTransferMeters)
+              .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= flexParams.maxTransferMeters)
               .filter(transfer -> getFinalStop(transfer) != null)
               .map(transfer -> {
                 List<Edge> edges = getTransferEdges(transfer);

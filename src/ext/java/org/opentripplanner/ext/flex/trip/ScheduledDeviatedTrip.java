@@ -66,7 +66,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters config
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
@@ -87,7 +87,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
                 stop,
                 date,
                 scheduledCalculator,
-                config
+                params
         ));
       }
     }
@@ -97,7 +97,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters config
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
@@ -118,7 +118,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
                 stop,
                 date,
                 scheduledCalculator,
-                config
+                params
         ));
       }
     }
