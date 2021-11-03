@@ -681,7 +681,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     //relation properties are copied over to ways
     props.setProperties(
-            "route=bicycle", StreetTraversalPermission.ALL, 0.8, 0.8, true
+            "lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.8, 0.8, true
     );
 
     props.setProperties("highway=busway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, low_traffic, low_traffic);
