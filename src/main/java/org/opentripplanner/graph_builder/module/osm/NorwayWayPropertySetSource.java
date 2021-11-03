@@ -746,8 +746,8 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("surface=dirt", StreetTraversalPermission.ALL, 1.5, 1.5, true);
     props.setProperties("surface=earth", StreetTraversalPermission.ALL, 1.5, 1.5, true);
     props.setProperties("surface=grass", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=mud", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=sand", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+    props.setProperties("surface=mud", StreetTraversalPermission.ALL, 2, 2, true);
+    props.setProperties("surface=sand", StreetTraversalPermission.ALL, 2, 2, true);
 
     /*
      * Automobile speeds in Norway. General speed limit is 80kph unless signs says otherwise
