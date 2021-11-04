@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -22,25 +23,27 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
-public class FlexTripsMapperTest {
+/**
+ * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the
+ * City of Aspen Downtown taxi service which is a completely unscheduled trip that takes
+ * you door-to-door in the city.
+ *
+ * It only contains a single stop time which in GTFS static would not work but is valid
+ * in GTFS Flex.
+ */
+public class UnscheduledTripTest {
 
     static final String ASPEN_GTFS = "src/ext-test/resources/aspen-flex-on-demand.gtfs.zip";
     static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator(null);
     static final ServiceDate serviceDate = new ServiceDate(2021, 4, 11);
     static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();
+    static final FlexServiceDate flexDate =
+            new FlexServiceDate(serviceDate, secondsSinceMidnight, new TIntHashSet());
+
+    static final Graph graph = new Graph();
 
     @Test
     public void parseAspenTaxiAsUnscheduledTrip() {
-        Graph graph = new Graph();
-
-        GtfsBundle gtfsBundle = new GtfsBundle(new File(ASPEN_GTFS));
-        GtfsModule module = new GtfsModule(
-                List.of(gtfsBundle),
-                new ServiceDateInterval(new ServiceDate(2021, 1, 1), new ServiceDate(2022, 1, 1)),
-                true
-        );
-        module.buildGraph(graph, new HashMap<>());
-
         var flexTrips = graph.flexTripsById.values();
         assertFalse(flexTrips.isEmpty());
         assertEquals(
@@ -54,12 +57,12 @@ public class FlexTripsMapperTest {
                 flexTrips.stream().map(FlexTrip::getClass).collect(
                         Collectors.toSet())
         );
+    }
 
-        var trip = flexTrips.iterator().next();
-
-        var stopLocation = trip.getStops().iterator().next();
-        var nearbyStop = new NearbyStop(stopLocation, 0, List.of(), null, null);
-        var flexDate = new FlexServiceDate(serviceDate, secondsSinceMidnight, new TIntHashSet());
+    @Test
+    public void calculateAccessTemplate() {
+        var trip = getFlexTrip();
+        var nearbyStop = getNearbyStop(trip);
 
         var accesses = trip.getFlexAccessTemplates(
                 nearbyStop,
@@ -73,6 +76,12 @@ public class FlexTripsMapperTest {
         assertEquals(0, access.fromStopIndex);
         assertEquals(0, access.toStopIndex);
 
+    }
+
+    @Test
+    public void calculateEgressTemplate() {
+        var trip = getFlexTrip();
+        var nearbyStop = getNearbyStop(trip);
         var egresses = trip.getFlexEgressTemplates(
                 nearbyStop,
                 flexDate,
@@ -84,6 +93,29 @@ public class FlexTripsMapperTest {
         var egress = egresses.get(0);
         assertEquals(0, egress.fromStopIndex);
         assertEquals(0, egress.toStopIndex);
+    }
 
+    @BeforeAll
+    static void setup() {
+        GtfsBundle gtfsBundle = new GtfsBundle(new File(ASPEN_GTFS));
+        GtfsModule module = new GtfsModule(
+                List.of(gtfsBundle),
+                new ServiceDateInterval(
+                        new ServiceDate(2021, 1, 1),
+                        new ServiceDate(2022, 1, 1)
+                ),
+                true
+        );
+        module.buildGraph(graph, new HashMap<>());
+    }
+
+    private static NearbyStop getNearbyStop(FlexTrip trip) {
+        var stopLocation = trip.getStops().iterator().next();
+        return new NearbyStop(stopLocation, 0, List.of(), null, null);
+    }
+
+    private static FlexTrip getFlexTrip() {
+        var flexTrips = graph.flexTripsById.values();
+        return flexTrips.iterator().next();
     }
 }
