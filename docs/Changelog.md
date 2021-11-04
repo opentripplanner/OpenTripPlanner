@@ -72,6 +72,7 @@
 - Vehicle rental updates [#3632](https://github.com/opentripplanner/OpenTripPlanner/pull/3632)
 - debug-client: add url handling and extend the displayed fields [#3712](https://github.com/opentripplanner/OpenTripPlanner/pull/3712)
 - add trolleybus & monorail support [#3658](https://github.com/opentripplanner/OpenTripPlanner/pull/3658)
+- Improve NeTEx import issue report [#3719](https://github.com/opentripplanner/OpenTripPlanner/pull/3719)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
