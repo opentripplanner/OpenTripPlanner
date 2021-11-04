@@ -32,33 +32,22 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
     if (o instanceof Agency) { return schema.getObjectType("Agency"); }
     if (o instanceof TransitAlert) { return schema.getObjectType("Alert"); }
     if (o instanceof VehicleParking) {
-      SelectionSet set = environment.getField().getFields().get(0).getSelectionSet();
-      boolean queryHasBikeParkFragment = set != null && set.getSelections()
-              .stream()
-              .filter(selection -> selection instanceof InlineFragment)
-              .map(InlineFragment.class::cast)
-              .anyMatch(fragment -> fragment.getTypeCondition()
-                      .getName()
-                      .equals("BikePark"));
-      return queryHasBikeParkFragment
-              ? schema.getObjectType("BikePark")
-              : schema.getObjectType("VehicleParking");
+      var vehicleParking = (VehicleParking) o;
+      if (queryContainsFragment("BikePark", environment) && vehicleParking.hasBicyclePlaces()) {
+        return schema.getObjectType("BikePark");
+      }
+      if (queryContainsFragment("CarPark", environment) && vehicleParking.hasAnyCarPlaces()) {
+        return schema.getObjectType("CarPark");
+      }
+      return schema.getObjectType("VehicleParking");
     }
     if (o instanceof VehicleRentalVehicle) { return schema.getObjectType("RentalVehicle"); }
     if (o instanceof VehicleRentalStation) {
-      SelectionSet set = environment.getField().getFields().get(0).getSelectionSet();
-      boolean queryHasBikeRentalStationFragment = set != null && set.getSelections()
-              .stream()
-              .filter(selection -> selection instanceof InlineFragment)
-              .map(InlineFragment.class::cast)
-              .anyMatch(fragment -> fragment.getTypeCondition()
-                      .getName()
-                      .equals("BikeRentalStation"));
-      return queryHasBikeRentalStationFragment
-              ? schema.getObjectType("BikeRentalStation")
-              : schema.getObjectType("VehicleRentalStation");
+      if (queryContainsFragment("BikeRentalStation", environment)) {
+        return schema.getObjectType("BikeRentalStation");
+      }
+      return schema.getObjectType("VehicleRentalStation");
     }
-    // if (o instanceof CarPark) { return schema.getObjectType("CarPark"); }
     // if (o instanceof Cluster) { return schema.getObjectType("Cluster"); }
     if (o instanceof PatternAtStop) { return schema.getObjectType("DepartureRow"); }
     if (o instanceof TripPattern) { return schema.getObjectType("Pattern"); }
@@ -71,5 +60,16 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
     if (o instanceof FareRuleSet) { return schema.getObjectType("TicketType"); }
     if (o instanceof Trip) { return schema.getObjectType("Trip"); }
     return null;
+  }
+
+  static boolean queryContainsFragment(String type, TypeResolutionEnvironment environment) {
+    SelectionSet set = environment.getField().getFields().get(0).getSelectionSet();
+    return set != null && set.getSelections()
+            .stream()
+            .filter(selection -> selection instanceof InlineFragment)
+            .map(InlineFragment.class::cast)
+            .anyMatch(fragment -> fragment.getTypeCondition()
+                    .getName()
+                    .equals(type));
   }
 }
