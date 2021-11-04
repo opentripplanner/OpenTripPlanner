@@ -69,7 +69,7 @@ public class SpeedTestRequest {
 
     Set<TransitMode> getTransitModes() {
         return new HashSet<>(EnumSet.of(
-            TransitMode.BUS, TransitMode.RAIL, TransitMode.SUBWAY, TransitMode.TRAM));
+            TransitMode.BUS, TransitMode.RAIL, TransitMode.SUBWAY, TransitMode.TRAM, TransitMode.TROLLEYBUS));
     }
 
     double getWalkSpeedMeterPrSecond() {
