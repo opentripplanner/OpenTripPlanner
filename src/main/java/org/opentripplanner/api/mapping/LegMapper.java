@@ -2,10 +2,20 @@ package org.opentripplanner.api.mapping;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiAlert;
+import org.opentripplanner.api.model.ApiBookingInfo;
+import org.opentripplanner.api.model.ApiBookingTime;
+import org.opentripplanner.api.model.ApiContactInfo;
 import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingMethod;
+import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.model.plan.Leg;
 
 public class LegMapper {
@@ -100,6 +110,10 @@ public class LegMapper {
         );
         api.boardRule = domain.boardRule;
         api.alightRule = domain.alightRule;
+
+        api.pickupBookingInfo = BookingInfoMapper.mapBookingInfo(domain.pickupBookingInfo, true);
+        api.dropOffBookingInfo = BookingInfoMapper.mapBookingInfo(domain.dropOffBookingInfo, false);
+
         api.rentedBike = domain.rentedVehicle;
         api.walkingBike = domain.walkingBike;
 

@@ -5,13 +5,13 @@
 
 ## Changelog
 - Initial implementation of readiness endpoint (November 2019)
-- Promethues metrics added using Micrometer (October 2021)
+- Prometheus metrics added using Micrometer (October 2021)
 
 ## Documentation
 This provides endpoints for checking the health status of the OTP instance. It can be useful when
 running OTP in a container.
 
-The API will be at the endpoint http://localhost:8080/otp/actuators and follows the Spring Boot
+The API will be at the endpoint `http://localhost:8080/otp/actuators` and follows the Spring Boot
 actuator API standard.
 
 ### Endpoints
