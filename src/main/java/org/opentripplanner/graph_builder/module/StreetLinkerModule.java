@@ -57,10 +57,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     if (graph.hasStreets) {
       linkTransitStops(graph);
       linkTransitEntrances(graph);
-      if (!graph.hasLinkedBikeParks) {
-        linkBikeParks(graph);
-        graph.hasLinkedBikeParks = true;
-      }
+      linkBikeParks(graph);
     }
 
     // Calculates convex hull of a graph which is shown in routerInfo API point
@@ -108,7 +105,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
-  public void linkTransitEntrances(Graph graph) {
+  private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
       graph.getLinker().linkVertexPermanently(
@@ -124,6 +121,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private void linkBikeParks(Graph graph) {
+    // If bike parks have already been linked on the previous round, skip them
+    if (graph.hasLinkedBikeParks) {
+      LOG.info("Bike parks have already been linked to the graph, skipping.");
+      return;
+    }
     LOG.info("Linking bike parks to graph...");
     // It is enough to have the edges traversable by foot, as you can walk with the bike if necessary
     for (BikeParkVertex bikePark : graph.getVerticesOfType(BikeParkVertex.class)) {
@@ -137,6 +139,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
           )
       );
     }
+    graph.hasLinkedBikeParks = true;
   }
 
   @Override
