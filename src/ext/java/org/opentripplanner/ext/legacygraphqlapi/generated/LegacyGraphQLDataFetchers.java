@@ -532,6 +532,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Boolean> wheelchairAccessibleCarPlaces();
   }
   
+  /** The number of spaces by type. null if unknown. */
   public interface LegacyGraphQLVehicleParkingSpaces {
     public DataFetcher<Integer> bicycleSpaces();
     public DataFetcher<Integer> carSpaces();
