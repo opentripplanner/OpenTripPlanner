@@ -8,7 +8,7 @@
 
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>1.5.2-cs-SNAPSHOT</version>
+    <version>1.5.2-cs</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -75,7 +75,7 @@
         <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
         <url>http://github.com/opentripplanner/OpenTripPlanner</url>
-      <tag>HEAD</tag>
+      <tag>otp-1.5.2-cs</tag>
   </scm>
 
     <properties>
