@@ -1387,10 +1387,10 @@ type Place {
     rentalVehicle: RentalVehicle
 
     """The bike parking related to the place"""
-    bikePark: BikePark
+    bikePark: BikePark @deprecated("bikePark is deprecated. Use vehicleParking instead.")
 
     """The car parking related to the place"""
-    carPark: CarPark
+    carPark: CarPark @deprecated("carPark is deprecated. Use vehicleParking instead.")
 
     """The vehicle parking related to the place"""
     vehicleParking: VehicleParking
@@ -1857,12 +1857,12 @@ type QueryType {
     vehicleRentalStation(id: String!): VehicleRentalStation
 
     """Get all bike parks"""
-    bikeParks: [BikePark]
+    bikeParks: [BikePark] @deprecated("bikeParks is deprecated. Use vehicleParkings instead.")
 
     """
     Get a single bike park based on its ID, i.e. value of field `bikeParkId`
     """
-    bikePark(id: String!): BikePark
+    bikePark(id: String!): BikePark @deprecated("bikePark is deprecated. Use vehicleParking instead.")
 
     """Get all car parks"""
     carParks(
@@ -1871,10 +1871,10 @@ type QueryType {
         **Note:** if an id is invalid (or the car park service is unavailable) the returned list will contain `null` values.
         """
         ids: [String]
-    ): [CarPark]
+    ): [CarPark] @deprecated("carParks is deprecated. Use vehicleParkings instead.")
 
     """Get a single car park based on its ID, i.e. value of field `carParkId`"""
-    carPark(id: String!): CarPark
+    carPark(id: String!): CarPark @deprecated("carPark is deprecated. Use vehicleParking instead.")
 
     """Get all vehicle parkings"""
     vehicleParkings(
