@@ -296,20 +296,23 @@ type VehicleParking implements Node & PlaceInterface {
     anyCarPlaces: Boolean
 
     """
-    Does this vehicle parking have spaces (capacity) for cars.
+    Does this vehicle parking have spaces (capacity) for cars excluding wheelchair accessible spaces.
+    Use anyCarPlaces to check if any type of car may use this vehicle parking.
     """
     carPlaces: Boolean
 
     """
+    Does this vehicle parking have wheelchair accessible (disabled) car spaces (capacity).
     """
     wheelchairAccessibleCarPlaces: Boolean
 
     """
-    Does this vehicle parking have wheelchair accessible (disabled) car spaces (capacity).
+    The capacity (maximum available spaces) of this vehicle parking.
     """
     capacity: VehicleParkingSpaces
 
     """
+    The currently available spaces at this vehicle parking.
     """
     availability: VehicleParkingSpaces
 }
