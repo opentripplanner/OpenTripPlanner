@@ -72,10 +72,10 @@
     </developers>
 
     <scm>
-        <connection>scm:git:http://github.com/camsys/OpenTripPlanner.git</connection>
+        <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
-        <url>http://github.com/camsys/OpenTripPlanner</url>
-      <tag>otp-1.5.1-cs</tag>
+        <url>http://github.com/opentripplanner/OpenTripPlanner</url>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>
