@@ -553,6 +553,7 @@ public class LegacyGraphQLQueryTypeImpl
     };
   }
 
+  @Override
   public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations() {
     return environment -> {
       VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
