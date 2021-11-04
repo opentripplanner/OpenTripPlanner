@@ -1390,11 +1390,11 @@ public class LegacyGraphQLTypes {
   
   
   public enum LegacyGraphQLVertexType {
+    Bikepark("BIKEPARK"),
     Bikeshare("BIKESHARE"),
     Normal("NORMAL"),
     Parkandride("PARKANDRIDE"),
-    Transit("TRANSIT"),
-    Vehicleparking("VEHICLEPARKING");
+    Transit("TRANSIT");
     
     public final String label;
      

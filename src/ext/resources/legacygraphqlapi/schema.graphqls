@@ -2820,8 +2820,8 @@ enum VertexType {
     """TRANSIT"""
     TRANSIT
 
-    """VEHICLEPARKING"""
-    VEHICLEPARKING
+    """BIKEPARK"""
+    BIKEPARK
 
     """BIKESHARE"""
     BIKESHARE
