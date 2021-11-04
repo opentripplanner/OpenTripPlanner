@@ -73,14 +73,14 @@ public class UnscheduledTrip extends FlexTrip {
       NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
     int fromIndex = getFromIndex(access);
+    int toIndex = getToIndex(access);
 
-    if (fromIndex != 0) { return Stream.empty(); }
-    if (stopTimes[1].dropOffType == NONE.getGtfsCode()) { return Stream.empty(); }
+    if (stopTimes[fromIndex].dropOffType == NONE.getGtfsCode()) { return Stream.empty(); }
 
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
-    for (StopLocation stop : expandStops(stopTimes[1].stop)) {
-      res.add(new FlexAccessTemplate(access, this, fromIndex, 1, stop, date, calculator, params));
+    for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
+      res.add(new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, calculator, params));
     }
 
     return res.stream();
@@ -90,15 +90,15 @@ public class UnscheduledTrip extends FlexTrip {
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
       NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
+    int fromIndex = getFromIndex(egress);
     int toIndex = getToIndex(egress);
 
-    if (toIndex != 1) { return Stream.empty(); }
-    if (stopTimes[0].pickupType == NONE.getGtfsCode()) { return Stream.empty(); }
+    if (stopTimes[toIndex].pickupType == NONE.getGtfsCode()) { return Stream.empty(); }
 
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
-    for (StopLocation stop : expandStops(stopTimes[0].stop)) {
-      res.add(new FlexEgressTemplate(egress, this, 0, toIndex, stop, date, calculator, params));
+    for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
+      res.add(new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, calculator, params));
     }
 
     return res.stream();
