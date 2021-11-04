@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * This interface defines the data needed for the StdTransitWorker to do transit. This interface
- * define that role, and make it possible to write small adapter in between the "OTP Transit Layer"
+ * defines that role, and make it possible to write small adapter in between the "OTP Transit Layer"
  * and the Raptor algorithm. This also simplify the use of the Worker with other data sources,
  * importing and adapting this code into other software like OTP.
  *
@@ -104,4 +104,18 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      */
     @NotNull
     RaptorStopNameResolver stopNameResolver();
+
+    /**
+     * Returns the beginning of valid transit data. All trips running even partially after this time are included.
+     * <p>
+     * Unit: seconds since midnight of the day of the search.
+     */
+    int getValidTransitDataStartTime();
+
+    /**
+     * Returns the end time of valid transit data. All trips running even partially before this time are included.
+     * <p>
+     * Unit: seconds since midnight of the day of the search
+     */
+    int getValidTransitDataEndTime();
 }
