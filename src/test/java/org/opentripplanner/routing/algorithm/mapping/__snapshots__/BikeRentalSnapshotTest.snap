@@ -105,7 +105,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -214,7 +214,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 51,
           "interlinedWithPreviousLeg": false,
@@ -328,7 +328,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -398,7 +398,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 49,
           "interlinedWithPreviousLeg": false,
@@ -1725,7 +1725,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -1834,7 +1834,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 51,
           "interlinedWithPreviousLeg": false,
@@ -1948,7 +1948,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -2018,7 +2018,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 49,
           "interlinedWithPreviousLeg": false,
@@ -2465,7 +2465,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -2574,7 +2574,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 51,
           "interlinedWithPreviousLeg": false,
@@ -2688,7 +2688,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -2758,7 +2758,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 49,
           "interlinedWithPreviousLeg": false,
@@ -3572,7 +3572,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -3681,7 +3681,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 51,
           "interlinedWithPreviousLeg": false,
@@ -3795,7 +3795,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -3865,7 +3865,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 338,
           "interlinedWithPreviousLeg": false,
@@ -4051,7 +4051,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -4160,7 +4160,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 65,
           "interlinedWithPreviousLeg": false,
@@ -4403,7 +4403,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -4512,7 +4512,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 51,
           "interlinedWithPreviousLeg": false,
@@ -5073,7 +5073,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -5165,7 +5165,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 196,
           "interlinedWithPreviousLeg": false,
@@ -5279,7 +5279,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -5349,7 +5349,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 168,
           "interlinedWithPreviousLeg": false,
@@ -6761,7 +6761,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -6853,7 +6853,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 196,
           "interlinedWithPreviousLeg": false,
@@ -6967,7 +6967,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "transitAlerts": [ ],
           "transitLeg": false,
@@ -7037,7 +7037,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
-            "vertexType": "BIKESHARE"
+            "vertexType": "VEHICLERENTAL"
           },
           "generalizedCost": 168,
           "interlinedWithPreviousLeg": false,

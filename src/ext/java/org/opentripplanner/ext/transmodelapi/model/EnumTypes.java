@@ -84,7 +84,7 @@ public class EnumTypes {
             .value("normal", VertexType.NORMAL)
             .value("transit", VertexType.TRANSIT)
             .value("bikePark", VertexType.VEHICLEPARKING)
-            .value("bikeShare", VertexType.BIKESHARE)
+            .value("bikeShare", VertexType.VEHICLERENTAL)
             //TODO QL: .value("parkAndRide", VertexType.PARKANDRIDE)
             .build();
 

@@ -48,7 +48,7 @@ public class Place {
     public final Integer stopSequence;
 
     /**
-     * The vehicle rental place if the type is {@link VertexType#BIKESHARE}.
+     * The vehicle rental place if the type is {@link VertexType#VEHICLERENTAL}.
      */
     public final VehicleRentalPlace vehicleRentalPlace;
 
@@ -195,7 +195,7 @@ public class Place {
                 name,
                 null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
-                VertexType.BIKESHARE,
+                VertexType.VEHICLERENTAL,
                 null,
                 null,
                 null,
