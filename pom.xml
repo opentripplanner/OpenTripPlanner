@@ -28,6 +28,7 @@
         <jackson.version>2.12.5</jackson.version>
         <jersey.version>2.34</jersey.version>
         <junit.version>5.7.2</junit.version>
+        <micrometer.version>1.7.4</micrometer.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -445,6 +446,17 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-jersey2</artifactId>
+            <version>${micrometer.version}</version>
         </dependency>
 
         <!--
