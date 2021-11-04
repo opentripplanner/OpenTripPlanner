@@ -15,6 +15,7 @@
 - Also link transit stops used by flex trips to the closest car traversable edge. This allows flex street routing all the way to the stop. (April 2021)
 - Fix performance issues with the StreetFlexPathCalculator [#3460](https://github.com/opentripplanner/OpenTripPlanner/pull/3460)
 - Improve performance of flex access/egress routing [#3661](https://github.com/opentripplanner/OpenTripPlanner/pull/3661)
+- Allow unscheduled trips with single stop time [#3720](https://github.com/opentripplanner/OpenTripPlanner/pull/3720)
 
 ## Documentation
 To enable this turn on `FlexRouting` as a feature in `otp-config.json`. 
