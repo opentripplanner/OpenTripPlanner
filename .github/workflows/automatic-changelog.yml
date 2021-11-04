@@ -23,7 +23,7 @@ jobs:
           git config --global user.email 'changelog-bot@opentripplanner.org'
 
       - name: Generate changelog entry from PR information
-        if: github.event.pull_request.merged
+        if: github.event.pull_request.merged && github.repository_owner == "opentripplanner"
         run: |
           # if the title contains "changelog skip" we don't generate an entry
           TITLE_LOWER_CASE=`echo $TITLE | awk '{print tolower($0)}'`
