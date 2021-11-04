@@ -9,6 +9,7 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
+import org.opentripplanner.graph_builder.module.VersionModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -167,6 +168,7 @@ public class GraphBuilder implements Runnable {
         List<File> osmFiles =  Lists.newArrayList();
         JsonNode builderConfig = null;
         JsonNode routerConfig = null;
+        File versionFile = null;
         File demFile = null;
         LOG.info("Searching for graph builder input files in {}", dir);
         if ( ! dir.isDirectory() && dir.canRead()) {
@@ -193,6 +195,10 @@ public class GraphBuilder implements Runnable {
                 case OSM:
                     LOG.info("Found OSM file {}", file);
                     osmFiles.add(file);
+                    break;
+                case VERSION:
+                    LOG.info("Found version file {}", file);
+                    versionFile = file;
                     break;
                 case DEM:
                     if (!builderParams.fetchElevationUS && demFile == null) {
@@ -309,6 +315,12 @@ public class GraphBuilder implements Runnable {
         if (builderParams.htmlAnnotations) {
             graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
         }
+        if (versionFile != null) {
+            LOG.info("found versionFile=" + versionFile);
+            graphBuilder.addModule(new VersionModule(versionFile));
+        } else {
+            LOG.info("no versionFile found.");
+        }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
@@ -319,7 +331,7 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private static enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
+        GTFS, OSM, DEM, CONFIG, GRAPH, VERSION, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -335,6 +347,7 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
             if (name.equals("Graph.obj")) return GRAPH;
+            if (name.equals("version.json")) return VERSION;
             if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
                 return CONFIG;
             }
