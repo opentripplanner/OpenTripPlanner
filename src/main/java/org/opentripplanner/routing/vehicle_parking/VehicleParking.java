@@ -83,6 +83,9 @@ public class VehicleParking implements Serializable {
    */
   private VehicleParkingSpaces availability;
 
+  /**
+   * The entrances to enter and exit this vehicle parking.
+   */
   private final List<VehicleParkingEntrance> entrances = new ArrayList<>();
 
   VehicleParking(

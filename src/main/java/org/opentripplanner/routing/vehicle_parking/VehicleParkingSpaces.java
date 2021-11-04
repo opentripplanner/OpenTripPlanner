@@ -8,10 +8,19 @@ import java.util.Objects;
  */
 public class VehicleParkingSpaces implements Serializable {
 
+    /**
+     * The number of bicycle spaces.
+     */
     private final Integer bicycleSpaces;
 
+    /**
+     * The number of car spaces.
+     */
     private final Integer carSpaces;
 
+    /**
+     * The number of wheelchair accessible (disabled) car spaces.
+     */
     private final Integer wheelchairAccessibleCarSpaces;
 
     VehicleParkingSpaces(
