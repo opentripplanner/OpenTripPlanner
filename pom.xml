@@ -72,9 +72,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:http://github.com/opentripplanner/OpenTripPlanner.git</connection>
+        <connection>scm:git:http://github.com/camsys/OpenTripPlanner.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/opentripplanner/OpenTripPlanner.git</developerConnection>
-        <url>http://github.com/opentripplanner/OpenTripPlanner</url>
+        <url>http://github.com/camsys/OpenTripPlanner</url>
       <tag>otp-1.5.1-cs</tag>
   </scm>
 
@@ -88,11 +88,15 @@
     </properties>
 
     <distributionManagement>
-        <!-- We are using Sonatype Nexus Staging instead of Maven Release plugin.
-             Only a snapshot repo should be configured. Releases are done from that snapshot staging repo. -->
+        <repository>
+            <id>releases-camsys-public-repo</id>
+            <name>Camsys Public Release Repo</name>
+            <url>s3://repo.camsys-apps.com/releases/</url>
+        </repository>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>snapshots-camsys-public-repo</id>
+            <name>Camsys Public Snapshot Repo</name>
+            <url>s3://repo.camsys-apps.com/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -181,18 +185,18 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                &lt;!&ndash; Recommended way to deploy to OSSRH , which allows deferred manual release to Central. &ndash;&gt;-->
+<!--                <groupId>org.sonatype.plugins</groupId>-->
+<!--                <artifactId>nexus-staging-maven-plugin</artifactId>-->
+<!--                <version>1.6.7</version>-->
+<!--                <extensions>true</extensions>-->
+<!--                <configuration>-->
+<!--                    <serverId>ossrh</serverId>-->
+<!--                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
+<!--                    <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
@@ -367,6 +371,18 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>3.0.0</version>
+            </extension>
+            <extension>
+                <groupId>com.allogy.maven.wagon</groupId>
+                <artifactId>maven-s3-wagon</artifactId>
+                <version>1.2.0</version>
+            </extension>
+        </extensions>
     </build>
 
     <reporting>
@@ -418,6 +434,10 @@
             <id>central2</id>
             <name>check central first to avoid a lot of not found warnings</name>
             <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>repo.camsys-apps.com</id>
+            <url>https://repo.camsys-apps.com/third-party/</url>
         </repository>
         <repository>
             <id>osgeo</id>
