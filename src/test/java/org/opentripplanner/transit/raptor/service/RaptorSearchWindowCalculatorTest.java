@@ -76,9 +76,9 @@ public class RaptorSearchWindowCalculatorTest {
            LAT = 10_200 + (840 + roundUp_60(300)) = 11_340
          */
         assertEquals(840, subject.getSearchWindowSeconds());
-        assertEquals(11_340, subject.getLatestArrivalTime());
         // Given - verify not changed
         assertEquals(10_200, subject.getEarliestDepartureTime());
+        assertEquals(SearchParams.TIME_NOT_SET, subject.getLatestArrivalTime());
     }
 
     @Test
@@ -104,9 +104,9 @@ public class RaptorSearchWindowCalculatorTest {
            LAT = 12_000 + (1_500 + roundUp_60(1_800)) = 15_300
          */
         assertEquals(1_800, subject.getSearchWindowSeconds());
-        assertEquals(15_300, subject.getLatestArrivalTime());
         // Given - verify not changed
         assertEquals(12_000, subject.getEarliestDepartureTime());
+        assertEquals(SearchParams.TIME_NOT_SET, subject.getLatestArrivalTime());
     }
 
     @Test

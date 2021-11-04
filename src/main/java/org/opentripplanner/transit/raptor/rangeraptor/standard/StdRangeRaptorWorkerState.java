@@ -69,23 +69,23 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     }
 
     @Override
-    public final boolean isNewRoundAvailable() {
+    public boolean isNewRoundAvailable() {
         return bestTimes.isCurrentRoundUpdated();
     }
 
     @Override
-    public final BitSetIterator stopsTouchedByTransitCurrentRound() {
+    public BitSetIterator stopsTouchedByTransitCurrentRound() {
         return bestTimes.transitStopsReachedCurrentRound();
     }
 
     @Override
-    public final IntIterator stopsTouchedPreviousRound() {
+    public IntIterator stopsTouchedPreviousRound() {
         return bestTimes.stopsReachedLastRound();
     }
 
 
     @Override
-    public final boolean isStopReachedInPreviousRound(int stop) {
+    public boolean isStopReachedInPreviousRound(int stop) {
         return bestTimes.isStopReachedLastRound(stop);
     }
 
@@ -111,7 +111,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     }
 
     @Override
-    public final void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
+    public void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
         final int durationInSeconds = accessPath.durationInSeconds();
         final int stop = accessPath.stop();
 
@@ -136,7 +136,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
      * Set the time at a transit stop iff it is optimal. This sets both the bestTime and the transitTime.
      */
     @Override
-    public final void transitToStop(int stop, int arrivalTime, int boardStop, int boardTime, T trip) {
+    public void transitToStop(int stop, int arrivalTime, int boardStop, int boardTime, T trip) {
         if (exceedsTimeLimit(arrivalTime)) {
             return;
         }
@@ -159,7 +159,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
      * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
      */
     @Override
-    public final void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
         int arrivalTimeTransit = bestTimes.transitTime(fromStop);
         while (transfers.hasNext()) {
             transferToStop(arrivalTimeTransit, fromStop, transfers.next());

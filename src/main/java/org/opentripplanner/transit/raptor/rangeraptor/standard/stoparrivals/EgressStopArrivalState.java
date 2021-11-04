@@ -35,7 +35,7 @@ public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends 
     }
 
 
-    public final RaptorTransfer egressPath() {
+    public RaptorTransfer egressPath() {
         return egressPath;
     }
 

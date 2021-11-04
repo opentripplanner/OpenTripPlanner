@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
 /**
@@ -20,6 +21,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
 
     private static final int NOT_SET = -1;
 
+    private final TransitCalculator<T> calculator;
     private final StdWorkerState<T> state;
 
     private int onTripIndex;
@@ -28,7 +30,8 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     private T onTrip;
     private int onTripTimeShift;
 
-    public NoWaitTransitWorker(StdWorkerState<T> state) {
+    public NoWaitTransitWorker(TransitCalculator<T> calculator, StdWorkerState<T> state) {
+        this.calculator = calculator;
         this.state = state;
     }
 
@@ -43,12 +46,12 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final int onTripIndex() {
+    public int onTripIndex() {
         return onTripIndex;
     }
 
     @Override
-    public final void prepareForTransitWith(RaptorTripPattern pattern) {
+    public void prepareForTransitWith(RaptorTripPattern pattern) {
         this.onTripIndex = NOT_SET;
         this.onTripBoardTime = NOT_SET;
         this.onTripBoardStop = NOT_SET;
@@ -57,11 +60,11 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final void alight(int stopIndex, int stopPos, ToIntFunction<T> getStopArrivalTime) {
+    public void alight(int stopIndex, int stopPos, int alightSlack) {
         // attempt to alight if we're on board
         if (onTripIndex != NOT_SET) {
             // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
-            final int stopArrivalTime0 = getStopArrivalTime.applyAsInt(onTrip);
+            final int stopArrivalTime0 = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
 
             // Remove the wait time from the arrival-time. We don´t need to use the transit
             // calculator because of the way we compute the time-shift. It is positive in the case
@@ -73,14 +76,14 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
+    public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
         if (state.isStopReachedInPreviousRound(stopIndex)) {
             prevStopArrivalTimeConsumer.accept(state.bestTimePreviousRound(stopIndex));
         }
     }
 
     @Override
-    public final void board(
+    public void board(
             final int stopIndex,
             final int earliestBoardTime,
             final RaptorTripScheduleBoardOrAlightEvent<T> result
@@ -95,7 +98,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public final TransitArrival<T> previousTransit(int boardStopIndex) {
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
         return state.previousTransit(boardStopIndex);
     }
 }

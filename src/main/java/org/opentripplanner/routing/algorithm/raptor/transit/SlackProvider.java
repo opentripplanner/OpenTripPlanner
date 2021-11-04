@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import java.util.Map;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TripPatternForDates;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-
-import java.util.Map;
 
 
 /**
@@ -23,7 +22,7 @@ public final class SlackProvider implements RaptorSlackProvider {
 
     /**
      * Keep a list of alight-slack values for each mode.
-     *
+     * Kept in an array for performance
      */
     private final int[] alightSlack;
 
@@ -36,9 +35,9 @@ public final class SlackProvider implements RaptorSlackProvider {
     public SlackProvider(
             int transferSlack,
             int defaultBoardSlack,
-            Map<TraverseMode, Integer> modeBoardSlack,
+            Map<TransitMode, Integer> modeBoardSlack,
             int defaultAlightSlack,
-            Map<TraverseMode, Integer> modeAlightSlack
+            Map<TransitMode, Integer> modeAlightSlack
     ) {
         this.transferSlack = transferSlack;
         this.boardSlack = slackByMode(modeBoardSlack, defaultBoardSlack);
@@ -63,18 +62,19 @@ public final class SlackProvider implements RaptorSlackProvider {
 
     /* private methods */
 
-    /**
-     * Return the trip-pattern ordinal as an index.
-     */
-    private static int index(RaptorTripPattern pattern) {
-        return ((TripPatternForDates)pattern).getTripPattern().getTransitMode().ordinal();
-    }
-
-    private static int[] slackByMode(Map<TraverseMode, Integer> modeSlack, int defaultSlack) {
-        int[] result = new int[TraverseMode.values().length];
-        for (TraverseMode mode : TraverseMode.values()) {
-            result[mode.ordinal()] = modeSlack.getOrDefault(mode, defaultSlack) ;
+    private static int[] slackByMode(Map<TransitMode, Integer> modeSlack, int defaultSlack) {
+        int[] result = new int[TransitMode.values().length];
+        for (TransitMode mode : TransitMode.values()) {
+            result[index(mode)] = modeSlack.getOrDefault(mode, defaultSlack) ;
         }
         return result;
+    }
+
+    private static int index(RaptorTripPattern pattern) {
+        return index(((TripPatternForDates)pattern).getTripPattern().getTransitMode());
+    }
+
+    private static int index(final TransitMode mode) {
+        return mode.ordinal();
     }
 }

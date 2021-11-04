@@ -53,8 +53,31 @@
 - Load additional data from GBFS and expose it [#3610](https://github.com/opentripplanner/OpenTripPlanner/pull/3610)
 - Allow transfers to use customizable request options [#3324](https://github.com/opentripplanner/OpenTripPlanner/issues/3324)
 - Fix NPE in NeTEx Booking Method mapping #3633 [#3633](https://github.com/opentripplanner/OpenTripPlanner/issues/3633)
+- Check boarding and alighting permissions in TransferGenerator [#3641](https://github.com/opentripplanner/OpenTripPlanner/pull/3641)
 - Refactor itinerary list filter chain [#3626](https://github.com/opentripplanner/OpenTripPlanner/pull/3626)
 - Stoptimes should return tripId on the REST API. [#3589](https://github.com/opentripplanner/OpenTripPlanner/issues/3589)
+- Handle non-symmetric transfers in RAPTOR [#3634](https://github.com/opentripplanner/OpenTripPlanner/issues/3634).
+- Order RAPTOR input data so that plans are deterministic [#3580](https://github.com/opentripplanner/OpenTripPlanner/issues/3580)
+- Cost on transfer in Raptor [#3617](https://github.com/opentripplanner/OpenTripPlanner/pull/3617)
+- Allow for combined NeTEx and GTFS data sources [#3650](https://github.com/opentripplanner/OpenTripPlanner/issues/3650)
+- Generalized graph connectivity pruning [#3426](https://github.com/opentripplanner/OpenTripPlanner/pull/3426)
+- Stop linking to area/platform edges obeys area boundaries and traverse modes [#3201](https://github.com/opentripplanner/OpenTripPlanner/issues/3201)
+- Add service day mapping to REST API [#3659](https://github.com/opentripplanner/OpenTripPlanner/pull/3659)
+- Cost on transfer in Raptor [#3629](https://github.com/opentripplanner/OpenTripPlanner/pull/3629)
+- Add two new filters for use within grouping filter [#3638](https://github.com/opentripplanner/OpenTripPlanner/pull/3638)
+- Use correct slack in transfer optimizer [#3668](https://github.com/opentripplanner/OpenTripPlanner/pull/3668)
+- fix: Use URI instead of file path string to load test files [#3703](https://github.com/opentripplanner/OpenTripPlanner/pull/3703)
+- Correct usage of boardSlackForMode / alightSlackForMode [#3693](https://github.com/opentripplanner/OpenTripPlanner/pull/3693)
+- Do not parse pass-through information in GBFS mappers [#3709](https://github.com/opentripplanner/OpenTripPlanner/pull/3709)
+- Vehicle rental updates [#3632](https://github.com/opentripplanner/OpenTripPlanner/pull/3632)
+- debug-client: add url handling and extend the displayed fields [#3712](https://github.com/opentripplanner/OpenTripPlanner/pull/3712)
+- add trolleybus & monorail support [#3658](https://github.com/opentripplanner/OpenTripPlanner/pull/3658)
+- Improve NeTEx import issue report [#3719](https://github.com/opentripplanner/OpenTripPlanner/pull/3719)
+- Do not create zero length StreetEdges [#3716](https://github.com/opentripplanner/OpenTripPlanner/pull/3716)
+- Add pickup and dropoff booking info to REST API [#3710](https://github.com/opentripplanner/OpenTripPlanner/pull/3710)
+- Use the whole duration of the filtered transit data for the raptor heuristic search [#3664](https://github.com/opentripplanner/OpenTripPlanner/pull/3664)
+- Perfomance improvement for flex access/egress searches [#3661](https://github.com/opentripplanner/OpenTripPlanner/pull/3661)
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
 ## 2.0.0 (2020-11-27)
@@ -107,6 +130,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Fix: The `BusRouteStreetMatcher` and `TransitToTaggedStopsModule` graph builder modules are not run if the graph is build in two steps, and add progress tracker to BusRouteStreetMatcher. [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
 - Improvement: Insert project information like Maven version number into configuration files. [#3254](https://github.com/opentripplanner/OpenTripPlanner/pull/3254)   
 - Added pathway FeedScopedId as the route text to trip plan responses. [#3287](https://github.com/opentripplanner/OpenTripPlanner/issues/3287)
+
 
 ## Ported over from 1.4 and 1.5
 
@@ -164,6 +188,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Docs: Update leadership committee listing following Boston Summit
 - Docs: Update OTP logo (Thanks Kate Chanba!)
 
+
 ## 1.2 (2017-09-18)
 
 - Add support for consuming GBFS bike-rental availability feeds. [#2458](https://github.com/opentripplanner/OpenTripPlanner/issues/2458)
@@ -189,6 +214,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Optionally compact ("reverse-optimize") results with complete reverse search [#2449](https://github.com/opentripplanner/OpenTripPlanner/issues/2449)
 - Add updater for urbaninfrastructure city bikes [#2448](https://github.com/opentripplanner/OpenTripPlanner/issues/2448)
 - Miscellaneous documentation updates
+
 
 ## 1.1 (2017-03-16)
 
@@ -225,6 +251,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Properly set wheelchairAccessible on area edges
 - Fixed file URL in test [#2339](https://github.com/opentripplanner/OpenTripPlanner/issues/2339)
 - Add details field to fares, listing which legs each fare applies to [#1699](https://github.com/opentripplanner/OpenTripPlanner/issues/1699)
+
 
 ## 1.0 (2016-09-09)
 

@@ -13,7 +13,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class TransitLayer {
 
@@ -126,8 +125,12 @@ public class TransitLayer {
     return transferService;
   }
 
-  public List<List<RaptorTransfer>> getRaptorTransfersForRequest(RoutingRequest routingRequest) {
+  public RaptorTransferIndex getRaptorTransfersForRequest(RoutingRequest routingRequest) {
     return transferCache.get(transfersByStopIndex, routingRequest);
+  }
+
+  public RaptorRequestTransferCache getTransferCache() {
+    return transferCache;
   }
 
   /**

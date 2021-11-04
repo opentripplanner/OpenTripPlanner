@@ -13,6 +13,9 @@
 - Fix the field bikesAllowed [#3586](https://github.com/opentripplanner/OpenTripPlanner/pull/3586)
 - Add triangle factors for bicycle routing [#3585](https://github.com/opentripplanner/OpenTripPlanner/pull/3585)
 - Fix correct type for BookingArrangementType#latestBookingDay
+- Fix NPE in BookingArrangementType data fetchers [#3649](https://github.com/opentripplanner/OpenTripPlanner/pull/3649)
+- Add BookingInfo to TimetabledPassingTime and EstimatedCall [#3666](https://github.com/opentripplanner/OpenTripPlanner/pull/3666)
+- Use correct capitalization for GraphQL fields [#3707](https://github.com/opentripplanner/OpenTripPlanner/pull/3707)
 
 ## Documentation
 

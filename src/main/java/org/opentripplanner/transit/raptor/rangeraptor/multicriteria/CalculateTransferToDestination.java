@@ -4,8 +4,6 @@ import java.util.List;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
@@ -39,23 +37,14 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
     @Override
     public void notifyElementAccepted(ArrivalView<T> newElement) {
         if(newElement.arrivedByTransit()) {
-            TransitStopArrival<T> transitStopArrival = (TransitStopArrival<T>) newElement;
             for (RaptorTransfer egress : egressPaths) {
-                destinationArrivals.add(
-                    transitStopArrival,
-                    egress,
-                    egress.generalizedCost()
-                );
+                destinationArrivals.add(newElement, egress);
             }
-        } else if (newElement.arrivedByTransfer()) {
+        }
+        else if (newElement.arrivedByTransfer()) {
             for (RaptorTransfer egress : egressPaths) {
                 if (egress.stopReachedOnBoard()) {
-                    TransferStopArrival<T> transferStopArrival = (TransferStopArrival<T>) newElement;
-                    destinationArrivals.add(
-                        transferStopArrival,
-                        egress,
-                        egress.generalizedCost()
-                    );
+                    destinationArrivals.add(newElement, egress);
                 }
             }
         }

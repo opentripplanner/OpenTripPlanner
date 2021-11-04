@@ -6,13 +6,13 @@ import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 /**
  * This class represents the different variations of what is considered flexible transit, and its
@@ -29,11 +29,11 @@ public abstract class FlexTrip extends TransitEntity {
   }
 
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   );
 
   public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex, int flexTime);

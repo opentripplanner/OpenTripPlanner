@@ -41,6 +41,8 @@ public class DebugTimingAggregator {
   private long finishedEgressCalculating;
   private long accessTime;
   private long egressTime;
+  private int numAccesses;
+  private int numEgresses;
 
   private long precalculationTime;
   private long startedTransitRouterTime;
@@ -141,10 +143,12 @@ public class DebugTimingAggregator {
   /**
    * Record the time when we are finished with the access and egress routing.
    */
-  public void finishedAccessEgress() {
+  public void finishedAccessEgress(int numAccesses, int numEgresses) {
     if(notEnabled) { return; }
     finishedAccessEgress = System.currentTimeMillis();
     accessEgressTime = finishedAccessEgress - finishedPatternFiltering;
+    this.numAccesses = numAccesses;
+    this.numEgresses = numEgresses;
   }
 
   /**
@@ -183,9 +187,9 @@ public class DebugTimingAggregator {
     }
 
     if (finishedPatternFiltering > 0) {
-      log("│┌ Filtering tripPatterns", tripPatternFilterTime);
-      log("│├ Access routing", accessTime);
-      log("│├ Egress routing", egressTime);
+      log("│┌ Creating raptor data model", tripPatternFilterTime);
+      log("│├ Access routing (" + numAccesses + " accesses)", accessTime);
+      log("│├ Egress routing ("+ numEgresses +" egresses)", egressTime);
       log("││ Access/Egress routing", accessEgressTime);
       log("│├ Main routing", raptorSearchTime);
       log("│├ Creating itineraries", itineraryCreationTime);
@@ -238,6 +242,6 @@ public class DebugTimingAggregator {
   }
 
   private void log(String msg, long millis) {
-    messages.add(String.format("%-30s: %5s ms", msg, millis));
+    messages.add(String.format("%-36s: %5s ms", msg, millis));
   }
 }

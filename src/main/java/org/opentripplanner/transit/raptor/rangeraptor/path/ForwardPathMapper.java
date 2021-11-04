@@ -1,17 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
-import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
-import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.path.PathBuilder;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
@@ -21,11 +17,27 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
  * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
  */
 public final class ForwardPathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
-    private int iterationDepartureTime = -1;
+    private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
     private final RaptorSlackProvider slackProvider;
+    private final CostCalculator costCalculator;
+    private final BoardAndAlightTimeSearch tripSearch;
+    private final RaptorStopNameResolver stopNameResolver;
 
-    public ForwardPathMapper(RaptorSlackProvider slackProvider, WorkerLifeCycle lifeCycle) {
+    private int iterationDepartureTime = -1;
+
+    public ForwardPathMapper(
+            RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
+            RaptorSlackProvider slackProvider,
+            CostCalculator costCalculator,
+            RaptorStopNameResolver stopNameResolver,
+            WorkerLifeCycle lifeCycle,
+            boolean useApproximateTripTimesSearch
+    ) {
+        this.transferConstraintsSearch = transferConstraintsSearch;
         this.slackProvider = slackProvider;
+        this.costCalculator = costCalculator;
+        this.stopNameResolver = stopNameResolver;
+        this.tripSearch = forwardSearch(useApproximateTripTimesSearch);
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
 
@@ -35,19 +47,21 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
     @Override
     public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
-        PathLeg<T> lastLeg;
-        AccessPathLeg<T> accessLeg;
+        var pathBuilder = PathBuilder.headPathBuilder(
+                transferConstraintsSearch, slackProvider, costCalculator, stopNameResolver
+        );
 
-        lastLeg = createEgressPathLeg(destinationArrival);
-
+        pathBuilder.egress(destinationArrival.egressPath().egress());
         ArrivalView<T> arrival = destinationArrival.previous();
+
         while (true) {
             if (arrival.arrivedByTransit()) {
-                lastLeg = createTransitLeg(arrival, lastLeg);
+                var times = tripSearch.find(arrival);
+                pathBuilder.transit(arrival.transitPath().trip(), times);
             } else if (arrival.arrivedByTransfer()) {
-                lastLeg = createTransferLeg(arrival, lastLeg);
+                pathBuilder.transfer(arrival.transferPath().transfer(), arrival.stop());
             } else if (arrival.arrivedByAccess()) {
-                accessLeg = createAccessPathLeg(arrival, lastLeg);
+                pathBuilder.access(arrival.accessPath().access());
                 break;
             } else {
                 throw new RuntimeException("Unknown arrival type");
@@ -55,86 +69,12 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
             arrival = arrival.previous();
         }
 
-        return new Path<>(iterationDepartureTime, accessLeg, destinationArrival.cost());
+        return pathBuilder.build(iterationDepartureTime);
     }
 
-    private EgressPathLeg<T> createEgressPathLeg(DestinationArrival<T> destinationArrival) {
-        RaptorTransfer egress = destinationArrival.egressPath().egress();
-        int departureTime = destinationArrival.arrivalTime() - egress.durationInSeconds();
-
-        return new EgressPathLeg<>(
-            egress,
-            departureTime,
-            destinationArrival.arrivalTime()
-        );
-    }
-
-    private TransitPathLeg<T> createTransitLeg(ArrivalView<T> arrival, PathLeg<T> lastLeg) {
-        BoardAndAlightTime r = TripTimesSearch.findTripForwardSearch(arrival);
-
-        return new TransitPathLeg<>(
-                arrival.previous().stop(),
-                r.boardTime(),
-                arrival.stop(),
-                r.alightTime(),
-                transitCost(arrival),
-                arrival.transitPath().trip(),
-                lastLeg
-        );
-    }
-
-    private TransferPathLeg<T> createTransferLeg(ArrivalView<T> arrival, PathLeg<T> nextLeg) {
-        int departureTime = arrival.arrivalTime() - arrival.transferPath().durationInSeconds();
-
-        return new TransferPathLeg<>(
-                arrival.previous().stop(),
-                departureTime,
-                arrival.arrivalTime(),
-                arrival.transferPath().transfer(),
-                nextLeg
-        );
-    }
-
-    private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, PathLeg<T> nextLeg) {
-        RaptorTransfer access = from.accessPath().access();
-
-        // We need to calculate the access-arrival-time. There are 3 cases:
-        // 1) Normal case: Walk ~ boardSlack ~ transit (access can be time-shifted)
-        // 2) Flex and walk case: Flex ~ Walk (no slack in between)
-        // 3) Flex and transit case: Flex ~ (transferSlack + boardSlack) ~ transit
-        // Flex access may or may not be time-shifted
-
-
-        int targetToTime = nextLeg.fromTime();
-
-        // Remove board slack if next leg is transit. If the access arrived "on board" (FLEX),
-        // then the next leg could be a transfer, not a transit leg.
-        if(nextLeg.isTransitLeg()) {
-            RaptorTripPattern pattern = nextLeg.asTransitLeg().trip().pattern();
-            // Case 1 and 3
-            targetToTime -= slackProvider.boardSlack(pattern);
-
-            // Case 3
-            if(access.hasRides()) {
-                targetToTime -= slackProvider.transferSlack();
-            }
-        }
-
-        // Time-shift the access
-        targetToTime = access.latestArrivalTime(targetToTime);
-
-        int targetFromTime = targetToTime - access.durationInSeconds();
-
-        return new AccessPathLeg<>(
-            access,
-            targetFromTime,
-            targetToTime,
-            nextLeg
-        );
-    }
-
-    private static int transitCost(ArrivalView<?> curr) {
-        if(curr.cost() == -1) { return -1; }
-        return curr.cost() - curr.previous().cost();
+    private static BoardAndAlightTimeSearch forwardSearch(boolean useApproximateTimeSearch) {
+        return useApproximateTimeSearch
+                ? TripTimesSearch::findTripForwardSearchApproximateTime
+                : TripTimesSearch::findTripForwardSearch;
     }
 }

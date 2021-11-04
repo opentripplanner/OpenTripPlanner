@@ -1,13 +1,22 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.api.model.ApiLeg;
-import org.opentripplanner.model.plan.Leg;
-
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.opentripplanner.api.model.ApiAlert;
+import org.opentripplanner.api.model.ApiBookingInfo;
+import org.opentripplanner.api.model.ApiBookingTime;
+import org.opentripplanner.api.model.ApiContactInfo;
+import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingMethod;
+import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.ContactInfo;
+import org.opentripplanner.model.plan.Leg;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;
@@ -88,7 +97,7 @@ public class LegMapper {
             api.route = "";
         }
 
-        api.interlineWithPreviousLeg = domain.interlineWithPreviousLeg;
+        api.interlineWithPreviousLeg = domain.isInterlinedWithPreviousLeg();
         api.headsign = domain.headsign;
         api.serviceDate = ServiceDateMapper.mapToApi(domain.serviceDate);
         api.routeBrandingUrl = domain.routeBrandingUrl;
@@ -101,6 +110,10 @@ public class LegMapper {
         );
         api.boardRule = domain.boardRule;
         api.alightRule = domain.alightRule;
+
+        api.pickupBookingInfo = BookingInfoMapper.mapBookingInfo(domain.pickupBookingInfo, true);
+        api.dropOffBookingInfo = BookingInfoMapper.mapBookingInfo(domain.dropOffBookingInfo, false);
+
         api.rentedBike = domain.rentedVehicle;
         api.walkingBike = domain.walkingBike;
 

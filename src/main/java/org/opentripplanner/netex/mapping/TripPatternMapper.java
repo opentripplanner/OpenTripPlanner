@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
@@ -27,8 +28,6 @@ import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern contain the same
@@ -42,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 class TripPatternMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);
+    private final DataImportIssueStore issueStore;
 
     private final FeedScopedIdFactory idFactory;
 
@@ -61,6 +60,7 @@ class TripPatternMapper {
     private TripPatternMapperResult result;
 
     TripPatternMapper(
+            DataImportIssueStore issueStore,
             FeedScopedIdFactory idFactory,
             EntityById<Operator> operatorById,
             EntityById<Stop> stopsById,
@@ -78,6 +78,7 @@ class TripPatternMapper {
             Map<String, FeedScopedId> serviceIds,
             Deduplicator deduplicator
     ) {
+        this.issueStore = issueStore;
         this.idFactory = idFactory;
         this.routeById = routeById;
         this.otpRouteById = otpRouteById;
@@ -91,6 +92,7 @@ class TripPatternMapper {
             shapePointsIds
         );
         this.stopTimesMapper = new StopTimesMapper(
+            issueStore,
             idFactory,
             stopsById,
             flexStopLocationsById,
@@ -115,8 +117,11 @@ class TripPatternMapper {
         Collection<ServiceJourney> serviceJourneys = serviceJourniesByPatternId.get(journeyPattern.getId());
 
         if (serviceJourneys == null || serviceJourneys.isEmpty()) {
-            LOG.warn("ServiceJourneyPattern " + journeyPattern.getId()
-                    + " does not contain any serviceJourneys.");
+            issueStore.add(
+                    "ServiceJourneyPatternIsEmpty",
+                    "ServiceJourneyPattern %s does not contain any serviceJourneys.",
+                    journeyPattern.getId()
+            );
             return result;
         }
 
@@ -198,7 +203,11 @@ class TripPatternMapper {
     ) {
         for (Trip trip : trips) {
             if (result.tripStopTimes.get(trip).size() == 0) {
-                LOG.warn("Trip" + trip.getId() + " does not contain any trip times.");
+                issueStore.add(
+                        "TripWithoutTripTimes",
+                        "Trip %s does not contain any trip times.",
+                        trip.getId()
+                );
             } else {
                 TripTimes tripTimes = new TripTimes(
                         trip,

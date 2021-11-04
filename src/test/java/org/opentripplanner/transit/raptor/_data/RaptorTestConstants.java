@@ -10,6 +10,7 @@ public interface RaptorTestConstants {
   int D0s = 0;
   int D1s = 1;
   int D10s = 10;
+  int D11s = 11;
   int D20s = 20;
   int D30s = 30;
   int D40s = 40;

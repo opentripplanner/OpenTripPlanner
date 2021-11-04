@@ -10,14 +10,18 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class TransferGeneratorTest implements RaptorTestConstants {
@@ -164,6 +168,163 @@ public class TransferGeneratorTest implements RaptorTestConstants {
                         + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [5 10:12 BUS L2], transfer: On-Street 1m ~ 5}, "
                         + "TripToTripTransfer{from: [3 10:20 BUS L1], to: [3 10:22 BUS L2]}, "
                         + "TripToTripTransfer{from: [4 10:30 BUS L1], to: [6 10:32 BUS L2], transfer: On-Street 20s ~ 6}"
+                        + "]]",
+                result.toString()
+        );
+    }
+
+    @Test
+    void findTransferForDifferentRoutesWithCustomBoardingSlack() {
+        TestRoute l1 = route("L1", STOP_A, STOP_B)
+                .withTimetable(schedule("10:00 10:10"));
+        TestRoute l2 = route("L2", STOP_B, STOP_C)
+                .withTimetable(schedule("10:20 10:30"));
+
+        // S
+        data.withRoutes(l1, l2);
+
+        // The only possible place to transfer between A and D is stop C (no extra transfers):
+        var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_C);
+
+        RaptorSlackProvider slackProvider = new RaptorSlackProvider() {
+            @Override public int transferSlack() { return 0; }
+            @Override public int boardSlack(RaptorTripPattern pattern) {
+                return ((TestTripPattern) pattern).getName().equals("L1") ? 20 * 60 : 0;
+            }
+            @Override public int alightSlack(RaptorTripPattern pattern) { return 0; }
+        };
+
+        var subject = new TransferGenerator<>(TS_ADAPTOR, slackProvider, data);
+
+        var result = subject.findAllPossibleTransfers(transitLegs);
+        assertEquals(
+                "[["
+                        + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}"
+                        + "]]",
+                result.toString()
+        );
+    }
+
+
+    @Test
+    void findTransferWithAlightingForbiddenAtSameStop() {
+        TestTripPattern p1 = TestTripPattern.pattern("L1", STOP_A, STOP_B, STOP_C);
+        p1.restrictions("B B A");
+
+        TestRoute l1 = route(p1)
+                .withTimetable(schedule("10:00 10:10 10:20"));
+        TestRoute l2 = route("L2", STOP_B, STOP_D, STOP_E)
+                .withTimetable(schedule("10:20 10:30 10:40"));
+
+        data.withRoutes(l1, l2).withTransfer(STOP_C, walk(STOP_D, D1m));
+
+        final Path<TestTripSchedule> path = pathBuilder
+                .access(ACCESS_START, ACCESS_DURATION, STOP_A)
+                .bus(l1.getTripSchedule(0), STOP_C)
+                .walk(D1m, STOP_D)
+                .bus(l2.getTripSchedule(0), STOP_E)
+                .egress(D1m);
+
+        var transitLegs = path.transitLegs().collect(Collectors.toList());
+
+        var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+
+        var result = subject.findAllPossibleTransfers(transitLegs);
+
+        // Transfer at B is not allowed
+        assertEquals(
+                "[["
+                        + "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: On-Street 1m ~ 4}"
+                        + "]]",
+                result.toString()
+        );
+    }
+
+    @Test
+    void findTransferWithBoardingForbiddenAtSameStop() {
+        TestRoute l1 = route("L1", STOP_A, STOP_B, STOP_C)
+                .withTimetable(schedule("10:00 10:10 10:20"));
+
+        TestTripPattern p2 = TestTripPattern.pattern("L2", STOP_B, STOP_D, STOP_E);
+        p2.restrictions("A BA A");
+
+        TestRoute l2 = route(p2)
+                .withTimetable(schedule("10:20 10:30 10:40"));
+
+        data.withRoutes(l1, l2).withTransfer(STOP_C, walk(STOP_D, D1m));
+
+        final Path<TestTripSchedule> path = pathBuilder
+                .access(ACCESS_START, ACCESS_DURATION, STOP_A)
+                .bus(l1.getTripSchedule(0), STOP_C)
+                .walk(D1m, STOP_D)
+                .bus(l2.getTripSchedule(0), STOP_E)
+                .egress(D1m);
+
+        var transitLegs = path.transitLegs().collect(Collectors.toList());
+
+        var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+
+        var result = subject.findAllPossibleTransfers(transitLegs);
+
+        // Transfer at B is not allowed
+        assertEquals(
+                "[["
+                        + "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: On-Street 1m ~ 4}"
+                        + "]]",
+                result.toString()
+        );
+    }
+
+    @Test
+    void findTransferWithAlightingForbiddenAtDifferentStop() {
+        TestTripPattern p1 = TestTripPattern.pattern("L1", STOP_A, STOP_B, STOP_C);
+        p1.restrictions("B A B");
+
+        TestRoute l1 = route(p1)
+                .withTimetable(schedule("10:00 10:10 10:20"));
+        TestRoute l2 = route("L2", STOP_B, STOP_D, STOP_E)
+                .withTimetable(schedule("10:20 10:30 10:40"));
+
+        data.withRoutes(l1, l2).withTransfer(STOP_C, walk(STOP_D, D1m));
+
+        var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_E);
+
+        var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+
+        var result = subject.findAllPossibleTransfers(transitLegs);
+
+        // Transfer at C is not allowed
+        assertEquals(
+                "[["
+                        + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}"
+                        + "]]",
+                result.toString()
+        );
+    }
+
+    @Test
+    void findTransferWithBoardingForbiddenAtDifferentStop() {
+        TestRoute l1 = route("L1", STOP_A, STOP_B, STOP_C)
+                .withTimetable(schedule("10:00 10:10 10:20"));
+
+        TestTripPattern p2 = TestTripPattern.pattern("L2", STOP_B, STOP_D, STOP_E);
+        p2.restrictions("B A A");
+
+        TestRoute l2 = route(p2)
+                .withTimetable(schedule("10:20 10:30 10:40"));
+
+        data.withRoutes(l1, l2).withTransfer(STOP_C, walk(STOP_D, D1m));
+
+        var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_E);
+
+        var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+
+        var result = subject.findAllPossibleTransfers(transitLegs);
+
+        // Transfer at D is not allowed
+        assertEquals(
+                "[["
+                        + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}"
                         + "]]",
                 result.toString()
         );

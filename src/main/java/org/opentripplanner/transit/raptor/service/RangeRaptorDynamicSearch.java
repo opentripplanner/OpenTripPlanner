@@ -117,24 +117,24 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
         fwdHeuristics.debugCompareResult(revHeuristics);
     }
 
-    private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> mcRequest) {
+    private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> request) {
 
-        LOG.debug("Main request: " + mcRequest.toString());
+        LOG.debug("Main request: " + request.toString());
         Worker<T> worker;
 
         // Create worker
-        if (mcRequest.profile().is(MULTI_CRITERIA)) {
-            worker = config.createMcWorker(transitData, mcRequest, getDestinationHeuristics());
+        if (request.profile().is(MULTI_CRITERIA)) {
+            worker = config.createMcWorker(transitData, request, getDestinationHeuristics());
         }
         else {
-            worker = config.createStdWorker(transitData, mcRequest);
+            worker = config.createStdWorker(transitData, request);
         }
 
         // Route
         Collection<Path<T>> paths = worker.route();
 
         // create and return response
-        return new RaptorResponse<>(paths, originalRequest, mcRequest);
+        return new RaptorResponse<>(paths, originalRequest, request);
     }
 
     private boolean isItPossibleToRunHeuristicsInParallel() {
@@ -223,7 +223,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
             return originalRequest;
         }
         return originalRequest.mutate().searchParams()
-                .earliestDepartureTime(dynamicSearchParamsCalculator.getEarliestDepartureTime())
+                .earliestDepartureTime(transitData.getValidTransitDataStartTime())
                 .build();
     }
 
@@ -232,7 +232,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
             return originalRequest;
         }
         return originalRequest.mutate().searchParams()
-                .latestArrivalTime(dynamicSearchParamsCalculator.getLatestArrivalTime())
+                .latestArrivalTime(transitData.getValidTransitDataEndTime())
                 .build();
     }
 

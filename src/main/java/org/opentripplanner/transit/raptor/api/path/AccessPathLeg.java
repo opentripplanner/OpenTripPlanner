@@ -15,6 +15,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     private final RaptorTransfer access;
     private final int fromTime;
     private final int toTime;
+    private final int generalizedCost;
     private final PathLeg<T> next;
 
 
@@ -22,17 +23,14 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
         @Nonnull RaptorTransfer access,
         int fromTime,
         int toTime,
+        int generalizedCost,
         @Nonnull PathLeg<T> next
     ) {
         this.access = access;
         this.fromTime = fromTime;
         this.toTime = toTime;
+        this.generalizedCost = generalizedCost;
         this.next = next;
-    }
-
-    /** Create new access leg with a different tail */
-    public AccessPathLeg(@Nonnull AccessPathLeg<T> o, @Nonnull PathLeg<T> next) {
-        this(o.access, o.fromTime, o.toTime, next);
     }
 
     @Override
@@ -55,7 +53,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
 
     @Override
     public int generalizedCost() {
-        return access.generalizedCost();
+        return generalizedCost;
     }
 
     @Override

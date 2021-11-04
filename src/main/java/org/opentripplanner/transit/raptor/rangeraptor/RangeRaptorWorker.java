@@ -145,8 +145,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * @return a unique set of paths
      */
     @Override
-    final public Collection<Path<T>> route() {
+    public Collection<Path<T>> route() {
         timerRoute().time(() -> {
+            lifeCycle.notifyRouteSearchStart(calculator.searchForward());
             transitData.setup();
 
             // The main outer loop iterates backward over all minutes in the departure times window.
@@ -216,7 +217,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 var txService = enableTransferConstraints
                         ? calculator.transferConstraintsSearch(route) : null;
 
-                slackProvider.setCurrentPattern(pattern);
+                int alightSlack = slackProvider.alightSlack(pattern);
+                int boardSlack = slackProvider.boardSlack(pattern);
+
                 transitWorker.prepareForTransitWith(pattern);
 
                 IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
@@ -228,11 +231,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                     // attempt to alight if we're on board, this is done above the board search
                     // so that we don't alight on first stop boarded
                     if (calculator.alightingPossibleAt(pattern, stopPos)) {
-                        transitWorker.alight(
-                                stopIndex,
-                                stopPos,
-                                (T trip) -> stopArrivalTime(trip, stopPos)
-                        );
+                        transitWorker.alight(stopIndex, stopPos, alightSlack);
                     }
 
                     if(calculator.boardingPossibleAt(pattern, stopPos)) {
@@ -240,13 +239,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
 
                             boolean ok = boardWithConstrainedTransfer(
-                                    route.timetable(), txService, stopIndex, stopPos
+                                    txService, route.timetable(), stopIndex, stopPos
                             );
 
                             // Find the best trip and board [no guaranteed transfer exist]
                             if(!ok) {
                                 boardWithRegularTransfer(
-                                        tripSearch, stopPos, stopIndex, prevArrivalTime
+                                        tripSearch, stopPos, stopIndex, prevArrivalTime, boardSlack
                                 );
                             }
                         });
@@ -261,10 +260,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             TripScheduleSearch<T> tripSearch,
             int stopPos,
             int stopIndex,
-            int prevArrivalTime
+            int prevArrivalTime,
+            int boardSlack
     ) {
         RaptorTripScheduleBoardOrAlightEvent<T> result;
-        this.earliestBoardTime = earliestBoardTime(prevArrivalTime);
+        this.earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
         // check if we can back up to an earlier trip due to this stop
         // being reached earlier
         result = tripSearch.search(
@@ -278,8 +278,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     private boolean boardWithConstrainedTransfer(
-            RaptorTimeTable<T> timetable,
             RaptorConstrainedTripScheduleBoardingSearch<T> txService,
+            RaptorTimeTable<T> targetTimetable,
             int targetStopIndex,
             int targetStopPos
     ) {
@@ -291,13 +291,15 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return false; }
 
-        this.earliestBoardTime = calculator.minusDuration(
-                sourceStopArrival.arrivalTime(),
-                slackProvider.alightSlack()
+        int prevStopArrivalTime = sourceStopArrival.arrivalTime();
+
+        int earliestBoardTime = calculator.minusDuration(
+                prevStopArrivalTime,
+                slackProvider.alightSlack(sourceStopArrival.trip().pattern())
         );
 
         var result = txService.find(
-                timetable,
+                targetTimetable,
                 sourceStopArrival.trip(),
                 sourceStopArrival.stop(),
                 earliestBoardTime
@@ -307,6 +309,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             return false;
         }
 
+        this.earliestBoardTime = earliestBoardTime;
         transitWorker.board(targetStopIndex, earliestBoardTime, result);
 
         return true;
@@ -320,7 +323,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 final int fromStop = it.next();
                 // no need to consider loop transfers, since we don't mark patterns here any more
                 // loop transfers are already included by virtue of those stops having been reached
-                state.transferToStops(fromStop, transitData.getTransfers(fromStop));
+                state.transferToStops(fromStop, calculator.getTransfers(transitData, fromStop));
             }
 
             lifeCycle.transfersForRoundComplete();
@@ -380,20 +383,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         return roundTracker.round();
     }
 
-    private int stopArrivalTime(final T trip, final int stopPositionInPattern) {
-        // Trip alightTime + alight-slack(forward-search) or board-slack(reverse-search)
-        return calculator.stopArrivalTime(
-                trip,
-                stopPositionInPattern,
-                slackProvider.alightSlack()
-        );
-    }
-
     /**
      * Add board-slack(forward-search) or alight-slack(reverse-search)
      */
-    private int earliestBoardTime(int prevArrivalTime) {
-        return calculator.plusDuration(prevArrivalTime,  slackProvider.boardSlack());
+    private int earliestBoardTime(int prevArrivalTime, int boardSlack) {
+        return calculator.plusDuration(prevArrivalTime,  boardSlack);
     }
 
     /**

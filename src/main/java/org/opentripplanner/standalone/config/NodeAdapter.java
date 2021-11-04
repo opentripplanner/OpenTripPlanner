@@ -8,6 +8,7 @@ import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -455,16 +456,16 @@ public class NodeAdapter {
         }
     }
 
-    private <T, E extends Enum<E>> Map<E, T> localAsEnumMap(
+    private <T, E extends Enum<E>> EnumMap<E, T> localAsEnumMap(
         String paramName, Class<E> enumClass,
         BiFunction<NodeAdapter, String, T> mapper,
         boolean requireAllValues
     ) {
         NodeAdapter node = path(paramName);
 
-        if(node.isEmpty()) { return Map.of(); }
+        EnumMap<E, T> result = new EnumMap<>(enumClass);
 
-        Map<E, T> result = new HashMap<>();
+        if(node.isEmpty()) { return result; }
 
         for (E v : enumClass.getEnumConstants()) {
             if(node.exist(v.name())) {

@@ -12,6 +12,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,7 @@ public class TestUnconnectedAreas extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        File file = new File(getClass().getResource("P+R.osm.pbf").getFile());
+        File file = new File(getClass().getResource("P+R.osm.pbf").toURI());
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
         loader.setProvider(provider);
         loader.buildGraph(gg, new HashMap<Class<?>, Object>(), issueStore);
@@ -64,13 +65,13 @@ public class TestUnconnectedAreas extends TestCase {
      * Hackettstown, NJ, which demonstrates this behavior. See discussion in ticket 1605.
      */
     @Test
-    public void testCoincidentNodeUnconnectedParkAndRide () {
+    public void testCoincidentNodeUnconnectedParkAndRide () throws URISyntaxException {
     	
     	Graph g = new Graph();
     	
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        File file = new File(getClass().getResource("hackett_pr.osm.pbf").getFile());
+        File file = new File(getClass().getResource("hackett_pr.osm.pbf").toURI());
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
         loader.setProvider(provider);
         loader.buildGraph(g, new HashMap<Class<?>, Object>());
@@ -151,7 +152,7 @@ public class TestUnconnectedAreas extends TestCase {
       * Additionally, the node of the ring is duplicated to test this corner case.
       */
      @Test
-     public void testRoadPassingOverDuplicatedNode () {
+     public void testRoadPassingOverDuplicatedNode () throws URISyntaxException {
     	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
     	 
     	 // depending on what order everything comes out of the spatial index, we will inject one of
@@ -163,13 +164,13 @@ public class TestUnconnectedAreas extends TestCase {
      /**
       * We've written several OSM files that exhibit different situations but should show the same results. Test with this code.
       */
-     public List<String> testGeometricGraphWithClasspathFile(String fn, int prCount, int prlCount) {
+     public List<String> testGeometricGraphWithClasspathFile(String fn, int prCount, int prlCount) throws URISyntaxException {
     	 
      	Graph g = new Graph();
      	
          OpenStreetMapModule loader = new OpenStreetMapModule();
          loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-         File file = new File(getClass().getResource(fn).getFile());
+         File file = new File(getClass().getResource(fn).toURI());
          BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
          loader.setProvider(provider);
          loader.buildGraph(g, new HashMap<>());

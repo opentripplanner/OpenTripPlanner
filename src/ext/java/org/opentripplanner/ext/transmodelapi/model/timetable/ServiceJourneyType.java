@@ -217,6 +217,7 @@ public class ServiceJourneyType {
                     .name("bookingArrangements")
                     .description("Booking arrangements for flexible services.")
                     .type(bookingArrangementType)
+                    .deprecate("BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
                     .build())
             .build();
   }

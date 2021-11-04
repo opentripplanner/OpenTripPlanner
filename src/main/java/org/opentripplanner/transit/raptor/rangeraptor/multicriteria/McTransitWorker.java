@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 import static org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 import java.util.function.IntConsumer;
-import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -59,17 +58,16 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     @Override
     public void prepareForTransitWith(RaptorTripPattern pattern) {
         this.patternRides.clear();
-        this.slackProvider.setCurrentPattern(pattern);
     }
 
     @Override
-    public void alight(final int stopIndex, final int stopPos, ToIntFunction<T> stopArrivalTimeOp) {
+    public void alight(final int stopIndex, final int stopPos, int alightSlack) {
         for (PatternRide<T> ride : patternRides) {
             state.transitToStop(
                     ride,
                     stopIndex,
                     ride.trip.arrival(stopPos),
-                    slackProvider.alightSlack()
+                    alightSlack
             );
         }
     }
@@ -83,6 +81,11 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     @Override
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        return prevArrival.mostResentTransitArrival();
+    }
+
+    @Override
     public void board(
             final int stopIndex,
             final int earliestBoardTime,
@@ -92,12 +95,13 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         final int boardTime = boarding.getTime();
 
         if(prevArrival.arrivedByAccess()) {
-            // What if access is FLEX with rides, should not FLEX alightSlack and
-            // transfersSlack be taken into account as well?
-            prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
+            // TODO: What if access is FLEX with rides, should not FLEX transfersSlack be taken
+            //       into account as well?
+            int latestArrivalTime = boardTime - slackProvider.boardSlack(trip.pattern());
+            prevArrival = prevArrival.timeShiftNewArrivalTime(latestArrivalTime);
         }
 
-        final int boardCost = calculateCostAtBoardTime(prevArrival, boardTime);
+        final int boardCost = calculateCostAtBoardTime(prevArrival, boarding);
 
         final int relativeBoardCost = boardCost +
                 calculateOnTripRelativeCost(trip.transitReluctanceFactorIndex(), boardTime);
@@ -115,31 +119,26 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         );
     }
 
-    @Override
-    public TransitArrival<T> previousTransit(int boardStopIndex) {
-        return prevArrival.mostResentTransitArrival();
-    }
 
     /**
      * Calculate a cost for riding a trip. It should include the cost from the beginning of the
-     * journey all the way until a trip is boarded.
+     * journey all the way until a trip is boarded. Any slack at the end of the last leg is not
+     * part of this, because that is already accounted for. If the previous leg is an access leg,
+     * then it is already time-shifted, which is important for this calculation to be correct.
      *
      * @param prevArrival The stop-arrival where the trip was boarded.
      */
-    private int calculateCostAtBoardTime(AbstractStopArrival<T> prevArrival, int boardTime) {
-        // Calculate the wait-time before the boarding.Any slack at the end of the last leg is not
-        // part of this, because that is already accounted for. If the previous leg is an
-        // access-leg, then it is already time-shifted, witch is important for this calculation to
-        // be correct.
-        final int boardWaitTime = boardTime - prevArrival.arrivalTime();
-
-        boolean firstRide = prevArrival.arrivedByAccess() &&
-                !prevArrival.accessPath().access().hasRides();
-
-        return prevArrival.cost() + costCalculator.boardCost(
-                firstRide,
-                boardWaitTime,
-                prevArrival.stop()
+    private int calculateCostAtBoardTime(
+            final AbstractStopArrival<T> prevArrival,
+            final RaptorTripScheduleBoardOrAlightEvent<T> boardEvent
+    ) {
+        return prevArrival.cost() + costCalculator.boardingCost(
+                prevArrival.isFirstRound(),
+                prevArrival.arrivalTime(),
+                boardEvent.getBoardStopIndex(),
+                boardEvent.getTime(),
+                boardEvent.getTrip(),
+                boardEvent.getTransferConstraint()
         );
     }
 

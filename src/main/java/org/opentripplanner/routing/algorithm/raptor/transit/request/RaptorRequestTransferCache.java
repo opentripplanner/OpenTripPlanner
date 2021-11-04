@@ -1,25 +1,20 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
+import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class RaptorRequestTransferCache {
 
-    private final LoadingCache<CacheKey, List<List<RaptorTransfer>>> transferCache;
+    private final LoadingCache<CacheKey, RaptorTransferIndex> transferCache;
 
     public RaptorRequestTransferCache(int maximumSize) {
         transferCache = CacheBuilder.newBuilder()
@@ -27,8 +22,12 @@ public class RaptorRequestTransferCache {
             .build(cacheLoader());
     }
 
+    public LoadingCache<CacheKey, RaptorTransferIndex> getTransferCache() {
+        return transferCache;
+    }
+
     @SneakyThrows
-    public List<List<RaptorTransfer>> get(
+    public RaptorTransferIndex get(
         List<List<Transfer>> transfersByStopIndex,
         RoutingRequest routingRequest
     ) {
@@ -38,34 +37,16 @@ public class RaptorRequestTransferCache {
         ));
     }
 
-    private CacheLoader<CacheKey, List<List<RaptorTransfer>>> cacheLoader() {
+    private CacheLoader<CacheKey, RaptorTransferIndex> cacheLoader() {
         return new CacheLoader<>() {
             @Override
-            public List<List<RaptorTransfer>> load(@javax.annotation.Nonnull CacheKey cacheKey) {
-                return createRaptorTransfersForRequest(
+            public RaptorTransferIndex load(@javax.annotation.Nonnull CacheKey cacheKey) {
+                return RaptorTransferIndex.create(
                         cacheKey.transfersByStopIndex,
                         cacheKey.routingRequest
                 );
             }
         };
-    }
-
-    static List<List<RaptorTransfer>> createRaptorTransfersForRequest(
-        List<List<Transfer>> transfersByStopIndex,
-        RoutingRequest routingRequest
-    ) {
-        return transfersByStopIndex
-            .stream()
-            .map(t -> new ArrayList<>(t
-                .stream()
-                .flatMap(s -> s.asRaptorTransfer(routingRequest).stream())
-                .collect(toMap(
-                    RaptorTransfer::stop,
-                    Function.identity(),
-                    (a, b) -> a.generalizedCost() < b.generalizedCost() ? a : b
-                ))
-                .values()))
-            .collect(toList());
     }
 
     private static class CacheKey {
