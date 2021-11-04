@@ -1,12 +1,14 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
-import java.util.TimeZone;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collections;
 import java.util.Set;
+import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.Route;
@@ -21,9 +23,6 @@ import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OrganisationRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
-
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RouteMapperTest {
 
@@ -42,6 +41,7 @@ public class RouteMapperTest {
         Line line = createExampleLine();
 
         RouteMapper routeMapper = new RouteMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 new EntityById<>(),
@@ -76,6 +76,7 @@ public class RouteMapperTest {
         Line line = createExampleLine();
 
         RouteMapper routeMapper = new RouteMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
@@ -101,6 +102,7 @@ public class RouteMapperTest {
                         .withTextColour(textColor));
 
         RouteMapper routeMapper = new RouteMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 new EntityById<>(),
@@ -122,6 +124,7 @@ public class RouteMapperTest {
         Line lineWithOutBicycles = createExampleFerry(RUT_FERRY_WITHOUT_BICYCLES_ID);
 
         RouteMapper routeMapper = new RouteMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 new EntityById<>(),

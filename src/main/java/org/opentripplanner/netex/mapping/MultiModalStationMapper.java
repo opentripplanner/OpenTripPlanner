@@ -1,22 +1,20 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Collection;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.StopPlace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
 
 class MultiModalStationMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MultiModalStationMapper.class);
-
+    private final DataImportIssueStore issueStore;
     private final FeedScopedIdFactory idFactory;
 
-    public MultiModalStationMapper(FeedScopedIdFactory idFactory) {
+    public MultiModalStationMapper(DataImportIssueStore issueStore, FeedScopedIdFactory idFactory) {
+        this.issueStore = issueStore;
         this.idFactory = idFactory;
     }
 
@@ -36,7 +34,8 @@ class MultiModalStationMapper {
         WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
 
         if (coordinate == null) {
-            LOG.warn(
+            issueStore.add(
+                    "MultiModalStationWithoutCoordinates",
                     "MultiModal station {} does not contain any coordinates.",
                     multiModalStation.getId()
             );
