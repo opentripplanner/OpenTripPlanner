@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 import static org.opentripplanner.model.PickDrop.NONE;
 
@@ -66,7 +67,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
     int fromIndex = getFromIndex(access);
 
@@ -76,7 +77,7 @@ public class UnscheduledTrip extends FlexTrip {
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
     for (StopLocation stop : expandStops(stopTimes[1].stop)) {
-      res.add(new FlexAccessTemplate(access, this, fromIndex, 1, stop, date, calculator));
+      res.add(new FlexAccessTemplate(access, this, fromIndex, 1, stop, date, calculator, params));
     }
 
     return res.stream();
@@ -84,7 +85,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
     int toIndex = getToIndex(egress);
 
@@ -94,7 +95,7 @@ public class UnscheduledTrip extends FlexTrip {
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
     for (StopLocation stop : expandStops(stopTimes[0].stop)) {
-      res.add(new FlexEgressTemplate(egress, this, 0, toIndex, stop, date, calculator));
+      res.add(new FlexEgressTemplate(egress, this, 0, toIndex, stop, date, calculator, params));
     }
 
     return res.stream();

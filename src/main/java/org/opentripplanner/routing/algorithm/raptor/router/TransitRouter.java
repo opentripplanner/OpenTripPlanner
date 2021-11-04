@@ -80,7 +80,10 @@ public class TransitRouter {
 
         var accessEgresses = getAccessEgresses(transitLayer);
 
-        debugTimingAggregator.finishedAccessEgress();
+        debugTimingAggregator.finishedAccessEgress(
+                accessEgresses.getAccesses().size(),
+                accessEgresses.getEgresses().size()
+        );
 
         var itineraries = new ArrayList<Itinerary>();
 
@@ -221,6 +224,7 @@ public class TransitRouter {
             if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
                 var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
                         accessRequest,
+                        router.routerConfig.flexParameters(request),
                         isEgress
                 );
 

@@ -21,13 +21,15 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   public FlexAccessTemplate(
       NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
-      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator
+      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator,
+      FlexParameters flexParams
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator);
+    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, flexParams);
   }
 
   public Itinerary createDirectItinerary(
