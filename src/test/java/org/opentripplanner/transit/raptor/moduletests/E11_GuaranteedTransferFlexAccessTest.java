@@ -78,6 +78,7 @@ public class E11_GuaranteedTransferFlexAccessTest implements RaptorTestConstants
         );
     }
 
+    //TODO: Enable after #3725 is fixed
     @Test
     @Disabled
     public void standardReverse() {
