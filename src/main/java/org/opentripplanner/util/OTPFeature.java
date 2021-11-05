@@ -44,7 +44,7 @@ public enum OTPFeature {
 
 
     /**
-     * This method allowes the application to initilize each OTP feature. Only use this
+     * This method allows the application to initialize each OTP feature. Only use this
      * method at startup-time.
      *
      * THIS METHOD IS NOT THREAD-SAFE!

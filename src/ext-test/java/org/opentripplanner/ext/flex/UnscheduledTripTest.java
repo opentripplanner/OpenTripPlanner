@@ -8,6 +8,7 @@ import java.io.File;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,6 +23,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.util.OTPFeature;
 
 /**
  * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the
@@ -39,6 +41,7 @@ public class UnscheduledTripTest {
     static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();
     static final FlexServiceDate flexDate =
             new FlexServiceDate(serviceDate, secondsSinceMidnight, new TIntHashSet());
+    static final FlexParameters params = new FlexParameters(300);
 
     static final Graph graph = new Graph();
 
@@ -67,7 +70,8 @@ public class UnscheduledTripTest {
         var accesses = trip.getFlexAccessTemplates(
                 nearbyStop,
                 flexDate,
-                calculator
+                calculator,
+                params
         ).collect(Collectors.toList());
 
         assertEquals(1, accesses.size());
@@ -85,7 +89,8 @@ public class UnscheduledTripTest {
         var egresses = trip.getFlexEgressTemplates(
                 nearbyStop,
                 flexDate,
-                calculator
+                calculator,
+                params
         ).collect(Collectors.toList());
 
         assertEquals(1, egresses.size());
@@ -103,10 +108,11 @@ public class UnscheduledTripTest {
                 new ServiceDateInterval(
                         new ServiceDate(2021, 1, 1),
                         new ServiceDate(2022, 1, 1)
-                ),
-                true
+                )
         );
+        OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
         module.buildGraph(graph, new HashMap<>());
+        OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
     }
 
     private static NearbyStop getNearbyStop(FlexTrip trip) {
