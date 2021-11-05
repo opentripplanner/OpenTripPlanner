@@ -3,47 +3,30 @@ package org.opentripplanner.ext.flex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import gnu.trove.set.hash.TIntHashSet;
-import java.io.File;
-import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.util.OTPFeature;
 
 /**
- * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the
- * City of Aspen Downtown taxi service which is a completely unscheduled trip that takes
- * you door-to-door in the city.
- *
- * It only contains a single stop time which in GTFS static would not work but is valid
- * in GTFS Flex.
+ * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the City of
+ * Aspen Downtown taxi service which is a completely unscheduled trip that takes you door-to-door in
+ * the city.
+ * <p>
+ * It only contains a single stop time which in GTFS static would not work but is valid in GTFS
+ * Flex.
  */
-public class UnscheduledTripTest {
+public class UnscheduledTripTest extends FlexTest {
 
     static final String ASPEN_GTFS = "src/ext-test/resources/aspen-flex-on-demand.gtfs.zip";
-    static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator(null);
-    static final ServiceDate serviceDate = new ServiceDate(2021, 4, 11);
-    static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();
-    static final FlexServiceDate flexDate =
-            new FlexServiceDate(serviceDate, secondsSinceMidnight, new TIntHashSet());
-    static final FlexParameters params = new FlexParameters(300);
 
-    static final Graph graph = new Graph();
+    static Graph graph;
 
     @Test
     public void parseAspenTaxiAsUnscheduledTrip() {
@@ -102,17 +85,7 @@ public class UnscheduledTripTest {
 
     @BeforeAll
     static void setup() {
-        GtfsBundle gtfsBundle = new GtfsBundle(new File(ASPEN_GTFS));
-        GtfsModule module = new GtfsModule(
-                List.of(gtfsBundle),
-                new ServiceDateInterval(
-                        new ServiceDate(2021, 1, 1),
-                        new ServiceDate(2022, 1, 1)
-                )
-        );
-        OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-        module.buildGraph(graph, new HashMap<>());
-        OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
+        graph = FlexTest.buildFlexGraph(ASPEN_GTFS);
     }
 
     private static NearbyStop getNearbyStop(FlexTrip trip) {
