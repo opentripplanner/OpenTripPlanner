@@ -158,7 +158,6 @@ public class ServiceJourneyType {
                             .name("date")
                             .type(gqlUtil.dateScalar)
                             .description("Date to get estimated calls for. Defaults to today.")
-                            .defaultValue(null)
                             .build())
                     .dataFetcher(environment -> {
                         final Trip trip = trip(environment);
@@ -218,6 +217,7 @@ public class ServiceJourneyType {
                     .name("bookingArrangements")
                     .description("Booking arrangements for flexible services.")
                     .type(bookingArrangementType)
+                    .deprecate("BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
                     .build())
             .build();
   }

@@ -135,6 +135,10 @@ public class VertexLinker {
     }
   }
 
+  public void removePermanentEdgeFromIndex(Edge edge) {
+    removeEdgeFromIndex(edge, Scope.PERMANENT);
+  }
+
   /**
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
@@ -357,7 +361,7 @@ public class VertexLinker {
       // edges that were missed by WalkableAreaBuilder
       // TODO Temporary code until we refactor the WalkableAreaBuilder (#3152)
       if (scope == Scope.PERMANENT && this.addExtraEdgesToAreas && edge instanceof AreaEdge) {
-        AreaVisibilityAdjuster.linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
+        ((AreaEdge) edge).getArea().addVertex(v0, graph);
       }
 
       // TODO Consider moving this code

@@ -13,18 +13,18 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.Issue;
 import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZoneRef;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx also contains
@@ -39,12 +39,12 @@ import org.slf4j.LoggerFactory;
  * of the StopPlace.
  */
 class StopAndStationMapper {
-    private static final Logger LOG = LoggerFactory.getLogger(StopAndStationMapper.class);
-
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
     private final StationMapper stationMapper;
     private final StopMapper stopMapper;
     private final TariffZoneMapper tariffZoneMapper;
+    private final DataImportIssueStore issueStore;
+
 
     /**
      * Quay ids for all processed stop places
@@ -62,10 +62,11 @@ class StopAndStationMapper {
             TariffZoneMapper tariffZoneMapper,
             DataImportIssueStore issueStore
     ) {
-        this.stationMapper = new StationMapper(idFactory);
+        this.stationMapper = new StationMapper(issueStore, idFactory);
         this.stopMapper = new StopMapper(idFactory, issueStore);
         this.tariffZoneMapper = tariffZoneMapper;
         this.quayIndex = quayIndex;
+        this.issueStore = issueStore;
     }
 
     /**
@@ -119,7 +120,14 @@ class StopAndStationMapper {
         var result = tariffZoneMapper.findAndMapTariffZone(ref);
 
         if(result == null) {
-            LOG.warn("StopPlace {} has unsupported tariff zone reference: {}", stopPlace.getId(), ref);
+            issueStore.add(
+                    Issue.issue(
+                            "StopPlaceMissingFareZone",
+                            "StopPlace %s has unsupported tariff zone reference: %s",
+                            stopPlace.getId(),
+                            ref
+                    )
+            );
         }
         return result;
     }
@@ -165,11 +173,11 @@ class StopAndStationMapper {
      * We do not support quay references, all quays must be included as part of the
      * given stopPlace.
      */
-    private static List<Quay> listOfQuays(StopPlace stopPlace) {
+    private List<Quay> listOfQuays(StopPlace stopPlace) {
         Quays_RelStructure quays = stopPlace.getQuays();
 
         if(quays == null) {
-            LOG.warn("StopPlace {} has no quays.", stopPlace.getId());
+            issueStore.add(new StopPlaceWithoutQuays(stopPlace.getId()));
             return Collections.emptyList();
         }
 
@@ -180,7 +188,14 @@ class StopAndStationMapper {
                 result.add((Quay) it);
             }
             else {
-                LOG.warn("StopPlace {} has unsupported quay reference: {}", stopPlace.getId(), it);
+                issueStore.add(
+                        Issue.issue(
+                                "StopPlaceWithoutQuays",
+                                "StopPlace %s has unsupported quay reference: %s",
+                                stopPlace.getId(),
+                                it
+                        )
+                );
             }
         }
         return result;

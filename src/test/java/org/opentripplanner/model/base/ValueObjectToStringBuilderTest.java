@@ -1,8 +1,9 @@
 package org.opentripplanner.model.base;
 
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class ValueObjectToStringBuilderTest {
     private enum  AEnum { A }
@@ -125,11 +126,11 @@ public class ValueObjectToStringBuilderTest {
     @Test
     public void addSecondsPastMidnight() {
         assertEquals(
-                "00:00:35",
+                "0:00:35",
                 subject().addServiceTime(35).toString()
         );
         assertEquals(
-                "02:50:45+1d",
+                "2:50:45+1d",
                 subject().addServiceTime((26 * 60 + 50) * 60 + 45).toString()
         );
         assertEquals(
@@ -153,4 +154,21 @@ public class ValueObjectToStringBuilderTest {
                 subject().skipNull().addDuration(null).toString()
         );
     }
+
+    @Test
+    public void addCost() {
+        assertEquals("null", subject().addCost(null).toString());
+        assertEquals("", subject().skipNull().addCost(null).toString());
+        assertEquals("$-0.01", subject().addCost(-1).toString());
+        assertEquals("$0", subject().addCost(0).toString());
+        assertEquals("$0.01", subject().addCost(1).toString());
+        assertEquals("$1", subject().addCost(100).toString());
+        assertEquals("$100.01", subject().addCost(10001).toString());
+
+        assertEquals("null", subject().addCost(null, "pip").toString());
+        assertEquals("", subject().skipNull().addCost(null, "pip").toString());
+        assertEquals("$-0.01pip", subject().addCost(-1, "pip").toString());
+        assertEquals("$1pip", subject().addCost(100, "pip").toString());
+    }
+
 }

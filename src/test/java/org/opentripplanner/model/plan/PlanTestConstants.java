@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.time.DurationUtils;
 
@@ -68,10 +69,24 @@ public interface PlanTestConstants {
   Place E = place("E", 9.0, 10.0);
   Place F = place("F", 9.0, 10.5);
   Place G = place("G", 9.5, 11.0);
+  Place H = place("H", 10.0, 11.5);
 
   private static Place place(String name, double lat, double lon) {
     Place p = new Place(lat, lon, name);
-    p.stopId = new FeedScopedId(FEED_ID, name);
+    p.stop = new Stop(
+            new FeedScopedId(FEED_ID, name),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+    );
     return p;
   }
 }

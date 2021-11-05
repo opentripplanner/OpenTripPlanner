@@ -1,14 +1,14 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import static org.opentripplanner.model.transfer.Transfer.MAX_WAIT_TIME_NOT_SET;
+import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.StopTransferPoint;
-import org.opentripplanner.model.transfer.Transfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.graph.GraphIndex;
 
@@ -23,25 +23,25 @@ public class TransfersReport {
     private static final int NOT_SET = -1;
 
 
-    private final List<Transfer> transfers;
+    private final List<ConstrainedTransfer> transfers;
     private final GraphIndex index;
     private final CsvReportBuilder buf = new CsvReportBuilder();
 
     private TransfersReport(
-            List<Transfer> transfers,
+            List<ConstrainedTransfer> transfers,
             GraphIndex index
     ) {
         this.transfers = transfers;
         this.index = index;
     }
 
-    public static String export(List<Transfer> transfers, GraphIndex index) {
+    public static String export(List<ConstrainedTransfer> transfers, GraphIndex index) {
         return new TransfersReport(transfers, index).export();
     }
 
     String export() {
         buf.addHeader(
-                "Operator", "FromTripId", "FromTrip", "FromStop",
+                "Id", "Operator", "FromTripId", "FromTrip", "FromStop",
                 "ToTripId", "ToTrip", "ToStop", "ArrivalTime", "DepartureTime", "TransferTime",
                 "Walk", "Priority", "MaxWaitTime", "StaySeated", "Guaranteed"
         );
@@ -57,7 +57,9 @@ public class TransfersReport {
                     );
             var duration = (from.time == NOT_SET || to.time == NOT_SET)
                     ? "" : durationToStr(to.time - from.time);
+            var c = t.getTransferConstraint();
 
+            buf.addText(t.getId() == null ? "" : t.getId().getId());
             buf.addText(t.getFrom().getTrip().getOperator().getId().getId());
             buf.addText(from.tripId);
             buf.addText(from.trip);
@@ -69,10 +71,10 @@ public class TransfersReport {
             buf.addTime(to.time, NOT_SET);
             buf.addText(duration);
             buf.addText(dist);
-            buf.addEnum(t.getPriority());
-            buf.addDuration(t.getMaxWaitTime(), MAX_WAIT_TIME_NOT_SET);
-            buf.addOptText(t.isStaySeated(), "YES");
-            buf.addOptText(t.isGuaranteed(), "YES");
+            buf.addEnum(c.getPriority());
+            buf.addDuration(c.getMaxWaitTime(), MAX_WAIT_TIME_NOT_SET);
+            buf.addOptText(c.isStaySeated(), "YES");
+            buf.addOptText(c.isGuaranteed(), "YES");
             buf.newLine();
         });
         return buf.toString();
@@ -103,7 +105,7 @@ public class TransfersReport {
             int pos = p.getStopPosition();
             Stop stop = ptn.getStops().get(pos);
             var tt = ptn.getScheduledTimetable().getTripTimes(trip);
-            r.loc += stop.getName() + " " + stop.getCoordinate();
+            r.loc += stop.getName() + " [" + pos + "]" +  " " + stop.getCoordinate();
             r.time = arrival ? tt.getScheduledArrivalTime(pos) : tt.getScheduledDepartureTime(pos);
             r.c = stop.getCoordinate().asJtsCoordinate();
         }

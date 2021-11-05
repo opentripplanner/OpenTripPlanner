@@ -4,7 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     public DataFetcher<Relay.ResolvedGlobalId> id() {
         return environment -> new Relay.ResolvedGlobalId(
                 "BikeRentalStation",
-                getSource(environment).id.toString()
+                getSource(environment).getId().toString()
         );
     }
 
@@ -25,33 +25,50 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<String> name() {
-        return environment -> getSource(environment).name.toString(environment.getLocale());
+        return environment -> getSource(environment).getName().toString(environment.getLocale());
     }
 
     @Override
     public DataFetcher<Integer> bikesAvailable() {
-        return environment -> getSource(environment).vehiclesAvailable;
+        return environment -> getSource(environment).getVehiclesAvailable();
     }
 
     @Override
     public DataFetcher<Integer> spacesAvailable() {
-        return environment -> getSource(environment).spacesAvailable;
+        return environment -> getSource(environment).getSpacesAvailable();
     }
 
-    //TODO:
     @Override
     public DataFetcher<String> state() {
-        return environment -> null;
+        return environment ->
+                getSource(environment).isAllowDropoff() && getSource(environment).isAllowPickup()
+                        ? "Station on"
+                        : "Station off";
     }
 
     @Override
     public DataFetcher<Boolean> realtime() {
-        return environment -> getSource(environment).realTimeData;
+        return environment -> getSource(environment).isRealTimeData();
     }
 
     @Override
     public DataFetcher<Boolean> allowDropoff() {
-        return environment -> getSource(environment).allowDropoff;
+        return environment -> getSource(environment).isAllowDropoff();
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowDropoffNow() {
+        return environment -> getSource(environment).allowDropoffNow();
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowPickup() {
+        return environment -> getSource(environment).isAllowPickup();
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowPickupNow() {
+        return environment -> getSource(environment).allowPickupNow();
     }
 
     @Override
@@ -61,32 +78,36 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<Double> lon() {
-        return environment -> getSource(environment).longitude;
+        return environment -> getSource(environment).getLongitude();
     }
 
     @Override
     public DataFetcher<Double> lat() {
-        return environment -> getSource(environment).latitude;
+        return environment -> getSource(environment).getLatitude();
     }
 
     @Override
     public DataFetcher<Boolean> allowOverloading() {
-        // TODO implement this
-        return environment -> false;
+        return environment -> getSource(environment).isAllowOverloading();
     }
 
     @Override
     public DataFetcher<Integer> capacity() {
-        // TODO implement this
-        return environment -> 0;
+        return environment -> getSource(environment).getCapacity();
+    }
+
+    @Override
+    public DataFetcher<Boolean> operative() {
+        return environment -> getSource(environment).isAllowPickup() && getSource(
+                environment).isAllowDropoff();
     }
 
     @Override
     public DataFetcher<VehicleRentalStationUris> rentalUris() {
-        return environment -> getSource(environment).rentalUris;
+        return environment -> getSource(environment).getRentalUris();
     }
 
-    private VehicleRentalStation getSource(DataFetchingEnvironment environment) {
+    private VehicleRentalPlace getSource(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
 }

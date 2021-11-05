@@ -8,13 +8,15 @@ import static org.opentripplanner.util.time.TimeUtils.time;
 
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.api.PathBuilder;
+import org.opentripplanner.transit.raptor._data.api.PathUtils;
+import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
 
@@ -34,7 +36,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
     private static final RaptorSlackProvider SLACK_PROVIDER = RaptorSlackProvider
             .defaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK);
 
-    public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+    public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE,
@@ -42,8 +44,15 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
             null
     );
 
-    static PathBuilder pathBuilder() {
-        return new PathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+    private static final TransferWaitTimeCalculator TRANS_WAIT_TIME_CALC =
+            new TransferWaitTimeCalculator(2.0);
+
+    static TestPathBuilder pathBuilder() {
+        return new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
+    }
+
+    static {
+        TRANS_WAIT_TIME_CALC.setMinSafeTransferTime(D5m);
     }
 
     /**
@@ -65,13 +74,16 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
                 .bus(trip1, STOP_C)
                 .egress(D1m);
 
-        var subject = subject(transfers);
+        var subject = subject(transfers, null);
 
         // When
         var result = subject.findBestTransitPath(original);
 
         // Then expect a set containing the original path
-        assertEquals(original.toStringDetailed(), first(result).toStringDetailed());
+        assertEquals(
+                original.toStringDetailed(this::stopIndexToName),
+                first(result).toStringDetailed(this::stopIndexToName)
+        );
         assertEquals(1, result.size());
     }
 
@@ -105,12 +117,19 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
                 .bus(trip2, STOP_G)
                 .egress(D1m);
 
-        var subject = subject(transfers);
+        var subject = subject(transfers, TRANS_WAIT_TIME_CALC);
 
         // When
         var result = subject.findBestTransitPath(original);
 
-        assertEquals(original.toStringDetailed(), first(result).toStringDetailed());
+        // Insert wait-time cost summary info
+        var expected = original.toStringDetailed(this::stopIndexToName)
+                .replace("$3250]", "$3250 $33pri $423.81wtc]");
+
+        assertEquals(
+                expected,
+                first(result).toStringDetailed(this::stopIndexToName)
+        );
         assertEquals(1, result.size());
     }
 
@@ -156,15 +175,34 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
                 .bus(trip3, STOP_G)
                 .egress(D0s);
 
-        var subject = subject(transfers);
+        // First we do the test without a wait-time cost calculator, which should pick the
+        // option with the lowest cost and as early as possible. So the preferred transfer
+        // between Trip 1 and 2 is at stop B - no walking (B to C) and before D. The preferred
+        // transfer between Trip 2 and 3 is at stop F.
+        var subject = subject(transfers, null);
 
         // Find the path with the lowest cost
         var result = subject.findBestTransitPath(original);
 
         assertEquals(
-                "[1 ~ BUS T1 10:02 10:10 ~ 2 ~ BUS T2 10:12 10:35 ~ 6 ~ "
-                        + "BUS T3 10:37 10:49 ~ 7 [10:00:20 10:49:20 49m $3010]]",
-                result.toString()
+                "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ "
+                        + "BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3010 $66pri]",
+                PathUtils.pathsToString(result)
+        );
+
+        // Then we do the test with the wait-time cost calculator, which should pick the
+        // option with the lowest wait-time cost. For the first transfer, the transfer between
+        // stop B and C with a 30 sec walk is the one maximising the wait time. The preferred
+        // transfer between Trip 2 and 3 is at stop F (same as case 1).
+        subject = subject(transfers, TRANS_WAIT_TIME_CALC);
+
+        // Find the path with the lowest cost
+        result = subject.findBestTransitPath(original);
+
+        assertEquals(
+                "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C ~ BUS T2 10:15 10:35 ~ F "
+                        + "~ BUS T3 10:37 10:49 ~ G [10:00:20 10:49:20 49m $3040 $66pri $704.05wtc]",
+                PathUtils.pathsToString(result)
         );
     }
 
@@ -178,7 +216,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
      * Expect: Transfer at C and transfer info attached
      */
     @Test
-    public void testGuaranteedTransferIsPreferred() {
+    public void testConstrainedTransferIsPreferred() {
         // Given
         var trip1 = TestTripSchedule.schedule()
                 .pattern("T1", STOP_A, STOP_B, STOP_C)
@@ -201,7 +239,7 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
                 .bus(trip2, STOP_D)
                 .egress(D0s);
 
-        var subject = subject(transfers);
+        var subject = subject(transfers, null);
 
         // Find the path with the lowest cost
         var result = subject.findBestTransitPath(original);
@@ -211,13 +249,13 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
         var it = result.iterator().next();
 
         assertEquals(
-                "1 ~ BUS T1 10:02 10:15 ~ 3 ~ BUS T2 10:17 10:30 ~ 4 [10:00:20 10:30:20 30m $1840]",
-                it.toString()
+                "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:00:20 10:30:20 30m $1810 $23pri]",
+                it.toString(this::stopIndexToName)
         );
         // Verify the attached Transfer is exist and is valid
         assertEquals(
-                "Transfer{from: (trip: BUS T1:10:02, stopPos: 2), to: (trip: BUS T2:10:13, stopPos: 1), guaranteed}",
-                it.getTransferTo(it.accessLeg().nextLeg().nextLeg()).toString()
+                "ConstrainedTransfer{from: (trip: BUS T1:10:02, stopPos: 2), to: (trip: BUS T2:10:13, stopPos: 1), constraint: {guaranteed}}",
+                it.accessLeg().nextLeg().asTransitLeg().getConstrainedTransferAfterLeg().toString()
         );
     }
 
@@ -225,14 +263,19 @@ public class OptimizePathServiceTest implements RaptorTestConstants {
     /* private methods */
 
     static OptimizePathService<TestTripSchedule> subject(
-            TransferGenerator<TestTripSchedule> generator
+            TransferGenerator<TestTripSchedule> generator,
+            @Nullable TransferWaitTimeCalculator waitTimeCalculator
     ) {
         return new OptimizePathService<>(
                 generator,
                 COST_CALCULATOR,
                 SLACK_PROVIDER,
-                PathLeg::generalizedCostTotal,
-                TransferOptimizedFilterFactory.filter(true, true)
+                waitTimeCalculator,
+                TransferOptimizedFilterFactory.filter(
+                        true,
+                        waitTimeCalculator != null
+                ),
+                (new RaptorTestConstants(){})::stopIndexToName
         );
     }
 

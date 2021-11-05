@@ -26,6 +26,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  */
 public class A01_SingeRouteTest implements RaptorTestConstants {
 
+  private static final String EXP_PATH = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s "
+          + "[0:00:30 0:05:20 4m50s";
+  private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
+  private static final String EXP_PATH_WITH_COST = EXP_PATH + " $940]";
+
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(RaptorConfig.defaultConfigForTest());
@@ -66,21 +71,19 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
   }
 
   @Test
-  public void standard() {
+  public void standardOneIteration() {
     var request = requestBuilder
         .profile(RaptorProfile.STANDARD)
+        .searchParams().searchOneIterationOnly()
         .build();
 
     var response = raptorService.route(request, data);
 
-    assertEquals(
-        "Walk 30s ~ 2 ~ BUS R1 0:01 0:05 ~ 4 ~ Walk 20s [0:00:30 0:05:20 4m50s]",
-        pathsToString(response)
-    );
+    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
   }
 
   @Test
-  public void standardReverse() {
+  public void standardReverseWithoutSearchWindow() {
     var request = requestBuilder
         .searchDirection(SearchDirection.REVERSE)
         .profile(RaptorProfile.STANDARD)
@@ -88,10 +91,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
 
     var response = raptorService.route(request, data);
 
-    assertEquals(
-        "Walk 30s ~ 2 ~ BUS R1 0:01 0:05 ~ 4 ~ Walk 20s [0:00:30 0:05:20 4m50s]",
-        pathsToString(response)
-    );
+    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
   }
 
   @Test
@@ -102,9 +102,6 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
 
     var response = raptorService.route(request, data);
 
-    assertEquals(
-        "Walk 30s ~ 2 ~ BUS R1 0:01 0:05 ~ 4 ~ Walk 20s [0:00:30 0:05:20 4m50s $940]",
-        pathsToString(response)
-    );
+    assertEquals(EXP_PATH_WITH_COST, pathsToString(response));
   }
 }

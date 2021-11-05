@@ -376,7 +376,7 @@ otp.widgets.ItinerariesWidget =
             }
 
             if(leg.mode === "WALK" || leg.mode === "BICYCLE" || leg.mode === "CAR") {
-                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
+                headerHtml += " "+otp.util.Itin.distanceString(leg.distance) + ", " + otp.util.Itin.durationString(leg.startTime, leg.endTime) + pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
                 if(otp.config.municoderHostname) {
                     var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
                     headerHtml += '<span id="'+spanId+'"></span>';
@@ -587,14 +587,15 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
 
-            var stopHtml = '<div class="otp-itin-leg-endpointDescSub">';
-            if( typeof leg.from.stopCode != 'undefined' ) {
-                stopHtml += _tr("Stop") + ' #'+leg.from.stopCode+ ' ';
-            }
-            stopHtml += '[<a href="#">' + _tr("Stop Viewer") +'</a>]</div>';
-
-            $(stopHtml)
+            $(
+                '<div class="otp-itin-leg-endpointDescSub">'
+                 + _tr("Stop")
+                 + ' #' + (leg.from.stopCode || leg.from.stopId)
+                 + ' [<a href="#">' + _tr("Stop Viewer") + '</a>]'
+                 + '</div>'
+            )
             .appendTo(legDiv)
+            .children('a')
             .click(function(evt) {
                 if(!this_.module.stopViewerWidget) {
                     this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
@@ -606,7 +607,6 @@ otp.widgets.ItinerariesWidget =
                 this_.module.stopViewerWidget.bringToFront();
             });
 
-
             $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);
 
             // show the "time in transit" line
@@ -614,6 +614,14 @@ otp.widgets.ItinerariesWidget =
             var inTransitDiv = $('<div class="otp-itin-leg-elapsedDesc" />').appendTo(legDiv);
 
             $('<span><i>' + _tr("Time in transit") + ": " + otp.util.Time.secsToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
+
+            $('<div class="otp-itin-leg-ids"></div>')
+                .append($('<table></table>').append([
+                    '<tr><td>' + _tr("Route ID") + ":</td><td>" + leg.routeId + '</td></tr>',
+                    '<tr><td>' + _tr("Trip ID") + ":</td><td>" + leg.tripId + '</td></tr>',
+                    '<tr><td>' + _tr("Service Date") + ":</td><td>" + leg.serviceDate + '</td></tr>'
+                ]))
+                .appendTo(legDiv);
 
             $('<span>&nbsp;[<a href="#">' + _tr("Trip Viewer") + '</a>]</span>')
             .appendTo(inTransitDiv)
@@ -630,7 +638,7 @@ otp.widgets.ItinerariesWidget =
 
             // show the intermediate stops, if applicable -- REPLACED BY TRIP VIEWER
 
-            /*if(this.module.showIntermediateStops) {
+            if(this.module.showIntermediateStops) {
 
                 $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);
                 var intStopsDiv = $('<div class="otp-itin-leg-intStops"></div>').appendTo(legDiv);
@@ -647,8 +655,12 @@ otp.widgets.ItinerariesWidget =
 
                 for(var i=0; i < leg.intermediateStops.length; i++) {
                     var stop = leg.intermediateStops[i];
-                    $('<div class="otp-itin-leg-intStopsListItem">'+(i+1)+'. '+stop.name+' (ID #'+stop.stopId.id+')</div>').
-                    appendTo(intStopsListDiv)
+                    var time = stop.arrival === stop.departure
+                                ? otp.util.Time.formatItinTime(stop.arrival, otp.config.locale.time.time_format)
+                                : otp.util.Time.formatItinTime(stop.arrival, otp.config.locale.time.time_format) + " - " + otp.util.Time.formatItinTime(stop.departure, otp.config.locale.time.time_format);
+                    $('<div class="otp-itin-leg-intStopsListItem"><span>'+time+' '+stop.name+' <i>(#'+(stop.stopCode || stop.stopId)+')</i></span></div>')
+                    .appendTo(intStopsListDiv)
+                    .children('span')
                     .data("stop", stop)
                     .click(function(evt) {
                         var stop = $(this).data("stop");
@@ -656,7 +668,7 @@ otp.widgets.ItinerariesWidget =
                     }).hover(function(evt) {
                         var stop = $(this).data("stop");
                         $(this).css('color', 'red');
-                        var popup = L.popup()
+                        L.popup()
                             .setLatLng(new L.LatLng(stop.lat, stop.lon))
                             .setContent(stop.name)
                             .openOn(this_.module.webapp.map.lmap);
@@ -666,7 +678,7 @@ otp.widgets.ItinerariesWidget =
                     });
                 }
                 intStopsListDiv.hide();
-            }*/
+            }
 
             // show the end time and stop
 
@@ -699,6 +711,25 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
 
+            $(
+                '<div class="otp-itin-leg-endpointDescSub">'
+                + _tr("Stop")
+                + ' #' + (leg.to.stopCode || leg.to.stopId)
+                + ' [<a href="#">' + _tr("Stop Viewer") + '</a>]'
+                + '</div>'
+            )
+                .appendTo(legDiv)
+                .children('a')
+                .click(function(evt) {
+                    if(!this_.module.stopViewerWidget) {
+                        this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
+                        this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
+                    }
+                    this_.module.stopViewerWidget.show();
+                    this_.module.stopViewerWidget.setActiveTime(leg.endTime);
+                    this_.module.stopViewerWidget.setStop(leg.to.stopId, leg.to.name);
+                    this_.module.stopViewerWidget.bringToFront();
+                });
 
             // render any alerts
 

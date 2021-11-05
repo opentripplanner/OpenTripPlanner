@@ -26,11 +26,11 @@ package org.opentripplanner.util;
  */
 public final class BitSetUtils {
 
-    public final static boolean get(byte bitset, int index) {
+    public static boolean get(byte bitset, int index) {
         return (bitset & (1 << index)) != 0;
     }
 
-    public final static byte set(byte bitset, int index, boolean value) {
+    public static byte set(byte bitset, int index, boolean value) {
         if (value) {
             bitset |= (1 << index);
         }
@@ -40,11 +40,11 @@ public final class BitSetUtils {
         return bitset;
     }
 
-    public final static boolean get(short bitset, int index) {
+    public static boolean get(short bitset, int index) {
         return (bitset & (1 << index)) != 0;
     }
 
-    public final static short set(short bitset, int index, boolean value) {
+    public static short set(short bitset, int index, boolean value) {
         if (value) {
             bitset |= (1 << index);
         }
@@ -54,11 +54,11 @@ public final class BitSetUtils {
         return bitset;
     }
 
-    public final static boolean get(int bitset, int index) {
+    public static boolean get(int bitset, int index) {
         return (bitset & (1 << index)) != 0;
     }
 
-    public final static int set(int bitset, int index, boolean value) {
+    public static int set(int bitset, int index, boolean value) {
         if (value) {
             bitset |= (1 << index);
         }
@@ -68,11 +68,11 @@ public final class BitSetUtils {
         return bitset;
     }
 
-    public final static boolean get(long bitset, int index) {
+    public static boolean get(long bitset, int index) {
         return (bitset & (1L << index)) != 0;
     }
 
-    public final static long set(long bitset, int index, boolean value) {
+    public static long set(long bitset, int index, boolean value) {
         if (value) {
             bitset |= (1L << index);
         }

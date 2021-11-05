@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -70,17 +69,6 @@ public interface  PathLeg<T extends RaptorTripSchedule> {
      * The unit is centi-seconds (Raptor cost unit)
      */
     int generalizedCost();
-
-    /**
-     * The computed generalized-cost for this path leg.
-     * <p>
-     * {@code -1} is returned if no cost exist.
-     * <p>
-     * The unit is seconds (OTP Domain/AStar unit)
-     */
-    default int otpDomainCost() {
-        return RaptorCostConverter.toOtpDomainCost(generalizedCost());
-    }
 
     /**
      * The computed generalized-cost for this leg plus all legs following it.

@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
@@ -111,7 +113,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * limit and should therefore be set high. Results close to the limit are not guaranteed to be
      * optimal. Use filters to limit what is presented to the client.
      *
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
+     * @see ItineraryListFilter
      */
     public double maxDirectStreetDurationSeconds = Duration.ofHours(4).toSeconds();
 
@@ -120,7 +122,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * performance limit and should therefore be set high. Results close to the limit are not
      * guaranteed to be optimal. Use filters to limit what is presented to the client.
      *
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
+     * @see ItineraryListFilter
      */
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
@@ -276,7 +278,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
 
     /** Configure the transfer optimization */
-    public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest(this);
+    public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest();
 
     /**
      * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add
@@ -507,7 +509,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * <p>
      * Unit is seconds. Default value is not-set(empty map).
      */
-    public Map<TraverseMode, Integer> boardSlackForMode = new HashMap<>();
+    public Map<TransitMode, Integer> boardSlackForMode = new EnumMap<>(TransitMode.class);
 
     /**
      * The number of seconds to add after alighting a transit leg. It is recommended to use the
@@ -527,7 +529,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * <p>
      * Unit is seconds. Default value is not-set(empty map).
      */
-    public Map<TraverseMode, Integer> alightSlackForMode = new HashMap<>();
+    public Map<TransitMode, Integer> alightSlackForMode = new EnumMap<>(TransitMode.class);
 
     /**
      * Ideally maxTransfers should be set in the router config, not here. Instead the client should
@@ -732,6 +734,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this();
         this.bicycleOptimizeType = bicycleOptimizeType;
         this.setStreetSubRequestModes(modeSet);
+    }
+
+    public RoutingRequest(RequestModes modes) {
+        this();
+        this.modes = modes;
     }
 
     /* ACCESSOR/SETTER METHODS */
@@ -1405,7 +1412,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      *
      * If you encounter a case of this, you can adjust this code to take this into account.
      *
-     * @see RoutingRequest.MAX_CLOSENESS_METERS
+     * @see RoutingRequest#MAX_CLOSENESS_METERS
      * @see DominanceFunction#betterOrEqualAndComparable(State, State)
      */
     public boolean isCloseToStartOrEnd(Vertex vertex) {

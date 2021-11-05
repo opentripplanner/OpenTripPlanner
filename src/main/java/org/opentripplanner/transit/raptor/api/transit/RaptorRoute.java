@@ -21,12 +21,14 @@ public interface RaptorRoute<T extends RaptorTripSchedule> {
     RaptorTripPattern pattern();
 
     /**
-     * Return a guaranteed transfer provider for the given route transferring TO the route.
+     * Return a service to search for transfer with constraints for the given route transferring
+     * FROM the route. This is used by raptor when searching in reverse.
      */
-    RaptorGuaranteedTransferProvider<T> getGuaranteedTransfersTo();
+    RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsForwardSearch();
 
     /**
-     * Return a guaranteed transfer provider for the given route transferring FROM the route.
+     * Return a service to search for transfers with constraints for the given route transferring
+     * TO the route. This is used by raptor when searching forward.
      */
-    RaptorGuaranteedTransferProvider<T> getGuaranteedTransfersFrom();
+    RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsReverseSearch();
 }

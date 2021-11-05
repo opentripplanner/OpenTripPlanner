@@ -2,16 +2,12 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.WAIT_TIME_L11_L21;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.WAIT_TIME_L21_L31;
 import static org.opentripplanner.util.time.DurationUtils.duration;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 
 public class TransferWaitTimeCalculatorTest {
-  private static final double WAIT_RELUCTANCE = 0.5;
   private static final double EPSILON = 0.1;
 
   final int d12s = duration("12s");
@@ -42,7 +38,7 @@ public class TransferWaitTimeCalculatorTest {
     double[] ns = { 1.0, 2.0, 10.0 };
 
     for (double n : ns) {
-      subject = new TransferWaitTimeCalculator(WAIT_RELUCTANCE,0.5, n);
+      subject = new TransferWaitTimeCalculator(n);
 
       for (int t0 : ts) {
         subject.setMinSafeTransferTime(t0);
@@ -61,7 +57,7 @@ public class TransferWaitTimeCalculatorTest {
 
   @Test
   public void calculateTxCost_sample_A() {
-    subject = new TransferWaitTimeCalculator(WAIT_RELUCTANCE, 1.0, 2.0);
+    subject = new TransferWaitTimeCalculator(2.0);
     subject.setMinSafeTransferTime(d2m);
 
     assertEquals(23664.0, subject.calculateOptimizedWaitCost(1), EPSILON);
@@ -75,7 +71,7 @@ public class TransferWaitTimeCalculatorTest {
 
   @Test
   public void calculateTxCost_sample_B() {
-    subject = new TransferWaitTimeCalculator(WAIT_RELUCTANCE, 1.0, 5.0);
+    subject = new TransferWaitTimeCalculator(5.0);
     subject.setMinSafeTransferTime(d10m);
 
     assertEquals(296607.0, subject.calculateOptimizedWaitCost(1), EPSILON);
@@ -90,48 +86,8 @@ public class TransferWaitTimeCalculatorTest {
   @Test
   public void calculateTxCostWithNoMinSafeTxTimeThrowsException() {
     assertThrows(IllegalStateException.class, () -> {
-      var subject = new TransferWaitTimeCalculator(WAIT_RELUCTANCE, 1.0, 2.0);
+      var subject = new TransferWaitTimeCalculator(2.0);
       subject.calculateOptimizedWaitCost(d20m);
     });
-  }
-
-  @Test
-  public void testLinearCostPart() {
-    // Given:
-    var aPath = BasicPathTestCase.basicTripAsPath();
-    double inverseWaitReluctance = 0.5;
-    int waitTime = aPath.waitTime();
-
-    // When: set min-safe-wait-time-factor to zero(0) and min-safe-transfer-time to any value
-    var subject = new TransferWaitTimeCalculator(WAIT_RELUCTANCE, inverseWaitReluctance, 0.0);
-    subject.setMinSafeTransferTime(99999999);
-
-    // Then: expect the cost to be equal to the original cost minus cost of waiting
-    int expectedCost = aPath.generalizedCost()
-            - RaptorCostConverter.toRaptorCost((WAIT_RELUCTANCE + inverseWaitReluctance) * waitTime);
-
-    assertEquals(expectedCost, subject.cost(aPath.accessLeg()));
-  }
-
-  @Test
-  public void testAccumulationOfLogarithmicCostPart() {
-    // Given:
-    var aPath = BasicPathTestCase.basicTripAsPath();
-
-    // When:
-    //    - set the inverseWaitReluctance to minus waitReluctance to zero out the effect of the
-    //      linear part of the function
-    //    - Set a minSafeWaitTimeFactor of 1.0
-    var subject = new TransferWaitTimeCalculator(WAIT_RELUCTANCE, -WAIT_RELUCTANCE, 1.0);
-    // Set to 6.67% (15/100) of 120m = 1080s
-    subject.setMinSafeTransferTime(1080);
-
-    // Then: expect the cost to be equal to the original cost plus the wait-time cost
-    double expectedCost = aPath.generalizedCost()
-        + subject.calculateOptimizedWaitCost(WAIT_TIME_L11_L21)
-        + subject.calculateOptimizedWaitCost(WAIT_TIME_L21_L31)
-    ;
-
-    assertEquals(expectedCost, subject.cost(aPath.accessLeg()), 1.0);
   }
 }

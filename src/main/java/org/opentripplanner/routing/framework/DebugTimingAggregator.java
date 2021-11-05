@@ -17,18 +17,35 @@ public class DebugTimingAggregator {
 
   private long startedCalculating;
   private long finishedPrecalculating;
+
+  private long startedDirectStreetRouter;
   private long finishedDirectStreetRouter;
+  private long directStreetRouterTime;
+
+  private long startedDirectFlexRouter;
+  private long finishedDirectFlexRouter;
+  private long directFlexRouterTime;
 
   private long finishedPatternFiltering;
   private long finishedAccessEgress;
   private long finishedRaptorSearch;
 
   private long finishedTransitRouter;
+  private long finishedRouters;
   private long finishedFiltering;
   private long finishedRendering;
 
+  private long startedAccessCalculating;
+  private long finishedAccessCalculating;
+  private long startedEgressCalculating;
+  private long finishedEgressCalculating;
+  private long accessTime;
+  private long egressTime;
+  private int numAccesses;
+  private int numEgresses;
+
   private long precalculationTime;
-  private long directStreetRouterTime;
+  private long startedTransitRouterTime;
   private long tripPatternFilterTime;
   private long accessEgressTime;
   private long raptorSearchTime;
@@ -57,15 +74,39 @@ public class DebugTimingAggregator {
     if(notEnabled) { return; }
     finishedPrecalculating = System.currentTimeMillis();
     precalculationTime = finishedPrecalculating - startedCalculating;
-    log("┌  Routing initialization", directStreetRouterTime);
+    log("┌  Routing initialization", precalculationTime);
+  }
+
+  /** Record the time when starting the direct street router search. */
+  public void startedDirectStreetRouter() {
+    if(notEnabled) { return; }
+    startedDirectStreetRouter = System.currentTimeMillis();
   }
 
   /** Record the time when we finished the direct street router search. */
   public void finishedDirectStreetRouter() {
     if(notEnabled) { return; }
     finishedDirectStreetRouter = System.currentTimeMillis();
-    directStreetRouterTime = finishedDirectStreetRouter - finishedPrecalculating;
-    log("├  Direct street routing", directStreetRouterTime);
+    directStreetRouterTime = finishedDirectStreetRouter - startedDirectStreetRouter;
+  }
+
+  /** Record the time when starting the direct flex router search. */
+  public void startedDirectFlexRouter() {
+    if(notEnabled) { return; }
+    startedDirectFlexRouter = System.currentTimeMillis();
+  }
+
+  /** Record the time when we finished the direct flex router search. */
+  public void finishedDirectFlexRouter() {
+    if(notEnabled) { return; }
+    finishedDirectFlexRouter = System.currentTimeMillis();
+    directFlexRouterTime = finishedDirectFlexRouter - startedDirectFlexRouter;
+  }
+
+  /** Record the time when starting the transit router search. */
+  public void startedTransitRouting() {
+    if(notEnabled) { return; }
+    startedTransitRouterTime = System.currentTimeMillis();
   }
 
   /**
@@ -74,18 +115,40 @@ public class DebugTimingAggregator {
   public void finishedPatternFiltering() {
     if(notEnabled) { return; }
     finishedPatternFiltering = System.currentTimeMillis();
-    tripPatternFilterTime = finishedPatternFiltering - finishedDirectStreetRouter;
-    log("│┌ Filtering tripPatterns", tripPatternFilterTime);
+    tripPatternFilterTime = finishedPatternFiltering - startedTransitRouterTime;
+  }
+
+  public void startedAccessCalculating() {
+    if(notEnabled) { return; }
+    startedAccessCalculating = System.currentTimeMillis();
+  }
+
+  public void finishedAccessCalculating() {
+    if(notEnabled) { return; }
+    finishedAccessCalculating = System.currentTimeMillis();
+    accessTime = finishedAccessCalculating - startedAccessCalculating;
+  }
+
+  public void startedEgressCalculating() {
+    if(notEnabled) { return; }
+    startedEgressCalculating = System.currentTimeMillis();
+  }
+
+  public void finishedEgressCalculating() {
+    if(notEnabled) { return; }
+    finishedEgressCalculating = System.currentTimeMillis();
+    egressTime = finishedEgressCalculating - startedEgressCalculating;
   }
 
   /**
    * Record the time when we are finished with the access and egress routing.
    */
-  public void finishedAccessEgress() {
+  public void finishedAccessEgress(int numAccesses, int numEgresses) {
     if(notEnabled) { return; }
     finishedAccessEgress = System.currentTimeMillis();
     accessEgressTime = finishedAccessEgress - finishedPatternFiltering;
-    log("│├ Access/egress routing", accessEgressTime);
+    this.numAccesses = numAccesses;
+    this.numEgresses = numEgresses;
   }
 
   /**
@@ -95,7 +158,6 @@ public class DebugTimingAggregator {
     if(notEnabled) { return; }
     finishedRaptorSearch = System.currentTimeMillis();
     raptorSearchTime = finishedRaptorSearch - finishedAccessEgress;
-    log("│├ Main routing", raptorSearchTime);
   }
 
   /**
@@ -104,27 +166,45 @@ public class DebugTimingAggregator {
   public void finishedItineraryCreation() {
     if(notEnabled) { return; }
     itineraryCreationTime = System.currentTimeMillis() - finishedRaptorSearch;
-    log("│├ Creating itineraries", itineraryCreationTime);
   }
 
-  /** Record the time when we finished the tranist router search */
+  /** Record the time when we finished the transit router search */
   public void finishedTransitRouter() {
     if(notEnabled) { return; }
     finishedTransitRouter = System.currentTimeMillis();
-    transitRouterTime = finishedTransitRouter - finishedDirectStreetRouter;
+    transitRouterTime = finishedTransitRouter - startedTransitRouterTime;
+  }
+
+  public void finishedRouting() {
+    if(notEnabled) { return; }
+
+    finishedRouters = System.currentTimeMillis();
+    if (directStreetRouterTime > 0) {
+      log("├  Direct street routing", directStreetRouterTime);
+    }
+    if (directFlexRouterTime > 0) {
+      log("├  Direct flex routing", directFlexRouterTime);
+    }
 
     if (finishedPatternFiltering > 0) {
+      log("│┌ Creating raptor data model", tripPatternFilterTime);
+      log("│├ Access routing (" + numAccesses + " accesses)", accessTime);
+      log("│├ Egress routing ("+ numEgresses +" egresses)", egressTime);
+      log("││ Access/Egress routing", accessEgressTime);
+      log("│├ Main routing", raptorSearchTime);
+      log("│├ Creating itineraries", itineraryCreationTime);
       log("├┴ Transit routing total", transitRouterTime);
     } else {
       log("├─ Transit routing total", transitRouterTime);
     }
+    log("│  Routing total: ", finishedRouters - finishedPrecalculating);
   }
 
   /** Record the time when we finished filtering the paths for this request. */
   public void finishedFiltering() {
     if(notEnabled) { return; }
     finishedFiltering = System.currentTimeMillis();
-    filteringTime = finishedFiltering - finishedTransitRouter;
+    filteringTime = finishedFiltering - finishedRouters;
     log("├  Filtering itineraries", filteringTime);
   }
 
@@ -162,6 +242,6 @@ public class DebugTimingAggregator {
   }
 
   private void log(String msg, long millis) {
-    messages.add(String.format("%-30s: %5s ms", msg, millis));
+    messages.add(String.format("%-36s: %5s ms", msg, millis));
   }
 }

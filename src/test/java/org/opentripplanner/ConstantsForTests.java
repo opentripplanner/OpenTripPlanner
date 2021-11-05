@@ -77,6 +77,7 @@ public class ConstantsForTests {
     public static final String HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = "src/test/resources/germany/herrenberg-hindenburgstr-under-construction.osm.pbf";
     public static final String HERRENBERG_BARRIER_GATES_OSM = "src/test/resources/germany/herrenberg-barrier-gates.osm.pbf";
     public static final String HERRENBERG_OSM = "src/test/resources/germany/herrenberg-minimal.osm.pbf";
+    public static final String ISLAND_PRUNE_OSM = "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
 
     private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
             new File(NETEX_DIR, NETEX_FILENAME),

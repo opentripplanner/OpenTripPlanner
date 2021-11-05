@@ -7,11 +7,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
@@ -38,19 +36,14 @@ class StreetGraphFinderTest extends GraphRoutingTest {
 
     @BeforeEach
     protected void setUp() throws Exception {
-        var a = new Agency(new FeedScopedId("F", "Agency"), "Agency", null);
-
-        R1 = new Route(new FeedScopedId("F", "R1"));
-        R1.setAgency(a);
-        R1.setMode(TransitMode.BUS);
-
-        R2 = new Route(new FeedScopedId("F", "R2"));
-        R2.setAgency(a);
-        R2.setMode(TransitMode.TRAM);
-
         var graph = graphOf(new Builder() {
             @Override
             public void build() {
+                var a = agency("Agency");
+
+                R1 = route("R1", TransitMode.BUS, a);
+                R2 = route("R2", TransitMode.TRAM, a);
+
                 S1 = stop("S1", 47.500, 19.001);
                 S2 = stop("S2", 47.510, 19.001);
                 S3 = stop("S3", 47.520, 19.001);
@@ -297,11 +290,5 @@ class StreetGraphFinderTest extends GraphRoutingTest {
                 )
         )
                 .collect(Collectors.toList());
-    }
-
-    private StopTime st(TransitStopVertex s1) {
-        var st = new StopTime();
-        st.setStop(s1.getStop());
-        return st;
     }
 }

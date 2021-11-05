@@ -1,6 +1,5 @@
 package org.opentripplanner.model.plan;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +14,7 @@ import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -107,11 +106,6 @@ public class Leg {
    public Integer routeType = null;
 
    /**
-    * For transit legs, if the rider should stay on the vehicle as it changes route names.
-    */
-   public Boolean interlineWithPreviousLeg;
-
-   /**
     * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
     */
    public String headsign = null;
@@ -172,9 +166,9 @@ public class Leg {
 
    public BookingInfo pickupBookingInfo = null;
 
-    public Transfer transferFromPrevLeg = null;
+    public ConstrainedTransfer transferFromPrevLeg = null;
 
-    public Transfer transferToNextLeg = null;
+    public ConstrainedTransfer transferToNextLeg = null;
 
     /**
      * Is this leg walking with a bike?
@@ -216,6 +210,14 @@ public class Leg {
        return mode.isTransit();
    }
 
+    /**
+     * For transit legs, if the rider should stay on the vehicle as it changes route names.
+     * This is the same as a stay-seated transfer.
+     */
+    public Boolean isInterlinedWithPreviousLeg() {
+        if(transferFromPrevLeg == null) { return false; }
+        return transferFromPrevLeg.getTransferConstraint().isStaySeated();
+    }
 
   /**
    * A scheduled leg is a leg riding a public scheduled transport including frequency based
@@ -329,7 +331,6 @@ public class Leg {
                 .addEntityId("routeId", getRoute())
                 .addEntityId("tripId", trip)
                 .addStr("headsign", headsign)
-                .addBool("interlineWithPreviousLeg", interlineWithPreviousLeg)
                 .addObj("serviceDate", serviceDate)
                 .addStr("routeBrandingUrl", routeBrandingUrl)
                 .addCol("intermediateStops", intermediateStops)
@@ -342,6 +343,8 @@ public class Leg {
                 .addBool("walkingBike", walkingBike)
                 .addBool("rentedVehicle", rentedVehicle)
                 .addStr("bikeRentalNetwork", vehicleRentalNetwork)
+                .addObj("transferFromPrevLeg", transferFromPrevLeg)
+                .addObj("transferToNextLeg", transferToNextLeg)
                 .toString();
     }
 }

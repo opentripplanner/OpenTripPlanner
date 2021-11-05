@@ -1,24 +1,27 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
+import org.entur.gbfs.v2_2.free_bike_status.GBFSFreeBikeStatus;
+import org.entur.gbfs.v2_2.station_information.GBFSStationInformation;
+import org.entur.gbfs.v2_2.station_status.GBFSStation;
+import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
+import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
+import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
-import org.opentripplanner.util.HttpUtils;
-import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by demory on 2017-03-14.
@@ -31,214 +34,97 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
 
-    private static final String DEFAULT_NETWORK_NAME = "GBFS";
+    private final String url;
 
-    // station_information.json required by GBFS spec
-    private final GbfsStationDataSource stationInformationSource;
+    private final String language;
 
-    // station_status.json required by GBFS spec
-    private final GbfsStationStatusDataSource stationStatusSource;
+    private final Map<String, String> httpHeaders;
 
-    // free_bike_status.json declared OPTIONAL by GBFS spec
-    private final GbfsFloatingVehicleDataSource floatingBikeSource;
+    /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
+    private final boolean allowKeepingRentedVehicleAtDestination;
 
-    private final String networkName;
-
-    /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
-    private final boolean routeAsCar;
+    private GbfsFeedLoader loader;
 
     public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
-        routeAsCar = parameters.routeAsCar();
-        stationInformationSource = new GbfsStationDataSource(parameters);
-        stationStatusSource = new GbfsStationStatusDataSource(parameters);
-        floatingBikeSource = OTPFeature.FloatingBike.isOn()
-            ? new GbfsFloatingVehicleDataSource(parameters)
-            : null;
-
-        configureUrls(parameters.getUrl(), parameters.getHttpHeaders());
-        this.networkName = parameters.getNetwork(DEFAULT_NETWORK_NAME);
+        url = parameters.getUrl();
+        language = parameters.language();
+        httpHeaders = parameters.getHttpHeaders();
+        allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
     }
 
-    private void configureUrls(String url, Map<String, String> headers) {
-        GbfsAutoDiscoveryDataSource gbfsAutoDiscoveryDataSource = new GbfsAutoDiscoveryDataSource(url, headers);
-        stationInformationSource.setUrl(gbfsAutoDiscoveryDataSource.stationInformationUrl);
-        stationStatusSource.setUrl(gbfsAutoDiscoveryDataSource.stationStatusUrl);
-        if (OTPFeature.FloatingBike.isOn()) {
-            floatingBikeSource.setUrl(gbfsAutoDiscoveryDataSource.freeBikeStatusUrl);
-        }
+    @Override
+    public void setup() {
+        loader = new GbfsFeedLoader(url, httpHeaders, language);
     }
 
     @Override
     public boolean update() {
-        // These first two GBFS files are required.
-        boolean updatesFound = stationInformationSource.update();
-        updatesFound |= stationStatusSource.update();
-        // This floating-bikes file is optional, and does not appear in all GBFS feeds.
-        if (OTPFeature.FloatingBike.isOn()) {
-            updatesFound |= floatingBikeSource.update();
+        if (loader == null) {
+            return false;
         }
-        // Return true if ANY of the sub-updaters found any updates.
-        return updatesFound;
+        return loader.update();
     }
 
     @Override
-    public List<VehicleRentalStation> getStations() {
+    public List<VehicleRentalPlace> getStations() {
 
-        // Index all the station status entries on their station ID.
-        Map<FeedScopedId, VehicleRentalStation> statusLookup = new HashMap<>();
-        for (VehicleRentalStation station : stationStatusSource.getStations()) {
-            statusLookup.put(station.id, station);
+        // Get system information
+        GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);
+        GbfsSystemInformationMapper systemInformationMapper = new GbfsSystemInformationMapper();
+        VehicleRentalSystem system = systemInformationMapper.mapSystemInformation(systemInformation.getData());
+
+        // Get vehicle types
+        Map<String, RentalVehicleType> vehicleTypes = null;
+        GBFSVehicleTypes rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
+        if (rawVehicleTypes != null) {
+            GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId);
+            vehicleTypes = rawVehicleTypes.getData().getVehicleTypes().stream()
+                    .map(vehicleTypeMapper::mapRentalVehicleType)
+                    .collect(Collectors.toMap(v -> v.id.getId(), Function.identity()));
         }
 
-        // Iterate over all known stations, and if we have any status information add it to those station objects.
-        for (VehicleRentalStation station : stationInformationSource.getStations()) {
-            if (!statusLookup.containsKey(station.id)) continue;
-            VehicleRentalStation status = statusLookup.get(station.id);
-            station.vehiclesAvailable = status.vehiclesAvailable;
-            station.spacesAvailable = status.spacesAvailable;
+        List<VehicleRentalPlace> stations = new LinkedList<>();
+
+        // Both station information and status are required for all systems using stations
+        GBFSStationInformation stationInformation = loader.getFeed(GBFSStationInformation.class);
+        GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
+        if (stationInformation != null && stationStatus != null) {
+            // Index all the station status entries on their station ID.
+            Map<String, GBFSStation> statusLookup = stationStatus.getData().getStations().stream()
+                    .collect(Collectors.toMap(GBFSStation::getStationId, Function.identity()));
+            GbfsStationStatusMapper stationStatusMapper = new GbfsStationStatusMapper(statusLookup, vehicleTypes);
+            GbfsStationInformationMapper stationInformationMapper = new GbfsStationInformationMapper(system, vehicleTypes, allowKeepingRentedVehicleAtDestination);
+
+            // Iterate over all known stations, and if we have any status information add it to those station objects.
+            stations.addAll(stationInformation.getData().getStations().stream()
+                    .map(stationInformationMapper::mapStationInformation)
+                    .peek(stationStatusMapper::fillStationStatus)
+                    .collect(Collectors.toList())
+            );
         }
 
-        // Copy the full list of station objects (with status updates) into a List, appending the floating bike stations.
-        List<VehicleRentalStation> stations = new LinkedList<>(stationInformationSource.getStations());
+        // Append the floating bike stations.
         if (OTPFeature.FloatingBike.isOn()) {
-            stations.addAll(floatingBikeSource.getStations());
+            GBFSFreeBikeStatus freeBikeStatus = loader.getFeed(GBFSFreeBikeStatus.class);
+            if (freeBikeStatus != null) {
+                GbfsFreeVehicleStatusMapper freeVehicleStatusMapper = new GbfsFreeVehicleStatusMapper(system, vehicleTypes);
+                stations.addAll(freeBikeStatus.getData().getBikes().stream()
+                        .map(freeVehicleStatusMapper::mapFreeVehicleStatus)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
+                );
+            }
         }
 
         return stations;
     }
 
-    private static class GbfsAutoDiscoveryDataSource {
-        private String stationInformationUrl;
-        private String stationStatusUrl;
-        private String freeBikeStatusUrl;
-
-        public GbfsAutoDiscoveryDataSource(String autoDiscoveryUrl, Map<String, String> headers) {
-
-            try {
-                InputStream is = HttpUtils.getData(autoDiscoveryUrl, headers);
-                JsonNode node = (new ObjectMapper()).readTree(is);
-                JsonNode languages = node.get("data");
-
-                for (JsonNode language : languages) {
-
-                    JsonNode feeds = language.get("feeds");
-
-                    for (JsonNode feed : feeds) {
-                        String url = feed.get("url").asText();
-                        switch (feed.get("name").asText()) {
-                            case "station_information":
-                                stationInformationUrl = url;
-                                break;
-                            case "station_status":
-                                stationStatusUrl = url;
-                                break;
-                            case "free_bike_status":
-                                freeBikeStatusUrl = url;
-                                break;
-                        }
-                    }
-                }
-            } catch (IOException | IllegalArgumentException e) {
-                LOG.warn("Error reading auto discovery file at {}. Using default values.",
-                    autoDiscoveryUrl, e);
-                // If the GBFS auto-discovery file (gbfs.json) can't be downloaded, fall back to the
-                // v1 logic of finding the files under the given base path.
-                var baseUrl = getBaseUrl(autoDiscoveryUrl);
-                stationInformationUrl = baseUrl + "station_information.json";
-                stationStatusUrl = baseUrl + "station_status.json";
-                freeBikeStatusUrl = baseUrl + "free_bike_status.json";
-            }
-        }
-
-        private String getBaseUrl(String url) {
-            String baseUrl = url;
-            if (baseUrl.endsWith("gbfs.json")) {
-                baseUrl = baseUrl.substring(0, url.length() - "gbfs.json".length());
-            }
-            if (baseUrl.endsWith("gbfs")) {
-                baseUrl = baseUrl.substring(0, url.length() - "gbfs".length());
-            }
-            if (!baseUrl.endsWith("/")) {
-                baseUrl += "/";
-            }
-            return baseUrl;
-        }
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(GbfsVehicleRentalDataSource.class)
+                .addStr("url", url)
+                .addStr("language", language)
+                .addBoolIfTrue("allowKeepingRentedVehicleAtDestination", allowKeepingRentedVehicleAtDestination)
+                .toString();
     }
-
-    class GbfsStationDataSource extends GenericJsonVehicleRentalDataSource<GbfsVehicleRentalDataSourceParameters> {
-
-        public GbfsStationDataSource (GbfsVehicleRentalDataSourceParameters config) {
-            super(config, "data/stations");
-        }
-
-        @Override
-        public VehicleRentalStation makeStation(JsonNode stationNode) {
-            VehicleRentalStation brstation = new VehicleRentalStation();
-            brstation.id = new FeedScopedId(networkName, stationNode.path("station_id").asText());
-            brstation.longitude = stationNode.path("lon").asDouble();
-            brstation.latitude = stationNode.path("lat").asDouble();
-            brstation.name =  new NonLocalizedString(stationNode.path("name").asText());
-            brstation.isKeepingVehicleRentalAtDestinationAllowed = config.allowKeepingRentedVehicleAtDestination();
-            brstation.isCarStation = routeAsCar;
-
-            if (stationNode.has("rental_uris")) {
-                var rentalUrisObject = stationNode.path("rental_uris");
-                String androidUri = rentalUrisObject.has("android") ? rentalUrisObject.get("android").asText() : null;
-                String iosUri = rentalUrisObject.has("ios") ? rentalUrisObject.get("ios").asText() : null;
-                String webUri = rentalUrisObject.has("web") ? rentalUrisObject.get("web").asText() : null;
-                brstation.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
-            }
-
-            return brstation;
-        }
-    }
-
-    class GbfsStationStatusDataSource extends GenericJsonVehicleRentalDataSource<GbfsVehicleRentalDataSourceParameters> {
-
-        public GbfsStationStatusDataSource (GbfsVehicleRentalDataSourceParameters config) {
-            super(config, "data/stations");
-        }
-
-        @Override
-        public VehicleRentalStation makeStation(JsonNode stationNode) {
-            VehicleRentalStation brstation = new VehicleRentalStation();
-            brstation.id = new FeedScopedId(networkName, stationNode.path("station_id").asText());
-            brstation.vehiclesAvailable = stationNode.path("num_bikes_available").asInt();
-            brstation.spacesAvailable = stationNode.path("num_docks_available").asInt();
-            brstation.isKeepingVehicleRentalAtDestinationAllowed = config.allowKeepingRentedVehicleAtDestination();
-            brstation.isCarStation = routeAsCar;
-            return brstation;
-        }
-    }
-
-    // TODO This is not currently safe to use. See javadoc on GbfsVehicleRentalDataSource class.
-    class GbfsFloatingVehicleDataSource extends GenericJsonVehicleRentalDataSource<GbfsVehicleRentalDataSourceParameters> {
-
-        public GbfsFloatingVehicleDataSource(GbfsVehicleRentalDataSourceParameters config) {
-            super(config, "data/bikes");
-        }
-
-        @Override
-        public VehicleRentalStation makeStation(JsonNode stationNode) {
-            if (stationNode.path("station_id").asText().isBlank() &&
-                    stationNode.has("lon") &&
-                    stationNode.has("lat")
-            ) {
-                VehicleRentalStation brstation = new VehicleRentalStation();
-                brstation.id = new FeedScopedId(networkName, stationNode.path("bike_id").asText());
-                brstation.name = new NonLocalizedString(stationNode.path("name").asText());
-                brstation.longitude = stationNode.path("lon").asDouble();
-                brstation.latitude = stationNode.path("lat").asDouble();
-                brstation.vehiclesAvailable = 1;
-                brstation.spacesAvailable = 0;
-                brstation.allowDropoff = false;
-                brstation.isFloatingBike = true;
-                brstation.isCarStation = routeAsCar;
-                return brstation;
-            } else {
-                return null;
-            }
-        }
-    }
-
 }

@@ -119,6 +119,7 @@ public class WalkableAreaBuilder {
         for (Ring ring : group.outermostRings) {
 
             AreaEdgeList edgeList = new AreaEdgeList();
+            edgeList.setOriginalEdges(ring.toJtsPolygon());
             // the points corresponding to concave or hole vertices
             // or those linked to ways
             HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
@@ -243,9 +244,9 @@ public class WalkableAreaBuilder {
             }
 
             if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
-                issueStore.add(
-                        new AreaNotEpsilonValid(group.getSomeOSMObject().getId()));
-                continue;
+                // these errors seem not to harm area visibility processing
+                // so just log an error (most likely OSM mapping error)
+                issueStore.add(new AreaNotEpsilonValid(group.getSomeOSMObject().getId()));
             }
 
             edgeList.setOriginalEdges(ring.toJtsPolygon());

@@ -2,9 +2,12 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
@@ -133,17 +136,6 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     }
 
     /**
-     * The computed generalized-cost for this path leg.
-     * <p>
-     * {@code -1} is returned if no cost exist.
-     * <p>
-     * The unit is seconds (OTP Domain/AStar unit)
-     */
-    public int otpDomainCost() {
-        return RaptorCostConverter.toOtpDomainCost(generalizedCost());
-    }
-
-    /**
      * The first leg/path of this journey - witch is linked to the next and so on. The leg
      * can contain sub-legs, for example: walk-flex-walk.
      *
@@ -190,17 +182,31 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                 .map(PathLeg::asTransitLeg);
     }
 
-    public String toStringDetailed() {
-        return toString(true);
+    public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
+        return buildString(true, stopNameResolver, null);
+    }
+
+    public String toString(RaptorStopNameResolver stopNameTranslator) {
+        return buildString(false, stopNameTranslator, null);
     }
 
     @Override
     public String toString() {
-        return toString(false);
+        return buildString(false, null, null);
     }
 
-    public String toString(boolean detailed) {
-        PathStringBuilder buf = new PathStringBuilder();
+    protected String toString(boolean detailed, RaptorStopNameResolver stopNameResolver) {
+        return buildString(detailed, stopNameResolver, null);
+    }
+
+    protected String buildString(
+            boolean detailed,
+            @Nullable RaptorStopNameResolver stopNameResolver,
+            @Nullable Consumer<PathStringBuilder> appendToSummary
+            ) {
+        RaptorTransferConstraint constraintPrevLeg = null;
+        var buf = new PathStringBuilder(stopNameResolver);
+
         if(accessLeg != null) {
             int prevToTime = 0;
             for (PathLeg<T> leg : accessLeg.iterator()) {
@@ -210,10 +216,18 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                 }
                 else {
                     buf.sep().stop(leg.fromStop());
+
                     if(detailed) {
                         buf.duration(leg.fromTime() - prevToTime);
+                        // Add Transfer constraints info from the previous transit lag
+                        if(constraintPrevLeg != null) {
+                            buf.space().append(constraintPrevLeg.toString());
+                            constraintPrevLeg = null;
+                        }
                     }
+
                     buf.sep();
+
                     if (leg.isTransitLeg()) {
                         TransitPathLeg<T> transitLeg = leg.asTransitLeg();
                         buf.transit(
@@ -223,7 +237,11 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
                         );
                         if (detailed) {
                             buf.duration(leg.duration());
-                            buf.costCentiSec(leg.generalizedCost());
+                            buf.generalizedCostSentiSec(leg.generalizedCost());
+                        }
+                        if(transitLeg.getConstrainedTransferAfterLeg() != null) {
+                            constraintPrevLeg = transitLeg.getConstrainedTransferAfterLeg()
+                                    .getTransferConstraint();
                         }
                     }
                     else if (leg.isTransferLeg()) {
@@ -242,10 +260,14 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
         }
         // Add summary info
         {
-            buf.append("[").time(startTime, endTime).duration(endTime - startTime);
+            buf.append("[")
+                    .time(startTime, endTime)
+                    .duration(endTime - startTime)
+                    .generalizedCostSentiSec(generalizedCost);
 
-            if (detailed) { buf.costCentiSec(generalizedCost); }
-            else { buf.costSec(generalizedCost); }
+            if(appendToSummary != null) {
+                appendToSummary.accept(buf);
+            }
 
             buf.append("]");
         }
@@ -305,7 +327,6 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private static <S extends RaptorTripSchedule> int countNumberOfTransfers(
         AccessPathLeg<S> accessLeg, EgressPathLeg<S> egressPathLeg
     ) {
-
         return accessLeg.access().numberOfRides()
             // Skip first transit
             + (int)accessLeg.nextLeg().nextLeg().stream().filter(PathLeg::isTransitLeg).count()

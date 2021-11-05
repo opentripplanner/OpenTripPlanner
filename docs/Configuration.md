@@ -166,7 +166,8 @@ Feature | Description | Enabled by default | Sandbox
 `APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
 `APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
 `OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (witch stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
-`GuaranteedTransfers` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
+`ParallelRouting` | Enable performing parts of the trip planning in parallel | yes | no
+`TransferConstraints` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
 `ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
 `GoogleCloudStorage` | Enable Google Cloud Storage integration | no | yes
 `SandboxAPITransmodelApi` | Enable Entur Transmodel(NeTEx) GraphQL API | no | yes
@@ -200,7 +201,7 @@ config key | description | value type | value default | notes
 `matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
 `maxDataImportIssuesPerFile` | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files | int | 1,000 | 
 `maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
-`maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
+`maxTransferDurationSeconds` | Transfers up to this duration in seconds will be pre-calculated and included in the Graph | double | 1800 | units: seconds
 `multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
 `osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`, `germany`
@@ -211,6 +212,7 @@ config key | description | value type | value default | notes
 `streets` | Include street input files (OSM/PBF) | boolean | true | 
 `storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
 `subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
+`transferRequests` | Routing requests to use for pre-calculating stop-to-stop transfers. | object | `[ { mode: WALK } ]` |
 `transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
 `transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | date or period | &minus;P1Y | _2020&#8209;01&#8209;01, &minus;P1M3D, &minus;P3W_
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
@@ -690,9 +692,14 @@ The order of transfer priority is:
 5. ALLOWED
 6. NOT_ALLOWED
 
-If two paths have the same priority level, then we break the tie by looking at waiting time. The goal is to maximize the wait time, avoiding situations where very little time is available to make the transfer. This is balanced with the generalized cost. The cost is adjusted with a new cost for the wait-time. The new wait-time cost follows an inverse logarithmic cost function (see the design doc). 
+If two paths have the same priority level, then we break the tie by looking at waiting time. The
+goal is to maximize the wait time, avoiding situations where there is little time available to make
+the transfer. This is balanced with the generalized-cost. The cost is adjusted with a new cost for
+the wait-time. The new wait-time cost follows an inverse logarithmic cost function (see the design
+doc).
 
-The defaults should work fine, but if you have results with "back-travel" try increasing the two parameters `minSafeWaitTimeFactor` and `inverseWaitReluctance`.
+The defaults should work fine, but if you have results with "back-travel" try increasing
+the `minSafeWaitTimeFactor`.
 
 ```JSON
 // router-config.json
@@ -700,8 +707,7 @@ The defaults should work fine, but if you have results with "back-travel" try in
   "routingDefaults": {
     "transferOptimization": {
       "optimizeTransferWaitTime": true,
-      "minSafeWaitTimeFactor": 5.0,
-      "inverseWaitReluctance": 1.0
+      "minSafeWaitTimeFactor": 5.0
     }
   }
 }
@@ -725,7 +731,8 @@ config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
 `debug` | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters. | boolean | `false`
 `groupSimilarityKeepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
-`groupSimilarityKeepNumOfItineraries` | Reduce the number of itineraries to the requested number by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
+`groupSimilarityKeepThree` | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
+`groupedOtherThanSameLegsMaxCostMultiplier` | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.  | double | `2.0` (2x cost)
 `minSafeTransferTimeFactor` | Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details. | double | `0.0`
 `transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `3600 + 2.0 x`
 `nonTransitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for non-transit itineraries. The max limit is calculated using ALL itineraries, but only non-transit itineraries will be filtered out. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Non-transit itineraries with a cost higher than the max-limit is dropped from the result set. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `3600 + 2.0 x`
@@ -736,21 +743,23 @@ config key | description | value type | value default
 #### Group by similarity filters
 
 The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
-with `searchWindow` and the two group-by parameters(`groupSimilarityKeepOne` and 
-`groupSimilarityKeepNumOfItineraries`). 
+with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`, 
+`groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`). 
 
 The group-by-filter work by grouping itineraries together and then reducing the number of 
 itineraries in each group, keeping the itinerary/itineraries with the best itinerary 
 _generalized-cost_. The group-by function first pick all transit legs that account for more than N%
-of the itinerary based on distance traveled. This become the group-key. To keys are the same if all
+of the itinerary based on distance traveled. This become the group-key. Two keys are the same if all
 legs in one of the keys also exist in the other. Note, one key may have a lager set of legs than 
 the other, but they can still be the same. When comparing two legs we compare the `tripId` and make
 sure the legs overlap in place and time. Two legs are the same if both legs ride at least a common
 subsection of the same trip. The `keepOne` filter will keep ONE itinerary in each group. The 
-`keepNumOfItineraries` is a bit more complex, because it uses the `numOfItineraries` request 
-parameter to estimate a maxLimit for each group. For example, if the `numOfItineraries` is set to 
-5 and there is 3 groups, we set the _max-limit_ for each group to 2, returning between 4 and 6 
-elements depending on the distribution. The _max-limit_ can never be less than 1.
+`keepThree` keeps 3 itineraries for each group.
+
+The grouped itineraries can be further reduced by using `groupedOtherThanSameLegsMaxCostMultiplier`.
+This parameter filters out itineraries, where the legs that are not common for all the grouped 
+itineraries have a much higher cost, than the lowest in the group. By default, it filters out 
+itineraries that are at least double in cost for the non-grouped legs.
 
 
 #### Minimum Safe Transfer Time Additional Cost
@@ -782,11 +791,13 @@ seconds needed for the ride and alighting processes in `router-config.json` as f
 ```JSON
 // router-config.json
 {
-  "boardTimes": {
-    "AIRPLANE": 2700
-  },
-  "alightTimes": {
-    "AIRPLANE": 1200
+  "routingDefaults": {
+    "boardSlackForMode": {
+      "AIRPLANE": 2700
+    },
+    "alightSlackForMode": {
+      "AIRPLANE": 1200
+    }
   }
 }
 ```
@@ -1032,6 +1043,8 @@ To add a GBFS feed to the router add one entry in the `updater` field of `router
    "frequencySec": 60,
    // The URL of the GBFS feed auto-discovery file
    "url": "http://coast.socialbicycles.com/opendata/gbfs.json",
+   // Optionally specify the language version of the feed to use. If no language is set, the first language in the feed is used. 
+   "language": "en",
    // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
    "allowKeepingRentedBicycleAtDestination": true
 }

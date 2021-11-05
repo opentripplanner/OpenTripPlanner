@@ -4,6 +4,8 @@ import static org.opentripplanner.updater.DataSourceType.GBFS;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
@@ -45,19 +47,28 @@ public class VehicleRentalSourceFactory {
       case GBFS:
         return new GbfsVehicleRentalDataSourceParameters(
             url(),
-            network(),
-            routeAsCar(),
+            language(),
             allowKeepingRentedVehicleAtDestination(),
+            headers()
+        );
+      case SMOOVE:
+        return new SmooveBikeRentalDataSourceParameters(
+            url(),
+            network(),
+            allowOverloading(),
             headers()
         );
       default:
         return new VehicleRentalDataSourceParameters(
             type,
             url(),
-            network(),
             headers()
         );
     }
+  }
+
+  private String language() {
+    return c.asText("language", null);
   }
 
   private Map<String, String> headers() {
@@ -72,11 +83,11 @@ public class VehicleRentalSourceFactory {
     return c.asText("network", null);
   }
 
-  private boolean routeAsCar() {
-    return c.asBoolean("routeAsCar", false);
-  }
-
   private boolean allowKeepingRentedVehicleAtDestination() {
     return c.asBoolean("allowKeepingRentedBicycleAtDestination", false);
+  }
+
+  private boolean allowOverloading() {
+    return c.asBoolean("allowOverloading", false);
   }
 }

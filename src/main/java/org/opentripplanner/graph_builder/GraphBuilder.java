@@ -18,7 +18,7 @@ import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
@@ -125,10 +125,6 @@ public class GraphBuilder implements Runnable {
             osmModule.banDiscouragedBiking = config.banDiscouragedBiking;
             osmModule.maxAreaNodes = config.maxAreaNodes;
             graphBuilder.addModule(osmModule);
-            PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
-            pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-            pruneFloatingIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-            graphBuilder.addModule(pruneFloatingIslands);
         }
         if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
@@ -172,6 +168,17 @@ public class GraphBuilder implements Runnable {
         StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
         streetLinkerModule.setAddExtraEdgesToAreas(config.areaVisibility);
         graphBuilder.addModule(streetLinkerModule);
+
+        // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
+        // existence of stops in islands. If an island has a stop, it actually may be a real island and should
+        // not be removed quite as easily
+        if ( hasOsm ) {
+            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
+            pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+            pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+            graphBuilder.addModule(pruneNoThruIslands);
+        }
+
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
         List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
@@ -216,7 +223,7 @@ public class GraphBuilder implements Runnable {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! config.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds));
+                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds, config.transferRequests));
             }
             // Analyze routing between stops to generate report
             if (OTPFeature.TransferAnalyzer.isOn()) {
@@ -237,4 +244,3 @@ public class GraphBuilder implements Runnable {
         return graphBuilder;
     }
 }
-

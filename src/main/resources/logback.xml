@@ -48,7 +48,6 @@
   <!-- Raptor request debug logging - Turn on/off: debug/info -->
   <logger name="org.opentripplanner.transit.raptor.RaptorService" level="info"/>
 
-
   <!-- THIRD PARTY LOGGERS -->
 
   <logger name="ch.qos.logback" level="warn"/>

@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferPoint;
 
 public class TestTransferPoint implements TransferPoint {
@@ -25,5 +26,13 @@ public class TestTransferPoint implements TransferPoint {
 
     public boolean matches(TestTripSchedule schedule, int stop) {
         return this.schedule == schedule && this.stop == stop;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of()
+                .addNum("stop", stop)
+                .addObj("trip", schedule.pattern().debugInfo())
+                .toString();
     }
 }

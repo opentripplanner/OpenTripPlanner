@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class Transfer {
@@ -55,11 +55,11 @@ public class Transfer {
 
     public Optional<RaptorTransfer> asRaptorTransfer(RoutingRequest routingRequest) {
         if (edges == null || edges.isEmpty()) {
-            int durationSeconds = (int) Math.ceil(distanceMeters / routingRequest.walkSpeed);
+            double durationSeconds = distanceMeters / routingRequest.walkSpeed;
             return Optional.of(new TransferWithDuration(
                     this,
-                    durationSeconds,
-                    RaptorCostConverter.toRaptorCost((int) Math.ceil(durationSeconds * routingRequest.walkReluctance))
+                    (int) Math.ceil(durationSeconds),
+                    RaptorCostConverter.toRaptorCost(durationSeconds * routingRequest.walkReluctance)
             ));
         }
 

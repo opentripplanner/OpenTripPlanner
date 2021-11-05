@@ -45,7 +45,7 @@ public class TransferStopArrivalTest {
             ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
             TRANSIT_TO_STOP,
             TRANSIT_ALIGHT_TIME,
-            TRANSIT_COST,
+            ACCESS_ARRIVAL.cost() + TRANSIT_COST,
             TRANSIT_TRIP
     );
 
@@ -95,7 +95,7 @@ public class TransferStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "Walk { round: 1, stop: 102, arrival-time: 9:26 $2600.00 }",
+                "Walk { round: 1, stop: 102, arrival-time: 9:26 $2600 }",
                 subject.toString()
         );
     }

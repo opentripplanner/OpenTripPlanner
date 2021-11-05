@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toOtpDomainCost;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +18,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
-import org.opentripplanner.model.plan.VertexType;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -38,7 +40,6 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.util.PolylineEncoder;
 
 /**
@@ -95,7 +96,7 @@ public class RaptorPathToItineraryMapper {
             // Map transit leg
             if (pathLeg.isTransitLeg()) {
                 transitLeg = mapTransitLeg(
-                        request, optimizedPath, transitLeg, pathLeg.asTransitLeg(), firstLeg
+                        request, transitLeg, pathLeg.asTransitLeg(), firstLeg
                 );
                 firstLeg = false;
                 legs.add(transitLeg);
@@ -117,13 +118,12 @@ public class RaptorPathToItineraryMapper {
         Itinerary itinerary = new Itinerary(legs);
 
         // Map general itinerary fields
-        itinerary.generalizedCost = path.otpDomainCost();
+        itinerary.generalizedCost = toOtpDomainCost(path.generalizedCost());
         itinerary.arrivedAtDestinationWithRentedVehicle = mapped != null && mapped.arrivedAtDestinationWithRentedVehicle;
 
         if(optimizedPath != null) {
-            itinerary.waitTimeAdjustedGeneralizedCost = RaptorCostConverter.toOtpDomainCost(
-                    optimizedPath.waitTimeOptimizedCost()
-            );
+            itinerary.waitTimeOptimizedCost = toOtpDomainCost(optimizedPath.waitTimeOptimizedCost());
+            itinerary.transferPriorityCost = toOtpDomainCost(optimizedPath.transferPriorityCost());
         }
 
         return itinerary;
@@ -148,7 +148,6 @@ public class RaptorPathToItineraryMapper {
 
     private Leg mapTransitLeg(
             RoutingRequest request,
-            OptimizedPath<TripSchedule> optPath,
             Leg prevTransitLeg,
             TransitPathLeg<TripSchedule> pathLeg,
             boolean firstLeg
@@ -194,18 +193,13 @@ public class RaptorPathToItineraryMapper {
 
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
-        leg.generalizedCost = pathLeg.otpDomainCost();
+        leg.generalizedCost = toOtpDomainCost(pathLeg.generalizedCost());
 
         leg.dropOffBookingInfo = tripTimes.getDropOffBookingInfo(boardStopIndexInPattern);
         leg.pickupBookingInfo = tripTimes.getPickupBookingInfo(boardStopIndexInPattern);
 
-        if(optPath != null) {
-            var transfer = optPath.getTransferTo(pathLeg);
-            if(transfer != null) {
-                leg.transferFromPrevLeg = transfer;
-                prevTransitLeg.transferToNextLeg = transfer;
-            }
-        }
+        leg.transferToNextLeg = (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg();
+        leg.transferFromPrevLeg = prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg;
 
         // TODO OTP2 - alightRule and boardRule needs mapping
         //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary
@@ -235,8 +229,8 @@ public class RaptorPathToItineraryMapper {
         Stop transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = ((TransferWithDuration) pathLeg.transfer()).transfer();
 
-        Place from = mapStopToPlace(transferFromStop);
-        Place to = mapStopToPlace(transferToStop);
+        Place from = new Place(transferFromStop);
+        Place to = new Place(transferToStop);
         return mapNonTransitLeg(pathLeg, transfer, from, to, false);
     }
 
@@ -269,7 +263,7 @@ public class RaptorPathToItineraryMapper {
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
             leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();
-            leg.generalizedCost = pathLeg.otpDomainCost();
+            leg.generalizedCost = toOtpDomainCost(pathLeg.generalizedCost());
 
             if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
                 return List.of(leg);
@@ -331,23 +325,10 @@ public class RaptorPathToItineraryMapper {
     }
 
     /**
-     * Maps stops for non-transit (transfer) legs.
-     */
-    private Place mapStopToPlace(Stop stop) {
-        Place place = new Place(stop.getLat(), stop.getLon(), stop.getName());
-        place.stopId = stop.getId();
-        place.stopCode = stop.getCode();
-        place.platformCode = stop.getPlatformCode();
-        place.zoneId = stop.getFirstZoneAsString();
-        place.vertexType = VertexType.TRANSIT;
-        return place;
-    }
-
-    /**
      * Maps stops for transit legs.
      */
     private Place mapStopToPlace(Stop stop, Integer stopIndex, TripTimes tripTimes) {
-        Place place = mapStopToPlace(stop);
+        Place place = new Place(stop);
         place.stopIndex = stopIndex;
         place.stopSequence = tripTimes.getOriginalGtfsStopSequence(stopIndex);
         return place;

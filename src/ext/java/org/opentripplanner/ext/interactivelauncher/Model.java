@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.interactivelauncher;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.beans.Transient;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -10,12 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 public class Model implements Serializable {
 
     private static final File MODEL_FILE = new File("interactive_otp_main.json");
 
     private final Map<String, Boolean> debugLogging = new HashMap<>();
+
+    @JsonIgnore
+    private transient Consumer<String> commandLineChange;
 
     private String rootDirectory = null;
     private String dataSource = null;
@@ -30,18 +34,24 @@ public class Model implements Serializable {
     }
 
     public static Model load() {
+        return MODEL_FILE.exists() ? readFromFile() : new Model();
+    }
+
+    private static Model readFromFile() {
         try {
-            return MODEL_FILE.exists()
-                    ? new ObjectMapper().readValue(MODEL_FILE, Model.class)
-                    : new Model();
+            return new ObjectMapper().readValue(MODEL_FILE, Model.class);
         }
         catch (IOException e) {
             System.err.println(
                     "Unable to read the InteractiveOtpMain state cache. If the model changed this "
-                    + "is expected, and it will work next time. Cause: " + e.getMessage()
+                            + "is expected, and it will work next time. Cause: " + e.getMessage()
             );
             return new Model();
         }
+    }
+
+    public void subscribeCmdLineUpdates(Consumer<String> commandLineChange) {
+        this.commandLineChange = commandLineChange;
     }
 
     @SuppressWarnings("AccessOfSystemProperties")
@@ -56,6 +66,7 @@ public class Model implements Serializable {
         if (rootDirectory != null) {
             this.rootDirectory = rootDirectory;
         }
+        notifyChangeListener();
     }
 
     public String getDataSource() {
@@ -64,9 +75,10 @@ public class Model implements Serializable {
 
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
+        notifyChangeListener();
     }
 
-    @Transient
+    @JsonIgnore
     public List<String> getDataSourceOptions() {
         List<String> dataSourceOptions = new ArrayList<>();
         File rootDir = new File(getRootDirectory());
@@ -86,6 +98,7 @@ public class Model implements Serializable {
 
     public void setBuildStreet(boolean buildStreet) {
         this.buildStreet = buildStreet;
+        notifyChangeListener();
     }
 
     public boolean isBuildTransit() {
@@ -94,6 +107,7 @@ public class Model implements Serializable {
 
     public void setBuildTransit(boolean buildTransit) {
         this.buildTransit = buildTransit;
+        notifyChangeListener();
     }
 
     public boolean isSaveGraph() {
@@ -102,6 +116,7 @@ public class Model implements Serializable {
 
     public void setSaveGraph(boolean saveGraph) {
         this.saveGraph = saveGraph;
+        notifyChangeListener();
     }
 
     public boolean isServeGraph() {
@@ -110,6 +125,7 @@ public class Model implements Serializable {
 
     public void setServeGraph(boolean serveGraph) {
         this.serveGraph = serveGraph;
+        notifyChangeListener();
     }
 
     public Map<String, Boolean> getDebugLogging() {
@@ -149,7 +165,7 @@ public class Model implements Serializable {
         }
     }
 
-    @Transient
+    @JsonIgnore
     String getDataSourceDirectory() {
         if (dataSource == null) {
             return "DATA_SOURCE_NOT_SET";
@@ -181,9 +197,15 @@ public class Model implements Serializable {
         return args.toArray(new String[0]);
     }
 
-    private boolean buildAll() { return isBuildStreet() && isBuildTransit(); }
+    private void notifyChangeListener() {
+        if(commandLineChange != null) {
+            commandLineChange.accept(toCliString());
+        }
+    }
 
-    private boolean buildStreetOnly() { return isBuildStreet() && !isBuildTransit(); }
+    private boolean buildAll() { return buildStreet && buildTransit; }
+
+    private boolean buildStreetOnly() { return buildStreet && !buildTransit; }
 
     private void setupListOfDebugLoggers() {
         for (String log : DebugLoggingSupport.getLogs()) {

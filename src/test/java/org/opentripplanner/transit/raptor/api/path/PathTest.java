@@ -15,12 +15,13 @@ import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;
 
 
-public class PathTest {
+public class PathTest implements RaptorTestConstants {
 
     private final Path<TestTripSchedule> subject = BasicPathTestCase.basicTripAsPath();
 
@@ -103,12 +104,12 @@ public class PathTest {
 
     @Test
     public void testToString() {
-        assertEquals(BASIC_PATH_AS_STRING, subject.toString());
+        assertEquals(BASIC_PATH_AS_STRING, subject.toString(this::stopIndexToName));
     }
 
     @Test
     public void testToStringDetailed() {
-        assertEquals(BASIC_PATH_AS_DETAILED_STRING, subject.toStringDetailed());
+        assertEquals(BASIC_PATH_AS_DETAILED_STRING, subject.toStringDetailed(this::stopIndexToName));
     }
     @Test
     public void equals() {
@@ -117,7 +118,8 @@ public class PathTest {
 
     @Test
     public void testHashCode() {
-        assertEquals(BasicPathTestCase.basicTripAsPath().hashCode(), subject.hashCode());
+        var expected = BasicPathTestCase.basicTripAsPath();
+        assertEquals(expected.hashCode(), subject.hashCode());
     }
 
     @Test

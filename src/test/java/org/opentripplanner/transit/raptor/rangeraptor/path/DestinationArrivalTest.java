@@ -42,7 +42,7 @@ public class DestinationArrivalTest {
             ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
             TRANSIT_STOP,
             TRANSIT_ALIGHT_TIME,
-            TRANSIT_COST,
+            ACCESS_ARRIVAL.cost() + TRANSIT_COST,
             A_TRIP
     );
 
@@ -76,7 +76,7 @@ public class DestinationArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-            "Egress { round: 1, from-stop: 101, duration: 50s, arrival-time: 8:14:50 $1484.00 }",
+            "Egress { round: 1, from-stop: 101, duration: 50s, arrival-time: 8:14:50 $1484 }",
             subject.toString()
         );
     }

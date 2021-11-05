@@ -18,9 +18,8 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexLegMapper;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
-import org.opentripplanner.model.VehicleRentalStationInfo;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -33,21 +32,21 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
@@ -287,10 +286,6 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.generalizedCost = (int) (states[states.length - 1].getWeight() - states[0].getWeight());
 
-        // Interlining information is now in a separate field in Graph, not in edges.
-        // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
-        leg.interlineWithPreviousLeg = false;
-
         leg.walkingBike = states[states.length - 1].isBackWalkingBike();
 
         leg.rentedVehicle = states[0].isBikeRenting();
@@ -445,24 +440,22 @@ public abstract class GraphPathToItineraryMapper {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
-        Stop firstStop = firstVertex instanceof TransitStopVertex ?
-                ((TransitStopVertex) firstVertex).getStop(): null;
-        Stop lastStop = lastVertex instanceof TransitStopVertex ?
-                ((TransitStopVertex) lastVertex).getStop(): null;
-
-        leg.from = makePlace(firstVertex, firstStop, requestedLocale);
-        leg.to = makePlace(lastVertex, lastStop, requestedLocale);
+        leg.from = makePlace(firstVertex, requestedLocale);
+        leg.to = makePlace(lastVertex, requestedLocale);
     }
 
     /**
      * Make a {@link Place} to add to a {@link Leg}.
      *
      * @param vertex The {@link Vertex} at the {@link State}.
-     * @param stop The {@link Stop} associated with the {@link Vertex}.
      * @param requestedLocale The locale to use for all text attributes.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(Vertex vertex, Stop stop, Locale requestedLocale) {
+    private static Place makePlace(Vertex vertex, Locale requestedLocale) {
+        if (vertex instanceof TransitStopVertex) {
+            return new Place(((TransitStopVertex) vertex).getStop());
+        }
+
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
@@ -477,15 +470,10 @@ public abstract class GraphPathToItineraryMapper {
                 name
         );
 
-        if (vertex instanceof TransitStopVertex) {
-            place.stopId = stop.getId();
-            place.stopCode = stop.getCode();
-            place.platformCode = stop.getPlatformCode();
-            place.zoneId = stop.getFirstZoneAsString();
-            place.vertexType = VertexType.TRANSIT;
-        } else if(vertex instanceof VehicleRentalStationVertex) {
-            place.bikeShareId = ((VehicleRentalStationVertex) vertex).getId();
-            LOG.trace("Added bike share Id {} to place", place.bikeShareId);
+
+        if (vertex instanceof VehicleRentalStationVertex) {
+            place.vehicleRentalStation = ((VehicleRentalStationVertex) vertex).getStation();
+            LOG.trace("Added bike share Id {} to place", place.vehicleRentalStation.getId());
             place.vertexType = VertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
             place.vertexType = VertexType.BIKEPARK;

@@ -5,26 +5,30 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.GenericJsonVehicleRentalDataSource;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of a VehicleRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
+ *
  * @see VehicleRentalDataSource
  */
-public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSource<VehicleRentalDataSourceParameters> {
+public class SmooveBikeRentalDataSource
+        extends GenericJsonVehicleRentalDataSource<SmooveBikeRentalDataSourceParameters> {
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
     public static final String DEFAULT_NETWORK_NAME = "smoove";
 
+    private final boolean allowOverloading;
+
     private final String networkName;
 
-    public SmooveBikeRentalDataSource(VehicleRentalDataSourceParameters config) {
-        super(config,"result");
+    public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
+        super(config, "result");
         networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
+        allowOverloading = config.isAllowOverloading();
     }
 
     /**
@@ -60,12 +64,17 @@ public class SmooveBikeRentalDataSource extends GenericJsonVehicleRentalDataSour
             return null;
         }
         if (!node.path("operative").asText().equals("true")) {
+            station.isRenting = false;
+            station.isReturning = false;
             station.vehiclesAvailable = 0;
             station.spacesAvailable = 0;
+            station.capacity = node.path("total_slots").asInt();
         } else {
             station.vehiclesAvailable = node.path("avl_bikes").asInt();
             station.spacesAvailable = node.path("free_slots").asInt();
+            station.capacity = node.path("total_slots").asInt();
         }
+        station.allowOverloading = allowOverloading;
         return station;
     }
 }

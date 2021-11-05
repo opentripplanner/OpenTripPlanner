@@ -1,5 +1,17 @@
 package org.opentripplanner.ext.flex.trip;
 
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.StopTime.MISSING_VALUE;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
@@ -12,20 +24,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.opentripplanner.model.StopTime.MISSING_VALUE;
-
-import static org.opentripplanner.model.PickDrop.NONE;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 /**
  * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop
@@ -67,7 +66,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
@@ -80,7 +79,16 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     for (int toIndex = fromIndex + 1; toIndex < stopTimes.length; toIndex++) {
       if (stopTimes[toIndex].dropOffType == NONE.getGtfsCode()) continue;
       for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
-        res.add(new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, scheduledCalculator));
+        res.add(new FlexAccessTemplate(
+                access,
+                this,
+                fromIndex,
+                toIndex,
+                stop,
+                date,
+                scheduledCalculator,
+                params
+        ));
       }
     }
 
@@ -89,7 +97,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
@@ -102,7 +110,16 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     for (int fromIndex = toIndex - 1; fromIndex >= 0; fromIndex--) {
       if (stopTimes[fromIndex].pickupType == NONE.getGtfsCode()) continue;
       for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
-        res.add(new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, scheduledCalculator));
+        res.add(new FlexEgressTemplate(
+                egress,
+                this,
+                fromIndex,
+                toIndex,
+                stop,
+                date,
+                scheduledCalculator,
+                params
+        ));
       }
     }
 

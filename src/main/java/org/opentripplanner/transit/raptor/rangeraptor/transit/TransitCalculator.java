@@ -3,12 +3,15 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
+import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -47,6 +50,12 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     int TIME_NOT_SET = SearchParams.TIME_NOT_SET;
 
     /**
+     * Return {@code true} is searching forward in space and time, {@code false}
+     * if search direction is in reverse.
+     */
+    boolean searchForward();
+
+    /**
      * Add duration to time and return the result. In the case of a normal
      * forward search this will be a plus '+' operation, while in a reverse
      * search (moving back in time) this will be a minus '-' operation: 'time - duration'.
@@ -68,13 +77,14 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     int duration(int timeA, int timeB);
 
     /**
-     * For a normal search return the trip arrival time at stop position including alightSlack.
-     * For a reverse search return the next trips departure time at stop position with the boardSlack added.
+     * For a forward search return the trip arrival time at stop position including alightSlack.
+     * For a reverse search return the next trips departure time at stop position with the
+     * boardSlack added.
      *
-     * @param onTrip the current boarded trip
+     * @param trip the current boarded trip
      * @param stopPositionInPattern the stop position/index
      */
-    int stopArrivalTime(T onTrip, int stopPositionInPattern, int slack);
+    int stopArrivalTime(T trip, int stopPositionInPattern, int slack);
 
     /**
      * Stop the search when the time exceeds the latest-acceptable-arrival-time.
@@ -157,11 +167,11 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
 
     /**
-     * Return a guaranteed transfer provider for the given pattern. When searching forward the
+     * Return a transfer provider for the given pattern. When searching forward the
      * given {@code target} is the TO pattern/stop, while when searching in reverse the given
      * target is the FROM pattern/stop.
      */
-    RaptorGuaranteedTransferProvider<T> guaranteedTransfers(RaptorRoute<T> route);
+    RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(RaptorRoute<T> route);
 
     /**
      * Return a calculator for test purpose. The following parameters are fixed:
@@ -190,4 +200,25 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
                         60
                 );
     }
+
+    /**
+     * Return {@code true} if it is allowed/possible to board at a particular stop index, on a
+     * normal search. For a backwards search, it checks for alighting instead. This should include
+     * checks like: Does the pattern allow boarding at the given stop? Is this accessible to
+     * wheelchairs (if requested).
+     */
+    boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos);
+
+    /**
+     * Same as {@link #boardingPossibleAt(RaptorTripPattern, int)}, but for switched alighting/boarding.
+     */
+    boolean alightingPossibleAt(RaptorTripPattern pattern, int stopPos);
+
+    /**
+     * Returns an iterator over all transfers "from" (or "to" for reverse searches) a stopIndex.
+     *
+     * @see RaptorTransitDataProvider#getTransfersFromStop(int)
+     * @see RaptorTransitDataProvider#getTransfersToStop(int)
+     */
+    Iterator<? extends RaptorTransfer> getTransfers(RaptorTransitDataProvider<T> transitDataProvider, int fromStop);
 }

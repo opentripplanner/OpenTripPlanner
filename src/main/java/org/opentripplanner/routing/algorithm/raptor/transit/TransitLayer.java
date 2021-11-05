@@ -13,7 +13,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class TransitLayer {
 
@@ -27,7 +26,7 @@ public class TransitLayer {
    * Index of outer list is from stop index, inner list index has no specific meaning. To stop index
    * is a field of the Transfer object.
    */
-  private final List<List<Transfer>> simpleTransfersByStopIndex;
+  private final List<List<Transfer>> transfersByStopIndex;
 
   /**
    * Trip to trip transfers like with properties like guaranteedTransfer, staySeated and priority.
@@ -51,7 +50,7 @@ public class TransitLayer {
   public TransitLayer(TransitLayer transitLayer) {
     this(
         transitLayer.tripPatternsRunningOnDate,
-        transitLayer.simpleTransfersByStopIndex,
+        transitLayer.transfersByStopIndex,
         transitLayer.transferService,
         transitLayer.stopIndex,
         transitLayer.transitDataZoneId,
@@ -61,14 +60,14 @@ public class TransitLayer {
 
   public TransitLayer(
       Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
-      List<List<Transfer>> simpleTransfers,
+      List<List<Transfer>> transfersByStopIndex,
       TransferService transferService,
       StopIndexForRaptor stopIndex,
       ZoneId transitDataZoneId,
       RaptorRequestTransferCache transferCache
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
-    this.simpleTransfersByStopIndex = simpleTransfers;
+    this.transfersByStopIndex = transfersByStopIndex;
     this.transferService = transferService;
     this.stopIndex = stopIndex;
     this.transitDataZoneId = transitDataZoneId;
@@ -122,16 +121,16 @@ public class TransitLayer {
         .collect(Collectors.toList()) : null;
   }
 
-  public List<List<Transfer>> getSimpleTransferByStopIndex() {
-    return simpleTransfersByStopIndex;
-  }
-
   public TransferService getTransferService() {
     return transferService;
   }
 
-  public List<List<RaptorTransfer>> getRaptorTransfersForRequest(RoutingRequest routingRequest) {
-    return transferCache.get(simpleTransfersByStopIndex, routingRequest);
+  public RaptorTransferIndex getRaptorTransfersForRequest(RoutingRequest routingRequest) {
+    return transferCache.get(transfersByStopIndex, routingRequest);
+  }
+
+  public RaptorRequestTransferCache getTransferCache() {
+    return transferCache;
   }
 
   /**

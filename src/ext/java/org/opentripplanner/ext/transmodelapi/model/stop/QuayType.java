@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.stop;
 
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
+
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -9,20 +11,16 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-
-import java.util.Collection;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.ARRIVAL_DEPARTURE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 
 public class QuayType {
 
@@ -146,7 +144,7 @@ public class QuayType {
                     .argument(GraphQLArgument.newArgument()
                             .name("omitNonBoarding")
                             .type(Scalars.GraphQLBoolean)
-                            .description("DEPRECATED and non-functional. Use arrivalDeparture instead.")
+                            .deprecate("Non-functional. Use arrivalDeparture instead.")
                             .defaultValue(false)
                             .build())
                     .argument(GraphQLArgument.newArgument()

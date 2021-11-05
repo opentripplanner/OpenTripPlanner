@@ -26,6 +26,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +101,7 @@ public class StreetVertexIndex {
 
       temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
       temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
+      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     }
@@ -116,6 +118,7 @@ public class StreetVertexIndex {
       temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
       temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
       temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
+      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     }
   }
@@ -285,6 +288,9 @@ public class StreetVertexIndex {
 
   @SuppressWarnings("rawtypes")
   private void postSetup() {
+    var progress = ProgressTracker.track("Index steet graph", 1000, graph.getVertices().size());
+    LOG.info(progress.startMessage());
+
     for (Vertex gv : graph.getVertices()) {
       /*
        * We add all edges with geometry, skipping transit, filtering them out after. We do not
@@ -309,7 +315,11 @@ public class StreetVertexIndex {
       }
       Envelope env = new Envelope(gv.getCoordinate());
       verticesTree.insert(env, gv);
+
+      //noinspection Convert2MethodRef
+      progress.step(m -> LOG.info(m));
     }
+    LOG.info(progress.completeMessage());
   }
 
   @Override

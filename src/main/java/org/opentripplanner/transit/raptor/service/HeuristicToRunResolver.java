@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.service;
 
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
-
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
+
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 
 class HeuristicToRunResolver {
 
@@ -33,7 +33,7 @@ class HeuristicToRunResolver {
             }
         }
 
-        // Use REV heuristics to find EAT (earliest arrival time), EAT is required by the search.
+        // Use REV heuristics to find EDT (earliest departure time), EDT is required by the search.
         if (!s.isEarliestDepartureTimeSet()) {
             reverse = true;
         }
