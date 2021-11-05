@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.readiness_endpoint;
+package org.opentripplanner.ext.actuator;
 
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.cache.GuavaCacheMetrics;

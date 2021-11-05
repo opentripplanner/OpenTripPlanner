@@ -1,4 +1,4 @@
-# Health API
+# Actuator API
 
 ## Contact Info
 - Entur, Norway
