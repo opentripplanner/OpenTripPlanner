@@ -25,15 +25,15 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     var high_traffic = 2.25;
     var medium_high_traffic = 2.06;
     var medium_traffic = 1.5;
-    var medium_low_traffic = 1.46;
+    var medium_low_traffic = 1.42;
     var low_traffic = 1.1;
-    var very_low_traffic = 0.96;
+    var very_low_traffic = 0.94;
 
     var cycle_lane_medium_traffic = 0.76;
     var cycle_lane_low_traffic = 0.66;
 
     var dedicated_footway = 0.85;
-    var sidewalk = 1.15;
+    var sidewalk = 1.16;
     var footway_crossing = 1.4;
     var mixed_cycleway = 0.67;
     var dedicated_cycleway = 0.62;
@@ -694,22 +694,22 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     props.setProperties("highway=busway", PEDESTRIAN_AND_BICYCLE, low_traffic, low_traffic);
     props.setProperties("highway=track", PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
-    props.setProperties("highway=bridleway", PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
-    props.setProperties("highway=path", PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
+    props.setProperties("highway=bridleway", PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
+    props.setProperties("highway=path", PEDESTRIAN_AND_BICYCLE, 1.5, 1.5);
     props.setProperties("highway=steps", PEDESTRIAN);
     props.setProperties("highway=corridor", PEDESTRIAN);
     props.setProperties("highway=footway;indoor=yes", PEDESTRIAN);
     props.setProperties("highway=platform", PEDESTRIAN);
     props.setProperties("public_transport=platform", PEDESTRIAN);
 
-    props.setProperties("smoothness=intermediate", ALL, 1.1, 1.1, true);
+    props.setProperties("smoothness=intermediate", ALL, 1.5, 1.5, true);
     props.setProperties("smoothness=bad", ALL, 2, 2, true);
     props.setProperties("highway=*;smoothness=very_bad", PEDESTRIAN);
     props.setProperties("highway=*;smoothness=horrible", NONE);
     props.setProperties("highway=*;smoothness=very_horrible", NONE);
     props.setProperties("highway=*;smoothness=impassable", NONE);
 
-    props.setProperties("highway=track;tracktype=grade1", PEDESTRIAN_AND_BICYCLE, 0.9, 0.9);
+    props.setProperties("highway=track;tracktype=grade1", PEDESTRIAN_AND_BICYCLE, very_low_traffic, very_low_traffic);
     props.setProperties("highway=track;tracktype=grade2", PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
     props.setProperties("highway=track;tracktype=grade3", PEDESTRIAN_AND_BICYCLE, 1.5, 1.5);
     props.setProperties("highway=track;tracktype=grade4", PEDESTRIAN);
