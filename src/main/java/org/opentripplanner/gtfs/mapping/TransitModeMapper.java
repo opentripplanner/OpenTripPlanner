@@ -22,10 +22,16 @@ public class TransitModeMapper {
             if (routeType >= 401 && routeType <= 402) {
                 return TransitMode.SUBWAY;
             }
+            if (routeType == 405) {
+                return TransitMode.MONORAIL;
+            }
             return TransitMode.RAIL;
         } else if (routeType >= 500 && routeType < 700) { //Metro Service and Underground Service
             return TransitMode.SUBWAY;
         } else if (routeType >= 700 && routeType < 900) { //Bus Service and Trolleybus service
+            if (routeType == 800) {
+                return TransitMode.TROLLEYBUS;
+            }
             return TransitMode.BUS;
         } else if (routeType >= 900 && routeType < 1000) { //Tram service
             return TransitMode.TRAM;
@@ -63,6 +69,10 @@ public class TransitModeMapper {
                 return TransitMode.GONDOLA;
             case 7:
                 return TransitMode.FUNICULAR;
+            case 11:
+                return TransitMode.TROLLEYBUS;
+            case 12:
+                return TransitMode.MONORAIL;
             default:
                 throw new IllegalArgumentException("unknown gtfs route type " + routeType);
         }

@@ -42,8 +42,12 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     private static final int MODE_AIRPLANE = 4096;
 
+    private static final int MODE_TROLLEYBUS = 8192;
+
+    private static final int MODE_MONORAIL = 16384;
+
     private static final int MODE_TRANSIT = MODE_TRAM | MODE_RAIL | MODE_SUBWAY | MODE_FUNICULAR
-            | MODE_GONDOLA | MODE_CABLE_CAR | MODE_BUS | MODE_FERRY | MODE_AIRPLANE;
+            | MODE_GONDOLA | MODE_CABLE_CAR | MODE_BUS | MODE_FERRY | MODE_AIRPLANE | MODE_TROLLEYBUS | MODE_MONORAIL;
  
     private static final int MODE_ALL = MODE_TRANSIT | MODE_WALK | MODE_BICYCLE;
 
@@ -90,6 +94,10 @@ public class TraverseModeSet implements Cloneable, Serializable {
             return MODE_SUBWAY;
         case RAIL:
             return MODE_RAIL;
+        case TROLLEYBUS:
+            return MODE_TROLLEYBUS;
+        case MONORAIL:
+            return MODE_MONORAIL;
         case AIRPLANE:
             return MODE_AIRPLANE;
         case TRANSIT:
@@ -150,7 +158,15 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public boolean getRail() {
         return (modes & MODE_RAIL) != 0;
     }
-    
+
+    public boolean getTrolleyBus() {
+        return (modes & MODE_TROLLEYBUS) != 0;
+    }
+
+    public boolean geMonorail() {
+        return (modes & MODE_MONORAIL) != 0;
+    }
+
     public boolean getSubway() {
         return (modes & MODE_SUBWAY) != 0;
     }
@@ -255,6 +271,22 @@ public class TraverseModeSet implements Cloneable, Serializable {
             modes &= ~MODE_AIRPLANE;
         }
 
+    }
+
+    public void setTrolleybus(boolean trolleybus) {
+        if (trolleybus) {
+            modes |= MODE_TROLLEYBUS;
+        } else {
+            modes &= ~MODE_TROLLEYBUS;
+        }
+    }
+
+    public void setMonorail(boolean monorail) {
+        if(monorail) {
+            modes |= MODE_MONORAIL;
+        } else {
+            modes &= ~MODE_MONORAIL;
+        }
     }
 
     /** Returns true if the trip may use some transit mode */

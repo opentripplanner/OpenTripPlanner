@@ -108,7 +108,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
-  public void linkTransitEntrances(Graph graph) {
+  private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
       graph.getLinker().linkVertexPermanently(
@@ -171,6 +171,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
               )
       );
     }
+    graph.hasLinkedBikeParks = true;
   }
 
   private void removeVehicleParkingEntranceVertexFromGraph(VehicleParkingEntranceVertex vehicleParkingEntranceVertex, Graph graph) {

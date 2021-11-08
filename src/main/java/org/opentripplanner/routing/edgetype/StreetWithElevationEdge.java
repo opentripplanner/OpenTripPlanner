@@ -44,6 +44,12 @@ public class StreetWithElevationEdge extends StreetEdge {
         this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
     }
 
+    public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
+            I18NString name, StreetTraversalPermission permission, boolean back
+    ) {
+        super(v1, v2, geometry, name, permission, back);
+    }
+
     @Override
     public StreetWithElevationEdge clone() {
         return (StreetWithElevationEdge) super.clone();

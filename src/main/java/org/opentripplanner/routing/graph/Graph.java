@@ -220,6 +220,12 @@ public class Graph implements Serializable {
     public boolean hasScheduledService = false;
 
     /**
+     * Have bike parks already been linked to the graph. As the linking happens twice if a base
+     * graph is used, we store information on whether bike park linking should be skipped.
+     */
+    public boolean hasLinkedBikeParks = false;
+
+    /**
      * The difference in meters between the WGS84 ellipsoid height and geoid height
      * at the graph's center
      */
