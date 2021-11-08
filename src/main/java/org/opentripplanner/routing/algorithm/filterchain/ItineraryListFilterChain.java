@@ -32,11 +32,17 @@ public class ItineraryListFilterChain {
             result = filter.filter(result);
         }
 
-        boolean allDeleted = result.stream().allMatch(Itinerary::isFlaggedForDeletion);
+        Predicate<Itinerary> isOnStreetAllTheWay = Itinerary::isOnStreetAllTheWay;
+
+        boolean hasTransitItineraries = itineraries.stream()
+                .anyMatch(Predicate.not(isOnStreetAllTheWay));
+
+        boolean allTransitItinerariesDeleted = result.stream()
+                .filter(Predicate.not(isOnStreetAllTheWay))
+                .allMatch(Itinerary::isFlaggedForDeletion);
 
         // Add errors, if there were any itineraries, but they were all filtered away
-        if (!itineraries.isEmpty() && allDeleted) {
-            Predicate<Itinerary> isOnStreetAllTheWay = Itinerary::isOnStreetAllTheWay;
+        if (hasTransitItineraries && allTransitItinerariesDeleted) {
             Predicate<Itinerary> isWorseThanStreet = it -> it.systemNotices.stream().anyMatch(
                 notice -> notice.tag.equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
             Predicate<Itinerary> isOutsideSearchWindow = it -> it.systemNotices.stream().anyMatch(
