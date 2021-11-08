@@ -27,7 +27,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  * transfers. This test has only one path available, and it is expected that it should be retuned
  * irrespective of the profile.
  */
-public class E11_GuaranteedTransferFlexAccessTest implements RaptorTestConstants {
+public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConstants {
     private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
 
     private final TestTransitData data = new TestTransitData();
