@@ -404,7 +404,8 @@ public abstract class GraphPathToItineraryMapper {
     private static TraverseMode resolveMode(State[] states) {
         TraverseMode returnMode = TraverseMode.WALK;
 
-        if (states[0].isRentingVehicle()) {
+        // Resolve correct mode if renting vehicle, and is not walking with it
+        if (states[0].isRentingVehicle() && !states[states.length - 1].isBackWalkingBike()) {
             switch (states[0].stateData.rentalVehicleFormFactor) {
                 case BICYCLE:
                 case OTHER: return TraverseMode.BICYCLE;
