@@ -59,17 +59,16 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
             "highway=trunk_link", ALL,
             high_traffic, high_traffic
     );
-    // foot=no indicates heavy traffic, and is considered less safe for bicycles.
+    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
             "highway=trunk;foot=no", BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic
     );
-    // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
             "highway=trunk_link;foot=no", BICYCLE_AND_CAR,
             very_high_traffic, very_high_traffic
     );
-    // Discourage cycling trunk road tunnels
+    // Discourage cycling on trunk road tunnels
     props.setProperties(
             "highway=trunk;tunnel=yes", CAR,
             very_high_traffic, very_high_traffic
