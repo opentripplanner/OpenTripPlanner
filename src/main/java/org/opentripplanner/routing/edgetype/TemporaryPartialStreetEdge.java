@@ -48,13 +48,10 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
      */
     TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
             LineString geometry, I18NString name) {
-        super(v1, v2, geometry, name, 0, parentEdge.getPermission(), false);
+        super(v1, v2, geometry, name, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
         this.geometry = super.getGeometry();
         setCarSpeed(parentEdge.getCarSpeed());
-
-        // No length is known, so we use the provided geometry to estimate it
-        calculateLengthFromGeometry();
         setElevationProfileUsingParents();
     }
 

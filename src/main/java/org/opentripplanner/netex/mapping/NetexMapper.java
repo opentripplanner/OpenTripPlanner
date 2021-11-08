@@ -37,8 +37,6 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -54,8 +52,6 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class NetexMapper {
-    private static final Logger LOG = LoggerFactory.getLogger(NetexMapper.class);
-
     private static final int LEVEL_SHARED = 0;
     private static final int LEVEL_GROUP = 1;
 
@@ -267,7 +263,7 @@ public class NetexMapper {
     }
 
     private void mapMultiModalStopPlaces() {
-        MultiModalStationMapper mapper = new MultiModalStationMapper(idFactory);
+        MultiModalStationMapper mapper = new MultiModalStationMapper(issueStore, idFactory);
         for (StopPlace multiModalStopPlace : currentNetexIndex.getMultiModalStopPlaceById().localValues()) {
             transitBuilder.getMultiModalStationsById().add(
                 mapper.map(
@@ -280,6 +276,7 @@ public class NetexMapper {
 
     private void mapGroupsOfStopPlaces() {
         GroupOfStationsMapper groupOfStationsMapper = new GroupOfStationsMapper(
+                issueStore,
                 idFactory,
                 transitBuilder.getMultiModalStationsById(),
                 transitBuilder.getStations()
@@ -328,6 +325,7 @@ public class NetexMapper {
 
     private void mapRoute() {
         RouteMapper routeMapper = new RouteMapper(
+                issueStore,
                 idFactory,
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
@@ -347,6 +345,7 @@ public class NetexMapper {
 
     private void mapTripPatterns(Map<String, FeedScopedId> serviceIds) {
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
+                issueStore,
                 idFactory,
                 transitBuilder.getOperatorsById(),
                 transitBuilder.getStops(),
@@ -382,6 +381,7 @@ public class NetexMapper {
 
     private void mapNoticeAssignments() {
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
+                issueStore,
                 idFactory,
                 currentNetexIndex.getServiceJourneyById().localValues(),
                 currentNetexIndex.getNoticeById(),
@@ -413,7 +413,8 @@ public class NetexMapper {
         String timeZone = currentNetexIndex.getTimeZone();
         if(timeZone == null) {
             LocalDateTime time = LocalDateTime.now(ZoneId.of("UTC"));
-            LOG.warn(
+            issueStore.add(
+                    "NetexImportTimeZone",
                     "No timezone set for the current NeTEx input data file. The import " +
                     "start-of-period is set to " + time + " UTC, used to check entity validity " +
                     "periods."

@@ -1,15 +1,16 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 import org.rutebanken.netex.model.WaterSubmodeEnumeration;
 
-import static org.junit.Assert.assertEquals;
-
 public class TransportModeMapperTest {
-    private TransportModeMapper transportModeMapper = new TransportModeMapper();
+
+    private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
     @Test
     public void mapWithTransportModeOnly() {

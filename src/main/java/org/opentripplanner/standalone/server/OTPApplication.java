@@ -2,12 +2,16 @@ package org.opentripplanner.standalone.server;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import io.micrometer.jersey2.server.DefaultJerseyTagsProvider;
+import io.micrometer.jersey2.server.MetricsApplicationEventListener;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
+import org.opentripplanner.ext.readiness_endpoint.ActuatorAPI;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
@@ -75,7 +79,7 @@ public class OTPApplication extends Application {
      */
     @Override
     public Set<Object> getSingletons() {
-        return Sets.newHashSet (
+        var singletons = Sets.newHashSet(
             // Show exception messages in responses
             new OTPExceptionMapper(),
             // Enable Jackson JSON response serialization
@@ -85,6 +89,17 @@ public class OTPApplication extends Application {
             // Allow injecting the OTP server object into Jersey resource classes
             server.makeBinder()
         );
+
+        if (OTPFeature.ActuatorAPI.isOn()) {
+            singletons.add(new MetricsApplicationEventListener(
+                    ActuatorAPI.prometheusRegistry,
+                    new DefaultJerseyTagsProvider(),
+                    "http.server.requests",
+                    true
+            ));
+        }
+
+        return singletons;
     }
 
     /**

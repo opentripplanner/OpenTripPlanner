@@ -211,4 +211,12 @@ public class GraphUpdaterManager {
         }
         return waitingUpdaters;
     }
+
+    public ExecutorService getUpdaterPool() {
+        return updaterPool;
+    }
+
+    public ScheduledExecutorService getScheduler() {
+        return scheduler;
+    }
 }

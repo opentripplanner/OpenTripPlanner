@@ -1,8 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Set;
 import javax.annotation.Nullable;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-import java.util.Set;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeAccess;
@@ -17,16 +18,13 @@ import org.rutebanken.netex.model.Line_VersionStructure;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OperatorRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Maps NeTEx line to OTP Route.
  */
 class RouteMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RouteMapper.class);
-
+    private final DataImportIssueStore issueStore;
     private final HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
@@ -38,6 +36,7 @@ class RouteMapper {
     private final Set<String> ferryIdsNotAllowedForBicycle;
 
     RouteMapper(
+            DataImportIssueStore issueStore,
             FeedScopedIdFactory idFactory,
             EntityById<Agency> agenciesById,
             EntityById<Operator> operatorsById,
@@ -45,6 +44,7 @@ class RouteMapper {
             String timeZone,
             Set<String> ferryIdsNotAllowedForBicycle
     ) {
+        this.issueStore = issueStore;
         this.idFactory = idFactory;
         this.agenciesById = agenciesById;
         this.operatorsById = operatorsById;
@@ -124,7 +124,11 @@ class RouteMapper {
     }
 
     private Agency createOrGetDummyAgency(Line_VersionStructure line) {
-        LOG.warn("No authority found for " + line.getId());
+        issueStore.add(
+            "LineWithoutAuthority",
+            "No authority found for %s",
+                line.getId()
+        );
 
         Agency agency = agenciesById.get(idFactory.createId(authorityMapper.dummyAgencyId()));
 

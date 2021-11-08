@@ -31,6 +31,6 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
     int arrivalTime = trip.latestArrivalTime(Integer.MAX_VALUE, fromStopIndex, toStopIndex, 0);
 
     if (departureTime >= arrivalTime) { return null; }
-    return new FlexPath(distance, arrivalTime - departureTime, flexPath.geometry);
+    return new FlexPath(distance, arrivalTime - departureTime, flexPath::getGeometry);
   }
 }

@@ -38,10 +38,12 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
         return environment -> getSource(environment).getSpacesAvailable();
     }
 
-    //TODO:
     @Override
     public DataFetcher<String> state() {
-        return environment -> null;
+        return environment ->
+                getSource(environment).isAllowDropoff() && getSource(environment).isAllowPickup()
+                        ? "Station on"
+                        : "Station off";
     }
 
     @Override
@@ -52,6 +54,21 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     @Override
     public DataFetcher<Boolean> allowDropoff() {
         return environment -> getSource(environment).isAllowDropoff();
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowDropoffNow() {
+        return environment -> getSource(environment).allowDropoffNow();
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowPickup() {
+        return environment -> getSource(environment).isAllowPickup();
+    }
+
+    @Override
+    public DataFetcher<Boolean> allowPickupNow() {
+        return environment -> getSource(environment).allowPickupNow();
     }
 
     @Override
@@ -71,14 +88,18 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<Boolean> allowOverloading() {
-        // TODO implement this
-        return environment -> false;
+        return environment -> getSource(environment).isAllowOverloading();
     }
 
     @Override
     public DataFetcher<Integer> capacity() {
-        // TODO implement this
-        return environment -> 0;
+        return environment -> getSource(environment).getCapacity();
+    }
+
+    @Override
+    public DataFetcher<Boolean> operative() {
+        return environment -> getSource(environment).isAllowPickup() && getSource(
+                environment).isAllowDropoff();
     }
 
     @Override

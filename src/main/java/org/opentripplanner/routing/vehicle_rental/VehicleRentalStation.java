@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
+ */
 public class VehicleRentalStation implements VehicleRentalPlace {
 
     // GBFS  Static information
@@ -50,6 +53,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     public ZonedDateTime lastReported;
 
     // OTP internal data
+    public boolean allowOverloading = false;
     public boolean isKeepingVehicleRentalAtDestinationAllowed = false;
     public boolean realTimeData = true;
 
@@ -96,8 +100,23 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     }
 
     @Override
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    @Override
     public boolean isAllowDropoff() {
         return isReturning;
+    }
+
+    @Override
+    public boolean isAllowOverloading() {
+        return allowOverloading;
+    }
+
+    @Override
+    public boolean isAllowPickup() {
+        return isRenting;
     }
 
     public boolean allowPickupNow() {
@@ -105,7 +124,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     }
 
     public boolean allowDropoffNow() {
-        return isReturning && spacesAvailable > 0;
+        return isReturning && (spacesAvailable > 0 || allowOverloading);
     }
 
     @Override
