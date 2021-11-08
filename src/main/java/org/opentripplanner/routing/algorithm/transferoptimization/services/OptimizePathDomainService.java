@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
@@ -75,13 +75,13 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
 
   @Nullable
-  private final TransferWaitTimeCalculator waitTimeCostCalculator;
+  private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
 
   public OptimizePathDomainService(
       TransferGenerator<T> transferGenerator,
       CostCalculator costCalculator,
       RaptorSlackProvider slackProvider,
-      @Nullable TransferWaitTimeCalculator waitTimeCostCalculator,
+      @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
       MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain,
       RaptorStopNameResolver stopNameTranslator
   ) {

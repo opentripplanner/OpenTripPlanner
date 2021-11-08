@@ -28,7 +28,8 @@ class OptimizedPathTailTest implements RaptorTestConstants {
             txConstrained(t2.trip(), STOP_D, t3.trip(), STOP_D).staySeated()
     );
 
-    private final TransferWaitTimeCalculator waitTimeCalc = new TransferWaitTimeCalculator(1.0, 5.0);
+    private final TransferWaitTimeCostCalculator
+            waitTimeCalc = new TransferWaitTimeCostCalculator(1.0, 5.0);
 
     private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
             BasicPathTestCase.SLACK_PROVIDER,

@@ -11,7 +11,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathUtils;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
@@ -44,8 +44,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
             null
     );
 
-    private static final TransferWaitTimeCalculator TRANS_WAIT_TIME_CALC =
-            new TransferWaitTimeCalculator(1.0, 2.0);
+    private static final TransferWaitTimeCostCalculator TRANS_WAIT_TIME_CALC =
+            new TransferWaitTimeCostCalculator(1.0, 2.0);
 
     static TestPathBuilder pathBuilder() {
         return new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
@@ -264,7 +264,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     static OptimizePathDomainService<TestTripSchedule> subject(
             TransferGenerator<TestTripSchedule> generator,
-            @Nullable TransferWaitTimeCalculator waitTimeCalculator
+            @Nullable TransferWaitTimeCostCalculator waitTimeCalculator
     ) {
         return new OptimizePathDomainService<>(
                 generator,

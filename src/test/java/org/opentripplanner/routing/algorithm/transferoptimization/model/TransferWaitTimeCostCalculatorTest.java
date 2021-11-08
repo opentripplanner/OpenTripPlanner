@@ -6,7 +6,7 @@ import static org.opentripplanner.util.time.DurationUtils.duration;
 
 import org.junit.jupiter.api.Test;
 
-public class TransferWaitTimeCalculatorTest {
+public class TransferWaitTimeCostCalculatorTest {
   private static final double EPSILON = 0.005;
   private static final double ANY = Double.NaN;
 
@@ -21,7 +21,7 @@ public class TransferWaitTimeCalculatorTest {
   final int d50m = duration("50m");
   final int d5d = 5 * duration("24h");
 
-  private TransferWaitTimeCalculator subject;
+  private TransferWaitTimeCostCalculator subject;
 
 
   /**
@@ -38,7 +38,7 @@ public class TransferWaitTimeCalculatorTest {
     double[] ns = { 1.0, 2.0, 10.0 };
 
     for (double n : ns) {
-      subject = new TransferWaitTimeCalculator(0.5, n);
+      subject = new TransferWaitTimeCostCalculator(0.5, n);
 
       for (int t0 : ts) {
         subject.setMinSafeTransferTime(t0);
@@ -55,7 +55,7 @@ public class TransferWaitTimeCalculatorTest {
 
   @Test
   public void avoidShortWaitTimeCost_sample_A() {
-    subject = new TransferWaitTimeCalculator(ANY, 2.0);
+    subject = new TransferWaitTimeCostCalculator(ANY, 2.0);
     subject.setMinSafeTransferTime(d2m);
 
     assertEquals(236.64, subject.avoidShortWaitTimeCost(1), EPSILON);
@@ -69,7 +69,7 @@ public class TransferWaitTimeCalculatorTest {
 
   @Test
   public void avoidShortWaitTimeCost_sample_B() {
-    subject = new TransferWaitTimeCalculator(ANY, 5.0);
+    subject = new TransferWaitTimeCostCalculator(ANY, 5.0);
     subject.setMinSafeTransferTime(d10m);
 
     assertEquals(2966.07, subject.avoidShortWaitTimeCost(1), EPSILON);
@@ -83,7 +83,7 @@ public class TransferWaitTimeCalculatorTest {
 
   @Test
   public void avoidBackTravelCost() {
-    subject = new TransferWaitTimeCalculator(0.5, ANY);
+    subject = new TransferWaitTimeCostCalculator(0.5, ANY);
     // MinSafeTransferTime should not have an effect on the test, hence any value
     subject.setMinSafeTransferTime(Integer.MAX_VALUE);
 
@@ -93,7 +93,7 @@ public class TransferWaitTimeCalculatorTest {
 
   @Test
   public void calculateOptimizedWaitCost() {
-    subject = new TransferWaitTimeCalculator(0.5, 5.0);
+    subject = new TransferWaitTimeCostCalculator(0.5, 5.0);
     subject.setMinSafeTransferTime(d10m);
 
     // Combine test avoidShortWaitTimeCost_sample_B and avoidBackTravelCost
@@ -103,20 +103,20 @@ public class TransferWaitTimeCalculatorTest {
   @Test
   public void calculateTxCostWithNoMinSafeTxTimeThrowsException() {
     assertThrows(IllegalStateException.class, () -> {
-      var subject = new TransferWaitTimeCalculator(1.0, 2.0);
+      var subject = new TransferWaitTimeCostCalculator(1.0, 2.0);
       subject.calculateOptimizedWaitCost(d20m);
     });
   }
 
   @Test
   void calculateStaySeatedTransferCost() {
-    subject = new TransferWaitTimeCalculator(1d, 1d);
+    subject = new TransferWaitTimeCostCalculator(1d, 1d);
     assertEquals(-10_000_000, subject.calculateStaySeatedTransferCost());
   }
 
   @Test
   void calculateGuaranteedTransferCost() {
-    subject = new TransferWaitTimeCalculator(1d, 1d);
+    subject = new TransferWaitTimeCostCalculator(1d, 1d);
     assertEquals(-5_000_000, subject.calculateGuaranteedTransferCost());
   }
 }

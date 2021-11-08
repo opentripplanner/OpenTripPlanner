@@ -31,14 +31,14 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 {
 
     @Nullable
-    private final TransferWaitTimeCalculator waitTimeCostCalculator;
+    private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
     private int transferPriorityCost = TransferConstraint.ZERO_COST;
-    private int waitTimeOptimizedCost = TransferWaitTimeCalculator.ZERO_COST;
+    private int waitTimeOptimizedCost = TransferWaitTimeCostCalculator.ZERO_COST;
 
     public OptimizedPathTail(
             RaptorSlackProvider slackProvider,
             CostCalculator costCalculator,
-            TransferWaitTimeCalculator waitTimeCostCalculator,
+            TransferWaitTimeCostCalculator waitTimeCostCalculator,
             RaptorStopNameResolver stopNameResolver
     ) {
         super(null, slackProvider, costCalculator, stopNameResolver);
@@ -234,7 +234,6 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
             }
         }
 
-        int cost = waitTimeCostCalculator.calculateOptimizedWaitCost(waitTime);
-        this.waitTimeOptimizedCost += cost;
+        this.waitTimeOptimizedCost += waitTimeCostCalculator.calculateOptimizedWaitCost(waitTime);
     }
 }

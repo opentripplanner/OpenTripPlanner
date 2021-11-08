@@ -8,7 +8,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
@@ -104,14 +104,14 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private OptimizePathDomainService<T> createOptimizePathService(
           TransferGenerator<T> transferGenerator,
           MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
-          TransferWaitTimeCalculator transferWaitTimeCalculator,
+          TransferWaitTimeCostCalculator transferWaitTimeCostCalculator,
           CostCalculator costCalculator
   ) {
     return new OptimizePathDomainService<>(
             transferGenerator,
             costCalculator,
             raptorRequest.slackProvider(),
-            transferWaitTimeCalculator,
+            transferWaitTimeCostCalculator,
             transferPointFilter,
             stopNameResolver
     );
@@ -133,8 +133,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     );
   }
 
-  private TransferWaitTimeCalculator createTransferWaitTimeCalculator() {
-    return new TransferWaitTimeCalculator(
+  private TransferWaitTimeCostCalculator createTransferWaitTimeCalculator() {
+    return new TransferWaitTimeCostCalculator(
             config.backTravelWaitTimeFactor(),
             config.minSafeWaitTimeFactor()
     );
