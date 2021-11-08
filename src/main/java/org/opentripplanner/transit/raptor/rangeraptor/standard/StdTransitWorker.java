@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
 /**
@@ -19,6 +20,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
 
     private static final int NOT_SET = -1;
 
+    private final TransitCalculator<T> calculator;
     private final StdWorkerState<T> state;
 
     private int onTripIndex;
@@ -26,7 +28,8 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     private int onTripBoardStop;
     private T onTrip;
 
-    public StdTransitWorker(StdWorkerState<T> state) {
+    public StdTransitWorker(TransitCalculator<T> calculator, StdWorkerState<T> state) {
+        this.calculator = calculator;
         this.state = state;
     }
 
@@ -53,9 +56,9 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public void alight(final int stopIndex, final int stopPos, ToIntFunction<T> stopArrivalTimeOp) {
+    public void alight(final int stopIndex, final int stopPos, final int alightSlack) {
         if (onTripIndex != NOT_SET) {
-            final int stopArrivalTime = stopArrivalTimeOp.applyAsInt(onTrip);
+            final int stopArrivalTime = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
             state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
         }
     }

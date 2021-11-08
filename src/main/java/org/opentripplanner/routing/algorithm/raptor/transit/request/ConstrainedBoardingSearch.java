@@ -1,9 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import gnu.trove.map.TIntObjectMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -22,7 +26,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 public final class ConstrainedBoardingSearch
         implements RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> {
 
-    private static final int NOT_FOUND = -999_999_999;
     private static final DirectionHelper FORWARD_HELPER = new ForwardDirectionHelper();
     private static final DirectionHelper REVERSE_HELPER = new ReverseDirectionHelper();
 
@@ -34,6 +37,7 @@ public final class ConstrainedBoardingSearch
     private final TIntObjectMap<List<ConstrainedTransfer>> transfers;
 
     private List<ConstrainedTransfer> currentTransfers;
+    private int currentTargetStopPos;
 
     public ConstrainedBoardingSearch(
             boolean forwardSearch,
@@ -49,6 +53,7 @@ public final class ConstrainedBoardingSearch
 
         // Get all guaranteed transfers for the target pattern at the target stop position
         this.currentTransfers = transfers.get(targetStopPos);
+        this.currentTargetStopPos = targetStopPos;
         return currentTransfers != null;
     }
 
@@ -64,40 +69,42 @@ public final class ConstrainedBoardingSearch
                 sourceTripSchedule, sourceArrivalTime, sourceStopIndex
         );
 
-        ConstrainedTransfer tx = findMatchingTargetPoint(sourceTrip, sourceStopPos);
+        var list = findMatchingTransfers(sourceTrip, sourceStopPos);
 
-        if(tx == null) { return null; }
+        if(list.isEmpty()) { return null; }
 
-        TransferPoint target = translator.target(tx);
-        final int targetStopPos = target.getStopPosition();
-
-        int tripIndex = translator.findTimetableTripIndex(
+        var tripInfo = translator.findTimetableTripInfo(
                 timetable,
-                target.getTrip(),
-                targetStopPos,
+                list,
+                currentTargetStopPos,
                 sourceArrivalTime
         );
-        if(tripIndex == NOT_FOUND) { return null; }
+
+        if(tripInfo == null) { return null; }
+
+        final int tripIndex = tripInfo.first;
+        final TransferConstraint transferConstraint = tripInfo.second;
 
         var trip = timetable.getTripSchedule(tripIndex);
-        int departureTime = translator.time(trip, targetStopPos);
+        int departureTime = translator.time(trip, currentTargetStopPos);
 
         return new ConstrainedTransferBoarding<>(
-                tx.getTransferConstraint(), tripIndex, trip, targetStopPos, departureTime
+                transferConstraint, tripIndex, trip, currentTargetStopPos, departureTime
         );
     }
 
-    private ConstrainedTransfer findMatchingTargetPoint(
+    private Collection<ConstrainedTransfer> findMatchingTransfers(
             Trip sourceTrip,
             int sourceStopPos
     ) {
+        var result = new ArrayList<ConstrainedTransfer>();
         for (ConstrainedTransfer tx : currentTransfers) {
             var sourcePoint = translator.source(tx);
             if(sourcePoint.matches(sourceTrip, sourceStopPos)) {
-                return tx;
+                result.add(tx);
             }
         }
-        return null;
+        return result;
     }
 
     private interface DirectionHelper {
@@ -105,9 +112,10 @@ public final class ConstrainedBoardingSearch
         TransferPoint target(ConstrainedTransfer tx);
         int time(RaptorTripSchedule schedule, int stopPos);
         int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop);
-        int findTimetableTripIndex(
+        /** Find the trip to board (trip index) and the transfer constraint */
+        T2<Integer, TransferConstraint> findTimetableTripInfo(
                 RaptorTimeTable<TripSchedule> timetable,
-                Trip trip,
+                Collection<ConstrainedTransfer> transfers,
                 int stopPos,
                 int sourceTime
         );
@@ -124,9 +132,9 @@ public final class ConstrainedBoardingSearch
             return schedule.findArrivalStopPosition(timeLimit, stop);
         }
         @Override
-        public int findTimetableTripIndex(
+        public T2<Integer, TransferConstraint> findTimetableTripInfo(
                 RaptorTimeTable<TripSchedule> timetable,
-                Trip trip,
+                Collection<ConstrainedTransfer> transfers,
                 int stopPos,
                 int sourceArrivalTime
         ) {
@@ -137,10 +145,17 @@ public final class ConstrainedBoardingSearch
                 var it = timetable.getTripSchedule(i);
                 int departureTime = it.departure(stopPos);
                 if(departureTime < sourceArrivalTime) { continue; }
-                if(departureTime > maxLimit) { return NOT_FOUND; }
-                if(it.getOriginalTripTimes().getTrip() == trip) { return i; }
+                if(departureTime > maxLimit) { return null; }
+
+                var targetTrip = it.getOriginalTripTimes().getTrip();
+
+                for (ConstrainedTransfer tx : transfers) {
+                    if(targetTrip == tx.getTo().getTrip()) {
+                        return new T2<>(i, tx.getTransferConstraint());
+                    }
+                }
             }
-            return NOT_FOUND;
+            return null;
         }
     }
 
@@ -155,9 +170,9 @@ public final class ConstrainedBoardingSearch
             return schedule.findDepartureStopPosition(timeLimit, stop);
         }
         @Override
-        public int findTimetableTripIndex(
+        public T2<Integer, TransferConstraint> findTimetableTripInfo(
                 RaptorTimeTable<TripSchedule> timetable,
-                Trip trip,
+                Collection<ConstrainedTransfer> transfers,
                 int stopPos,
                 int sourceDepartureTime
         ) {
@@ -168,10 +183,17 @@ public final class ConstrainedBoardingSearch
                 var it = timetable.getTripSchedule(i);
                 int arrivalTime = it.arrival(stopPos);
                 if(arrivalTime < minLimit) { continue; }
-                if(arrivalTime > sourceDepartureTime) { return NOT_FOUND; }
-                if(it.getOriginalTripTimes().getTrip() == trip) { return i; }
-            }
-            return NOT_FOUND;
+                if(arrivalTime > sourceDepartureTime) { return null; }
+
+                var targetTrip = it.getOriginalTripTimes().getTrip();
+
+                for (ConstrainedTransfer tx : transfers) {
+                    if(targetTrip == tx.getFrom().getTrip()) {
+                        return new T2<>(i ,tx.getTransferConstraint());
+                    }
+                }
+           }
+            return null;
         }
     }
 }

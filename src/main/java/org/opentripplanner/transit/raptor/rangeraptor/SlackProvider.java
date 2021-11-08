@@ -18,11 +18,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 public interface SlackProvider {
 
     /**
-     * Set the trip pattern to use when finding the {@code boardSlack} and {@code alightSlack}.
-     */
-    void setCurrentPattern(RaptorTripPattern pattern);
-
-    /**
      * The board-slack (duration time in seconds) to add to the stop arrival time,
      * before boarding the given trip pattern.
      * <p>
@@ -30,7 +25,7 @@ public interface SlackProvider {
      * <p>
      * Unit: seconds.
      */
-    int boardSlack();
+    int boardSlack(RaptorTripPattern pattern);
 
     /**
      * The alight-slack (duration time in seconds) to add to the trip alight time for
@@ -40,7 +35,7 @@ public interface SlackProvider {
      * <p>
      * Unit: seconds.
      */
-    int alightSlack();
+    int alightSlack(RaptorTripPattern pattern);
 
 
     /**

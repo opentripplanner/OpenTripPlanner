@@ -18,7 +18,7 @@ public class AuthorityToAgencyMapperTest {
     private static final String TIME_ZONE = "CEST";
     private static final String N_A = "N/A";
 
-    private AuthorityToAgencyMapper mapper = new AuthorityToAgencyMapper(ID_FACTORY, TIME_ZONE);
+    private final AuthorityToAgencyMapper mapper = new AuthorityToAgencyMapper(ID_FACTORY, TIME_ZONE);
 
     @Test public void mapAgency() {
         // Given

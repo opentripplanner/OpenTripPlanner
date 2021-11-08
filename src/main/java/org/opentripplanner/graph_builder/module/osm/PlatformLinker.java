@@ -5,11 +5,15 @@ import static java.lang.Math.min;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
@@ -18,6 +22,7 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -78,14 +83,31 @@ public class PlatformLinker {
         for (Area area : platforms) {
             List<OsmVertex> endpointsWithin = new ArrayList<>();
             List<Ring> rings = area.outermostRings;
-            AreaEdgeList edgeList = new AreaEdgeList();
             for (Ring ring : rings) {
                 endpointsWithin.addAll(endpoints.stream().filter(t -> contains(ring, t)).collect(Collectors.toList()));
 
                 for (OSMNode node : ring.nodes) {
                     Vertex vertexById = graph.getVertex("osm:node:" + node.getId());
                     if (vertexById != null) {
-                        endpointsWithin.forEach(e -> makePlatformEdges(area, e, (OsmVertex) vertexById, edgeList));
+                        // TODO: This shouldn't be happening. As it is, something is wrong with isEndpoint
+                        if (endpoints.contains(vertexById)) {
+                            continue;
+                        }
+
+                        Polygon polygon = ring.toJtsPolygon();
+                        // Find the original AreaEdgeList, to which add the edges to.
+                        Optional<AreaEdgeList> edgeList = vertexById.getOutgoing().stream()
+                            .filter(AreaEdge.class::isInstance)
+                            .map(AreaEdge.class::cast)
+                            .map(AreaEdge::getArea)
+                            .filter(areaEdgeList -> areaEdgeList.getOriginalEdges().covers(polygon))
+                            .findAny();
+
+                        if (edgeList.isEmpty()) {
+                            continue;
+                        }
+
+                        endpointsWithin.forEach(e -> makePlatformEdges(area, e, (OsmVertex) vertexById, edgeList.get()));
                     }
                 }
 

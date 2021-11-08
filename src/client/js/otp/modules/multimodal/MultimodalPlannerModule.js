@@ -23,7 +23,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
 
     itinWidget  : null,
 
-    showIntermediateStops : false,
+    showIntermediateStops : true,
 
     stopsWidget: false,
 

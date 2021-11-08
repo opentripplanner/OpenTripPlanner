@@ -33,6 +33,7 @@ public class FlexRouter {
 
   /* Transit data */
   private final Graph graph;
+  private final FlexParameters config;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -52,6 +53,7 @@ public class FlexRouter {
 
   public FlexRouter(
       Graph graph,
+      FlexParameters config,
       Instant searchInstant,
       boolean arriveBy,
       int additionalPastSearchDays,
@@ -60,6 +62,7 @@ public class FlexRouter {
       Collection<NearbyStop> egressTransfers
   ) {
     this.graph = graph;
+    this.config = config;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = graph.index.getFlexIndex();
@@ -145,7 +148,8 @@ public class FlexRouter {
             .flatMap(date -> t2.second.getFlexAccessTemplates(
                 t2.first,
                 date,
-                accessFlexPathCalculator
+                accessFlexPathCalculator,
+                config
             )))
         .collect(Collectors.toList());
   }
@@ -163,7 +167,8 @@ public class FlexRouter {
             .flatMap(date -> t2.second.getFlexEgressTemplates(
                 t2.first, 
                 date,
-                egressFlexPathCalculator
+                egressFlexPathCalculator,
+                config
             )))
         .collect(Collectors.toList());;
   }

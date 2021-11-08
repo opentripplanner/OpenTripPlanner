@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
@@ -36,6 +37,7 @@ public class StopTimesMapperTest {
         NetexTestDataSample sample = new NetexTestDataSample();
 
         StopTimesMapper stopTimesMapper = new StopTimesMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 sample.getStopsById(),
                 new EntityById<>(),

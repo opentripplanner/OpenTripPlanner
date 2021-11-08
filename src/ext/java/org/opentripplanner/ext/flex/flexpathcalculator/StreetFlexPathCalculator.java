@@ -66,9 +66,11 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
     int distance = (int) path.getDistanceMeters();
     int duration = path.getDuration();
-    LineString geometry = path.getGeometry();
 
-    return new FlexPath(distance, duration, geometry);
+    // computing the linestring from the graph path is a surprisingly expensive operation
+    // so we delay it until it's actually needed. since most flex paths are never shown to the user
+    // this improves performance quite a bit.
+    return new FlexPath(distance, duration, path::getGeometry);
   }
 
   private ShortestPathTree routeToMany(Vertex vertex) {

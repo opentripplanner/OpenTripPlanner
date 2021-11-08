@@ -129,6 +129,10 @@ public class TransitLayer {
     return transferCache.get(transfersByStopIndex, routingRequest);
   }
 
+  public RaptorRequestTransferCache getTransferCache() {
+    return transferCache;
+  }
+
   /**
    * Replaces all the TripPatternForDates for a single date. This is an atomic operation according
    * to the HashMap implementation.

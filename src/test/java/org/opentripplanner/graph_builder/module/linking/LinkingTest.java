@@ -18,7 +18,7 @@ import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,7 +77,7 @@ public class LinkingTest {
      * We do this by building the graphs and then comparing the stop tree caches.
      */
     @Test
-    public void testStopsLinkedIdentically () throws UnsupportedEncodingException {
+    public void testStopsLinkedIdentically () throws URISyntaxException {
         // build the graph without the added stops
         Graph g1 = buildGraphNoTransit();
         addRegularStopGrid(g1);
