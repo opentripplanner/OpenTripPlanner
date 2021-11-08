@@ -215,9 +215,7 @@ public class RoutingContext implements Cloneable {
 
         // Not connected if linking did not create incoming/outgoing edges depending on the
         // direction and the end.
-        Predicate<Vertex> isNotConnected = isFrom ^ opt.arriveBy
-                ? hasNoOutgoing
-                : hasNoIncoming;
+        Predicate<Vertex> isNotConnected = (isFrom == opt.arriveBy) ? hasNoIncoming : hasNoOutgoing;
 
         return vertices.stream().allMatch(isNotTransit.and(isNotConnected));
     }
