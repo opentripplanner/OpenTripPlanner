@@ -708,6 +708,13 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=*;smoothness=very_horrible", NONE);
     props.setProperties("highway=*;smoothness=impassable", NONE);
 
+    props.setProperties("highway=*;mtb:scale=1", PEDESTRIAN);
+    props.setProperties("highway=*;mtb:scale=2", PEDESTRIAN);
+    props.setProperties("highway=*;mtb:scale=3", NONE);
+    props.setProperties("highway=*;mtb:scale=4", NONE);
+    props.setProperties("highway=*;mtb:scale=5", NONE);
+    props.setProperties("highway=*;mtb:scale=6", NONE);
+
     props.setProperties("highway=track;tracktype=grade1", PEDESTRIAN_AND_BICYCLE, very_low_traffic, very_low_traffic);
     props.setProperties("highway=track;tracktype=grade2", PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
     props.setProperties("highway=track;tracktype=grade3", PEDESTRIAN_AND_BICYCLE, 1.5, 1.5);
@@ -724,13 +731,6 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=path;sac_scale=alpine_hiking", NONE);
     props.setProperties("highway=path;sac_scale=demanding_alpine_hiking", NONE);
     props.setProperties("highway=path;sac_scale=difficult_alpine_hiking", NONE);
-
-    props.setProperties("highway=path;mtb:scale=1", PEDESTRIAN);
-    props.setProperties("highway=path;mtb:scale=2", PEDESTRIAN);
-    props.setProperties("highway=path;mtb:scale=3", NONE);
-    props.setProperties("highway=path;mtb:scale=4", NONE);
-    props.setProperties("highway=path;mtb:scale=5", NONE);
-    props.setProperties("highway=path;mtb:scale=6", NONE);
 
     // paved but unfavorable
     props.setProperties("surface=grass_paver", ALL, 1.2, 1.2, true);
