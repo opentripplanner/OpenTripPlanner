@@ -59,6 +59,7 @@ import org.opentripplanner.ext.transmodelapi.model.network.PresentationType;
 import org.opentripplanner.ext.transmodelapi.model.plan.LegType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PathGuidanceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PlanPlaceType;
+import org.opentripplanner.ext.transmodelapi.model.plan.RoutingErrorType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripPatternType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripType;
@@ -1195,8 +1196,15 @@ public class TransmodelGraphQLSchema {
       GraphQLObjectType tripPatternType = TripPatternType.create(
             systemNoticeType, legType, gqlUtil
       );
+      GraphQLObjectType routingErrorType = RoutingErrorType.create();
 
-      return TripType.create(placeType, tripPatternType, tripMetadataType, gqlUtil);
+      return TripType.create(
+          placeType,
+          tripPatternType,
+          tripMetadataType,
+          routingErrorType,
+          gqlUtil
+      );
     }
 
     private List<FeedScopedId> toIdList(List<String> ids) {
