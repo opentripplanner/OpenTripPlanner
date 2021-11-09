@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.fares.impl;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.FeedScopedId;

@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,6 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.fares.impl;
 
-import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.fares.FareService;
 
 public class DutchFareServiceFactory extends DefaultFareServiceFactory {
     @Override

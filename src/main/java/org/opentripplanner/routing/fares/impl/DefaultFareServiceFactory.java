@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.fares.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.FareAttribute;
@@ -10,8 +10,8 @@ import org.opentripplanner.routing.vehicle_rental.TimeBasedVehicleRentalFareServ
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.fares.MultipleFareServiceFactory;
-import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

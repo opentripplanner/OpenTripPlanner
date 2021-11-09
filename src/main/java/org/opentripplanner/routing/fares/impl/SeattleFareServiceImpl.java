@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.fares.impl;
 
 import com.google.common.collect.Iterables;
 import org.opentripplanner.model.FeedScopedId;

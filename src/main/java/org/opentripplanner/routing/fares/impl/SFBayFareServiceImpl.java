@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.fares.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;

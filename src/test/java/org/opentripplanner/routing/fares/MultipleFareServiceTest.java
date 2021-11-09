@@ -6,7 +6,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 
 import java.util.ArrayList;
