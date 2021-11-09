@@ -88,7 +88,7 @@ public class DefaultFareServiceImpl implements FareService {
     }
 
     @Override
-    public Fare getCost(Itinerary itinerary, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary) {
 
         List<Ride> rides = RideMapper.ridesForRaptorPath(itinerary);
 

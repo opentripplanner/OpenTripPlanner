@@ -20,12 +20,12 @@ public class AddingMultipleFareService implements FareService, Serializable {
     }
 
     @Override
-    public Fare getCost(Itinerary itinerary, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary) {
 
         Fare fare = null;
 
         for (FareService subService : subServices) {
-            Fare subFare = subService.getCost(itinerary, transitLayer);
+            Fare subFare = subService.getCost(itinerary);
             if (subFare == null) {
                 // No fare, next one please
                 continue;

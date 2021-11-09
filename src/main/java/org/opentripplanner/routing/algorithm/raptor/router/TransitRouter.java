@@ -126,7 +126,6 @@ public class TransitRouter {
         );
         FareService fareService = router.graph.getService(FareService.class);
 
-        // TODO
         for (Path<TripSchedule> path : paths) {
             // Convert the Raptor/Astar paths to OTP API Itineraries
             Itinerary itinerary = itineraryMapper.createItinerary(path);
@@ -134,7 +133,7 @@ public class TransitRouter {
             // Itinerary and Leg are API model classes, lacking internal object references needed for effective
             // fare calculation. We derive the fares from the internal Path objects and add them to the itinerary.
             if (fareService != null) {
-                itinerary.fare = fareService.getCost(itinerary, transitLayer);
+                itinerary.fare = fareService.getCost(itinerary);
             }
             itineraries.add(itinerary);
         }

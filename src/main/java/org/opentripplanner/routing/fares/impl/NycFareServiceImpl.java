@@ -82,7 +82,7 @@ public class NycFareServiceImpl implements FareService {
 	public NycFareServiceImpl() { }
 
 	@Override
-	public Fare getCost(Itinerary itinerary, TransitLayer transitLayer) {
+	public Fare getCost(Itinerary itinerary) {
 
 		// Use custom ride-categorizing method instead of the usual mapper from default fare service.
 		List<Ride> rides = createRides(itinerary);

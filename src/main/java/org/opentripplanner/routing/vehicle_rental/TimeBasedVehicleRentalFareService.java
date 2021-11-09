@@ -6,7 +6,6 @@ import java.util.List;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
@@ -45,7 +44,7 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
     }
 
     @Override
-    public Fare getCost(Itinerary itinerary, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary) {
 
         var totalCost = itinerary.legs.stream()
                 .filter(l -> l.rentedVehicle)

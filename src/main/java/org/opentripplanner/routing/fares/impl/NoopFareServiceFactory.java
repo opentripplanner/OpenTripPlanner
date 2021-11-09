@@ -39,7 +39,7 @@ class NoopFareServiceFactory implements FareServiceFactory {
     private static class NoopFareService implements FareService {
         private static final Long serialVersionUID = 1L;
         @Override
-        public Fare getCost(Itinerary path, TransitLayer transitLayer) {
+        public Fare getCost(Itinerary path) {
             return null;
         }
     }

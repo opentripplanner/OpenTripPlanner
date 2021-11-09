@@ -194,13 +194,13 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     @Override
-    public Fare getCost(Itinerary itinerary, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary) {
         Currency euros = Currency.getInstance("EUR");
         // Use the usual process from the default fare service, but force the currency to Euros.
         // The default process assumes there is only one currency per set of fare rules and looks at any old rule to
         // guess what the currency is. This doesn't work on the Dutch data which has distances mixed in with Euros to
         // account for distance-derived fares.
-        Fare fare = super.getCost(itinerary, transitLayer);
+        Fare fare = super.getCost(itinerary);
         if (fare != null) {
             for (Money money : fare.fare.values()) {
                 money.setCurrency(euros);
