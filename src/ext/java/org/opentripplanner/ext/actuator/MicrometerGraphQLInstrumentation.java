@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.readiness_endpoint;
+package org.opentripplanner.ext.actuator;
 
 import static graphql.execution.instrumentation.SimpleInstrumentationContext.noOp;
 import static graphql.execution.instrumentation.SimpleInstrumentationContext.whenCompleted;
