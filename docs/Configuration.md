@@ -741,8 +741,8 @@ config key | description | value type | value default
 #### Group by similarity filters
 
 The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
-with `searchWindow` and the two group-by parameters(`groupSimilarityKeepOne` and 
-`groupSimilarityKeepThree`). 
+with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`,
+`groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`).
 
 The group-by-filter work by grouping itineraries together and then reducing the number of 
 itineraries in each group, keeping the itinerary/itineraries with the best itinerary 
