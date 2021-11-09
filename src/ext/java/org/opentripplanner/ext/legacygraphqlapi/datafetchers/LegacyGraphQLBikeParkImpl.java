@@ -18,7 +18,7 @@ public class LegacyGraphQLBikeParkImpl implements LegacyGraphQLDataFetchers.Lega
 
     @Override
     public DataFetcher<String> bikeParkId() {
-        return environment -> getSource(environment).getId().toString();
+        return environment -> getSource(environment).getId().getId();
     }
 
     @Override

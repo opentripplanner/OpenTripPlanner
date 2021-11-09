@@ -683,10 +683,9 @@ public class LegacyGraphQLQueryTypeImpl
 
       if (vehicleParkingService == null) { return null; }
 
-      var bikeParkId = FeedScopedId.parseId(args.getLegacyGraphQLId());
       return vehicleParkingService
               .getBikeParks()
-              .filter(bikePark -> bikePark.getId().equals(bikeParkId))
+              .filter(bikePark -> bikePark.getId().getId().equals(args.getLegacyGraphQLId()))
               .findAny()
               .orElse(null);
     };
@@ -731,10 +730,9 @@ public class LegacyGraphQLQueryTypeImpl
 
       if (vehicleParkingService == null) { return null; }
 
-      var carParkId = FeedScopedId.parseId(args.getLegacyGraphQLId());
       return vehicleParkingService
           .getCarParks()
-          .filter(carPark -> carPark.getId().equals(carParkId))
+          .filter(carPark -> carPark.getId().getId().equals(args.getLegacyGraphQLId()))
           .findAny()
           .orElse(null);
     };
