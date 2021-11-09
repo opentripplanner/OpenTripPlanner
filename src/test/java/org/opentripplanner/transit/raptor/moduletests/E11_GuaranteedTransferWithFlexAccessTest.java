@@ -24,7 +24,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should support combining multiple features, like Flexible access paths and constrained
- * transfers. This test has only one path available, and it is expected that it should be retuned
+* transfers. This test has only one path available, and it is expected that it should be returned
  * irrespective of the profile.
  */
 public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConstants {
