@@ -1387,10 +1387,10 @@ type Place {
     rentalVehicle: RentalVehicle
 
     """The bike parking related to the place"""
-    bikePark: BikePark @deprecated("bikePark is deprecated. Use vehicleParking instead.")
+    bikePark: BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """The car parking related to the place"""
-    carPark: CarPark @deprecated("carPark is deprecated. Use vehicleParking instead.")
+    carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
 
     """The vehicle parking related to the place"""
     vehicleParking: VehicleParking
@@ -1857,12 +1857,12 @@ type QueryType {
     vehicleRentalStation(id: String!): VehicleRentalStation
 
     """Get all bike parks"""
-    bikeParks: [BikePark] @deprecated("bikeParks is deprecated. Use vehicleParkings instead.")
+    bikeParks: [BikePark] @deprecated(reason: "bikeParks is deprecated. Use vehicleParkings instead.")
 
     """
     Get a single bike park based on its ID, i.e. value of field `bikeParkId`
     """
-    bikePark(id: String!): BikePark @deprecated("bikePark is deprecated. Use vehicleParking instead.")
+    bikePark(id: String!): BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """Get all car parks"""
     carParks(
@@ -1871,10 +1871,10 @@ type QueryType {
         **Note:** if an id is invalid (or the car park service is unavailable) the returned list will contain `null` values.
         """
         ids: [String]
-    ): [CarPark] @deprecated("carParks is deprecated. Use vehicleParkings instead.")
+    ): [CarPark] @deprecated(reason: "carParks is deprecated. Use vehicleParkings instead.")
 
     """Get a single car park based on its ID, i.e. value of field `carParkId`"""
-    carPark(id: String!): CarPark @deprecated("carPark is deprecated. Use vehicleParking instead.")
+    carPark(id: String!): CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
 
     """Get all vehicle parkings"""
     vehicleParkings(
