@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**
- * Encapsulate information about a access, transfer or egress path. We do not distinguish
+ * Encapsulate information about an access, transfer or egress path. We do not distinguish
  * between the access (origin to first stop), transfer (stop to stop) or egress (last stop to
  * destination), to Raptor - all these are the same thing.
  */
@@ -99,13 +99,13 @@ public interface RaptorTransfer {
      * rental-bicycle |      0       | Picking up the bike and returning it is is best
      *                |              | accounted using time and cost penalties, not transfers.
      *     taxi       |     0/1      | Currently 0 in OTP(car), but this is definitely discussable.
-     *     flex       |      1       | Waking leg followed by a flex transit leg
-     * walk-flex-walk |      1       | Waking , then flex transit and then walking again
+     *     flex       |      1       | Walking leg followed by a flex transit leg
+     * walk-flex-walk |      1       | Walking , then flex transit and then walking again
      *   flex-flex    |      2       | Two flex transit legs after each other
      * </pre>
      * {@code flex} is used as a placeholder for any type of on-board public service.
      *
-     * @return the number transfers including thefirst boarding in the RAPTOR algorithm.
+     * @return the number transfers including the first boarding in the RAPTOR algorithm.
      */
     default int numberOfRides() {
         return 0;
