@@ -6,6 +6,7 @@
 ## Changelog
 - Initial implementation of readiness endpoint (November 2019)
 - Prometheus metrics added using Micrometer (October 2021)
+- GraphQL metrics added to prometheus export (November 2021)
 
 ## Documentation
 This provides endpoints for checking the health status of the OTP instance. It can be useful when
@@ -24,6 +25,9 @@ Otherwise, a 404 NOT FOUND is returned.
 #### /prometheus
 
 Prometheus metrics are returned using Micrometer. The default JVM and jersey metrics are enabled.
+
+Also, GraphQL timing metrics are exported under `graphql.timer.query` and `graphql.timer.resolver`,
+if the GraphQL endpoints are enabled.
 
 ### Configuration
 To enable this you need to add the feature `ActuatorAPI`.
