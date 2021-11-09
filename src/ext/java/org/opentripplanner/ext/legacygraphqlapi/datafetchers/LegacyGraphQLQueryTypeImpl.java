@@ -707,7 +707,7 @@ public class LegacyGraphQLQueryTypeImpl
 
         if (!idList.isEmpty()) {
           Map<String, VehicleParking> carParkMap = vehicleParkingService.getCarParks()
-                  .collect(Collectors.toMap(station -> station.getId().toString(), station -> station));
+                  .collect(Collectors.toMap(station -> station.getId().getId(), station -> station));
 
           return idList.stream()
               .map(carParkMap::get)
