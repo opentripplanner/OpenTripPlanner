@@ -271,6 +271,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
                 COST_CALCULATOR,
                 SLACK_PROVIDER,
                 waitTimeCalculator,
+                null,
+                0.0,
                 TransferOptimizedFilterFactory.filter(
                         true,
                         waitTimeCalculator != null

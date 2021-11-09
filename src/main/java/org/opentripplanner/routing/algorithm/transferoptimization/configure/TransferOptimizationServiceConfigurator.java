@@ -27,15 +27,17 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private final RaptorStopNameResolver stopNameResolver;
   private final TransferService transferService;
   private final RaptorTransitDataProvider<T> transitDataProvider;
+  private final int[] stopBoardAlightCosts;
   private final RaptorRequest<T> raptorRequest;
   private final TransferOptimizationParameters config;
 
 
-  public TransferOptimizationServiceConfigurator(
+  private TransferOptimizationServiceConfigurator(
       IntFunction<Stop> stopLookup,
       RaptorStopNameResolver stopNameResolver,
       TransferService transferService,
       RaptorTransitDataProvider<T> transitDataProvider,
+      int[] stopBoardAlightCosts,
       RaptorRequest<T> raptorRequest,
       TransferOptimizationParameters config
   ) {
@@ -43,6 +45,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     this.stopNameResolver = stopNameResolver;
     this.transferService = transferService;
     this.transitDataProvider = transitDataProvider;
+    this.stopBoardAlightCosts = stopBoardAlightCosts;
     this.raptorRequest = raptorRequest;
     this.config = config;
   }
@@ -55,6 +58,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       RaptorStopNameResolver stopNameResolver,
       TransferService transferService,
       RaptorTransitDataProvider<T> transitDataProvider,
+      int[] stopBoardAlightCosts,
       RaptorRequest<T> raptorRequest,
       TransferOptimizationParameters config
   ) {
@@ -63,6 +67,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
         stopNameResolver,
         transferService,
         transitDataProvider,
+            stopBoardAlightCosts,
         raptorRequest,
         config
     ).createOptimizeTransferService();
@@ -112,6 +117,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
             costCalculator,
             raptorRequest.slackProvider(),
             transferWaitTimeCostCalculator,
+            stopBoardAlightCosts,
+            config.extraStopBoardAlightCostsFactor(),
             transferPointFilter,
             stopNameResolver
     );

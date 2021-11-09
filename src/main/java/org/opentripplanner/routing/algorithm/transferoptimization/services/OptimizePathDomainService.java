@@ -73,22 +73,28 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private final MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain;
   private final RaptorStopNameResolver stopNameTranslator;
 
-
   @Nullable
   private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
+  @Nullable
+  private final int[] stopBoardAlightCosts;
+  private final double extraStopBoardAlightCostsFactor;
 
   public OptimizePathDomainService(
       TransferGenerator<T> transferGenerator,
       CostCalculator costCalculator,
       RaptorSlackProvider slackProvider,
       @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
+      int[] stopBoardAlightCosts,
+      double extraStopBoardAlightCostsFactor,
       MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain,
       RaptorStopNameResolver stopNameTranslator
   ) {
+    this.transferGenerator = transferGenerator;
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
     this.waitTimeCostCalculator = waitTimeCostCalculator;
-    this.transferGenerator = transferGenerator;
+    this.stopBoardAlightCosts = stopBoardAlightCosts;
+    this.extraStopBoardAlightCostsFactor = extraStopBoardAlightCostsFactor;
     this.minCostFilterChain = minCostFilterChain;
     this.stopNameTranslator = stopNameTranslator;
   }
@@ -124,6 +130,8 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
                 slackProvider,
                 costCalculator,
                 waitTimeCostCalculator,
+                stopBoardAlightCosts,
+                extraStopBoardAlightCostsFactor,
                 stopNameTranslator
         )
               .addTransitTail(last(originalTransitLegs))

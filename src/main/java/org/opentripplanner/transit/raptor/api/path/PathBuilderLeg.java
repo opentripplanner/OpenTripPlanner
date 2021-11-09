@@ -326,8 +326,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
      * <ul>
      */
     public int waitTimeBeforeNextTransitIncludingSlack() {
-        if(!isTransit() || nextTransitLeg() == null) { return -1; }
-
         if(next.hasRides()) { return waitTimeBeforeNextLegIncludingSlack(); }
 
         // Add wait-time before and after transfer(the next leg)
