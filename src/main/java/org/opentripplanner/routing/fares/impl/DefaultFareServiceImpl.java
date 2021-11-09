@@ -2,8 +2,8 @@ package org.opentripplanner.routing.fares.impl;
 
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
@@ -11,7 +11,6 @@ import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,9 +88,9 @@ public class DefaultFareServiceImpl implements FareService {
     }
 
     @Override
-    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary, TransitLayer transitLayer) {
 
-        List<Ride> rides = RideMapper.ridesForRaptorPath(path, transitLayer);
+        List<Ride> rides = RideMapper.ridesForRaptorPath(itinerary);
 
         // If there are no rides, there's no fare.
         if (rides.size() == 0) {

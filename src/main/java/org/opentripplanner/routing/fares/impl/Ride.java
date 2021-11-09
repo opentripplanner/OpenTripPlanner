@@ -5,6 +5,7 @@ import org.opentripplanner.model.Stop;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.opentripplanner.model.StopLocation;
 
 /**
  * A set of edges on a single route, with associated information. Used only in calculating fares.
@@ -31,9 +32,9 @@ public class Ride {
     // it can be used differently in custom fare services
     public Object classifier;
 
-    public Stop firstStop;
+    public StopLocation firstStop;
 
-    public Stop lastStop;
+    public StopLocation lastStop;
 
     public Ride() {
         zones = new HashSet<String>();

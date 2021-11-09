@@ -1,18 +1,16 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import org.opentripplanner.transit.raptor.api.path.Path;
+import java.io.Serializable;
+import java.util.Currency;
+import java.util.List;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-
-import java.io.Serializable;
-import java.util.Currency;
-import java.util.List;
 
 /**
  * This appears to be used in combination with transit using an AddingMultipleFareService.
@@ -32,11 +30,9 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
         this.pricing_by_second = pricingBySecond;
     }
 
-    // FIXME we need to test if the leg is a vehicle rental leg.
-    //       OTP2 doesn't handle non walk access or egress yet.
-    private int getLegCost(PathLeg<TripSchedule> pathLeg) {
+    private int getLegCost(Leg pathLeg) {
         int rideCost = 0;
-        int rideTime = pathLeg.duration();
+        long rideTime = pathLeg.getDuration();
         for (P2<Integer> bracket : pricing_by_second) {
             int time = bracket.first;
             if (rideTime < time) {
@@ -49,13 +45,14 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
     }
 
     @Override
-    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary, TransitLayer transitLayer) {
 
-        int rideCost = getLegCost(path.accessLeg());
-        rideCost += getLegCost(path.egressLeg());
+        var totalCost = itinerary.legs.stream()
+                .filter(l -> l.rentedVehicle)
+                .mapToInt(this::getLegCost).sum();
 
         Fare fare = new Fare();
-        fare.addFare(FareType.regular, new WrappedCurrency(currency), rideCost);
+        fare.addFare(FareType.regular, new WrappedCurrency(currency), totalCost);
         return fare;
     }
 }

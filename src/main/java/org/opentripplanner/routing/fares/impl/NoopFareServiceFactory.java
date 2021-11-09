@@ -2,6 +2,7 @@ package org.opentripplanner.routing.fares.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
@@ -38,9 +39,7 @@ class NoopFareServiceFactory implements FareServiceFactory {
     private static class NoopFareService implements FareService {
         private static final Long serialVersionUID = 1L;
         @Override
-        public Fare getCost(
-                Path<TripSchedule> path, TransitLayer transitLayer
-        ) {
+        public Fare getCost(Itinerary path, TransitLayer transitLayer) {
             return null;
         }
     }

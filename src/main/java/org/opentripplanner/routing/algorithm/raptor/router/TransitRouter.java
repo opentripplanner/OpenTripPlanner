@@ -134,7 +134,7 @@ public class TransitRouter {
             // Itinerary and Leg are API model classes, lacking internal object references needed for effective
             // fare calculation. We derive the fares from the internal Path objects and add them to the itinerary.
             if (fareService != null) {
-                itinerary.fare = fareService.getCost(path, transitLayer);
+                itinerary.fare = fareService.getCost(itinerary, transitLayer);
             }
             itineraries.add(itinerary);
         }

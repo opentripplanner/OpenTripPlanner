@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * A StopLocation describes a place where a vehicle can be boarded or alighted, which is not
  * necessarily a marked stop, but can be of other shapes, such as a service area for flexible
- * transit. StopLocations are referred toin stop times.
+ * transit. StopLocations are referred to in stop times.
  */
 public interface StopLocation {
 
@@ -47,4 +47,6 @@ public interface StopLocation {
    * the centroid of an area or line.
    */
   WgsCoordinate getCoordinate();
+
+  String getFirstZoneAsString();
 }

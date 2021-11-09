@@ -17,6 +17,8 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private Geometry geometry;
 
+  private String zoneId;
+
   public FlexStopLocation(FeedScopedId id) {
     super(id);
   }
@@ -52,5 +54,14 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   public WgsCoordinate getCoordinate() {
     Point centroid = geometry.getCentroid();
     return new WgsCoordinate(centroid.getY(), centroid.getX());
+  }
+
+  @Override
+  public String getFirstZoneAsString() {
+    return zoneId;
+  }
+
+  public void setZoneId(String zoneId) {
+    this.zoneId = zoneId;
   }
 }
