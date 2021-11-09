@@ -25,7 +25,7 @@ import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLAPI;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
-import org.opentripplanner.ext.readiness_endpoint.ActuatorAPI;
+import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;

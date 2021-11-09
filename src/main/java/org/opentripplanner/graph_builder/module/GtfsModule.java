@@ -58,12 +58,6 @@ public class GtfsModule implements GraphBuilderModule {
 
     private FareServiceFactory fareServiceFactory;
 
-    /** will be applied to all bundles which do not have the cacheDirectory property set */
-    private File cacheDirectory;
-
-    /** will be applied to all bundles which do not have the useCached property set */
-    private Boolean useCached;
-
     private Set<String> agencyIdsSeen = Sets.newHashSet();
 
     private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
@@ -114,15 +108,6 @@ public class GtfsModule implements GraphBuilderModule {
 
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
-                // apply global defaults to individual GTFSBundles (if globals have been set)
-                if (cacheDirectory != null && gtfsBundle.cacheDirectory == null) {
-                    gtfsBundle.cacheDirectory = cacheDirectory;
-                }
-
-                if (useCached != null && gtfsBundle.useCached == null) {
-                    gtfsBundle.useCached = useCached;
-                }
-
                 GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
                 GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
                         gtfsBundle.getFeedId().getId(),

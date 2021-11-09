@@ -76,7 +76,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
-    for (int toIndex = fromIndex + 1; toIndex < stopTimes.length; toIndex++) {
+    for (int toIndex = fromIndex; toIndex < stopTimes.length; toIndex++) {
       if (stopTimes[toIndex].dropOffType == NONE.getGtfsCode()) continue;
       for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
         res.add(new FlexAccessTemplate(
@@ -107,7 +107,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
-    for (int fromIndex = toIndex - 1; fromIndex >= 0; fromIndex--) {
+    for (int fromIndex = toIndex; fromIndex >= 0; fromIndex--) {
       if (stopTimes[fromIndex].pickupType == NONE.getGtfsCode()) continue;
       for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
         res.add(new FlexEgressTemplate(
