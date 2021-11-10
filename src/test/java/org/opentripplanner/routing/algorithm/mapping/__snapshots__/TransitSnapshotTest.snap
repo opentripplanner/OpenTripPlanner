@@ -461,7 +461,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1760,
           "headsign": "Montgomery Park",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 129,
             "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
@@ -901,7 +900,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1820,
           "headsign": "NW 27th & Thurman",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 129,
             "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
@@ -1341,7 +1339,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1820,
           "headsign": "Montgomery Park",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 129,
             "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
@@ -1781,7 +1778,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1820,
           "headsign": "NW 27th & Thurman",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 129,
             "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
@@ -2221,7 +2217,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1820,
           "headsign": "Montgomery Park",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 129,
             "points": "kaytG||qkVA~@?jE?tC???r@AhE?jE?rA???tBAjE?nD???X?hE?xC??Ah@?pE?~C???J?`@?vAAvBEbE?jEAlE?`BAbB@d@??@tAAj@Cx@Cb@Cp@_@dEcAtFoA`IS~@i@`BmAzDi@zAc@pAi@~C??Id@u@jEm@bD??If@u@jEk@bD??If@u@|DW`B??CPs@|Du@lElBz@??VJbCfAk@dD??Id@w@rEWvAId@AF??Q~@s@`Ei@~C??Ib@u@dEWzA??]jB]MQSe@WOKOKIIQe@GWE]GnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"
@@ -2971,7 +2966,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1369,
           "headsign": "Beaverton TC",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 95,
             "points": "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
@@ -3451,7 +3445,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1399,
           "headsign": "23rd Ave to Tichner",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 95,
             "points": "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
@@ -3931,7 +3924,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1369,
           "headsign": "Beaverton TC",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 95,
             "points": "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
@@ -4398,7 +4390,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 972,
           "headsign": "Rose Qtr TC",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 46,
             "points": "{fztG`xrkVwA?mCAmC?oCA}C?sDC??aBAm@@k@AY?uABU@I@IBQFb@fC}@d@OFO@q@???Q?]?gGA??[??nJ???b@?vK?rA???tBCfD???^?nE?V@Z?PH\\Nb@`@~@Rf@"
@@ -4543,7 +4534,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1598,
           "headsign": "Montgomery Park",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 96,
             "points": "kx{tG~qtkV`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
@@ -4976,7 +4966,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1364,
           "headsign": "23rd Ave to Tichner",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 90,
             "points": "weztGdtrkV?BPj@@jA?jEAhE?pD???VAjE?hE?dB?b@???`AAhE?dD???l@C`EAhEEhE?bAA|@?XAZ@\\AzACnGKbKAjC?bE???JEnE@fEDlE@hE@~A??@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC"
@@ -5121,7 +5110,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "generalizedCost": 1096,
           "headsign": "27th & Thurman",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 16,
             "points": "khztGbn{kVAPkAh@o@?sCB{BD??S?mCDmCDyBB??U?mCDmCDyBB"

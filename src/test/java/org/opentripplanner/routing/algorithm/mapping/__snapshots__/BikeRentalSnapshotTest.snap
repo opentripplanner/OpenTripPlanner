@@ -537,7 +537,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "generalizedCost": 1175,
           "headsign": "136th Ave",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 39,
             "points": "{c{tGnwzkVR?lCEvBC??VAlCClCEAkA??A}BCkEAkECaD???g@CiECiEEiE?c@?o@?]Aa@?w@AoD???YEkEAkECiEA_A??AiCCkECmD???[A_CCiD"
@@ -977,7 +976,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "generalizedCost": 1133,
           "headsign": "Gresham TC",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 53,
             "points": "gkztGz_|kVTmALiBt@mJJ_DBoA??@e@D}AFyDBgADwB??@]BaADgCDmC??By@FiEJoEBuA??DsBD}BBiADmC@y@AiB???Y?g@As@?_@?YAeB@uD???{@G{D?mECeBAu@??Ai@CoEASAuDAmB???MCqEA_B"
@@ -1417,7 +1415,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "generalizedCost": 1391,
           "headsign": "Troutdale",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 60,
             "points": "yo{tG|b|kVC}CEuKGwI???}@G{J???YGsKEuKCuD???UCiECeEAgA?{@AkA?WAwDE{C???i@CiECkECcD??Ae@?mE{BDQ@q@@??{ADCsDbBiB`DaEt@_AVANIX?tBCLK`@c@\\c@l@w@??\\c@FKDCFEXCCgEvBEVAlCClCEnCECoD"
@@ -2157,7 +2154,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "generalizedCost": 1175,
           "headsign": "136th Ave",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 39,
             "points": "{c{tGnwzkVR?lCEvBC??VAlCClCEAkA??A}BCkEAkECaD???g@CiECiEEiE?c@?o@?]Aa@?w@AoD???YEkEAkECiEA_A??AiCCkECmD???[A_CCiD"
@@ -2897,7 +2893,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "generalizedCost": 1175,
           "headsign": "136th Ave",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 39,
             "points": "{c{tGnwzkVR?lCEvBC??VAlCClCEAkA??A}BCkEAkECaD???g@CiECiEEiE?c@?o@?]Aa@?w@AoD???YEkEAkECiEA_A??AiCCkECmD???[A_CCiD"
@@ -3286,7 +3281,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "generalizedCost": 1391,
           "headsign": "Troutdale",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 60,
             "points": "yo{tG|b|kVC}CEuKGwI???}@G{J???YGsKEuKCuD???UCiECeEAgA?{@AkA?WAwDE{C???i@CiECkECcD??Ae@?mE{BDQ@q@@??{ADCsDbBiB`DaEt@_AVANIX?tBCLK`@c@\\c@l@w@??\\c@FKDCFEXCCgEvBEVAlCClCEnCECoD"
@@ -4881,7 +4875,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "generalizedCost": 1122,
           "headsign": "Sauvie Is. via St.Johns",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 39,
             "points": "kwztGhgwkVQ?kC@@zD???PBjE?`B??@X@jEBjD???\\BhEBpD???XBhE@nD??@Z?hEBtA?h@@h@??@Z@nEBhEBhD???`@FtKDhH??@hBoCD}BB"
@@ -5655,7 +5648,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "generalizedCost": 1203,
           "headsign": "Beaverton TC",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 56,
             "points": "efztGhcwkV@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
@@ -6129,7 +6121,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "generalizedCost": 1077,
           "headsign": "Montgomery Park",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 53,
             "points": "i|ztG|fwkV?LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
@@ -6569,7 +6560,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "generalizedCost": 1122,
           "headsign": "31st & Industrial",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 39,
             "points": "kwztGhgwkVQ?kC@@zD???PBjE?`B??@X@jEBjD???\\BhEBpD???XBhE@nD??@Z?hEBtA?h@@h@??@Z@nEBhEBhD???`@FtKDhH??@hBoCD}BB"
@@ -7343,7 +7333,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "generalizedCost": 1263,
           "headsign": "Beaverton TC",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 56,
             "points": "efztGhcwkV@rBBzDBpE@~A???Z@tD@RBnEB|A???@BdB?lEBjA??BnBApF@dB?X?^@r@?f@@bCAx@EtB???VChAE|BGnD??AXKnEGnD???XGjD??AZEfCC`AEzB??AXCfAGxDE|AEtBIlC??APu@lJMhBI`@"
@@ -7817,7 +7806,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "generalizedCost": 1077,
           "headsign": "Montgomery Park",
           "interlinedWithPreviousLeg": false,
-          "intermediateStops": [ ],
           "legGeometry": {
             "length": 53,
             "points": "i|ztG|fwkV?LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
