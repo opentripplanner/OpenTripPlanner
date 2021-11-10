@@ -812,7 +812,9 @@ public class TransmodelGraphQLSchema {
                     .getArguments()
                     .entrySet()
                     .stream()
-                    .filter(it -> it.getValue() != null)
+                    .filter(it -> it.getValue() != null &&
+                            !(it.getKey().equals("flexibleOnly") && it.getValue().equals(false))
+                    )
                     .count() != 1) {
                   throw new IllegalArgumentException("Unable to combine other filters with ids");
                 }
