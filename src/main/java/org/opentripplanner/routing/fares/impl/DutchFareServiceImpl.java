@@ -1,21 +1,17 @@
 package org.opentripplanner.routing.fares.impl;
 
+import java.util.Collection;
+import java.util.Currency;
+import java.util.List;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.Currency;
-import java.util.List;
 
 public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 

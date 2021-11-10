@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
@@ -312,7 +312,7 @@ public class NycFareServiceImpl implements FareService {
 			// agency IDs we don't recognize.
 			if (!AGENCIES.contains(leg.getAgency().getId().getFeedId())) {
 				return null;
-			} else if (!leg.isTransitLeg()) {
+			} else if (isTransferLeg(leg, itinerary)) {
 				Ride ride = new Ride();
 				ride.classifier = NycRideClassifier.WALK;
 				return ride;
@@ -346,6 +346,10 @@ public class NycFareServiceImpl implements FareService {
 			}
 			return null;
 		}).filter(Objects::nonNull).collect(Collectors.toList());
+	}
+
+	private static boolean isTransferLeg(Leg leg, Itinerary itinerary) {
+		return !itinerary.firstLeg().equals(leg) && !itinerary.lastLeg().equals(leg) && leg.isWalkingLeg();
 	}
 
 	private static List<FeedScopedId> makeMtaStopList(String... stops) {

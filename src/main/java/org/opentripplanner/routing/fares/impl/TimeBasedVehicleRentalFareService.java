@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_rental;
+package org.opentripplanner.routing.fares.impl;
 
 import java.io.Serializable;
 import java.util.Currency;
