@@ -178,7 +178,6 @@ public class RaptorPathToItineraryMapper {
         }
 
         leg.serviceDate = new ServiceDate(tripSchedule.getServiceDate());
-        leg.intermediateStops = new ArrayList<>();
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
         leg.from = mapStopToPlace(boardStop, boardStopIndexInPattern, tripTimes);
@@ -187,9 +186,9 @@ public class RaptorPathToItineraryMapper {
         leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
         leg.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
 
-        if (request.showIntermediateStops) {
-            leg.intermediateStops = extractIntermediateStops(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern);
-        }
+        // intermediate stops are required for fare calculation that's why we always add them here
+        // and remove them after the fare calculation if they were not requested.
+        leg.intermediateStops = extractIntermediateStops(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern);
 
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
@@ -252,7 +251,6 @@ public class RaptorPathToItineraryMapper {
     }
 
     private List<Leg> mapNonTransitLeg(PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {
-        //List<Leg> legs = new ArrayList<>();
         List<Edge> edges = transfer.getEdges();
         if (edges == null || edges.isEmpty()) {
             Leg leg = new Leg(TraverseMode.WALK);

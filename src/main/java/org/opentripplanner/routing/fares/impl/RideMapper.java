@@ -36,11 +36,11 @@ public class RideMapper {
         ride.startZone = ride.firstStop.getFirstZoneAsString();
         ride.endZone = ride.lastStop.getFirstZoneAsString();
 
-        // In almost all cases (except some loop routes) this should get the right set of zones passed through.
-        // We don't have the position of the stops within the pattern so can't readily get more accurate than this.
         var zones = leg.intermediateStops.stream()
                 .map(stopArrival -> stopArrival.place.stop.getFirstZoneAsString())
                 .collect(Collectors.toSet());
+
+        zones.addAll(List.of(ride.startZone, ride.endZone));
 
         ride.zones = zones;
         ride.agency = leg.getRoute().getAgency().getId();

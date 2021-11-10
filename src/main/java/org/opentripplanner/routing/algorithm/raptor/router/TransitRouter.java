@@ -135,6 +135,12 @@ public class TransitRouter {
             if (fareService != null) {
                 itinerary.fare = fareService.getCost(itinerary);
             }
+
+            // we need the intermediate stops to calculate the fares. that's why we remove them if
+            // they were not requested.
+            if(!request.showIntermediateStops) {
+                itinerary.legs.stream().forEach(l -> l.intermediateStops = List.of());
+            }
             itineraries.add(itinerary);
         }
 
