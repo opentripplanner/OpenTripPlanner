@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.fares.impl;
 
 import java.time.ZoneOffset;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
@@ -37,20 +38,29 @@ public class RideMapper {
 
         // In almost all cases (except some loop routes) this should get the right set of zones passed through.
         // We don't have the position of the stops within the pattern so can't readily get more accurate than this.
-        var zones = leg.intermediateStops.stream().map(stopArrival -> stopArrival.place.stop.getFirstZoneAsString()).collect(
-                Collectors.toSet());
+        var zones = leg.intermediateStops.stream()
+                .map(stopArrival -> stopArrival.place.stop.getFirstZoneAsString())
+                .collect(Collectors.toSet());
+
         ride.zones = zones;
         ride.agency = leg.getRoute().getAgency().getId();
         ride.route = leg.getRoute().getId();
         ride.trip = leg.getTrip().getId();
 
         // TODO verify that times are in seconds after midnight
-        ride.startTime = leg.startTime.toInstant().atOffset(ZoneOffset.ofTotalSeconds(leg.agencyTimeZoneOffset)).toLocalTime().toSecondOfDay();
-        ride.endTime = leg.startTime.toInstant().atOffset(ZoneOffset.ofTotalSeconds(leg.agencyTimeZoneOffset)).toLocalTime().toSecondOfDay();
+        ride.startTime = getSecondsSinceMidnight(leg.startTime, leg);
+        ride.endTime = getSecondsSinceMidnight(leg.endTime, leg);
 
         // In the default fare service, we classify rides by mode.
         ride.classifier = leg.mode;
         return ride;
+    }
+
+    private static int getSecondsSinceMidnight(Calendar time, Leg leg) {
+        return time.toInstant()
+                .atOffset(ZoneOffset.ofTotalSeconds(leg.agencyTimeZoneOffset))
+                .toLocalTime()
+                .toSecondOfDay();
     }
 
 }
