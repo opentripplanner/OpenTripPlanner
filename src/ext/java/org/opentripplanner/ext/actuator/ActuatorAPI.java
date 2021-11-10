@@ -45,6 +45,8 @@ public class ActuatorAPI {
 
     private final Router router;
 
+    private static boolean isReadinessLogged = false;
+
     public ActuatorAPI(@Context OTPServer otpServer) {
         this.router = otpServer.getRouter();
 
@@ -138,6 +140,11 @@ public class ActuatorAPI {
                     .type("text/plain")
                     .build());
             }
+        }
+
+        if (!isReadinessLogged) {
+            LOG.info("All updaters initialized");
+            isReadinessLogged = true;
         }
 
         return Response.status(Response.Status.OK).entity(
