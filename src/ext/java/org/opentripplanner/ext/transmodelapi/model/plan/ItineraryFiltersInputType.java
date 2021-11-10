@@ -30,9 +30,9 @@ public class ItineraryFiltersInputType {
             .newInputObjectField()
             .name(MIN_SAFE_TRANSFER_TIME_FACTOR)
             .type(Scalars.GraphQLFloat)
+            .deprecate("This filter is removed, it have undesired side-effects")
             .description("Add an additional cost for short transfers on long transit itineraries. "
                 + "See javaDoc on `AddMinSafeTransferCostFilter` details.")
-            .defaultValue(dft.minSafeTransferTimeFactor)
             .build())
         .field(GraphQLInputObjectField.newInputObjectField().name(TRANSIT_GENERALIZED_COST_LIMIT).type(gqlUtil.doubleFunctionScalar)
             // There is a bug in the GraphQL lib. The default value is shown as a `boolean`
@@ -97,7 +97,6 @@ public class ItineraryFiltersInputType {
 
     setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) -> target.groupSimilarityKeepThree = v);
     setField(callWith, GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER, (Double v) -> target.groupedOtherThanSameLegsMaxCostMultiplier = v);
-    setField(callWith, MIN_SAFE_TRANSFER_TIME_FACTOR, (Double v) -> target.minSafeTransferTimeFactor = v);
     setField(callWith, TRANSIT_GENERALIZED_COST_LIMIT, (DoubleFunction<Double> v) -> target.transitGeneralizedCostLimit = v);
   }
 
