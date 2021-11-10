@@ -121,7 +121,7 @@ public class Place {
                 .toString();
     }
 
-    public static Place normal(double lat, double lon, String name) {
+    public static Place normal(Double lat, Double lon, String name) {
         return new Place(
                 name,
                 null,

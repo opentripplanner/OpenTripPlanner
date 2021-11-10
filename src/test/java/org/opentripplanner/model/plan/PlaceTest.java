@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -41,6 +42,12 @@ public class PlaceTest {
         assertTrue("same place(symmetric)", samePlace.sameLocation(aPlace));
         assertFalse("other place", aPlace.sameLocation(otherPlace));
         assertFalse("other place(symmetric)", otherPlace.sameLocation(aPlace));
+    }
+
+    @Test
+    public void acceptsNullCoordinates() {
+        var p = Place.normal(null, null, "Test");
+        assertNull(p.coordinate);
     }
 
     private static Stop stop(String stopId, double lat, double lon) {
