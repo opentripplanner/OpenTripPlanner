@@ -27,7 +27,6 @@ public class RoutingRequestMapper {
         request.bikeRental = c.asBoolean("allowBikeRental", dft.bikeRental);
         request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
         request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
-        request.bikeParkAndRide = c.asBoolean("bikeParkAndRide", dft.bikeParkAndRide);
         request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
         request.bikeParkCost = c.asInt("bikeParkCost", dft.bikeParkCost);
         request.bikeReluctance = c.asDouble("bikeReluctance", dft.bikeReluctance);
@@ -51,6 +50,8 @@ public class RoutingRequestMapper {
         request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
         request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
         request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
+        request.carParkCost = c.asInt("carParkCost", dft.carParkCost);
+        request.carParkTime = c.asInt("carParkTime", dft.carParkTime);
         request.carPickupCost = c.asInt("carPickupCost", dft.carPickupCost);
         request.carPickupTime = c.asInt("carPickupTime", dft.carPickupTime);
         request.carReluctance = c.asDouble("carReluctance", dft.carReluctance);

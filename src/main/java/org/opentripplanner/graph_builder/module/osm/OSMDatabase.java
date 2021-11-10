@@ -65,6 +65,9 @@ public class OSMDatabase {
     /* Map of all bike parking nodes, keyed by their OSM ID */
     private TLongObjectMap<OSMNode> bikeParkingNodes = new TLongObjectHashMap<>();
 
+    /* Map of all bike parking nodes, keyed by their OSM ID */
+    private TLongObjectMap<OSMNode> carParkingNodes = new TLongObjectHashMap<>();
+
     /* Map of all non-area ways keyed by their OSM ID */
     private TLongObjectMap<OSMWay> waysById = new TLongObjectHashMap<>();
 
@@ -156,6 +159,10 @@ public class OSMDatabase {
         return Collections.unmodifiableCollection(bikeParkingNodes.valueCollection());
     }
 
+    public Collection<OSMNode> getCarParkingNodes() {
+        return Collections.unmodifiableCollection(carParkingNodes.valueCollection());
+    }
+
     public Collection<Area> getWalkableAreas() {
         return Collections.unmodifiableCollection(walkableAreas);
     }
@@ -204,6 +211,9 @@ public class OSMDatabase {
     public void addNode(OSMNode node) {
         if (node.isBikeParking()) {
             bikeParkingNodes.put(node.getId(), node);
+        }
+        if (node.isParkAndRide()) {
+            carParkingNodes.put(node.getId(), node);
         }
         if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
                 .isStop())) {
@@ -269,12 +279,12 @@ public class OSMDatabase {
         }
 
         if (relation.isTag("type", "multipolygon")
-                && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide())) {
+                && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide()) || relation.isBikeParking()) {
             // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
             // without reference to the ways that compose them. Accordingly, we will merely
             // mark the ways for preservation here, and deal with the details once we have
             // the ways loaded.
-            if (!OSMFilter.isWayRoutable(relation) && !relation.isParkAndRide()) {
+            if (!OSMFilter.isWayRoutable(relation) && !relation.isParkAndRide() && !relation.isBikeParking()) {
                 return;
             }
             for (OSMRelationMember member : relation.getMembers()) {
@@ -347,6 +357,17 @@ public class OSMDatabase {
         processUnconnectedAreas();
     }
 
+    // Simple holder for the spatial index
+    class RingSegment {
+        Area area;
+
+        Ring ring;
+
+        OSMNode nA;
+
+        OSMNode nB;
+    }
+
     /**
      * Connect areas with ways when unconnected (areas outer rings crossing with ways at the same
      * level, but with no common nodes). Currently process P+R areas only, but could easily be
@@ -354,17 +375,6 @@ public class OSMDatabase {
      */
     private void processUnconnectedAreas() {
         LOG.info("Intersecting unconnected areas...");
-
-        // Simple holder for the spatial index
-        class RingSegment {
-            Area area;
-
-            Ring ring;
-
-            OSMNode nA;
-
-            OSMNode nB;
-        }
 
         /*
          * Create a spatial index for each segment of area outer rings. Note: The spatial index is
@@ -376,22 +386,7 @@ public class OSMDatabase {
         HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
         for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
             for (Ring ring : area.outermostRings) {
-                for (int j = 0; j < ring.nodes.size(); j++) {
-                    RingSegment ringSegment = new RingSegment();
-                    ringSegment.area = area;
-                    ringSegment.ring = ring;
-                    ringSegment.nA = ring.nodes.get(j);
-                    ringSegment.nB = ring.nodes.get((j + 1) % ring.nodes.size());
-                    Envelope env = new Envelope(ringSegment.nA.lon, ringSegment.nB.lon,
-                            ringSegment.nA.lat, ringSegment.nB.lat);
-                    P2<Long> key1 = new P2<>(ringSegment.nA.getId(), ringSegment.nB.getId());
-                    P2<Long> key2 = new P2<>(ringSegment.nB.getId(), ringSegment.nA.getId());
-                    if (!commonSegments.contains(key1) && !commonSegments.contains(key2)) {
-                        spndx.insert(env, ringSegment);
-                        commonSegments.add(key1);
-                        commonSegments.add(key2);
-                    }
-                }
+                processAreaRingForUnconnectedAreas(commonSegments, spndx, area, ring);
             }
         }
 
@@ -592,7 +587,33 @@ public class OSMDatabase {
         LOG.info("Created {} virtual intersection nodes.", nCreatedNodes);
     }
 
-	/**
+    private void processAreaRingForUnconnectedAreas(
+            Set<P2<Long>> commonSegments,
+            HashGridSpatialIndex<RingSegment> spndx,
+            Area area,
+            Ring ring
+    ) {
+        for (int j = 0; j < ring.nodes.size(); j++) {
+            RingSegment ringSegment = new RingSegment();
+            ringSegment.area = area;
+            ringSegment.ring = ring;
+            ringSegment.nA = ring.nodes.get(j);
+            ringSegment.nB = ring.nodes.get((j + 1) % ring.nodes.size());
+            Envelope env = new Envelope(ringSegment.nA.lon, ringSegment.nB.lon,
+                    ringSegment.nA.lat, ringSegment.nB.lat);
+            P2<Long> key1 = new P2<>(ringSegment.nA.getId(), ringSegment.nB.getId());
+            P2<Long> key2 = new P2<>(ringSegment.nB.getId(), ringSegment.nA.getId());
+            if (!commonSegments.contains(key1) && !commonSegments.contains(key2)) {
+                spndx.insert(env, ringSegment);
+                commonSegments.add(key1);
+                commonSegments.add(key2);
+            }
+        }
+
+        ring.holes.forEach(hole -> processAreaRingForUnconnectedAreas(commonSegments, spndx, area, hole));
+    }
+
+    /**
      * Create a virtual OSM node, using a negative unique ID.
      * 
      * @param c The location of the node to create.
@@ -688,7 +709,7 @@ public class OSMDatabase {
                 continue;
             }
             if (!(relation.isTag("type", "multipolygon") && (OSMFilter
-                    .isOsmEntityRoutable(relation) || relation.isParkAndRide()))) {
+                    .isOsmEntityRoutable(relation) || relation.isParkAndRide() || relation.isBikeParking()))) {
                 continue;
             }
             // Area multipolygons -- pedestrian plazas

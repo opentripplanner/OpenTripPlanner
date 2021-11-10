@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import java.util.Collection;
+import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -33,11 +35,6 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
   @Override
   public String getName() {
     return name;
-  }
-
-  @Override
-  public String getCode() {
-    return null;
   }
 
   /**

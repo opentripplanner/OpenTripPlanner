@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import java.util.Collection;
+import java.util.List;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 
@@ -41,17 +43,6 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   public void setGeometry(Geometry geometry) {
     this.geometry = geometry;
-  }
-
-  /**
-   * Short text or a number that identifies the location for riders. These codes are often used in
-   * phone-based reservation systems to make it easier for riders to specify a particular location.
-   * The stop_code can be the same as id if it is public facing. This field should be left empty for
-   * locations without a code presented to riders.
-   */
-  @Override
-  public String getCode() {
-    return null;
   }
 
   /**
