@@ -48,5 +48,4 @@ public interface StopLocation {
    */
   WgsCoordinate getCoordinate();
 
-  String getFirstZoneAsString();
 }

@@ -244,7 +244,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 }
 
         		/* The entrance Fee applies if the transfer time ends before the new trip starts. */
-                if ((alightedTariefEenheden + TRANSFER_DURATION) < ride.startTime) {
+                if ((alightedTariefEenheden + TRANSFER_DURATION) < ride.startTime.toSecondOfDay()) {
                     LOG.trace("3. Exceeded Transfer Time");
                     cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
                     if (cost == Float.POSITIVE_INFINITY) { return cost; }
@@ -265,7 +265,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                     startTariefEenheden = ride.startZone;
                 }
 
-                alightedTariefEenheden = ride.endTime;
+                alightedTariefEenheden = ride.endTime.toSecondOfDay();
                 endTariefEenheden = ride.endZone;
                 lastAgencyId = ride.agency;
 
@@ -276,13 +276,13 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 mustHaveCheckedOut = (startTariefEenheden != null);
 
                 /* The entranceFee applies if the transfer time ends before the new trip starts. */
-                boolean entranceFee = ((alightedEasyTrip + TRANSFER_DURATION) < ride.startTime);
+                boolean entranceFee = ((alightedEasyTrip + TRANSFER_DURATION) < ride.startTime.toSecondOfDay());
 
                 /* EasyTrip will always calculate its price per leg */
                 cost += getEasyTripFareByLineFromTo(ride.route.getId(), ride.startZone, ride.endZone, entranceFee, fareRules);
                 if (cost == Float.POSITIVE_INFINITY) { return cost; }
 
-                alightedEasyTrip = ride.endTime;
+                alightedEasyTrip = ride.endTime.toSecondOfDay();
             }
         }
 

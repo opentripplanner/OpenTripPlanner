@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.fares.impl;
 
+import java.time.LocalTime;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 
@@ -24,9 +25,9 @@ public class Ride {
 
     String endZone;
 
-    long startTime;
+    LocalTime startTime;
 
-    long endTime;
+    LocalTime endTime;
 
     // in DefaultFareServiceImpl classifier is just the TraverseMode
     // it can be used differently in custom fare services

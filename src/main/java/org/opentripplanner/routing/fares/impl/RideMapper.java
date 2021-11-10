@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.fares.impl;
 
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.List;
@@ -47,20 +48,18 @@ public class RideMapper {
         ride.route = leg.getRoute().getId();
         ride.trip = leg.getTrip().getId();
 
-        // TODO verify that times are in seconds after midnight
-        ride.startTime = getSecondsSinceMidnight(leg.startTime, leg);
-        ride.endTime = getSecondsSinceMidnight(leg.endTime, leg);
+        ride.startTime = toLocalTime(leg.startTime, leg);
+        ride.endTime = toLocalTime(leg.endTime, leg);
 
         // In the default fare service, we classify rides by mode.
         ride.classifier = leg.mode;
         return ride;
     }
 
-    private static int getSecondsSinceMidnight(Calendar time, Leg leg) {
+    private static LocalTime toLocalTime(Calendar time, Leg leg) {
         return time.toInstant()
                 .atOffset(ZoneOffset.ofTotalSeconds(leg.agencyTimeZoneOffset))
-                .toLocalTime()
-                .toSecondOfDay();
+                .toLocalTime();
     }
 
 }

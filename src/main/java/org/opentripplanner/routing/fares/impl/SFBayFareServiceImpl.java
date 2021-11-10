@@ -50,8 +50,8 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     protected float getLowestCost(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
         List<Ride> bartBlock = null;
-        Long sfmtaTransferIssued = null;
-        Long alightedBart = null;
+        Integer sfmtaTransferIssued = null;
+        Integer alightedBart = null;
         String alightedBartStop = null;
         float cost = 0f;
         String agencyId = null;
@@ -62,7 +62,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
                     bartBlock = new ArrayList<Ride>();
                 }
                 bartBlock.add(ride);
-                alightedBart = ride.endTime;
+                alightedBart = ride.endTime.toSecondOfDay();
                 alightedBartStop = ride.lastStop.getId().getId();
             } else { // non-BART agency
                 if (bartBlock != null) {
@@ -75,10 +75,10 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
                         // no transfers issued or accepted
                         cost += CABLE_CAR_FARE;
                     } else if (sfmtaTransferIssued == null || 
-                        sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.endTime) {
-                        sfmtaTransferIssued = ride.startTime;
+                        sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.endTime.toSecondOfDay()) {
+                        sfmtaTransferIssued = ride.startTime.toSecondOfDay();
                         if (alightedBart != null &&
-                            alightedBart + BART_TRANSFER_DURATION > ride.startTime &&
+                            alightedBart + BART_TRANSFER_DURATION > ride.startTime.toSecondOfDay() &&
                             SFMTA_BART_TRANSFER_STOPS.contains(alightedBartStop)) {
                             // discount for BART to Muni transfer
                             if (alightedBartStop.equals(SFMTA_BART_FREE_TRANSFER_STOP)) {
