@@ -30,7 +30,7 @@ public class ItineraryFiltersInputType {
             .newInputObjectField()
             .name(MIN_SAFE_TRANSFER_TIME_FACTOR)
             .type(Scalars.GraphQLFloat)
-            .deprecate("This filter is removed, it have undesired side-effects")
+            .deprecate("This filter is removed, it has undesired side-effects")
             .description("Add an additional cost for short transfers on long transit itineraries. "
                 + "See javaDoc on `AddMinSafeTransferCostFilter` details.")
             .build())
