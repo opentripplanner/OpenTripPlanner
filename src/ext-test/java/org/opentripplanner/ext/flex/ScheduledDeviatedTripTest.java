@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,8 +25,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
  */
 public class ScheduledDeviatedTripTest extends FlexTest {
 
-    static final String COBB_COUNTY_GTFS =
-            "src/ext-test/resources/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
+    static final String COBB_COUNTY_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
 
     static Graph graph;
 
@@ -81,7 +81,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     }
 
     @BeforeAll
-    static void setup() {
+    static void setup() throws URISyntaxException {
         graph = FlexTest.buildFlexGraph(COBB_COUNTY_GTFS);
     }
 

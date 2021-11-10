@@ -1,13 +1,14 @@
 package org.opentripplanner.ext.flex;
 
 import gnu.trove.set.hash.TIntHashSet;
-import java.io.File;
+import java.net.URISyntaxException;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -24,9 +25,11 @@ abstract public class FlexTest {
     static final FlexParameters params = new FlexParameters(300);
 
 
-    static Graph buildFlexGraph(String fileName) {
+    static Graph buildFlexGraph(String fileName) throws URISyntaxException {
+        var file = FakeGraph.getFileForResource(fileName);
+
         var graph = new Graph();
-        GtfsBundle gtfsBundle = new GtfsBundle(new File(fileName));
+        GtfsBundle gtfsBundle = new GtfsBundle(file);
         GtfsModule module = new GtfsModule(
                 List.of(gtfsBundle),
                 new ServiceDateInterval(
