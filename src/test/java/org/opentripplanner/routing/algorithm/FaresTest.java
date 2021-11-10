@@ -1,106 +1,115 @@
 package org.opentripplanner.routing.algorithm;
 
-import junit.framework.TestCase;
-import org.junit.Ignore;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.fares.impl.SeattleFareServiceFactory;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.impl.SeattleFareServiceFactory;
+import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.TestUtils;
 
-import java.util.List;
-
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
-/**
- * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented for Raptor.
- */
-@Ignore
-public class TestFares extends TestCase {
+public class FaresTest {
 
     private AStar aStar = new AStar();
-    
+
     public void testBasic() throws Exception {
 
         Graph gg = new Graph();
         GtfsContext context = contextBuilder(ConstantsForTests.CALTRAIN_GTFS).build();
         GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(gg);
-        gg.putService(
-                CalendarServiceData.class, context.getCalendarServiceData()
-        );
-        RoutingRequest options = new RoutingRequest();
-        String feedId = gg.getFeedIds().iterator().next();
-        options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
-        options.setRoutingContext(gg, feedId + ":Millbrae Caltrain", feedId + ":Mountain View Caltrain");
-        ShortestPathTree spt;
-        GraphPath path = null;
-        spt = aStar.getShortestPathTree(options);
+        gg.putService(CalendarServiceData.class, context.getCalendarServiceData());
+        RoutingRequest request = new RoutingRequest();
 
-        path = spt.getPath(gg.getVertex(feedId + ":Mountain View Caltrain"), true);
+        var router = new Router(gg, RouterConfig.DEFAULT);
+
+        String feedId = gg.getFeedIds().iterator().next();
+
+        request.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
+        request.setRoutingContext(gg, feedId + ":Millbrae Caltrain", feedId + ":Mountain View Caltrain");
+
 
         FareService fareService = gg.getService(FareService.class);
-        
-        Fare cost = null; // was: fareService.getCost(path);
+
+        var x = TransitRouter.route(request, router, new DebugTimingAggregator());
+        var z = x.getItineraries().get(0);
+
+        Fare cost = fareService.getCost(z);
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
     }
 
-    public void testPortland() throws Exception {
+    @Test
+    public void testPortland() {
 
         Graph gg = ConstantsForTests.getInstance().getCachedPortlandGraph();
-        String feedId = gg.getFeedIds().iterator().next();
-        RoutingRequest options = new RoutingRequest();
+
+        String portlandId = gg.getFeedIds().iterator().next();
+        RoutingRequest request = new RoutingRequest();
         ShortestPathTree spt;
         GraphPath path = null;
+
+        var router = new Router(gg, RouterConfig.DEFAULT);
+        router.startup();
+
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
-        options.dateTime = startTime;
-        options.setRoutingContext(gg, feedId + ":10579", feedId + ":8371");
+        request.dateTime = startTime;
+
         // from zone 3 to zone 2
-        spt = aStar.getShortestPathTree(options);
+        request.from = GenericLocation.fromStopId("Portland Int'l Airport MAX Station,Eastbound stop in Portland",
+                portlandId, "10579");
+        request.to = GenericLocation.fromStopId("NE 82nd Ave MAX Station,Westbound stop in Portland",
+                portlandId, "8371");
 
-        path = spt.getPath(gg.getVertex(feedId + ":8371"), true);
-        assertNotNull(path);
+        var result = TransitRouter.route(request, router, new DebugTimingAggregator());
+        var itineraries = result.getItineraries().get(0);
+        var fare = itineraries.fare;
 
-        FareService fareService = gg.getService(FareService.class);
-        Fare cost = null; // was: fareService.getCost(path);
-        assertEquals(new Money(new WrappedCurrency("USD"), 200), cost.getFare(FareType.regular));
+        assertEquals(new Money(new WrappedCurrency("USD"), 200), fare.getFare(FareType.regular));
 
         // long trip
 
         startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
-        options.dateTime = startTime;
-        options.setRoutingContext(gg, feedId + ":8389", feedId + ":1252");
-        spt = aStar.getShortestPathTree(options);
+        request.dateTime = startTime;
+        request.from = GenericLocation.fromStopId("Origin", portlandId, "8389");
+        request.to = GenericLocation.fromStopId("Destination", portlandId, "1252");
 
-        path = spt.getPath(gg.getVertex(feedId + ":1252"), true);
-        assertNotNull(path);
-        cost = null; // was: fareService.getCost(path);
-        
-        //assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 460));
-        
+        result = TransitRouter.route(request, router, new DebugTimingAggregator());
+        itineraries = result.getItineraries().get(0);
+        fare = itineraries.fare;
+
+
+        //assertEquals(new Money(new WrappedCurrency("USD"), 460), fare.getFare(FareType.regular));
+
         // complex trip
-        options.maxTransfers = 5;
+        request.maxTransfers = 5;
         startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
-        options.dateTime = startTime;
-        options.setRoutingContext(gg, feedId + ":10428", feedId + ":4231");
-        spt = aStar.getShortestPathTree(options);
+        request.dateTime = startTime;
+        request.from = GenericLocation.fromStopId("", portlandId, "10428");
+        request.setRoutingContext(gg, portlandId + ":10428", portlandId + ":4231");
 
-        path = spt.getPath(gg.getVertex(feedId + ":4231"), true);
-        assertNotNull(path);
-        cost = null; // was: fareService.getCost(path);
         //
         // this is commented out because portland's fares are, I think, broken in the gtfs. see
         // thread on gtfs-changes.
