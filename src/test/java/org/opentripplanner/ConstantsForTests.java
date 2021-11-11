@@ -18,20 +18,14 @@ import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
@@ -42,7 +36,6 @@ import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.fares.impl.SeattleFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
@@ -52,11 +45,11 @@ import org.opentripplanner.util.NonLocalizedString;
 
 public class ConstantsForTests {
 
-    public static final String CALTRAIN_GTFS = "src/test/resources/caltrain_gtfs.zip";
+    public static final String CALTRAIN_GTFS = "src/test/resources/gtfs/caltrain_gtfs.zip";
 
     public static final String NETEX_MINIMAL = "src/test/resources/netex/netex_minimal.zip";
 
-    private static final String PORTLAND_GTFS = "src/test/resources/google_transit.zip";
+    private static final String PORTLAND_GTFS = "src/test/resources/gtfs/portland.gtfs.zip";
 
     private static final String PORTLAND_CENTRAL_OSM = "src/test/resources/portland-central-filtered.osm.pbf";
 
