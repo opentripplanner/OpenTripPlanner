@@ -7,8 +7,6 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
@@ -40,23 +38,7 @@ public class FaresTest {
     @Test
     public void testBasic() throws Exception {
 
-        var graph = new Graph();
-
-        var context = contextBuilder(ConstantsForTests.CALTRAIN_GTFS)
-                .withIssueStoreAndDeduplicator(graph)
-                .build();
-        AddTransitModelEntitiesToGraph.addToGraph(context, graph);
-        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-        factory.run(graph);
-        graph.putService(
-                CalendarServiceData.class,
-                context.getCalendarServiceData()
-        );
-
-        graph.updateTransitFeedValidity(
-                context.getCalendarServiceData(), new DataImportIssueStore(false));
-        graph.index();
-        graph.hasTransit = true;
+        var graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
 
         var feedId = graph.getFeedIds().iterator().next();
 

@@ -1,5 +1,7 @@
 package org.opentripplanner;
 
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
 import com.csvreader.CsvReader;
 import com.google.common.collect.Lists;
 import java.io.File;
@@ -13,16 +15,21 @@ import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
@@ -162,17 +169,33 @@ public class ConstantsForTests {
     }
 
     private static void addGtfsToGraph(Graph graph, String file, Optional<String> feedId) {
-        GtfsBundle gtfsBundle = new GtfsBundle(new File(file));
-        var builder = new GtfsFeedId.Builder();
-        // add feed id if provided
-        builder = feedId.map(builder::id).orElse(builder);
-        gtfsBundle.setFeedId(builder.build());
-        GtfsModule module = new GtfsModule(
-                List.of(gtfsBundle),
-                new ServiceDateInterval(new ServiceDate(2009, 9, 1), new ServiceDate(2010, 3, 1))
-        );
-        module.buildGraph(graph, new HashMap<>());
-        graph.hasTransit = true;
+        try {
+            var context = feedId.map(id -> {
+                        try {
+                            return contextBuilder(id, file);
+                        }
+                        catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).orElse(contextBuilder(file))
+                    .withIssueStoreAndDeduplicator(graph)
+                    .build();
+            AddTransitModelEntitiesToGraph.addToGraph(context, graph);
+            GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
+            factory.run(graph);
+            graph.putService(
+                    CalendarServiceData.class,
+                    context.getCalendarServiceData()
+            );
+
+            graph.updateTransitFeedValidity(
+                    context.getCalendarServiceData(), new DataImportIssueStore(false));
+            graph.index();
+            graph.hasTransit = true;
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Graph buildOsmGraph(String osmPath) {
