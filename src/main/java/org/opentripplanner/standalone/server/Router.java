@@ -5,6 +5,8 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
+import io.micrometer.core.instrument.Metrics;
+import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -57,7 +59,12 @@ public class Router {
     public Router(Graph graph, RouterConfig routerConfig) {
         this.graph = graph;
         this.routerConfig = routerConfig;
-        this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters());
+        this.raptorConfig = new RaptorConfig<>(
+            routerConfig.raptorTuningParameters(),
+            OTPFeature.ActuatorAPI.isOn()
+                ? ActuatorAPI.prometheusRegistry
+                : Metrics.globalRegistry
+        );
     }
 
     /*
