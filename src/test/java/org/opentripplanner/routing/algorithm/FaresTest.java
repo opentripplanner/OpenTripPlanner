@@ -2,16 +2,17 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
+import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
-import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -21,6 +22,7 @@ import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.impl.SeattleFareServiceFactory;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -105,7 +107,10 @@ public class FaresTest {
     @Test
     public void testKCM() {
 
-        Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.KCM_GTFS);
+        Graph graph = ConstantsForTests.buildGtfsGraph(
+                ConstantsForTests.KCM_GTFS,
+                new SeattleFareServiceFactory()
+        );
         var feedId = graph.getFeedIds().iterator().next();
 
         var router = new Router(graph, RouterConfig.DEFAULT);
@@ -116,39 +121,38 @@ public class FaresTest {
 
         var dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
 
-        Fare costOffPeak = getFare(from, to, dateTime, router);
+        var costOffPeak = getFare(from, to, dateTime, router);
 
         assertEquals(new Money(USD, 250), costOffPeak.getFare(FareType.regular));
 
         long onPeakStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
-        Fare costOnPeak = getFare(from, to, onPeakStartTime, router);
+        var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
+        var leg = peakItinerary.legs.get(0);
+        assertTrue(toLocalTime(leg.startTime).isAfter(LocalTime.parse("08:00")));
+        assertTrue(toLocalTime(leg.startTime).isBefore(LocalTime.parse("09:00")));
 
-        assertEquals(new Money(USD, 275), costOnPeak.getFare(FareType.regular));
+        assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
 
     }
 
+    @Test
     public void testFareComponent() throws Exception {
-        Graph gg = new Graph();
-        GtfsContext context = contextBuilder(ConstantsForTests.FARE_COMPONENT_GTFS).build();
-        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-        factory.run(gg);
-        gg.putService(
-                CalendarServiceData.class, context.getCalendarServiceData()
-        );
-        String feedId = gg.getFeedIds().iterator().next();
+        Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
+        String feedId = graph.getFeedIds().iterator().next();
+
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
         ShortestPathTree spt;
         GraphPath path;
         Fare fare;
         List<FareComponent> fareComponents = null;
-        FareService fareService = gg.getService(FareService.class);
+        FareService fareService = graph.getService(FareService.class);
         Money tenUSD = new Money(USD, 1000);
 
         // A -> B, base case
-        options.setRoutingContext(gg, feedId + ":A", feedId + ":B");
+        options.setRoutingContext(graph, feedId + ":A", feedId + ":B");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":B"), true);
+        path = spt.getPath(graph.getVertex(feedId + ":B"), true);
         fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
@@ -157,16 +161,16 @@ public class FaresTest {
         assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
 
         // D -> E, null case
-        options.setRoutingContext(gg, feedId + ":D", feedId + ":E");
+        options.setRoutingContext(graph, feedId + ":D", feedId + ":E");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":E"), true);
+        path = spt.getPath(graph.getVertex(feedId + ":E"), true);
         fare = null; // was: fareService.getCost(path);
         assertNull(fare);
 
         // A -> C, 2 components in a path
-        options.setRoutingContext(gg, feedId + ":A", feedId + ":C");
+        options.setRoutingContext(graph, feedId + ":A", feedId + ":C");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":C"), true);
+        path = spt.getPath(graph.getVertex(feedId + ":C"), true);
         fare = null; // was:  fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
@@ -178,9 +182,9 @@ public class FaresTest {
         assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
 
         // B -> D, 2 fully connected components
-        options.setRoutingContext(gg, feedId + ":B", feedId + ":D");
+        options.setRoutingContext(graph, feedId + ":B", feedId + ":D");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":D"), true);
+        path = spt.getPath(graph.getVertex(feedId + ":D"), true);
         fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
@@ -190,9 +194,9 @@ public class FaresTest {
         assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "3"));
 
         // E -> G, missing in between fare
-        options.setRoutingContext(gg, feedId + ":E", feedId + ":G");
+        options.setRoutingContext(graph, feedId + ":E", feedId + ":G");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":G"), true);
+        path = spt.getPath(graph.getVertex(feedId + ":G"), true);
         fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
@@ -202,9 +206,9 @@ public class FaresTest {
         assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
 
         // C -> E, missing fare after
-        options.setRoutingContext(gg, feedId + ":C", feedId + ":E");
+        options.setRoutingContext(graph, feedId + ":C", feedId + ":E");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":E"), true);
+        path = spt.getPath(graph.getVertex(feedId + ":E"), true);
         fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
@@ -213,9 +217,9 @@ public class FaresTest {
         assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "3"));
 
         // D -> G, missing fare before
-        options.setRoutingContext(gg, feedId + ":D", feedId + ":G");
+        options.setRoutingContext(graph, feedId + ":D", feedId + ":G");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":G"), true);
+        path = spt.getPath(graph.getVertex(feedId + ":G"), true);
         fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
@@ -225,9 +229,9 @@ public class FaresTest {
         assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
 
         // A -> D, use individual component parts
-        options.setRoutingContext(gg, feedId + ":A", feedId + ":D");
+        options.setRoutingContext(graph, feedId + ":A", feedId + ":D");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":D"), true);
+        path = spt.getPath(graph.getVertex(feedId + ":D"), true);
         fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
@@ -246,14 +250,29 @@ public class FaresTest {
             long time,
             Router router
     ) {
+        Itinerary itinerary = getItineraries(from, to, time, router).get(0);
+        return itinerary.fare;
+    }
+
+    private static List<Itinerary> getItineraries(
+            GenericLocation from,
+            GenericLocation to,
+            long time,
+            Router router
+    ) {
         RoutingRequest request = new RoutingRequest();
         request.dateTime = time;
         request.from = from;
         request.to = to;
 
         var result = TransitRouter.route(request, router, new DebugTimingAggregator());
-        var itinerary = result.getItineraries().get(0);
+        return result.getItineraries();
+    }
 
-        return itinerary.fare;
+    private static LocalTime toLocalTime(Calendar time) {
+        return time.toInstant()
+                .atZone(time.getTimeZone().toZoneId())
+                .toLocalTime();
     }
 }
+

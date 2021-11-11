@@ -40,6 +40,9 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
+import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.fares.impl.SeattleFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
@@ -148,7 +151,7 @@ public class ConstantsForTests {
             }
             // Add transit data from GTFS
             {
-                addGtfsToGraph(graph, PORTLAND_GTFS, Optional.of("prt"));
+                addGtfsToGraph(graph, PORTLAND_GTFS, new DefaultFareServiceFactory(), Optional.of("prt"));
             }
             // Link transit stops to streets
             {
@@ -168,7 +171,7 @@ public class ConstantsForTests {
         }
     }
 
-    private static void addGtfsToGraph(Graph graph, String file, Optional<String> feedId) {
+    private static void addGtfsToGraph(Graph graph, String file, FareServiceFactory fareServiceFactory, Optional<String> feedId) {
         try {
             var context = feedId.map(id -> {
                         try {
@@ -182,6 +185,7 @@ public class ConstantsForTests {
                     .build();
             AddTransitModelEntitiesToGraph.addToGraph(context, graph);
             GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
+            factory.setFareServiceFactory(fareServiceFactory);
             factory.run(graph);
             graph.putService(
                     CalendarServiceData.class,
@@ -221,7 +225,7 @@ public class ConstantsForTests {
     public static Graph buildOsmAndGtfsGraph(String osmPath, String gtfsPath) {
         var graph = buildOsmGraph(osmPath);
 
-        addGtfsToGraph(graph, gtfsPath, Optional.empty());
+        addGtfsToGraph(graph, gtfsPath, new DefaultFareServiceFactory(), Optional.empty());
 
         // Link transit stops to streets
         GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
@@ -230,8 +234,12 @@ public class ConstantsForTests {
     }
 
     public static Graph buildGtfsGraph(String gtfsPath) {
+      return buildGtfsGraph(gtfsPath, new DefaultFareServiceFactory());
+    }
+
+    public static Graph buildGtfsGraph(String gtfsPath, FareServiceFactory fareServiceFactory) {
         var graph = new Graph();
-        addGtfsToGraph(graph, gtfsPath, Optional.empty());
+        addGtfsToGraph(graph, gtfsPath, fareServiceFactory, Optional.empty());
         return graph;
     }
 
