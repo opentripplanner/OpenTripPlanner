@@ -80,6 +80,7 @@
 - Add new routing errors for cases where all itineraries were filtered by post-processing [#3628](https://github.com/opentripplanner/OpenTripPlanner/pull/3628)
 - Fix combination of flex access and constrained transfer [#3726](https://github.com/opentripplanner/OpenTripPlanner/pull/3726)
 - Merge B+R and P+R functionality into vehicle parking [#3480](https://github.com/opentripplanner/OpenTripPlanner/pull/3480)
+- Remove AddMinSafeTransferCostFilter from itinerary-filter-chain [#3736](https://github.com/opentripplanner/OpenTripPlanner/pull/3736)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
