@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 public class RoutingRequestToFilterChainMapper {
@@ -25,31 +25,25 @@ public class RoutingRequestToFilterChainMapper {
     var p = request.itineraryFilters;
 
     // Group by similar legs filter
-    if(request.itineraryFilters != null) {
+    if (p.groupSimilarityKeepOne >= 0.5) {
+      builder.addGroupBySimilarity(
+          GroupBySimilarity.createWithOneItineraryPerGroup(p.groupSimilarityKeepOne)
+      );
+    }
 
-      builder.withMinSafeTransferTimeFactor(p.minSafeTransferTimeFactor);
-
-      if (p.groupSimilarityKeepOne >= 0.5) {
-        builder.addGroupBySimilarity(
-            GroupBySimilarity.createWithOneItineraryPerGroup(p.groupSimilarityKeepOne)
-        );
-      }
-
-      if (p.groupSimilarityKeepThree >= 0.5) {
-        builder.addGroupBySimilarity(
-          GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(
-              p.groupSimilarityKeepThree,
-              KEEP_THREE,
-              true,
-              p.groupedOtherThanSameLegsMaxCostMultiplier
-          )
-        );
-      }
+    if (p.groupSimilarityKeepThree >= 0.5) {
+      builder.addGroupBySimilarity(
+        GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(
+            p.groupSimilarityKeepThree,
+            KEEP_THREE,
+            true,
+            p.groupedOtherThanSameLegsMaxCostMultiplier
+        )
+      );
     }
 
     builder
         .withMaxNumberOfItineraries(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES))
-        .withMinSafeTransferTimeFactor(p.minSafeTransferTimeFactor)
         .withTransitGeneralizedCostLimit(p.transitGeneralizedCostLimit)
         .withBikeRentalDistanceRatio(p.bikeRentalDistanceRatio)
         .withParkAndRideDurationRatio(p.parkAndRideDurationRatio)

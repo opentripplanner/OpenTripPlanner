@@ -1,14 +1,15 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.DoubleFunction;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
-import org.opentripplanner.routing.algorithm.filterchain.filter.AddMinSafeTransferCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
@@ -18,14 +19,11 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveP
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
-import java.util.stream.Collectors;
+import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 
 
 /**
@@ -40,7 +38,6 @@ public class ItineraryListFilterChainBuilder {
     private boolean debug = false;
     private int maxNumberOfItineraries = NOT_SET;
     private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
-    private double minSafeTransferTimeFactor;
     private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
     private double bikeRentalDistanceRatio;
@@ -66,17 +63,6 @@ public class ItineraryListFilterChainBuilder {
      */
     public ItineraryListFilterChainBuilder withMaxNumberOfItineraries(int value) {
         this.maxNumberOfItineraries = value;
-        return this;
-    }
-
-    /**
-     * If the transfer-time for an itinerary is less than the min-safe-transfer-time-limit, then
-     * the difference is multiplied with this factor and added to the itinerary generalized-cost.
-     * <p>
-     * Default is off {@code 0.0}.
-     */
-    public ItineraryListFilterChainBuilder withMinSafeTransferTimeFactor(double minSafeTransferTimeFactor) {
-        this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
         return this;
     }
 
@@ -207,10 +193,6 @@ public class ItineraryListFilterChainBuilder {
 
     public ItineraryListFilterChain build() {
         List<ItineraryListFilter> filters = new ArrayList<>();
-
-        if(minSafeTransferTimeFactor > 0.01) {
-            filters.add(new AddMinSafeTransferCostFilter(minSafeTransferTimeFactor));
-        }
 
         filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
