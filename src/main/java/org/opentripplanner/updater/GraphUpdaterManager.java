@@ -94,6 +94,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
                 }
             });
         }
+        reportReadinessForUpdaters();
     }
 
     public void stop() {
@@ -138,7 +139,6 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
             } catch (Exception e) {
                 LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
             }
-            updateInternalState();
         });
     }
 
@@ -189,18 +189,29 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
         return scheduler;
     }
 
-    private void updateInternalState() {
-        try {
-            if(numberOfNonePrimedUpdaters.intValue() > 0) {
-                int waiting = (int) updaterList.stream().filter(u -> !u.isPrimed()).count();
-                numberOfNonePrimedUpdaters.set(waiting);
-                if(waiting == 0) {
-                    LOG.info("All updaters initialized");
+    /**
+     * This method start a task during startup, witch update the 'numberOfNonePrimedUpdaters'. It
+     * does so in its own thread, using busy-wait(anti-pattern). The ideal would be to add a
+     * callback from each updater to notify the manager about 'isPrimed'. But, this is simple, the
+     * thread is mostly idle, and it is short-lived, so the busy-wait is a compromise.
+     */
+    private void reportReadinessForUpdaters() {
+        Executors.newSingleThreadExecutor().submit(() -> {
+            while (true) {
+                try {
+                    int waiting = (int) updaterList.stream().filter(u -> !u.isPrimed()).count();
+                    numberOfNonePrimedUpdaters.set(waiting);
+                    if (waiting == 0) {
+                        LOG.info("All updaters initialized");
+                        return;
+                    }
+                    //noinspection BusyWait
+                    Thread.sleep(1000);
+                }
+                catch (Exception e) {
+                    LOG.error(e.getMessage(), e);
                 }
             }
-        }
-        catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
+        });
     }
 }
