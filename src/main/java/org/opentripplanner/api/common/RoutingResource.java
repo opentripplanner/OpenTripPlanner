@@ -371,6 +371,22 @@ public abstract class RoutingResource {
     @QueryParam("bannedVehicleRentalNetworks")
     protected Set<String> bannedVehicleRentalNetworks;
 
+    /** Time to park a bike */
+    @QueryParam("bikeParkTime")
+    protected Integer bikeParkTime;
+
+    /** Cost of parking a bike. */
+    @QueryParam("bikeParkCost")
+    protected Integer bikeParkCost;
+
+    /** Time to park a car */
+    @QueryParam("carParkTime")
+    protected Integer carParkTime = 60;
+
+    /** Cost of parking a car. */
+    @QueryParam("carParkCost")
+    protected Integer carParkCost = 120;
+
     /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
     @QueryParam("requiredVehicleParkingTags")
     protected Set<String> requiredVehicleParkingTags = Set.of();
@@ -761,6 +777,18 @@ public abstract class RoutingResource {
 
         if (bannedVehicleRentalNetworks != null)
             request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+
+        if (bikeParkCost != null)
+            request.bikeParkCost = bikeParkCost;
+
+        if (bikeParkTime != null)
+            request.bikeParkTime = bikeParkTime;
+
+        if (carParkCost != null)
+            request.carParkCost = carParkCost;
+
+        if (carParkTime != null)
+            request.carParkTime = carParkTime;
 
         if (bannedVehicleParkingTags != null)
             request.bannedVehicleParkingTags = bannedVehicleParkingTags;
