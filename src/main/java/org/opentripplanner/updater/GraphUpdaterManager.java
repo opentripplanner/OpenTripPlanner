@@ -3,13 +3,13 @@ package org.opentripplanner.updater;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +53,9 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
      */
     private final List<GraphUpdater> updaterList = new ArrayList<>();
 
+
+    private final AtomicInteger numberOfNonePrimedUpdaters = new AtomicInteger(0);
+
     /**
      * The Graph that will be updated.
      */
@@ -68,6 +71,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
         var threadFactory = new ThreadFactoryBuilder().setNameFormat("GraphUpdater-%d").build();
         this.scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
         this.updaterPool = Executors.newCachedThreadPool(threadFactory);
+        this.numberOfNonePrimedUpdaters.set(updaters.size());
 
         for (GraphUpdater updater : updaters) {
             updaterList.add(updater);
@@ -126,14 +130,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
         }
     }
 
-    /**
-     * This is the method to use to modify the graph from the updaters. The runnables will be
-     * scheduled after each other, guaranteeing that only one of these runnables will be active at
-     * any time. If a particular GraphUpdater calls this method on more than one GraphWriterRunnable, they should be
-     * executed in the same order that GraphUpdater made the calls.
-     *
-     * @param runnable is a graph writer runnable
-     */
+    @Override
     public void execute(GraphWriterRunnable runnable) {
         scheduler.submit(() -> {
             try {
@@ -141,11 +138,21 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
             } catch (Exception e) {
                 LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
             }
+            updateInternalState();
         });
     }
 
-    public int size() {
+    public int numberOfUpdaters() {
         return updaterList.size();
+    }
+
+
+    /**
+     * Return the number of updaters started, but not ready.
+     * @see GraphUpdater#isPrimed()
+     */
+    public int numberOfNonePrimedUpdaters() {
+        return numberOfNonePrimedUpdaters.get();
     }
 
     /**
@@ -174,21 +181,26 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
         return updaterList;
     }
 
-    public Collection<String> waitingUpdaters() {
-        Collection<String> waitingUpdaters = new ArrayList<>();
-        for (GraphUpdater updater : graph.updaterManager.getUpdaterList()) {
-            if (!(updater).isPrimed()) {
-                waitingUpdaters.add(updater.getConfigRef());
-            }
-        }
-        return waitingUpdaters;
-    }
-
     public ExecutorService getUpdaterPool() {
         return updaterPool;
     }
 
     public ScheduledExecutorService getScheduler() {
         return scheduler;
+    }
+
+    private void updateInternalState() {
+        try {
+            if(numberOfNonePrimedUpdaters.intValue() > 0) {
+                int waiting = (int) updaterList.stream().filter(u -> !u.isPrimed()).count();
+                numberOfNonePrimedUpdaters.set(waiting);
+                if(waiting == 0) {
+                    LOG.info("All updaters initialized");
+                }
+            }
+        }
+        catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
     }
 }

@@ -16,7 +16,6 @@ import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import javax.ws.rs.GET;
@@ -44,8 +43,6 @@ public class ActuatorAPI {
     );
 
     private final Router router;
-
-    private static boolean isReadinessLogged = false;
 
     public ActuatorAPI(@Context OTPServer otpServer) {
         this.router = otpServer.getRouter();
@@ -130,9 +127,9 @@ public class ActuatorAPI {
     @Path("/health")
     public Response health() {
         if (router.graph.updaterManager != null) {
-            Collection<String> waitingUpdaters = router.graph.updaterManager.waitingUpdaters();
+            int waitingUpdaters = router.graph.updaterManager.numberOfNonePrimedUpdaters();
 
-            if (!waitingUpdaters.isEmpty()) {
+            if (waitingUpdaters > 0) {
                 LOG.info("Graph ready, waiting for updaters: {}", waitingUpdaters);
                 throw new WebApplicationException(Response
                     .status(Response.Status.NOT_FOUND)
@@ -140,11 +137,6 @@ public class ActuatorAPI {
                     .type("text/plain")
                     .build());
             }
-        }
-
-        if (!isReadinessLogged) {
-            LOG.info("All updaters initialized");
-            isReadinessLogged = true;
         }
 
         return Response.status(Response.Status.OK).entity(
