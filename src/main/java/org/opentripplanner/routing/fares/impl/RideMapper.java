@@ -3,7 +3,9 @@ package org.opentripplanner.routing.fares.impl;
 import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
@@ -21,7 +23,7 @@ public class RideMapper {
      * Convert transit legs in a Raptor Path into Rides, which are used by FareServices to calculate
      * fares. Adapted from from previously used method DefaultFareServiceImpl.createRides().
      */
-    public static List<Ride> ridesForRaptorPath(Itinerary itinerary) {
+    public static List<Ride> ridesForItinerary(Itinerary itinerary) {
         return itinerary.legs.stream()
                 .filter(leg -> leg.isTransitLeg() || leg.flexibleTrip)
                 .map(RideMapper::rideForTransitPathLeg)
@@ -40,7 +42,9 @@ public class RideMapper {
                 .map(stopArrival -> stopArrival.place.stop.getFirstZoneAsString())
                 .collect(Collectors.toSet());
 
-        zones.addAll(List.of(ride.startZone, ride.endZone));
+        zones.addAll(Stream.of(ride.startZone, ride.endZone)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet()));
 
         ride.zones = zones;
         ride.agency = leg.getRoute().getAgency().getId();

@@ -90,7 +90,7 @@ public class DefaultFareServiceImpl implements FareService {
     @Override
     public Fare getCost(Itinerary itinerary) {
 
-        List<Ride> rides = RideMapper.ridesForRaptorPath(itinerary);
+        List<Ride> rides = RideMapper.ridesForItinerary(itinerary);
 
         // If there are no rides, there's no fare.
         if (rides.size() == 0) {
