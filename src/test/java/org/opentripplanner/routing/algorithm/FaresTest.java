@@ -134,6 +134,7 @@ public class FaresTest {
 
     }
 
+    // this test I sadly could not revive as it relies on the frequencies.txt feature
     public void testFareComponent() throws Exception {
         Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
         String feedId = graph.getFeedIds().iterator().next();

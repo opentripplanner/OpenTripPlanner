@@ -2,6 +2,7 @@ package org.opentripplanner.routing.fares.impl;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -235,13 +236,13 @@ public class DefaultFareServiceImpl implements FareService {
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);
-        LocalTime startTime = firstRide.startTime;
+        ZonedDateTime startTime = firstRide.startTime;
         String startZone = firstRide.startZone;
         String endZone = firstRide.endZone;
         // stops don't really have an agency id, they have the per-feed default id
         String feedId = firstRide.firstStop.getId().getFeedId();
-        LocalTime lastRideStartTime = firstRide.startTime;
-        LocalTime lastRideEndTime = firstRide.endTime;
+        ZonedDateTime lastRideStartTime = firstRide.startTime;
+        ZonedDateTime lastRideEndTime = firstRide.endTime;
         for (Ride ride : rides) {
             if ( ! ride.firstStop.getId().getFeedId().equals(feedId)) {
                 LOG.debug("skipped multi-feed ride sequence {}", rides);
