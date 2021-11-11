@@ -21,7 +21,6 @@ import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.fares.impl.SeattleFareServiceFactory;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -36,7 +35,7 @@ public class FaresTest {
     private AStar aStar = new AStar();
 
     @Test
-    public void testBasic() throws Exception {
+    public void testBasic() {
 
         var graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
 
@@ -103,44 +102,28 @@ public class FaresTest {
         // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
     }
 
-    public void testKCM() throws Exception {
+    @Test
+    public void testKCM() {
 
-        Graph gg = new Graph();
-        GtfsContext context = contextBuilder(ConstantsForTests.KCM_GTFS).build();
+        Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.KCM_GTFS);
+        var feedId = graph.getFeedIds().iterator().next();
 
-        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-        factory.setFareServiceFactory(new SeattleFareServiceFactory());
+        var router = new Router(graph, RouterConfig.DEFAULT);
+        router.startup();
 
-        factory.run(gg);
-        gg.putService(
-                CalendarServiceData.class, context.getCalendarServiceData()
-        );
-        RoutingRequest options = new RoutingRequest();
-        String feedId = gg.getFeedIds().iterator().next();
+        var from = GenericLocation.fromStopId("Origin", feedId, "2010");
+        var to = GenericLocation.fromStopId("Destination", feedId, "2140");
 
-        String vertex0 = feedId + ":2010";
-        String vertex1 = feedId + ":2140";
-        ShortestPathTree spt;
-        GraphPath path = null;
+        var dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
 
-        FareService fareService = gg.getService(FareService.class);
+        Fare costOffPeak = getFare(from, to, dateTime, router);
 
-        options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
-        options.setRoutingContext(gg, vertex0, vertex1);
-        spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(vertex1), true);
-
-        Fare costOffPeak = null; // was: fareService.getCost(path);
-        assertEquals(costOffPeak.getFare(FareType.regular), new Money(USD, 250));
+        assertEquals(new Money(USD, 250), costOffPeak.getFare(FareType.regular));
 
         long onPeakStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
-        options.dateTime = onPeakStartTime;
-        options.setRoutingContext(gg, vertex0, vertex1);
-        spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(vertex1), true);
+        Fare costOnPeak = getFare(from, to, onPeakStartTime, router);
 
-        Fare costOnPeak = null; // was: fareService.getCost(path);
-        assertEquals(costOnPeak.getFare(FareType.regular), new Money(USD, 275));
+        assertEquals(new Money(USD, 275), costOnPeak.getFare(FareType.regular));
 
     }
 

@@ -58,7 +58,7 @@ public class RideMapper {
 
     private static LocalTime toLocalTime(Calendar time, Leg leg) {
         return time.toInstant()
-                .atOffset(ZoneOffset.ofTotalSeconds(leg.agencyTimeZoneOffset))
+                .atZone(time.getTimeZone().toZoneId())
                 .toLocalTime();
     }
 
