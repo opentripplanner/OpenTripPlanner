@@ -135,7 +135,6 @@ public class FaresTest {
 
     }
 
-    @Test
     public void testFareComponent() throws Exception {
         Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
         String feedId = graph.getFeedIds().iterator().next();
