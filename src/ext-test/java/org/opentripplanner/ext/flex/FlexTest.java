@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.flex;
 
+import static graphql.Assert.assertFalse;
+
 import gnu.trove.set.hash.TIntHashSet;
 import java.net.URISyntaxException;
 import java.time.LocalTime;
@@ -40,6 +42,7 @@ abstract public class FlexTest {
         OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
         module.buildGraph(graph, new HashMap<>());
         OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
+        assertFalse(graph.flexTripsById.isEmpty());
         return graph;
     }
 
