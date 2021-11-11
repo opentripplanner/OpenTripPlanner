@@ -113,9 +113,6 @@ public class Graph implements Serializable {
 
     private final OtpProjectInfo projectInfo = projectInfo();
 
-    // TODO Remove this field, use Router.routerId ?
-    public String routerId;
-
     private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
     public final StreetNotesService streetNotesService = new StreetNotesService();

@@ -2,10 +2,6 @@ package org.opentripplanner.updater;
 
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.opentripplanner.routing.graph.Graph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,8 +9,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is attached to the graph:
@@ -28,19 +26,9 @@ import java.util.concurrent.TimeUnit;
  * between graph write operations.
  * 
  */
-public class GraphUpdaterManager {
+public class GraphUpdaterManager implements WriteToGraphCallback {
 
-    private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
-    
-    /**
-     * Text used for naming threads when the graph lacks a routerId.
-     */
-    private static String DEFAULT_ROUTER_ID = "(default)";
-    
-    /**
-     * Thread factory used to create new threads, giving them more human-readable names including the routerId.
-     */
-    private ThreadFactory threadFactory;
+    private static final Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
 
     /**
      * OTP's multi-version concurrency control model for graph updating allows simultaneous reads,
@@ -51,46 +39,56 @@ public class GraphUpdaterManager {
      *        We're scheduling for immediate execution from separate threads that sleep in a loop.
      *        We should perhaps switch to having polling GraphUpdaters call scheduleAtFixedInterval.
      */
-    private ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService scheduler;
 
     /**
      * A pool of threads on which the updaters will run.
      * This creates a pool that will auto-scale up to any size (maximum pool size is MAX_INT).
      * FIXME The polling updaters occupy an entire thread, sleeping in between polling operations.
      */
-    private ExecutorService updaterPool;
+    private final ExecutorService updaterPool;
 
     /**
      * Keep track of all updaters so we can cleanly free resources associated with them at shutdown.
      */
-    private List<GraphUpdater> updaterList = new ArrayList<>();
+    private final List<GraphUpdater> updaterList = new ArrayList<>();
 
     /**
      * The Graph that will be updated.
      */
-    private Graph graph;
+    private final Graph graph;
 
     /**
      * Constructor.
      * @param graph is the Graph that will be updated.
      */
-    public GraphUpdaterManager(Graph graph) {
+    public GraphUpdaterManager(Graph graph, List<GraphUpdater> updaters) {
         this.graph = graph;
-        
-        String routerId = graph.routerId;
-        if(routerId == null || routerId.isEmpty())
-            routerId = DEFAULT_ROUTER_ID;
-        
-        threadFactory = new ThreadFactoryBuilder().setNameFormat("GraphUpdater-" + routerId + "-%d").build();
-        scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
-        updaterPool = Executors.newCachedThreadPool(threadFactory);
+         // Thread factory used to create new threads, giving them more human-readable names.
+        var threadFactory = new ThreadFactoryBuilder().setNameFormat("GraphUpdater-%d").build();
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
+        this.updaterPool = Executors.newCachedThreadPool(threadFactory);
+
+        for (GraphUpdater updater : updaters) {
+            updaterList.add(updater);
+            updater.setGraphUpdaterManager(this);
+        }
     }
 
-    public GraphUpdaterManager(Graph graph, List<GraphUpdater> updaters) {
-        this(graph);
-        for (GraphUpdater updater : updaters) {
-            this.addUpdater(updater);
-            updater.setGraphUpdaterManager(this);
+    /**
+     * This should be called only once at startup to kick off every updater in its own thread, and only after all
+     * the updaters have had their setup methods called.
+     */
+    public void startUpdaters() {
+        for (GraphUpdater updater : updaterList) {
+            LOG.info("Starting new thread for updater {}", updater.toString());
+            updaterPool.execute(() -> {
+                try {
+                    updater.run();
+                } catch (Exception e) {
+                    LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
+                }
+            });
         }
     }
 
@@ -129,20 +127,11 @@ public class GraphUpdaterManager {
     }
 
     /**
-     * Adds an updater to the manager and runs it immediately in its own thread.
-     * 
-     * @param updater is the updater to add and run
-     */
-    public void addUpdater(final GraphUpdater updater) {
-        updaterList.add(updater);
-    }
-
-    /**
      * This is the method to use to modify the graph from the updaters. The runnables will be
      * scheduled after each other, guaranteeing that only one of these runnables will be active at
      * any time. If a particular GraphUpdater calls this method on more than one GraphWriterRunnable, they should be
      * executed in the same order that GraphUpdater made the calls.
-     * 
+     *
      * @param runnable is a graph writer runnable
      */
     public void execute(GraphWriterRunnable runnable) {
@@ -157,23 +146,6 @@ public class GraphUpdaterManager {
 
     public int size() {
         return updaterList.size();
-    }
-
-    /**
-     * This should be called only once at startup to kick off every updater in its own thread, and only after all
-     * the updaters have had their setup methods called.
-     */
-    public void startUpdaters() {
-        for (GraphUpdater updater : updaterList) {
-            LOG.info("Starting new thread for updater {}", updater.toString());
-            updaterPool.execute(() -> {
-                try {
-                    updater.run();
-                } catch (Exception e) {
-                    LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
-                }
-            });
-        }
     }
 
     /**
