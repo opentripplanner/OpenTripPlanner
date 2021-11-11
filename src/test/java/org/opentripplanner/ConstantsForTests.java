@@ -1,7 +1,5 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
 import com.csvreader.CsvReader;
 import com.google.common.collect.Lists;
 import java.io.File;
@@ -10,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -17,17 +16,13 @@ import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
@@ -146,13 +141,7 @@ public class ConstantsForTests {
             }
             // Add transit data from GTFS
             {
-                GtfsBundle gtfsBundle = new GtfsBundle(new File(PORTLAND_GTFS));
-                gtfsBundle.setFeedId(new GtfsFeedId.Builder().id("prt").build());
-                GtfsModule module = new GtfsModule(
-                        List.of(gtfsBundle),
-                        new ServiceDateInterval(new ServiceDate(2009, 9, 1), new ServiceDate(2010, 3, 1))
-                );
-                module.buildGraph(graph, new HashMap<>());
+                addGtfsToGraph(graph, PORTLAND_GTFS, Optional.of("prt"));
             }
             // Link transit stops to streets
             {
@@ -161,7 +150,6 @@ public class ConstantsForTests {
             }
 
             graph.hasStreets = true;
-            graph.hasTransit = true;
 
             addPortlandVehicleRentals(graph);
 
@@ -171,6 +159,20 @@ public class ConstantsForTests {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void addGtfsToGraph(Graph graph, String file, Optional<String> feedId) {
+        GtfsBundle gtfsBundle = new GtfsBundle(new File(file));
+        var builder = new GtfsFeedId.Builder();
+        // add feed id if provided
+        builder = feedId.map(builder::id).orElse(builder);
+        gtfsBundle.setFeedId(builder.build());
+        GtfsModule module = new GtfsModule(
+                List.of(gtfsBundle),
+                new ServiceDateInterval(new ServiceDate(2009, 9, 1), new ServiceDate(2010, 3, 1))
+        );
+        module.buildGraph(graph, new HashMap<>());
+        graph.hasTransit = true;
     }
 
     public static Graph buildOsmGraph(String osmPath) {
@@ -193,22 +195,20 @@ public class ConstantsForTests {
         }
     }
 
-    public static Graph buildGtfsGraph(String osmPath, String gtfsPath) throws IOException {
+    public static Graph buildOsmAndGtfsGraph(String osmPath, String gtfsPath) {
         var graph = buildOsmGraph(osmPath);
 
-        var context = contextBuilder(gtfsPath)
-                .withIssueStoreAndDeduplicator(graph)
-                .build();
-        AddTransitModelEntitiesToGraph.addToGraph(context, graph);
-        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-        factory.run(graph);
+        addGtfsToGraph(graph, gtfsPath, Optional.empty());
+
         // Link transit stops to streets
         GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
         streetTransitLinker.buildGraph(graph, new HashMap<>());
-        graph.putService(
-                CalendarServiceData.class,
-                context.getCalendarServiceData()
-        );
+        return graph;
+    }
+
+    public static Graph buildGtfsGraph(String gtfsPath) {
+        var graph = new Graph();
+        addGtfsToGraph(graph, gtfsPath, Optional.empty());
         return graph;
     }
 
