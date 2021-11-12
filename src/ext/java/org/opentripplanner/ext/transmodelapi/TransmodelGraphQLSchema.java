@@ -140,8 +140,8 @@ public class TransmodelGraphQLSchema {
     GraphQLOutputType systemNoticeType = SystemNoticeType.create();
     GraphQLOutputType linkGeometryType = PointsOnLinkType.create();
     GraphQLOutputType serverInfoType = ServerInfoType.create();
-    GraphQLOutputType authorityType = AuthorityType.create(LineType.REF, PtSituationElementType.REF);
-    GraphQLOutputType operatorType = OperatorType.create(LineType.REF, ServiceJourneyType.REF);
+    GraphQLOutputType authorityType = AuthorityType.create(LineType.REF, PtSituationElementType.REF, gqlUtil);
+    GraphQLOutputType operatorType = OperatorType.create(LineType.REF, ServiceJourneyType.REF, gqlUtil);
     GraphQLOutputType noticeType = NoticeType.create();
     GraphQLOutputType rentalVehicleTypeType = RentalVehicleTypeType.create();
 

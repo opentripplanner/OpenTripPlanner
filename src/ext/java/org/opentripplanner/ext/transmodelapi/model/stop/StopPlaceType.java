@@ -111,6 +111,7 @@ public class StopPlaceType {
 
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("quays")
+            .withDirective(gqlUtil.timingData)
             .description("Returns all quays that are children of this stop place")
             .type(new GraphQLList(quayType))
             .argument(GraphQLArgument.newArgument()
@@ -153,6 +154,7 @@ public class StopPlaceType {
             )
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("estimatedCalls")
+            .withDirective(gqlUtil.timingData)
             .description("List of visits to this stop place as part of vehicle journeys.")
             .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
             .argument(GraphQLArgument.newArgument()

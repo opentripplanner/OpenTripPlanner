@@ -214,6 +214,7 @@ public class EstimatedCallType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("situations")
+                    .withDirective(gqlUtil.timingData)
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                     .description("Get all relevant situations for this EstimatedCall.")
                     .dataFetcher(environment -> {
