@@ -127,13 +127,13 @@ public class ActuatorAPI {
     @Path("/health")
     public Response health() {
         if (router.graph.updaterManager != null) {
-            int waitingUpdaters = router.graph.updaterManager.numberOfNonePrimedUpdaters();
+            var waitingForUpdaters = router.graph.updaterManager.listNonePrimedUpdaters();
 
-            if (waitingUpdaters > 0) {
-                LOG.info("Graph ready, waiting for updaters: {}", waitingUpdaters);
+            if (!waitingForUpdaters.isEmpty()) {
+                LOG.info("Graph ready, waiting for updaters: {}", waitingForUpdaters);
                 throw new WebApplicationException(Response
                     .status(Response.Status.NOT_FOUND)
-                    .entity("Graph ready, waiting for updaters: " + waitingUpdaters + "\n")
+                    .entity("Graph ready, waiting for updaters: " + waitingForUpdaters + "\n")
                     .type("text/plain")
                     .build());
             }

@@ -9,7 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,11 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
     private final List<GraphUpdater> updaterList = new ArrayList<>();
 
 
-    private final AtomicInteger numberOfNonePrimedUpdaters = new AtomicInteger(0);
+    /**
+     * This is set to true after all updaters are ready and the initial set of updates are
+     * processed.
+     */
+    private boolean allUpdatersPrimed = false;
 
     /**
      * The Graph that will be updated.
@@ -71,7 +76,6 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
         var threadFactory = new ThreadFactoryBuilder().setNameFormat("GraphUpdater-%d").build();
         this.scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
         this.updaterPool = Executors.newCachedThreadPool(threadFactory);
-        this.numberOfNonePrimedUpdaters.set(updaters.size());
 
         for (GraphUpdater updater : updaters) {
             updaterList.add(updater);
@@ -151,8 +155,11 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
      * Return the number of updaters started, but not ready.
      * @see GraphUpdater#isPrimed()
      */
-    public int numberOfNonePrimedUpdaters() {
-        return numberOfNonePrimedUpdaters.get();
+    public List<String> listNonePrimedUpdaters() {
+        return updaterList.stream()
+                .filter(Predicate.not(GraphUpdater::isPrimed))
+                .map(GraphUpdater::getConfigRef)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -199,9 +206,8 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
         Executors.newSingleThreadExecutor().submit(() -> {
             while (true) {
                 try {
-                    int waiting = (int) updaterList.stream().filter(u -> !u.isPrimed()).count();
-                    numberOfNonePrimedUpdaters.set(waiting);
-                    if (waiting == 0) {
+                    if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
+                        allUpdatersPrimed = true;
                         LOG.info("All updaters initialized");
                         return;
                     }
