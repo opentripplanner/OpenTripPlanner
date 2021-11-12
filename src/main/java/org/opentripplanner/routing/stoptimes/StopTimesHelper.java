@@ -13,7 +13,9 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -55,8 +57,19 @@ public class StopTimesHelper {
       startTime = System.currentTimeMillis() / 1000;
     }
     List<StopTimesInPattern> result = new ArrayList<>();
-    Date date = new Date(startTime * 1000);
-    ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
+
+    LocalDate date = LocalDate.ofEpochDay(startTime/86400);
+
+    int numberOfDays = timeRange / 86400 + 1; // Number of days requested + the following day
+
+    List<ServiceDate> dates = new ArrayList<>();
+
+    // Yesterday, today, number of requested days, following day
+    for (int i = -1; i <= numberOfDays; i++) {
+      dates.add(new ServiceDate(date).shift(i));
+    }
+
+    ServiceDate[] serviceDates = dates.toArray(new ServiceDate[dates.size()]);
 
     // TODO The following logic could probably be encapsulated in the TimetableSnapshot
     Collection<TripPattern> plannedPatterns = routingService.getPatternsForStop(stop, false);
