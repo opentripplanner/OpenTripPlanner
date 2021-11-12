@@ -21,7 +21,7 @@ import java.util.Map;
  * using the AStar algorithm.
  *
  * Note that it caches the whole ShortestPathTree the first time it encounters a new fromVertex.
- * Subsequents requests from the same fromVertex can fetch the path to the toVertex from the
+ * Subsequent requests from the same fromVertex can fetch the path to the toVertex from the
  * existing ShortestPathTree. This one-to-many approach is needed to make the performance acceptable.
  *
  * Because we will have lots of searches with the same origin when doing access searches and a lot

@@ -41,6 +41,7 @@ abstract public class FlexTest {
         );
         OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
         module.buildGraph(graph, new HashMap<>());
+        graph.index();
         OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
         assertFalse(graph.flexTripsById.isEmpty());
         return graph;
