@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -12,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -86,13 +86,19 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     }
 
     private static NearbyStop getNearbyStop(FlexTrip trip) {
-        var stopLocation = trip.getStops().stream().collect(Collectors.toList()).get(2);
-        assertTrue(stopLocation instanceof FlexStopLocation);
+        // getStops() returns a set of stops and the order doesn't correspond to the stop times
+        // of the trip
+        var stopLocation = trip.getStops()
+                .stream()
+                .filter(s -> s instanceof FlexStopLocation)
+                .findFirst()
+                .get();
         return new NearbyStop(stopLocation, 0, List.of(), null, null);
     }
 
     private static FlexTrip getFlexTrip() {
-        var flexTrips = graph.flexTripsById.values();
-        return flexTrips.iterator().next();
+        var feedId = graph.getFeedIds().iterator().next();
+        var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
+        return graph.flexTripsById.get(tripId);
     }
 }
