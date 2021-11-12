@@ -120,7 +120,7 @@ public class Router {
 
         if(OTPFeature.SandboxAPITransmodelApi.isOn()) {
             TransmodelAPI.setUp(
-                routerConfig.transmodelApiHideFeedId(),
+                routerConfig.transmodelApi(),
                 graph,
                 defaultRoutingRequest
             );

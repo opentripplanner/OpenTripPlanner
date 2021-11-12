@@ -19,6 +19,7 @@ import graphql.language.Document;
 import graphql.schema.GraphQLTypeUtil;
 import graphql.validation.ValidationError;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -48,9 +49,11 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
             "Timer that records the time to fetch the data by Operation Name";
 
     private final MeterRegistry meterRegistry;
+    private Iterable<Tag> tags;
 
-    public MicrometerGraphQLInstrumentation(MeterRegistry meterRegistry) {
+    public MicrometerGraphQLInstrumentation(MeterRegistry meterRegistry, Iterable<Tag> tags) {
         this.meterRegistry = meterRegistry;
+        this.tags = tags;
     }
 
     @Override
@@ -130,6 +133,7 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
                 .description(TIMER_DESCRIPTION)
                 .tag(OPERATION_NAME_TAG, operationName)
                 .tag(OPERATION, operation)
+                .tags(tags)
                 .register(meterRegistry);
     }
 
@@ -139,6 +143,7 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
                 .tag(OPERATION_NAME_TAG, operationName)
                 .tag(PARENT, parent)
                 .tag(FIELD, field)
+                .tags(tags)
                 .register(meterRegistry);
     }
 
