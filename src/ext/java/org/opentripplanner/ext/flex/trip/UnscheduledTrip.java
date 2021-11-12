@@ -133,7 +133,7 @@ public class UnscheduledTrip extends FlexTrip {
   }
 
   @Override
-  public Collection<StopLocation> getStops() {
+  public Set<StopLocation> getStops() {
     return Arrays
         .stream(stopTimes)
         .map(scheduledDeviatedStopTime -> scheduledDeviatedStopTime.stop)
