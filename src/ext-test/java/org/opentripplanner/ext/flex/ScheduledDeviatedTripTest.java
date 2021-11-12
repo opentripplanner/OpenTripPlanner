@@ -35,7 +35,7 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class ScheduledDeviatedTripTest extends FlexTest {
 
-    static final String COBB_COUNTY_GTFS = "/flex/cobblinc-flex-with-farezones.zip";
+    static final String COBB_COUNTY_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
 
     static Graph graph;
 
@@ -64,7 +64,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
                 params
         ).collect(Collectors.toList());
 
-        assertEquals(2, accesses.size());
+        assertEquals(3, accesses.size());
 
         var access = accesses.get(0);
         assertEquals(1, access.fromStopIndex);
@@ -83,11 +83,11 @@ public class ScheduledDeviatedTripTest extends FlexTest {
                 params
         ).collect(Collectors.toList());
 
-        assertEquals(2, egresses.size());
+        assertEquals(3, egresses.size());
 
         var egress = egresses.get(0);
-        assertEquals(1, egress.fromStopIndex);
-        assertEquals(1, egress.toStopIndex);
+        assertEquals(2, egress.fromStopIndex);
+        assertEquals(2, egress.toStopIndex);
     }
 
     @Test

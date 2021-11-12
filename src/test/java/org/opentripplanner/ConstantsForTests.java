@@ -61,7 +61,7 @@ public class ConstantsForTests {
     
     public static final String FAKE_GTFS = "src/test/resources/testagency";
 
-    public static final String FARE_COMPONENT_GTFS = "src/test/resources/gtfs/fares2.zip";
+    public static final String FARE_COMPONENT_GTFS = "src/test/resources/gtfs/farecomponents.gtfs.zip";
 
     private static final String NETEX_DIR = "src/test/resources/netex";
 
