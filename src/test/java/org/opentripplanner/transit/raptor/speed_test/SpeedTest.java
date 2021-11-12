@@ -429,6 +429,8 @@ public class SpeedTest {
 
         RoutingRequest routingRequest = new RoutingRequest();
         routingRequest.walkSpeed = config.walkSpeedMeterPrSecond;
+        RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
+        transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
 
         return new RaptorRoutingRequestTransitData(
                 null,
@@ -437,7 +439,7 @@ public class SpeedTest {
                 0,
                 1,
                 transitDataProviderFilter,
-                Transfer.prepareTransferRoutingRequest(routingRequest)
+                transferRoutingRequest
         );
     }
 
