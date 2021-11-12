@@ -681,25 +681,22 @@ For a detailed description of the design and the optimization calculations see t
 #### Transfer optimization configuration
 
 To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on). 
-You should leave this on unless you there is a critical issue with it. The OTPFeature `GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
+You should leave this on unless there is a critical issue with it. The OTPFeature `GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
 
-The order of transfer priority is:
+The optimized transfer service will try to, in order:
 
-1. STAY SEATED
-2. GUARANTIED
-3. PREFERRED
-4. RECOMMENDED
-5. ALLOWED
-6. NOT_ALLOWED
+1. Use transfer priority. This includes stay-seated and guaranteed transfers.
+2. Use the transfers with the best distribution of the wait-time, and avoid very short transfers.
+3. Avoid back-travel
 
-If two paths have the same priority level, then we break the tie by looking at waiting time. The
-goal is to maximize the wait time, avoiding situations where there is little time available to make
-the transfer. This is balanced with the generalized-cost. The cost is adjusted with a new cost for
-the wait-time. The new wait-time cost follows an inverse logarithmic cost function (see the design
-doc).
+If two paths have the same priority level, then we break the tie by looking at waiting times. The
+goal is to maximize the wait-time for each stop, avoiding situations where there is little time 
+available to make the transfer. This is balanced with the generalized-cost. The cost is adjusted 
+with a new cost for wait-time.
 
-The defaults should work fine, but if you have results with "back-travel" try increasing
-the `minSafeWaitTimeFactor`.
+The defaults should work fine, but if you have results with short wait-times dominating a better 
+option or "back-travel", then try to increase the `minSafeWaitTimeFactor` and/or 
+`backTravelWaitTimeFactor`.
 
 ```JSON
 // router-config.json
@@ -707,7 +704,8 @@ the `minSafeWaitTimeFactor`.
   "routingDefaults": {
     "transferOptimization": {
       "optimizeTransferWaitTime": true,
-      "minSafeWaitTimeFactor": 5.0
+      "minSafeWaitTimeFactor": 5.0,
+      "backTravelWaitTimeFactor": 1.0
     }
   }
 }
@@ -742,8 +740,8 @@ config key | description | value type | value default
 #### Group by similarity filters
 
 The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
-with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`, 
-`groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`). 
+with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`,
+`groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`).
 
 The group-by-filter work by grouping itineraries together and then reducing the number of 
 itineraries in each group, keeping the itinerary/itineraries with the best itinerary 

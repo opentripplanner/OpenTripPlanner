@@ -221,7 +221,17 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         if(tx != null) {
             var c = (TransferConstraint)tx.getTransferConstraint();
             // If the transfer is stay-seated or guaranteed, then no wait-time cost is added
-            if (c != null && c.isFacilitated()) { return; }
+            if (c != null && c.isFacilitated()) {
+                if(c.isStaySeated()) {
+                    this.waitTimeOptimizedCost +=
+                            waitTimeCostCalculator.calculateStaySeatedTransferCost();
+                }
+                else if(c.isGuaranteed()) {
+                    this.waitTimeOptimizedCost +=
+                            waitTimeCostCalculator.calculateGuaranteedTransferCost();
+                }
+                return;
+            }
         }
 
         int cost = waitTimeCostCalculator.calculateOptimizedWaitCost(waitTime);

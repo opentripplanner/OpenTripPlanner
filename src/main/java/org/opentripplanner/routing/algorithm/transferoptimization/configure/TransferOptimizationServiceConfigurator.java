@@ -9,7 +9,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostF
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathService;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
@@ -101,13 +101,13 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     }
   }
 
-  private OptimizePathService<T> createOptimizePathService(
+  private OptimizePathDomainService<T> createOptimizePathService(
           TransferGenerator<T> transferGenerator,
           MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
           TransferWaitTimeCalculator transferWaitTimeCalculator,
           CostCalculator costCalculator
   ) {
-    return new OptimizePathService<>(
+    return new OptimizePathDomainService<>(
             transferGenerator,
             costCalculator,
             raptorRequest.slackProvider(),
@@ -134,7 +134,10 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   }
 
   private TransferWaitTimeCalculator createTransferWaitTimeCalculator() {
-    return new TransferWaitTimeCalculator(config.minSafeWaitTimeFactor());
+    return new TransferWaitTimeCalculator(
+            config.backTravelWaitTimeFactor(),
+            config.minSafeWaitTimeFactor()
+    );
   }
 
   private MinCostFilterChain<OptimizedPathTail<T>> createTransferOptimizedFilter(

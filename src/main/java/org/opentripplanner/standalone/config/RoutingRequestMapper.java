@@ -107,5 +107,6 @@ public class RoutingRequestMapper {
                 "optimizeTransferWaitTime", p.optimizeTransferWaitTime
         );
         p.minSafeWaitTimeFactor = c.asDouble("minSafeWaitTimeFactor", p.minSafeWaitTimeFactor);
+        p.backTravelWaitTimeFactor = c.asDouble("backTravelWaitTimeFactor", p.backTravelWaitTimeFactor);
     }
 }

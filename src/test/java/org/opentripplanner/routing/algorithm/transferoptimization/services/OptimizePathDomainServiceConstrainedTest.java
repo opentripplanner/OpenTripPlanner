@@ -40,10 +40,10 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
  *     be found by the router. 
  *
  * Note! This test uses some of the constants and utility methods of {@link
- *     OptimizePathServiceTest}
+ *     OptimizePathDomainServiceTest}
  */
 @SuppressWarnings("SameParameterValue")
-public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
+public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConstants {
 
     /**
      * The exact start time to walk to stop A to catch Trip_1 with 40s board slack
@@ -135,14 +135,14 @@ public class OptimizePathServiceConstrainedTest implements RaptorTestConstants {
             TransferPriority expPriority,
             String expItinerary
     ) {
-        var original = OptimizePathServiceTest.pathBuilder()
+        var original = OptimizePathDomainServiceTest.pathBuilder()
                 .access(START_TIME_T1, 0, STOP_A)
                 .bus(trip1, STOP_B)
                 .walk(D1m, STOP_C)
                 .bus(trip2, egressStop)
                 .egress(D0s);
 
-        var subject = OptimizePathServiceTest.subject(transfers, null);
+        var subject = OptimizePathDomainServiceTest.subject(transfers, null);
 
         // Find the path with the lowest cost
         var result = subject.findBestTransitPath(original);

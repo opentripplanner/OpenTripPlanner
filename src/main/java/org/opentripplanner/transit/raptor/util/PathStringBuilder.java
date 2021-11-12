@@ -107,7 +107,7 @@ public class PathStringBuilder {
      * </ul>
      */
     public PathStringBuilder costCentiSec(int cost, String unit) {
-        if(cost <= 0) { return this; }
+        if(cost == 0) { return this; }
         space().append(OtpNumberFormat.formatCost(cost));
         if(unit != null) {
             append(unit);

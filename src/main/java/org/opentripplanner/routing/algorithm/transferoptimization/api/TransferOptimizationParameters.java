@@ -22,6 +22,12 @@ public interface TransferOptimizationParameters {
   boolean optimizeTransferWaitTime();
 
   /**
+   * The wait time is used to prevent "back-travel", the {@code backTravelWaitTimeFactor} is
+   * multiplied with the {@code wait-time} and subtracted from the optimized-transfer-cost.
+   */
+  double backTravelWaitTimeFactor();
+
+  /**
    * This defines the maximum cost for the logarithmic function relative to the {@code
    * min-safe-transfer-time (t0)} when wait time goes towards zero(0).
    * <pre>

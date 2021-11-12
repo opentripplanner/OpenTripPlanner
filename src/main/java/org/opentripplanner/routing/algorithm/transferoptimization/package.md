@@ -33,6 +33,7 @@ those paths (the post-processing).
     3. For a transfer between two trips we want to find the right balance, between
        extra-transfer-time and the path generalized-cost(like the cost of walking and riding a
        bus). 
+
  
 ## Not Supported (jet)
  - Using GTFS transfers.txt it is possible to set the `min_transfer_time` with `transfer_type = 2`.
@@ -42,8 +43,7 @@ those paths (the post-processing).
    See issue [#3505](https://github.com/opentripplanner/OpenTripPlanner/issues/3505).
  - Support for Trip matching when only Route is specified in transfers.txt.
    See issue [#3429](https://github.com/opentripplanner/OpenTripPlanner/issues/3429)
- - Add support for redused cost for guaranteed interchange. 
-   See issue [#3478](https://github.com/opentripplanner/OpenTripPlanner/issues/3478)  
+
 
 ## Implementation
 
@@ -72,7 +72,7 @@ OTP finds the best transfers in 2 steps:
     3. Another filter which breaks ties based on an "optimize-transfer-cost" function.
     4. Because the number of permutations grow exponentially with the number of transfers, 
        each filter above is applied for each sub-path starting from the end of the path. This 
-       keep the number of options down to almost O(N), where N is the number of transfers.
+       keep the number of options down, close to O(N), where N is the number of transfers.
 
 
 ## Design - Optimize transfers
@@ -96,7 +96,7 @@ Here is an outline of the calls:
 Package `org.opentripplanner.routing.algorithm.transferoptimization` has the following subpackages:
 - `api` classes used outside the transfer-optimization.
 - `configure` creates and wires up the the module.
-- `model` simple internal model classes used by the services to build the result.
+- `model` simple internal model classes used by the services.
 - `services` internal transfer-optimization domain services, witch collaborate to do the job.
 
 ### Important classes

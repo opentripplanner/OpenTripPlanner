@@ -65,7 +65,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class OptimizePathService<T extends RaptorTripSchedule> {
+public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
   private final TransferGenerator<T> transferGenerator;
   private final CostCalculator costCalculator;
@@ -77,7 +77,7 @@ public class OptimizePathService<T extends RaptorTripSchedule> {
   @Nullable
   private final TransferWaitTimeCalculator waitTimeCostCalculator;
 
-  public OptimizePathService(
+  public OptimizePathDomainService(
       TransferGenerator<T> transferGenerator,
       CostCalculator costCalculator,
       RaptorSlackProvider slackProvider,

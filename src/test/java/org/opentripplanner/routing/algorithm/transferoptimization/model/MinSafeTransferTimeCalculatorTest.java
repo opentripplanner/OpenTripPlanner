@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator.bound;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.SLACK_PROVIDER;
 import static org.opentripplanner.util.time.TimeUtils.time;
@@ -54,5 +55,14 @@ public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
         133,
         subject.minSafeTransferTime(List.of(path_1_bus_leg, path_3_bus_legs))
     );
+  }
+
+  @Test
+  public void testBound() {
+    assertEquals(1, bound(0, 1, 3));
+    assertEquals(1, bound(1, 1, 3));
+    assertEquals(2, bound(2, 1, 3));
+    assertEquals(3, bound(3, 1, 3));
+    assertEquals(3, bound(4, 1, 3));
   }
 }
