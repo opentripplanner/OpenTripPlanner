@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
+import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLSeverityMapper.getLegacyGraphQLSeverity;
+
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -146,7 +148,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertSeverityLevel() {
-    return environment -> getSource(environment).severity;
+    return environment -> getLegacyGraphQLSeverity(getSource(environment).severity);
   }
 
   @Override

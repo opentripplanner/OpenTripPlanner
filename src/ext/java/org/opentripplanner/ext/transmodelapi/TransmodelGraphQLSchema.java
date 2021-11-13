@@ -2,6 +2,7 @@ package org.opentripplanner.ext.transmodelapi;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
+import static org.opentripplanner.ext.transmodelapi.mapping.SeverityMapper.getTransmodelSeverity;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
@@ -1106,7 +1107,7 @@ public class TransmodelGraphQLSchema {
                 List<String> severities = environment.getArgument("severities");
                 alerts = alerts
                     .stream()
-                    .filter(alert -> severities.contains(alert.severity))
+                    .filter(alert -> severities.contains(getTransmodelSeverity(alert.severity)))
                     .collect(Collectors.toSet());
               }
               return alerts;

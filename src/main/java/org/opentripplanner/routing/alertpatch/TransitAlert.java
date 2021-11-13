@@ -31,8 +31,10 @@ public class TransitAlert implements Serializable {
     //null means unknown
     public String alertType;
 
-    //null means unknown
-    public String severity;
+    /**
+     * The severity of the alert.
+     */
+    public AlertSeverity severity;
 
     //null means unknown
     public Integer priority;
