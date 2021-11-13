@@ -1,5 +1,7 @@
 package org.opentripplanner.updater.alerts;
 
+import static org.opentripplanner.updater.alerts.GtfsRealtimeSeverityMapper.getAlertSeverityForGtfsRtSeverity;
+
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -130,6 +132,8 @@ public class AlertsUpdateHandler {
                 alertText.addEntity(new EntitySelector.Agency(new FeedScopedId(feedId, agencyId)));
             }
         }
+
+        alertText.severity = getAlertSeverityForGtfsRtSeverity(alert.getSeverityLevel());
 
         return alertText;
     }
