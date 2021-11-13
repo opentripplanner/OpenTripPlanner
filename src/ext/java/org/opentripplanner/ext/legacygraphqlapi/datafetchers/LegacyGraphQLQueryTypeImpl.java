@@ -12,6 +12,7 @@ import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -497,10 +498,19 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> null;
   }
 
-  //TODO
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
-    return environment -> List.of();
+    return environment -> {
+      Collection<TransitAlert> alerts = getRoutingService(environment)
+              .getTransitAlertService()
+              .getAllAlerts();
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(
+              environment.getArguments());
+      return alerts.stream()
+              .filter(alert -> args.getLegacyGraphQLFeeds() == null
+                      || ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getFeedId()))
+              .collect(Collectors.toList());
+    };
   }
 
   @Override
