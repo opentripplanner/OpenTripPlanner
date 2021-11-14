@@ -134,6 +134,8 @@
                 <configuration>
                     <!-- Target Java versions -->
                     <release>11</release>
+                	<fork>true</fork>
+                	<useIncrementalCompilation>true</useIncrementalCompilation>
                 </configuration>
             </plugin>
             <plugin>
