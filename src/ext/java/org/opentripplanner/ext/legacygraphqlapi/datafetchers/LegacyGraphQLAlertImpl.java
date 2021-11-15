@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
+import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLCauseMapper.getLegacyGraphQLCause;
+import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLEffectMapper.getLegacyGraphQLEffect;
 import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLSeverityMapper.getLegacyGraphQLSeverity;
 
 import graphql.relay.Relay;
@@ -134,16 +136,14 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment -> null;
   }
 
-  //TODO
   @Override
   public DataFetcher<String> alertEffect() {
-    return environment -> null;
+    return environment -> getLegacyGraphQLEffect(getSource(environment).effect);
   }
 
-  //TODO
   @Override
   public DataFetcher<String> alertCause() {
-    return environment -> null;
+    return environment -> getLegacyGraphQLCause(getSource(environment).cause);
   }
 
   @Override

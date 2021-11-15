@@ -1,5 +1,7 @@
 package org.opentripplanner.updater.alerts;
 
+import static org.opentripplanner.updater.alerts.GtfsRealtimeCauseMapper.getAlertCauseForGtfsRtCause;
+import static org.opentripplanner.updater.alerts.GtfsRealtimeEffectMapper.getAlertEffectForGtfsRtEffect;
 import static org.opentripplanner.updater.alerts.GtfsRealtimeSeverityMapper.getAlertSeverityForGtfsRtSeverity;
 
 import com.google.transit.realtime.GtfsRealtime;
@@ -134,6 +136,8 @@ public class AlertsUpdateHandler {
         }
 
         alertText.severity = getAlertSeverityForGtfsRtSeverity(alert.getSeverityLevel());
+        alertText.cause = getAlertCauseForGtfsRtCause(alert.getCause());
+        alertText.effect = getAlertEffectForGtfsRtEffect(alert.getEffect());
 
         return alertText;
     }

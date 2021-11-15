@@ -177,6 +177,9 @@ enum AlertEffectType {
 
     """NO_EFFECT"""
     NO_EFFECT
+
+    """ACCESSIBILITY_ISSUE"""
+    ACCESSIBILITY_ISSUE
 }
 
 """Severity level of a alert"""

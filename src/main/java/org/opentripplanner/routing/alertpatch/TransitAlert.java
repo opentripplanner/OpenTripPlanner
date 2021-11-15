@@ -36,6 +36,16 @@ public class TransitAlert implements Serializable {
      */
     public AlertSeverity severity;
 
+    /**
+     * The cause of the disruption.
+     */
+    public AlertCause cause;
+
+    /**
+     * The effect of the disruption.
+     */
+    public AlertEffect effect;
+
     //null means unknown
     public Integer priority;
 
