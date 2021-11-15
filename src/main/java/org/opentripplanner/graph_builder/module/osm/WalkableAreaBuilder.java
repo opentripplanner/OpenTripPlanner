@@ -277,8 +277,7 @@ public class WalkableAreaBuilder {
                     LineString line = geometryFactory.createLineString(coordinates);
                     if (poly != null && poly.contains(line)) {
 
-                        createSegments(nodeI, nodeJ, startEndpoint, endEndpoint, group.areas,
-                                edgeList, edges);
+                        createSegments(startEndpoint, endEndpoint, group.areas, edgeList, edges);
                         if (startingNodes.contains(nodeI)) {
                             startingVertices.add(startEndpoint);
                         }
@@ -401,14 +400,12 @@ public class WalkableAreaBuilder {
         IntersectionVertex startEndpoint = handler.getVertexForOsmNode(node, area.parent);
         IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nextNode, area.parent);
 
-        createSegments(node, nextNode, startEndpoint, endEndpoint, Arrays.asList(area), edgeList,
-                edges);
+        createSegments(startEndpoint, endEndpoint, List.of(area), edgeList, edges);
     }
 
-    private void createSegments(OSMNode fromNode, OSMNode toNode, IntersectionVertex startEndpoint,
-            IntersectionVertex endEndpoint, Collection<Area> areas, AreaEdgeList edgeList,
-            Set<Edge> edges) {
-
+    private void createSegments(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
+            Collection<Area> areas, AreaEdgeList edgeList, Set<Edge> edges
+    ) {
         List<Area> intersects = new ArrayList<Area>();
 
         Coordinate[] coordinates = new Coordinate[] { startEndpoint.getCoordinate(),
@@ -527,10 +524,8 @@ public class WalkableAreaBuilder {
                                 + edgeCoordinate, edgeCoordinate.x, edgeCoordinate.y);
                         areaBoundaryVertexForCoordinate.put(edgeCoordinate, newEndpoint);
                     }
-                    createSegments(fromNode, toNode, startEndpoint, newEndpoint,
-                            Arrays.asList(area), edgeList, edges);
-                    createSegments(fromNode, toNode, newEndpoint, endEndpoint, intersects,
-                            edgeList, edges);
+                    createSegments(startEndpoint, newEndpoint, List.of(area), edgeList, edges);
+                    createSegments(newEndpoint, endEndpoint, intersects, edgeList, edges);
                     break;
                 }
             }
