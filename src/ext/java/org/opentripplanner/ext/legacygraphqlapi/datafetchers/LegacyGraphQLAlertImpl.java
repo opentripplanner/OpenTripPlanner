@@ -21,6 +21,7 @@ import org.opentripplanner.util.TranslatedString;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
   @Override
@@ -31,10 +32,15 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
     );
   }
 
-  // TODO
   @Override
   public DataFetcher<Integer> alertHash() {
-    return environment -> null;
+    return environment -> {
+      TransitAlert alert = getSource(environment);
+      return Objects.hash(
+              alert.alertDescriptionText, alert.alertHeaderText, alert.alertUrl, alert.cause,
+              alert.effect, alert.severity
+      );
+    };
   }
 
   @Override
