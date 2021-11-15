@@ -118,10 +118,14 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         environment.getLocale());
   }
 
-  //TODO
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
-    return environment -> null;
+    return environment -> {
+      var text = getSource(environment).alertDescriptionText;
+      return text instanceof TranslatedString
+              ? ((TranslatedString) text).getTranslations()
+              : Collections.emptyList();
+    };
   }
 
   @Override
@@ -130,10 +134,14 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         environment.getLocale());
   }
 
-  //TODO
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations() {
-    return environment -> null;
+    return environment -> {
+      var url = getSource(environment).alertUrl;
+      return url instanceof TranslatedString
+              ? ((TranslatedString) url).getTranslations()
+              : Collections.emptyList();
+    };
   }
 
   @Override
