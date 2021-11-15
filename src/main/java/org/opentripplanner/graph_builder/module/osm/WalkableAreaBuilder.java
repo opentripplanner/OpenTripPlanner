@@ -153,6 +153,7 @@ public class WalkableAreaBuilder {
         for (Ring ring : group.outermostRings) {
 
             AreaEdgeList edgeList = new AreaEdgeList();
+            edgeList.setOriginalEdges(ring.toJtsPolygon());
             // the points corresponding to concave or hole vertices
             // or those linked to ways
             ArrayList<OSMNode> visibilityNodes = new ArrayList<OSMNode>();
@@ -229,8 +230,6 @@ public class WalkableAreaBuilder {
                         ));
                 continue;
             }
-
-            edgeList.setOriginalEdges(ring.toJtsPolygon());
 
             createNamedAreas(edgeList, ring, group.areas);
 
