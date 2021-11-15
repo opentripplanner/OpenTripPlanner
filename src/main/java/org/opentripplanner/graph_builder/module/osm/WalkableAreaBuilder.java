@@ -149,6 +149,10 @@ public class WalkableAreaBuilder {
         Set<Vertex> startingVertices = new HashSet<Vertex>();
         Set<Edge> edges = new HashSet<Edge>();
 
+        // Edges which are part of the rings. We want to keep there for linking even tough they
+        // might not be part of the visibility edges.
+        Set<Edge> ringEdges = new HashSet<>();
+
         // create polygon and accumulate nodes for area
         for (Ring ring : group.outermostRings) {
 
@@ -202,6 +206,7 @@ public class WalkableAreaBuilder {
                     }
                 }
             }
+            ringEdges.addAll(edgeList.getEdges());
             List<OSMNode> nodes = new ArrayList<OSMNode>();
             List<VLPoint> vertices = new ArrayList<VLPoint>();
             accumulateRingNodes(ring, nodes, vertices);
@@ -265,7 +270,7 @@ public class WalkableAreaBuilder {
                 }
             }
         }
-        pruneAreaEdges(startingVertices, edges);
+        pruneAreaEdges(startingVertices, edges, ringEdges);
     }
 
     class ListedEdgesOnly implements SkipEdgeStrategy {
@@ -295,7 +300,7 @@ public class WalkableAreaBuilder {
      * @param startingVertices
      * @param edges
      */
-    private void pruneAreaEdges(Collection<Vertex> startingVertices, Set<Edge> edges) {
+    private void pruneAreaEdges(Collection<Vertex> startingVertices, Set<Edge> edges, Set<Edge> edgesToKeep) {
         if (edges.size() == 0)
             return;
         TraverseMode mode;
@@ -321,14 +326,12 @@ public class WalkableAreaBuilder {
             for (Vertex endVertex : startingVertices) {
                 GraphPath path = spt.getPath(endVertex, false);
                 if (path != null) {
-                    for (Edge edge : path.edges) {
-                        usedEdges.add(edge);
-                    }
+                    usedEdges.addAll(path.edges);
                 }
             }
         }
         for (Edge edge : edges) {
-            if (!usedEdges.contains(edge)) {
+            if (!usedEdges.contains(edge) && !edgesToKeep.contains(edge)) {
                 graph.removeEdge(edge);
             }
         }
