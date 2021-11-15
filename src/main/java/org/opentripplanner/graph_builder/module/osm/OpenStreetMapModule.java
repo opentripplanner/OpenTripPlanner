@@ -281,10 +281,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             buildBasicGraph();
             buildWalkableAreas(skipVisibility, platformEntriesLinking);
 
-            if(platformEntriesLinking){
-                linkPlatformEntries(edgeFactory, customNamer);
-            }
-
             if (staticParkAndRide) {
                 buildParkAndRideAreas();
             }
@@ -377,7 +373,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
             WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(graph, osmdb,
-                    wayPropertySet, edgeFactory, this, issueStore, maxAreaNodes
+                    wayPropertySet, edgeFactory, this, issueStore, maxAreaNodes,
+                    platformEntriesLinking
             );
             if (skipVisibility) {
                 for (AreaGroup group : areaGroups) {
@@ -390,21 +387,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     areaGroups.size()
                 );
                 for (AreaGroup group : areaGroups) {
-                    walkableAreaBuilder.buildWithVisibility(group, platformEntriesLinking);
+                    walkableAreaBuilder.buildWithVisibility(group);
                     //Keep lambda! A method-ref would causes incorrect class and line number to be logged
                     progress.step(m -> LOG.info(m));
                 }
                 LOG.info(progress.completeMessage());
-
-                if(platformEntriesLinking){
-                    List<Area> platforms = osmdb.getWalkableAreas().stream().
-                            filter(area -> "platform".equals(area.parent.getTag("public_transport"))).
-                            collect(Collectors.toList());
-                    List<AreaGroup> platformGroups = groupAreas(platforms);
-                    for (AreaGroup group : platformGroups) {
-                        walkableAreaBuilder.buildWithoutVisibility(group);
-                    }
-                }
             }
 
             // running a request caches the timezone; we need to clear it now so that when agencies are loaded
@@ -856,12 +843,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     way.setCreativeName(creativeName);
                 }
             }
-        }
-
-        private void linkPlatformEntries(StreetEdgeFactory factory, CustomNamer customNamer) {
-            PlatformLinker platformLinker = new PlatformLinker(graph, osmdb, factory, customNamer);
-            platformLinker.linkEntriesToPlatforms();
-
         }
 
         private void buildElevatorEdges(Graph graph) {

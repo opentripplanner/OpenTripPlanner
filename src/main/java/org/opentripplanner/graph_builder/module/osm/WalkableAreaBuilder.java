@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -36,6 +37,7 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.visibility.VLPoint;
 import org.opentripplanner.visibility.VLPolygon;
@@ -90,9 +92,13 @@ public class WalkableAreaBuilder {
 
     private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
 
+    private boolean platformEntriesLinking;
+
+    private List<OsmVertex> platformLinkingEndpoints;
+
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
             StreetEdgeFactory edgeFactory, Handler handler, DataImportIssueStore issueStore,
-            int maxAreaNodes
+            int maxAreaNodes, boolean platformEntriesLinking
     ) {
         this.graph = graph;
         this.osmdb = osmdb;
@@ -101,6 +107,14 @@ public class WalkableAreaBuilder {
         this.handler = handler;
         this.issueStore = issueStore;
         this.maxAreaNodes = maxAreaNodes;
+        this.platformEntriesLinking = platformEntriesLinking;
+        this.platformLinkingEndpoints = platformEntriesLinking
+            ? graph.getVertices().stream().
+                filter(OsmVertex.class::isInstance).
+                map(OsmVertex.class::cast).
+                filter(this::isPlatformLinkingEndpoint).
+                collect(Collectors.toList())
+            : List.of();
     }
 
     /**
@@ -144,7 +158,7 @@ public class WalkableAreaBuilder {
         }
     }
 
-    public void buildWithVisibility(AreaGroup group, boolean platformEntriesLinking) {
+    public void buildWithVisibility(AreaGroup group) {
         Set<OSMNode> startingNodes = new HashSet<OSMNode>();
         Set<Vertex> startingVertices = new HashSet<Vertex>();
         Set<Edge> edges = new HashSet<Edge>();
@@ -166,17 +180,11 @@ public class WalkableAreaBuilder {
             // inside this ring, but only for shared nodes; we don't care about
             // convexity, which we'll handle for the grouped area only.
 
+            GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+
             // we also want to fill in the edges of this area anyway, because we can,
             // and to avoid the numerical problems that they tend to cause
             for (Area area : group.areas) {
-
-                // public transform platforms will be handled separately if platformEntriesLinking
-                // parameter is true
-                if(platformEntriesLinking
-                        && "platform".equals(area.parent.getTag("public_transport"))) {
-                    continue;
-                }
-
                 if (!ring.toJtsPolygon().contains(area.toJTSMultiPolygon())) {
                     continue;
                 }
@@ -190,6 +198,19 @@ public class WalkableAreaBuilder {
                 }
 
                 for (Ring outerRing : area.outermostRings) {
+                    // Add unconnected entries to area if platformEntriesLinking parameter is true
+                    if (platformEntriesLinking
+                            && "platform".equals(area.parent.getTag("public_transport"))) {
+                        List<OsmVertex> endpointsWithin = platformLinkingEndpoints.stream()
+                            .filter(t -> outerRing.toJtsPolygon()
+                                    .contains(geometryFactory.createPoint(t.getCoordinate())))
+                            .collect(Collectors.toList());
+                        for (OsmVertex v : endpointsWithin) {
+                            OSMNode node = osmdb.getNode(v.nodeId);
+                            addtoVisibilityAndStartSets(startingNodes, visibilityNodes, node);
+                        }
+                    }
+
                     for (int i = 0; i < outerRing.nodes.size(); ++i) {
                         OSMNode node = outerRing.nodes.get(i);
                         createEdgesForRingSegment(edges, edgeList, area, outerRing, i,
@@ -255,7 +276,6 @@ public class WalkableAreaBuilder {
 
                     Coordinate[] coordinates = new Coordinate[] { startEndpoint.getCoordinate(),
                             endEndpoint.getCoordinate() };
-                    GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
                     LineString line = geometryFactory.createLineString(coordinates);
                     if (poly != null && poly.contains(line)) {
 
@@ -629,5 +649,31 @@ public class WalkableAreaBuilder {
             nodes.set(i, nodes.get(opposite));
             nodes.set(opposite, tmp);
         }
+    }
+
+    private boolean isPlatformLinkingEndpoint(OsmVertex osmVertex) {
+        boolean isCandidate = false;
+        Vertex start = null;
+        for (Edge e : osmVertex.getIncoming()) {
+            if (e instanceof StreetEdge && ! (e instanceof AreaEdge)) {
+                StreetEdge se = (StreetEdge) e;
+                if (Arrays.asList(1,2,3).contains(se.getPermission().code)) {
+                    isCandidate = true;
+                    start = se.getFromVertex();
+                    break;
+                }
+            }
+        }
+
+        if (isCandidate && start != null) {
+            boolean isEndpoint = true;
+            for (Edge se : osmVertex.getOutgoing()) {
+                if (!se.getToVertex().getCoordinate().equals(start.getCoordinate()) && !(se instanceof AreaEdge)) {
+                    isEndpoint = false;
+                }
+            }
+            return isEndpoint;
+        }
+        return false;
     }
 }
