@@ -3,14 +3,11 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.visibility.VLPoint;
-import org.opentripplanner.visibility.VLPolygon;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -27,7 +24,7 @@ public class Ring {
 
     public List<OSMNode> nodes;
 
-    public VLPolygon geometry;
+    public Coordinate[] geometry;
 
     public List<Ring> holes = new ArrayList<Ring>();
 
@@ -35,17 +32,17 @@ public class Ring {
     private Polygon jtsPolygon;
 
     public Ring(List<OSMNode> osmNodes) {
-        ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
+        ArrayList<Coordinate> vertices = new ArrayList<>();
         nodes = osmNodes;
         for (OSMNode node : osmNodes) {
-            VLPoint point = new VLPoint(node.lon, node.lat);
+            Coordinate point = new Coordinate(node.lon, node.lat);
             vertices.add(point);
         }
-        geometry = new VLPolygon(vertices);
+        geometry = vertices.toArray(new Coordinate[0]);
     }
 
     public Ring(TLongList osmNodes, TLongObjectMap<OSMNode> _nodes) {
-        ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
+        ArrayList<Coordinate> vertices = new ArrayList<>();
         nodes = new ArrayList<>(osmNodes.size());
         osmNodes.forEach(nodeId -> {
             OSMNode node = _nodes.get(nodeId);
@@ -53,12 +50,12 @@ public class Ring {
                 // Hopefully, this only happens in order to close polygons. Next iteration.
                 return true;
             }
-            VLPoint point = new VLPoint(node.lon, node.lat);
+            Coordinate point = new Coordinate(node.lon, node.lat);
             nodes.add(node);
             vertices.add(point);
             return true;
         });
-        geometry = new VLPolygon(vertices);
+        geometry = vertices.toArray(new Coordinate[0]);
     }
 
     public Polygon toJtsPolygon() {
@@ -69,7 +66,7 @@ public class Ring {
 
         LinearRing shell;
         try {
-            shell = factory.createLinearRing(toCoordinates(geometry));
+            shell = factory.createLinearRing(geometry);
         } catch (IllegalArgumentException e) {
             throw new RingConstructionException();
         }
@@ -80,7 +77,7 @@ public class Ring {
 
         List<Polygon> polygonHoles = new ArrayList<Polygon>();
         for (Ring ring : holes) {
-            LinearRing linearRing = factory.createLinearRing(toCoordinates(ring.geometry));
+            LinearRing linearRing = factory.createLinearRing(ring.geometry);
             Polygon polygon = factory.createPolygon(linearRing, new LinearRing[0]);
             for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext();) {
                 Polygon otherHole = it.next();
@@ -111,14 +108,4 @@ public class Ring {
         return jtsPolygon;
     }
 
-    private Coordinate[] toCoordinates(VLPolygon geometry) {
-        Coordinate[] coords = new Coordinate[geometry.n() + 1];
-        int i = 0;
-        for (VLPoint point : geometry.vertices) {
-            coords[i++] = new Coordinate(point.x, point.y);
-        }
-        VLPoint first = geometry.vertices.get(0);
-        coords[i++] = new Coordinate(first.x, first.y);
-        return coords;
-    }
 }

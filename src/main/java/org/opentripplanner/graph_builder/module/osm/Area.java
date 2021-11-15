@@ -62,7 +62,7 @@ class Area {
         OUTER: for (Ring outer : outerRings) {
             for (Ring possibleContainer : outerRings) {
                 if (outer != possibleContainer
-                        && outer.geometry.hasPointInside(possibleContainer.geometry)) {
+                        && outer.toJtsPolygon().overlaps(possibleContainer.toJtsPolygon())) {
                     continue OUTER;
                 }
             }
@@ -70,7 +70,7 @@ class Area {
 
             // find holes in this ring
             for (Ring possibleHole : innerRings) {
-                if (possibleHole.geometry.hasPointInside(outer.geometry)) {
+                if (possibleHole.toJtsPolygon().overlaps(outer.toJtsPolygon())) {
                     outer.holes.add(possibleHole);
                 }
             }
