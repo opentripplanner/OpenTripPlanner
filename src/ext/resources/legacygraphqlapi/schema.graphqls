@@ -67,7 +67,7 @@ type Alert implements Node {
     stop: Stop
 
     """Patterns affected by the disruption"""
-    patterns: [Pattern]
+    patterns: [Pattern] @deprecated(reason: "This will always return an empty list")
 
     """Header of the alert, if available"""
     alertHeaderText: String

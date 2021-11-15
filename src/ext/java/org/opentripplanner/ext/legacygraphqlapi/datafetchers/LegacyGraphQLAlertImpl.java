@@ -96,7 +96,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .orElse(null);
   }
 
-  // TODO
+  // This is deprecated
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
     return environment -> Collections.emptyList();
