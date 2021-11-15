@@ -238,12 +238,12 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                         // MC Raptor have many, while RR have one boarding
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
 
-                            boolean ok = boardWithConstrainedTransfer(
+                            boolean handled = boardWithConstrainedTransfer(
                                     txService, route.timetable(), stopIndex, stopPos
                             );
 
                             // Find the best trip and board [no guaranteed transfer exist]
-                            if(!ok) {
+                            if(!handled) {
                                 boardWithRegularTransfer(
                                         tripSearch, stopPos, stopIndex, prevArrivalTime, boardSlack
                                 );
@@ -277,6 +277,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         }
     }
 
+    /**
+     * @return {@code true} if a constrained transfer exist to prevent the normal
+     * trip search from execution.
+     */
     private boolean boardWithConstrainedTransfer(
             RaptorConstrainedTripScheduleBoardingSearch<T> txService,
             RaptorTimeTable<T> targetTimetable,
@@ -305,8 +309,15 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 earliestBoardTime
         );
 
-        if (result == null) {
-            return false;
+        if (result == null) { return false; }
+
+        if (
+                result.getTransferConstraint() != null &&
+                result.getTransferConstraint().isNotAllowed()
+        ) {
+            // We are blocking a normal trip search here by returning
+            // true without boarding the trip
+            return true;
         }
 
         this.earliestBoardTime = earliestBoardTime;
