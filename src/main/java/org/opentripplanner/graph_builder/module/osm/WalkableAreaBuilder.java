@@ -217,8 +217,7 @@ public class WalkableAreaBuilder {
             accumulateVisibilityPoints(ring.nodes, polygon, visibilityPoints, visibilityNodes,
                     false);
 
-            ArrayList<VLPolygon> polygons = new ArrayList<VLPolygon>();
-            polygons.add(polygon);
+            Geometry poly = toJTSPolygon(polygon);
             // holes
             for (Ring innerRing : ring.holes) {
                 ArrayList<OSMNode> holeNodes = new ArrayList<OSMNode>();
@@ -228,7 +227,7 @@ public class WalkableAreaBuilder {
                 accumulateVisibilityPoints(innerRing.nodes, hole, visibilityPoints,
                         visibilityNodes, true);
                 nodes.addAll(holeNodes);
-                polygons.add(hole);
+                poly.difference(toJTSPolygon(hole));
             }
 
             Environment areaEnv = new Environment(polygons);
@@ -257,9 +256,6 @@ public class WalkableAreaBuilder {
 
             for (int i = 0; i < visibilityNodes.size(); ++i) {
                 OSMNode nodeI = visibilityNodes.get(i);
-                VisibilityPolygon visibilityPolygon = new VisibilityPolygon(
-                        visibilityPoints.get(i), areaEnv, VISIBILITY_EPSILON);
-                Polygon poly = toJTSPolygon(visibilityPolygon);
                 for (int j = 0; j < visibilityNodes.size(); ++j) {
                     OSMNode nodeJ = visibilityNodes.get(j);
                     P2<OSMNode> nodePair = new P2<OSMNode>(nodeI, nodeJ);
