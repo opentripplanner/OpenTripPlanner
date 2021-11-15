@@ -27,6 +27,11 @@ public class TripTransferPoint implements TransferPoint, Serializable {
     return stopPosition;
   }
 
+  @Override
+  public boolean applyToAllTrips() {
+    return false;
+  }
+
   /**
    * <a href="https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
    *     GTFS Specificity of a transfer

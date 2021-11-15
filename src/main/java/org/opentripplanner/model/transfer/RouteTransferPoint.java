@@ -24,6 +24,11 @@ public class RouteTransferPoint extends TripTransferPoint implements Serializabl
   }
 
   @Override
+  public boolean applyToAllTrips() {
+    return true;
+  }
+
+  @Override
   public int getSpecificityRanking() { return 1; }
 
   @Override

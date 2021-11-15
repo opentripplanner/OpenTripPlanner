@@ -192,8 +192,8 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     guaranteedTransfers.add(
         new ConstrainedTransfer(
             null,
-            new TestTransferPoint(fromStop, fromTrip),
-            new TestTransferPoint(toStop, toTrip),
+            new TestTransferPoint(fromStop, fromTrip, false),
+            new TestTransferPoint(toStop, toTrip, false),
             GUARANTEED
         )
     );

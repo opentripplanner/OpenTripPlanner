@@ -28,7 +28,7 @@ public class TransferService implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransferService.class);
 
-    /** Index of guaranteed transfers by the to/destination point. */
+    /** Index of constrained transfers with an effect on routing by the to/destination point. */
     private final Multimap<TripTransferPoint, ConstrainedTransfer> constrainedTransferByToPoint;
 
     /**

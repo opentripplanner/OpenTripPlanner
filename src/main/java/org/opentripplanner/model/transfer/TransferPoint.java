@@ -54,6 +54,9 @@ public interface TransferPoint {
     return null;
   }
 
+  /** Return {@code true} if this transfer point apply to all trips in pattern */
+  boolean applyToAllTrips();
+
   /**
    * If the given transfer point is a {@link TripTransferPoint}, this method return the stop
    * position in the trip pattern. If this transfer point is just a stop or a stop+route this

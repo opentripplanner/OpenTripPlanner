@@ -21,6 +21,11 @@ public class StopTransferPoint implements TransferPoint, Serializable {
   }
 
   @Override
+  public boolean applyToAllTrips() {
+    return true;
+  }
+
+  @Override
   public int getSpecificityRanking() {
     return 0;
   }
