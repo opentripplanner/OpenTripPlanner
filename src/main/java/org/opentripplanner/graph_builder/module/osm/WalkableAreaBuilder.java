@@ -13,7 +13,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.AreaNotEpsilonValid;
 import org.opentripplanner.graph_builder.issues.AreaTooComplicated;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
@@ -38,10 +37,8 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.visibility.Environment;
 import org.opentripplanner.visibility.VLPoint;
 import org.opentripplanner.visibility.VLPolygon;
-import org.opentripplanner.visibility.VisibilityPolygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,8 +76,6 @@ public class WalkableAreaBuilder {
     private DataImportIssueStore issueStore;
 
     private final int maxAreaNodes;
-
-    public static final double VISIBILITY_EPSILON = 0.000000001;
 
     private Graph graph;
 
@@ -160,7 +155,6 @@ public class WalkableAreaBuilder {
             AreaEdgeList edgeList = new AreaEdgeList();
             // the points corresponding to concave or hole vertices
             // or those linked to ways
-            ArrayList<VLPoint> visibilityPoints = new ArrayList<VLPoint>();
             ArrayList<OSMNode> visibilityNodes = new ArrayList<OSMNode>();
             HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
             // we need to accumulate visibility points from all contained areas
@@ -186,8 +180,7 @@ public class WalkableAreaBuilder {
                 Collection<OSMNode> nodes = osmdb.getStopsInArea(area.parent);
                 if (nodes != null) {
                     for (OSMNode node : nodes) {
-                        addtoVisibilityAndStartSets(startingNodes, visibilityPoints,
-                                visibilityNodes, node);
+                        addtoVisibilityAndStartSets(startingNodes, visibilityNodes, node);
                     }
                 }
 
@@ -196,16 +189,14 @@ public class WalkableAreaBuilder {
                         OSMNode node = outerRing.nodes.get(i);
                         createEdgesForRingSegment(edges, edgeList, area, outerRing, i,
                                 alreadyAddedEdges);
-                        addtoVisibilityAndStartSets(startingNodes, visibilityPoints,
-                                visibilityNodes, node);
+                        addtoVisibilityAndStartSets(startingNodes, visibilityNodes, node);
                     }
                     for (Ring innerRing : outerRing.holes) {
                         for (int j = 0; j < innerRing.nodes.size(); ++j) {
                             OSMNode node = innerRing.nodes.get(j);
                             createEdgesForRingSegment(edges, edgeList, area, innerRing, j,
                                     alreadyAddedEdges);
-                            addtoVisibilityAndStartSets(startingNodes, visibilityPoints,
-                                    visibilityNodes, node);
+                            addtoVisibilityAndStartSets(startingNodes, visibilityNodes, node);
                         }
                     }
                 }
@@ -214,8 +205,7 @@ public class WalkableAreaBuilder {
             List<VLPoint> vertices = new ArrayList<VLPoint>();
             accumulateRingNodes(ring, nodes, vertices);
             VLPolygon polygon = makeStandardizedVLPolygon(vertices, nodes, false);
-            accumulateVisibilityPoints(ring.nodes, polygon, visibilityPoints, visibilityNodes,
-                    false);
+            accumulateVisibilityPoints(ring.nodes, polygon, visibilityNodes, false);
 
             Geometry poly = toJTSPolygon(polygon);
             // holes
@@ -224,28 +214,20 @@ public class WalkableAreaBuilder {
                 vertices = new ArrayList<VLPoint>();
                 accumulateRingNodes(innerRing, holeNodes, vertices);
                 VLPolygon hole = makeStandardizedVLPolygon(vertices, holeNodes, true);
-                accumulateVisibilityPoints(innerRing.nodes, hole, visibilityPoints,
-                        visibilityNodes, true);
+                accumulateVisibilityPoints(innerRing.nodes, hole, visibilityNodes, true);
                 nodes.addAll(holeNodes);
                 poly.difference(toJTSPolygon(hole));
             }
 
-            Environment areaEnv = new Environment(polygons);
             // FIXME: temporary hard limit on size of
             // areas to prevent way explosion
-            if (visibilityPoints.size() > maxAreaNodes) {
+            if (visibilityNodes.size() > maxAreaNodes) {
                 issueStore.add(
                         new AreaTooComplicated(
-                                group.getSomeOSMObject().getId(), visibilityPoints.size(),
+                                group.getSomeOSMObject().getId(), visibilityNodes.size(),
                                 maxAreaNodes
                         ));
                 continue;
-            }
-
-            if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
-                // these errors seem not to harm area visibility processing
-                // so just log an error (most likely OSM mapping error)
-                issueStore.add(new AreaNotEpsilonValid(group.getSomeOSMObject().getId()));
             }
 
             edgeList.setOriginalEdges(ring.toJtsPolygon());
@@ -354,13 +336,12 @@ public class WalkableAreaBuilder {
     }
 
     private void addtoVisibilityAndStartSets(Set<OSMNode> startingNodes,
-            ArrayList<VLPoint> visibilityPoints, ArrayList<OSMNode> visibilityNodes, OSMNode node) {
+            ArrayList<OSMNode> visibilityNodes, OSMNode node
+    ) {
         if (osmdb.isNodeBelongsToWay(node.getId())
                 || osmdb.isNodeSharedByMultipleAreas(node.getId()) || node.isStop()) {
             startingNodes.add(node);
-            VLPoint point = new VLPoint(node.lon, node.lat);
-            if (!visibilityPoints.contains(point)) {
-                visibilityPoints.add(point);
+            if (!visibilityNodes.contains(node)) {
                 visibilityNodes.add(node);
             }
         }
@@ -573,7 +554,7 @@ public class WalkableAreaBuilder {
     }
 
     private void accumulateVisibilityPoints(List<OSMNode> nodes, VLPolygon polygon,
-            List<VLPoint> visibilityPoints, List<OSMNode> visibilityNodes, boolean hole) {
+            List<OSMNode> visibilityNodes, boolean hole) {
         int n = polygon.vertices.size();
         for (int i = 0; i < n; ++i) {
             OSMNode curNode = nodes.get(i);
@@ -587,7 +568,6 @@ public class WalkableAreaBuilder {
                 // visilibity is either ccw or latitude-major
 
                 if (!visibilityNodes.contains(curNode)) {
-                    visibilityPoints.add(cur);
                     visibilityNodes.add(curNode);
                 }
             }
