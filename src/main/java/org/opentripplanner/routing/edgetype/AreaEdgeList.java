@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -18,8 +17,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.MultiLineString;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 
 /**
@@ -78,14 +75,14 @@ public class AreaEdgeList implements Serializable {
 
         @SuppressWarnings("unchecked")
         HashSet<IntersectionVertex> verticesCopy = (HashSet<IntersectionVertex>) vertices.clone();
-        VERTEX: for (IntersectionVertex v : verticesCopy) {
+        for (IntersectionVertex v : verticesCopy) {
             LineString newGeometry = geometryFactory.createLineString(new Coordinate[] {
                     newVertex.getCoordinate(), v.getCoordinate() });
 
             // ensure that new edge does not leave the bounds of the original area, or
             // fall into any holes
-            if (!originalEdges.union(originalEdges.getBoundary()).contains(newGeometry)) {
-                continue VERTEX;
+            if (!originalEdges.union(originalEdges.getBoundary()).buffer(0.000001).contains(newGeometry)) {
+                continue;
             }
 
             // check to see if this splits multiple NamedAreas. This code is rather similar to
@@ -113,7 +110,8 @@ public class AreaEdgeList implements Serializable {
                 intersects.add(area);
             }
         }
-        if (intersects.size() == 1) {
+        if (intersects.size() > 0) {
+            // If more than one area intersects, we pick one by random for the name & properties
             NamedArea area = intersects.get(0);
 
             double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
@@ -126,45 +124,6 @@ public class AreaEdgeList implements Serializable {
             backward.setStreetClass(area.getStreetClass());
             edges.add(forward);
             edges.add(backward);
-
-        } else {
-            Coordinate startCoordinate = from.getCoordinate();
-            Point startPoint = geometryFactory.createPoint(startCoordinate);
-            for (NamedArea area : intersects) {
-                Geometry polygon = area.getPolygon();
-                if (!polygon.intersects(startPoint))
-                    continue;
-                Geometry lineParts = line.intersection(polygon);
-                if (lineParts.getLength() > 0.000001) {
-                    Coordinate edgeCoordinate = null;
-                    // this is either a LineString or a MultiLineString (we hope)
-                    if (lineParts instanceof MultiLineString) {
-                        MultiLineString mls = (MultiLineString) lineParts;
-                        for (int i = 0; i < mls.getNumGeometries(); ++i) {
-                            LineString segment = (LineString) mls.getGeometryN(i);
-                            if (segment.contains(startPoint)
-                                    || segment.getBoundary().contains(startPoint)) {
-                                edgeCoordinate = segment.getEndPoint().getCoordinate();
-                            }
-                        }
-                    } else if (lineParts instanceof LineString) {
-                        edgeCoordinate = ((LineString) lineParts).getEndPoint().getCoordinate();
-                    } else {
-                        continue;
-                    }
-
-                    String label = "area splitter at " + edgeCoordinate;
-                    IntersectionVertex newEndpoint = (IntersectionVertex) graph.getVertex(label);
-                    if (newEndpoint == null) {
-                        newEndpoint = new IntersectionVertex(graph, label, edgeCoordinate.x,
-                                edgeCoordinate.y);
-                    }
-
-                    createSegments(from, newEndpoint, Arrays.asList(area), graph);
-                    createSegments(newEndpoint, to, intersects, graph);
-                    break;
-                }
-            }
         }
     }
 
