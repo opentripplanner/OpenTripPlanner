@@ -92,14 +92,14 @@ public class TripPatternWithRaptorStopIndexes {
                 '}';
     }
 
-    /** These are public to allow the mappers to inject transfers */
+    /** This is public to allow the mappers to inject transfers */
     public void addTransferConstraintsForwardSearch(ConstrainedTransfer tx) {
         // In the Raptor search the transfer is looked up using the target
         // trip, the trip boarded after the transfer is done for a forward search.
         add(constrainedTransfersForwardSearch, tx, tx.getTo().getStopPosition());
     }
 
-    /** These are public to allow the mappers to inject transfers */
+    /** This is public to allow the mappers to inject transfers */
     public void addTransferConstraintsReverseSearch(ConstrainedTransfer tx) {
         // In the Raptor search the transfer is looked up using the target
         // trip. Thus, the transfer "from trip" should be used in a reverse search.

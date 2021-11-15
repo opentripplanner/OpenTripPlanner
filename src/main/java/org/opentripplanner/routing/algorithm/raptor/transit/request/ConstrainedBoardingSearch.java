@@ -1,18 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import gnu.trove.map.TIntObjectMap;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.common.model.T2;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
@@ -26,10 +23,10 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 public final class ConstrainedBoardingSearch
         implements RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> {
 
-    private static final DirectionHelper FORWARD_HELPER = new ForwardDirectionHelper();
-    private static final DirectionHelper REVERSE_HELPER = new ReverseDirectionHelper();
+    private static final ConstrainedBoardingSearchStrategy FORWARD_STRATEGY = new ConstrainedBoardingSearchForward();
+    private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
 
-    private final DirectionHelper translator;
+    private final ConstrainedBoardingSearchStrategy translator;
 
     /**
      * List of transfers for each stop position in pattern
@@ -43,7 +40,7 @@ public final class ConstrainedBoardingSearch
             boolean forwardSearch,
             TIntObjectMap<List<ConstrainedTransfer>> transfers
     ) {
-        this.translator = forwardSearch ? FORWARD_HELPER : REVERSE_HELPER;
+        this.translator = forwardSearch ? FORWARD_STRATEGY : REVERSE_STRATEGY;
         this.transfers = transfers;
     }
 
@@ -97,103 +94,8 @@ public final class ConstrainedBoardingSearch
             Trip sourceTrip,
             int sourceStopPos
     ) {
-        var result = new ArrayList<ConstrainedTransfer>();
-        for (ConstrainedTransfer tx : currentTransfers) {
-            var sourcePoint = translator.source(tx);
-            if(sourcePoint.matches(sourceTrip, sourceStopPos)) {
-                result.add(tx);
-            }
-        }
-        return result;
-    }
-
-    private interface DirectionHelper {
-        TransferPoint source(ConstrainedTransfer tx);
-        TransferPoint target(ConstrainedTransfer tx);
-        int time(RaptorTripSchedule schedule, int stopPos);
-        int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop);
-        /** Find the trip to board (trip index) and the transfer constraint */
-        T2<Integer, TransferConstraint> findTimetableTripInfo(
-                RaptorTimeTable<TripSchedule> timetable,
-                Collection<ConstrainedTransfer> transfers,
-                int stopPos,
-                int sourceTime
-        );
-    }
-
-    private static class ForwardDirectionHelper implements DirectionHelper {
-        @Override public TransferPoint source(ConstrainedTransfer tx) { return tx.getFrom();  }
-        @Override public TransferPoint target(ConstrainedTransfer tx) { return tx.getTo(); }
-        @Override public int time(RaptorTripSchedule schedule, int stopPos) {
-            return schedule.departure(stopPos);
-        }
-        @Override
-        public int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop) {
-            return schedule.findArrivalStopPosition(timeLimit, stop);
-        }
-        @Override
-        public T2<Integer, TransferConstraint> findTimetableTripInfo(
-                RaptorTimeTable<TripSchedule> timetable,
-                Collection<ConstrainedTransfer> transfers,
-                int stopPos,
-                int sourceArrivalTime
-        ) {
-            // Abort after 6 hours
-            int maxLimit = sourceArrivalTime + 3600 * 6;
-
-            for (int i = 0; i < timetable.numberOfTripSchedules(); i++) {
-                var it = timetable.getTripSchedule(i);
-                int departureTime = it.departure(stopPos);
-                if(departureTime < sourceArrivalTime) { continue; }
-                if(departureTime > maxLimit) { return null; }
-
-                var targetTrip = it.getOriginalTripTimes().getTrip();
-
-                for (ConstrainedTransfer tx : transfers) {
-                    if(targetTrip == tx.getTo().getTrip()) {
-                        return new T2<>(i, tx.getTransferConstraint());
-                    }
-                }
-            }
-            return null;
-        }
-    }
-
-    private static class ReverseDirectionHelper implements DirectionHelper {
-        @Override public TransferPoint source(ConstrainedTransfer tx) { return tx.getTo();  }
-        @Override public TransferPoint target(ConstrainedTransfer tx) { return tx.getFrom(); }
-        @Override public int time(RaptorTripSchedule schedule, int stopPos) {
-            return schedule.arrival(stopPos);
-        }
-        @Override
-        public int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop) {
-            return schedule.findDepartureStopPosition(timeLimit, stop);
-        }
-        @Override
-        public T2<Integer, TransferConstraint> findTimetableTripInfo(
-                RaptorTimeTable<TripSchedule> timetable,
-                Collection<ConstrainedTransfer> transfers,
-                int stopPos,
-                int sourceDepartureTime
-        ) {
-            // Abort after 6 hours
-            int minLimit = sourceDepartureTime - 3600 * 6;
-
-            for (int i = 0; i < timetable.numberOfTripSchedules(); i++) {
-                var it = timetable.getTripSchedule(i);
-                int arrivalTime = it.arrival(stopPos);
-                if(arrivalTime < minLimit) { continue; }
-                if(arrivalTime > sourceDepartureTime) { return null; }
-
-                var targetTrip = it.getOriginalTripTimes().getTrip();
-
-                for (ConstrainedTransfer tx : transfers) {
-                    if(targetTrip == tx.getFrom().getTrip()) {
-                        return new T2<>(i ,tx.getTransferConstraint());
-                    }
-                }
-           }
-            return null;
-        }
+        return currentTransfers.stream()
+                .filter(tx -> translator.source(tx).matches(sourceTrip, sourceStopPos))
+                .collect(Collectors.toList());
     }
 }
