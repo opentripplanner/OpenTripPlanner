@@ -571,7 +571,9 @@ public class LegacyGraphQLTypes {
         private Iterable<LegacyGraphQLAlertCauseType> _cause;
         private Iterable<LegacyGraphQLAlertEffectType> _effect;
         private Iterable<String> _feeds;
+        private Iterable<String> _route;
         private Iterable<LegacyGraphQLAlertSeverityLevelType> _severityLevel;
+        private Iterable<String> _stop;
 
         public LegacyGraphQLQueryTypeAlertsArgs(Map<String, Object> args) {
             if (args != null) {
@@ -586,11 +588,13 @@ public class LegacyGraphQLTypes {
                             .collect(Collectors.toList());
                 }
                 this._feeds = (Iterable<String>) args.get("feeds");
+                this._route = (Iterable<String>) args.get("route");
                 if (args.get("severityLevel") != null) {
                     this._severityLevel = ((List<String>) args.get("severityLevel")).stream()
                             .map(LegacyGraphQLAlertSeverityLevelType::valueOfLabel)
                             .collect(Collectors.toList());
                 }
+                this._stop = (Iterable<String>) args.get("stop");
             }
         }
 
@@ -600,7 +604,11 @@ public class LegacyGraphQLTypes {
 
         public Iterable<String> getLegacyGraphQLFeeds() {return this._feeds;}
 
+        public Iterable<String> getLegacyGraphQLRoute() {return this._route;}
+
         public Iterable<LegacyGraphQLAlertSeverityLevelType> getLegacyGraphQLSeverityLevel() {return this._severityLevel;}
+
+        public Iterable<String> getLegacyGraphQLStop() {return this._stop;}
     }
 
     public static class LegacyGraphQLQueryTypeBikeParkArgs {

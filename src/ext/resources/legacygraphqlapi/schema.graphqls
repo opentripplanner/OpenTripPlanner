@@ -1809,6 +1809,12 @@ type QueryType {
 
         """Only return alerts with these causes"""
         cause: [AlertCauseType!]
+
+        """Only return alerts affecting these routes"""
+        route: [String!]
+
+        """Only return alerts affecting these stops"""
+        stop: [String!]
     ): [Alert]
 
     """Get the time range for which the API has data available"""

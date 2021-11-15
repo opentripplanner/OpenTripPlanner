@@ -1,5 +1,9 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
+import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLCauseMapper.getLegacyGraphQLCause;
+import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLEffectMapper.getLegacyGraphQLEffect;
+import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLSeverityMapper.getLegacyGraphQLSeverity;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimaps;
@@ -41,6 +45,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
@@ -506,9 +511,44 @@ public class LegacyGraphQLQueryTypeImpl
               .getAllAlerts();
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(
               environment.getArguments());
+      List<String> severities = args.getLegacyGraphQLSeverityLevel() == null
+              ? null
+              : ((List<LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType>) args.getLegacyGraphQLSeverityLevel()).stream()
+                      .map(severity -> severity.label)
+                      .collect(Collectors.toList());
+      List<String> effects = args.getLegacyGraphQLEffect() == null
+              ? null
+              : ((List<LegacyGraphQLTypes.LegacyGraphQLAlertEffectType>) args.getLegacyGraphQLEffect()).stream()
+                      .map(effect -> effect.label)
+                      .collect(Collectors.toList());
+      List<String> causes = args.getLegacyGraphQLCause() == null
+              ? null
+              : ((List<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType>) args.getLegacyGraphQLCause()).stream()
+                      .map(cause -> cause.label)
+                      .collect(Collectors.toList());
       return alerts.stream()
               .filter(alert -> args.getLegacyGraphQLFeeds() == null
                       || ((List<String>) args.getLegacyGraphQLFeeds()).contains(alert.getFeedId()))
+              .filter(alert -> args.getLegacyGraphQLSeverityLevel() == null
+                      || severities.contains(getLegacyGraphQLSeverity(alert.severity)))
+              .filter(alert -> args.getLegacyGraphQLEffect() == null
+                      || effects.contains(getLegacyGraphQLEffect(alert.effect)))
+              .filter(alert -> args.getLegacyGraphQLCause() == null
+                      || causes.contains(getLegacyGraphQLCause(alert.cause)))
+              .filter(alert -> args.getLegacyGraphQLRoute() == null
+                      || alert.getEntities()
+                      .stream()
+                      .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
+                      .map(EntitySelector.Route.class::cast)
+                      .anyMatch(route -> ((List<String>) args.getLegacyGraphQLRoute()).contains(
+                              route.routeId.toString())))
+              .filter(alert -> args.getLegacyGraphQLStop() == null
+                      || alert.getEntities()
+                      .stream()
+                      .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
+                      .map(EntitySelector.Stop.class::cast)
+                      .anyMatch(stop -> ((List<String>) args.getLegacyGraphQLStop()).contains(
+                              stop.stopId.toString())))
               .collect(Collectors.toList());
     };
   }
