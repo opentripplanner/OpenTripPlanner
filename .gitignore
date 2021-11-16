@@ -32,3 +32,6 @@ _site/
 /otp-batch-analyst
 *.DS_Store
 graphs
+Dockerfile
+cloudbuild.yaml
+run-otp.sh
