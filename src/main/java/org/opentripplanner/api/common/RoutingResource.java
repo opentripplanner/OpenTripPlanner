@@ -1,7 +1,7 @@
 package org.opentripplanner.api.common;
 
-import fi.metatavu.airquality.GenericFileConfigurationParser;
-import fi.metatavu.airquality.configuration_parsing.RequestParameters;
+import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
+import org.opentripplanner.ext.airquality.configuration.RequestParameters;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -580,8 +580,6 @@ public abstract class RoutingResource {
     @Deprecated
     @QueryParam("pathComparator")
     private String pathComparator;
-
-
 
     /**
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 

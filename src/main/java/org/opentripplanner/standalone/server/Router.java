@@ -5,7 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;

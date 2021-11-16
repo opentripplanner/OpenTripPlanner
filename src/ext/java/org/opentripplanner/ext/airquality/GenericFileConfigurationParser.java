@@ -1,10 +1,10 @@
-package fi.metatavu.airquality;
+package org.opentripplanner.ext.airquality;
 
 import com.google.gson.Gson;
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
-import fi.metatavu.airquality.configuration_parsing.IndexVariable;
-import fi.metatavu.airquality.configuration_parsing.ParameterType;
-import fi.metatavu.airquality.configuration_parsing.RequestParameters;
+import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.IndexVariable;
+import org.opentripplanner.ext.airquality.configuration.ParameterType;
+import org.opentripplanner.ext.airquality.configuration.RequestParameters;
 import org.opentripplanner.datastore.DataSource;
 
 import java.io.InputStreamReader;

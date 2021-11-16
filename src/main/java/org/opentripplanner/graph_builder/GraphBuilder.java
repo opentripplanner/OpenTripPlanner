@@ -1,11 +1,10 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import fi.metatavu.airquality.EdgeUpdaterModule;
-import fi.metatavu.airquality.GenericDataFile;
-import fi.metatavu.airquality.GenericFileConfigurationParser;
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.EdgeUpdaterModule;
+import org.opentripplanner.ext.airquality.GenericDataFile;
+import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
+import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;

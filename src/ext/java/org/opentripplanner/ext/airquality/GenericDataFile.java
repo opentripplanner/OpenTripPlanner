@@ -1,10 +1,8 @@
-package fi.metatavu.airquality;
+package org.opentripplanner.ext.airquality;
 
-import fi.metatavu.airquality.configuration_parsing.IndexVariable;
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.IndexVariable;
+import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
 import ucar.ma2.Array;
-import ucar.ma2.ArrayFloat;
-import ucar.ma2.ArrayInt;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFiles;
 import ucar.nc2.Variable;

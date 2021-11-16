@@ -1,7 +1,7 @@
-package fi.metatavu.airquality;
+package org.opentripplanner.ext.airquality;
 
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
-import fi.metatavu.airquality.configuration_parsing.TimeUnit;
+import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.TimeUnit;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -51,7 +51,7 @@ public class GenericEdgeUpdater {
     }
 
     /**
-     * Returns ms from epoch for the first data point of the file
+     * Returns ms from epoch for the first data point of the file, by default data format is assumed to be hours
      *
      * @param configuration configuration
      * @return epoch milliseconds
@@ -68,12 +68,10 @@ public class GenericEdgeUpdater {
         } else if (timeFormat == TimeUnit.MS_EPOCH && dataType.equals(Long.TYPE)) {
             return timeArray.getLong(0);
         } else {
-            //default option is hours
             long addSeconds = 0;
             if  (dataType.equals(Double.TYPE)) {
                 addSeconds = (long) (timeArray.getDouble(0) * 3600);
-            }
-            else if (dataType.equals(Float.TYPE)) {
+            } else if (dataType.equals(Float.TYPE)) {
                 addSeconds = (long) (timeArray.getFloat(0) * 3600);
             }
 
@@ -142,7 +140,7 @@ public class GenericEdgeUpdater {
     }
 
     /**
-     * Returns closest property value samples for given line
+     * Returns the closest property value samples for given line
      *
      * Each list cell represent an average of grid data in time
      *
@@ -175,7 +173,7 @@ public class GenericEdgeUpdater {
      *
      * @param samplePoint point
      * @param propertyName propertyName
-     * @return result closest value for selected property for given point
+     * @return result the closest value for selected property for given point
      */
     private <E> List<E> getClosestPropertyValue(Point2D samplePoint, String propertyName) {
         double lon = samplePoint.getX();

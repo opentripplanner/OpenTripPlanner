@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
-import fi.metatavu.airquality.configuration_parsing.RequestParameters;
+import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.RequestParameters;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;

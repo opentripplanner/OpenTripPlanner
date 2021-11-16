@@ -1,8 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
-import fi.metatavu.airquality.GenericFileConfigurationParser;
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
-import fi.metatavu.airquality.configuration_parsing.RequestParameters;
+import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
+import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
@@ -20,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
-
-import java.util.Map;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 

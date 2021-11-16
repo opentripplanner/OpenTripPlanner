@@ -1,4 +1,4 @@
-package fi.metatavu.airquality.configuration_parsing;
+package org.opentripplanner.ext.airquality.configuration;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,9 +1,6 @@
-package fi.metatavu.airquality;
-
-import ucar.ma2.ArrayFloat;
+package org.opentripplanner.ext.airquality;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.Map;
 
 /**

@@ -1,4 +1,4 @@
-package fi.metatavu.airquality;
+package org.opentripplanner.ext.airquality;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +77,6 @@ public class EdgeGenQuality <E extends  Number> {
     }
 
    return calculateAverage(values);
-
   }
 
   /**
@@ -95,8 +94,7 @@ public class EdgeGenQuality <E extends  Number> {
         total += (Integer) value;
       }
       return (float) total / len;
-    }
-    else if (values.get(0) instanceof Float) {
+    } else if (values.get(0) instanceof Float) {
       float sum = 0f;
 
       for (E value : values) {
@@ -104,24 +102,21 @@ public class EdgeGenQuality <E extends  Number> {
       }
 
       return sum / len;
-    }
-    else if (values.get(0) instanceof Double) {
+    } else if (values.get(0) instanceof Double) {
       double sum = 0;
 
       for (E value : values) {
         sum += (double) value;
       }
       return (float) sum / len;
-    }
-    else  if (values.get(0) instanceof Long) {
+    } else  if (values.get(0) instanceof Long) {
       Long total = 0L;
 
       for (E value : values){
         total += (Long) value;
       }
       return (float) total / len;
-    }
-    else {
+    } else {
       throw new UnsupportedOperationException("Unrecognizable format of "+values.get(0));
     }
   }
@@ -135,5 +130,4 @@ public class EdgeGenQuality <E extends  Number> {
   private List<E> getPropertyValuesInTime(int time) {
     return gridDataVariableValues.get(time);
   }
-
 }

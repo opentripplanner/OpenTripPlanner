@@ -1,7 +1,7 @@
-package fi.metatavu.airquality;
+package org.opentripplanner.ext.airquality;
 
 
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;

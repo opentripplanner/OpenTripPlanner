@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
-import fi.metatavu.airquality.EdgeDataFromGenericFile;
-import fi.metatavu.airquality.configuration_parsing.RequestParameters;
-import fi.metatavu.airquality.configuration_parsing.TimeUnit;
+import org.opentripplanner.ext.airquality.EdgeDataFromGenericFile;
+import org.opentripplanner.ext.airquality.configuration.RequestParameters;
+import org.opentripplanner.ext.airquality.configuration.TimeUnit;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
