@@ -45,7 +45,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleE
  *     <li>Multi-criteria pareto optimal Range Raptor (McRR)
  *     <li>Reverse search in combination with R and RR
  * </ul>
- * This version do NOT support the following features:
+ * This version does NOT support the following features:
  * <ul>
  *     <li>Frequency routes, supported by the original code using Monte Carlo methods
  *     (generating randomized schedules)

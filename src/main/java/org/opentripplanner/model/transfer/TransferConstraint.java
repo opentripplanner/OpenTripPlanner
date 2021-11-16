@@ -110,6 +110,11 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         return staySeated || guaranteed;
     }
 
+    @Override
+    public boolean isNotAllowed() {
+        return priority == NOT_ALLOWED;
+    }
+
     /**
      * Maximum time after scheduled departure time the connecting transport is guarantied to wait
      * for the delayed trip.

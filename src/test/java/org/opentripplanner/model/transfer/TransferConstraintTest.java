@@ -16,6 +16,7 @@ public class TransferConstraintTest implements TransferTestData {
   private final TransferConstraint RECOMMENDED = TransferConstraint.create().recommended().build();
   private final TransferConstraint STAY_SEATED = TransferConstraint.create().staySeated().build();
   private final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
+  private final TransferConstraint NOT_ALLOWED = TransferConstraint.create().notAllowed().build();
   private final TransferConstraint MAX_WAIT_TIME = TransferConstraint.create()
           .guaranteed().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
   private final TransferConstraint EVERYTHING = TransferConstraint.create()
@@ -44,6 +45,14 @@ public class TransferConstraintTest implements TransferTestData {
     assertTrue(GUARANTIED.isFacilitated());
     assertTrue(STAY_SEATED.isFacilitated());
     assertFalse(NO_CONSTRAINS.isFacilitated());
+    assertFalse(NOT_ALLOWED.isFacilitated());
+  }
+
+  @Test
+  public void isNotAllowed() {
+    assertTrue(NOT_ALLOWED.isNotAllowed());
+    assertFalse(GUARANTIED.isNotAllowed());
+    assertFalse(NO_CONSTRAINS.isNotAllowed());
   }
 
   @Test
