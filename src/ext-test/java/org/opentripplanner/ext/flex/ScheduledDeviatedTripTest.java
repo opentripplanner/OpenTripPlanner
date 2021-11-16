@@ -143,7 +143,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
                 0,
                 List.of(),
                 null,
-                new State(new StreetLocation(id, new Coordinate(0, 0), id), r));
+                new State(new StreetLocation(id, new Coordinate(0, 0), id), r)
+        );
     }
 
     private static FlexTrip getFlexTrip() {
