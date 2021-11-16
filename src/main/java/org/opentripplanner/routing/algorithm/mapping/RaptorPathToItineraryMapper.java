@@ -187,7 +187,7 @@ public class RaptorPathToItineraryMapper {
         leg.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
 
         // intermediate stops are required for fare calculation that's why we always add them here
-        // and remove them after the fare calculation if they were not requested.
+        // and remove them in the API layers after the fare calculation if they were not requested.
         leg.intermediateStops = extractIntermediateStops(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern);
 
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);

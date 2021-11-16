@@ -236,7 +236,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
-    // TODO OTP2 Maybe this should be up to the API?
     public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */

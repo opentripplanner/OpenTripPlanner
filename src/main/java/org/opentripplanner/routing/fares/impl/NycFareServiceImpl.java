@@ -307,45 +307,50 @@ public class NycFareServiceImpl implements FareService {
 	}
 
 	private static List<Ride> createRides(Itinerary itinerary) {
-		return itinerary.legs.stream().map(leg -> {
-			// It seems like we should do something more sophisticated than just ignore
-			// agency IDs we don't recognize.
-			if (!AGENCIES.contains(leg.getAgency().getId().getFeedId())) {
-				return null;
-			} else if (isTransferLeg(leg, itinerary)) {
-				Ride ride = new Ride();
-				ride.classifier = NycRideClassifier.WALK;
-				return ride;
-			} else if (leg.isTransitLeg()) {
+		return itinerary.legs.stream()
+				.map(leg -> mapToRide(itinerary, leg))
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+	}
 
-				Ride ride = RideMapper.rideForTransitPathLeg(leg);
-				Route route = leg.getRoute();
-				int routeType = route.getType();
-
-				// Note the old implementation directly used the ints as classifiers here.
-				if (routeType == 1) {
-					ride.classifier = NycRideClassifier.SUBWAY;
-				} else if (routeType == 2) {
-					// All rail is Staten Island Railway? This won't work for LIRR and MNRR.
-					ride.classifier = NycRideClassifier.SIR;
-				} else if (routeType == 3) {
-					ride.classifier = NycRideClassifier.LOCAL_BUS;
-				}
-				String shortName = route.getShortName();
-				if (shortName == null ) {
-					ride.classifier = NycRideClassifier.SUBWAY;
-				} else if (shortName.equals("BxM4C")) {
-					ride.classifier = NycRideClassifier.EXPENSIVE_EXPRESS_BUS;
-				} else if (shortName.startsWith("X")
-						|| shortName.startsWith("BxM")
-						|| shortName.startsWith("QM")
-						|| shortName.startsWith("BM")) {
-					ride.classifier = NycRideClassifier.EXPRESS_BUS;
-				}
-				return ride;
-			}
+	private static Ride mapToRide(Itinerary itinerary, Leg leg) {
+		// It seems like we should do something more sophisticated than just ignore
+		// agency IDs we don't recognize.
+		if (!AGENCIES.contains(leg.getAgency().getId().getFeedId())) {
 			return null;
-		}).filter(Objects::nonNull).collect(Collectors.toList());
+		} else if (isTransferLeg(leg, itinerary)) {
+			Ride ride = new Ride();
+			ride.classifier = NycRideClassifier.WALK;
+			return ride;
+		} else if (leg.isTransitLeg()) {
+
+			Ride ride = RideMapper.rideForTransitPathLeg(leg);
+			Route route = leg.getRoute();
+			int routeType = route.getType();
+
+			// Note the old implementation directly used the ints as classifiers here.
+			if (routeType == 1) {
+				ride.classifier = NycRideClassifier.SUBWAY;
+			} else if (routeType == 2) {
+				// All rail is Staten Island Railway? This won't work for LIRR and MNRR.
+				ride.classifier = NycRideClassifier.SIR;
+			} else if (routeType == 3) {
+				ride.classifier = NycRideClassifier.LOCAL_BUS;
+			}
+			String shortName = route.getShortName();
+			if (shortName == null ) {
+				ride.classifier = NycRideClassifier.SUBWAY;
+			} else if (shortName.equals("BxM4C")) {
+				ride.classifier = NycRideClassifier.EXPENSIVE_EXPRESS_BUS;
+			} else if (shortName.startsWith("X")
+					|| shortName.startsWith("BxM")
+					|| shortName.startsWith("QM")
+					|| shortName.startsWith("BM")) {
+				ride.classifier = NycRideClassifier.EXPRESS_BUS;
+			}
+			return ride;
+		}
+		return null;
 	}
 
 	private static boolean isTransferLeg(Leg leg, Itinerary itinerary) {
