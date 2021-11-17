@@ -196,12 +196,12 @@ public class OSMDatabase {
         return level != null ? level : OSMLevel.DEFAULT;
     }
 
-    public boolean isNodeSharedByMultipleAreas(Long nodeId) {
+    public Set<OSMWay> getAreasForNode(Long nodeId) {
         Set<OSMWay> areas = areasForNode.get(nodeId);
         if (areas == null) {
-            return false;
+            return Set.of();
         }
-        return areas.size() > 1;
+        return areas;
     }
 
     public boolean isNodeBelongsToWay(Long nodeId) {
