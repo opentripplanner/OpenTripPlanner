@@ -643,16 +643,7 @@
         </dependency>
         <!-- OBA GTFS loader -->
         <dependency>
-            <!--
-            This is a forked version of OBA which contains the code from version 1.3.102
-            plus this PR: https://github.com/OneBusAway/onebusaway-gtfs-modules/pull/183
-
-            It's deployed to Maven Central https://repo1.maven.org/maven2/io/leonard/onebusaway-gtfs/
-            and the source code is here: https://github.com/ibi-group/onebusaway-gtfs-modules/tree/release
-
-            Once that PR has been merged we can switch back to the official groupId "org.onebusaway".
-            -->
-            <groupId>io.leonard</groupId>
+            <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
             <version>1.3.103</version>
         </dependency>
