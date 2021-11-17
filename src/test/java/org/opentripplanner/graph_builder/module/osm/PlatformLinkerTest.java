@@ -4,6 +4,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class PlatformLinkerTest {
@@ -27,11 +29,6 @@ public class PlatformLinkerTest {
     public void testLinkEntriesToPlatforms() throws Exception {
 
         String stairsEndpointLabel = "osm:node:1028861028";
-
-        List<String> platformRingVertexLabels = Arrays.asList("osm:node:304045332", "osm:node:3238357455", "osm:node:1475363433",
-                "osm:node:3238357491", "osm:node:1475363427", "osm:node:304045336", "osm:node:304045337", "osm:node:1475363437",
-                "osm:node:3238357483", "osm:node:1475363443", "osm:node:1028860941", "osm:node:304045341", "osm:node:304045332");
-
 
         Graph gg = new Graph();
         OpenStreetMapModule loader = new OpenStreetMapModule();
@@ -51,18 +48,10 @@ public class PlatformLinkerTest {
         Vertex stairsEndpoint = gg.getVertex(stairsEndpointLabel);
 
         // verify outgoing links
-        List<String> linkedRingVertecies = stairsEndpoint.getOutgoing().stream().map(edge -> edge.getToVertex().getLabel()).collect(Collectors.toList());
-        assertEquals(linkedRingVertecies.size() -2, platformRingVertexLabels.size());  // the endpoint has links to two nodes in OSM
-        for(String label : platformRingVertexLabels){
-            assert(linkedRingVertecies.contains(label));
-        }
+        assertTrue(stairsEndpoint.getOutgoing().stream().anyMatch(AreaEdge.class::isInstance));
 
         // verify incoming links
-        List<String> linkedRingVerteciesInn = stairsEndpoint.getIncoming().stream().map(edge -> edge.getFromVertex().getLabel()).collect(Collectors.toList());
-        assertEquals(linkedRingVerteciesInn.size() -2, platformRingVertexLabels.size());  // the endpoint has links to two nodes in OSM
-        for(String label : platformRingVertexLabels){
-            assert(linkedRingVerteciesInn.contains(label));
-        }
+        assertTrue(stairsEndpoint.getIncoming().stream().anyMatch(AreaEdge.class::isInstance));
 
     }
 
