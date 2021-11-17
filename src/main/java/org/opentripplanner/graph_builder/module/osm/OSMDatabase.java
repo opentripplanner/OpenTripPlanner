@@ -690,9 +690,11 @@ public class OSMDatabase {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
                 // the area; we'll mark it as processed so that we don't retry.
+                issueStore.add("InvalidGeometry", "Invalid geometry for osm way %s", way.getId());
             } catch (IllegalArgumentException iae) {
                 // This occurs when there are an invalid number of points in a LinearRing
                 // Mark the ring as processed so we don't retry it.
+                issueStore.add("InvalidGeometry", "Invalid geometry for osm way %s", way.getId());
             }
             processedAreas.add(way);
         }
@@ -745,6 +747,7 @@ public class OSMDatabase {
             try {
                 newArea(new Area(relation, outerWays, innerWays, nodesById));
             } catch (Area.AreaConstructionException|Ring.RingConstructionException e) {
+                issueStore.add("InvalidGeometry", "Invalid geometry for osm relation %s", relation.getId());
                 continue;
             }
 

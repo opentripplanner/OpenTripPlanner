@@ -8,6 +8,7 @@ import java.util.List;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TLongObjectMap;
+import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -58,24 +59,29 @@ class Area {
 
         List<Ring> outermostRings = new ArrayList<>();
 
-        // now, ring grouping
-        // first, find outermost rings
-        OUTER: for (Ring outer : outerRings) {
-            for (Ring possibleContainer : outerRings) {
-                if (outer != possibleContainer
-                        && outer.jtsPolygon.within(possibleContainer.jtsPolygon)) {
-                    continue OUTER;
+        try {
+            // now, ring grouping
+            // first, find outermost rings
+            OUTER: for (Ring outer : outerRings) {
+                for (Ring possibleContainer : outerRings) {
+                    if (outer != possibleContainer
+                            && outer.jtsPolygon.within(possibleContainer.jtsPolygon)) {
+                        continue OUTER;
+                    }
                 }
-            }
-            outermostRings.add(outer);
+                outermostRings.add(outer);
 
-            // find holes in this ring
-            for (Ring possibleHole : innerRings) {
-                if (possibleHole.jtsPolygon.within(outer.jtsPolygon)) {
-                    outer.addHole(possibleHole);
+                // find holes in this ring
+                for (Ring possibleHole : innerRings) {
+                    if (possibleHole.jtsPolygon.within(outer.jtsPolygon)) {
+                        outer.addHole(possibleHole);
+                    }
                 }
             }
+        } catch (TopologyException ex) {
+            throw new AreaConstructionException();
         }
+
         // Make outermostRings immutable
         this.outermostRings = List.copyOf(outermostRings);
         // run this at end of ctor so that exception
