@@ -610,7 +610,7 @@ public class OSMDatabase {
             }
         }
 
-        ring.holes.forEach(hole -> processAreaRingForUnconnectedAreas(commonSegments, spndx, area, hole));
+        ring.getHoles().forEach(hole -> processAreaRingForUnconnectedAreas(commonSegments, spndx, area, hole));
     }
 
     /**

@@ -591,7 +591,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
 
             accessVertices.addAll(
-                    ring.holes.stream()
+                    ring.getHoles().stream()
                             .flatMap(innerRing -> processVehicleParkingArea(innerRing, entity, envelope).stream())
                             .collect(Collectors.toList())
             );
@@ -1063,7 +1063,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
             }
 
-            outerRing.holes.forEach(hole -> intersectAreaRingNodes(possibleIntersectionNodes, hole));
+            outerRing.getHoles().forEach(hole -> intersectAreaRingNodes(possibleIntersectionNodes, hole));
         }
 
         /**

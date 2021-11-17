@@ -24,12 +24,12 @@ public class Ring {
 
     public List<OSMNode> nodes;
 
-    public Coordinate[] geometry;
+    private Coordinate[] geometry;
 
-    public List<Ring> holes = new ArrayList<Ring>();
+    private List<Ring> holes = new ArrayList<Ring>();
 
     // equivalent to the ring representation, but used for JTS operations
-    private Polygon jtsPolygon;
+    public Polygon jtsPolygon;
 
     public Ring(List<OSMNode> osmNodes) {
         ArrayList<Coordinate> vertices = new ArrayList<>();
@@ -39,6 +39,7 @@ public class Ring {
             vertices.add(point);
         }
         geometry = vertices.toArray(new Coordinate[0]);
+        jtsPolygon = calculateJtsPolygon();
     }
 
     public Ring(TLongList osmNodes, TLongObjectMap<OSMNode> _nodes) {
@@ -46,22 +47,25 @@ public class Ring {
         nodes = new ArrayList<>(osmNodes.size());
         osmNodes.forEach(nodeId -> {
             OSMNode node = _nodes.get(nodeId);
-            if (nodes.contains(node)) {
-                // Hopefully, this only happens in order to close polygons. Next iteration.
-                return true;
-            }
             Coordinate point = new Coordinate(node.lon, node.lat);
             nodes.add(node);
             vertices.add(point);
             return true;
         });
         geometry = vertices.toArray(new Coordinate[0]);
+        jtsPolygon = calculateJtsPolygon();
     }
 
-    public Polygon toJtsPolygon() {
-        if (jtsPolygon != null) {
-            return jtsPolygon;
-        }
+    public List<Ring> getHoles() {
+        return holes;
+    }
+
+    public void addHole(Ring hole) {
+        holes.add(hole);
+        jtsPolygon = calculateJtsPolygon();
+    }
+
+    private Polygon calculateJtsPolygon() {
         GeometryFactory factory = GeometryUtils.getGeometryFactory();
 
         LinearRing shell;
@@ -104,8 +108,7 @@ public class Ring {
             }
         }
         LinearRing[] lrholes = lrholelist.toArray(new LinearRing[lrholelist.size()]);
-        jtsPolygon = factory.createPolygon(shell, lrholes);
-        return jtsPolygon;
+        return factory.createPolygon(shell, lrholes);
     }
 
 }

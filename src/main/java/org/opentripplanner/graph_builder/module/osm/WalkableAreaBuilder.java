@@ -128,7 +128,7 @@ public class WalkableAreaBuilder {
         for (Ring ring : group.outermostRings) {
 
             AreaEdgeList edgeList = new AreaEdgeList();
-            edgeList.setOriginalEdges(ring.toJtsPolygon());
+            edgeList.setOriginalEdges(ring.jtsPolygon);
             // the points corresponding to concave or hole vertices
             // or those linked to ways
             HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
@@ -137,7 +137,7 @@ public class WalkableAreaBuilder {
             // and to avoid the numerical problems that they tend to cause
             for (Area area : group.areas) {
 
-                if (!ring.toJtsPolygon().contains(area.toJTSMultiPolygon())) {
+                if (!ring.jtsPolygon.contains(area.jtsMultiPolygon)) {
                     continue;
                 }
 
@@ -147,7 +147,7 @@ public class WalkableAreaBuilder {
                             alreadyAddedEdges);
                     }
                     //TODO: is this actually needed?
-                    for (Ring innerRing : outerRing.holes) {
+                    for (Ring innerRing : outerRing.getHoles()) {
                         for (int j = 0; j < innerRing.nodes.size(); ++j) {
                             createEdgesForRingSegment(edges, edgeList, area, innerRing, j,
                                 alreadyAddedEdges);
@@ -171,7 +171,8 @@ public class WalkableAreaBuilder {
         for (Ring ring : group.outermostRings) {
 
             AreaEdgeList edgeList = new AreaEdgeList();
-            edgeList.setOriginalEdges(ring.toJtsPolygon());
+            Polygon polygon = ring.jtsPolygon;
+            edgeList.setOriginalEdges(polygon);
             // the points corresponding to concave or hole vertices
             // or those linked to ways
             ArrayList<OSMNode> visibilityNodes = new ArrayList<OSMNode>();
@@ -185,7 +186,7 @@ public class WalkableAreaBuilder {
             // we also want to fill in the edges of this area anyway, because we can,
             // and to avoid the numerical problems that they tend to cause
             for (Area area : group.areas) {
-                if (!ring.toJtsPolygon().contains(area.toJTSMultiPolygon())) {
+                if (!polygon.contains(area.jtsMultiPolygon)) {
                     continue;
                 }
 
@@ -202,7 +203,7 @@ public class WalkableAreaBuilder {
                     if (platformEntriesLinking
                             && "platform".equals(area.parent.getTag("public_transport"))) {
                         List<OsmVertex> endpointsWithin = platformLinkingEndpoints.stream()
-                            .filter(t -> outerRing.toJtsPolygon()
+                            .filter(t -> outerRing.jtsPolygon
                                     .contains(geometryFactory.createPoint(t.getCoordinate())))
                             .collect(Collectors.toList());
                         for (OsmVertex v : endpointsWithin) {
@@ -217,7 +218,7 @@ public class WalkableAreaBuilder {
                                 alreadyAddedEdges);
                         addtoVisibilityAndStartSets(startingNodes, visibilityNodes, node);
                     }
-                    for (Ring innerRing : outerRing.holes) {
+                    for (Ring innerRing : outerRing.getHoles()) {
                         for (int j = 0; j < innerRing.nodes.size(); ++j) {
                             OSMNode node = innerRing.nodes.get(j);
                             createEdgesForRingSegment(edges, edgeList, area, innerRing, j,
@@ -412,7 +413,7 @@ public class WalkableAreaBuilder {
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
         LineString line = geometryFactory.createLineString(coordinates);
         for (Area area : areas) {
-            MultiPolygon polygon = area.toJTSMultiPolygon();
+            MultiPolygon polygon = area.jtsMultiPolygon;
             Geometry intersection = polygon.intersection(line);
             if (intersection.getLength() > 0.000001) {
                 intersects.add(area);
@@ -484,7 +485,7 @@ public class WalkableAreaBuilder {
             Coordinate startCoordinate = startEndpoint.getCoordinate();
             Point startPoint = geometryFactory.createPoint(startCoordinate);
             for (Area area : intersects) {
-                MultiPolygon polygon = area.toJTSMultiPolygon();
+                MultiPolygon polygon = area.jtsMultiPolygon;
                 if (!(polygon.intersects(startPoint) || polygon.getBoundary()
                         .intersects(startPoint)))
                     continue;
@@ -532,9 +533,9 @@ public class WalkableAreaBuilder {
     }
 
     private void createNamedAreas(AreaEdgeList edgeList, Ring ring, Collection<Area> areas) {
-        Polygon containingArea = ring.toJtsPolygon();
+        Polygon containingArea = ring.jtsPolygon;
         for (Area area : areas) {
-            Geometry intersection = containingArea.intersection(area.toJTSMultiPolygon());
+            Geometry intersection = containingArea.intersection(area.jtsMultiPolygon);
             if (intersection.getArea() == 0) {
                 continue;
             }
