@@ -5,7 +5,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
@@ -39,8 +38,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.visibility.VLPoint;
-import org.opentripplanner.visibility.VLPolygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,27 +226,10 @@ public class WalkableAreaBuilder {
                     }
                 }
             }
-            List<OSMNode> nodes = new ArrayList<OSMNode>();
-            List<VLPoint> vertices = new ArrayList<VLPoint>();
-            accumulateRingNodes(ring, nodes, vertices);
-            VLPolygon polygon = makeStandardizedVLPolygon(vertices, nodes, false);
-            accumulateVisibilityPoints(ring.nodes, polygon, visibilityNodes, false);
-
-            Geometry poly = toJTSPolygon(polygon);
-            // holes
-            for (Ring innerRing : ring.holes) {
-                ArrayList<OSMNode> holeNodes = new ArrayList<OSMNode>();
-                vertices = new ArrayList<VLPoint>();
-                accumulateRingNodes(innerRing, holeNodes, vertices);
-                VLPolygon hole = makeStandardizedVLPolygon(vertices, holeNodes, true);
-                accumulateVisibilityPoints(innerRing.nodes, hole, visibilityNodes, true);
-                nodes.addAll(holeNodes);
-                poly.difference(toJTSPolygon(hole));
-            }
 
             // FIXME: temporary hard limit on size of
             // areas to prevent way explosion
-            if (visibilityNodes.size() > maxAreaNodes) {
+            if (polygon.getNumPoints() > maxAreaNodes) {
                 issueStore.add(
                         new AreaTooComplicated(
                                 group.getSomeOSMObject().getId(), visibilityNodes.size(),
@@ -278,8 +258,7 @@ public class WalkableAreaBuilder {
                     Coordinate[] coordinates = new Coordinate[] { startEndpoint.getCoordinate(),
                             endEndpoint.getCoordinate() };
                     LineString line = geometryFactory.createLineString(coordinates);
-                    if (poly != null && poly.contains(line)) {
-
+                    if (polygon.contains(line)) {
                         edges.addAll(
                             createSegments(startEndpoint, endEndpoint, group.areas, edgeList)
                         );
@@ -370,24 +349,6 @@ public class WalkableAreaBuilder {
                 visibilityNodes.add(node);
             }
         }
-    }
-
-    private Polygon toJTSPolygon(VLPolygon visibilityPolygon) {
-        if (visibilityPolygon.vertices.isEmpty()) {
-            return null;
-        }
-        // incomprehensibly, visilibity's routines for figuring out point-polygon containment are
-        // too broken
-        // to use here, so we have to fall back to JTS.
-        Coordinate[] coordinates = new Coordinate[visibilityPolygon.n() + 1];
-
-        for (int p = 0; p < coordinates.length; ++p) {
-            VLPoint vlPoint = visibilityPolygon.get(p);
-            coordinates[p] = new Coordinate(vlPoint.x, vlPoint.y);
-        }
-        LinearRing shell = GeometryUtils.getGeometryFactory().createLinearRing(coordinates);
-        Polygon poly = GeometryUtils.getGeometryFactory().createPolygon(shell, new LinearRing[0]);
-        return poly;
     }
 
     private Set<Edge> createEdgesForRingSegment(AreaEdgeList edgeList, Area area,
@@ -562,95 +523,6 @@ public class WalkableAreaBuilder {
             namedArea.setPermission(permission);
 
             edgeList.addArea(namedArea);
-        }
-    }
-
-    private void accumulateRingNodes(Ring ring, List<OSMNode> nodes, List<VLPoint> vertices) {
-        for (OSMNode node : ring.nodes) {
-            if (nodes.contains(node)) {
-                // hopefully, this only happens in order to
-                // close polygons
-                continue;
-            }
-            VLPoint point = new VLPoint(node.lon, node.lat);
-            nodes.add(node);
-            vertices.add(point);
-        }
-    }
-
-    private void accumulateVisibilityPoints(List<OSMNode> nodes, VLPolygon polygon,
-            List<OSMNode> visibilityNodes, boolean hole) {
-        int n = polygon.vertices.size();
-        for (int i = 0; i < n; ++i) {
-            OSMNode curNode = nodes.get(i);
-            VLPoint cur = polygon.vertices.get(i);
-            VLPoint prev = polygon.vertices.get((i + n - 1) % n);
-            VLPoint next = polygon.vertices.get((i + 1) % n);
-            if (hole
-                    || (cur.x - prev.x) * (next.y - cur.y) - (cur.y - prev.y) * (next.x - cur.x) > 0) {
-                // that math up there is a cross product to check
-                // if the point is concave. Note that the sign is reversed because
-                // visilibity is either ccw or latitude-major
-
-                if (!visibilityNodes.contains(curNode)) {
-                    visibilityNodes.add(curNode);
-                }
-            }
-        }
-    }
-
-    private VLPolygon makeStandardizedVLPolygon(List<VLPoint> vertices, List<OSMNode> nodes,
-            boolean reversed) {
-        VLPolygon polygon = new VLPolygon(vertices);
-
-        if ((reversed && polygon.area() > 0) || (!reversed && polygon.area() < 0)) {
-            polygon.reverse();
-            // need to reverse nodes as well
-            reversePolygonOfOSMNodes(nodes);
-        }
-
-        if (!polygon.is_in_standard_form()) {
-            standardize(polygon.vertices, nodes);
-        }
-        return polygon;
-    }
-
-    private void standardize(ArrayList<VLPoint> vertices, List<OSMNode> nodes) {
-        // based on code from VisiLibity
-        int point_count = vertices.size();
-        if (point_count > 1) { // if more than one point in the polygon.
-            ArrayList<VLPoint> vertices_temp = new ArrayList<VLPoint>(point_count);
-            ArrayList<OSMNode> nodes_temp = new ArrayList<OSMNode>(point_count);
-            // Find index of lexicographically smallest point.
-            int index_of_smallest = 0;
-            for (int i = 1; i < point_count; i++)
-                if (vertices.get(i).compareTo(vertices.get(index_of_smallest)) < 0)
-                    index_of_smallest = i;
-            // minor optimization for already-standardized polygons
-            if (index_of_smallest == 0)
-                return;
-            // Fill vertices_temp starting with lex. smallest.
-            for (int i = index_of_smallest; i < point_count; i++) {
-                vertices_temp.add(vertices.get(i));
-                nodes_temp.add(nodes.get(i));
-            }
-            for (int i = 0; i < index_of_smallest; i++) {
-                vertices_temp.add(vertices.get(i));
-                nodes_temp.add(nodes.get(i));
-            }
-            for (int i = 0; i < point_count; ++i) {
-                vertices.set(i, vertices_temp.get(i));
-                nodes.set(i, nodes_temp.get(i));
-            }
-        }
-    }
-
-    private void reversePolygonOfOSMNodes(List<OSMNode> nodes) {
-        for (int i = 1; i < (nodes.size() + 1) / 2; ++i) {
-            OSMNode tmp = nodes.get(i);
-            int opposite = nodes.size() - i;
-            nodes.set(i, nodes.get(opposite));
-            nodes.set(opposite, tmp);
         }
     }
 
