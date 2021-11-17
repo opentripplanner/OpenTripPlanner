@@ -54,13 +54,6 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
      */
     private final List<GraphUpdater> updaterList = new ArrayList<>();
 
-
-    /**
-     * This is set to true after all updaters are ready and the initial set of updates are
-     * processed.
-     */
-    private boolean allUpdatersPrimed = false;
-
     /**
      * The Graph that will be updated.
      */
@@ -155,7 +148,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
      * Return the number of updaters started, but not ready.
      * @see GraphUpdater#isPrimed()
      */
-    public List<String> listNonePrimedUpdaters() {
+    public List<String> listUnprimedUpdaters() {
         return updaterList.stream()
                 .filter(Predicate.not(GraphUpdater::isPrimed))
                 .map(GraphUpdater::getConfigRef)
@@ -197,8 +190,10 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
     }
 
     /**
-     * This method start a task during startup, witch update the 'numberOfNonePrimedUpdaters'. It
-     * does so in its own thread, using busy-wait(anti-pattern). The ideal would be to add a
+     * This method start a task during startup and log a message when all updaters are initialized.
+     * When all updaters are ready, then OTP is ready for processing routing requests.
+     * <p>
+     * It starts its own thread using busy-wait(anti-pattern). The ideal would be to add a
      * callback from each updater to notify the manager about 'isPrimed'. But, this is simple, the
      * thread is mostly idle, and it is short-lived, so the busy-wait is a compromise.
      */
@@ -207,8 +202,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
             while (true) {
                 try {
                     if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
-                        allUpdatersPrimed = true;
-                        LOG.info("All updaters initialized");
+                        LOG.info("OTP UPDATERS INITIALIZED - OTP is read for routing!");
                         return;
                     }
                     //noinspection BusyWait
