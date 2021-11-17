@@ -234,8 +234,13 @@ public class WalkableAreaBuilder {
 
                     for (int i = 0; i < outerRing.nodes.size(); ++i) {
                         OSMNode node = outerRing.nodes.get(i);
-                        Set<Edge> newEdges = createEdgesForRingSegment(edgeList, area, outerRing, i,
-                                alreadyAddedEdges);
+                        Set<AreaEdge> newEdges = createEdgesForRingSegment(
+                            edgeList,
+                            area,
+                            outerRing,
+                            i,
+                            alreadyAddedEdges
+                        );
                         edges.addAll(newEdges);
                         ringEdges.addAll(newEdges);
                         // TODO: this is really needed only for convex nodes
@@ -293,9 +298,13 @@ public class WalkableAreaBuilder {
                     };
                     LineString line = geometryFactory.createLineString(coordinates);
                     if (polygon.contains(line)) {
-                        edges.addAll(
-                            createSegments(startEndpoint, endEndpoint, group.areas, edgeList)
+                        Set<AreaEdge> segments = createSegments(
+                            startEndpoint,
+                            endEndpoint,
+                            group.areas,
+                            edgeList
                         );
+                        edges.addAll(segments);
                         if (startingNodes.contains(nodeI)) {
                             startingVertices.add(startEndpoint);
                         }
@@ -381,7 +390,7 @@ public class WalkableAreaBuilder {
             || node.isStop();
     }
 
-    private Set<Edge> createEdgesForRingSegment(AreaEdgeList edgeList, Area area,
+    private Set<AreaEdge> createEdgesForRingSegment(AreaEdgeList edgeList, Area area,
             Ring ring, int i, HashSet<P2<OSMNode>> alreadyAddedEdges) {
         OSMNode node = ring.nodes.get(i);
         OSMNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
@@ -396,7 +405,7 @@ public class WalkableAreaBuilder {
         return createSegments(startEndpoint, endEndpoint, List.of(area), edgeList);
     }
 
-    private Set<Edge> createSegments(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
+    private Set<AreaEdge> createSegments(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
             Collection<Area> areas, AreaEdgeList edgeList
     ) {
         List<Area> intersects = new ArrayList<Area>();
@@ -475,7 +484,7 @@ public class WalkableAreaBuilder {
             // take the part that intersects with the start vertex
             Coordinate startCoordinate = startEndpoint.getCoordinate();
             Point startPoint = geometryFactory.createPoint(startCoordinate);
-            Set<Edge> edges = new HashSet<>();
+            Set<AreaEdge> edges = new HashSet<>();
             for (Area area : intersects) {
                 MultiPolygon polygon = area.jtsMultiPolygon;
                 if (!(polygon.intersects(startPoint) || polygon.getBoundary()
