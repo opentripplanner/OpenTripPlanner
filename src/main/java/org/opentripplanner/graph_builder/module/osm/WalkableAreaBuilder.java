@@ -143,14 +143,13 @@ public class WalkableAreaBuilder {
 
                 for (Ring outerRing : area.outermostRings) {
                     for (int i = 0; i < outerRing.nodes.size(); ++i) {
-                        createEdgesForRingSegment(edges, edgeList, area, outerRing, i,
-                            alreadyAddedEdges);
+                        edges.addAll(createEdgesForRingSegment(edgeList, area, outerRing, i, alreadyAddedEdges));
                     }
                     //TODO: is this actually needed?
                     for (Ring innerRing : outerRing.getHoles()) {
                         for (int j = 0; j < innerRing.nodes.size(); ++j) {
-                            createEdgesForRingSegment(edges, edgeList, area, innerRing, j,
-                                alreadyAddedEdges);
+                            edges.addAll(createEdgesForRingSegment(edgeList, area, innerRing, j,
+                                alreadyAddedEdges));
                         }
                     }
                 }
@@ -214,15 +213,16 @@ public class WalkableAreaBuilder {
 
                     for (int i = 0; i < outerRing.nodes.size(); ++i) {
                         OSMNode node = outerRing.nodes.get(i);
-                        createEdgesForRingSegment(edges, edgeList, area, outerRing, i,
+                        Set<Edge> newEdges = createEdgesForRingSegment(edgeList, area, outerRing, i,
                                 alreadyAddedEdges);
+                        edges.addAll(newEdges);
                         addtoVisibilityAndStartSets(startingNodes, visibilityNodes, node);
                     }
                     for (Ring innerRing : outerRing.getHoles()) {
                         for (int j = 0; j < innerRing.nodes.size(); ++j) {
                             OSMNode node = innerRing.nodes.get(j);
-                            createEdgesForRingSegment(edges, edgeList, area, innerRing, j,
-                                    alreadyAddedEdges);
+                            edges.addAll(createEdgesForRingSegment(edgeList, area, innerRing, j,
+                                    alreadyAddedEdges));
                             addtoVisibilityAndStartSets(startingNodes, visibilityNodes, node);
                         }
                     }
@@ -280,7 +280,9 @@ public class WalkableAreaBuilder {
                     LineString line = geometryFactory.createLineString(coordinates);
                     if (poly != null && poly.contains(line)) {
 
-                        createSegments(startEndpoint, endEndpoint, group.areas, edgeList, edges);
+                        edges.addAll(
+                            createSegments(startEndpoint, endEndpoint, group.areas, edgeList)
+                        );
                         if (startingNodes.contains(nodeI)) {
                             startingVertices.add(startEndpoint);
                         }
@@ -388,23 +390,23 @@ public class WalkableAreaBuilder {
         return poly;
     }
 
-    private void createEdgesForRingSegment(Set<Edge> edges, AreaEdgeList edgeList, Area area,
+    private Set<Edge> createEdgesForRingSegment(AreaEdgeList edgeList, Area area,
             Ring ring, int i, HashSet<P2<OSMNode>> alreadyAddedEdges) {
         OSMNode node = ring.nodes.get(i);
         OSMNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
         P2<OSMNode> nodePair = new P2<OSMNode>(node, nextNode);
         if (alreadyAddedEdges.contains(nodePair)) {
-            return;
+            return Set.of();
         }
         alreadyAddedEdges.add(nodePair);
         IntersectionVertex startEndpoint = handler.getVertexForOsmNode(node, area.parent);
         IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nextNode, area.parent);
 
-        createSegments(startEndpoint, endEndpoint, List.of(area), edgeList, edges);
+        return createSegments(startEndpoint, endEndpoint, List.of(area), edgeList);
     }
 
-    private void createSegments(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
-            Collection<Area> areas, AreaEdgeList edgeList, Set<Edge> edges
+    private Set<Edge> createSegments(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
+            Collection<Area> areas, AreaEdgeList edgeList
     ) {
         List<Area> intersects = new ArrayList<Area>();
 
@@ -421,7 +423,7 @@ public class WalkableAreaBuilder {
         }
         if (intersects.size() == 0) {
             // apparently our intersection here was bogus
-            return;
+            return Set.of();
         }
         // do we need to recurse?
         if (intersects.size() == 1) {
@@ -456,7 +458,6 @@ public class WalkableAreaBuilder {
             }
 
             street.setStreetClass(cls);
-            edges.add(street);
 
             label = "way (area) " + areaEntity.getId() + " from " + endEndpoint.getLabel() + " to "
                     + startEndpoint.getLabel();
@@ -475,15 +476,15 @@ public class WalkableAreaBuilder {
             }
 
             backStreet.setStreetClass(cls);
-            edges.add(backStreet);
 
             WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
             handler.applyWayProperties(street, backStreet, wayData, areaEntity);
-
+            return Set.of(street, backStreet);
         } else {
             // take the part that intersects with the start vertex
             Coordinate startCoordinate = startEndpoint.getCoordinate();
             Point startPoint = geometryFactory.createPoint(startCoordinate);
+            Set<Edge> edges = new HashSet<>();
             for (Area area : intersects) {
                 MultiPolygon polygon = area.jtsMultiPolygon;
                 if (!(polygon.intersects(startPoint) || polygon.getBoundary()
@@ -524,12 +525,13 @@ public class WalkableAreaBuilder {
                                 + edgeCoordinate, edgeCoordinate.x, edgeCoordinate.y);
                         areaBoundaryVertexForCoordinate.put(edgeCoordinate, newEndpoint);
                     }
-                    createSegments(startEndpoint, newEndpoint, List.of(area), edgeList, edges);
-                    createSegments(newEndpoint, endEndpoint, intersects, edgeList, edges);
-                    break;
+                    edges.addAll(createSegments(startEndpoint, newEndpoint, List.of(area), edgeList));
+                    edges.addAll(createSegments(newEndpoint, endEndpoint, intersects, edgeList));
+                    return edges;
                 }
             }
         }
+        return Set.of();
     }
 
     private void createNamedAreas(AreaEdgeList edgeList, Ring ring, Collection<Area> areas) {
