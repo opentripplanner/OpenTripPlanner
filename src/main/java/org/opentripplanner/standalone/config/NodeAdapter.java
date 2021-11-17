@@ -21,7 +21,6 @@ import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
@@ -174,7 +173,7 @@ public class NodeAdapter {
 
     public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
         if(!exist(paramName)) return defaultValue;
-        return arrayAsList(paramName, JsonNode::asText).stream().collect(Collectors.toSet());
+        return new HashSet<>(arrayAsList(paramName, JsonNode::asText));
     }
 
     public RequestModes asRequestModes(String paramName, RequestModes defaultValue) {
@@ -492,22 +491,5 @@ public class NodeAdapter {
             result.put(key, mapper.apply(node, key));
         }
         return result;
-    }
-
-    public Set<String> asStringSet(
-            String paramName,
-            Set<String> defaultValue
-    ) {
-        if (!exist(paramName)) { return Set.of(); }
-
-        JsonNode param = param(paramName);
-        if (param.isArray()) {
-            Set<String> result = new HashSet<>(param.size());
-            for (JsonNode it : param) {
-                result.add(it.asText());
-            }
-            return result;
-        }
-        return defaultValue;
     }
 }
