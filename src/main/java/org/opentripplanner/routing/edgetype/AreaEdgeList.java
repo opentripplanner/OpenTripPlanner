@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.locationtech.jts.operation.distance.DistanceOp;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -39,15 +40,24 @@ public class AreaEdgeList implements Serializable {
     public void addVertex(IntersectionVertex newVertex) {
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-        @SuppressWarnings("unchecked")
-        HashSet<IntersectionVertex> verticesCopy = (HashSet<IntersectionVertex>) vertices.clone();
-        for (IntersectionVertex v : verticesCopy) {
-            LineString newGeometry = geometryFactory.createLineString(new Coordinate[] {
-                    newVertex.getCoordinate(), v.getCoordinate() });
+        Geometry polygon = originalEdges.union(originalEdges.getBoundary());
+
+        // Due to truncating of precision in storage of the edge geometry, the new split vertex
+        // might be located just outside the area, so we calculate the point closest to the polygon
+        // for the comparison.
+        Coordinate[] nearestPoints = DistanceOp.nearestPoints(
+            polygon,
+            geometryFactory.createPoint(newVertex.getCoordinate())
+        );
+
+        for (IntersectionVertex v : visibilityVertices) {
+            LineString newGeometry = geometryFactory.createLineString(
+                new Coordinate[] {nearestPoints[0], v.getCoordinate() }
+            );
 
             // ensure that new edge does not leave the bounds of the original area, or
             // fall into any holes
-            if (!originalEdges.union(originalEdges.getBoundary()).buffer(0.000001).contains(newGeometry)) {
+            if (!polygon.contains(newGeometry)) {
                 continue;
             }
 

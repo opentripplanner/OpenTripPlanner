@@ -247,7 +247,6 @@ public class WalkableAreaBuilder {
                         visibilityNodes.add(node);
                         if (isStartingNode(node, osmWayIds)) {
                             startingNodes.add(node);
-
                         }
                     }
                     for (Ring innerRing : outerRing.getHoles()) {
