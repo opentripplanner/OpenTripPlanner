@@ -216,6 +216,7 @@ public class WalkableAreaBuilder {
                         Set<Edge> newEdges = createEdgesForRingSegment(edgeList, area, outerRing, i,
                                 alreadyAddedEdges);
                         edges.addAll(newEdges);
+                        ringEdges.addAll(newEdges);
                         addtoVisibilityAndStartSets(startingNodes, visibilityNodes, node);
                     }
                     for (Ring innerRing : outerRing.getHoles()) {
@@ -228,7 +229,6 @@ public class WalkableAreaBuilder {
                     }
                 }
             }
-            ringEdges.addAll(edgeList.getEdges());
             List<OSMNode> nodes = new ArrayList<OSMNode>();
             List<VLPoint> vertices = new ArrayList<VLPoint>();
             accumulateRingNodes(ring, nodes, vertices);
