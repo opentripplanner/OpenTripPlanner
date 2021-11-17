@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,8 +7,6 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -28,50 +24,20 @@ import org.locationtech.jts.geom.Polygon;
 public class AreaEdgeList implements Serializable {
     private static final long serialVersionUID = 969137349467214074L;
 
-    private ArrayList<AreaEdge> edges = new ArrayList<AreaEdge>();
-
-    private HashSet<IntersectionVertex> vertices = new HashSet<IntersectionVertex>();
+    public final HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
 
     // these are all of the original edges of the area, whether
     // or not there are corresponding OSM edges. It is used as part of a hack
     // to fix up areas after network linking.
     private Polygon originalEdges;
 
-    private List<NamedArea> areas = new ArrayList<NamedArea>();
-
-    public List<AreaEdge> getEdges() {
-        return edges;
-    }
-
-    public void setEdges(ArrayList<AreaEdge> edges) {
-        this.edges = edges;
-        for (AreaEdge edge : edges) {
-            vertices.add((IntersectionVertex) edge.getFromVertex());
-        }
-    }
-
-    public void addEdge(AreaEdge edge) {
-        edges.add(edge);
-        vertices.add((IntersectionVertex) edge.getFromVertex());
-    }
-
-    public void removeEdge(AreaEdge edge) {
-        edges.remove(edge);
-        // reconstruct vertices
-        vertices.clear();
-        for (Edge e : edges) {
-            vertices.add((IntersectionVertex) e.getFromVertex());
-        }
-    }
+    private final List<NamedArea> areas = new ArrayList<NamedArea>();
 
     /**
      * Safely add a vertex to this area. This creates edges to all other vertices unless those edges would cross one of the original edges.
      */
-    public void addVertex(IntersectionVertex newVertex, Graph graph) {
+    public void addVertex(IntersectionVertex newVertex) {
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-        if (edges.size() == 0) {
-            throw new RuntimeException("Can't add a vertex to an empty area");
-        }
 
         @SuppressWarnings("unchecked")
         HashSet<IntersectionVertex> verticesCopy = (HashSet<IntersectionVertex>) vertices.clone();
@@ -87,15 +53,14 @@ public class AreaEdgeList implements Serializable {
 
             // check to see if this splits multiple NamedAreas. This code is rather similar to
             // code in OSMGBI, but the data structures are different
-
-            createSegments(newVertex, v, areas, graph);
+            createSegments(newVertex, v, areas);
         }
 
-        vertices.add(newVertex);
+        visibilityVertices.add(newVertex);
     }
 
     private void createSegments(IntersectionVertex from, IntersectionVertex to,
-            List<NamedArea> areas, Graph graph) {
+            List<NamedArea> areas) {
 
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
@@ -122,8 +87,6 @@ public class AreaEdgeList implements Serializable {
             AreaEdge backward = new AreaEdge(to, from, (LineString) line.reverse(), area.getRawName(),
                     length, area.getPermission(), true, this);
             backward.setStreetClass(area.getStreetClass());
-            edges.add(forward);
-            edges.add(backward);
         }
     }
 
@@ -143,8 +106,8 @@ public class AreaEdgeList implements Serializable {
         return areas;
     }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        edges.trimToSize();
-        out.defaultWriteObject();
+    public void removeEdge(AreaEdge e) {
+        visibilityVertices.remove(e.getFromVertex());
+        visibilityVertices.remove(e.getToVertex());
     }
 }

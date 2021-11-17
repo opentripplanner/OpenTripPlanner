@@ -243,7 +243,7 @@ public class WalkableAreaBuilder {
                         );
                         edges.addAll(newEdges);
                         ringEdges.addAll(newEdges);
-                        // TODO: this is really needed only for convex nodes
+                        // TODO: this is really needed only for convex nodes, could be a perf optimization
                         visibilityNodes.add(node);
                         if (isStartingNode(node, osmWayIds)) {
                             startingNodes.add(node);
@@ -255,7 +255,7 @@ public class WalkableAreaBuilder {
                             OSMNode node = innerRing.nodes.get(j);
                             edges.addAll(createEdgesForRingSegment(edgeList, area, innerRing, j,
                                     alreadyAddedEdges));
-                            // TODO: this is really needed only for convex nodes
+                            // TODO: this is really needed only for convex nodes, could be a perf optimization
                             visibilityNodes.add(node);
                             if (isStartingNode(node, osmWayIds)) {
                                 startingNodes.add(node);
@@ -307,9 +307,15 @@ public class WalkableAreaBuilder {
                         edges.addAll(segments);
                         if (startingNodes.contains(nodeI)) {
                             startingVertices.add(startEndpoint);
+                            for (AreaEdge segment: segments) {
+                                segment.getArea().visibilityVertices.add(startEndpoint);
+                            }
                         }
                         if (startingNodes.contains(nodeJ)) {
                             startingVertices.add(endEndpoint);
+                            for (AreaEdge segment: segments) {
+                                segment.getArea().visibilityVertices.add(endEndpoint);
+                            }
                         }
                     }
                 }

@@ -361,7 +361,7 @@ public class VertexLinker {
       // edges that were missed by WalkableAreaBuilder
       // TODO Temporary code until we refactor the WalkableAreaBuilder (#3152)
       if (scope == Scope.PERMANENT && this.addExtraEdgesToAreas && edge instanceof AreaEdge) {
-        ((AreaEdge) edge).getArea().addVertex(v0, graph);
+        ((AreaEdge) edge).getArea().addVertex(v0);
       }
 
       // TODO Consider moving this code
