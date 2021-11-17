@@ -105,7 +105,7 @@ public class GenericEdgeUpdater {
         }
 
         EdgeDataFromGenericFile edgeGenData = new EdgeDataFromGenericFile(dataStartTime, edgeGenericDataValues);
-        streetEdge.getExtraData().add(edgeGenData);
+        streetEdge.setExtraData(edgeGenData);
 
         edgesUpdated++;
 

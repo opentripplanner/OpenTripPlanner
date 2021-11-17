@@ -35,6 +35,7 @@ import java.util.List;
 
 import static org.opentripplanner.datastore.FileType.*;
 import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
+import static org.opentripplanner.util.OTPFeature.DataOverlay;
 
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
@@ -234,14 +235,13 @@ public class GraphBuilder implements Runnable {
             );
         }
 
-        if (hasSettings) {
+        if (DataOverlay.isOn()) {
             DataSource settingsSource = dataSources.getDataSettings();
             GenericFileConfiguration configuration = GenericFileConfigurationParser.parse(settingsSource);
-            if (configuration != null) {
-                GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()), configuration);
-                EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, configuration);
-                graphBuilder.addModule(edgeUpdaterModule);
-            }
+            GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()), configuration);
+            EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, configuration);
+            graphBuilder.addModule(edgeUpdaterModule);
+
         }
 
         return graphBuilder;
