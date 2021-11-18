@@ -2626,6 +2626,9 @@ type stopAtDistanceEdge {
     cursor: String!
 }
 
+"""
+Stop that should (but not guaranteed) to exist on a route.
+"""
 type StopOnRoute {
     """
     Stop at the route. It's also possible that the stop is no longer on the route
@@ -2638,6 +2641,9 @@ type StopOnRoute {
     route: Route
 }
 
+"""
+Stop that should (but not guaranteed) to exist on a trip.
+"""
 type StopOnTrip {
     """
     Stop at the trip. It's also possible that the stop is no longer on the trip
