@@ -3,6 +3,7 @@ package org.opentripplanner.routing.stoptimes;
 import com.google.common.collect.MinMaxPriorityQueue;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -44,7 +45,7 @@ public class StopTimesHelper {
   public static List<StopTimesInPattern> stopTimesForStop(
       RoutingService routingService,
       TimetableSnapshot timetableSnapshot,
-      Stop stop,
+      StopLocation stop,
       long startTime,
       int timeRange,
       int numberOfDepartures,
@@ -143,7 +144,7 @@ public class StopTimesHelper {
    */
   public static List<StopTimesInPattern> stopTimesForStop(
       RoutingService routingService,
-      Stop stop,
+      StopLocation stop,
       ServiceDate serviceDate,
       ArrivalDeparture arrivalDeparture
   ) {
@@ -195,7 +196,7 @@ public class StopTimesHelper {
   public static List<TripTimeOnDate> stopTimesForPatternAtStop(
           RoutingService routingService,
           TimetableSnapshot timetableSnapshot,
-          Stop stop,
+          StopLocation stop,
           TripPattern pattern,
           long startTime,
           int timeRange,
@@ -226,7 +227,7 @@ public class StopTimesHelper {
   private static Queue<TripTimeOnDate> listTripTimeShortsForPatternAtStop(
       RoutingService routingService,
       TimetableSnapshot timetableSnapshot,
-      Stop stop,
+      StopLocation stop,
       TripPattern pattern,
       long startTime,
       int timeRange,

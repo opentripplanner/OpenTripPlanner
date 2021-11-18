@@ -122,7 +122,7 @@ public class TimetableSnapshot {
      *
      * TODO Find a generic way to keep all realtime indexes.
      */
-    private SetMultimap<Stop, TripPattern> patternsForStop = HashMultimap.create();
+    private SetMultimap<StopLocation, TripPattern> patternsForStop = HashMultimap.create();
     
     /**
      * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it shouldn't
@@ -377,15 +377,6 @@ public class TimetableSnapshot {
     }
 
     /**
-     * @return all TripPatterns for which we have any updated timetables created by realtime messages, including both
-     *         patterns that were in the scheduled (static) transit data and those that were added to this snapshot by
-     *         rerouted or added trips.
-     */
-    public Collection<TripPattern> getAllRealtimeTripPatterns () {
-        return timetables.keySet();
-    }
-
-    /**
      * Add the patterns to the stop index, only if they come from a modified pattern
      */
     private void addPatternToIndex(TripPattern tripPattern) {
@@ -396,11 +387,11 @@ public class TimetableSnapshot {
         }
     }
 
-    public Collection<TripPattern> getPatternsForStop(Stop stop) {
+    public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
         return patternsForStop.get(stop);
     }
 
-    public void setPatternsForStop(SetMultimap<Stop, TripPattern> patternsForStop) {
+    public void setPatternsForStop(SetMultimap<StopLocation, TripPattern> patternsForStop) {
         this.patternsForStop = patternsForStop;
     }
 }

@@ -840,8 +840,17 @@ type Geometry {
 scalar GeoJson
 
 type StopGeometries {
+    """Representation of the stop geometries as GeoJSON (https://geojson.org/)"""
     geoJson: GeoJson,
-    geometries: [Geometry]
+
+    """
+    Representation of a stop as a series of polylines.
+
+    Polygons of flex stops are represented as linear rings (lines where the first and last point are the same).
+
+    Proper stops are represented as single point "lines".
+    """
+    polylines: [Geometry]
 }
 
 input InputBanned {
@@ -2484,12 +2493,12 @@ type Stop implements Node & PlaceInterface {
     lon: Float
 
     """
-    GeoJSON representation of this stop's geometry. This is interesting for flex stops which can be
-    a polygon or a group stops either with points with polygons.
+    Representations of this stop's geometry. This is mainly interesting for flex stops which can be
+    a polygon or a group of stops either consisting of either points or polygons.
 
     Regular fixed-schedule stops return a single point.
     """
-    geoJson: GeoJson
+    geometries: StopGeometries
 
     """Stop code which is visible at the stop"""
     code: String

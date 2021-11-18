@@ -2,7 +2,7 @@ package org.opentripplanner.model;
 
 import java.util.Collection;
 import java.util.List;
-
+import java.util.TimeZone;
 import org.locationtech.jts.geom.GeometryCollection;
 
 /**
@@ -18,6 +18,10 @@ public interface StopLocation {
   /** Name of the StopLocation, if provided */
   String getName();
 
+  String getDescription();
+
+  String getUrl();
+
   /**
    * Short text or a number that identifies the location for riders. These codes are often used in
    * phone-based reservation systems to make it easier for riders to specify a particular location.
@@ -32,9 +36,19 @@ public interface StopLocation {
     return null;
   }
 
+  default TransitMode getVehicleType() { return null; }
+
+  double getLat();
+
+  double getLon();
+
+  default Station getParentStation() { return null; }
+
   default Collection<FareZone> getFareZones() {
     return List.of();
   }
+
+  default WheelChairBoarding getWheelchairBoarding() { return null; };
 
   /**
    * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
@@ -60,4 +74,5 @@ public interface StopLocation {
    */
   GeometryCollection getGeometries();
 
+  default TimeZone getTimeZone() { return null; }
 }

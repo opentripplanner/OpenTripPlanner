@@ -1,15 +1,12 @@
 package org.opentripplanner.model;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A group of stopLocations, which can share a common Stoptime
@@ -35,6 +32,26 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public String getDescription() {
+    return null;
+  }
+
+  @Override
+  public String getUrl() {
+    return null;
+  }
+
+  @Override
+  public double getLat() {
+    return geometry.getCentroid().getY();
+  }
+
+  @Override
+  public double getLon() {
+    return geometry.getCentroid().getX();
   }
 
   /**

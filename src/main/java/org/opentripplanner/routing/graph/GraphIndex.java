@@ -172,7 +172,7 @@ public class GraphIndex {
     }
 
     /** Dynamically generate the set of Routes passing though a Stop on demand. */
-    public Set<Route> getRoutesForStop(Stop stop) {
+    public Set<Route> getRoutesForStop(StopLocation stop) {
         Set<Route> routes = Sets.newHashSet();
         for (TripPattern p : getPatternsForStop(stop)) {
             routes.add(p.getRoute());
@@ -191,7 +191,7 @@ public class GraphIndex {
      * TimetableSnapshot.
      */
     public Collection<TripPattern> getPatternsForStop(
-            Stop stop,
+            StopLocation stop,
             TimetableSnapshot timetableSnapshot
     ) {
         Set<TripPattern> tripPatterns = new HashSet<>(getPatternsForStop(stop));

@@ -15,9 +15,13 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private String name;
 
+  private String description;
+
   private Geometry geometry;
 
   private String zoneId;
+
+  private String url;
 
   public FlexStopLocation(FeedScopedId id) {
     super(id);
@@ -30,6 +34,30 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public String getUrl() {
+    return url;
+  }
+
+  @Override
+  public double getLat() {
+    return geometry.getCentroid().getX();
+  }
+
+  @Override
+  public double getLon() {
+    return geometry.getCentroid().getY();
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
   }
 
   public void setName(String name) {
@@ -68,5 +96,9 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   public void setZoneId(String zoneId) {
     this.zoneId = zoneId;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 }
