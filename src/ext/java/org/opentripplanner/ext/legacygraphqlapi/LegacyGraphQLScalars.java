@@ -34,7 +34,31 @@ public class LegacyGraphQLScalars {
       })
       .build();
 
-  public static GraphQLScalarType graphQLIDScalar = GraphQLScalarType
+    public static GraphQLScalarType geoJsonScalar = GraphQLScalarType
+            .newScalar()
+            .name("GeoJson")
+            .description(
+                    "List of coordinates in an encoded polyline format (see https://developers.google.com/maps/documentation/utilities/polylinealgorithm). The value appears in JSON as a string.")
+            .coercing(new Coercing<String, String>() {
+                @Override
+                public String serialize(Object input) {
+                    return input == null ? null : input.toString();
+                }
+
+                @Override
+                public String parseValue(Object input) {
+                    return serialize(input);
+                }
+
+                @Override
+                public String parseLiteral(Object input) {
+                    if (!(input instanceof StringValue)) {return null;}
+                    return ((StringValue) input).getValue();
+                }
+            })
+            .build();
+
+    public static GraphQLScalarType graphQLIDScalar = GraphQLScalarType
       .newScalar()
       .name("ID")
       .coercing(new Coercing<Relay.ResolvedGlobalId, String>() {

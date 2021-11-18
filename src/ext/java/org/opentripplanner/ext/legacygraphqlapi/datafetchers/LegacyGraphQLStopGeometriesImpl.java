@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.legacygraphqlapi.generated;
+package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
