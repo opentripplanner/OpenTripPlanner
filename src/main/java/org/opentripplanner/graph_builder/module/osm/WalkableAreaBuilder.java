@@ -127,8 +127,7 @@ public class WalkableAreaBuilder {
         // create polygon and accumulate nodes for area
         for (Ring ring : group.outermostRings) {
 
-            AreaEdgeList edgeList = new AreaEdgeList();
-            edgeList.setOriginalEdges(ring.jtsPolygon);
+            AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon);
             // the points corresponding to concave or hole vertices
             // or those linked to ways
             HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
@@ -182,10 +181,9 @@ public class WalkableAreaBuilder {
 
         // create polygon and accumulate nodes for area
         for (Ring ring : group.outermostRings) {
-
-            AreaEdgeList edgeList = new AreaEdgeList();
             Polygon polygon = ring.jtsPolygon;
-            edgeList.setOriginalEdges(polygon);
+            AreaEdgeList edgeList = new AreaEdgeList(polygon);
+
             // the points corresponding to concave or hole vertices
             // or those linked to ways
             HashSet<OSMNode> visibilityNodes = new HashSet<OSMNode>();

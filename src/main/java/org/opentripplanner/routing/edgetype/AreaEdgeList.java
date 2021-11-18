@@ -30,9 +30,13 @@ public class AreaEdgeList implements Serializable {
     // these are all of the original edges of the area, whether
     // or not there are corresponding OSM edges. It is used as part of a hack
     // to fix up areas after network linking.
-    private Polygon originalEdges;
+    private final Polygon originalEdges;
 
     private final List<NamedArea> areas = new ArrayList<NamedArea>();
+
+    public AreaEdgeList(Polygon originalEdges) {
+        this.originalEdges = originalEdges;
+    }
 
     /**
      * Safely add a vertex to this area. This creates edges to all other vertices unless those edges would cross one of the original edges.
@@ -98,14 +102,6 @@ public class AreaEdgeList implements Serializable {
                     length, area.getPermission(), true, this);
             backward.setStreetClass(area.getStreetClass());
         }
-    }
-
-    public Polygon getOriginalEdges() {
-        return originalEdges;
-    }
-
-    public void setOriginalEdges(Polygon polygon) {
-        this.originalEdges = polygon;
     }
 
     public void addArea(NamedArea namedArea) {
