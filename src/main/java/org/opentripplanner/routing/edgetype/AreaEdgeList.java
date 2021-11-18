@@ -40,7 +40,7 @@ public class AreaEdgeList implements Serializable {
     public void addVertex(IntersectionVertex newVertex) {
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-        Geometry polygon = originalEdges.union(originalEdges.getBoundary());
+        Geometry polygon = originalEdges.union(originalEdges.getBoundary()).buffer(0.000001);
 
         // Due to truncating of precision in storage of the edge geometry, the new split vertex
         // might be located just outside the area, so we calculate the point closest to the polygon
