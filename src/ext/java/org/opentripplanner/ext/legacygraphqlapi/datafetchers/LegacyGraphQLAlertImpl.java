@@ -21,6 +21,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRouteOrTripKey;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.TranslatedString;
 
 import java.util.Collections;
@@ -117,9 +118,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations() {
     return environment -> {
       var text = getSource(environment).alertHeaderText;
-      return text instanceof TranslatedString
-          ? ((TranslatedString) text).getTranslations()
-          : Collections.emptyList();
+      return getTranslations(text);
     };
   }
 
@@ -133,9 +132,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
     return environment -> {
       var text = getSource(environment).alertDescriptionText;
-      return text instanceof TranslatedString
-              ? ((TranslatedString) text).getTranslations()
-              : Collections.emptyList();
+      return getTranslations(text);
     };
   }
 
@@ -149,9 +146,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations() {
     return environment -> {
       var url = getSource(environment).alertUrl;
-      return url instanceof TranslatedString
-              ? ((TranslatedString) url).getTranslations()
-              : Collections.emptyList();
+      return getTranslations(url);
     };
   }
 
@@ -231,5 +226,11 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   private TransitAlert getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  private Iterable<Map.Entry<String, String>> getTranslations(I18NString text) {
+    return text instanceof TranslatedString
+            ? ((TranslatedString) text).getTranslations()
+            : Collections.emptyList();
   }
 }
