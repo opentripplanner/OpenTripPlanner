@@ -7,14 +7,19 @@ import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLSeve
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRoute;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRouteOrTripKey;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.util.TranslatedString;
 
@@ -181,6 +186,43 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
       if (effectiveEndDate == null) { return null; }
       return effectiveEndDate.getTime() / 1000;
     };
+  }
+
+  @Override
+  public DataFetcher<Iterable<Object>> entities() {
+    return environment -> getSource(environment).getEntities().stream()
+            .map(entitySelector -> {
+              if (entitySelector instanceof EntitySelector.Stop) {
+                return getRoutingService(environment).getStopForId(((EntitySelector.Stop) entitySelector).stopId);
+              }
+              if (entitySelector instanceof EntitySelector.Agency) {
+                return getRoutingService(environment).getAgencyForId(((EntitySelector.Agency) entitySelector).agencyId);
+              }
+              if (entitySelector instanceof EntitySelector.Route) {
+                return getRoutingService(environment).getRouteForId(((EntitySelector.Route) entitySelector).routeId);
+              }
+              if (entitySelector instanceof EntitySelector.Trip) {
+                return getRoutingService(environment).getTripForId().get(((EntitySelector.Trip) entitySelector).tripId);
+              }
+              if (entitySelector instanceof EntitySelector.TripPattern) {
+                return getRoutingService(environment).getTripPatternForId(((EntitySelector.TripPattern) entitySelector).tripPatternId);
+              }
+              if (entitySelector instanceof EntitySelector.StopAndRoute) {
+                StopAndRouteOrTripKey stopAndRouteKey = ((EntitySelector.StopAndRoute) entitySelector).stopAndRoute;
+                Stop stop = stopAndRouteKey == null ? null : getRoutingService(environment).getStopForId(stopAndRouteKey.stop);
+                Route route = stopAndRouteKey == null ? null : getRoutingService(environment).getRouteForId(stopAndRouteKey.routeOrTrip);
+                return new LegacyGraphQLStopOnRoute(stop, route);
+              }
+              if (entitySelector instanceof EntitySelector.StopAndTrip) {
+                StopAndRouteOrTripKey stopAndTripKey = ((EntitySelector.StopAndTrip) entitySelector).stopAndTrip;
+                Stop stop = stopAndTripKey == null ? null : getRoutingService(environment).getStopForId(stopAndTripKey.stop);
+                Trip trip = stopAndTripKey == null ? null : getRoutingService(environment).getTripForId().get(stopAndTripKey.routeOrTrip);
+                return new LegacyGraphQLStopOnTrip(stop, trip);
+              }
+              return null;
+            })
+            .map(Object.class::cast)
+            .collect(Collectors.toList());
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

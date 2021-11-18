@@ -30,6 +30,8 @@ import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import graphql.relay.Connection;
 import graphql.relay.Edge;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRoute;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -101,6 +103,8 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Long> effectiveStartDate();
 
+        public DataFetcher<Iterable<Object>> entities();
+
         public DataFetcher<String> feed();
 
         public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -112,6 +116,12 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Object> stop();
 
         public DataFetcher<Trip> trip();
+    }
+
+    /**
+     * Entity related to an alert
+     */
+    public interface LegacyGraphQLAlertEntity extends TypeResolver {
     }
 
     /**
@@ -727,6 +737,20 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Object> wheelchairBoarding();
 
         public DataFetcher<String> zoneId();
+    }
+
+    public interface LegacyGraphQLStopOnRoute {
+
+        public DataFetcher<Route> route();
+
+        public DataFetcher<Object> stop();
+    }
+
+    public interface LegacyGraphQLStopOnTrip {
+
+        public DataFetcher<Object> stop();
+
+        public DataFetcher<Trip> trip();
     }
 
     /**

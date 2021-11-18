@@ -96,6 +96,9 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLBookingInfoImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLVehicleRentalStationImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLRentalVehicleImpl.class))
+          .type("AlertEntity", type -> type.typeResolver(new LegacyGraphQLAlertEntityTypeResolver()))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnRouteImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnTripImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

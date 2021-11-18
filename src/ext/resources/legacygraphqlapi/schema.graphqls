@@ -55,19 +55,43 @@ type Alert implements Node {
     Agency affected by the disruption. Note that this value is present only if the
     disruption has an effect on all operations of the agency (e.g. in case of a strike).
     """
-    agency: Agency
+    agency: Agency @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected agencies.
+       Use entities instead.
+       """
+    )
 
     """Route affected by the disruption"""
-    route: Route
+    route: Route @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected routes.
+       Use entities instead.
+       """
+    )
 
     """Trip affected by the disruption"""
-    trip: Trip
+    trip: Trip @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected trips.
+       Use entities instead.
+       """
+    )
 
     """Stop affected by the disruption"""
-    stop: Stop
+    stop: Stop @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected stops.
+       Use entities instead.
+       """
+    )
 
     """Patterns affected by the disruption"""
-    patterns: [Pattern] @deprecated(reason: "This will always return an empty list")
+    patterns: [Pattern] @deprecated(reason: "This will always return an empty list. Use entities instead.")
 
     """Header of the alert, if available"""
     alertHeaderText: String
@@ -105,6 +129,11 @@ type Alert implements Node {
     Time when this alert is not in effect anymore. Format: Unix timestamp in seconds
     """
     effectiveEndDate: Long
+
+    """
+    Entities affected by the disruption.
+    """
+    entities: [AlertEntity]
 }
 
 """Cause of a alert"""
@@ -181,6 +210,10 @@ enum AlertEffectType {
     """ACCESSIBILITY_ISSUE"""
     ACCESSIBILITY_ISSUE
 }
+
+
+"""Entity related to an alert"""
+union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip
 
 """Severity level of a alert"""
 enum AlertSeverityLevelType {
@@ -2591,6 +2624,30 @@ type stopAtDistanceEdge {
     """The item at the end of the edge"""
     node: stopAtDistance
     cursor: String!
+}
+
+type StopOnRoute {
+    """
+    Stop at the route. It's also possible that the stop is no longer on the route
+    or that the stop is null when it can no longer be found.
+    """
+    stop: Stop
+    """
+    Route which contains the stop. Route is null if it can't be found anymore.
+    """
+    route: Route
+}
+
+type StopOnTrip {
+    """
+    Stop at the trip. It's also possible that the stop is no longer on the trip
+    or that the stop is null when it can no longer be found.
+    """
+    stop: Stop
+    """
+    Trip which contains the stop. Route is null if it can't be found anymore.
+    """
+    trip: Trip
 }
 
 """

@@ -165,9 +165,9 @@ public interface EntitySelector {
   }
 
   class StopAndRouteOrTripKey {
-    private final FeedScopedId stop;
-    private final FeedScopedId routeOrTrip;
-    private final ServiceDate serviceDate;
+    public final FeedScopedId stop;
+    public final FeedScopedId routeOrTrip;
+    public final ServiceDate serviceDate;
     private final transient int hash;
 
     public StopAndRouteOrTripKey(FeedScopedId stop, FeedScopedId routeOrTrip) {
