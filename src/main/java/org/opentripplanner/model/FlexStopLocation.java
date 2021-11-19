@@ -98,6 +98,21 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     this.zoneId = zoneId;
   }
 
+  @Override
+  public boolean isPartOfStation() {
+    return false;
+  }
+
+  @Override
+  public StopTransferPriority getPriority() {
+    return null;
+  }
+
+  @Override
+  public boolean isPartOfSameStationAs(StopLocation alternativeStop) {
+    return false;
+  }
+
   public void setDescription(String description) {
     this.description = description;
   }

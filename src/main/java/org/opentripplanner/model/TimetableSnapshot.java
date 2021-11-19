@@ -381,7 +381,7 @@ public class TimetableSnapshot {
      */
     private void addPatternToIndex(TripPattern tripPattern) {
         if (tripPattern.isCreatedByRealtimeUpdater()) {
-            for (Stop stop: tripPattern.getStops()) {
+            for (var stop: tripPattern.getStops()) {
                 patternsForStop.put(stop, tripPattern);
             }
         }

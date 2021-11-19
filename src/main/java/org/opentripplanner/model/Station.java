@@ -36,7 +36,7 @@ public class Station extends TransitEntity implements StopCollection {
 
   // We serialize this class to json only for snapshot tests, and this creates cyclical structures
   @JsonBackReference
-  private final Set<Stop> childStops = new HashSet<>();
+  private final Set<StopLocation> childStops = new HashSet<>();
 
   public Station(
       FeedScopedId id,
@@ -106,7 +106,7 @@ public class Station extends TransitEntity implements StopCollection {
     return timezone;
   }
 
-  public Collection<Stop> getChildStops() {
+  public Collection<StopLocation> getChildStops() {
     return childStops;
   }
 

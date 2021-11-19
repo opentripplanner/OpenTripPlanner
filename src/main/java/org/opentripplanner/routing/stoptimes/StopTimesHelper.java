@@ -164,7 +164,7 @@ public class StopTimesHelper {
           .getRoute()
           .getAgency().getId());
       int sidx = 0;
-      for (Stop currStop : pattern.getStopPattern().getStops()) {
+      for (var currStop : pattern.getStopPattern().getStops()) {
         if (currStop == stop) {
           if(skipByPickUpDropOff(pattern, arrivalDeparture, sidx)) continue;
           for (TripTimes t : tt.getTripTimes()) {
@@ -267,7 +267,7 @@ public class StopTimesHelper {
 
       int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
       int stopIndex = 0;
-      for (Stop currStop : pattern.getStopPattern().getStops()) {
+      for (var currStop : pattern.getStopPattern().getStops()) {
         if (currStop == stop) {
 
           if (skipByPickUpDropOff(pattern, arrivalDeparture, stopIndex)) { continue; }

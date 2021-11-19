@@ -12,6 +12,7 @@ import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.issues.RepeatedStops;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
@@ -53,7 +54,7 @@ public class RepairStopTimesForEachTripOperation {
             List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
             /* Remove stoptimes without stops */
-            stopTimes.removeIf(st -> !(st.getStop() instanceof Stop));
+            stopTimes.removeIf(st -> !(st.getStop() instanceof StopLocation));
 
             /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);

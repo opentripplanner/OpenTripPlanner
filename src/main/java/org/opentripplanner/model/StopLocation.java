@@ -75,4 +75,10 @@ public interface StopLocation {
   GeometryCollection getGeometries();
 
   default TimeZone getTimeZone() { return null; }
+
+  boolean isPartOfStation();
+
+  StopTransferPriority getPriority();
+
+  boolean isPartOfSameStationAs(StopLocation alternativeStop);
 }

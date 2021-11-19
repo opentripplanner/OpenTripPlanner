@@ -11,6 +11,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
@@ -42,7 +43,7 @@ public class GraphIndex {
     // TODO: consistently key on model object or id string
     private final Map<FeedScopedId, Agency> agencyForId = Maps.newHashMap();
     private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
-    private final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
+    private final Map<FeedScopedId, StopLocation> stopForId = Maps.newHashMap();
     private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
     private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
     private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
@@ -88,7 +89,7 @@ public class GraphIndex {
                 patternForTrip.put(trip, pattern);
                 tripForId.put(trip.getId(), trip);
             }
-            for (Stop stop : pattern.getStops()) {
+            for (StopLocation stop : pattern.getStops()) {
                 patternsForStopId.put(stop, pattern);
             }
         }
@@ -108,8 +109,8 @@ public class GraphIndex {
             for (Route route : flexIndex.routeById.values()) {
                 routeForId.put(route.getId(), route);
             }
-            for (Trip trip : flexIndex.tripById.values()) {
-                tripForId.put(trip.getId(), trip);
+            for (FlexTrip flexTrip : flexIndex.tripById.values()) {
+                tripForId.put(flexTrip.getId(), flexTrip.getTrip());
             }
         }
 
@@ -155,7 +156,7 @@ public class GraphIndex {
         return agencyForId.get(id);
     }
 
-    public Stop getStopForId(FeedScopedId id) {
+    public StopLocation getStopForId(FeedScopedId id) {
         return stopForId.get(id);
     }
 
@@ -214,7 +215,7 @@ public class GraphIndex {
         return operatorForId;
     }
 
-    public Collection<Stop> getAllStops() {
+    public Collection<StopLocation> getAllStops() {
         return stopForId.values();
     }
 

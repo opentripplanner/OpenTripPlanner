@@ -28,7 +28,7 @@ public class FlexIndex {
 
   public Map<FeedScopedId, Route> routeById = new HashMap<>();
 
-  public Map<FeedScopedId, Trip> tripById = new HashMap<>();
+  public Map<FeedScopedId, FlexTrip> tripById = new HashMap<>();
 
   public FlexIndex(Graph graph) {
     for (PathTransfer transfer : graph.transfersByStop.values()) {
@@ -36,7 +36,7 @@ public class FlexIndex {
     }
     for (FlexTrip flexTrip : graph.flexTripsById.values()) {
       routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
-      tripById.put(flexTrip.getTrip().getId(), flexTrip.getTrip());
+      tripById.put(flexTrip.getTrip().getId(), flexTrip);
       for (StopLocation stop : flexTrip.getStops()) {
         if (stop instanceof FlexLocationGroup) {
           for (StopLocation stopElement : ((FlexLocationGroup) stop).getLocations()) {

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 
@@ -27,11 +28,11 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConve
  * stored in the {@link TransitLayer}.
  */
 public class StopIndexForRaptor {
-    public final List<Stop> stopsByIndex;
-    public final Map<Stop, Integer> indexByStop = new HashMap<>();
+    public final List<StopLocation> stopsByIndex;
+    public final Map<StopLocation, Integer> indexByStop = new HashMap<>();
     public final int[] stopBoardAlightCosts;
 
-    public StopIndexForRaptor(Collection<Stop> stops, TransitTuningParameters tuningParameters) {
+    public StopIndexForRaptor(Collection<StopLocation> stops, TransitTuningParameters tuningParameters) {
         this.stopsByIndex = new ArrayList<>(stops);
         initializeIndexByStop();
         this.stopBoardAlightCosts = createStopBoardAlightCosts(stopsByIndex, tuningParameters);
@@ -49,7 +50,7 @@ public class StopIndexForRaptor {
     /**
      * Create a list of stop indexes for a given list of stops.
      */
-    public int[] listStopIndexesForStops(Stop[] stops) {
+    public int[] listStopIndexesForStops(StopLocation[] stops) {
         int[] stopIndex = new int[stops.length];
 
         for (int i = 0; i < stops.length; i++) {
@@ -62,7 +63,7 @@ public class StopIndexForRaptor {
      * Create static board/alight cost for Raptor to include for each stop.
      */
     private static int[] createStopBoardAlightCosts(
-        List<Stop> stops,
+        List<StopLocation> stops,
         TransitTuningParameters tuningParams
     ) {
         if(!tuningParams.enableStopTransferPriority()) {

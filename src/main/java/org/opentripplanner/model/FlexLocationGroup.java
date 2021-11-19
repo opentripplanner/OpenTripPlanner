@@ -73,6 +73,21 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     return geometry;
   }
 
+  @Override
+  public boolean isPartOfStation() {
+    return false;
+  }
+
+  @Override
+  public StopTransferPriority getPriority() {
+    return null;
+  }
+
+  @Override
+  public boolean isPartOfSameStationAs(StopLocation alternativeStop) {
+    return false;
+  }
+
   /**
    * Adds a new location to the location group.
    * This should ONLY be used during the graph build process.

@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,17 +39,17 @@ public class TransferService implements Serializable {
     /**
      * Table which contains transfers between a trip/route and a stops
      */
-    private final Map<T2<TripTransferPoint, Stop>, ConstrainedTransfer> trip2StopTransfers;
+    private final Map<T2<TripTransferPoint, StopLocation>, ConstrainedTransfer> trip2StopTransfers;
 
     /**
      * Table which contains transfers between a stop and a trip/route
      */
-    private final Map<T2<Stop, TripTransferPoint>, ConstrainedTransfer> stop2TripTransfers;
+    private final Map<T2<StopLocation, TripTransferPoint>, ConstrainedTransfer> stop2TripTransfers;
 
     /**
      * Table which contains transfers between two stops
      */
-    private final Map<P2<Stop>, ConstrainedTransfer> stop2StopTransfers;
+    private final Map<P2<StopLocation>, ConstrainedTransfer> stop2StopTransfers;
 
     public TransferService() {
         this.constrainedTransferByToPoint = ArrayListMultimap.create();
@@ -79,8 +80,8 @@ public class TransferService implements Serializable {
 
     @Nullable
     public ConstrainedTransfer findTransfer(
-            Stop fromStop,
-            Stop toStop,
+            StopLocation fromStop,
+            StopLocation toStop,
             Trip fromTrip,
             Trip toTrip,
             int fromStopPosition,

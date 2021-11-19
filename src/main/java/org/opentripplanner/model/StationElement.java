@@ -123,8 +123,8 @@ public abstract class StationElement extends TransitEntity {
    * Return {@code true} if this stop (element) has the same parent station as the other stop
    * (element).
    */
-  public boolean isPartOfSameStationAs(StationElement other) {
-    return isPartOfStation() && parentStation.equals(other.parentStation);
+  public boolean isPartOfSameStationAs(StopLocation other) {
+    return isPartOfStation() && parentStation.equals(other.getParentStation());
   }
 
   public void setParentStation(Station parentStation) {

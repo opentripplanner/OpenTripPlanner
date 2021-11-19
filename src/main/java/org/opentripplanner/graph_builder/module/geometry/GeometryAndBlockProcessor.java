@@ -225,8 +225,8 @@ public class GeometryAndBlockProcessor {
                     }
                     TripPattern prevPattern = patternForTripTimes.get(prev);
                     TripPattern currPattern = patternForTripTimes.get(curr);
-                    Stop fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
-                    Stop toStop = currPattern.getStop(0);
+                    var fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
+                    var toStop = currPattern.getStop(0);
                     double teleportationDistance = SphericalDistanceLibrary.fastDistance(
                             fromStop.getLat(),
                             fromStop.getLon(),
