@@ -169,7 +169,7 @@ public class WalkableAreaBuilder {
         // might not be part of the visibility edges.
         Set<Edge> ringEdges = new HashSet<>();
 
-        // OSM ways that this
+        // OSM ways that this area group consists of
         Set<Long> osmWayIds = group.areas.stream()
                 .map(area -> area.parent)
                 .flatMap(osmWithTags -> osmWithTags instanceof OSMRelation
@@ -188,11 +188,14 @@ public class WalkableAreaBuilder {
             // or those linked to ways
             HashSet<OSMNode> visibilityNodes = new HashSet<OSMNode>();
             HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
+            HashSet<OsmVertex> platformLinkingVertices = new HashSet<>();
             // we need to accumulate visibility points from all contained areas
             // inside this ring, but only for shared nodes; we don't care about
             // convexity, which we'll handle for the grouped area only.
 
             GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+
+            OSMWithTags areaEntity = group.getSomeOSMObject();
 
             // we also want to fill in the edges of this area anyway, because we can,
             // and to avoid the numerical problems that they tend to cause
@@ -205,10 +208,9 @@ public class WalkableAreaBuilder {
                 Collection<OSMNode> nodes = osmdb.getStopsInArea(area.parent);
                 if (nodes != null) {
                     for (OSMNode node : nodes) {
+                        platformLinkingVertices.add(handler.getVertexForOsmNode(node, areaEntity));
                         visibilityNodes.add(node);
-                        if (isStartingNode(node, osmWayIds)) {
-                            startingNodes.add(node);
-                        }
+                        startingNodes.add(node);
                     }
                 }
 
@@ -220,13 +222,11 @@ public class WalkableAreaBuilder {
                             .filter(t -> outerRing.jtsPolygon
                                     .contains(geometryFactory.createPoint(t.getCoordinate())))
                             .collect(Collectors.toList());
+                        platformLinkingVertices.addAll(endpointsWithin);
                         for (OsmVertex v : endpointsWithin) {
                             OSMNode node = osmdb.getNode(v.nodeId);
                             visibilityNodes.add(node);
-                            if (isStartingNode(node, osmWayIds)) {
-                                startingNodes.add(node);
-
-                            }
+                            startingNodes.add(node);
                         }
                     }
 
@@ -276,8 +276,6 @@ public class WalkableAreaBuilder {
 
             createNamedAreas(edgeList, ring, group.areas);
 
-            OSMWithTags areaEntity = group.getSomeOSMObject();
-
             for (OSMNode nodeI : visibilityNodes) {
                 for (OSMNode nodeJ : visibilityNodes) {
                     P2<OSMNode> nodePair = new P2<OSMNode>(nodeI, nodeJ);
@@ -307,11 +305,17 @@ public class WalkableAreaBuilder {
                             for (AreaEdge segment: segments) {
                                 segment.getArea().visibilityVertices.add(startEndpoint);
                             }
+                            if (platformLinkingVertices.contains(startEndpoint)) {
+                                ringEdges.addAll(segments);
+                            }
                         }
                         if (startingNodes.contains(nodeJ)) {
                             startingVertices.add(endEndpoint);
                             for (AreaEdge segment: segments) {
                                 segment.getArea().visibilityVertices.add(endEndpoint);
+                            }
+                            if (platformLinkingVertices.contains(endEndpoint)) {
+                                ringEdges.addAll(segments);
                             }
                         }
                     }

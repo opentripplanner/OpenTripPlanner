@@ -111,9 +111,4 @@ public class AreaEdgeList implements Serializable {
     public List<NamedArea> getAreas() {
         return areas;
     }
-
-    public void removeEdge(AreaEdge e) {
-        visibilityVertices.remove(e.getFromVertex());
-        visibilityVertices.remove(e.getToVertex());
-    }
 }

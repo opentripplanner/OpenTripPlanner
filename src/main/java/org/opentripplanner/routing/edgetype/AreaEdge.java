@@ -6,7 +6,7 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 
-public class AreaEdge extends StreetWithElevationEdge implements EdgeWithCleanup{
+public class AreaEdge extends StreetWithElevationEdge{
     private static final long serialVersionUID = 6761687673982054612L;
     private final AreaEdgeList area;
 
@@ -19,10 +19,5 @@ public class AreaEdge extends StreetWithElevationEdge implements EdgeWithCleanup
 
     public AreaEdgeList getArea() {
         return area;
-    }
-
-    @Override
-    public void detach() {
-        area.removeEdge(this);
     }
 }
