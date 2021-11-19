@@ -138,8 +138,10 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertUrl() {
-    return environment -> getSource(environment).alertUrl.toString(
-        environment.getLocale());
+    return environment -> {
+      var alertUrl = getSource(environment).alertUrl;
+      return alertUrl == null ? null : alertUrl.toString(environment.getLocale());
+    };
   }
 
   @Override
