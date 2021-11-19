@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.airquality;
 
-import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
 import org.opentripplanner.ext.airquality.configuration.TimeUnit;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
@@ -26,6 +26,7 @@ public class GenericEdgeUpdater {
 
     private final GenericDataFile dataFile;
     private final Collection<StreetEdge> streetEdges;
+    private final DavaOverlayConfig davaOverlayConfig;
 
     private final Map<String, Array> genericVariablesData;
     private int edgesUpdated;
@@ -38,11 +39,11 @@ public class GenericEdgeUpdater {
      * @param fileConfiguration configuration for data file
      * @param streetEdges collection of all street edges to be updated
      */
-    public GenericEdgeUpdater(GenericDataFile dataFile, GenericFileConfiguration fileConfiguration, Collection<StreetEdge> streetEdges){
+    public GenericEdgeUpdater(GenericDataFile dataFile, DavaOverlayConfig fileConfiguration, Collection<StreetEdge> streetEdges){
         super();
         this.dataFile = dataFile;
         this.streetEdges = streetEdges;
-
+        this.davaOverlayConfig = fileConfiguration;
         this.edgesUpdated = 0;
 
         this.dataStartTime = calculateDataStartTime(fileConfiguration);
@@ -56,7 +57,7 @@ public class GenericEdgeUpdater {
      * @param configuration configuration
      * @return epoch milliseconds
      */
-    private long calculateDataStartTime(GenericFileConfiguration configuration) {
+    private long calculateDataStartTime(DavaOverlayConfig configuration) {
         TimeUnit timeFormat = configuration.getTimeFormat();
         Array timeArray = dataFile.getTimeArray();
         Class dataType = timeArray.getDataType().getPrimitiveClassType();
@@ -104,7 +105,7 @@ public class GenericEdgeUpdater {
             edgeGenericDataValues.put(variableValues.getKey(), averageDataValue);
         }
 
-        EdgeDataFromGenericFile edgeGenData = new EdgeDataFromGenericFile(dataStartTime, edgeGenericDataValues);
+        EdgeDataFromGenericFile edgeGenData = new EdgeDataFromGenericFile(dataStartTime, edgeGenericDataValues, davaOverlayConfig.getTimeFormat());
         streetEdge.setExtraData(edgeGenData);
 
         edgesUpdated++;

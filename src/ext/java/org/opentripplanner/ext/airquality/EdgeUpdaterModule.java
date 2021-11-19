@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.airquality;
 
 
-import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -16,15 +16,15 @@ import java.util.HashMap;
  */
 public class EdgeUpdaterModule implements GraphBuilderModule {
     private final GenericDataFile dataFile;
-    private final GenericFileConfiguration fileConfiguration;
+    private final DavaOverlayConfig fileConfiguration;
 
     /**
      * Sets the generic grid data file
      *
      * @param dataFile generic data file
-     * @param configuration corresponding configutation
+     * @param configuration corresponding configuration
      */
-    public EdgeUpdaterModule(GenericDataFile dataFile, GenericFileConfiguration configuration) {
+    public EdgeUpdaterModule(GenericDataFile dataFile, DavaOverlayConfig configuration) {
         this.dataFile = dataFile;
         this.fileConfiguration = configuration;
     }

@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.airquality;
 
+import org.opentripplanner.ext.airquality.configuration.TimeUnit;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -11,16 +13,18 @@ import java.util.Map;
 public class EdgeDataFromGenericFile implements Serializable {
     private final long dataStartTime;
     private final Map<String, float[]> variableValues;
+    private final TimeUnit timeUnit;
 
     /**
      * Sets the abstract grid data
-     *
-     * @param dataStartTime the time when the grid records start
+     *  @param dataStartTime the time when the grid records start
      * @param variableValues map of variable names and arrays of their values
+     * @param timeUnit time unit of the data overlay
      */
-    public EdgeDataFromGenericFile(long dataStartTime, Map<String, float[]> variableValues) {
+    public EdgeDataFromGenericFile(long dataStartTime, Map<String, float[]> variableValues, TimeUnit timeUnit) {
         this.dataStartTime = dataStartTime;
         this.variableValues = variableValues;
+        this.timeUnit = timeUnit;
     }
 
     /**
@@ -40,4 +44,14 @@ public class EdgeDataFromGenericFile implements Serializable {
     public Map<String, float[]> getVariableValues() {
         return variableValues;
     }
+
+    /**
+     * Gets time format of the data
+     *
+     * @return time format
+     */
+    public TimeUnit getTimeFormat() {
+        return timeUnit;
+    }
+
 }

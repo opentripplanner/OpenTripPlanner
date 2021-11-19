@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.airquality;
 
 import org.opentripplanner.ext.airquality.configuration.IndexVariable;
-import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
 import ucar.ma2.Array;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFiles;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Generic data file which is read according to graphs/*settings.json settings
+ * Generic data file which is read according to graphs/data-settings.json settings
  *
  * @author Katja Danilova
  */
@@ -35,9 +35,9 @@ public class GenericDataFile{
      * values from the .nc file
      *
      * @param file input .nc data grid file
-     * @param genericFileConfiguration settings which describe the file variables selection
+     * @param davaOverlayConfig settings which describe the file variables selection
      */
-    public GenericDataFile(File file, GenericFileConfiguration genericFileConfiguration) {
+    public GenericDataFile(File file, DavaOverlayConfig davaOverlayConfig) {
         error = null;
 
         try {
@@ -48,18 +48,18 @@ public class GenericDataFile{
 
             NetcdfFile netcdfFile = readNetcdfFile(file);
 
-            Variable time = netcdfFile.findVariable(genericFileConfiguration.getTimeVariable());
+            Variable time = netcdfFile.findVariable(davaOverlayConfig.getTimeVariable());
 
             if (time == null) {
                 error = String.format("Missing time variable from %s file", file.getAbsolutePath());
                 return;
             }
 
-            Variable latitude = netcdfFile.findVariable(genericFileConfiguration.getLatitudeVariable());
-            Variable longitude = netcdfFile.findVariable(genericFileConfiguration.getLongitudeVariable());
+            Variable latitude = netcdfFile.findVariable(davaOverlayConfig.getLatitudeVariable());
+            Variable longitude = netcdfFile.findVariable(davaOverlayConfig.getLongitudeVariable());
 
             HashMap<IndexVariable, Variable> genVariables = new HashMap<>();
-            for (IndexVariable indexVariable : genericFileConfiguration.getIndexVariables()){
+            for (IndexVariable indexVariable : davaOverlayConfig.getIndexVariables()){
                 genVariables.put(indexVariable, netcdfFile.findVariable(indexVariable.getVariable()));
                 //todo check if any vars from the configuration are missing from the file?
             }

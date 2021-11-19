@@ -40,12 +40,6 @@ public interface OtpDataStoreConfig {
     String DEFAULT_DEM_PATTERN = "(?i)\\.tiff?$";
 
     /**
-     * Match all filenames that ends with suffix {@code .nc}.
-     * The pattern is NOT Case sensitive.
-     */
-    String DEFAULT_SETTINGS_PATTERN = "(?i)settings.json$";
-
-    /**
      * The base directory on the local file-system. Used to lookup config files and all input
      * files if no URIs are found in the config.
      */
@@ -101,14 +95,6 @@ public interface OtpDataStoreConfig {
     @NotNull List<URI> netexFiles();
 
     /**
-     * Array of URIs to Settings files.
-     * <p>
-     * This parameter is optional. If {@code null} Air quality files are loaded from
-     * {@link #baseDirectory()}.
-     */
-    List<URI> settingsFiles();
-
-    /**
      * The URI to the graph object file to load and/or save.
      */
     URI graph();
@@ -150,5 +136,4 @@ public interface OtpDataStoreConfig {
      */
     Pattern demLocalFilePattern();
 
-    Pattern settingsLocalFilePattern();
 }

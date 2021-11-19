@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
 import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
-import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
@@ -85,6 +85,7 @@ public class OTPAppConstruction {
         LOG.info("Wiring up and configuring graph builder task.");
         return GraphBuilder.create(
                 config.buildConfig(),
+                config.dataOverlayConfig(),
                 graphBuilderDataSources(),
                 baseGraph
         );
@@ -108,15 +109,6 @@ public class OTPAppConstruction {
      */
     public OTPConfiguration config() {
         return config;
-    }
-
-    /**
-     * Return configuration file for extra data provided by .nc file
-     *
-     * @return configuration for .nc file
-     */
-    public GenericFileConfiguration getGenFileConfiguration(){
-        return GenericFileConfigurationParser.parse(store().getGenericDataSettings());
     }
 
     /**

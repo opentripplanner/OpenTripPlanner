@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.airquality.configuration;
 
 /**
- * POJO class describing expected settings.json structure
+ * POJO class describing expected data-settings.json structure
  *
  * @author Katja Danilova
  */
-public class GenericFileConfiguration {
+public class DavaOverlayConfig {
     private String fileName;
     private String latitudeVariable;
     private String longitudeVariable;

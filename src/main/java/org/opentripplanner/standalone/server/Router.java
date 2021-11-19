@@ -5,7 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
-import org.opentripplanner.ext.airquality.configuration.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -33,7 +33,7 @@ public class Router {
     public final Graph graph;
     public final RouterConfig routerConfig;
     public final RaptorConfig<TripSchedule> raptorConfig;
-    public GenericFileConfiguration genericFileConfiguration;
+    public DavaOverlayConfig davaOverlayConfig;
 
     /**
      *  Separate logger for incoming requests. This should be handled with a Logback logger
@@ -60,20 +60,11 @@ public class Router {
         this.graph = graph;
         this.routerConfig = routerConfig;
         this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters());
-
     }
 
-    /**
-     * Additional constructor which allows to initialize the Router with extra request settings from settings.json
-     * data sourc and build the route based on the request parameters + extra data previously appended to the streetEdges
-     *
-     * @param graph graph
-     * @param routerConfig router configuration
-     * @param genericFileConfiguration configuration for .nc file data
-     */
-    public Router(Graph graph, RouterConfig routerConfig, GenericFileConfiguration genericFileConfiguration) {
+    public Router(Graph graph, RouterConfig routerConfig, DavaOverlayConfig davaOverlayConfig) {
         this(graph, routerConfig);
-        this.genericFileConfiguration = genericFileConfiguration;
+        this.davaOverlayConfig = davaOverlayConfig;
     }
 
     /*

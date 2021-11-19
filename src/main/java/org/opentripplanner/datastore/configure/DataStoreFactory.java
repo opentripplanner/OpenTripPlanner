@@ -73,8 +73,7 @@ public class DataStoreFactory {
                         config.gtfsLocalFilePattern(),
                         config.netexLocalFilePattern(),
                         config.osmLocalFilePattern(),
-                        config.demLocalFilePattern(),
-                        config.settingsLocalFilePattern()
+                        config.demLocalFilePattern()
             )
         );
 

@@ -591,7 +591,7 @@ public class StreetEdge extends Edge implements Cloneable {
         s1.incrementWeight(weight);
 
         /*
-         * If traverse mode is WALK or BICYCLE and the request contains the parameters from settings.json
+         * If traverse mode is WALK or BICYCLE and the request contains the parameters from data-settings.json
          * then the weight is updated based on additional parameters (like air quality)
          * Weight is increased for each quality parameter defined in the request.
          */
@@ -615,7 +615,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
 
                     //calculate time format based on the input file settings
-                    TimeUnit selectedTimeUnit = options.genericFileConfiguration.getTimeFormat();
+                    TimeUnit selectedTimeUnit = extraData.getTimeFormat();
                     Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
                     int dataQualityRequestedTime;
                     if (selectedTimeUnit == TimeUnit.SECONDS) {
@@ -636,7 +636,9 @@ public class StreetEdge extends Edge implements Cloneable {
                             }
 
                             totalPenalty += calculatePenaltyFromParameters(penaltyFormulaString, value, thresholdPenaltyPair.getKey(),
-                              thresholdPenaltyPair.getValue());
+                                thresholdPenaltyPair.getValue());
+                        } else {
+                            LOG.warn("No available data overlay for the given time");
                         }
                     }
                 }
@@ -658,16 +660,14 @@ public class StreetEdge extends Edge implements Cloneable {
      * @return penalty
      */
     private double calculatePenaltyFromParameters (String formula, float value, RequestParameters threshold, RequestParameters penalty){
+        if (threshold == null || penalty == null || threshold.getValue() == null || penalty.getValue() == null) {
+            return 0.0;
+        }
+
         Map<String, Double> variables = new HashMap<>();
 
-        if (threshold != null && threshold.getValue() != null) {
-            variables.put("THRESHOLD", Double.parseDouble(threshold.getValue()));
-        }
-
-        if (penalty != null && penalty.getValue() != null) {
-            variables.put("PENALTY", Double.parseDouble(penalty.getValue()));
-        }
-
+        variables.put("THRESHOLD", Double.parseDouble(threshold.getValue()));
+        variables.put("PENALTY", Double.parseDouble(penalty.getValue()));
         variables.put("VALUE", (double) value);
 
         try {

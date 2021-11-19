@@ -1,14 +1,15 @@
 package org.opentripplanner.api.common;
 
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
 import org.opentripplanner.ext.airquality.configuration.RequestParameters;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -634,15 +635,17 @@ public abstract class RoutingResource {
             }
         }
 
-        if (otpServer.getRouter().genericFileConfiguration != null) {
-            request.genericFileConfiguration = otpServer.getRouter().genericFileConfiguration;
-            request.genericGridDataRequestParam = GenericFileConfigurationParser.parseConfParam(this.otpServer.getRouter().genericFileConfiguration);
-            for (Map.Entry<RequestParameters, RequestParameters> genParam : request.genericGridDataRequestParam.entrySet()) {
-                RequestParameters thresholdEmpty = genParam.getKey();
-                RequestParameters penaltyEmpty = genParam.getValue();
-                thresholdEmpty.setValue(requestParameters.get(thresholdEmpty.getName()));
-                penaltyEmpty.setValue(requestParameters.get(penaltyEmpty.getName()));
-            }
+
+         if (OTPFeature.DataOverlay.isOn() && otpServer.getRouter().davaOverlayConfig != null) {
+            request.genericGridDataRequestParam = GenericFileConfigurationParser.parseConfParam(this.otpServer.getRouter().davaOverlayConfig);
+             if (request.genericGridDataRequestParam != null) {
+                 for (Map.Entry<RequestParameters, RequestParameters> genParam : request.genericGridDataRequestParam.entrySet()) {
+                     RequestParameters thresholdEmpty = genParam.getKey();
+                     RequestParameters penaltyEmpty = genParam.getValue();
+                     thresholdEmpty.setValue(requestParameters.get(thresholdEmpty.getName()));
+                     penaltyEmpty.setValue(requestParameters.get(penaltyEmpty.getName()));
+                 }
+             }
         }
 
         if(searchWindow != null) {
