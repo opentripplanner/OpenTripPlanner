@@ -61,9 +61,7 @@ public class Router {
         this.routerConfig = routerConfig;
         this.raptorConfig = new RaptorConfig<>(
             routerConfig.raptorTuningParameters(),
-            OTPFeature.ActuatorAPI.isOn()
-                ? ActuatorAPI.prometheusRegistry
-                : Metrics.globalRegistry
+            Metrics.globalRegistry
         );
     }
 

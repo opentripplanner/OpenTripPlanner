@@ -8,6 +8,7 @@ import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.schema.GraphQLSchema;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import java.util.List;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
@@ -51,7 +52,7 @@ class TransmodelGraph {
         Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
         if (OTPFeature.ActuatorAPI.isOn()) {
             instrumentation = new ChainedInstrumentation(
-                new MicrometerGraphQLInstrumentation(ActuatorAPI.prometheusRegistry, tracingTags),
+                new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, tracingTags),
                 instrumentation
             );
         }

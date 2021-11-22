@@ -16,6 +16,7 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
@@ -116,7 +117,7 @@ class LegacyGraphQLIndex {
 
     if (OTPFeature.ActuatorAPI.isOn()) {
       instrumentation = new ChainedInstrumentation(
-              new MicrometerGraphQLInstrumentation(ActuatorAPI.prometheusRegistry, List.of()),
+              new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, List.of()),
               instrumentation
       );
     }

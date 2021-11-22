@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.actuator;
 
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.cache.GuavaCacheMetrics;
 import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;
@@ -39,61 +40,18 @@ public class ActuatorAPI {
 
     private static final Logger LOG = LoggerFactory.getLogger(ActuatorAPI.class);
 
-    public static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
+    private static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
             PrometheusConfig.DEFAULT
     );
+
+    static {
+        Metrics.globalRegistry.add(prometheusRegistry);
+    }
 
     private final Router router;
 
     public ActuatorAPI(@Context OTPServer otpServer) {
         this.router = otpServer.getRouter();
-
-        new ClassLoaderMetrics().bindTo(prometheusRegistry);
-        new FileDescriptorMetrics().bindTo(prometheusRegistry);
-        new JvmCompilationMetrics().bindTo(prometheusRegistry);
-        new JvmGcMetrics().bindTo(prometheusRegistry);
-        new JvmHeapPressureMetrics().bindTo(prometheusRegistry);
-        new JvmInfoMetrics().bindTo(prometheusRegistry);
-        new JvmMemoryMetrics().bindTo(prometheusRegistry);
-        new JvmThreadMetrics().bindTo(prometheusRegistry);
-        new LogbackMetrics().bindTo(prometheusRegistry);
-        new ProcessorMetrics().bindTo(prometheusRegistry);
-        new UptimeMetrics().bindTo(prometheusRegistry);
-
-        new GuavaCacheMetrics(
-                otpServer.getRouter().graph
-                        .getTransitLayer().getTransferCache().getTransferCache(),
-                "raptorTransfersCache",
-                List.of(Tag.of("cache", "raptorTransfers"))
-        ).bindTo(prometheusRegistry);
-
-        new ExecutorServiceMetrics(
-                ForkJoinPool.commonPool(),
-                "commonPool",
-                List.of(Tag.of("pool", "commonPool"))
-        ).bindTo(prometheusRegistry);
-
-        if (otpServer.getRouter().graph.updaterManager != null) {
-            new ExecutorServiceMetrics(
-                    otpServer.getRouter().graph.updaterManager.getUpdaterPool(),
-                    "graphUpdaters",
-                    List.of(Tag.of("pool", "graphUpdaters"))
-            ).bindTo(prometheusRegistry);
-
-            new ExecutorServiceMetrics(
-                    otpServer.getRouter().graph.updaterManager.getScheduler(),
-                    "graphUpdateScheduler",
-                    List.of(Tag.of("pool", "graphUpdateScheduler"))
-            ).bindTo(prometheusRegistry);
-        }
-
-        if (otpServer.getRouter().raptorConfig.isMultiThreaded()) {
-            new ExecutorServiceMetrics(
-                    otpServer.getRouter().raptorConfig.threadPool(),
-                    "raptorHeuristics",
-                    List.of(Tag.of("pool", "raptorHeuristics"))
-            ).bindTo(prometheusRegistry);
-        }
     }
 
     /**

@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.server;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.jersey2.server.DefaultJerseyTagsProvider;
 import io.micrometer.jersey2.server.MetricsApplicationEventListener;
 import org.glassfish.jersey.CommonProperties;
@@ -10,7 +11,6 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -92,7 +92,7 @@ public class OTPApplication extends Application {
 
         if (OTPFeature.ActuatorAPI.isOn()) {
             singletons.add(new MetricsApplicationEventListener(
-                    ActuatorAPI.prometheusRegistry,
+                    Metrics.globalRegistry,
                     new DefaultJerseyTagsProvider(),
                     "http.server.requests",
                     true

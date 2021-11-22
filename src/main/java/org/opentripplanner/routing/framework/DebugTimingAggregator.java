@@ -24,13 +24,8 @@ public class DebugTimingAggregator {
 
   private static final long nanosToMillis = 1000000;
 
-  public static final Clock clock = OTPFeature.ActuatorAPI.isOn()
-          ? ActuatorAPI.prometheusRegistry.config().clock()
-          : Clock.SYSTEM;
-
-  private static final MeterRegistry registry = OTPFeature.ActuatorAPI.isOn()
-          ? ActuatorAPI.prometheusRegistry
-          : Metrics.globalRegistry;
+  private static final Clock clock = Clock.SYSTEM;
+  private static final MeterRegistry registry = Metrics.globalRegistry;
 
   private static final Timer directStreetRouterTimer = Timer.builder("routing.directStreet").register(registry);
   private static final Timer directFlexRouterTimer =  Timer.builder("routing.directFlex").register(registry);
