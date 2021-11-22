@@ -380,7 +380,7 @@ public class TimetableHelper {
         List<StopLocation> modifiedStops = new ArrayList<>();
 
         for (int i = 0; i < stops.length; i++) {
-            var stop = stops[i];
+            StopLocation stop = stops[i];
 
             boolean foundMatch = false;
             if (i < recordedCalls.size()) {

@@ -3,7 +3,6 @@ package org.opentripplanner.model;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -157,5 +156,9 @@ public class StopPattern implements Serializable {
 
     public PickDrop getDropoff(int i) {
         return dropoffs[i];
+    }
+
+    public boolean isFlexStop(int i) {
+        return stops[i] instanceof FlexStopLocation;
     }
 }

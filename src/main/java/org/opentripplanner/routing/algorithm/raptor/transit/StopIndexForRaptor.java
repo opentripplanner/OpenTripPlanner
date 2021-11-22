@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
@@ -17,7 +16,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConve
  * <p>
  * Raptor uses an integer index to reference stops. This is not the stop id, but just a
  * sequence number - an index. Hence we don´t care about the order - as long as the order does
- * not change. Raptor reference stops as integers for performance reasons, it never access
+ * not change. Raptor reference stops as integers for performance reasons, it never accesses
  * stops, it does not need to. The returned itineraries from Raptor contain stop indexes, not
  * references to stops, so OTP must maintain the stop index.
  * <p>

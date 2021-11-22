@@ -90,7 +90,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     }
 
     /**
-     * Convinience method to get the route traverse mode, the mode for all trips in this pattern.
+     * Convenience method to get the route traverse mode, the mode for all trips in this pattern.
      */
     public final TransitMode getMode() {
         return route.getMode();
@@ -205,22 +205,17 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     /** Returns whether passengers can alight at a given stop */
     public boolean canAlight(int stopIndex) {
-        return stopPattern.getDropoff(stopIndex).isRoutable();
+        return (!stopPattern.isFlexStop(stopIndex)) && stopPattern.getDropoff(stopIndex).isRoutable();
     }
 
     /** Returns whether passengers can board at a given stop */
     public boolean canBoard(int stopIndex) {
-        return stopPattern.getPickup(stopIndex).isRoutable();
+        return (!stopPattern.isFlexStop(stopIndex)) && stopPattern.getPickup(stopIndex).isRoutable();
     }
 
     /** Returns whether a given stop is wheelchair-accessible. */
     public boolean wheelchairAccessible(int stopIndex) {
         return stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-    }
-
-    /** Returns the zone of a given stop */
-    public String getZone(int stopIndex) {
-        return getStop(stopIndex).getFirstZoneAsString();
     }
 
     public PickDrop getAlightType(int stopIndex) {

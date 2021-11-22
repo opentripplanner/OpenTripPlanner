@@ -374,7 +374,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   ) {
       Object source = environment.getSource();
       if (source instanceof StopLocation) {
-        return stopTFunction.apply((Stop) source);
+        return stopTFunction.apply((StopLocation) source);
       }
       else if (source instanceof Station) {
         return stationTFunction.apply((Station) source);

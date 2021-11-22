@@ -111,7 +111,9 @@ public class GraphIndex {
             }
             for (FlexTrip flexTrip : flexIndex.tripById.values()) {
                 tripForId.put(flexTrip.getId(), flexTrip.getTrip());
+                flexTrip.getStops().stream().forEach(stop -> stopForId.put(stop.getId(), stop));
             }
+
         }
 
         LOG.info("GraphIndex init complete.");

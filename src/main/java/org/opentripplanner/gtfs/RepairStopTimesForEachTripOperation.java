@@ -3,6 +3,8 @@ package org.opentripplanner.gtfs;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.HopSpeedFast;
@@ -62,7 +64,10 @@ public class RepairStopTimesForEachTripOperation {
                 issueStore.add(new RepeatedStops(trip, removedStopSequences));
             }
             filterStopTimes(stopTimes);
-            interpolateStopTimes(stopTimes);
+
+            if(!FlexTrip.isFlexTrip(stopTimes)) {
+                interpolateStopTimes(stopTimes);
+            }
 
             stopTimesByTrip.replace(trip, stopTimes);
         }
