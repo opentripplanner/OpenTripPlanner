@@ -87,7 +87,7 @@ class StopAndStationMapper {
         // were deleted in never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
-                addNewStopToParentIfNotPresent(quay, station, fareZones);
+                addNewStopToParentIfNotPresent(quay, station, fareZones, stopPlace);
             }
         }
     }
@@ -144,7 +144,8 @@ class StopAndStationMapper {
     private void addNewStopToParentIfNotPresent(
         Quay quay,
         Station station,
-        Collection<FareZone> fareZones
+        Collection<FareZone> fareZones,
+        StopPlace stopPlace
     ) {
         // TODO OTP2 - This assumtion is only valid because Norway have a
         //           - national stop register, we should add all stops/quays
@@ -157,7 +158,7 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones);
+        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, stopPlace);
         if (stop == null) return;
 
         station.addChildStop(stop);
