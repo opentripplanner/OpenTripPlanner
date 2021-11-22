@@ -2,20 +2,10 @@ package org.opentripplanner.api.mapping;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.api.model.ApiBookingInfo;
-import org.opentripplanner.api.model.ApiBookingTime;
-import org.opentripplanner.api.model.ApiContactInfo;
 import org.opentripplanner.api.model.ApiLeg;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.BookingTime;
-import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.model.plan.Leg;
 
 public class LegMapper {
@@ -23,12 +13,14 @@ public class LegMapper {
     private final StreetNoteMaperMapper streetNoteMaperMapper;
     private final AlertMapper alertMapper;
     private final PlaceMapper placeMapper;
+    private final boolean addIntermediateStops;
 
-    public LegMapper(Locale locale) {
+    public LegMapper(Locale locale, boolean addIntermediateStops) {
         this.walkStepMapper = new WalkStepMapper(locale);
         this.streetNoteMaperMapper = new StreetNoteMaperMapper(locale);
         this.alertMapper = new AlertMapper(locale);
         this.placeMapper = new PlaceMapper(locale);
+        this.addIntermediateStops = addIntermediateStops;
     }
 
     public List<ApiLeg> mapLegs(List<Leg> domain) {
@@ -103,7 +95,9 @@ public class LegMapper {
         api.headsign = domain.headsign;
         api.serviceDate = ServiceDateMapper.mapToApi(domain.serviceDate);
         api.routeBrandingUrl = domain.routeBrandingUrl;
-        api.intermediateStops = placeMapper.mapStopArrivals(domain.intermediateStops);
+        if(addIntermediateStops) {
+            api.intermediateStops = placeMapper.mapStopArrivals(domain.intermediateStops);
+        }
         api.legGeometry = domain.legGeometry;
         api.steps = walkStepMapper.mapWalkSteps(domain.walkSteps);
         api.alerts = concatenateAlerts(

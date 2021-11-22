@@ -1,23 +1,21 @@
-package org.opentripplanner.routing.impl;
-
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.opentripplanner.routing.fares.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.WrappedCurrency;
+import org.opentripplanner.routing.fares.FareService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 enum NycFareState {
 	INIT, 
@@ -84,10 +82,10 @@ public class NycFareServiceImpl implements FareService {
 	public NycFareServiceImpl() { }
 
 	@Override
-	public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
+	public Fare getCost(Itinerary itinerary) {
 
 		// Use custom ride-categorizing method instead of the usual mapper from default fare service.
-		List<Ride> rides = createRides(path, transitLayer);
+		List<Ride> rides = createRides(itinerary);
 
 		// There are no rides, so there's no fare.
 		if (rides.size() == 0) {
@@ -308,47 +306,55 @@ public class NycFareServiceImpl implements FareService {
 		return fare;
 	}
 
-	private static List<Ride> createRides (Path<TripSchedule> path, TransitLayer transitLayer) {
-		List<Ride> rides = new ArrayList<>();
-		for (PathLeg<TripSchedule> leg = path.accessLeg(); ! leg.isEgressLeg(); leg = leg.nextLeg()) {
-			if (leg.isTransferLeg()) {
-				Ride ride = new Ride();
-				ride.classifier = NycRideClassifier.WALK;
-				rides.add(ride);
-				continue;
-			} else if (leg.isTransitLeg()) {
-				Ride ride = RideMapper.rideForTransitPathLeg(leg.asTransitLeg(), transitLayer);
-				// It seems like we should do something more sophisticated than just ignore
-				// agency IDs we don't recognize.
-				if (!AGENCIES.contains(ride.agency)) {
-					continue;
-				}
-				TripPattern tripPattern = leg.asTransitLeg().trip().getOriginalTripPattern();
-				Route route = tripPattern.getRoute();
-				int routeType = route.getType();
-				// Note the old implementation directly used the ints as classifiers here.
-				if (routeType == 1) {
-					ride.classifier = NycRideClassifier.SUBWAY;
-				} else if (routeType == 2) {
-					// All rail is Staten Island Railway? This won't work for LIRR and MNRR.
-					ride.classifier = NycRideClassifier.SIR;
-				} else if (routeType == 3) {
-					ride.classifier = NycRideClassifier.LOCAL_BUS;
-				}
-				String shortName = route.getShortName();
-				if (shortName == null ) {
-					ride.classifier = NycRideClassifier.SUBWAY;
-				} else if (shortName.equals("BxM4C")) {
-					ride.classifier = NycRideClassifier.EXPENSIVE_EXPRESS_BUS;
-				} else if (shortName.startsWith("X")
-						|| shortName.startsWith("BxM")
-						|| shortName.startsWith("QM")
-						|| shortName.startsWith("BM")) {
-					ride.classifier = NycRideClassifier.EXPRESS_BUS;
-				}
+	private static List<Ride> createRides(Itinerary itinerary) {
+		return itinerary.legs.stream()
+				.map(leg -> mapToRide(itinerary, leg))
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+	}
+
+	private static Ride mapToRide(Itinerary itinerary, Leg leg) {
+		// It seems like we should do something more sophisticated than just ignore
+		// agency IDs we don't recognize.
+		if (!AGENCIES.contains(leg.getAgency().getId().getFeedId())) {
+			return null;
+		} else if (isTransferLeg(leg, itinerary)) {
+			Ride ride = new Ride();
+			ride.classifier = NycRideClassifier.WALK;
+			return ride;
+		} else if (leg.isTransitLeg()) {
+
+			Ride ride = RideMapper.rideForTransitPathLeg(leg);
+			Route route = leg.getRoute();
+			int routeType = route.getType();
+
+			// Note the old implementation directly used the ints as classifiers here.
+			if (routeType == 1) {
+				ride.classifier = NycRideClassifier.SUBWAY;
+			} else if (routeType == 2) {
+				// All rail is Staten Island Railway? This won't work for LIRR and MNRR.
+				ride.classifier = NycRideClassifier.SIR;
+			} else if (routeType == 3) {
+				ride.classifier = NycRideClassifier.LOCAL_BUS;
 			}
+			String shortName = route.getShortName();
+			if (shortName == null ) {
+				ride.classifier = NycRideClassifier.SUBWAY;
+			} else if (shortName.equals("BxM4C")) {
+				ride.classifier = NycRideClassifier.EXPENSIVE_EXPRESS_BUS;
+			} else if (shortName.startsWith("X")
+					|| shortName.startsWith("BxM")
+					|| shortName.startsWith("QM")
+					|| shortName.startsWith("BM")) {
+				ride.classifier = NycRideClassifier.EXPRESS_BUS;
+			}
+			return ride;
 		}
-		return rides;
+		return null;
+	}
+
+	private static boolean isTransferLeg(Leg leg, Itinerary itinerary) {
+		return !itinerary.firstLeg().equals(leg) && !itinerary.lastLeg().equals(leg) && leg.isWalkingLeg();
 	}
 
 	private static List<FeedScopedId> makeMtaStopList(String... stops) {

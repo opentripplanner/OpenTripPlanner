@@ -1,15 +1,12 @@
-package org.opentripplanner.routing.fares;
-
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.transit.raptor.api.path.Path;
+package org.opentripplanner.routing.fares.impl;
 
 import java.io.Serializable;
 import java.util.List;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.routing.fares.FareService;
 
 public class AddingMultipleFareService implements FareService, Serializable {
 
@@ -22,12 +19,12 @@ public class AddingMultipleFareService implements FareService, Serializable {
     }
 
     @Override
-    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary) {
 
         Fare fare = null;
 
         for (FareService subService : subServices) {
-            Fare subFare = subService.getCost(path, transitLayer);
+            Fare subFare = subService.getCost(itinerary);
             if (subFare == null) {
                 // No fare, next one please
                 continue;

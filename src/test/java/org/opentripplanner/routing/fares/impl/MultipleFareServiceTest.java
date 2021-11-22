@@ -1,37 +1,39 @@
-package org.opentripplanner.routing.fares;
+package org.opentripplanner.routing.fares.impl;
 
-import junit.framework.TestCase;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.transit.raptor.api.path.Path;
+import static graphql.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.WrappedCurrency;
+import org.opentripplanner.routing.fares.FareService;
 
 /**
  * 
  * @author laurent
  */
-public class MultipleFareServiceTest extends TestCase {
+public class MultipleFareServiceTest {
 
-    private class SimpleFareService implements FareService {
+    private static class SimpleFareService implements FareService {
 
-        private Fare fare;
+        private final Fare fare;
 
         private SimpleFareService(Fare fare) {
             this.fare = fare;
         }
 
         @Override
-        public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
+        public Fare getCost(Itinerary itin) {
             return fare;
         }
     }
 
+    @Test
     public void testAddingMultipleFareService() {
 
         Fare fare1 = new Fare();
@@ -51,42 +53,42 @@ public class MultipleFareServiceTest extends TestCase {
         fare3.addFare(FareType.student, new WrappedCurrency("EUR"), 80);
         FareService fs3 = new SimpleFareService(fare3);
 
-        AddingMultipleFareService mfs = new AddingMultipleFareService(new ArrayList<FareService>());
-        Fare fare = mfs.getCost(null, null);
+        AddingMultipleFareService mfs = new AddingMultipleFareService(new ArrayList<>());
+        Fare fare = mfs.getCost(null);
         assertNull(fare);
 
-        mfs = new AddingMultipleFareService(Arrays.asList(fs1));
-        fare = mfs.getCost(null, null);
+        mfs = new AddingMultipleFareService(List.of(fs1));
+        fare = mfs.getCost(null);
         assertEquals(100, fare.getFare(FareType.regular).getCents());
-        assertEquals(null, fare.getFare(FareType.student));
+        assertNull(fare.getFare(FareType.student));
 
-        mfs = new AddingMultipleFareService(Arrays.asList(fs2));
-        fare = mfs.getCost(null, null);
+        mfs = new AddingMultipleFareService(List.of(fs2));
+        fare = mfs.getCost(null);
         assertEquals(140, fare.getFare(FareType.regular).getCents());
         assertEquals(120, fare.getFare(FareType.student).getCents());
 
         mfs = new AddingMultipleFareService(Arrays.asList(fs1, fs2));
-        fare = mfs.getCost(null, null);
+        fare = mfs.getCost(null);
         assertEquals(240, fare.getFare(FareType.regular).getCents());
         assertEquals(220, fare.getFare(FareType.student).getCents());
 
         mfs = new AddingMultipleFareService(Arrays.asList(fs2, fs1));
-        fare = mfs.getCost(null, null);
+        fare = mfs.getCost(null);
         assertEquals(240, fare.getFare(FareType.regular).getCents());
         assertEquals(220, fare.getFare(FareType.student).getCents());
 
         mfs = new AddingMultipleFareService(Arrays.asList(fs1, fs3));
-        fare = mfs.getCost(null, null);
+        fare = mfs.getCost(null);
         assertEquals(100, fare.getFare(FareType.regular).getCents());
         assertEquals(180, fare.getFare(FareType.student).getCents());
 
         mfs = new AddingMultipleFareService(Arrays.asList(fs3, fs1));
-        fare = mfs.getCost(null, null);
+        fare = mfs.getCost(null);
         assertEquals(100, fare.getFare(FareType.regular).getCents());
         assertEquals(180, fare.getFare(FareType.student).getCents());
 
         mfs = new AddingMultipleFareService(Arrays.asList(fs1, fs2, fs3));
-        fare = mfs.getCost(null, null);
+        fare = mfs.getCost(null);
         assertEquals(240, fare.getFare(FareType.regular).getCents());
         assertEquals(300, fare.getFare(FareType.student).getCents());
     }
