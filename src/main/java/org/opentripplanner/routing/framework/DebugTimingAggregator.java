@@ -96,7 +96,7 @@ public class DebugTimingAggregator {
    * Record the time when the worker initialization is done, and the direct street router starts.
    */
   public void finishedPrecalculating() {
-    precalculationTime = startedCalculating.stop(preCalculationTimer) / nanosToMillis;
+    precalculationTime = startedCalculating.stop(preCalculationTimer);
     log("┌  Routing initialization", precalculationTime);
   }
 
@@ -107,7 +107,7 @@ public class DebugTimingAggregator {
 
   /** Record the time when we finished the direct street router search. */
   public void finishedDirectStreetRouter() {
-    directStreetRouterTime = startedDirectStreetRouter.stop(directStreetRouterTimer) / nanosToMillis;
+    directStreetRouterTime = startedDirectStreetRouter.stop(directStreetRouterTimer);
   }
 
   /** Record the time when starting the direct flex router search. */
@@ -117,7 +117,7 @@ public class DebugTimingAggregator {
 
   /** Record the time when we finished the direct flex router search. */
   public void finishedDirectFlexRouter() {
-    directFlexRouterTime = startedDirectFlexRouter.stop(directFlexRouterTimer) / nanosToMillis;
+    directFlexRouterTime = startedDirectFlexRouter.stop(directFlexRouterTimer);
   }
 
   /** Record the time when starting the transit router search. */
@@ -130,7 +130,7 @@ public class DebugTimingAggregator {
    */
   public void finishedPatternFiltering() {
     finishedPatternFiltering = Timer.start(clock);
-    tripPatternFilterTime = startedTransitRouterTime.stop(tripPatternFilterTimer) / nanosToMillis;
+    tripPatternFilterTime = startedTransitRouterTime.stop(tripPatternFilterTimer);
   }
 
   public void startedAccessCalculating() {
@@ -138,7 +138,7 @@ public class DebugTimingAggregator {
   }
 
   public void finishedAccessCalculating() {
-    accessTime = startedAccessCalculating.stop(accessTimer) / nanosToMillis;
+    accessTime = startedAccessCalculating.stop(accessTimer);
   }
 
   public void startedEgressCalculating() {
@@ -146,7 +146,7 @@ public class DebugTimingAggregator {
   }
 
   public void finishedEgressCalculating() {
-    egressTime = startedEgressCalculating.stop(egressTimer) / nanosToMillis;
+    egressTime = startedEgressCalculating.stop(egressTimer);
   }
 
   /**
@@ -154,7 +154,7 @@ public class DebugTimingAggregator {
    */
   public void finishedAccessEgress(int numAccesses, int numEgresses) {
     finishedAccessEgress = Timer.start(clock);
-    accessEgressTime = finishedPatternFiltering.stop(accessEgressTimer) / nanosToMillis;
+    accessEgressTime = finishedPatternFiltering.stop(accessEgressTimer);
     this.numAccesses = numAccesses;
     numAccessesDistribution.record(numAccesses);
     this.numEgresses = numEgresses;
@@ -166,23 +166,23 @@ public class DebugTimingAggregator {
    */
   public void finishedRaptorSearch() {
     finishedRaptorSearch = Timer.start(clock);
-    raptorSearchTime = finishedAccessEgress.stop(raptorSearchTimer) / nanosToMillis;
+    raptorSearchTime = finishedAccessEgress.stop(raptorSearchTimer);
   }
 
   /**
    * Record the time when we have created internal itinerary objects from the raptor responses.
    */
   public void finishedItineraryCreation() {
-    itineraryCreationTime = finishedRaptorSearch.stop(itineraryCreationTimer) / nanosToMillis;
+    itineraryCreationTime = finishedRaptorSearch.stop(itineraryCreationTimer);
   }
 
   /** Record the time when we finished the transit router search */
   public void finishedTransitRouter() {
-    transitRouterTime = startedTransitRouterTime.stop(transitRouterTimer) / nanosToMillis;
+    transitRouterTime = startedTransitRouterTime.stop(transitRouterTimer);
   }
 
   public void finishedRouting() {
-    long routingTotalTime = startedCalculating.stop(routingTotalTimer) / nanosToMillis;
+    long routingTotalTime = startedCalculating.stop(routingTotalTimer);
 
     finishedRouters = Timer.start(clock);
     if (directStreetRouterTime > 0) {
@@ -207,15 +207,15 @@ public class DebugTimingAggregator {
   /** Record the time when we finished filtering the paths for this request. */
   public void finishedFiltering() {
     finishedFiltering = Timer.start(clock);
-    filteringTime = finishedRouters.stop(filteringTimer) / nanosToMillis;
+    filteringTime = finishedRouters.stop(filteringTimer);
     log("├  Filtering itineraries", filteringTime);
   }
 
   /** Record the time when we finished converting the internal model to API classes */
   @SuppressWarnings("Convert2MethodRef")
   public DebugOutput finishedRendering() {
-    renderingTime =  finishedFiltering.stop(renderingTimer) / nanosToMillis;
-    requestTotalTime = startedCalculating.stop(requestTotalTimer) / nanosToMillis;
+    renderingTime =  finishedFiltering.stop(renderingTimer);
+    requestTotalTime = startedCalculating.stop(requestTotalTimer);
     log("├  Converting model objects", renderingTime);
     log("┴  Request total", requestTotalTime);
     messages.forEach(m -> LOG.debug(m));
@@ -241,7 +241,7 @@ public class DebugTimingAggregator {
     );
   }
 
-  private void log(String msg, long millis) {
-    messages.add(String.format("%-36s: %5s ms", msg, millis));
+  private void log(String msg, long nanos) {
+    messages.add(String.format("%-36s: %5s ms", msg, nanos / nanosToMillis));
   }
 }
