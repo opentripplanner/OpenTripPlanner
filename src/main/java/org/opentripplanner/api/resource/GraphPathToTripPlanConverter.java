@@ -285,7 +285,7 @@ public abstract class GraphPathToTripPlanConverter {
                     nextLeg = legs.get(nextIndex);
                 }
                 currentLeg.accessibilityScore =
-                        computeAccessibilityScore(trip, currentLeg, nextLeg, states[i][0].getOptions());
+                        computeAccessibilityScore(trip, currentLeg, nextLeg, request);
             }
             else if (currentLeg.mode.equals("WALK") && request.wheelchairAccessible) {
                 currentLeg.accessibilityScore = 0.5f;
