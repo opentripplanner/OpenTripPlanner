@@ -104,7 +104,7 @@ public class AlertsUpdateHandler {
                 stopId = informed.getStopId();
             }
 
-            String agencyId = informed.getAgencyId();
+            String agencyId = null;
             if (informed.hasAgencyId()) {
                 agencyId = informed.getAgencyId().intern();
             }
